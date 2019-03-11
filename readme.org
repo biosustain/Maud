@@ -1,0 +1,8 @@
+A repository for Stan models of ecoli glycolysis, based on data from this
+paper:
+
+- Millard, P., Smallbone, K., & Mendes, P. (2017). Metabolic regulation is
+  sufficient for global and robust coordination of glucose uptake, catabolism,
+  energy production and growth in Escherichia coli. PLOS Computational Biology,
+  13(2), 1005396. http://dx.doi.org/10.1371/journal.pcbi.1005396
+ 
