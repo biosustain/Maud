@@ -1,4 +1,3 @@
-#include kinetics.stan
 vector steady_state_equation(vector species, vector kinetic_parameters, real[] known_reals, int[] known_ints){
   // fixed numbers
   real MG = 1;
