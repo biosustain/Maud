@@ -210,7 +210,7 @@ real flux_PFK(real ATP, real F6P, real FDP, real KefrADP, real KefrPEP, real Kef
   return numerator / denominator;
 }
 
-real flux_PGI_1(real G6P, real F6P, real Keq, real KmF6P, real KmG6P, real KmPEP,
+real flux_PGI_1(real G6P, real F6P, real Keq, real KmF6P, real KmG6P,
                 real KmPEP, real KmPGN, real PEP, real PGN, real Vmax){
   real numerator = Vmax*(G6P-F6P/Keq)/KmG6P;
   real denominator = (1+F6P/KmF6P+G6P/KmG6P+PEP/KmPEP+PGN/KmPGN);
