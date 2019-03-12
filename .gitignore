@@ -1,0 +1,2 @@
+*__pycache__*
+data/cached_stan_models/*.pkl
