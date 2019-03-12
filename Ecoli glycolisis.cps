@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!-- generated with COPASI 4.24 (Build 197) (http://www.copasi.org) at 2019-03-11 13:09:06 UTC -->
+<!-- generated with COPASI 4.24 (Build 197) (http://www.copasi.org) at 2019-03-12 12:42:45 UTC -->
 <?oxygen RNGSchema="http://www.copasi.org/static/schema/CopasiML.rng" type="xml"?>
 <COPASI xmlns="http://www.copasi.org/static/schema" versionMajor="4" versionMinor="24" versionDevel="197" copasiSourcesModified="0">
   <ListOfFunctions>
@@ -374,30 +374,6 @@ Reaction scheme where the products are created from the reactants and the change
         <ParameterDescription key="FunctionParameter_470" name="Vmax" order="5" role="constant"/>
       </ListOfParameterDescriptions>
     </Function>
-    <Function key="Function_49" name="Function for F6P_GAP_TAL" type="UserDefined" reversible="true">
-      <MiriamAnnotation>
-<rdf:RDF xmlns:dcterms="http://purl.org/dc/terms/" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
-  <rdf:Description rdf:about="#Function_49">
-    <dcterms:created>
-      <rdf:Description>
-        <dcterms:W3CDTF>2014-12-29T22:00:25Z</dcterms:W3CDTF>
-      </rdf:Description>
-    </dcterms:created>
-  </rdf:Description>
-</rdf:RDF>
-      </MiriamAnnotation>
-      <Expression>
-        kcat*(GAP*talC3-F6P*tal/Keq)
-      </Expression>
-      <ListOfParameterDescriptions>
-        <ParameterDescription key="FunctionParameter_464" name="F6P" order="0" role="product"/>
-        <ParameterDescription key="FunctionParameter_465" name="GAP" order="1" role="substrate"/>
-        <ParameterDescription key="FunctionParameter_466" name="Keq" order="2" role="constant"/>
-        <ParameterDescription key="FunctionParameter_467" name="kcat" order="3" role="constant"/>
-        <ParameterDescription key="FunctionParameter_468" name="tal" order="4" role="product"/>
-        <ParameterDescription key="FunctionParameter_469" name="talC3" order="5" role="substrate"/>
-      </ListOfParameterDescriptions>
-    </Function>
     <Function key="Function_50" name="Function for GPM" type="UserDefined" reversible="true">
       <MiriamAnnotation>
 <rdf:RDF xmlns:dcterms="http://purl.org/dc/terms/" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
@@ -448,10 +424,10 @@ Reaction scheme where the products are created from the reactants and the change
         <ParameterDescription key="FunctionParameter_450" name="kR" order="7" role="constant"/>
       </ListOfParameterDescriptions>
     </Function>
-    <Function key="Function_53" name="Function for PGI_1" type="UserDefined" reversible="true">
+    <Function key="Function_52" name="Function for PGI_1" type="UserDefined" reversible="true">
       <MiriamAnnotation>
 <rdf:RDF xmlns:dcterms="http://purl.org/dc/terms/" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
-  <rdf:Description rdf:about="#Function_53">
+  <rdf:Description rdf:about="#Function_52">
     <dcterms:created>
       <rdf:Description>
         <dcterms:W3CDTF>2019-03-08T16:02:36Z</dcterms:W3CDTF>
@@ -464,22 +440,22 @@ Reaction scheme where the products are created from the reactants and the change
         Vmax*(G6P-F6P/Keq)/KmG6P/(1+F6P/KmF6P+G6P/KmG6P+PEP/KmPEP+PGN/KmPGN)
       </Expression>
       <ListOfParameterDescriptions>
-        <ParameterDescription key="FunctionParameter_447" name="F6P" order="0" role="product"/>
-        <ParameterDescription key="FunctionParameter_446" name="G6P" order="1" role="substrate"/>
-        <ParameterDescription key="FunctionParameter_445" name="Keq" order="2" role="constant"/>
-        <ParameterDescription key="FunctionParameter_448" name="KmF6P" order="3" role="constant"/>
-        <ParameterDescription key="FunctionParameter_449" name="KmG6P" order="4" role="constant"/>
-        <ParameterDescription key="FunctionParameter_441" name="KmPEP" order="5" role="constant"/>
-        <ParameterDescription key="FunctionParameter_440" name="KmPGN" order="6" role="constant"/>
-        <ParameterDescription key="FunctionParameter_439" name="PEP" order="7" role="modifier"/>
-        <ParameterDescription key="FunctionParameter_438" name="PGN" order="8" role="modifier"/>
-        <ParameterDescription key="FunctionParameter_437" name="Vmax" order="9" role="constant"/>
+        <ParameterDescription key="FunctionParameter_442" name="F6P" order="0" role="product"/>
+        <ParameterDescription key="FunctionParameter_443" name="G6P" order="1" role="substrate"/>
+        <ParameterDescription key="FunctionParameter_444" name="Keq" order="2" role="constant"/>
+        <ParameterDescription key="FunctionParameter_445" name="KmF6P" order="3" role="constant"/>
+        <ParameterDescription key="FunctionParameter_446" name="KmG6P" order="4" role="constant"/>
+        <ParameterDescription key="FunctionParameter_447" name="KmPEP" order="5" role="constant"/>
+        <ParameterDescription key="FunctionParameter_448" name="KmPGN" order="6" role="constant"/>
+        <ParameterDescription key="FunctionParameter_449" name="PEP" order="7" role="modifier"/>
+        <ParameterDescription key="FunctionParameter_441" name="PGN" order="8" role="modifier"/>
+        <ParameterDescription key="FunctionParameter_440" name="Vmax" order="9" role="constant"/>
       </ListOfParameterDescriptions>
     </Function>
-    <Function key="Function_54" name="Function for PTS_4_1" type="UserDefined" reversible="true">
+    <Function key="Function_53" name="Function for PTS_4_1" type="UserDefined" reversible="true">
       <MiriamAnnotation>
 <rdf:RDF xmlns:dcterms="http://purl.org/dc/terms/" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
-  <rdf:Description rdf:about="#Function_54">
+  <rdf:Description rdf:about="#Function_53">
     <dcterms:created>
       <rdf:Description>
         <dcterms:W3CDTF>2019-03-08T16:04:21Z</dcterms:W3CDTF>
@@ -492,21 +468,21 @@ Reaction scheme where the products are created from the reactants and the change
         cell*(kF*eiicbP*GLCp/(KmGLC+GLCp)-kR*eiicb*G6P/(KmG6P+G6P))
       </Expression>
       <ListOfParameterDescriptions>
-        <ParameterDescription key="FunctionParameter_485" name="G6P" order="0" role="product"/>
-        <ParameterDescription key="FunctionParameter_484" name="GLCp" order="1" role="substrate"/>
-        <ParameterDescription key="FunctionParameter_483" name="KmG6P" order="2" role="constant"/>
-        <ParameterDescription key="FunctionParameter_482" name="KmGLC" order="3" role="constant"/>
-        <ParameterDescription key="FunctionParameter_481" name="cell" order="4" role="volume"/>
-        <ParameterDescription key="FunctionParameter_480" name="eiicb" order="5" role="product"/>
-        <ParameterDescription key="FunctionParameter_479" name="eiicbP" order="6" role="substrate"/>
-        <ParameterDescription key="FunctionParameter_478" name="kF" order="7" role="constant"/>
-        <ParameterDescription key="FunctionParameter_477" name="kR" order="8" role="constant"/>
+        <ParameterDescription key="FunctionParameter_482" name="G6P" order="0" role="product"/>
+        <ParameterDescription key="FunctionParameter_481" name="GLCp" order="1" role="substrate"/>
+        <ParameterDescription key="FunctionParameter_480" name="KmG6P" order="2" role="constant"/>
+        <ParameterDescription key="FunctionParameter_479" name="KmGLC" order="3" role="constant"/>
+        <ParameterDescription key="FunctionParameter_478" name="cell" order="4" role="volume"/>
+        <ParameterDescription key="FunctionParameter_477" name="eiicb" order="5" role="product"/>
+        <ParameterDescription key="FunctionParameter_476" name="eiicbP" order="6" role="substrate"/>
+        <ParameterDescription key="FunctionParameter_437" name="kF" order="7" role="constant"/>
+        <ParameterDescription key="FunctionParameter_438" name="kR" order="8" role="constant"/>
       </ListOfParameterDescriptions>
     </Function>
-    <Function key="Function_55" name="Function for ATP_MAINTENANCE_1" type="UserDefined" reversible="true">
+    <Function key="Function_54" name="Function for ATP_MAINTENANCE_1" type="UserDefined" reversible="true">
       <MiriamAnnotation>
 <rdf:RDF xmlns:dcterms="http://purl.org/dc/terms/" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
-  <rdf:Description rdf:about="#Function_55">
+  <rdf:Description rdf:about="#Function_54">
     <dcterms:created>
       <rdf:Description>
         <dcterms:W3CDTF>2019-03-08T15:57:33Z</dcterms:W3CDTF>
@@ -519,17 +495,17 @@ Reaction scheme where the products are created from the reactants and the change
         Vmax*(ATP-ADP*P/Keq)
       </Expression>
       <ListOfParameterDescriptions>
-        <ParameterDescription key="FunctionParameter_493" name="ADP" order="0" role="product"/>
-        <ParameterDescription key="FunctionParameter_492" name="ATP" order="1" role="substrate"/>
-        <ParameterDescription key="FunctionParameter_491" name="Keq" order="2" role="constant"/>
-        <ParameterDescription key="FunctionParameter_490" name="P" order="3" role="product"/>
-        <ParameterDescription key="FunctionParameter_489" name="Vmax" order="4" role="constant"/>
+        <ParameterDescription key="FunctionParameter_490" name="ADP" order="0" role="product"/>
+        <ParameterDescription key="FunctionParameter_489" name="ATP" order="1" role="substrate"/>
+        <ParameterDescription key="FunctionParameter_488" name="Keq" order="2" role="constant"/>
+        <ParameterDescription key="FunctionParameter_487" name="P" order="3" role="product"/>
+        <ParameterDescription key="FunctionParameter_486" name="Vmax" order="4" role="constant"/>
       </ListOfParameterDescriptions>
     </Function>
-    <Function key="Function_56" name="Function for XCH_RMM_1" type="UserDefined" reversible="true">
+    <Function key="Function_55" name="Function for XCH_RMM_1" type="UserDefined" reversible="true">
       <MiriamAnnotation>
 <rdf:RDF xmlns:dcterms="http://purl.org/dc/terms/" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
-  <rdf:Description rdf:about="#Function_56">
+  <rdf:Description rdf:about="#Function_55">
     <dcterms:created>
       <rdf:Description>
         <dcterms:W3CDTF>2019-03-08T16:05:41Z</dcterms:W3CDTF>
@@ -542,32 +518,10 @@ Reaction scheme where the products are created from the reactants and the change
         Vmax*(GLCx/Km-GLCp/Km)/(1+GLCx/Km+GLCp/Km)
       </Expression>
       <ListOfParameterDescriptions>
-        <ParameterDescription key="FunctionParameter_494" name="GLCp" order="0" role="product"/>
-        <ParameterDescription key="FunctionParameter_476" name="GLCx" order="1" role="substrate"/>
-        <ParameterDescription key="FunctionParameter_486" name="Km" order="2" role="constant"/>
-        <ParameterDescription key="FunctionParameter_487" name="Vmax" order="3" role="constant"/>
-      </ListOfParameterDescriptions>
-    </Function>
-    <Function key="Function_57" name="Function for GL6P_HYDROLYSIS_1" type="UserDefined" reversible="true">
-      <MiriamAnnotation>
-<rdf:RDF xmlns:dcterms="http://purl.org/dc/terms/" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
-  <rdf:Description rdf:about="#Function_57">
-    <dcterms:created>
-      <rdf:Description>
-        <dcterms:W3CDTF>2019-03-08T15:58:38Z</dcterms:W3CDTF>
-      </rdf:Description>
-    </dcterms:created>
-  </rdf:Description>
-</rdf:RDF>
-      </MiriamAnnotation>
-      <Expression>
-        KGl6Phydrol*(GL6P-PGN/KeqGl6Phydrol)
-      </Expression>
-      <ListOfParameterDescriptions>
-        <ParameterDescription key="FunctionParameter_497" name="GL6P" order="0" role="substrate"/>
-        <ParameterDescription key="FunctionParameter_496" name="KGl6Phydrol" order="1" role="constant"/>
-        <ParameterDescription key="FunctionParameter_495" name="KeqGl6Phydrol" order="2" role="constant"/>
-        <ParameterDescription key="FunctionParameter_488" name="PGN" order="3" role="product"/>
+        <ParameterDescription key="FunctionParameter_491" name="GLCp" order="0" role="product"/>
+        <ParameterDescription key="FunctionParameter_439" name="GLCx" order="1" role="substrate"/>
+        <ParameterDescription key="FunctionParameter_483" name="Km" order="2" role="constant"/>
+        <ParameterDescription key="FunctionParameter_484" name="Vmax" order="3" role="constant"/>
       </ListOfParameterDescriptions>
     </Function>
   </ListOfFunctions>
@@ -597,22 +551,6 @@ Reaction scheme where the products are created from the reactants and the change
       <rdf:Bag>
         <rdf:li>
           <rdf:Description>
-            <vCard:EMAIL>kieran.smallbone@manchester.ac.uk</vCard:EMAIL>
-            <vCard:N>
-              <rdf:Description>
-                <vCard:Family>Smallbone</vCard:Family>
-                <vCard:Given>Kieran</vCard:Given>
-              </rdf:Description>
-            </vCard:N>
-            <vCard:ORG>
-              <rdf:Description>
-                <vCard:Orgname>University of Manchester</vCard:Orgname>
-              </rdf:Description>
-            </vCard:ORG>
-          </rdf:Description>
-        </rdf:li>
-        <rdf:li>
-          <rdf:Description>
             <vCard:EMAIL>pedro.mendes@manchester.ac.uk</vCard:EMAIL>
             <vCard:N>
               <rdf:Description>
@@ -639,6 +577,22 @@ Reaction scheme where the products are created from the reactants and the change
             <vCard:ORG>
               <rdf:Description>
                 <vCard:Orgname>INRA</vCard:Orgname>
+              </rdf:Description>
+            </vCard:ORG>
+          </rdf:Description>
+        </rdf:li>
+        <rdf:li>
+          <rdf:Description>
+            <vCard:EMAIL>kieran.smallbone@manchester.ac.uk</vCard:EMAIL>
+            <vCard:N>
+              <rdf:Description>
+                <vCard:Family>Smallbone</vCard:Family>
+                <vCard:Given>Kieran</vCard:Given>
+              </rdf:Description>
+            </vCard:N>
+            <vCard:ORG>
+              <rdf:Description>
+                <vCard:Orgname>University of Manchester</vCard:Orgname>
               </rdf:Description>
             </vCard:ORG>
           </rdf:Description>
@@ -768,9 +722,7 @@ energy metabolism</div>
     <ListOfMetabolites>
       <Metabolite key="Metabolite_0" name="AKG" simulationType="reactions" compartment="Compartment_0" addNoise="false">
         <MiriamAnnotation>
-<rdf:RDF
-   xmlns:dcterms="http://purl.org/dc/terms/"
-   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
+<rdf:RDF xmlns:dcterms="http://purl.org/dc/terms/" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
   <rdf:Description rdf:about="#Metabolite_0">
     <dcterms:created>
       <rdf:Description>
@@ -779,14 +731,11 @@ energy metabolism</div>
     </dcterms:created>
   </rdf:Description>
 </rdf:RDF>
-
         </MiriamAnnotation>
       </Metabolite>
       <Metabolite key="Metabolite_1" name="BPG" simulationType="reactions" compartment="Compartment_0" addNoise="false">
         <MiriamAnnotation>
-<rdf:RDF
-   xmlns:dcterms="http://purl.org/dc/terms/"
-   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
+<rdf:RDF xmlns:dcterms="http://purl.org/dc/terms/" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
   <rdf:Description rdf:about="#Metabolite_1">
     <dcterms:created>
       <rdf:Description>
@@ -795,14 +744,11 @@ energy metabolism</div>
     </dcterms:created>
   </rdf:Description>
 </rdf:RDF>
-
         </MiriamAnnotation>
       </Metabolite>
       <Metabolite key="Metabolite_2" name="DAP" simulationType="reactions" compartment="Compartment_0" addNoise="false">
         <MiriamAnnotation>
-<rdf:RDF
-   xmlns:dcterms="http://purl.org/dc/terms/"
-   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
+<rdf:RDF xmlns:dcterms="http://purl.org/dc/terms/" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
   <rdf:Description rdf:about="#Metabolite_2">
     <dcterms:created>
       <rdf:Description>
@@ -811,14 +757,11 @@ energy metabolism</div>
     </dcterms:created>
   </rdf:Description>
 </rdf:RDF>
-
         </MiriamAnnotation>
       </Metabolite>
       <Metabolite key="Metabolite_3" name="F6P" simulationType="reactions" compartment="Compartment_0" addNoise="false">
         <MiriamAnnotation>
-<rdf:RDF
-   xmlns:dcterms="http://purl.org/dc/terms/"
-   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
+<rdf:RDF xmlns:dcterms="http://purl.org/dc/terms/" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
   <rdf:Description rdf:about="#Metabolite_3">
     <dcterms:created>
       <rdf:Description>
@@ -827,14 +770,11 @@ energy metabolism</div>
     </dcterms:created>
   </rdf:Description>
 </rdf:RDF>
-
         </MiriamAnnotation>
       </Metabolite>
       <Metabolite key="Metabolite_4" name="FDP" simulationType="reactions" compartment="Compartment_0" addNoise="false">
         <MiriamAnnotation>
-<rdf:RDF
-   xmlns:dcterms="http://purl.org/dc/terms/"
-   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
+<rdf:RDF xmlns:dcterms="http://purl.org/dc/terms/" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
   <rdf:Description rdf:about="#Metabolite_4">
     <dcterms:created>
       <rdf:Description>
@@ -843,14 +783,11 @@ energy metabolism</div>
     </dcterms:created>
   </rdf:Description>
 </rdf:RDF>
-
         </MiriamAnnotation>
       </Metabolite>
       <Metabolite key="Metabolite_5" name="G6P" simulationType="reactions" compartment="Compartment_0" addNoise="false">
         <MiriamAnnotation>
-<rdf:RDF
-   xmlns:dcterms="http://purl.org/dc/terms/"
-   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
+<rdf:RDF xmlns:dcterms="http://purl.org/dc/terms/" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
   <rdf:Description rdf:about="#Metabolite_5">
     <dcterms:created>
       <rdf:Description>
@@ -859,14 +796,11 @@ energy metabolism</div>
     </dcterms:created>
   </rdf:Description>
 </rdf:RDF>
-
         </MiriamAnnotation>
       </Metabolite>
       <Metabolite key="Metabolite_6" name="GAP" simulationType="reactions" compartment="Compartment_0" addNoise="false">
         <MiriamAnnotation>
-<rdf:RDF
-   xmlns:dcterms="http://purl.org/dc/terms/"
-   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
+<rdf:RDF xmlns:dcterms="http://purl.org/dc/terms/" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
   <rdf:Description rdf:about="#Metabolite_6">
     <dcterms:created>
       <rdf:Description>
@@ -875,14 +809,11 @@ energy metabolism</div>
     </dcterms:created>
   </rdf:Description>
 </rdf:RDF>
-
         </MiriamAnnotation>
       </Metabolite>
       <Metabolite key="Metabolite_7" name="GL6P" simulationType="reactions" compartment="Compartment_0" addNoise="false">
         <MiriamAnnotation>
-<rdf:RDF
-   xmlns:dcterms="http://purl.org/dc/terms/"
-   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
+<rdf:RDF xmlns:dcterms="http://purl.org/dc/terms/" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
   <rdf:Description rdf:about="#Metabolite_7">
     <dcterms:created>
       <rdf:Description>
@@ -891,7 +822,6 @@ energy metabolism</div>
     </dcterms:created>
   </rdf:Description>
 </rdf:RDF>
-
         </MiriamAnnotation>
       </Metabolite>
       <Metabolite key="Metabolite_8" name="NAD" simulationType="reactions" compartment="Compartment_0" addNoise="false">
@@ -1088,9 +1018,7 @@ energy metabolism</div>
       </Metabolite>
       <Metabolite key="Metabolite_20" name="X5P" simulationType="reactions" compartment="Compartment_0" addNoise="false">
         <MiriamAnnotation>
-<rdf:RDF
-   xmlns:dcterms="http://purl.org/dc/terms/"
-   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
+<rdf:RDF xmlns:dcterms="http://purl.org/dc/terms/" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
   <rdf:Description rdf:about="#Metabolite_20">
     <dcterms:created>
       <rdf:Description>
@@ -1099,14 +1027,11 @@ energy metabolism</div>
     </dcterms:created>
   </rdf:Description>
 </rdf:RDF>
-
         </MiriamAnnotation>
       </Metabolite>
       <Metabolite key="Metabolite_21" name="ei" simulationType="reactions" compartment="Compartment_0" addNoise="false">
         <MiriamAnnotation>
-<rdf:RDF
-   xmlns:dcterms="http://purl.org/dc/terms/"
-   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
+<rdf:RDF xmlns:dcterms="http://purl.org/dc/terms/" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
   <rdf:Description rdf:about="#Metabolite_21">
     <dcterms:created>
       <rdf:Description>
@@ -1115,14 +1040,11 @@ energy metabolism</div>
     </dcterms:created>
   </rdf:Description>
 </rdf:RDF>
-
         </MiriamAnnotation>
       </Metabolite>
       <Metabolite key="Metabolite_22" name="eiP" simulationType="reactions" compartment="Compartment_0" addNoise="false">
         <MiriamAnnotation>
-<rdf:RDF
-   xmlns:dcterms="http://purl.org/dc/terms/"
-   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
+<rdf:RDF xmlns:dcterms="http://purl.org/dc/terms/" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
   <rdf:Description rdf:about="#Metabolite_22">
     <dcterms:created>
       <rdf:Description>
@@ -1131,14 +1053,11 @@ energy metabolism</div>
     </dcterms:created>
   </rdf:Description>
 </rdf:RDF>
-
         </MiriamAnnotation>
       </Metabolite>
       <Metabolite key="Metabolite_23" name="eiia" simulationType="reactions" compartment="Compartment_0" addNoise="false">
         <MiriamAnnotation>
-<rdf:RDF
-   xmlns:dcterms="http://purl.org/dc/terms/"
-   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
+<rdf:RDF xmlns:dcterms="http://purl.org/dc/terms/" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
   <rdf:Description rdf:about="#Metabolite_23">
     <dcterms:created>
       <rdf:Description>
@@ -1147,14 +1066,11 @@ energy metabolism</div>
     </dcterms:created>
   </rdf:Description>
 </rdf:RDF>
-
         </MiriamAnnotation>
       </Metabolite>
       <Metabolite key="Metabolite_24" name="eiiaP" simulationType="reactions" compartment="Compartment_0" addNoise="false">
         <MiriamAnnotation>
-<rdf:RDF
-   xmlns:dcterms="http://purl.org/dc/terms/"
-   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
+<rdf:RDF xmlns:dcterms="http://purl.org/dc/terms/" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
   <rdf:Description rdf:about="#Metabolite_24">
     <dcterms:created>
       <rdf:Description>
@@ -1163,14 +1079,11 @@ energy metabolism</div>
     </dcterms:created>
   </rdf:Description>
 </rdf:RDF>
-
         </MiriamAnnotation>
       </Metabolite>
       <Metabolite key="Metabolite_25" name="eiicb" simulationType="reactions" compartment="Compartment_0" addNoise="false">
         <MiriamAnnotation>
-<rdf:RDF
-   xmlns:dcterms="http://purl.org/dc/terms/"
-   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
+<rdf:RDF xmlns:dcterms="http://purl.org/dc/terms/" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
   <rdf:Description rdf:about="#Metabolite_25">
     <dcterms:created>
       <rdf:Description>
@@ -1179,14 +1092,11 @@ energy metabolism</div>
     </dcterms:created>
   </rdf:Description>
 </rdf:RDF>
-
         </MiriamAnnotation>
       </Metabolite>
       <Metabolite key="Metabolite_26" name="eiicbP" simulationType="reactions" compartment="Compartment_0" addNoise="false">
         <MiriamAnnotation>
-<rdf:RDF
-   xmlns:dcterms="http://purl.org/dc/terms/"
-   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
+<rdf:RDF xmlns:dcterms="http://purl.org/dc/terms/" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
   <rdf:Description rdf:about="#Metabolite_26">
     <dcterms:created>
       <rdf:Description>
@@ -1195,14 +1105,11 @@ energy metabolism</div>
     </dcterms:created>
   </rdf:Description>
 </rdf:RDF>
-
         </MiriamAnnotation>
       </Metabolite>
       <Metabolite key="Metabolite_27" name="hpr" simulationType="reactions" compartment="Compartment_0" addNoise="false">
         <MiriamAnnotation>
-<rdf:RDF
-   xmlns:dcterms="http://purl.org/dc/terms/"
-   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
+<rdf:RDF xmlns:dcterms="http://purl.org/dc/terms/" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
   <rdf:Description rdf:about="#Metabolite_27">
     <dcterms:created>
       <rdf:Description>
@@ -1211,14 +1118,11 @@ energy metabolism</div>
     </dcterms:created>
   </rdf:Description>
 </rdf:RDF>
-
         </MiriamAnnotation>
       </Metabolite>
       <Metabolite key="Metabolite_28" name="hprP" simulationType="reactions" compartment="Compartment_0" addNoise="false">
         <MiriamAnnotation>
-<rdf:RDF
-   xmlns:dcterms="http://purl.org/dc/terms/"
-   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
+<rdf:RDF xmlns:dcterms="http://purl.org/dc/terms/" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
   <rdf:Description rdf:about="#Metabolite_28">
     <dcterms:created>
       <rdf:Description>
@@ -1227,46 +1131,11 @@ energy metabolism</div>
     </dcterms:created>
   </rdf:Description>
 </rdf:RDF>
-
-        </MiriamAnnotation>
-      </Metabolite>
-      <Metabolite key="Metabolite_29" name="tal" simulationType="reactions" compartment="Compartment_0" addNoise="false">
-        <MiriamAnnotation>
-<rdf:RDF
-   xmlns:dcterms="http://purl.org/dc/terms/"
-   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
-  <rdf:Description rdf:about="#Metabolite_29">
-    <dcterms:created>
-      <rdf:Description>
-        <dcterms:W3CDTF>2013-10-01T10:37:13Z</dcterms:W3CDTF>
-      </rdf:Description>
-    </dcterms:created>
-  </rdf:Description>
-</rdf:RDF>
-
-        </MiriamAnnotation>
-      </Metabolite>
-      <Metabolite key="Metabolite_30" name="talC3" simulationType="reactions" compartment="Compartment_0" addNoise="false">
-        <MiriamAnnotation>
-<rdf:RDF
-   xmlns:dcterms="http://purl.org/dc/terms/"
-   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
-  <rdf:Description rdf:about="#Metabolite_30">
-    <dcterms:created>
-      <rdf:Description>
-        <dcterms:W3CDTF>2013-10-01T10:37:13Z</dcterms:W3CDTF>
-      </rdf:Description>
-    </dcterms:created>
-  </rdf:Description>
-</rdf:RDF>
-
         </MiriamAnnotation>
       </Metabolite>
       <Metabolite key="Metabolite_31" name="ADP" simulationType="reactions" compartment="Compartment_0" addNoise="false">
         <MiriamAnnotation>
-<rdf:RDF
-   xmlns:dcterms="http://purl.org/dc/terms/"
-   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
+<rdf:RDF xmlns:dcterms="http://purl.org/dc/terms/" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
   <rdf:Description rdf:about="#Metabolite_31">
     <dcterms:created>
       <rdf:Description>
@@ -1275,7 +1144,6 @@ energy metabolism</div>
     </dcterms:created>
   </rdf:Description>
 </rdf:RDF>
-
         </MiriamAnnotation>
       </Metabolite>
       <Metabolite key="Metabolite_32" name="AMP" simulationType="reactions" compartment="Compartment_0" addNoise="false">
@@ -1293,9 +1161,7 @@ energy metabolism</div>
       </Metabolite>
       <Metabolite key="Metabolite_33" name="ATP" simulationType="reactions" compartment="Compartment_0" addNoise="false">
         <MiriamAnnotation>
-<rdf:RDF
-   xmlns:dcterms="http://purl.org/dc/terms/"
-   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
+<rdf:RDF xmlns:dcterms="http://purl.org/dc/terms/" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
   <rdf:Description rdf:about="#Metabolite_33">
     <dcterms:created>
       <rdf:Description>
@@ -1304,7 +1170,6 @@ energy metabolism</div>
     </dcterms:created>
   </rdf:Description>
 </rdf:RDF>
-
         </MiriamAnnotation>
       </Metabolite>
       <Metabolite key="Metabolite_34" name="P" simulationType="reactions" compartment="Compartment_0" addNoise="false">
@@ -1325,9 +1190,7 @@ energy metabolism</div>
       </Metabolite>
       <Metabolite key="Metabolite_35" name="MG" simulationType="fixed" compartment="Compartment_0" addNoise="false">
         <MiriamAnnotation>
-<rdf:RDF
-   xmlns:dcterms="http://purl.org/dc/terms/"
-   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
+<rdf:RDF xmlns:dcterms="http://purl.org/dc/terms/" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
   <rdf:Description rdf:about="#Metabolite_35">
     <dcterms:created>
       <rdf:Description>
@@ -1336,14 +1199,11 @@ energy metabolism</div>
     </dcterms:created>
   </rdf:Description>
 </rdf:RDF>
-
         </MiriamAnnotation>
       </Metabolite>
       <Metabolite key="Metabolite_36" name="MgADP" simulationType="assignment" compartment="Compartment_0" addNoise="false">
         <MiriamAnnotation>
-<rdf:RDF
-   xmlns:dcterms="http://purl.org/dc/terms/"
-   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
+<rdf:RDF xmlns:dcterms="http://purl.org/dc/terms/" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
   <rdf:Description rdf:about="#Metabolite_36">
     <dcterms:created>
       <rdf:Description>
@@ -1352,7 +1212,6 @@ energy metabolism</div>
     </dcterms:created>
   </rdf:Description>
 </rdf:RDF>
-
         </MiriamAnnotation>
         <Expression>
           &lt;CN=Root,Model=Millard2016 - E. coli central carbon and energy metabolism,Vector=Compartments[cell_cytoplasm],Vector=Metabolites[MG],Reference=Concentration>*&lt;CN=Root,Model=Millard2016 - E. coli central carbon and energy metabolism,Vector=Compartments[cell_cytoplasm],Vector=Metabolites[ADP],Reference=Concentration>/(&lt;CN=Root,Model=Millard2016 - E. coli central carbon and energy metabolism,Vector=Values[KdADPMg],Reference=Value>+&lt;CN=Root,Model=Millard2016 - E. coli central carbon and energy metabolism,Vector=Compartments[cell_cytoplasm],Vector=Metabolites[MG],Reference=Concentration>)
@@ -1360,9 +1219,7 @@ energy metabolism</div>
       </Metabolite>
       <Metabolite key="Metabolite_37" name="MgATP" simulationType="assignment" compartment="Compartment_0" addNoise="false">
         <MiriamAnnotation>
-<rdf:RDF
-   xmlns:dcterms="http://purl.org/dc/terms/"
-   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
+<rdf:RDF xmlns:dcterms="http://purl.org/dc/terms/" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
   <rdf:Description rdf:about="#Metabolite_37">
     <dcterms:created>
       <rdf:Description>
@@ -1371,7 +1228,6 @@ energy metabolism</div>
     </dcterms:created>
   </rdf:Description>
 </rdf:RDF>
-
         </MiriamAnnotation>
         <Expression>
           &lt;CN=Root,Model=Millard2016 - E. coli central carbon and energy metabolism,Vector=Compartments[cell_cytoplasm],Vector=Metabolites[MG],Reference=Concentration>*&lt;CN=Root,Model=Millard2016 - E. coli central carbon and energy metabolism,Vector=Compartments[cell_cytoplasm],Vector=Metabolites[ATP],Reference=Concentration>/(&lt;CN=Root,Model=Millard2016 - E. coli central carbon and energy metabolism,Vector=Values[KdATPMg],Reference=Value>+&lt;CN=Root,Model=Millard2016 - E. coli central carbon and energy metabolism,Vector=Compartments[cell_cytoplasm],Vector=Metabolites[MG],Reference=Concentration>)
@@ -1398,9 +1254,7 @@ energy metabolism</div>
       </Metabolite>
       <Metabolite key="Metabolite_39" name="GLCx" simulationType="reactions" compartment="Compartment_1" addNoise="false">
         <MiriamAnnotation>
-<rdf:RDF
-   xmlns:dcterms="http://purl.org/dc/terms/"
-   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
+<rdf:RDF xmlns:dcterms="http://purl.org/dc/terms/" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
   <rdf:Description rdf:about="#Metabolite_39">
     <dcterms:created>
       <rdf:Description>
@@ -1409,14 +1263,11 @@ energy metabolism</div>
     </dcterms:created>
   </rdf:Description>
 </rdf:RDF>
-
         </MiriamAnnotation>
       </Metabolite>
       <Metabolite key="Metabolite_40" name="GLCp" simulationType="reactions" compartment="Compartment_2" addNoise="false">
         <MiriamAnnotation>
-<rdf:RDF
-   xmlns:dcterms="http://purl.org/dc/terms/"
-   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
+<rdf:RDF xmlns:dcterms="http://purl.org/dc/terms/" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
   <rdf:Description rdf:about="#Metabolite_40">
     <dcterms:created>
       <rdf:Description>
@@ -1425,16 +1276,13 @@ energy metabolism</div>
     </dcterms:created>
   </rdf:Description>
 </rdf:RDF>
-
         </MiriamAnnotation>
       </Metabolite>
     </ListOfMetabolites>
     <ListOfModelValues>
       <ModelValue key="ModelValue_0" name="FEED" simulationType="fixed" addNoise="false">
         <MiriamAnnotation>
-<rdf:RDF
-   xmlns:dcterms="http://purl.org/dc/terms/"
-   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
+<rdf:RDF xmlns:dcterms="http://purl.org/dc/terms/" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
   <rdf:Description rdf:about="#ModelValue_0">
     <dcterms:created>
       <rdf:Description>
@@ -1443,14 +1291,11 @@ energy metabolism</div>
     </dcterms:created>
   </rdf:Description>
 </rdf:RDF>
-
         </MiriamAnnotation>
       </ModelValue>
       <ModelValue key="ModelValue_1" name="KdADPMg" simulationType="fixed" addNoise="false">
         <MiriamAnnotation>
-<rdf:RDF
-   xmlns:dcterms="http://purl.org/dc/terms/"
-   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
+<rdf:RDF xmlns:dcterms="http://purl.org/dc/terms/" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
   <rdf:Description rdf:about="#ModelValue_1">
     <dcterms:created>
       <rdf:Description>
@@ -1459,14 +1304,11 @@ energy metabolism</div>
     </dcterms:created>
   </rdf:Description>
 </rdf:RDF>
-
         </MiriamAnnotation>
       </ModelValue>
       <ModelValue key="ModelValue_2" name="KdATPMg" simulationType="fixed" addNoise="false">
         <MiriamAnnotation>
-<rdf:RDF
-   xmlns:dcterms="http://purl.org/dc/terms/"
-   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
+<rdf:RDF xmlns:dcterms="http://purl.org/dc/terms/" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
   <rdf:Description rdf:about="#ModelValue_2">
     <dcterms:created>
       <rdf:Description>
@@ -1475,7 +1317,6 @@ energy metabolism</div>
     </dcterms:created>
   </rdf:Description>
 </rdf:RDF>
-
         </MiriamAnnotation>
       </ModelValue>
       <ModelValue key="ModelValue_3" name="KdFDPMg" simulationType="fixed" addNoise="false">
@@ -1493,9 +1334,7 @@ energy metabolism</div>
       </ModelValue>
       <ModelValue key="ModelValue_4" name="KmICIT_ACN" simulationType="fixed" addNoise="false">
         <MiriamAnnotation>
-<rdf:RDF
-   xmlns:dcterms="http://purl.org/dc/terms/"
-   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
+<rdf:RDF xmlns:dcterms="http://purl.org/dc/terms/" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
   <rdf:Description rdf:about="#ModelValue_4">
     <dcterms:created>
       <rdf:Description>
@@ -1504,14 +1343,11 @@ energy metabolism</div>
     </dcterms:created>
   </rdf:Description>
 </rdf:RDF>
-
         </MiriamAnnotation>
       </ModelValue>
       <ModelValue key="ModelValue_5" name="KmCIT_ACN" simulationType="fixed" addNoise="false">
         <MiriamAnnotation>
-<rdf:RDF
-   xmlns:dcterms="http://purl.org/dc/terms/"
-   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
+<rdf:RDF xmlns:dcterms="http://purl.org/dc/terms/" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
   <rdf:Description rdf:about="#ModelValue_5">
     <dcterms:created>
       <rdf:Description>
@@ -1520,14 +1356,11 @@ energy metabolism</div>
     </dcterms:created>
   </rdf:Description>
 </rdf:RDF>
-
         </MiriamAnnotation>
       </ModelValue>
       <ModelValue key="ModelValue_6" name="KmACO_ACN" simulationType="fixed" addNoise="false">
         <MiriamAnnotation>
-<rdf:RDF
-   xmlns:dcterms="http://purl.org/dc/terms/"
-   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
+<rdf:RDF xmlns:dcterms="http://purl.org/dc/terms/" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
   <rdf:Description rdf:about="#ModelValue_6">
     <dcterms:created>
       <rdf:Description>
@@ -1536,14 +1369,11 @@ energy metabolism</div>
     </dcterms:created>
   </rdf:Description>
 </rdf:RDF>
-
         </MiriamAnnotation>
       </ModelValue>
       <ModelValue key="ModelValue_7" name="KeqNDH" simulationType="fixed" addNoise="false">
         <MiriamAnnotation>
-<rdf:RDF
-   xmlns:dcterms="http://purl.org/dc/terms/"
-   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
+<rdf:RDF xmlns:dcterms="http://purl.org/dc/terms/" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
   <rdf:Description rdf:about="#ModelValue_7">
     <dcterms:created>
       <rdf:Description>
@@ -1552,7 +1382,6 @@ energy metabolism</div>
     </dcterms:created>
   </rdf:Description>
 </rdf:RDF>
-
         </MiriamAnnotation>
       </ModelValue>
     </ListOfModelValues>
@@ -1587,36 +1416,36 @@ energy metabolism</div>
           <Constant key="Parameter_4999" name="Vmax" value="2.32456"/>
           <Constant key="Parameter_4998" name="KmPGN" value="0.515958"/>
         </ListOfConstants>
-        <KineticLaw function="Function_53" unitType="Default" scalingCompartment="CN=Root,Model=Millard2016 - E. coli central carbon and energy metabolism,Vector=Compartments[cell_cytoplasm]">
+        <KineticLaw function="Function_52" unitType="Default" scalingCompartment="CN=Root,Model=Millard2016 - E. coli central carbon and energy metabolism,Vector=Compartments[cell_cytoplasm]">
           <ListOfCallParameters>
-            <CallParameter functionParameter="FunctionParameter_447">
+            <CallParameter functionParameter="FunctionParameter_442">
               <SourceParameter reference="Metabolite_3"/>
             </CallParameter>
-            <CallParameter functionParameter="FunctionParameter_446">
+            <CallParameter functionParameter="FunctionParameter_443">
               <SourceParameter reference="Metabolite_5"/>
             </CallParameter>
-            <CallParameter functionParameter="FunctionParameter_445">
+            <CallParameter functionParameter="FunctionParameter_444">
               <SourceParameter reference="Parameter_5003"/>
             </CallParameter>
-            <CallParameter functionParameter="FunctionParameter_448">
+            <CallParameter functionParameter="FunctionParameter_445">
               <SourceParameter reference="Parameter_5002"/>
             </CallParameter>
-            <CallParameter functionParameter="FunctionParameter_449">
+            <CallParameter functionParameter="FunctionParameter_446">
               <SourceParameter reference="Parameter_5001"/>
             </CallParameter>
-            <CallParameter functionParameter="FunctionParameter_441">
+            <CallParameter functionParameter="FunctionParameter_447">
               <SourceParameter reference="Parameter_5000"/>
             </CallParameter>
-            <CallParameter functionParameter="FunctionParameter_440">
+            <CallParameter functionParameter="FunctionParameter_448">
               <SourceParameter reference="Parameter_4998"/>
             </CallParameter>
-            <CallParameter functionParameter="FunctionParameter_439">
+            <CallParameter functionParameter="FunctionParameter_449">
               <SourceParameter reference="Metabolite_11"/>
             </CallParameter>
-            <CallParameter functionParameter="FunctionParameter_438">
+            <CallParameter functionParameter="FunctionParameter_441">
               <SourceParameter reference="Metabolite_14"/>
             </CallParameter>
-            <CallParameter functionParameter="FunctionParameter_437">
+            <CallParameter functionParameter="FunctionParameter_440">
               <SourceParameter reference="Parameter_4999"/>
             </CallParameter>
           </ListOfCallParameters>
@@ -2094,8 +1923,8 @@ energy metabolism</div>
         <ListOfConstants>
           <Constant key="Parameter_4944" name="Keq" value="3"/>
           <Constant key="Parameter_4940" name="KmPEP" value="0.1"/>
-          <Constant key="Parameter_4939" name="KmPGA2" value="0.1"/>
-          <Constant key="Parameter_4943" name="Vmax" value="11.7189"/>
+          <Constant key="Parameter_4941" name="KmPGA2" value="0.1"/>
+          <Constant key="Parameter_4942" name="Vmax" value="11.7189"/>
         </ListOfConstants>
         <KineticLaw function="Function_42" unitType="Default" scalingCompartment="CN=Root,Model=Millard2016 - E. coli central carbon and energy metabolism,Vector=Compartments[cell_cytoplasm]">
           <ListOfCallParameters>
@@ -2106,7 +1935,7 @@ energy metabolism</div>
               <SourceParameter reference="Parameter_4940"/>
             </CallParameter>
             <CallParameter functionParameter="FunctionParameter_291">
-              <SourceParameter reference="Parameter_4939"/>
+              <SourceParameter reference="Parameter_4941"/>
             </CallParameter>
             <CallParameter functionParameter="FunctionParameter_290">
               <SourceParameter reference="Metabolite_11"/>
@@ -2115,7 +1944,7 @@ energy metabolism</div>
               <SourceParameter reference="Metabolite_12"/>
             </CallParameter>
             <CallParameter functionParameter="FunctionParameter_288">
-              <SourceParameter reference="Parameter_4943"/>
+              <SourceParameter reference="Parameter_4942"/>
             </CallParameter>
           </ListOfCallParameters>
         </KineticLaw>
@@ -2153,8 +1982,8 @@ energy metabolism</div>
           <Modifier metabolite="Metabolite_20" stoichiometry="1"/>
         </ListOfModifiers>
         <ListOfConstants>
-          <Constant key="Parameter_4942" name="KefrFDP" value="0.449149"/>
-          <Constant key="Parameter_4941" name="KefrG6P" value="0.158746"/>
+          <Constant key="Parameter_4943" name="KefrFDP" value="0.449149"/>
+          <Constant key="Parameter_4939" name="KefrG6P" value="0.158746"/>
           <Constant key="Parameter_4938" name="KefrGL6P" value="0.150482"/>
           <Constant key="Parameter_4937" name="KefrR5P" value="9.33254"/>
           <Constant key="Parameter_4936" name="KefrRU5P" value="1.53591"/>
@@ -2171,9 +2000,9 @@ energy metabolism</div>
           <Constant key="Parameter_4925" name="KitATP" value="0.039564"/>
           <Constant key="Parameter_4924" name="KitPEP" value="0.465672"/>
           <Constant key="Parameter_4923" name="KitPYR" value="0.2499"/>
-          <Constant key="Parameter_4920" name="KitPyrATP" value="11.3691"/>
+          <Constant key="Parameter_4922" name="KitPyrATP" value="11.3691"/>
           <Constant key="Parameter_4921" name="KmrADPMg" value="0.326144"/>
-          <Constant key="Parameter_4922" name="KmrPEP" value="5.56368e-07"/>
+          <Constant key="Parameter_4920" name="KmrPEP" value="5.56368e-07"/>
           <Constant key="Parameter_4919" name="KmtADPMg" value="0.054678"/>
           <Constant key="Parameter_4918" name="KmtPEP" value="0.11475"/>
           <Constant key="Parameter_4917" name="L0" value="50.4818"/>
@@ -2195,10 +2024,10 @@ energy metabolism</div>
               <SourceParameter reference="Metabolite_7"/>
             </CallParameter>
             <CallParameter functionParameter="FunctionParameter_425">
-              <SourceParameter reference="Parameter_4942"/>
+              <SourceParameter reference="Parameter_4943"/>
             </CallParameter>
             <CallParameter functionParameter="FunctionParameter_424">
-              <SourceParameter reference="Parameter_4941"/>
+              <SourceParameter reference="Parameter_4939"/>
             </CallParameter>
             <CallParameter functionParameter="FunctionParameter_423">
               <SourceParameter reference="Parameter_4938"/>
@@ -2249,13 +2078,13 @@ energy metabolism</div>
               <SourceParameter reference="Parameter_4923"/>
             </CallParameter>
             <CallParameter functionParameter="FunctionParameter_407">
-              <SourceParameter reference="Parameter_4920"/>
+              <SourceParameter reference="Parameter_4922"/>
             </CallParameter>
             <CallParameter functionParameter="FunctionParameter_406">
               <SourceParameter reference="Parameter_4921"/>
             </CallParameter>
             <CallParameter functionParameter="FunctionParameter_405">
-              <SourceParameter reference="Parameter_4922"/>
+              <SourceParameter reference="Parameter_4920"/>
             </CallParameter>
             <CallParameter functionParameter="FunctionParameter_404">
               <SourceParameter reference="Parameter_4919"/>
@@ -2298,53 +2127,6 @@ energy metabolism</div>
             </CallParameter>
             <CallParameter functionParameter="FunctionParameter_436">
               <SourceParameter reference="Parameter_4915"/>
-            </CallParameter>
-          </ListOfCallParameters>
-        </KineticLaw>
-      </Reaction>
-      <Reaction key="Reaction_9" name="F6P_GAP_TAL" reversible="true" fast="false" addNoise="false">
-        <MiriamAnnotation>
-<rdf:RDF xmlns:dcterms="http://purl.org/dc/terms/" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
-  <rdf:Description rdf:about="#Reaction_9">
-    <dcterms:created>
-      <rdf:Description>
-        <dcterms:W3CDTF>2013-09-27T11:53:43Z</dcterms:W3CDTF>
-      </rdf:Description>
-    </dcterms:created>
-  </rdf:Description>
-</rdf:RDF>
-        </MiriamAnnotation>
-        <ListOfSubstrates>
-          <Substrate metabolite="Metabolite_6" stoichiometry="1"/>
-          <Substrate metabolite="Metabolite_30" stoichiometry="1"/>
-        </ListOfSubstrates>
-        <ListOfProducts>
-          <Product metabolite="Metabolite_3" stoichiometry="1"/>
-          <Product metabolite="Metabolite_29" stoichiometry="1"/>
-        </ListOfProducts>
-        <ListOfConstants>
-          <Constant key="Parameter_4914" name="Keq" value="0.11011"/>
-          <Constant key="Parameter_4913" name="kcat" value="119.992"/>
-        </ListOfConstants>
-        <KineticLaw function="Function_49" unitType="Default" scalingCompartment="CN=Root,Model=Millard2016 - E. coli central carbon and energy metabolism,Vector=Compartments[cell_cytoplasm]">
-          <ListOfCallParameters>
-            <CallParameter functionParameter="FunctionParameter_464">
-              <SourceParameter reference="Metabolite_3"/>
-            </CallParameter>
-            <CallParameter functionParameter="FunctionParameter_465">
-              <SourceParameter reference="Metabolite_6"/>
-            </CallParameter>
-            <CallParameter functionParameter="FunctionParameter_466">
-              <SourceParameter reference="Parameter_4914"/>
-            </CallParameter>
-            <CallParameter functionParameter="FunctionParameter_467">
-              <SourceParameter reference="Parameter_4913"/>
-            </CallParameter>
-            <CallParameter functionParameter="FunctionParameter_468">
-              <SourceParameter reference="Metabolite_29"/>
-            </CallParameter>
-            <CallParameter functionParameter="FunctionParameter_469">
-              <SourceParameter reference="Metabolite_30"/>
             </CallParameter>
           </ListOfCallParameters>
         </KineticLaw>
@@ -2881,44 +2663,42 @@ energy metabolism</div>
           <Constant key="Parameter_4849" name="kF" value="4000"/>
           <Constant key="Parameter_4848" name="kR" value="1e-05"/>
         </ListOfConstants>
-        <KineticLaw function="Function_54" unitType="Default">
+        <KineticLaw function="Function_53" unitType="Default">
           <ListOfCallParameters>
-            <CallParameter functionParameter="FunctionParameter_485">
+            <CallParameter functionParameter="FunctionParameter_482">
               <SourceParameter reference="Metabolite_5"/>
             </CallParameter>
-            <CallParameter functionParameter="FunctionParameter_484">
+            <CallParameter functionParameter="FunctionParameter_481">
               <SourceParameter reference="Metabolite_40"/>
             </CallParameter>
-            <CallParameter functionParameter="FunctionParameter_483">
+            <CallParameter functionParameter="FunctionParameter_480">
               <SourceParameter reference="Parameter_4851"/>
             </CallParameter>
-            <CallParameter functionParameter="FunctionParameter_482">
+            <CallParameter functionParameter="FunctionParameter_479">
               <SourceParameter reference="Parameter_4850"/>
             </CallParameter>
-            <CallParameter functionParameter="FunctionParameter_481">
+            <CallParameter functionParameter="FunctionParameter_478">
               <SourceParameter reference="Compartment_0"/>
             </CallParameter>
-            <CallParameter functionParameter="FunctionParameter_480">
+            <CallParameter functionParameter="FunctionParameter_477">
               <SourceParameter reference="Metabolite_25"/>
             </CallParameter>
-            <CallParameter functionParameter="FunctionParameter_479">
+            <CallParameter functionParameter="FunctionParameter_476">
               <SourceParameter reference="Metabolite_26"/>
             </CallParameter>
-            <CallParameter functionParameter="FunctionParameter_478">
+            <CallParameter functionParameter="FunctionParameter_437">
               <SourceParameter reference="Parameter_4849"/>
             </CallParameter>
-            <CallParameter functionParameter="FunctionParameter_477">
+            <CallParameter functionParameter="FunctionParameter_438">
               <SourceParameter reference="Parameter_4848"/>
             </CallParameter>
           </ListOfCallParameters>
         </KineticLaw>
       </Reaction>
-      <Reaction key="Reaction_18" name="ATP_MAINTENANCE" reversible="true" fast="false" addNoise="false">
+      <Reaction key="Reaction_17" name="ATP_MAINTENANCE" reversible="true" fast="false" addNoise="false">
         <MiriamAnnotation>
-<rdf:RDF
-   xmlns:dcterms="http://purl.org/dc/terms/"
-   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
-  <rdf:Description rdf:about="#Reaction_18">
+<rdf:RDF xmlns:dcterms="http://purl.org/dc/terms/" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
+  <rdf:Description rdf:about="#Reaction_17">
     <dcterms:created>
       <rdf:Description>
         <dcterms:W3CDTF>2013-10-21T14:43:37Z</dcterms:W3CDTF>
@@ -2926,7 +2706,6 @@ energy metabolism</div>
     </dcterms:created>
   </rdf:Description>
 </rdf:RDF>
-
         </MiriamAnnotation>
         <ListOfSubstrates>
           <Substrate metabolite="Metabolite_33" stoichiometry="1"/>
@@ -2936,33 +2715,33 @@ energy metabolism</div>
           <Product metabolite="Metabolite_34" stoichiometry="1"/>
         </ListOfProducts>
         <ListOfConstants>
-          <Constant key="Parameter_4846" name="Vmax" value="1.30166"/>
-          <Constant key="Parameter_4845" name="Keq" value="3.63369"/>
+          <Constant key="Parameter_4847" name="Vmax" value="1.30166"/>
+          <Constant key="Parameter_4846" name="Keq" value="3.63369"/>
         </ListOfConstants>
-        <KineticLaw function="Function_55" unitType="Default" scalingCompartment="CN=Root,Model=Millard2016 - E. coli central carbon and energy metabolism,Vector=Compartments[cell_cytoplasm]">
+        <KineticLaw function="Function_54" unitType="Default" scalingCompartment="CN=Root,Model=Millard2016 - E. coli central carbon and energy metabolism,Vector=Compartments[cell_cytoplasm]">
           <ListOfCallParameters>
-            <CallParameter functionParameter="FunctionParameter_493">
+            <CallParameter functionParameter="FunctionParameter_490">
               <SourceParameter reference="Metabolite_31"/>
             </CallParameter>
-            <CallParameter functionParameter="FunctionParameter_492">
+            <CallParameter functionParameter="FunctionParameter_489">
               <SourceParameter reference="Metabolite_33"/>
             </CallParameter>
-            <CallParameter functionParameter="FunctionParameter_491">
-              <SourceParameter reference="Parameter_4845"/>
+            <CallParameter functionParameter="FunctionParameter_488">
+              <SourceParameter reference="Parameter_4846"/>
             </CallParameter>
-            <CallParameter functionParameter="FunctionParameter_490">
+            <CallParameter functionParameter="FunctionParameter_487">
               <SourceParameter reference="Metabolite_34"/>
             </CallParameter>
-            <CallParameter functionParameter="FunctionParameter_489">
-              <SourceParameter reference="Parameter_4846"/>
+            <CallParameter functionParameter="FunctionParameter_486">
+              <SourceParameter reference="Parameter_4847"/>
             </CallParameter>
           </ListOfCallParameters>
         </KineticLaw>
       </Reaction>
-      <Reaction key="Reaction_19" name="XCH_GLC" reversible="true" fast="false" addNoise="false">
+      <Reaction key="Reaction_18" name="XCH_GLC" reversible="true" fast="false" addNoise="false">
         <MiriamAnnotation>
 <rdf:RDF xmlns:dcterms="http://purl.org/dc/terms/" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
-  <rdf:Description rdf:about="#Reaction_19">
+  <rdf:Description rdf:about="#Reaction_18">
     <dcterms:created>
       <rdf:Description>
         <dcterms:W3CDTF>2013-10-23T16:07:48Z</dcterms:W3CDTF>
@@ -2978,61 +2757,22 @@ energy metabolism</div>
           <Product metabolite="Metabolite_40" stoichiometry="1"/>
         </ListOfProducts>
         <ListOfConstants>
-          <Constant key="Parameter_4844" name="Vmax" value="100"/>
-          <Constant key="Parameter_4843" name="Km" value="10"/>
+          <Constant key="Parameter_4845" name="Vmax" value="100"/>
+          <Constant key="Parameter_4844" name="Km" value="10"/>
         </ListOfConstants>
-        <KineticLaw function="Function_56" unitType="Default">
+        <KineticLaw function="Function_55" unitType="Default">
           <ListOfCallParameters>
-            <CallParameter functionParameter="FunctionParameter_494">
+            <CallParameter functionParameter="FunctionParameter_491">
               <SourceParameter reference="Metabolite_40"/>
             </CallParameter>
-            <CallParameter functionParameter="FunctionParameter_476">
+            <CallParameter functionParameter="FunctionParameter_439">
               <SourceParameter reference="Metabolite_39"/>
             </CallParameter>
-            <CallParameter functionParameter="FunctionParameter_486">
-              <SourceParameter reference="Parameter_4843"/>
-            </CallParameter>
-            <CallParameter functionParameter="FunctionParameter_487">
+            <CallParameter functionParameter="FunctionParameter_483">
               <SourceParameter reference="Parameter_4844"/>
             </CallParameter>
-          </ListOfCallParameters>
-        </KineticLaw>
-      </Reaction>
-      <Reaction key="Reaction_20" name="GL6P_HYDROLYSIS" reversible="true" fast="false" addNoise="false">
-        <MiriamAnnotation>
-<rdf:RDF xmlns:dcterms="http://purl.org/dc/terms/" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
-  <rdf:Description rdf:about="#Reaction_20">
-    <dcterms:created>
-      <rdf:Description>
-        <dcterms:W3CDTF>2015-01-22T11:03:40Z</dcterms:W3CDTF>
-      </rdf:Description>
-    </dcterms:created>
-  </rdf:Description>
-</rdf:RDF>
-        </MiriamAnnotation>
-        <ListOfSubstrates>
-          <Substrate metabolite="Metabolite_7" stoichiometry="1"/>
-        </ListOfSubstrates>
-        <ListOfProducts>
-          <Product metabolite="Metabolite_14" stoichiometry="1"/>
-        </ListOfProducts>
-        <ListOfConstants>
-          <Constant key="Parameter_4842" name="KGl6Phydrol" value="0.000167"/>
-          <Constant key="Parameter_4841" name="KeqGl6Phydrol" value="42.8"/>
-        </ListOfConstants>
-        <KineticLaw function="Function_57" unitType="Default" scalingCompartment="CN=Root,Model=Millard2016 - E. coli central carbon and energy metabolism,Vector=Compartments[cell_cytoplasm]">
-          <ListOfCallParameters>
-            <CallParameter functionParameter="FunctionParameter_497">
-              <SourceParameter reference="Metabolite_7"/>
-            </CallParameter>
-            <CallParameter functionParameter="FunctionParameter_496">
-              <SourceParameter reference="Parameter_4842"/>
-            </CallParameter>
-            <CallParameter functionParameter="FunctionParameter_495">
-              <SourceParameter reference="Parameter_4841"/>
-            </CallParameter>
-            <CallParameter functionParameter="FunctionParameter_488">
-              <SourceParameter reference="Metabolite_14"/>
+            <CallParameter functionParameter="FunctionParameter_484">
+              <SourceParameter reference="Parameter_4845"/>
             </CallParameter>
           </ListOfCallParameters>
         </KineticLaw>
@@ -3078,8 +2818,6 @@ energy metabolism</div>
           <ModelParameter cn="CN=Root,Model=Millard2016 - E. coli central carbon and energy metabolism,Vector=Compartments[cell_cytoplasm],Vector=Metabolites[eiicbP]" value="2.0633142966785149e+17" type="Species" simulationType="reactions"/>
           <ModelParameter cn="CN=Root,Model=Millard2016 - E. coli central carbon and energy metabolism,Vector=Compartments[cell_cytoplasm],Vector=Metabolites[hpr]" value="1.1515043650212757e+17" type="Species" simulationType="reactions"/>
           <ModelParameter cn="CN=Root,Model=Millard2016 - E. coli central carbon and energy metabolism,Vector=Compartments[cell_cytoplasm],Vector=Metabolites[hprP]" value="3.1621128357967836e+18" type="Species" simulationType="reactions"/>
-          <ModelParameter cn="CN=Root,Model=Millard2016 - E. coli central carbon and energy metabolism,Vector=Compartments[cell_cytoplasm],Vector=Metabolites[tal]" value="1.6747235514063363e+18" type="Species" simulationType="reactions"/>
-          <ModelParameter cn="CN=Root,Model=Millard2016 - E. coli central carbon and energy metabolism,Vector=Compartments[cell_cytoplasm],Vector=Metabolites[talC3]" value="3.4458121569610027e+19" type="Species" simulationType="reactions"/>
           <ModelParameter cn="CN=Root,Model=Millard2016 - E. coli central carbon and energy metabolism,Vector=Compartments[cell_cytoplasm],Vector=Metabolites[ADP]" value="3.6031354180883579e+20" type="Species" simulationType="reactions"/>
           <ModelParameter cn="CN=Root,Model=Millard2016 - E. coli central carbon and energy metabolism,Vector=Compartments[cell_cytoplasm],Vector=Metabolites[AMP]" value="1.1216394702819669e+20" type="Species" simulationType="reactions"/>
           <ModelParameter cn="CN=Root,Model=Millard2016 - E. coli central carbon and energy metabolism,Vector=Compartments[cell_cytoplasm],Vector=Metabolites[ATP]" value="1.5490159511281688e+21" type="Species" simulationType="reactions"/>
@@ -3209,10 +2947,6 @@ energy metabolism</div>
             <ModelParameter cn="CN=Root,Model=Millard2016 - E. coli central carbon and energy metabolism,Vector=Reactions[PYK],ParameterGroup=Parameters,Parameter=Vmax" value="0.74716000000000005" type="ReactionParameter" simulationType="fixed"/>
             <ModelParameter cn="CN=Root,Model=Millard2016 - E. coli central carbon and energy metabolism,Vector=Reactions[PYK],ParameterGroup=Parameters,Parameter=n" value="4" type="ReactionParameter" simulationType="fixed"/>
           </ModelParameterGroup>
-          <ModelParameterGroup cn="CN=Root,Model=Millard2016 - E. coli central carbon and energy metabolism,Vector=Reactions[F6P_GAP_TAL]" type="Reaction">
-            <ModelParameter cn="CN=Root,Model=Millard2016 - E. coli central carbon and energy metabolism,Vector=Reactions[F6P_GAP_TAL],ParameterGroup=Parameters,Parameter=Keq" value="0.11011" type="ReactionParameter" simulationType="fixed"/>
-            <ModelParameter cn="CN=Root,Model=Millard2016 - E. coli central carbon and energy metabolism,Vector=Reactions[F6P_GAP_TAL],ParameterGroup=Parameters,Parameter=kcat" value="119.992" type="ReactionParameter" simulationType="fixed"/>
-          </ModelParameterGroup>
           <ModelParameterGroup cn="CN=Root,Model=Millard2016 - E. coli central carbon and energy metabolism,Vector=Reactions[FBP]" type="Reaction">
             <ModelParameter cn="CN=Root,Model=Millard2016 - E. coli central carbon and energy metabolism,Vector=Reactions[FBP],ParameterGroup=Parameters,Parameter=KirAMP" value="0.0012212200000000001" type="ReactionParameter" simulationType="fixed"/>
             <ModelParameter cn="CN=Root,Model=Millard2016 - E. coli central carbon and energy metabolism,Vector=Reactions[FBP],ParameterGroup=Parameters,Parameter=KirAMPFDP" value="0.25625599999999998" type="ReactionParameter" simulationType="fixed"/>
@@ -3312,51 +3046,45 @@ energy metabolism</div>
             <ModelParameter cn="CN=Root,Model=Millard2016 - E. coli central carbon and energy metabolism,Vector=Reactions[XCH_GLC],ParameterGroup=Parameters,Parameter=Vmax" value="100" type="ReactionParameter" simulationType="fixed"/>
             <ModelParameter cn="CN=Root,Model=Millard2016 - E. coli central carbon and energy metabolism,Vector=Reactions[XCH_GLC],ParameterGroup=Parameters,Parameter=Km" value="10" type="ReactionParameter" simulationType="fixed"/>
           </ModelParameterGroup>
-          <ModelParameterGroup cn="CN=Root,Model=Millard2016 - E. coli central carbon and energy metabolism,Vector=Reactions[GL6P_HYDROLYSIS]" type="Reaction">
-            <ModelParameter cn="CN=Root,Model=Millard2016 - E. coli central carbon and energy metabolism,Vector=Reactions[GL6P_HYDROLYSIS],ParameterGroup=Parameters,Parameter=KGl6Phydrol" value="0.00016699999999999999" type="ReactionParameter" simulationType="fixed"/>
-            <ModelParameter cn="CN=Root,Model=Millard2016 - E. coli central carbon and energy metabolism,Vector=Reactions[GL6P_HYDROLYSIS],ParameterGroup=Parameters,Parameter=KeqGl6Phydrol" value="42.799999999999997" type="ReactionParameter" simulationType="fixed"/>
-          </ModelParameterGroup>
         </ModelParameterGroup>
       </ModelParameterSet>
     </ListOfModelParameterSets>
     <StateTemplate>
       <StateTemplateVariable objectReference="Model_1"/>
       <StateTemplateVariable objectReference="Metabolite_33"/>
-      <StateTemplateVariable objectReference="Metabolite_6"/>
-      <StateTemplateVariable objectReference="Metabolite_3"/>
       <StateTemplateVariable objectReference="Metabolite_11"/>
       <StateTemplateVariable objectReference="Metabolite_34"/>
+      <StateTemplateVariable objectReference="Metabolite_6"/>
+      <StateTemplateVariable objectReference="Metabolite_3"/>
       <StateTemplateVariable objectReference="Metabolite_2"/>
       <StateTemplateVariable objectReference="Metabolite_23"/>
       <StateTemplateVariable objectReference="Metabolite_40"/>
       <StateTemplateVariable objectReference="Metabolite_12"/>
       <StateTemplateVariable objectReference="Metabolite_21"/>
       <StateTemplateVariable objectReference="Metabolite_13"/>
-      <StateTemplateVariable objectReference="Metabolite_5"/>
-      <StateTemplateVariable objectReference="Metabolite_14"/>
-      <StateTemplateVariable objectReference="Metabolite_27"/>
-      <StateTemplateVariable objectReference="Metabolite_1"/>
       <StateTemplateVariable objectReference="Metabolite_25"/>
-      <StateTemplateVariable objectReference="Metabolite_31"/>
-      <StateTemplateVariable objectReference="Metabolite_29"/>
-      <StateTemplateVariable objectReference="Metabolite_9"/>
-      <StateTemplateVariable objectReference="Metabolite_15"/>
-      <StateTemplateVariable objectReference="Metabolite_26"/>
-      <StateTemplateVariable objectReference="Metabolite_28"/>
-      <StateTemplateVariable objectReference="Metabolite_24"/>
-      <StateTemplateVariable objectReference="Metabolite_30"/>
-      <StateTemplateVariable objectReference="Metabolite_7"/>
-      <StateTemplateVariable objectReference="Metabolite_32"/>
       <StateTemplateVariable objectReference="Metabolite_4"/>
-      <StateTemplateVariable objectReference="Metabolite_22"/>
-      <StateTemplateVariable objectReference="Metabolite_39"/>
+      <StateTemplateVariable objectReference="Metabolite_27"/>
+      <StateTemplateVariable objectReference="Metabolite_31"/>
+      <StateTemplateVariable objectReference="Metabolite_5"/>
       <StateTemplateVariable objectReference="Metabolite_8"/>
+      <StateTemplateVariable objectReference="Metabolite_15"/>
+      <StateTemplateVariable objectReference="Metabolite_22"/>
+      <StateTemplateVariable objectReference="Metabolite_28"/>
+      <StateTemplateVariable objectReference="Metabolite_26"/>
+      <StateTemplateVariable objectReference="Metabolite_32"/>
+      <StateTemplateVariable objectReference="Metabolite_1"/>
+      <StateTemplateVariable objectReference="Metabolite_24"/>
+      <StateTemplateVariable objectReference="Metabolite_39"/>
+      <StateTemplateVariable objectReference="Metabolite_9"/>
       <StateTemplateVariable objectReference="Metabolite_36"/>
       <StateTemplateVariable objectReference="Metabolite_37"/>
       <StateTemplateVariable objectReference="Metabolite_38"/>
       <StateTemplateVariable objectReference="Metabolite_35"/>
       <StateTemplateVariable objectReference="Metabolite_0"/>
+      <StateTemplateVariable objectReference="Metabolite_7"/>
       <StateTemplateVariable objectReference="Metabolite_10"/>
+      <StateTemplateVariable objectReference="Metabolite_14"/>
       <StateTemplateVariable objectReference="Metabolite_16"/>
       <StateTemplateVariable objectReference="Metabolite_17"/>
       <StateTemplateVariable objectReference="Metabolite_18"/>
@@ -3375,7 +3103,7 @@ energy metabolism</div>
       <StateTemplateVariable objectReference="ModelValue_7"/>
     </StateTemplate>
     <InitialState type="initialState">
-      0 1.5490159511281688e+21 7.0569319205180695e+19 1.5763946066185716e+20 6.0043053493910241e+20 5.8799869312313674e+21 2.6322420431957089e+20 8.5525575608716513e+18 6.0723801560420096e+17 2.2781584503402476e+20 2.0114735423457258e+17 4.193061098189998e+20 5.1858431598197925e+20 7.9251241914975207e+19 1.1515043650212757e+17 3.9391164070065283e+19 28419065176204708 3.6031354180883579e+20 1.6747235514063363e+18 9.5424644986276282e+19 1.4265932662081769e+20 2.0633142966785149e+17 3.1621128357967836e+18 2.8940514631167993e+20 3.4458121569610027e+19 1.9642127972845123e+18 1.1216394702819669e+20 1.6970884333545056e+20 3.8428260841912832e+18 3.0110704285000002e+22 8.5005146998199353e+20 1.581911401402443e+20 1.42797586195125e+21 2.4920534997863522e+19 6.0221408570000002e+20 3.6004593044112428e+20 7.6986801648223224e+19 6.4341569172230717e+19 2.0585278619139365e+20 8.5505452688743842e+19 2.474363866819711e+19 3.0473116183618054e+20 1 100 0.25 0.23000000000000001 1.2777099999999999 0.084763400000000003 5.8099999999999996 9.3135200000000005 0.062888200000000005 0.02001 27.619299999999999 
+      0 1.5490159511281688e+21 6.0043053493910241e+20 5.8799869312313674e+21 7.0569319205180695e+19 1.5763946066185716e+20 2.6322420431957089e+20 8.5525575608716513e+18 6.0723801560420096e+17 2.2781584503402476e+20 2.0114735423457258e+17 4.193061098189998e+20 28419065176204708 1.6970884333545056e+20 1.1515043650212757e+17 3.6031354180883579e+20 5.1858431598197925e+20 8.5005146998199353e+20 1.4265932662081769e+20 3.8428260841912832e+18 3.1621128357967836e+18 2.0633142966785149e+17 1.1216394702819669e+20 3.9391164070065283e+19 2.8940514631167993e+20 3.0110704285000002e+22 9.5424644986276282e+19 1.581911401402443e+20 1.42797586195125e+21 2.4920534997863522e+19 6.0221408570000002e+20 3.6004593044112428e+20 1.9642127972845123e+18 7.6986801648223224e+19 7.9251241914975207e+19 6.4341569172230717e+19 2.0585278619139365e+20 8.5505452688743842e+19 2.474363866819711e+19 3.0473116183618054e+20 1 100 0.25 0.23000000000000001 1.2777099999999999 0.084763400000000003 5.8099999999999996 9.3135200000000005 0.062888200000000005 0.02001 27.619299999999999 
     </InitialState>
   </Model>
   <ListOfTasks>
@@ -3774,18 +3502,16 @@ energy metabolism</div>
     <SBMLMap SBMLid="AKG" COPASIkey="Metabolite_0"/>
     <SBMLMap SBMLid="AMP" COPASIkey="Metabolite_32"/>
     <SBMLMap SBMLid="ATP" COPASIkey="Metabolite_33"/>
-    <SBMLMap SBMLid="ATP_MAINTENANCE" COPASIkey="Reaction_18"/>
+    <SBMLMap SBMLid="ATP_MAINTENANCE" COPASIkey="Reaction_17"/>
     <SBMLMap SBMLid="BPG" COPASIkey="Metabolite_1"/>
     <SBMLMap SBMLid="DAP" COPASIkey="Metabolite_2"/>
     <SBMLMap SBMLid="ENO" COPASIkey="Reaction_7"/>
     <SBMLMap SBMLid="F6P" COPASIkey="Metabolite_3"/>
-    <SBMLMap SBMLid="F6P_GAP_TAL" COPASIkey="Reaction_9"/>
     <SBMLMap SBMLid="FBA" COPASIkey="Reaction_2"/>
     <SBMLMap SBMLid="FBP" COPASIkey="Reaction_10"/>
     <SBMLMap SBMLid="FDP" COPASIkey="Metabolite_4"/>
     <SBMLMap SBMLid="FEED" COPASIkey="ModelValue_0"/>
     <SBMLMap SBMLid="Function_for_ENO" COPASIkey="Function_42"/>
-    <SBMLMap SBMLid="Function_for_F6P_GAP_TAL" COPASIkey="Function_49"/>
     <SBMLMap SBMLid="Function_for_FBA" COPASIkey="Function_45"/>
     <SBMLMap SBMLid="Function_for_FBP" COPASIkey="Function_43"/>
     <SBMLMap SBMLid="Function_for_GDH" COPASIkey="Function_41"/>
@@ -3800,7 +3526,6 @@ energy metabolism</div>
     <SBMLMap SBMLid="GAP" COPASIkey="Metabolite_6"/>
     <SBMLMap SBMLid="GDH" COPASIkey="Reaction_4"/>
     <SBMLMap SBMLid="GL6P" COPASIkey="Metabolite_7"/>
-    <SBMLMap SBMLid="GL6P_HYDROLYSIS" COPASIkey="Reaction_20"/>
     <SBMLMap SBMLid="GLCp" COPASIkey="Metabolite_40"/>
     <SBMLMap SBMLid="GLCx" COPASIkey="Metabolite_39"/>
     <SBMLMap SBMLid="GPM" COPASIkey="Reaction_6"/>
@@ -3840,7 +3565,7 @@ energy metabolism</div>
     <SBMLMap SBMLid="SUCCOA" COPASIkey="Metabolite_19"/>
     <SBMLMap SBMLid="TPI" COPASIkey="Reaction_3"/>
     <SBMLMap SBMLid="X5P" COPASIkey="Metabolite_20"/>
-    <SBMLMap SBMLid="XCH_GLC" COPASIkey="Reaction_19"/>
+    <SBMLMap SBMLid="XCH_GLC" COPASIkey="Reaction_18"/>
     <SBMLMap SBMLid="cell" COPASIkey="Compartment_0"/>
     <SBMLMap SBMLid="cell_periplasm" COPASIkey="Compartment_2"/>
     <SBMLMap SBMLid="ei" COPASIkey="Metabolite_21"/>
@@ -3852,8 +3577,6 @@ energy metabolism</div>
     <SBMLMap SBMLid="extracellular" COPASIkey="Compartment_1"/>
     <SBMLMap SBMLid="hpr" COPASIkey="Metabolite_27"/>
     <SBMLMap SBMLid="hprP" COPASIkey="Metabolite_28"/>
-    <SBMLMap SBMLid="tal" COPASIkey="Metabolite_29"/>
-    <SBMLMap SBMLid="talC3" COPASIkey="Metabolite_30"/>
   </SBMLReference>
   <ListOfUnitDefinitions>
     <UnitDefinition key="Unit_0" name="meter" symbol="m">
