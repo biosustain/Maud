@@ -23,7 +23,7 @@ data {
   int<lower=0,upper=1> LIKELIHOOD;
 }
 parameters {
-  vector[P] kinetic_parameters;
+  real kinetic_parameters[P];
 }
 transformed parameters {
   int x_i[0];
