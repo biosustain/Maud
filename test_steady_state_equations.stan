@@ -5,13 +5,12 @@ data {
   int<lower=1> S;
   int<lower=1> P;
   int<lower=1> R;
-  int<lower=1> I;
   vector[S] species;
   vector[P] kinetic_parameters;
-  vector[R] known_reals;
-  vector[I] known_ints;
+  real known_reals[R];
 }
 generated quantities {
+  int known_ints[0];
   vector[S] dsdt = steady_state_equation(species,
                                          kinetic_parameters,
                                          known_reals,
