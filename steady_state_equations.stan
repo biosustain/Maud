@@ -2,7 +2,6 @@ vector steady_state_equation(vector species, vector kinetic_parameters, real[] k
   // fixed numbers
   real MG = 1;
   real cell_cytoplasm = 1;
-  real extracellular = 100;
   real KdADPMg = 1.27771;
   real KdATPMg = 0.0847634;
   real KdFDPMg = 5.81;
@@ -207,7 +206,7 @@ vector steady_state_equation(vector species, vector kinetic_parameters, real[] k
   real AMP = ct[5]-1*ATP-ADP;
   real BPG = ct[6]-ATP-0.5*PEP-0.5*P-0.5*GAP-0.5*F6P-0.5*DAP+0.5*eiia-0.5*PGA2+0.5*ei-0.5*PGA3+0.5*eiicb-FDP+0.5*hpr-0.5*ADP-0.5*G6P;
   real eiiaP = ct[7]-eiia;
-  real GLCx = (ct[8]-0.5*GAP-1*F6P-0.5*DAP-GLCp-1*FDP-G6P-0.5*NADH)/extracellular;
+  real GLCx = (ct[8]-0.5*GAP-1*F6P-0.5*DAP-GLCp-1*FDP-G6P-0.5*NADH);
   real eiicbP = ct[9]-eiicb;
   real MgADP = MG*ADP/(KdADPMg+MG);
   real MgATP = MG*ATP/(KdATPMg+MG);
@@ -227,7 +226,7 @@ vector steady_state_equation(vector species, vector kinetic_parameters, real[] k
   real FBP = Vmax_9*n_2*MgFDP/KirFDPMg/(1+KmrFDP_1/KirFDP_1*(MG/KmrMg)+P/KirP+P/KirP*(MG/KirPMg)+F6P/KirF6P_1+F6P/KirF6P_1*(MG/KirF6PMg)+P/KirP*(F6P/KirPF6P)+P/KirP*(F6P/KirPF6P)*(MG/KirPF6PMg)+(FDP-MgFDP)/KirFDP_1+KdFDPMg/KmrMg*(MgFDP/KirFDP_1)+AMP/KirAMP+MgFDP/KirFDPMg+MgFDP/KirFDPMg*(MG/KirFDPMgMg)+AMP/KirAMP*((FDP-MgFDP)/KirAMPFDP))/(1+L0_2*((1+KmtFDP_1/KitFDP_1*(MG/KmtMg)+P/KitP+P/KitP*(MG/KitPMg)+F6P/KitF6P_1+F6P/KitF6P_1*(MG/KitF6PMg)+P/KitP*(F6P/KitPF6P)+P/KitP*(F6P/KitPF6P)*(MG/KitPF6PMg)+(FDP-MgFDP)/KitFDP_1+KdFDPMg/KmtMg*(MgFDP/KitFDP_1)+AMP/KitAMP+MgFDP/KitFDPMg+MgFDP/KitFDPMg*(MG/KitFDPMgMg)+AMP/KitAMP*((FDP-MgFDP)/KitAMPFDP))/(1+KmrFDP_1/KirFDP_1*(MG/KmrMg)+P/KirP+P/KirP*(MG/KirPMg)+F6P/KirF6P_1+F6P/KirF6P_1*(MG/KirF6PMg)+P/KirP*(F6P/KirPF6P)+P/KirP*(F6P/KirPF6P)*(MG/KirPF6PMg)+(FDP-MgFDP)/KirFDP_1+KdFDPMg/KmrMg*(MgFDP/KirFDP_1)+AMP/KirAMP+MgFDP/KirFDPMg+MgFDP/KirFDPMg*(MG/KirFDPMgMg)+AMP/KirAMP*((FDP-MgFDP)/KirAMPFDP)))^n_2);
   real PPS = Vmax_10*(MgATP*PYR-AMP*PEP*P*MG/Keq_8)/(KmATPMg_1*KmPYR)/(MgATP/KmATPMg_1+alpha*(P/KdP)*(MgATP/KmATPMg_1)+alpha*(AMP/KdAMP)*(MgATP/KmATPMg_1)+alpha*(P/KdP)*(AMP/KdAMP)*(MgATP/KmATPMg_1)+alpha*(MG/KdMg)*(P/KmP_1)*(AMP/KdAMP)*(MgATP/KdATPMgPPS)/(W*(1+MG/KdMg))+MgATP/KmATPMg_1*(AKG/KefAKG)+(1+MG/KdMg)*(AKG/KefAKG)*(PEP/KmPEP_3)/W+MgATP/KmATPMg_1*(OAA/KefOAA)+(1+MG/KdMg)*(OAA/KefOAA)*(PEP/KmPEP_3)/W+MG/KdMg*(P/KmP_1)*(AMP/KdAMP)/W+alpha*(P/KdP)*(AMP/KdAMP)*(PEP/KmPEP_3)/W+alpha*(MG/KdMg)*(P/KmP_1)*(AMP/KdAMP)*(PEP/KmPEP_3)/W+alpha*(1+MG/KdMg)*(KmAMP/KdAMP*(P/KmP_1)*(PEP/KmPEP_3)+AMP/KdAMP*(PEP/KmPEP_3))/W+(1+MG/KdMg)*(PYR/KmPYR)+MgATP/KmATPMg_1*(PYR/KmPYR)+KdADPMg/KdMg*(P/KmP_1)*(MgADP/KefADP)*(AMP/KdAMP)/(W*(1+MG/KdMg))+(ADP-MgADP)/KefADP*(PYR/KmPYR)+KdATPMg/KdMg*(P/KmP_1)*(AMP/KdAMP)*(MgATP/KefATP)/(W*(1+MG/KdMg))+(ATP-MgATP)/KefATP*(PYR/KmPYR)+(1+MG/KdMg)*(PEP/KmPEP_3)/W+alpha*(1+MG/KdMg)*(PEP/KdPEP)*(PYR/KmPYR)+(1+MG/KdMg)*(PYR/KdPYR)*(PEP/KmPEP_3)/W);
   real PTS_0 = kF*ei*PEP^2/(KmPEP_4^2+PEP^2)-kR*eiP*PYR^2/(KmPYR_1^2+PYR^2);
-  real PTS_1 = kF*ei*PEP^2/(KmPEP_4^2+PEP^2)-kR*eiP*PYR^2/(KmPYR_1^2+PYR^2);
+  real PTS_1 = k1*hpr*eiP-k2*hprP*ei;
   real PTS_2 = k1_1*eiia*hprP-k2_1*eiiaP*hpr;
   real PTS_3 = k1_2*eiicb*eiiaP-k2_2*eiicbP*eiia;
   real PTS_4 = cell_cytoplasm*(kF_1*eiicbP*GLCp/(KmGLC+GLCp)-kR_1*eiicb*G6P/(KmG6P_1+G6P));
@@ -252,9 +251,5 @@ vector steady_state_equation(vector species, vector kinetic_parameters, real[] k
                                 PFK-PGK-PYK+ATP_MAINTENANCE, // ADP
                                 -PGI+PTS_4, // G6P
                                 GDH]'; // NADH
-
-  print(PTS_4);
-  print(XCH_RMM);
   return dsdt;
-
 }
