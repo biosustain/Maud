@@ -8,4 +8,4 @@ if __name__ == '__main__':
 
     for target in targets:
         if target.endswith(".pkl"):
-            os.remove(os.path.join(dir_name, there))
+            os.remove(os.path.join(there, target))
