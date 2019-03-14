@@ -13,7 +13,7 @@ SPECIES_INPUT = {
     'F6P': 0.261766,
     'DAP': 0.437094,
     'eiia': 0.0142019,
-    'GLCp': 0.00100834,
+    'GLCp': 0.00403337,
     'PGA2': 0.378297,
     'ei': 0.000334013,
     'PGA3': 0.696274,
@@ -189,7 +189,7 @@ KNOWN_REALS_INPUT = {
     'AMP': 3.356768777029624,
     'BPG': 9.9675557170810123,
     'eiiaP': 0.4947703996764079,
-    'GLCx': 51.762079246314791,
+    'GLCx': 2.2651042736100142,
     'eiicbP': 0.00038981236144815099,
 
     'AKG': 0.59787,
@@ -204,7 +204,7 @@ KNOWN_REALS_INPUT = {
  
 }
 KNOWN_INTS_INPUT = {}
-TIME_POINTS = np.linspace(0, 30, 100)
+TIME_POINTS = np.linspace(0, 20, 100)
 
 if __name__ == '__main__':
     model = StanModel_cache(file='test_steady_state_equations.stan')
