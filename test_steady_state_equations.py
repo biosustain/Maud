@@ -1,3 +1,7 @@
+import arviz
+from matplotlib import pyplot as plt
+import numpy as np
+import pandas as pd
 import pystan
 from python_functions import StanModel_cache
 
@@ -200,7 +204,7 @@ KNOWN_REALS_INPUT = {
  
 }
 KNOWN_INTS_INPUT = {}
-
+TIME_POINTS = np.linspace(0, 30, 100)
 
 if __name__ == '__main__':
     model = StanModel_cache(file='test_steady_state_equations.stan')
@@ -208,10 +212,29 @@ if __name__ == '__main__':
         'S': len(SPECIES_INPUT.values()),
         'P': len(KINETIC_PARAMETER_INPUT.values()),
         'R': len(KNOWN_REALS_INPUT.values()),
+        'T': len(TIME_POINTS) - 1,
+        'ts': TIME_POINTS[1:],
+        't0': TIME_POINTS[0],
         'species': list(SPECIES_INPUT.values()),
         'kinetic_parameters': list(KINETIC_PARAMETER_INPUT.values()),
         'known_reals': list(KNOWN_REALS_INPUT.values())
+
     }
-    fit = model.sampling(data=data, algorithm='Fixed_param')
-    for species, dsdt in zip(SPECIES_INPUT.keys(), fit['dsdt'].reshape(-1)):
-        print(f'{species}: {dsdt.round(3)}')
+    fit = model.sampling(data=data, algorithm='Fixed_param', iter=1, chains=1)
+    infd = arviz.from_pystan(posterior=fit,
+                             coords={'sim_time': TIME_POINTS[1:],
+                                     'species': list(SPECIES_INPUT.keys())},
+                             dims={'species_sim': ['sim_time', 'species']})
+    out = infd.posterior['species_sim'].mean(dim=['chain', 'draw']).to_series().unstack()
+    out.loc[0] = pd.Series(SPECIES_INPUT)
+    out = out.sort_index()
+    f, axes = plt.subplots(2, 3, sharex=True)
+    axes = axes.ravel()
+    for ax, col in zip(axes,
+                       ['GLCp', 'ADP', 'ATP', 'P', 'G6P', 'FDP']):
+        ax.plot(out.index, out[col])
+        ax.set(title=col, xlabel='Time', ylabel='Concentration')
+    plt.savefig('fig.png')
+    plt.clf()
+    out.to_csv('ode_species.csv')
+    print(out)
