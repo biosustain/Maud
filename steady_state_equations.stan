@@ -1,6 +1,8 @@
 vector steady_state_equation(vector species, vector kinetic_parameters, real[] known_reals, int[] known_ints){
   // fixed numbers
   real MG = 1;
+  real cell_cytoplasm = 1;
+  real extracellular = 100;
   real KdADPMg = 1.27771;
   real KdATPMg = 0.0847634;
   real KdFDPMg = 5.81;
@@ -205,7 +207,7 @@ vector steady_state_equation(vector species, vector kinetic_parameters, real[] k
   real AMP = ct[5]-1*ATP-ADP;
   real BPG = ct[6]-ATP-0.5*PEP-0.5*P-0.5*GAP-0.5*F6P-0.5*DAP+0.5*eiia-0.5*PGA2+0.5*ei-0.5*PGA3+0.5*eiicb-FDP+0.5*hpr-0.5*ADP-0.5*G6P;
   real eiiaP = ct[7]-eiia;
-  real GLCx = ct[8]-0.5*GAP-1*F6P-0.5*DAP-GLCp-1*FDP-G6P-0.5*NADH;
+  real GLCx = (ct[8]-0.5*GAP-1*F6P-0.5*DAP-GLCp-1*FDP-G6P-0.5*NADH)/extracellular;
   real eiicbP = ct[9]-eiicb;
   real MgADP = MG*ADP/(KdADPMg+MG);
   real MgATP = MG*ATP/(KdATPMg+MG);
@@ -228,7 +230,7 @@ vector steady_state_equation(vector species, vector kinetic_parameters, real[] k
   real PTS_1 = kF*ei*PEP^2/(KmPEP_4^2+PEP^2)-kR*eiP*PYR^2/(KmPYR_1^2+PYR^2);
   real PTS_2 = k1_1*eiia*hprP-k2_1*eiiaP*hpr;
   real PTS_3 = k1_2*eiicb*eiiaP-k2_2*eiicbP*eiia;
-  real PTS_4 = kF_1*eiicbP*GLCp/(KmGLC+GLCp)-kR_1*eiicb*G6P/(KmG6P_1+G6P);
+  real PTS_4 = cell_cytoplasm*(kF_1*eiicbP*GLCp/(KmGLC+GLCp)-kR_1*eiicb*G6P/(KmG6P_1+G6P));
   real ATP_MAINTENANCE = Vmax_11*(ATP-ADP*P/Keq_9);
   real XCH_RMM = Vmax_12*(GLCx/Km-GLCp/Km)/(1+GLCx/Km+GLCp/Km);
   
@@ -250,6 +252,9 @@ vector steady_state_equation(vector species, vector kinetic_parameters, real[] k
                                 PFK-PGK-PYK+ATP_MAINTENANCE, // ADP
                                 -PGI+PTS_4, // G6P
                                 GDH]'; // NADH
+
+  print(PTS_4);
+  print(XCH_RMM);
   return dsdt;
 
 }
