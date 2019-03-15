@@ -3,17 +3,19 @@ functions {
 }
 data {
   // dimensions
-  int<lower=1> S;                    // number of species
-  int<lower=1> R;                    // number of reactions
-  int<lower=1> P;                    // total number of parameters
-  int<lower=1> Q;                    // total number of known quantities
-  int<lower=0> n_known_quantity[R];  // number of known quantities per reaction
+  int<lower=1> S;             // number of species
+  int<lower=1> SM;            // number of species measurements
+  int<lower=1> KR;            // number of known reals
+  int<lower=1> P;             // total number of parameters
+  int<lower=1> Q;             // total number of known quantities
   // measurements
-  vector[S] species_measured;
+  int[SM] species_measurement_ix;
+  vector[SM] species_measurement;
   // hardcoded priors
   vector[P] prior_location;
   vector[P] prior_scale;
-  real<lower=0> sigma_measurement;
+  vector<lower=0>[SM] sigma_measurement;
+  real known_reals[KR];
   // algebra solver config
   vector[S] initial_guess;
   real rel_tol;
@@ -30,14 +32,15 @@ transformed parameters {
   vector[S] species_hat = algebra_solver(steady_state_equations,
                                          initial_guess,
                                          kinetic_parameters,
-                                         known_quantities,
+                                         known_reals,
                                          x_i,
                                          rel_tol, f_tol, max_steps);
 }
 model {
   kinetic_parameters ~ lognormal(prior_location, prior_scale);
   if (LIKELIHOOD == 1){
-    species_measured ~ normal(species_hat, sigma_measurement);
+    species_measurement[species_measurement_ix]
+      ~ normal(species_hat[species_measurement_ix], sigma_measurement);
   }
 }
 generated quantities {

@@ -234,22 +234,22 @@ vector steady_state_equation(vector species, vector kinetic_parameters, real[] k
   real XCH_RMM = Vmax_12*(GLCx/Km-GLCp/Km)/(1+GLCx/Km+GLCp/Km);
   
   // work out rate of change of each species concentration
-  vector[rows(species)] dsdt = [-PFK+PGK+PYK-PPS-ATP_MAINTENANCE, // ATP
-                                ENO-PYK+PPS-PTS_0, // PEP
-                                -GDH+FBP+PPS+ATP_MAINTENANCE, // P
-                                FBA+TPI-GDH, // GAP
-                                PGI-PFK+FBP, // F6P
-                                FBA-TPI, // DAP
-                                -PTS_2+PTS_3, // eiia
-                                -PTS_4+XCH_RMM, // GLCp
-                                GPM-ENO, // PGA2
-                                -PTS_0+PTS_1, // ei
-                                PGK-GPM, // PGA3
-                                -PTS_3+PTS_4, // eiicb
-                                PFK-FBA-FBP, // FDP
-                                -PTS_1+PTS_2, // hpr
-                                PFK-PGK-PYK+ATP_MAINTENANCE, // ADP
-                                -PGI+PTS_4, // G6P
-                                GDH]'; // NADH
+  vector[rows(species)] dsdt = [-PFK+PGK+PYK-PPS-ATP_MAINTENANCE,  // ATP
+                                ENO-PYK+PPS-PTS_0,                 // PEP
+                                -GDH+FBP+PPS+ATP_MAINTENANCE,      // P
+                                FBA+TPI-GDH,                       // GAP
+                                PGI-PFK+FBP,                       // F6P
+                                FBA-TPI,                           // DAP
+                                -PTS_2+PTS_3,                      // eiia
+                                -PTS_4+XCH_RMM,                    // GLCp
+                                GPM-ENO,                           // PGA2
+                                -PTS_0+PTS_1,                      // ei
+                                PGK-GPM,                           // PGA3
+                                -PTS_3+PTS_4,                      // eiicb
+                                PFK-FBA-FBP,                       // FDP
+                                -PTS_1+PTS_2,                      // hpr
+                                PFK-PGK-PYK+ATP_MAINTENANCE,       // ADP
+                                -PGI+PTS_4,                        // G6P
+                                GDH]';                             // NADH
   return dsdt;
 }
