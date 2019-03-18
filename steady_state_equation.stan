@@ -1,26 +1,67 @@
-vector steady_state_equation(vector species, vector kinetic_parameters, real[] known_reals, int[] known_ints){
-  // fixed numbers
-  real MG = 1;
-  real cell_cytoplasm = 1;
-  real KdADPMg = 1.27771;
-  real KdATPMg = 0.0847634;
-  real KdFDPMg = 5.81;
-  real KmICIT_ACN = 9.31352;
-  real KmCIT_ACN = 0.0628882;
-  real KmACO_ACN = 0.02001;
-  real KeqNDH = 27.6193;
-
+real[] get_derived_quantities(vector species, real[] known_reals){
   // unpack known reals
   real ct[9] = known_reals[1:9];
-  real AKG = known_reals[10];
-  real GL6P = known_reals[11];
-  real OAA = known_reals[12];
-  real PGN = known_reals[13];
-  real R5P = known_reals[14];
-  real RU5P = known_reals[15];
-  real S7P = known_reals[16];
-  real SUCCOA = known_reals[17];
-  real X5P = known_reals[18];
+  real MG = known_reals[10];
+  real KdADPMg = known_reals[11];
+  real KdATPMg = known_reals[12];
+  real KdFDPMg = known_reals[13];
+
+  // unpack species...
+  real ATP = species[1];
+  real PEP = species[2];
+  real P = species[3];
+  real GAP = species[4];
+  real F6P = species[5];
+  real DAP = species[6];
+  real eiia = species[7];
+  real GLCp = species[8];
+  real PGA2 = species[9];
+  real ei = species[10];
+  real PGA3 = species[11];
+  real eiicb = species[12];
+  real FDP = species[13];
+  real hpr = species[14];
+  real ADP = species[15];
+  real G6P = species[16];
+  real NADH = species[17];
+
+  real PYR = ct[1]+1*ATP-0.5*PEP+0.5*P+0.5*GAP+0.5*F6P+0.5*DAP-0.5*eiia-0.5*PGA2-0.5*ei-0.5*PGA3-0.5*eiicb+FDP-0.5*hpr+0.5*ADP+0.5*G6P+NADH;
+  real eiP = ct[2]-ei;
+  real hprP = ct[3]-hpr;
+  real NAD = ct[4]-NADH;
+  real AMP = ct[5]-1*ATP-ADP;
+  real BPG = ct[6]-ATP-0.5*PEP-0.5*P-0.5*GAP-0.5*F6P-0.5*DAP+0.5*eiia-0.5*PGA2+0.5*ei-0.5*PGA3+0.5*eiicb-FDP+0.5*hpr-0.5*ADP-0.5*G6P;
+  real eiiaP = ct[7]-eiia;
+  real GLCx = (ct[8]-0.5*GAP-1*F6P-0.5*DAP-GLCp-1*FDP-G6P-0.5*NADH);
+  real eiicbP = ct[9]-eiicb;
+  real MgADP = MG*ADP/(KdADPMg+MG);
+  real MgATP = MG*ATP/(KdATPMg+MG);
+  real MgFDP = MG*FDP/(KdFDPMg+MG);
+
+  return {PYR, eiP, hprP, NAD, AMP, BPG, eiiaP, GLCx, eiicbP, MgADP, MgATP, MgFDP};
+}
+
+vector steady_state_equation(vector species, vector kinetic_parameters, real[] known_reals, int[] known_ints){
+  // unpack known reals
+  real ct[9] = known_reals[1:9];
+  real MG = known_reals[10];
+  real KdADPMg = known_reals[11];
+  real KdATPMg = known_reals[12];
+  real KdFDPMg = known_reals[13];
+  real KmICIT_ACN = known_reals[14];
+  real KmCIT_ACN = known_reals[15];
+  real KmACO_ACN = known_reals[16];
+  real KeqNDH = known_reals[17];
+  real cell_cytoplasm = known_reals[18];
+  real AKG = known_reals[19];
+  real GL6P = known_reals[20];
+  real OAA = known_reals[21];
+  real PGN = known_reals[22];
+  real R5P = known_reals[23];
+  real RU5P = known_reals[24];
+  real S7P = known_reals[25];
+  real SUCCOA = known_reals[26];
+  real X5P = known_reals[27];
 
   // unpack species...
   real ATP = species[1];
@@ -199,18 +240,19 @@ vector steady_state_equation(vector species, vector kinetic_parameters, real[] k
   real Km = kinetic_parameters[155];
 
   // derived quantities
-  real PYR = ct[1]+1*ATP-0.5*PEP+0.5*P+0.5*GAP+0.5*F6P+0.5*DAP-0.5*eiia-0.5*PGA2-0.5*ei-0.5*PGA3-0.5*eiicb+FDP-0.5*hpr+0.5*ADP+0.5*G6P+NADH;
-  real eiP = ct[2]-ei;
-  real hprP = ct[3]-hpr;
-  real NAD = ct[4]-NADH;
-  real AMP = ct[5]-1*ATP-ADP;
-  real BPG = ct[6]-ATP-0.5*PEP-0.5*P-0.5*GAP-0.5*F6P-0.5*DAP+0.5*eiia-0.5*PGA2+0.5*ei-0.5*PGA3+0.5*eiicb-FDP+0.5*hpr-0.5*ADP-0.5*G6P;
-  real eiiaP = ct[7]-eiia;
-  real GLCx = (ct[8]-0.5*GAP-1*F6P-0.5*DAP-GLCp-1*FDP-G6P-0.5*NADH);
-  real eiicbP = ct[9]-eiicb;
-  real MgADP = MG*ADP/(KdADPMg+MG);
-  real MgATP = MG*ATP/(KdATPMg+MG);
-  real MgFDP = MG*FDP/(KdFDPMg+MG);
+  real derived_quantities[12] = get_derived_quantities(species, known_reals);
+  real PYR = derived_quantities[1];
+  real eiP = derived_quantities[2];
+  real hprP = derived_quantities[3];
+  real NAD = derived_quantities[4];
+  real AMP = derived_quantities[5];
+  real BPG = derived_quantities[6];
+  real eiiaP = derived_quantities[7];
+  real GLCx = derived_quantities[8];
+  real eiicbP = derived_quantities[9];
+  real MgADP = derived_quantities[10];
+  real MgATP = derived_quantities[11];
+  real MgFDP = derived_quantities[12];
 
  
   // flux equations

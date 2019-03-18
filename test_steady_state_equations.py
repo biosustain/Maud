@@ -192,6 +192,17 @@ KNOWN_REALS_INPUT = {
     'GLCx': 2.2651042736100142,
     'eiicbP': 0.00038981236144815099,
 
+    'MG': 1,
+    'KdADPMg': 1.27771,
+    'KdATPMg': 0.0847634,
+    'KdFDPMg': 5.81,
+    'KmICIT_ACN': 9.31352,
+    'KmCIT_ACN': 0.0628882,
+    'KmACO_ACN': 0.02001,
+    'KeqNDH': 27.6193,
+    'cell_cytoplasm': 1,
+
+
     'AKG': 0.59787,
     'GL6P': 0.00326165,
     'OAA': 0.12784,
@@ -203,6 +214,20 @@ KNOWN_REALS_INPUT = {
     'X5P': 0.506018,
  
 }
+DERIVED_QUANTITIES = [
+    'PYR',
+    'eiP',
+    'hprP',
+    'NAD',
+    'AMP',
+    'BPG',
+    'eiiaP',
+    'GLCx',
+    'eiicbP',
+    'MgADP',
+    'MgATP',
+    'MgFDP'
+]
 KNOWN_INTS_INPUT = {}
 TIME_POINTS = np.linspace(0, 20, 100)
 
@@ -222,18 +247,23 @@ if __name__ == '__main__':
     }
     fit = model.sampling(data=data, algorithm='Fixed_param', iter=1, chains=1)
     infd = arviz.from_pystan(posterior=fit,
-                             coords={'sim_time': TIME_POINTS[1:],
-                                     'species': list(SPECIES_INPUT.keys())},
-                             dims={'species_sim': ['sim_time', 'species']})
-    out = infd.posterior['species_sim'].mean(dim=['chain', 'draw']).to_series().unstack()
-    out.loc[0] = pd.Series(SPECIES_INPUT)
+                             coords={'sim_time': TIME_POINTS,
+                                     'species': list(SPECIES_INPUT.keys()),
+                                     'derived_quantity': DERIVED_QUANTITIES},
+                             dims={'species_sim': ['sim_time', 'species'],
+                                   'derived_quantities_sim': ['sim_time', 'derived_quantity']})
+    species_out = infd.posterior['species_sim'].mean(dim=['chain', 'draw']).to_series().unstack()
+    derived_out = infd.posterior['derived_quantities_sim'].mean(dim=['chain', 'draw']).to_series().unstack()
+    out = species_out.join(derived_out)
     out = out.sort_index()
-    f, axes = plt.subplots(2, 3, sharex=True)
+    f, axes = plt.subplots(2, 4, sharex=True, figsize=[15, 10])
     axes = axes.ravel()
     for ax, col in zip(axes,
-                       ['GLCp', 'ADP', 'ATP', 'P', 'G6P', 'FDP']):
+                       ['GLCp', 'ADP', 'ATP', 'P', 'G6P', 'FDP', 'PYR', 'GLCx']):
         ax.plot(out.index, out[col])
-        ax.set(title=col, xlabel='Time', ylabel='Concentration')
+        ax.set(title=col, xlabel='Time')
+        if ax in [axes[0], axes[4]]:
+            ax.set_ylabel('Concentration')
     plt.savefig('fig.png')
     plt.clf()
     out.to_csv('ode_species.csv')
