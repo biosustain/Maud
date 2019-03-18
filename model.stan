@@ -23,6 +23,7 @@ data {
   vector[P] prior_location;
   vector[P] prior_scale;
   vector<lower=0>[SM] sigma_measurement;
+  vector<lower=0>[FM] sigma_flux;
   real known_reals[KR];
   // algebra solver config
   vector[S] initial_guess;
@@ -44,6 +45,7 @@ transformed parameters {
                                          x_i,
                                          rel_tol, f_tol, max_steps);
   vector[D] derived_quantity_hat = get_derived_quantities(species_hat, known_reals); 
+  vector[F] flux_hat = get_fluxes(species_hat, kinetic_parameters, known_reals);
 }
 model {
   kinetic_parameters ~ lognormal(prior_location, prior_scale);
@@ -61,7 +63,10 @@ generated quantities {
   for (s in 1:S){
     species_pred[s] = normal_rng(species_hat[s], sigma_measurement);
   }
-  for (dq in 1:D){
-    derived_quantity_pred[dq] = normal_rng(derived_quantity_hat[dq], sigma_measurement);
+  for (d in 1:D){
+    derived_quantity_pred[d] = normal_rng(derived_quantity_hat[d], sigma_measurement);
+  }
+  for (f in 1:F){
+    derived_quantity_pred[f] = normal_rng(derived_quantity_hat[f], sigma_flux);
   }
 }
