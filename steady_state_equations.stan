@@ -1,17 +1,3 @@
-<<<<<<< Updated upstream:steady_state_equations.stan
-vector steady_state_equation(vector species, vector kinetic_parameters, real[] known_reals, int[] known_ints){
-  // fixed numbers
-  real MG = 1;
-  real cell_cytoplasm = 1;
-  real KdADPMg = 1.27771;
-  real KdATPMg = 0.0847634;
-  real KdFDPMg = 5.81;
-  real KmICIT_ACN = 9.31352;
-  real KmCIT_ACN = 0.0628882;
-  real KmACO_ACN = 0.02001;
-  real KeqNDH = 27.6193;
-
-=======
 real[] get_derived_quantities(vector species, real[] known_reals){
   // unpack known reals
   real ct[9] = known_reals[1:9];
@@ -56,7 +42,6 @@ real[] get_derived_quantities(vector species, real[] known_reals){
 }
 
 real[] get_fluxes(vector species, vector kinetic_parameters, real[] known_reals){
->>>>>>> Stashed changes:steady_state_equation.stan
   // unpack known reals
   real ct[9] = known_reals[1:9];
   real AKG = known_reals[10];
@@ -245,21 +230,6 @@ real[] get_fluxes(vector species, vector kinetic_parameters, real[] known_reals)
   real Vmax_12 = kinetic_parameters[154];
   real Km = kinetic_parameters[155];
 
-<<<<<<< Updated upstream:steady_state_equations.stan
-  // derived quantities
-  real PYR = ct[1]+1*ATP-0.5*PEP+0.5*P+0.5*GAP+0.5*F6P+0.5*DAP-0.5*eiia-0.5*PGA2-0.5*ei-0.5*PGA3-0.5*eiicb+FDP-0.5*hpr+0.5*ADP+0.5*G6P+NADH;
-  real eiP = ct[2]-ei;
-  real hprP = ct[3]-hpr;
-  real NAD = ct[4]-NADH;
-  real AMP = ct[5]-1*ATP-ADP;
-  real BPG = ct[6]-ATP-0.5*PEP-0.5*P-0.5*GAP-0.5*F6P-0.5*DAP+0.5*eiia-0.5*PGA2+0.5*ei-0.5*PGA3+0.5*eiicb-FDP+0.5*hpr-0.5*ADP-0.5*G6P;
-  real eiiaP = ct[7]-eiia;
-  real GLCx = (ct[8]-0.5*GAP-1*F6P-0.5*DAP-GLCp-1*FDP-G6P-0.5*NADH);
-  real eiicbP = ct[9]-eiicb;
-  real MgADP = MG*ADP/(KdADPMg+MG);
-  real MgATP = MG*ATP/(KdATPMg+MG);
-  real MgFDP = MG*FDP/(KdFDPMg+MG);
-=======
   // get derived quantities
   real derived_quantities[12] = get_derived_quantities(species, known_reals);
   real PYR = derived_quantities[1];
@@ -274,7 +244,6 @@ real[] get_fluxes(vector species, vector kinetic_parameters, real[] known_reals)
   real MgADP = derived_quantities[10];
   real MgATP = derived_quantities[11];
   real MgFDP = derived_quantities[12];
->>>>>>> Stashed changes:steady_state_equation.stan
 
   // calculate fluxes
   real PGI = Vmax*(G6P-F6P/Keq)/KmG6P/(1+F6P/KmF6P+G6P/KmG6P+PEP/KmPEP+PGN/KmPGN);
