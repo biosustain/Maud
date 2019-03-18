@@ -1,5 +1,5 @@
 functions {
-#include steady_state_equations.stan
+#include steady_state_equation.stan
   real[] ode(real t,        // time
              real[] s,      // state
              real[] theta,  // parameters
@@ -21,5 +21,11 @@ data {
 }
 generated quantities {
   int known_ints[0];
-  real species_sim[T,S] = integrate_ode_rk45(ode, species, t0, ts, kinetic_parameters, known_reals, known_ints);
+  real species_sim[T+1,S]; 
+  real derived_quantities_sim[T+1, 12];
+  species_sim[1] = species;
+  species_sim[2:T+1] = integrate_ode_rk45(ode, species, t0, ts, kinetic_parameters, known_reals, known_ints);
+  for (t in 1:T+1){
+    derived_quantities_sim[t] = get_derived_quantities(to_vector(species_sim[t]), known_reals);
+  }
 }

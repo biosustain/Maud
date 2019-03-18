@@ -41,18 +41,27 @@ real[] get_derived_quantities(vector species, real[] known_reals){
   return {PYR, eiP, hprP, NAD, AMP, BPG, eiiaP, GLCx, eiicbP, MgADP, MgATP, MgFDP};
 }
 
-real[] get_fluxes(vector species, vector kinetic_parameters, real[] known_reals){
+vector get_fluxes(vector species, vector kinetic_parameters, real[] known_reals){
   // unpack known reals
   real ct[9] = known_reals[1:9];
-  real AKG = known_reals[10];
-  real GL6P = known_reals[11];
-  real OAA = known_reals[12];
-  real PGN = known_reals[13];
-  real R5P = known_reals[14];
-  real RU5P = known_reals[15];
-  real S7P = known_reals[16];
-  real SUCCOA = known_reals[17];
-  real X5P = known_reals[18];
+  real MG = known_reals[10];
+  real KdADPMg = known_reals[11];
+  real KdATPMg = known_reals[12];
+  real KdFDPMg = known_reals[13];
+  real KmICIT_ACN = known_reals[14];
+  real KmCIT_ACN = known_reals[15];
+  real KmACO_ACN = known_reals[16];
+  real KeqNDH = known_reals[17];
+  real cell_cytoplasm = known_reals[18];
+  real AKG = known_reals[19];
+  real GL6P = known_reals[20];
+  real OAA = known_reals[21];
+  real PGN = known_reals[22];
+  real R5P = known_reals[23];
+  real RU5P = known_reals[24];
+  real S7P = known_reals[25];
+  real SUCCOA = known_reals[26];
+  real X5P = known_reals[27];
 
   // unpack species...
   real ATP = species[1];
@@ -265,8 +274,8 @@ real[] get_fluxes(vector species, vector kinetic_parameters, real[] known_reals)
   real ATP_MAINTENANCE = Vmax_11*(ATP-ADP*P/Keq_9);
   real XCH_RMM = Vmax_12*(GLCx/Km-GLCp/Km)/(1+GLCx/Km+GLCp/Km);
 
-  return {PGI, PFK, FBA, TPI, GDH, PGK, GPM, ENO, PYK, FBP, PPS,
-          PTS_0, PTS_1, PTS_2, PTS_3, PTS_4, ATP_MAINTENANCE, XCH_RMM};
+  return [PGI, PFK, FBA, TPI, GDH, PGK, GPM, ENO, PYK, FBP, PPS,
+          PTS_0, PTS_1, PTS_2, PTS_3, PTS_4, ATP_MAINTENANCE, XCH_RMM]';
 }
 
 vector get_odes(vector fluxes){
