@@ -11,19 +11,18 @@ data {
   int<lower=1> FM;            // number of flux measurements
   int<lower=1> KR;            // number of known reals
   int<lower=1> P;             // total number of parameters
-  int<lower=1> Q;             // total number of known quantities
   // measurements
-  int[FM] flux_measurement_ix;
+  int flux_measurement_ix[FM];
   vector[FM] flux_measurement;
-  int[SM] species_measurement_ix;
+  int species_measurement_ix[SM];
   vector[SM] species_measurement;
-  int[D] derived_quantity_measurement_ix;
+  int derived_quantity_measurement_ix[DM];
   vector[DM] derived_quantity_measurement;
   // hardcoded priors
   vector[P] prior_location;
   vector[P] prior_scale;
-  vector<lower=0>[SM] sigma_measurement;
-  vector<lower=0>[FM] sigma_flux;
+  real<lower=0> sigma_measurement;
+  real<lower=0> sigma_flux;
   real known_reals[KR];
   // algebra solver config
   vector[S] initial_guess;
@@ -33,18 +32,20 @@ data {
   // likelihood config
   int<lower=0,upper=1> LIKELIHOOD;
 }
+transformed data {
+  int x_i[0];
+}
 parameters {
-  real kinetic_parameters[P];
+  vector<lower=0>[P] kinetic_parameters;
 }
 transformed parameters {
-  int x_i[0];
   vector[S] species_hat = algebra_solver(steady_state_equation,
                                          initial_guess,
                                          kinetic_parameters,
                                          known_reals,
                                          x_i,
                                          rel_tol, f_tol, max_steps);
-  vector[D] derived_quantity_hat = get_derived_quantities(species_hat, known_reals); 
+  real derived_quantity_hat[D] = get_derived_quantities(species_hat, known_reals); 
   vector[F] flux_hat = get_fluxes(species_hat, kinetic_parameters, known_reals);
 }
 model {
