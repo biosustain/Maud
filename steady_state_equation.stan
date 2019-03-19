@@ -1,4 +1,4 @@
-real[] get_derived_quantities(vector species, real[] known_reals){
+real[] get_derived_metabolites(vector ode_metabolites, real[] known_reals){
   // unpack known reals
   real ct[9] = known_reals[1:9];
   real MG = known_reals[10];
@@ -6,24 +6,24 @@ real[] get_derived_quantities(vector species, real[] known_reals){
   real KdATPMg = known_reals[12];
   real KdFDPMg = known_reals[13];
 
-  // unpack species...
-  real ATP = species[1];
-  real PEP = species[2];
-  real P = species[3];
-  real GAP = species[4];
-  real F6P = species[5];
-  real DAP = species[6];
-  real eiia = species[7];
-  real GLCp = species[8];
-  real PGA2 = species[9];
-  real ei = species[10];
-  real PGA3 = species[11];
-  real eiicb = species[12];
-  real FDP = species[13];
-  real hpr = species[14];
-  real ADP = species[15];
-  real G6P = species[16];
-  real NADH = species[17];
+  // unpack ode_metabolites...
+  real ATP = ode_metabolites[1];
+  real PEP = ode_metabolites[2];
+  real P = ode_metabolites[3];
+  real GAP = ode_metabolites[4];
+  real F6P = ode_metabolites[5];
+  real DAP = ode_metabolites[6];
+  real eiia = ode_metabolites[7];
+  real GLCp = ode_metabolites[8];
+  real PGA2 = ode_metabolites[9];
+  real ei = ode_metabolites[10];
+  real PGA3 = ode_metabolites[11];
+  real eiicb = ode_metabolites[12];
+  real FDP = ode_metabolites[13];
+  real hpr = ode_metabolites[14];
+  real ADP = ode_metabolites[15];
+  real G6P = ode_metabolites[16];
+  real NADH = ode_metabolites[17];
 
   real PYR = ct[1]+1*ATP-0.5*PEP+0.5*P+0.5*GAP+0.5*F6P+0.5*DAP-0.5*eiia-0.5*PGA2-0.5*ei-0.5*PGA3-0.5*eiicb+FDP-0.5*hpr+0.5*ADP+0.5*G6P+NADH;
   real eiP = ct[2]-ei;
@@ -41,7 +41,7 @@ real[] get_derived_quantities(vector species, real[] known_reals){
   return {PYR, eiP, hprP, NAD, AMP, BPG, eiiaP, GLCx, eiicbP, MgADP, MgATP, MgFDP};
 }
 
-vector get_fluxes(vector species, vector kinetic_parameters, real[] known_reals){
+vector get_fluxes(vector ode_metabolites, vector kinetic_parameters, real[] known_reals){
   // unpack known reals
   real ct[9] = known_reals[1:9];
   real MG = known_reals[10];
@@ -63,24 +63,24 @@ vector get_fluxes(vector species, vector kinetic_parameters, real[] known_reals)
   real SUCCOA = known_reals[26];
   real X5P = known_reals[27];
 
-  // unpack species...
-  real ATP = species[1];
-  real PEP = species[2];
-  real P = species[3];
-  real GAP = species[4];
-  real F6P = species[5];
-  real DAP = species[6];
-  real eiia = species[7];
-  real GLCp = species[8];
-  real PGA2 = species[9];
-  real ei = species[10];
-  real PGA3 = species[11];
-  real eiicb = species[12];
-  real FDP = species[13];
-  real hpr = species[14];
-  real ADP = species[15];
-  real G6P = species[16];
-  real NADH = species[17];
+  // unpack ode_metabolites...
+  real ATP = ode_metabolites[1];
+  real PEP = ode_metabolites[2];
+  real P = ode_metabolites[3];
+  real GAP = ode_metabolites[4];
+  real F6P = ode_metabolites[5];
+  real DAP = ode_metabolites[6];
+  real eiia = ode_metabolites[7];
+  real GLCp = ode_metabolites[8];
+  real PGA2 = ode_metabolites[9];
+  real ei = ode_metabolites[10];
+  real PGA3 = ode_metabolites[11];
+  real eiicb = ode_metabolites[12];
+  real FDP = ode_metabolites[13];
+  real hpr = ode_metabolites[14];
+  real ADP = ode_metabolites[15];
+  real G6P = ode_metabolites[16];
+  real NADH = ode_metabolites[17];
 
   // unpack parameters...
   real Keq = kinetic_parameters[1];
@@ -240,19 +240,19 @@ vector get_fluxes(vector species, vector kinetic_parameters, real[] known_reals)
   real Km = kinetic_parameters[155];
 
   // get derived quantities
-  real derived_quantities[12] = get_derived_quantities(species, known_reals);
-  real PYR = derived_quantities[1];
-  real eiP = derived_quantities[2];
-  real hprP = derived_quantities[3];
-  real NAD = derived_quantities[4];
-  real AMP = derived_quantities[5];
-  real BPG = derived_quantities[6];
-  real eiiaP = derived_quantities[7];
-  real GLCx = derived_quantities[8];
-  real eiicbP = derived_quantities[9];
-  real MgADP = derived_quantities[10];
-  real MgATP = derived_quantities[11];
-  real MgFDP = derived_quantities[12];
+  real derived_metabolites[12] = get_derived_metabolites(ode_metabolites, known_reals);
+  real PYR = derived_metabolites[1];
+  real eiP = derived_metabolites[2];
+  real hprP = derived_metabolites[3];
+  real NAD = derived_metabolites[4];
+  real AMP = derived_metabolites[5];
+  real BPG = derived_metabolites[6];
+  real eiiaP = derived_metabolites[7];
+  real GLCx = derived_metabolites[8];
+  real eiicbP = derived_metabolites[9];
+  real MgADP = derived_metabolites[10];
+  real MgATP = derived_metabolites[11];
+  real MgFDP = derived_metabolites[12];
 
   // calculate fluxes
   real PGI = Vmax*(G6P-F6P/Keq)/KmG6P/(1+F6P/KmF6P+G6P/KmG6P+PEP/KmPEP+PGN/KmPGN);
@@ -314,9 +314,9 @@ vector get_odes(vector fluxes){
           -PTS_1+PTS_2,                      // hpr
           PFK-PGK-PYK+ATP_MAINTENANCE,       // ADP
           -PGI+PTS_4,                        // G6P
-          GDH]';
+          GDH]';                             // NADH
 }
 
-vector steady_state_equation(vector species, vector kinetic_parameters, real[] known_reals, int[] known_ints){
-  return get_odes(get_fluxes(species, kinetic_parameters, known_reals));
+vector steady_state_equation(vector ode_metabolites, vector kinetic_parameters, real[] known_reals, int[] known_ints){
+  return get_odes(get_fluxes(ode_metabolites, kinetic_parameters, known_reals));
 }

@@ -3,29 +3,29 @@ functions {
 }
 data {
   // dimensions
-  int<lower=1> S;             // number of species
-  int<lower=1> D;             // number of derived quantities
-  int<lower=1> F;             // number of fluxes
-  int<lower=1> SM;            // number of species measurements
-  int<lower=1> DM;            // number of derived quantity measurements
-  int<lower=1> FM;            // number of flux measurements
-  int<lower=1> KR;            // number of known reals
+  int<lower=1> N_ode;         // number of ode metabolites
+  int<lower=1> N_derived;     // number of derived metabolites
+  int<lower=1> N_flux;        // number of fluxes
+  int<lower=1> M_ode;         // number of measurements of ode metabolites
+  int<lower=1> M_derived;     // number of measurements of derived metabolites
+  int<lower=1> M_flux;        // number of flux measurements
+  int<lower=1> N_known_real;  // number of known reals
   int<lower=1> P;             // total number of parameters
   // measurements
-  int flux_measurement_ix[FM];
-  vector[FM] flux_measurement;
-  int species_measurement_ix[SM];
-  vector[SM] species_measurement;
-  int derived_quantity_measurement_ix[DM];
-  vector[DM] derived_quantity_measurement;
+  int<lower=1,upper=N_flux> measurement_ix_flux[M_flux];
+  vector[M_flux] measurement_flux;
+  int<lower=1,upper=N_ode> measurement_ix_ode[M_ode];
+  vector[M_ode] measurement_ode;
+  int<lower=1,upper=N_derived> measurement_ix_derived[M_derived];
+  vector[M_derived] measurement_derived;
   // hardcoded priors
   vector[P] prior_location;
   vector[P] prior_scale;
-  real<lower=0> sigma_measurement;
+  real<lower=0> sigma_metabolite;
   real<lower=0> sigma_flux;
-  real known_reals[KR];
+  real known_reals[N_known_real];
   // algebra solver config
-  vector[S] initial_guess;
+  vector[N_ode] initial_guess;
   real rel_tol;
   real f_tol;
   int max_steps;
@@ -39,35 +39,31 @@ parameters {
   vector<lower=0>[P] kinetic_parameters;
 }
 transformed parameters {
-  vector[S] species_hat = algebra_solver(steady_state_equation,
+  vector[N_ode] ode_hat = algebra_solver(steady_state_equation,
                                          initial_guess,
                                          kinetic_parameters,
                                          known_reals,
                                          x_i,
                                          rel_tol, f_tol, max_steps);
-  real derived_quantity_hat[D] = get_derived_quantities(species_hat, known_reals); 
-  vector[F] flux_hat = get_fluxes(species_hat, kinetic_parameters, known_reals);
+  real derived_hat[N_derived] = get_derived_metabolites(ode_hat, known_reals); 
+  vector[N_flux] flux_hat = get_fluxes(ode_hat, kinetic_parameters, known_reals);
 }
 model {
   kinetic_parameters ~ lognormal(prior_location, prior_scale);
   if (LIKELIHOOD == 1){
-    species_measurement[species_measurement_ix]
-      ~ normal(species_hat[species_measurement_ix], sigma_measurement);
-    derived_quantity_measurement[derived_quantity_measurement_ix]
-      ~ normal(derived_quantity_hat[derived_quantity_measurement_ix], sigma_measurement);
-    flux_measurement[flux_measurement_ix] ~ normal(flux_hat[flux_measurement_ix], sigma_flux);
+    measurement_ode[measurement_ix_ode] ~ normal(ode_hat[measurement_ix_ode], sigma_metabolite);
+    measurement_derived[measurement_ix_derived] ~ normal(derived_hat[measurement_ix_derived], sigma_metabolite);
+    measurement_flux[measurement_ix_flux] ~ normal(flux_hat[measurement_ix_flux], sigma_flux);
   }
 }
 generated quantities {
-  vector[S] species_pred;
-  vector[D] derived_quantity_pred;
-  for (s in 1:S){
-    species_pred[s] = normal_rng(species_hat[s], sigma_measurement);
-  }
-  for (d in 1:D){
-    derived_quantity_pred[d] = normal_rng(derived_quantity_hat[d], sigma_measurement);
-  }
-  for (f in 1:F){
-    derived_quantity_pred[f] = normal_rng(derived_quantity_hat[f], sigma_flux);
-  }
+  vector[N_ode] ode_pred;
+  vector[N_derived] derived_pred;
+  vector[N_flux] flux_pred;
+  for (n in 1:N_ode)
+    ode_pred[n] = normal_rng(ode_hat[n], sigma_metabolite);
+  for (n in 1:N_derived)
+    derived_pred[n] = normal_rng(derived_hat[n], sigma_metabolite);
+  for (n in 1:N_flux)
+    flux_pred[n] = normal_rng(flux_hat[n], sigma_flux);
 }

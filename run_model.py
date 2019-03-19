@@ -6,20 +6,19 @@ from hardcoded_numbers import (EXAMPLE_SPECIES_INPUT,
 
 METABOLITE_MEASUREMENT_FILE = 'data/millard_steady_state_metabolite_measurements.csv'
 FLUX_MEASUREMENT_FILE = 'data/millard_steady_state_flux_measurements.csv'
-DERIVED_QUANTITY_NAMES = ['PYR', 'eiP', 'hprP', 'NAD', 'AMP', 'BPG', 'eiiaP',
+DERIVED_METABOLITE_NAMES = ['PYR', 'eiP', 'hprP', 'NAD', 'AMP', 'BPG', 'eiiaP',
                           'GLCx', 'eiicbP', 'MgADP', 'MgATP', 'MgFDP']
 FLUX_NAMES = ['PGI', 'PFK', 'FBA', 'TPI', 'GDH', 'PGK', 'GPM', 'ENO', 'PYK',
               'FBP', 'PPS', 'PTS_0', 'PTS_1', 'PTS_2', 'PTS_3', 'PTS_4',
               'ATP_MAINTENANCE', 'XCH_RMM']
-REL_TOL = 1e-9
+REL_TOL = 1e-13
 F_TOL = 1e-6
 MAX_STEPS = int(1e9)
 LIKELIHOOD = 1
 
 
-ode_metabolite_names = list(EXAMPLE_SPECIES_INPUT.keys())
-
 if __name__ == '__main__':
+    ode_metabolite_names = list(EXAMPLE_SPECIES_INPUT.keys())
     model = StanModel_cache(file='model.stan')
 
     metabolites, fluxes = (
@@ -29,11 +28,11 @@ if __name__ == '__main__':
         for handle, index_col, names in zip(
                 [METABOLITE_MEASUREMENT_FILE, FLUX_MEASUREMENT_FILE],
                 ['metabolite', 'flux'],
-                [list(EXAMPLE_SPECIES_INPUT) + DERIVED_QUANTITY_NAMES, FLUX_NAMES]
+                [list(EXAMPLE_SPECIES_INPUT) + DERIVED_METABOLITE_NAMES, FLUX_NAMES]
         ))
     fluxes['ix'] = range(1, len(fluxes) + 1)
     metabolites_derived = (metabolites
-                        .reindex([i for i in DERIVED_QUANTITY_NAMES if i in metabolites.index])
+                        .reindex([i for i in DERIVED_METABOLITE_NAMES if i in metabolites.index])
                         .assign(ix=lambda df: range(1, len(df) + 1)))
     metabolites_ode = (metabolites
                     .reindex([i for i in list(EXAMPLE_SPECIES_INPUT.keys())
@@ -44,23 +43,23 @@ if __name__ == '__main__':
         for df in [metabolites_derived, metabolites_ode, fluxes]
     )
     data = {
-        'S': len(metabolites_ode),
-        'D': len(metabolites_derived),
-        'F': len(fluxes),
-        'SM': len(metabolites_ode_measured),
-        'DM': len(metabolites_derived_measured),
-        'FM': len(fluxes_measured),
-        'KR': len(EXAMPLE_KNOWN_REALS.keys()),
+        'N_ode': len(metabolites_ode),
+        'N_derived': len(metabolites_derived),
+        'N_flux': len(fluxes),
+        'M_ode': len(metabolites_ode_measured),
+        'M_derived': len(metabolites_derived_measured),
+        'M_flux': len(fluxes_measured),
+        'N_known_real': len(EXAMPLE_KNOWN_REALS.keys()),
         'P': len(EXAMPLE_KINETIC_PARAMETER_INPUT),
-        'flux_measurement_ix': fluxes_measured['ix'],
-        'flux_measurement': fluxes_measured['exp value'],
-        'species_measurement_ix': metabolites_ode_measured['ix'],
-        'species_measurement': metabolites_ode_measured['exp value'],
-        'derived_quantity_measurement_ix': metabolites_derived_measured['ix'],
-        'derived_quantity_measurement': metabolites_derived_measured['exp value'],
+        'measurement_ix_flux': fluxes_measured['ix'],
+        'measurement_flux': fluxes_measured['exp value'],
+        'measurement_ix_ode': metabolites_ode_measured['ix'],
+        'measurement_ode': metabolites_ode_measured['exp value'],
+        'measurement_ix_derived': metabolites_derived_measured['ix'],
+        'measurement_derived': metabolites_derived_measured['exp value'],
         'prior_location': list(EXAMPLE_KINETIC_PARAMETER_INPUT.values()),
         'prior_scale': [i / 5 for i in EXAMPLE_KINETIC_PARAMETER_INPUT.values()],
-        'sigma_measurement': 0.2,
+        'sigma_metabolite': 0.2,
         'sigma_flux': 0.2,
         'known_reals': list(EXAMPLE_KNOWN_REALS.values()),
         'initial_guess': list(EXAMPLE_SPECIES_INPUT.values()),

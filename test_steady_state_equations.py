@@ -11,7 +11,7 @@ DERIVED_QUANTITIES = [
     'PYR', 'eiP', 'hprP', 'NAD', 'AMP', 'BPG', 'eiiaP', 'GLCx', 'eiicbP',
     'MgADP', 'MgATP', 'MgFDP'
 ]
-TIME_POINTS = np.linspace(0, 20, 100)
+TIME_POINTS = np.linspace(0, 100, 100)
 
 if __name__ == '__main__':
     model = StanModel_cache(file='test_steady_state_equations.stan')
@@ -38,10 +38,9 @@ if __name__ == '__main__':
     derived_out = infd.posterior['derived_quantities_sim'].mean(dim=['chain', 'draw']).to_series().unstack()
     out = species_out.join(derived_out)
     out = out.sort_index()
-    f, axes = plt.subplots(2, 4, sharex=True, figsize=[15, 10])
+    f, axes = plt.subplots(5, 6, sharex=True, figsize=[15, 15])
     axes = axes.ravel()
-    for ax, col in zip(axes,
-                       ['GLCp', 'ADP', 'ATP', 'P', 'G6P', 'FDP', 'PYR', 'GLCx']):
+    for ax, col in zip(axes, out.columns):
         ax.plot(out.index, out[col])
         ax.set(title=col, xlabel='Time')
         if ax in [axes[0], axes[4]]:
