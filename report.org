@@ -1,0 +1,164 @@
+#+TITLE: Modelling ecoli glycolysis with Stan
+
+This report documents what we've been doing with this repository.
+
+* Kinetics
+The first step in our procedure is to represent the available kinetic
+information as Stan functions. This job is handled by Stan functions in the
+file ~steady_state_equation.stan~, and comprises the following steps:
+
+1. Where possible, express metabolites as functions of other metabolites and
+   system variables (see the function ~get_derived_metabolites~)
+2. Express the rate of each reaction as a function of metabolite
+   concentrations, system variables and kinetic parameters (~get_fluxes~).
+3. Express the rate of change of each non-derived metabolite as a function of
+   reaction rates (~get_odes~).
+4. Using the functions defined above, express the rate of change of each
+   non-derived metabolite as a function of current non-derived metabolite
+   concentrations, system variables and kinetic parameters. Ensure that this
+   function can be used with Stan's algebra solver (~steady_state_equation~)
+   
+To test that the kinetics were encoded correctly, we used the following stan
+program to create a time course of all metabolite concentrations that can be
+compared with time courses from copasi with the same input:
+
+#+begin_src python :results output code
+# Uncomment to update the code
+# with open('test_steady_state_equations.stan', 'r') as f:
+    # print(f.read())
+#+end_src
+
+#+begin_src stan
+functions {
+#include steady_state_equation.stan
+  real[] ode(real t,        // time
+             real[] s,      // state
+             real[] theta,  // parameters
+             real[] x_r,    // data (real)
+             int[] x_i){   // data (integer)
+    return to_array_1d(steady_state_equation(to_vector(s), to_vector(theta), x_r, x_i));
+  }
+}
+data {
+  int<lower=1> N_ode;
+  int<lower=1> N_derived;
+  int<lower=1> N_known_real;
+  int<lower=1> P;
+  int<lower=1> T;
+  real initial_metabolite_ode[N_ode];
+  real kinetic_parameters[P];
+  real known_reals[N_known_real];
+  real ts[T];
+  real t0;
+}
+generated quantities {
+  int known_ints[0];
+  real metabolite_sim_ode[T+1,N_ode]; 
+  real metabolite_sim_derived[T+1, N_derived];
+  metabolite_sim_ode[1] = initial_metabolite_ode;
+  metabolite_sim_ode[2:T+1] = integrate_ode_rk45(ode,
+                                                 initial_metabolite_ode,
+                                                 t0,
+                                                 ts,
+                                                 kinetic_parameters,
+                                                 known_reals,
+                                                 known_ints);
+  for (t in 1:T+1){
+    metabolite_sim_derived[t] = get_derived_metabolites(to_vector(metabolite_sim_ode[t]), known_reals);
+  }
+}
+
+#+end_src
+
+* Model
+With the reaction system's kinetics expressed in a Stan-friendly format, we
+made the following simple model with independent lognormal priors for all
+kinetic parameters:
+
+#+begin_src python :results output code
+# Uncomment to update the code
+# with open('model.stan', 'r') as f:
+    # print(f.read())
+#+end_src
+
+#+begin_src stan
+functions {
+#include steady_state_equation.stan
+}
+data {
+  // dimensions
+  int<lower=1> N_ode;         // number of ode metabolites
+  int<lower=1> N_derived;     // number of derived metabolites
+  int<lower=1> N_flux;        // number of fluxes
+  int<lower=1> M_ode;         // number of measurements of ode metabolites
+  int<lower=1> M_derived;     // number of measurements of derived metabolites
+  int<lower=1> M_flux;        // number of flux measurements
+  int<lower=1> N_known_real;  // number of known reals
+  int<lower=1> P;             // total number of parameters
+  // measurements
+  int<lower=1,upper=N_flux> measurement_ix_flux[M_flux];
+  vector[M_flux] measurement_flux;
+  int<lower=1,upper=N_ode> measurement_ix_ode[M_ode];
+  vector[M_ode] measurement_ode;
+  int<lower=1,upper=N_derived> measurement_ix_derived[M_derived];
+  vector[M_derived] measurement_derived;
+  // hardcoded priors
+  vector[P] prior_location;
+  vector[P] prior_scale;
+  real<lower=0> sigma_metabolite;
+  real<lower=0> sigma_flux;
+  real known_reals[N_known_real];
+  // algebra solver config
+  vector[N_ode] initial_guess;
+  real rel_tol;
+  real f_tol;
+  int max_steps;
+  // likelihood config
+  int<lower=0,upper=1> LIKELIHOOD;
+}
+transformed data {
+  int x_i[0];
+}
+parameters {
+  vector<lower=0>[P] kinetic_parameters;
+}
+transformed parameters {
+  vector[N_ode] ode_hat = algebra_solver(steady_state_equation,
+                                         initial_guess,
+                                         kinetic_parameters,
+                                         known_reals,
+                                         x_i,
+                                         rel_tol, f_tol, max_steps);
+  real derived_hat[N_derived] = get_derived_metabolites(ode_hat, known_reals); 
+  vector[N_flux] flux_hat = get_fluxes(ode_hat, kinetic_parameters, known_reals);
+}
+model {
+  kinetic_parameters ~ lognormal(prior_location, prior_scale);
+  if (LIKELIHOOD == 1){
+    measurement_ode[measurement_ix_ode] ~ normal(ode_hat[measurement_ix_ode], sigma_metabolite);
+    measurement_derived[measurement_ix_derived] ~ normal(derived_hat[measurement_ix_derived], sigma_metabolite);
+    measurement_flux[measurement_ix_flux] ~ normal(flux_hat[measurement_ix_flux], sigma_flux);
+  }
+}
+generated quantities {
+  vector[N_ode] ode_pred;
+  vector[N_derived] derived_pred;
+  vector[N_flux] flux_pred;
+  for (n in 1:N_ode)
+    ode_pred[n] = normal_rng(ode_hat[n], sigma_metabolite);
+  for (n in 1:N_derived)
+    derived_pred[n] = normal_rng(derived_hat[n], sigma_metabolite);
+  for (n in 1:N_flux)
+    flux_pred[n] = normal_rng(flux_hat[n], sigma_flux);
+}
+#+end_src
+
+The model accounts for measurement error by assuming that metabolite and flux
+measurements are noisily around the true values, with the noise described by a
+normal distribution with known variance. Non-experimental uncertainty about
+parameter values is taken into account by a lognormal prior distribution for
+each kinetic parameter, with hardcoded location and scale.
+
+This model doesn't ensure that only thermodynamically feasible regions of
+parameter space are explored - this will be achieved in a future model through
+a more careful choice of prior distributions.
