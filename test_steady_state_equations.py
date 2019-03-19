@@ -18,13 +18,13 @@ if __name__ == '__main__':
     data = {
         'S': len(EXAMPLE_SPECIES_INPUT.values()),
         'P': len(EXAMPLE_KINETIC_PARAMETER_INPUT.values()),
-        'R': len(EXAMPLE_KNOWN_REALS_INPUT.values()),
+        'R': len(EXAMPLE_KNOWN_REALS.values()),
         'T': len(TIME_POINTS) - 1,
         'ts': TIME_POINTS[1:],
         't0': TIME_POINTS[0],
         'species': list(EXAMPLE_SPECIES_INPUT.values()),
         'kinetic_parameters': list(EXAMPLE_KINETIC_PARAMETER_INPUT.values()),
-        'known_reals': list(EXAMPLE_KNOWN_REALS_INPUT.values())
+        'known_reals': list(EXAMPLE_KNOWN_REALS.values())
 
     }
     fit = model.sampling(data=data, algorithm='Fixed_param', iter=1, chains=1)
