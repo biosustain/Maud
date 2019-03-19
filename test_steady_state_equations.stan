@@ -9,23 +9,30 @@ functions {
   }
 }
 data {
-  int<lower=1> S;
+  int<lower=1> N_ode;
+  int<lower=1> N_derived;
+  int<lower=1> N_known_real;
   int<lower=1> P;
-  int<lower=1> R;
   int<lower=1> T;
-  real species[S];
+  real initial_metabolite_ode[N_ode];
   real kinetic_parameters[P];
-  real known_reals[R];
+  real known_reals[N_known_real];
   real ts[T];
   real t0;
 }
 generated quantities {
   int known_ints[0];
-  real species_sim[T+1,S]; 
-  real derived_quantities_sim[T+1, 12];
-  species_sim[1] = species;
-  species_sim[2:T+1] = integrate_ode_rk45(ode, species, t0, ts, kinetic_parameters, known_reals, known_ints);
+  real metabolite_sim_ode[T+1,N_ode]; 
+  real metabolite_sim_derived[T+1, N_derived];
+  metabolite_sim_ode[1] = initial_metabolite_ode;
+  metabolite_sim_ode[2:T+1] = integrate_ode_rk45(ode,
+                                                 initial_metabolite_ode,
+                                                 t0,
+                                                 ts,
+                                                 kinetic_parameters,
+                                                 known_reals,
+                                                 known_ints);
   for (t in 1:T+1){
-    derived_quantities_sim[t] = get_derived_quantities(to_vector(species_sim[t]), known_reals);
+    metabolite_sim_derived[t] = get_derived_metabolites(to_vector(metabolite_sim_ode[t]), known_reals);
   }
 }
