@@ -1,5 +1,7 @@
 #+TITLE: Modelling ecoli glycolysis with Stan
 
+This report documents what we've been doing with this repository.
+
 * Kinetics
 The first step in our procedure is to represent the available kinetic
 information as Stan functions. This job is handled by Stan functions in the
