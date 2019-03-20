@@ -1,11 +1,49 @@
 #+TITLE: Modelling ecoli glycolysis with Stan
 
-This report documents what we've been doing with this repository.
+* Introduction
 
-* Kinetics
-The first step in our procedure is to represent the available kinetic
-information as Stan functions. This job is handled by Stan functions in the
-file ~steady_state_equation.stan~, and comprises the following steps:
+Our long-term aim is to develop a platform for making probabilistic inferences
+about metabolic networks incorporating the following information:
+
+- Structural information about the reactions that make up the network
+- Information from the literature about parameter values
+- Information from experimental data
+
+We aim to do this using Bayesian models implemented with the probabilistic
+programming framework [[https://mc-stan.org/][Stan.]]
+
+In this project we aim to validate the modelling approach by recovering some
+known results about about the central metabolism of ecoli. We chose this system
+because is has already been pretty well investigated and is relatively simple,
+which should make for more straightforward modelling. We used structural
+information and measurement data from
+@millardMetabolicRegulationSufficient2017.
+
+* Our method
+Our overall approach is to represent structural information about the reaction
+network as a system of ordinary differential equations indicating how the rate
+of change of each metabolite concentration depends on current concentrations,
+system variables and kinetic parameters. These equations are built up out of
+components describing each reaction. Non-experimental information from the
+literature is represented as prior distributions over the kinetic parameters
+and system variables. Experimental information is represented through a simple
+regression model.
+
+** Simplifying assumptions
+We made a few simplifications to make the model easier to fit. Within the ecoli
+central metabolism, we looked specifically at the glycolysis pathways. 
+
+# *TG* not sure if 'pathways' is the right word here...
+We also made  simplifying assumptions about the reactions themselves[...].
+
+* Stan Implementation
+Our Stan model consists of two files: a file ~steady_state_equation.stan~
+representing the system's kinetics and a file ~model.stan~ which specifies how
+information is taken into account.
+
+** Kinetics
+The reaction system's kinetics are represented by Stan functions in the file
+~steady_state_equation.stan~, according to the following steps:
 
 1. Where possible, express metabolites as functions of other metabolites and
    system variables (see the function ~get_derived_metabolites~)
@@ -70,7 +108,7 @@ generated quantities {
 
 #+end_src
 
-* Model
+** Model
 With the reaction system's kinetics expressed in a Stan-friendly format, we
 made the following simple model with independent lognormal priors for all
 kinetic parameters:
@@ -162,3 +200,6 @@ each kinetic parameter, with hardcoded location and scale.
 This model doesn't ensure that only thermodynamically feasible regions of
 parameter space are explored - this will be achieved in a future model through
 a more careful choice of prior distributions.
+
+* Bibliography
+#+bibliography:bibliography.bib
