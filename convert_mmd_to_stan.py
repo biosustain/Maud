@@ -88,6 +88,35 @@ def get_odes(target_file):
                 expression = l.split(' ')[2].replace('\t', '').replace('FunctionFor', '')
                 out[reaction] = expression
     return out
+
+
+def build_derived_quantity_function(conserved_totals,
+                                    ode_metabolites,
+                                    derived_quantity_expressions):
+    first_block = """real[] get_derived_quantities(vector ode_metabolites,
+                              real[] global_quantities,
+                              real[] conserved_totals){"""
+    conserved_total_lines = [
+        f"  real ct_{i+1} = conserved_totals[{i+1}];"
+        for i, _ in enumerate(conserved_totals)
+    ]
+    ode_metabolite_lines = [
+        f"  real {metabolite} = ode_metabolites[{i+1}];"
+        for i, metabolite in enumerate(ode_metabolites)
+    ]
+    derivation_lines = [
+        f"  real {quantity} = {expression}"
+        for quantity, expression in derived_quantity_expressions.items()
+    ]
+    return_line = f"  return {{{', '.join(derived_quantity_expressions.keys())}}};"
+    close_braces_line = "}"
+    return '\n'.join([first_block,
+                      *conserved_total_lines,
+                      *ode_metabolite_lines,
+                      *derivation_lines,
+                      return_line,
+                      close_braces_line])
+
             
 
 if __name__ == '__main__':
@@ -97,10 +126,11 @@ if __name__ == '__main__':
     compartments = get_named_quantity(TARGET_FILE, 'compartment')
     kinetic_parameters = get_named_quantity(TARGET_FILE, 'kinetic parameter')
     global_quantities = get_named_quantity(TARGET_FILE, 'global quantity')
-    derived_quantities = get_derived_quantities(TARGET_FILE)
+    derived_quantity_expressions = get_derived_quantities(TARGET_FILE)
     kinetic_functions = get_kinetic_functions(TARGET_FILE)
     odes = get_odes(TARGET_FILE)
 
-    print(list(metabolites))
+    dqf = build_derived_quantity_function(conserved_totals, ode_metabolites, derived_quantity_expressions)
+    print(dqf)
 
 
