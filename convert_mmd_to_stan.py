@@ -76,7 +76,7 @@ def get_kinetic_functions(input_file):
     with open(input_file, 'r') as f:
         for l in f:
             if 'kinetic function' in l:
-                reaction = re.findall("reaction '(.*?)'", l)[0]
+                reaction = l.split(' ')[0].replace('FunctionFor', '')
                 expression = l.split(' ')[2].replace('\t', '')
                 out[reaction] = expression
     return out
@@ -91,7 +91,8 @@ def get_odes(input_file):
                 expression = (l.split(' ')[2]
                               .replace('\t', '')
                               .replace('FunctionFor', '')
-                              .replace(';', ','))
+                              .replace(';', ',')
+                              .replace('*cell_cytoplasm', ''))  #TODO: deal with compartments properly
                 out[reaction] = expression
     return out
 
@@ -183,11 +184,11 @@ def build_kinetics_function(conserved_totals,
                       close_braces_line])
 
 
-def build_ode_function(odes):
+def build_ode_function(odes, kinetic_functions):
     definition_line = "vector get_odes(vector fluxes){"
     flux_unpack_lines = [
         f"  real {flux} = fluxes[{i+1}];"
-        for i, flux in enumerate(odes.keys())
+        for i, flux in enumerate(kinetic_functions.keys())
     ]
     return_line_open = "  return ["
     return_body_lines = [
@@ -237,7 +238,7 @@ if __name__ == '__main__':
         derived_quantity_expressions,
         global_quantities
     )
-    ode_function = build_ode_function(odes)
+    ode_function = build_ode_function(odes, kinetic_functions)
     steady_state_function = build_steady_state_function()
 
     out = '\n\n'.join([derived_quantity_function,
@@ -247,6 +248,6 @@ if __name__ == '__main__':
     output_file = open(OUTPUT_FILE, "w")
     output_file.write(out)
     output_file.close()
-    print(out)
+    print(ode_function)
 
 
