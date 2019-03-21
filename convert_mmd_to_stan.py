@@ -24,15 +24,6 @@ def get_all_metabolites(input_file):
                 yield re.findall("concentration of metabolite '(.*?)'", l)[0]
 
 
-
-def get_ode_metabolites(input_file):
-    with open(input_file, 'r') as f:
-        for l in f:
-            if l[:4] == 'init':
-                met = l.split(' ')[1]
-                yield met
-
-
 def is_float(value):
     try:
         float(value)
@@ -56,6 +47,14 @@ def get_named_quantity(input_file, regex, remove_non_numeric=True):
                     quantity = remove_non_numeric_bits(quantity)
                 out[name] = quantity
     return out
+
+
+def get_ode_metabolites(input_file):
+    return {
+        k.replace('init ', ''): float(v)
+        for k, v in get_named_quantity(input_file, '; metabolite.*reactions', False).items()
+        if is_float(v)
+    }
 
 
 def get_derived_quantities(input_file):
