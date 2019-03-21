@@ -33,14 +33,6 @@ def get_ode_metabolites(input_file):
                 yield met
             
 
-def get_conserved_totals(input_file):
-    with open(input_file, 'r') as f:
-        for l in f:
-            if 'conserved total' in l:
-                ct = remove_non_numeric_bits(l.split(' ')[2])
-                yield ct
-
-
 def get_named_quantity(input_file, quantity_type):
     out = dict()
     with open(input_file, 'r') as f:
@@ -48,6 +40,8 @@ def get_named_quantity(input_file, quantity_type):
             if quantity_type in l:
                 split_line = l.split('=')
                 name = split_line[0].strip()
+                # turn square bracket indexes into subscripts
+                name = re.sub(r"\[([^{}]+)\]", r"_\1", name)
                 volume = remove_non_numeric_bits(split_line[1])
                 out[name] = volume
     return out
@@ -63,8 +57,6 @@ def get_derived_quantities(input_file):
             if on:
                 quantity = l.split(' ')[0]
                 expression = re.findall("\= (.*?);", l)[0].replace('\t', '') + ';'
-                # turn square bracket indexes into subscripts
-                expression = re.sub(r"\[([^{}]+)\]", r"_\1", expression)
                 out[quantity] = expression
             if l == '{Assignment Model Entities: }\n':
                 on = True
@@ -97,20 +89,13 @@ def get_odes(input_file):
     return out
 
 
-def build_derived_quantity_function(conserved_totals,
-                                    compartments,
+def build_derived_quantity_function(known_reals,
                                     ode_metabolites,
                                     derived_quantity_expressions):
-    first_block = """real[] get_derived_quantities(vector ode_metabolites,
-                              real[] global_quantities,
-                              real[] conserved_totals){"""
-    conserved_total_lines = [
-        f"  real ct_{i} = conserved_totals[{i+1}];"
-        for i, _ in enumerate(conserved_totals)
-    ]
-    compartment_lines = [
-        f"  real {compartment} = {compartment};"
-        for compartment in compartments.values()
+    first_line = """real[] get_derived_quantities(vector ode_metabolites, real[] known_reals){"""
+    known_reals_lines = [
+        f"  real {kr} = known_reals[{i+1}];"
+        for i, kr in enumerate(known_reals.keys())
     ]
     ode_metabolite_lines = [
         f"  real {metabolite} = ode_metabolites[{i+1}];"
@@ -122,33 +107,25 @@ def build_derived_quantity_function(conserved_totals,
     ]
     return_line = f"  return {{{', '.join(derived_quantity_expressions.keys())}}};"
     close_braces_line = "}"
-    return '\n'.join([first_block,
-                      *compartment_lines,
-                      *conserved_total_lines,
+    return '\n'.join([first_line,
+                      *known_reals_lines,
                       *ode_metabolite_lines,
                       *derivation_lines,
                       return_line,
                       close_braces_line])
 
 
-def build_kinetics_function(conserved_totals,
-                            compartments,
+def build_kinetics_function(known_reals,
                             kinetic_functions,
                             ode_metabolites,
-                            derived_quantity_expressions,
-                            global_quantities):
+                            derived_quantity_expressions):
     first_block = """real[] get_kinetics(vector ode_metabolites,
                     vector kinetic_parameters,
-                    real[] global_quantities,
-                    real[] conserved_totals){"""
+                    real[] known reals){"""
 
-    conserved_total_lines = [
-        f"  real ct_{i} = conserved_totals[{i+1}];"
-        for i, _ in enumerate(conserved_totals)
-    ]
-    compartment_lines = [
-        f"  real {compartment} = {compartment};"
-        for compartment in compartments.values()
+    known_reals_lines = [
+        f"  real {kr} = known_reals[{i+1}];"
+        for i, kr in enumerate(known_reals.keys())
     ]
     ode_metabolite_lines = [
         f"  real {metabolite} = ode_metabolites[{i+1}];"
@@ -173,8 +150,7 @@ def build_kinetics_function(conserved_totals,
     return_line = f"  return [{', '.join(kinetic_functions.keys())}]';"
     close_braces_line = "}"
     return '\n'.join([first_block,
-                      *compartment_lines,
-                      *conserved_total_lines,
+                      *known_reals_lines,
                       *ode_metabolite_lines,
                       *kinetic_parameter_lines,
                       derived_quantity_calculation_line,
@@ -206,37 +182,36 @@ def build_ode_function(odes, kinetic_functions):
 
 
 def build_steady_state_function():
-    return (
-    """vector steady_state_equation(vector ode_metabolites, vector kinetic_parameters, real[] known_reals, int[] known ints){
-    return get_odes(get_kinetics(ode_metabolites, kinetic_parameters, known_reals));"""
-    )
+    return """vector steady_state_equation(vector ode_metabolites,
+                             vector kinetic_parameters,
+                             real[] known_reals,
+                             int[] known ints){
+    return get_odes(get_kinetics(ode_metabolites, kinetic_parameters, known_reals));\n}"""
             
 
 if __name__ == '__main__':
     # parse input
     metabolites = get_all_metabolites(INPUT_FILE)
     ode_metabolites = get_ode_metabolites(INPUT_FILE)
-    conserved_totals = get_conserved_totals(INPUT_FILE)
+    conserved_totals = get_named_quantity(INPUT_FILE, 'conserved total')
     compartments = get_named_quantity(INPUT_FILE, 'compartment')
-    kinetic_parameters = get_named_quantity(INPUT_FILE, 'kinetic parameter')
     global_quantities = get_named_quantity(INPUT_FILE, 'global quantity')
+    known_reals = {**conserved_totals, **compartments, **global_quantities}
+    kinetic_parameters = get_named_quantity(INPUT_FILE, 'kinetic parameter')
     derived_quantity_expressions = get_derived_quantities(INPUT_FILE)
     kinetic_functions = get_kinetic_functions(INPUT_FILE)
     odes = get_odes(INPUT_FILE)
 
     derived_quantity_function = build_derived_quantity_function(
-        conserved_totals,
-        compartments,
+        known_reals,
         ode_metabolites,
         derived_quantity_expressions
     )
     kinetics_function = build_kinetics_function(
-        conserved_totals,
-        compartments,
+        known_reals,
         kinetic_functions,
         ode_metabolites,
         derived_quantity_expressions,
-        global_quantities
     )
     ode_function = build_ode_function(odes, kinetic_functions)
     steady_state_function = build_steady_state_function()
@@ -248,6 +223,6 @@ if __name__ == '__main__':
     output_file = open(OUTPUT_FILE, "w")
     output_file.write(out)
     output_file.close()
-    print(ode_function)
+    print(compartments)
 
 
