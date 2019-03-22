@@ -1,7 +1,8 @@
 import re
+import argparse
 
-INPUT_FILE = "Ecoli glycolisis.mmd"
-OUTPUT_FILE = "data/steady_state_autogen.stan"
+DEFAULT_INPUT_FILE = "Ecoli glycolisis.mmd"
+DEFAULT_OUTPUT_FILE = "data/steady_state_autogen.stan"
 
 
 def remove_non_numeric_bits(s, return_type=float):
@@ -83,11 +84,11 @@ def get_derived_quantities(input_file):
         
 
 def get_known_reals(input_file):
-    conserved_totals = get_named_quantity(INPUT_FILE, 'conserved total')
-    compartments = get_named_quantity(INPUT_FILE, 'compartment')
-    fixed_global = get_named_quantity(INPUT_FILE, 'global quantity .*fixed')
-    fixed_compartment = get_named_quantity(INPUT_FILE, 'compartment .*fixed')
-    fixed_metabolite = get_named_quantity(INPUT_FILE, '; metabolite .*fixed')
+    conserved_totals = get_named_quantity(input_file, 'conserved total')
+    compartments = get_named_quantity(input_file, 'compartment')
+    fixed_global = get_named_quantity(input_file, 'global quantity .*fixed')
+    fixed_compartment = get_named_quantity(input_file, 'compartment .*fixed')
+    fixed_metabolite = get_named_quantity(input_file, '; metabolite .*fixed')
     return {**conserved_totals,
             **compartments,
             **fixed_global,
@@ -115,8 +116,7 @@ def get_odes(input_file):
                 expression = (l.split(' ')[2]
                               .replace('\t', '')
                               .replace('FunctionFor', '')
-                              .replace(';', ',')
-                              .replace('*cell_cytoplasm', ''))  #TODO: deal with compartments properly
+                              .replace(';', ''))
                 out[reaction] = expression
     return out
 
@@ -192,21 +192,26 @@ def build_kinetics_function(known_reals,
                       close_braces_line])
 
 
-def build_ode_function(odes, kinetic_functions):
+def build_ode_function(odes, kinetic_functions, compartments):
     definition_line = "vector get_odes(vector fluxes){"
+    compartment_unpack_lines = [
+        f"  real {k} = {v};"
+        for k, v in compartments.items()
+    ]
     flux_unpack_lines = [
         f"  real {flux} = fluxes[{i+1}];"
         for i, flux in enumerate(kinetic_functions.keys())
     ]
     return_line_open = "  return ["
     return_body_lines = [
-        f"    {expression}  // {flux}"
+        f"    {expression};  // {flux}"
         for flux, expression in odes.items()
     ]
     return_body_lines[-1] = return_body_lines[-1].replace(',', '')
     return_close_line = "  ]';"
     close_braces_line = "}"
     return '\n'.join([definition_line,
+                      *compartment_unpack_lines,
                       *flux_unpack_lines,
                       return_line_open,
                       *return_body_lines,
@@ -224,13 +229,27 @@ def build_steady_state_function():
 
 if __name__ == '__main__':
     # parse input
-    metabolites = get_all_metabolites(INPUT_FILE)
-    ode_metabolites = get_ode_metabolites(INPUT_FILE)
-    kinetic_parameters = get_named_quantity(INPUT_FILE, 'kinetic parameter')
-    derived_quantity_expressions = get_derived_quantities(INPUT_FILE)
-    kinetic_functions = get_kinetic_functions(INPUT_FILE)
-    odes = get_odes(INPUT_FILE)
-    known_reals = get_known_reals(INPUT_FILE)
+    parser = argparse.ArgumentParser()
+    parser.add_argument('--input', type=str,
+                        default=DEFAULT_INPUT_FILE,
+                        help='path to an mmd file')
+    parser.add_argument('--output', type=str,
+                        default=DEFAULT_OUTPUT_FILE,
+                        help='Stan file will be saved here')
+
+    args = parser.parse_args()
+    input_file_path = args.input
+    output_file_path = args.output
+
+
+    metabolites = get_all_metabolites(input_file_path)
+    ode_metabolites = get_ode_metabolites(input_file_path)
+    kinetic_parameters = get_named_quantity(input_file_path, 'kinetic parameter')
+    derived_quantity_expressions = get_derived_quantities(input_file_path)
+    kinetic_functions = get_kinetic_functions(input_file_path)
+    compartments = get_named_quantity(input_file_path, 'compartment')
+    odes = get_odes(input_file_path)
+    known_reals = get_known_reals(input_file_path)
 
     derived_quantity_function = build_derived_quantity_function(
         known_reals,
@@ -243,14 +262,14 @@ if __name__ == '__main__':
         ode_metabolites,
         derived_quantity_expressions,
     )
-    ode_function = build_ode_function(odes, kinetic_functions)
+    ode_function = build_ode_function(odes, kinetic_functions, compartments)
     steady_state_function = build_steady_state_function()
 
     out = '\n\n'.join([derived_quantity_function,
                        kinetics_function,
                        ode_function,
                        steady_state_function])
-    output_file = open(OUTPUT_FILE, "w")
+    output_file = open(output_file_path, "w")
     output_file.write(out)
     output_file.close()
 
