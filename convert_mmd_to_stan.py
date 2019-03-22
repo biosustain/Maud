@@ -116,8 +116,7 @@ def get_odes(input_file):
                 expression = (l.split(' ')[2]
                               .replace('\t', '')
                               .replace('FunctionFor', '')
-                              .replace(';', ',')
-                              .replace('*cell_cytoplasm', ''))  #TODO: deal with compartments properly
+                              .replace(';', ''))
                 out[reaction] = expression
     return out
 
@@ -193,21 +192,26 @@ def build_kinetics_function(known_reals,
                       close_braces_line])
 
 
-def build_ode_function(odes, kinetic_functions):
+def build_ode_function(odes, kinetic_functions, compartments):
     definition_line = "vector get_odes(vector fluxes){"
+    compartment_unpack_lines = [
+        f"  real {k} = {v};"
+        for k, v in compartments.items()
+    ]
     flux_unpack_lines = [
         f"  real {flux} = fluxes[{i+1}];"
         for i, flux in enumerate(kinetic_functions.keys())
     ]
     return_line_open = "  return ["
     return_body_lines = [
-        f"    {expression}  // {flux}"
+        f"    {expression};  // {flux}"
         for flux, expression in odes.items()
     ]
     return_body_lines[-1] = return_body_lines[-1].replace(',', '')
     return_close_line = "  ]';"
     close_braces_line = "}"
     return '\n'.join([definition_line,
+                      *compartment_unpack_lines,
                       *flux_unpack_lines,
                       return_line_open,
                       *return_body_lines,
@@ -243,6 +247,7 @@ if __name__ == '__main__':
     kinetic_parameters = get_named_quantity(input_file_path, 'kinetic parameter')
     derived_quantity_expressions = get_derived_quantities(input_file_path)
     kinetic_functions = get_kinetic_functions(input_file_path)
+    compartments = get_named_quantity(input_file_path, 'compartment')
     odes = get_odes(input_file_path)
     known_reals = get_known_reals(input_file_path)
 
@@ -257,7 +262,7 @@ if __name__ == '__main__':
         ode_metabolites,
         derived_quantity_expressions,
     )
-    ode_function = build_ode_function(odes, kinetic_functions)
+    ode_function = build_ode_function(odes, kinetic_functions, compartments)
     steady_state_function = build_steady_state_function()
 
     out = '\n\n'.join([derived_quantity_function,
