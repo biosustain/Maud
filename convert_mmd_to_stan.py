@@ -1,7 +1,8 @@
 import re
+import argparse
 
-INPUT_FILE = "Ecoli glycolisis.mmd"
-OUTPUT_FILE = "data/steady_state_autogen.stan"
+DEFAULT_INPUT_FILE = "Ecoli glycolisis.mmd"
+DEFAULT_OUTPUT_FILE = "data/steady_state_autogen.stan"
 
 
 def remove_non_numeric_bits(s, return_type=float):
@@ -83,11 +84,11 @@ def get_derived_quantities(input_file):
         
 
 def get_known_reals(input_file):
-    conserved_totals = get_named_quantity(INPUT_FILE, 'conserved total')
-    compartments = get_named_quantity(INPUT_FILE, 'compartment')
-    fixed_global = get_named_quantity(INPUT_FILE, 'global quantity .*fixed')
-    fixed_compartment = get_named_quantity(INPUT_FILE, 'compartment .*fixed')
-    fixed_metabolite = get_named_quantity(INPUT_FILE, '; metabolite .*fixed')
+    conserved_totals = get_named_quantity(input_file, 'conserved total')
+    compartments = get_named_quantity(input_file, 'compartment')
+    fixed_global = get_named_quantity(input_file, 'global quantity .*fixed')
+    fixed_compartment = get_named_quantity(input_file, 'compartment .*fixed')
+    fixed_metabolite = get_named_quantity(input_file, '; metabolite .*fixed')
     return {**conserved_totals,
             **compartments,
             **fixed_global,
@@ -224,13 +225,26 @@ def build_steady_state_function():
 
 if __name__ == '__main__':
     # parse input
-    metabolites = get_all_metabolites(INPUT_FILE)
-    ode_metabolites = get_ode_metabolites(INPUT_FILE)
-    kinetic_parameters = get_named_quantity(INPUT_FILE, 'kinetic parameter')
-    derived_quantity_expressions = get_derived_quantities(INPUT_FILE)
-    kinetic_functions = get_kinetic_functions(INPUT_FILE)
-    odes = get_odes(INPUT_FILE)
-    known_reals = get_known_reals(INPUT_FILE)
+    parser = argparse.ArgumentParser()
+    parser.add_argument('--input', type=str,
+                        default=DEFAULT_INPUT_FILE,
+                        help='path to an mmd file')
+    parser.add_argument('--output', type=str,
+                        default=DEFAULT_OUTPUT_FILE,
+                        help='Stan file will be saved here')
+
+    args = parser.parse_args()
+    input_file_path = args.input
+    output_file_path = args.output
+
+
+    metabolites = get_all_metabolites(input_file_path)
+    ode_metabolites = get_ode_metabolites(input_file_path)
+    kinetic_parameters = get_named_quantity(input_file_path, 'kinetic parameter')
+    derived_quantity_expressions = get_derived_quantities(input_file_path)
+    kinetic_functions = get_kinetic_functions(input_file_path)
+    odes = get_odes(input_file_path)
+    known_reals = get_known_reals(input_file_path)
 
     derived_quantity_function = build_derived_quantity_function(
         known_reals,
@@ -250,7 +264,7 @@ if __name__ == '__main__':
                        kinetics_function,
                        ode_function,
                        steady_state_function])
-    output_file = open(OUTPUT_FILE, "w")
+    output_file = open(output_file_path, "w")
     output_file.write(out)
     output_file.close()
 
