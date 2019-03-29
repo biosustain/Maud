@@ -44,6 +44,8 @@ def get_named_quantity(input_file, regex, remove_non_numeric=True):
                 # turn square bracket indexes into subscripts
                 name = re.sub(r"\[([^{}]+)\]", r"_\1", name)
                 quantity = re.sub(r"\[([^{}]+)\]", r"_\1", quantity)
+                # catch annoying compartment edge case
+                quantity = re.sub(r"(.*) \*", r'(\1) *', quantity)
                 if remove_non_numeric:
                     quantity = remove_non_numeric_bits(quantity)
                 out[name] = quantity
@@ -73,19 +75,32 @@ def get_derived_quantities(input_file):
     )
     concentrations_assignment = get_named_quantity(
         input_file, 'concentration of metabolite .*assignment', False
-
     )
-    
-    return {**derived_metabolites,
+    out = {**derived_metabolites,
             **concentrations_reaction,
             **concentrations_fixed,
             **model_entities,
             **concentrations_assignment}
+    # make sure order is ok
+    not_yet_defined = out.copy()
+    already_defined = {}
+    ticker = 0
+    while len(not_yet_defined) > 0 or ticker < 2000:
+        for n, q in list(not_yet_defined.items()):
+            already_defined[n] = q
+            not_yet_defined.pop(n)
+            for adk, adv in list(already_defined.items()):
+                if n in adv:
+                    not_yet_defined[adk] = adv
+                    already_defined.pop(adk)
+        ticker += 1
+    return already_defined
+
         
 
 def get_known_reals(input_file):
     conserved_totals = get_named_quantity(input_file, 'conserved total')
-    compartments = get_named_quantity(input_file, 'compartment')
+    compartments = get_named_quantity(input_file, 'compartment .*fixed')
     fixed_global = get_named_quantity(input_file, 'global quantity .*fixed')
     fixed_compartment = get_named_quantity(input_file, 'compartment .*fixed')
     fixed_metabolite = get_named_quantity(input_file, '; metabolite .*fixed')
@@ -123,7 +138,7 @@ def get_odes(input_file):
 
 def build_derived_quantity_function(known_reals,
                                     ode_metabolites,
-                                    derived_quantity_expressions):
+                                    derived_quantity_expressions_raw):
     first_line = """real[] get_derived_quantities(vector ode_metabolites, real[] known_reals){"""
     known_reals_lines = [
         f"  real {kr} = known_reals[{i+1}];"
@@ -204,7 +219,7 @@ def build_ode_function(odes, kinetic_functions, compartments):
     ]
     return_line_open = "  return ["
     return_body_lines = [
-        f"    {expression};  // {flux}"
+        f"    {expression},  // {flux}"
         for flux, expression in odes.items()
     ]
     return_body_lines[-1] = return_body_lines[-1].replace(',', '')
@@ -247,7 +262,7 @@ if __name__ == '__main__':
     kinetic_parameters = get_named_quantity(input_file_path, 'kinetic parameter')
     derived_quantity_expressions = get_derived_quantities(input_file_path)
     kinetic_functions = get_kinetic_functions(input_file_path)
-    compartments = get_named_quantity(input_file_path, 'compartment')
+    compartments = get_named_quantity(input_file_path, 'compartment.*fixed')
     odes = get_odes(input_file_path)
     known_reals = get_known_reals(input_file_path)
 
