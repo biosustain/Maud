@@ -1,5 +1,5 @@
 functions {
-#include data/steady_state_autogen.stan
+#include data/t_brucei.stan
   real[] ode(real t,        // time
              real[] s,      // state
              real[] theta,  // parameters
