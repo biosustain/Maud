@@ -54,23 +54,21 @@ real Function_for_Glycerol_3_phosphate_oxidase(real Gly3Pc,real K9Gly3Pc,real Vm
   return tot_cell / Vt * Vm9 * Gly3Pc / (K9Gly3Pc * 1 + Gly3Pc);
 }
 
-real[] get_derived_quantities(vector ode_metabolites, real[] known_Reals){
+real[] get_derived_quantities(vector ode_metabolites, real[] known_reals){
   real tot_cell = known_reals[1];
   real glycosome = known_reals[2];
   real cytosol = known_reals[3];
   real extracellular = known_reals[4];
   real Vt = known_reals[5];
-  real Vc = known_reals[6];
-  real Vg = known_reals[7];
-  real TPIact = known_reals[8];
-  real sumAc = known_reals[9];
-  real sumAg = known_reals[10];
-  real KeqAK = known_reals[11];
-  real Keq_anti = known_reals[12];
-  real sumc4 = known_reals[13];
-  real sumc5 = known_reals[14];
-  real Keq_PGM = known_reals[15];
-  real Keq_ENO = known_reals[16];
+  real TPIact = known_reals[6];
+  real sumAc = known_reals[7];
+  real sumAg = known_reals[8];
+  real KeqAK = known_reals[9];
+  real Keq_anti = known_reals[10];
+  real sumc4 = known_reals[11];
+  real sumc5 = known_reals[12];
+  real Keq_PGM = known_reals[13];
+  real Keq_ENO = known_reals[14];
   real GlcI = ode_metabolites[1];
   real Pg = ode_metabolites[2];
   real Glc6P = ode_metabolites[3];
@@ -111,17 +109,15 @@ vector get_kinetics(vector ode_metabolites,
   real cytosol = known_reals[3];
   real extracellular = known_reals[4];
   real Vt = known_reals[5];
-  real Vc = known_reals[6];
-  real Vg = known_reals[7];
-  real TPIact = known_reals[8];
-  real sumAc = known_reals[9];
-  real sumAg = known_reals[10];
-  real KeqAK = known_reals[11];
-  real Keq_anti = known_reals[12];
-  real sumc4 = known_reals[13];
-  real sumc5 = known_reals[14];
-  real Keq_PGM = known_reals[15];
-  real Keq_ENO = known_reals[16];
+  real TPIact = known_reals[6];
+  real sumAc = known_reals[7];
+  real sumAg = known_reals[8];
+  real KeqAK = known_reals[9];
+  real Keq_anti = known_reals[10];
+  real sumc4 = known_reals[11];
+  real sumc5 = known_reals[12];
+  real Keq_PGM = known_reals[13];
+  real Keq_ENO = known_reals[14];
   real GlcI = ode_metabolites[1];
   real Pg = ode_metabolites[2];
   real Glc6P = ode_metabolites[3];
@@ -212,20 +208,20 @@ vector get_kinetics(vector ode_metabolites,
   real Gly3P = derived_quantities[11];
   real PGAg = derived_quantities[12];
   real PEPc = derived_quantities[13];
-  real vGlcTr = Function_for_Glucose_transport(GlcE, GlcI, K1Glc, Vm1, Vt, afac, tot_cell)
-  real vHK = Function_for_Hexokinase(ADPg, ATPg, Glc6P, GlcI, K2ADPg, K2ATPg, K2Glc6P, K2GlcI, Vm2, Vt, tot_cell)
-  real vPGI = glycosome * Function_for_Glucose_phosphate_isomerase(Fru6P, Glc6P, K3Fru6P, K3Glc6P, Vm3, Vt, glycosome, tot_cell)
-  real vPFK = glycosome * Function_for_Phosphofructokinase(ATPg, Fru16BP, Fru6P, K4ATPg, K4Fru6P, K4i1Fru16BP, K4i2Fru16BP, Vm4, Vt, glycosome, tot_cell)
-  real vALD = Function_for_Aldolase(ADPg, ATPg, DHAPg, Fru16BP, GAP, K5DHAP, K5GAP, K5GAPi, Vm5f, Vm5r, Vt, sumAg, tot_cell)
-  real vTPI = Function_for_Triosephosphate_isomerase(DHAPg, GAP, K6DHAPg, K6GAP, TPIact, Vm6, Vt, tot_cell)
-  real vGAPdh = glycosome * Function_for_Glyceraldehyde_3_phosphate_dehydrogenase(BPGA13, GAP, K7BPGA13, K7GAP, K7NAD, K7NADH, NAD, NADH, Vm7, Vm7f, Vm7r, Vt, glycosome, tot_cell)
-  real vGDH = Function_for_Glycerol_3_phosphate_dehydrogenase(DHAPg, Gly3Pg, K8DHAPg, K8Gly3Pg, K8NAD, K8NADH, NAD, NADH, Vm8, Vm8f, Vm8r, Vt, tot_cell)
-  real vGPO = Function_for_Glycerol_3_phosphate_oxidase(Gly3Pc, K9Gly3Pc, Vm9, Vt, tot_cell)
-  real vPyrTr = Function_for_Pyruvate_transport(K10Pyr, Pyr, Vm10, Vt, tot_cell)
-  real vPGK = Function_for_Phosphoglycerate_kinase(ADPg, ATPg, BPGA13, K11ADPg, K11ATPg, K11BPGA13, K11PGA3, PGAg, Vm11, Vm11f, Vm11r, Vt, tot_cell)
-  real vPK = Function_for_Pyruvate_kinase(ADPc, ATPc, K12ADP, PEPc, Vm12, Vt, n12, tot_cell)
-  real vATPase = cytosol * Function_for_ATPase(ADPc, ATPc, K13, Vt, cytosol, tot_cell)
-  real vGlyK = Function_for_Glycerol_kinase(ADPg, ATPg, Gly, Gly3Pg, K14ADPg, K14ATPg, K14Gly, K14Gly3Pg, Vm14, Vm14f, Vm14r, Vt, tot_cell)
+  real vGlcTr = Function_for_Glucose_transport(GlcE, GlcI, K1Glc, Vm1, Vt, afac, tot_cell);
+  real vHK = Function_for_Hexokinase(ADPg, ATPg, Glc6P, GlcI, K2ADPg, K2ATPg, K2Glc6P, K2GlcI, Vm2, Vt, tot_cell);
+  real vPGI = glycosome * Function_for_Glucose_phosphate_isomerase(Fru6P, Glc6P, K3Fru6P, K3Glc6P, Vm3, Vt, glycosome, tot_cell);
+  real vPFK = glycosome * Function_for_Phosphofructokinase(ATPg, Fru16BP, Fru6P, K4ATPg, K4Fru6P, K4i1Fru16BP, K4i2Fru16BP, Vm4, Vt, glycosome, tot_cell);
+  real vALD = Function_for_Aldolase(ADPg, ATPg, DHAPg, Fru16BP, GAP, K5DHAP, K5GAP, K5GAPi, Vm5f, Vm5r, Vt, sumAg, tot_cell);
+  real vTPI = Function_for_Triosephosphate_isomerase(DHAPg, GAP, K6DHAPg, K6GAP, TPIact, Vm6, Vt, tot_cell);
+  real vGAPdh = glycosome * Function_for_Glyceraldehyde_3_phosphate_dehydrogenase(BPGA13, GAP, K7BPGA13, K7GAP, K7NAD, K7NADH, NAD, NADH, Vm7, Vm7f, Vm7r, Vt, glycosome, tot_cell);
+  real vGDH = Function_for_Glycerol_3_phosphate_dehydrogenase(DHAPg, Gly3Pg, K8DHAPg, K8Gly3Pg, K8NAD, K8NADH, NAD, NADH, Vm8, Vm8f, Vm8r, Vt, tot_cell);
+  real vGPO = Function_for_Glycerol_3_phosphate_oxidase(Gly3Pc, K9Gly3Pc, Vm9, Vt, tot_cell);
+  real vPyrTr = Function_for_Pyruvate_transport(K10Pyr, Pyr, Vm10, Vt, tot_cell);
+  real vPGK = Function_for_Phosphoglycerate_kinase(ADPg, ATPg, BPGA13, K11ADPg, K11ATPg, K11BPGA13, K11PGA3, PGAg, Vm11, Vm11f, Vm11r, Vt, tot_cell);
+  real vPK = Function_for_Pyruvate_kinase(ADPc, ATPc, K12ADP, PEPc, Vm12, Vt, n12, tot_cell);
+  real vATPase = cytosol * Function_for_ATPase(ADPc, ATPc, K13, Vt, cytosol, tot_cell);
+  real vGlyK = Function_for_Glycerol_kinase(ADPg, ATPg, Gly, Gly3Pg, K14ADPg, K14ATPg, K14Gly, K14Gly3Pg, Vm14, Vm14f, Vm14r, Vt, tot_cell);
   return [vGlcTr, vHK, vPGI, vPFK, vALD, vTPI, vGAPdh, vGDH, vGPO, vPyrTr, vPGK, vPK, vATPase, vGlyK]';
 }
 
@@ -260,8 +256,7 @@ vector get_odes(vector fluxes){
     1.0*vPK-1.0*vATPase,  // Pc
     1.0*vPyrTr,  // PyrE
     1.0*vGlyK,  // Gly
-    -1.0*vGlcTr,  // GlcE
-    1.0*vGDH-1.0*vGPO-1.0*vGlyK  // Gly3P
+    -1.0*vGlcTr  // GlcE
   ]';
 }
 

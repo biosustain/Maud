@@ -38,7 +38,8 @@ def _get_known_reals(m):
     compartment_volumes = {compartment.getId(): compartment.getVolume()
                            for compartment in compartments}
     fixed_parameters = {parameter.getId(): parameter.getValue()
-                        for parameter in m.getListOfParameters()}
+                        for parameter in m.getListOfParameters()
+                        if parameter.getConstant()}
     return {**compartment_volumes,
             **fixed_parameters}
 
@@ -91,24 +92,26 @@ def _get_ode_expressions(m):
     out = {}
     specieses = m.getListOfSpecies()
     reactions = m.getListOfReactions()
+    ode_metabolites = list(_get_ode_metabolites(m).keys())
     for species in specieses:
-        reactant_expressions = []
-        product_expressions = []
-        for reaction in reactions:
-            for reactant_ref_ix in range(reaction.getNumReactants()):
-                reactant_ref = reaction.getReactant(reactant_ref_ix)
-                reactant_expressions = update_expressions(reactant_expressions,
-                                                          reactant_ref,
-                                                          species,
-                                                          reaction)
-            for product_ref_ix in range(reaction.getNumProducts()):
-                product_ref = reaction.getProduct(product_ref_ix)
-                product_expressions = update_expressions(product_expressions,
-                                                         product_ref,
-                                                         species,
-                                                         reaction)
-        expr = ('+'.join(product_expressions)
-                + ''.join([f'-{i}' for i in reactant_expressions]))
-        if expr != '':
-            out[species.getId()] = expr
+        if species.getId() not in _get_assignment_rules(m).keys():
+            reactant_expressions = []
+            product_expressions = []
+            for reaction in reactions:
+                for reactant_ref_ix in range(reaction.getNumReactants()):
+                    reactant_ref = reaction.getReactant(reactant_ref_ix)
+                    reactant_expressions = update_expressions(reactant_expressions,
+                                                            reactant_ref,
+                                                            species,
+                                                            reaction)
+                for product_ref_ix in range(reaction.getNumProducts()):
+                    product_ref = reaction.getProduct(product_ref_ix)
+                    product_expressions = update_expressions(product_expressions,
+                                                            product_ref,
+                                                            species,
+                                                            reaction)
+            expr = ('+'.join(product_expressions)
+                    + ''.join([f'-{i}' for i in reactant_expressions]))
+            if expr != '':
+                out[species.getId()] = expr
     return out
