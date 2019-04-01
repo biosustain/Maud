@@ -38,7 +38,8 @@ def _get_known_reals(m):
     compartment_volumes = {compartment.getId(): compartment.getVolume()
                            for compartment in compartments}
     fixed_parameters = {parameter.getId(): parameter.getValue()
-                        for parameter in m.getListOfParameters()}
+                        for parameter in m.getListOfParameters()
+                        if parameter.getConstant()}
     return {**compartment_volumes,
             **fixed_parameters}
 

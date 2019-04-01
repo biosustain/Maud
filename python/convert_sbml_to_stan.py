@@ -34,7 +34,7 @@ def _build_functions(m: StanReadySbmlModel) -> str:
     ])
 
 def _build_get_derived_quantities(m: StanReadySbmlModel) -> str:
-    first_line = "real[] get_derived_quantities(vector ode_metabolites, real[] known_Reals){"
+    first_line = "real[] get_derived_quantities(vector ode_metabolites, real[] known_reals){"
     known_real_lines = [
         f"  real {kr} = known_reals[{i+1}];"
         for i, kr in enumerate(m.known_reals.keys())
@@ -82,7 +82,7 @@ def _build_get_kinetics_function(m: StanReadySbmlModel) -> str:
         for i, quantity in enumerate(m.assignment_rules.keys())
     ]
     kinetic_expression_lines = [
-        f"  real {parameter} = {expression}"
+        f"  real {parameter} = {expression};"
         for parameter, expression in m.kinetic_expressions.items()
     ]
     return_line = f"  return [{', '.join(m.kinetic_expressions.keys())}]';"
