@@ -256,8 +256,7 @@ vector get_odes(vector fluxes){
     1.0*vPK-1.0*vATPase,  // Pc
     1.0*vPyrTr,  // PyrE
     1.0*vGlyK,  // Gly
-    -1.0*vGlcTr,  // GlcE
-    1.0*vGDH-1.0*vGPO-1.0*vGlyK  // Gly3P
+    -1.0*vGlcTr  // GlcE
   ]';
 }
 
