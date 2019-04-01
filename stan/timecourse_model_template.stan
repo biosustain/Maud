@@ -1,5 +1,5 @@
 functions {
-#include data/t_brucei.stan
+#include REPLACE_THIS_WORD
   real[] ode(real t,        // time
              real[] s,      // state
              real[] theta,  // parameters
