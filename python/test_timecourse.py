@@ -8,11 +8,11 @@ import os
 from stan_utils import StanModel_cache
 from sbml_functions import read_sbml_file
 
-DEFAULT_SBML_FILE = '/../data_in/t_brucei.xml'
-DEFAULT_KINETICS_FILE = '/../stan/autogen/t_brucei.stan'
-PATH_FROM_HERE_TO_TEMPLATE = '/../stan/timecourse_model_template.stan'
+DEFAULT_SBML_FILE = '../data_in/t_brucei.xml'
+DEFAULT_KINETICS_FILE = '../stan/autogen/t_brucei.stan'
+PATH_FROM_HERE_TO_TEMPLATE = '../stan/timecourse_model_template.stan'
 
-TIME_POINTS = np.linspace(0, 100, 100)
+TIME_POINTS = np.linspace(0, 20, 101)
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
@@ -30,8 +30,8 @@ if __name__ == '__main__':
 
     # compile Stan model
     here = os.path.dirname(__file__)
-    template_path = here + PATH_FROM_HERE_TO_TEMPLATE
-    kinetics_file_path = here + path_from_here_to_kinetics_file
+    template_path = os.path.join(here, PATH_FROM_HERE_TO_TEMPLATE)
+    kinetics_file_path = os.path.join(here, path_from_here_to_kinetics_file)
     with open(template_path, 'r') as f:
         model_code = f.read().replace('REPLACE_THIS_WORD', kinetics_file_path)
     model =StanModel_cache(model_code)
@@ -72,7 +72,13 @@ if __name__ == '__main__':
         ax.set(title=col, xlabel='Time')
         if ax in [axes[0], axes[4]]:
             ax.set_ylabel('Concentration')
-    plt.savefig('fig.png')
+    plt.savefig(os.path.join(here, '../data_out/fig.png'))
     plt.clf()
-    out.to_csv('ode_species.csv')
-    print(out)
+    timecourse_filename = ('timecourse_'
+                           + path_from_here_to_sbml_file
+                           .split('/')[-1]
+                           .replace('.xml', '.csv'))
+    out_target = os.path.join(here, '../data_out/' + timecourse_filename)
+    print(f'Writing results to {out_target}...')
+    out.to_csv(out_target)
+    print('Finished!')
