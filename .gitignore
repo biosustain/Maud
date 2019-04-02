@@ -1,2 +1,10 @@
 *__pycache__*
 data/cached_stan_models/*.pkl
+*/.ipynb_checkpoints/*
+data_out/*.csv
+data_out/*.png
+data_out/*.stan
+data_in/*.mmd
+data_in/*.ode
+data_in/*.cps
+data_in/*.c
