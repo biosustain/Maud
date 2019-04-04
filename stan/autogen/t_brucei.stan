@@ -69,6 +69,9 @@ real[] get_derived_quantities(vector ode_metabolites, real[] known_reals){
   real sumc5 = known_reals[12];
   real Keq_PGM = known_reals[13];
   real Keq_ENO = known_reals[14];
+  real PyrE = known_reals[15];
+  real Gly = known_reals[16];
+  real GlcE = known_reals[17];
   real GlcI = ode_metabolites[1];
   real Pg = ode_metabolites[2];
   real Glc6P = ode_metabolites[3];
@@ -82,15 +85,12 @@ real[] get_derived_quantities(vector ode_metabolites, real[] known_reals){
   real Pyr = ode_metabolites[11];
   real Nb = ode_metabolites[12];
   real Pc = ode_metabolites[13];
-  real PyrE = ode_metabolites[14];
-  real Gly = ode_metabolites[15];
-  real GlcE = ode_metabolites[16];
+  real Vc = cytosol * Vt / tot_cell;
+  real Vg = glycosome * Vt / tot_cell;
   real ATPc = (Pc * (1 - 4 * KeqAK) - sumAc + pow(pow(sumAc - (1 - 4 * KeqAK) * Pc, 2) + 4 * (1 - 4 * KeqAK) * KeqAK * pow(Pc, 2), 0.5)) / (2 * (1 - 4 * KeqAK));
   real ADPc = Pc - 2 * ATPc;
   real ATPg = (Pg * (1 - 4 * KeqAK) - sumAg + pow(pow(sumAg - (1 - 4 * KeqAK) * Pg, 2) + 4 * (1 - 4 * KeqAK) * KeqAK * pow(Pg, 2), 0.5)) / (2 * (1 - 4 * KeqAK));
   real ADPg = Pg - 2 * ATPg;
-  real Vc = cytosol * Vt / tot_cell;
-  real Vg = glycosome * Vt / tot_cell;
   real DHAPc = sumc5 * (1 + Vc / Vg) * DHAP / (sumc4 + sumc5 * Vc / Vg - (BPGA13 + 2 * Fru16BP + Fru6P + GAP + Glc6P + Pg));
   real DHAPg = (DHAP * Vt - DHAPc * Vc) / Vg;
   real Gly3Pc = sumc5 - DHAPc;
@@ -98,7 +98,7 @@ real[] get_derived_quantities(vector ode_metabolites, real[] known_reals){
   real Gly3P = (Gly3Pc * cytosol + Gly3Pg * glycosome) / tot_cell;
   real PGAg = Nb * (1 + Vc / Vg) / (1 + (1 + Keq_PGM + Keq_PGM * Keq_ENO) * Vc / Vg);
   real PEPc = Keq_ENO * Keq_PGM * PGAg;
-  return {ATPc, ADPc, ATPg, ADPg, Vc, Vg, DHAPc, DHAPg, Gly3Pc, Gly3Pg, Gly3P, PGAg, PEPc};
+  return {Vc, Vg, ATPc, ADPc, ATPg, ADPg, DHAPc, DHAPg, Gly3Pc, Gly3Pg, Gly3P, PGAg, PEPc};
 }
 
 vector get_kinetics(vector ode_metabolites,
@@ -118,6 +118,9 @@ vector get_kinetics(vector ode_metabolites,
   real sumc5 = known_reals[12];
   real Keq_PGM = known_reals[13];
   real Keq_ENO = known_reals[14];
+  real PyrE = known_reals[15];
+  real Gly = known_reals[16];
+  real GlcE = known_reals[17];
   real GlcI = ode_metabolites[1];
   real Pg = ode_metabolites[2];
   real Glc6P = ode_metabolites[3];
@@ -131,9 +134,6 @@ vector get_kinetics(vector ode_metabolites,
   real Pyr = ode_metabolites[11];
   real Nb = ode_metabolites[12];
   real Pc = ode_metabolites[13];
-  real PyrE = ode_metabolites[14];
-  real Gly = ode_metabolites[15];
-  real GlcE = ode_metabolites[16];
   real K1Glc = kinetic_parameters[1];
   real Vm1 = kinetic_parameters[2];
   real afac = kinetic_parameters[3];
@@ -195,12 +195,12 @@ vector get_kinetics(vector ode_metabolites,
   real Vm14f = kinetic_parameters[59];
   real Vm14r = kinetic_parameters[60];
   real derived_quantities[13] = get_derived_quantities(ode_metabolites, known_reals);
-  real ATPc = derived_quantities[1];
-  real ADPc = derived_quantities[2];
-  real ATPg = derived_quantities[3];
-  real ADPg = derived_quantities[4];
-  real Vc = derived_quantities[5];
-  real Vg = derived_quantities[6];
+  real Vc = derived_quantities[1];
+  real Vg = derived_quantities[2];
+  real ATPc = derived_quantities[3];
+  real ADPc = derived_quantities[4];
+  real ATPg = derived_quantities[5];
+  real ADPg = derived_quantities[6];
   real DHAPc = derived_quantities[7];
   real DHAPg = derived_quantities[8];
   real Gly3Pc = derived_quantities[9];
@@ -241,22 +241,19 @@ vector get_odes(vector fluxes){
   real vATPase = fluxes[13];
   real vGlyK = fluxes[14];
   return [
-    1.0*vGlcTr-1.0*vHK,  // GlcI
-    1.0*vPGK+1.0*vGlyK-1.0*vHK-1.0*vPFK,  // Pg
-    1.0*vHK-1.0*vPGI,  // Glc6P
-    1.0*vPGI-1.0*vPFK,  // Fru6P
-    1.0*vPFK-1.0*vALD,  // Fru16BP
-    1.0*vALD+1.0*vGPO-1.0*vTPI-1.0*vGDH,  // DHAP
-    1.0*vALD+1.0*vTPI-1.0*vGAPdh,  // GAP
-    1.0*vGDH-1.0*vGAPdh,  // NAD
-    1.0*vGAPdh-1.0*vPGK,  // BPGA13
-    1.0*vGAPdh-1.0*vGDH,  // NADH
-    1.0*vPK-1.0*vPyrTr,  // Pyr
-    1.0*vPGK-1.0*vPK,  // Nb
-    1.0*vPK-1.0*vATPase,  // Pc
-    1.0*vPyrTr,  // PyrE
-    1.0*vGlyK,  // Gly
-    -1.0*vGlcTr  // GlcE
+    (1.0*vGlcTr-1.0*vHK)/5.7,  // GlcI
+    (1.0*vPGK+1.0*vGlyK-1.0*vHK-1.0*vPFK)/0.2446,  // Pg
+    (1.0*vHK-1.0*vPGI)/0.2446,  // Glc6P
+    (1.0*vPGI-1.0*vPFK)/0.2446,  // Fru6P
+    (1.0*vPFK-1.0*vALD)/0.2446,  // Fru16BP
+    (1.0*vALD+1.0*vGPO-1.0*vTPI-1.0*vGDH)/5.7,  // DHAP
+    (1.0*vALD+1.0*vTPI-1.0*vGAPdh)/0.2446,  // GAP
+    (1.0*vGDH-1.0*vGAPdh)/0.2446,  // NAD
+    (1.0*vGAPdh-1.0*vPGK)/0.2446,  // BPGA13
+    (1.0*vGAPdh-1.0*vGDH)/0.2446,  // NADH
+    (1.0*vPK-1.0*vPyrTr)/5.4554,  // Pyr
+    (1.0*vPGK-1.0*vPK)/5.7,  // Nb
+    (1.0*vPK-1.0*vATPase)/5.4554  // Pc
   ]';
 }
 

@@ -7,7 +7,7 @@ from pprint import pprint
 StanReadySbmlModel = namedtuple('OdeSystem', ['ode_metabolites',
                                               'known_reals',
                                               'kinetic_parameters',
-                                              'assignment_rules',
+                                              'assignment_expressions',
                                               'function_definitions',
                                               'kinetic_expressions',
                                               'ode_expressions'])
@@ -20,17 +20,20 @@ def read_sbml_file(f):
     return StanReadySbmlModel(_get_ode_metabolites(m),
                               _get_known_reals(m),
                               _get_kinetic_parameters(m),
-                              _get_assignment_rules(m),
+                              _get_assignment_expressions(m),
                               _get_function_definitions(m),
                               _get_kinetic_expressions(m),
                               _get_ode_expressions(m))
 
 
 def _get_ode_metabolites(m):
-    assignment_rules = _get_assignment_rules(m)
-    return {s.getId(): s.getInitialConcentration()
-            for s in m.getListOfSpecies()
-            if s.getId() not in assignment_rules.keys()}
+    out = {}
+    assignment_rules = _get_assignment_expressions(m)
+    for s in m.getListOfSpecies():
+        if s.getId() not in assignment_rules.keys():
+            if not s.getConstant():
+                out[s.getId()] = s.getInitialConcentration()
+    return out
     
 
 def _get_known_reals(m):
@@ -40,8 +43,12 @@ def _get_known_reals(m):
     fixed_parameters = {parameter.getId(): parameter.getValue()
                         for parameter in m.getListOfParameters()
                         if parameter.getConstant()}
+    constant_species = {species.getId(): species.getInitialConcentration()
+                        for species in m.getListOfSpecies()
+                        if species.getConstant()}
     return {**compartment_volumes,
-            **fixed_parameters}
+            **fixed_parameters,
+            **constant_species}
 
 
 def _get_kinetic_parameters(m):
@@ -54,10 +61,36 @@ def _get_kinetic_parameters(m):
     return out
 
 
-def _get_assignment_rules(m):
-    rules = filter(lambda r: r.isAssignment(), m.getListOfRules())
-    return {rule.getId(): rule.getFormula()
-            for rule in rules}
+def _get_derived_parameter_expressions(m):
+    param_dict = {p.getId(): p for p in m.getListOfParameters()}
+
+    def is_derived_parameter_rule(rule):
+        return rule.isAssignment() and rule.getVariable() in param_dict.keys()
+
+    rules = filter(is_derived_parameter_rule, m.getListOfRules())
+
+    return {rule.getVariable(): rule.getFormula() for rule in rules}
+        
+
+def _get_derived_species_expressions(m):
+    species_dict = {s.getId(): s for s in m.getListOfSpecies()}
+
+    def is_derived_species_rule(rule):
+        return rule.isAssignment() and rule.getVariable() in species_dict.keys()
+
+    # def get_expression(rule):
+        # formula = rule.getFormula()
+        # compartment = species_dict[rule.getVariable()].getCompartment()
+        # return f"({formula}) * {compartment}"
+
+    rules = filter(is_derived_species_rule, m.getListOfRules())
+
+    return {rule.getVariable(): rule.getFormula() for rule in rules}
+
+
+def _get_assignment_expressions(m):
+    return {**_get_derived_parameter_expressions(m),
+            **_get_derived_species_expressions(m)}
 
 
 def _get_function_definitions(m):
@@ -93,8 +126,11 @@ def _get_ode_expressions(m):
     specieses = m.getListOfSpecies()
     reactions = m.getListOfReactions()
     ode_metabolites = list(_get_ode_metabolites(m).keys())
+    compartment_volumes = {compartment.getId(): compartment.getVolume()
+                           for compartment in m.getListOfCompartments()}
+
     for species in specieses:
-        if species.getId() not in _get_assignment_rules(m).keys():
+        if species.getId() in ode_metabolites:
             reactant_expressions = []
             product_expressions = []
             for reaction in reactions:
@@ -112,6 +148,10 @@ def _get_ode_expressions(m):
                                                             reaction)
             expr = ('+'.join(product_expressions)
                     + ''.join([f'-{i}' for i in reactant_expressions]))
+            # compartment logic
+            compartment_volume = compartment_volumes[species.getCompartment()]
+            expr = f'({expr})/{str(compartment_volume)}'
             if expr != '':
                 out[species.getId()] = expr
+
     return out
