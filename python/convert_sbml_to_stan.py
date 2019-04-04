@@ -45,9 +45,9 @@ def _build_get_derived_quantities(m: StanReadySbmlModel) -> str:
     ]
     derived_quantity_lines = [
         f"  real {quantity} = {expression};"
-        for quantity, expression in m.assignment_rules.items()
+        for quantity, expression in m.assignment_expressions.items()
     ]
-    return_line = f"  return {{{', '.join(m.assignment_rules.keys())}}};"
+    return_line = f"  return {{{', '.join(m.assignment_expressions.keys())}}};"
     close_braces_line = "}"
     return '\n'.join([first_line,
                       *known_real_lines,
@@ -74,12 +74,12 @@ def _build_get_kinetics_function(m: StanReadySbmlModel) -> str:
         for i, parameter in enumerate(m.kinetic_parameters.keys())
     ]
     derived_quantity_calculation_line = (
-        f"  real derived_quantities[{len(m.assignment_rules.keys())}] = "
+        f"  real derived_quantities[{len(m.assignment_expressions.keys())}] = "
         "get_derived_quantities(ode_metabolites, known_reals);"
     )
     derived_quantity_unpack_lines = [
         f"  real {quantity} = derived_quantities[{i+1}];"
-        for i, quantity in enumerate(m.assignment_rules.keys())
+        for i, quantity in enumerate(m.assignment_expressions.keys())
     ]
     kinetic_expression_lines = [
         f"  real {parameter} = {expression};"
@@ -142,7 +142,7 @@ if __name__ == '__main__':
     stan_program = get_stan_program(parsed_sbml)
 
     output_filename = args.input_file.split('/')[-1].replace('.xml', '.stan')
-    output_path = os.path.dirname(__file__) + '/../stan/autogen/' + output_filename
+    output_path = os.path.join(os.path.dirname(__file__), '../stan/autogen/' + output_filename)
     print(f'Writing Stan code to {output_path}...')
 
     with open(output_path, 'w') as f:
