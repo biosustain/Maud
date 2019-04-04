@@ -241,25 +241,25 @@ vector get_odes(vector fluxes){
   real vATPase = fluxes[13];
   real vGlyK = fluxes[14];
   return [
-          (1.0*vGlcTr-1.0*vHK)/5.7,  // GlcI
-          (1.0*vPGK+1.0*vGlyK-1.0*vHK-1.0*vPFK)/0.2446,  // Pg
-          (1.0*vHK-1.0*vPGI)/0.2446,  // Glc6P
-          (1.0*vPGI-1.0*vPFK)/0.2446,  // Fru6P
-          (1.0*vPFK-1.0*vALD)/0.2446,  // Fru16BP
-          (1.0*vALD+1.0*vGPO-1.0*vTPI-1.0*vGDH)/5.7,  // DHAP
-          (1.0*vALD+1.0*vTPI-1.0*vGAPdh)/0.2446,  // GAP
-          (1.0*vGDH-1.0*vGAPdh)/0.2446,  // NAD
-          (1.0*vGAPdh-1.0*vPGK)/0.2446,  // BPGA13
-          (1.0*vGAPdh-1.0*vGDH)/0.2446,  // NADH
-          (1.0*vPK-1.0*vPyrTr)/5.4554,  // Pyr
-          (1.0*vPGK-1.0*vPK)/5.7,  // Nb
-          (1.0*vPK-1.0*vATPase)/5.4554  // Pc
-          ]';
+    (1.0*vGlcTr-1.0*vHK)/5.7,  // GlcI
+    (1.0*vPGK+1.0*vGlyK-1.0*vHK-1.0*vPFK)/0.2446,  // Pg
+    (1.0*vHK-1.0*vPGI)/0.2446,  // Glc6P
+    (1.0*vPGI-1.0*vPFK)/0.2446,  // Fru6P
+    (1.0*vPFK-1.0*vALD)/0.2446,  // Fru16BP
+    (1.0*vALD+1.0*vGPO-1.0*vTPI-1.0*vGDH)/5.7,  // DHAP
+    (1.0*vALD+1.0*vTPI-1.0*vGAPdh)/0.2446,  // GAP
+    (1.0*vGDH-1.0*vGAPdh)/0.2446,  // NAD
+    (1.0*vGAPdh-1.0*vPGK)/0.2446,  // BPGA13
+    (1.0*vGAPdh-1.0*vGDH)/0.2446,  // NADH
+    (1.0*vPK-1.0*vPyrTr)/5.4554,  // Pyr
+    (1.0*vPGK-1.0*vPK)/5.7,  // Nb
+    (1.0*vPK-1.0*vATPase)/5.4554  // Pc
+  ]';
 }
 
 vector steady_state_equation(vector ode_metabolites,
                              vector kinetic_parameters,
                              real[] known_reals,
                              int[] known_ints){
-  return get_odes(get_kinetics(ode_metabolites, kinetic_parameters, known_reals));
+    return get_odes(get_kinetics(ode_metabolites, kinetic_parameters, known_reals));
 }
