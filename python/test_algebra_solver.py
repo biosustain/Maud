@@ -34,7 +34,7 @@ if __name__ == '__main__':
         'N_kinetic_parameter': len(kinetic_parameters),
         'initial_guess': ode_metabolites,
         'known_reals': known_reals,
-        'log_kinetic_parameters': np.log(priors['guess']),
+        'log_kinetic_parameters': np.log(priors['copasi_value']),
         'rel_tol': REL_TOL,
         'f_tol': F_TOL,
         'max_steps': MAX_STEPS
