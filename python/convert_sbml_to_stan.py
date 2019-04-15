@@ -11,7 +11,7 @@ PATH_TO_OUTPUT_DIRECTORY = '../stan/autogen'
 def get_stan_program(m: StanReadySbmlModel) -> str:
     return '\n\n'.join([_build_functions(m),
                         _build_get_derived_quantities(m),
-                        _build_get_kinetics_function(m),
+                        _build_get_fluxes_function(m),
                         _build_ode_function(m),
                         _build_steady_state_function()])
 
@@ -34,7 +34,7 @@ def _build_functions(m: StanReadySbmlModel) -> str:
     ])
 
 def _build_get_derived_quantities(m: StanReadySbmlModel) -> str:
-    first_line = "real[] get_derived_quantities(vector ode_metabolites, real[] known_reals){"
+    first_line = "real[] get_derived_quantities(real[] ode_metabolites, real[] known_reals){"
     known_real_lines = [
         f"  real {kr} = known_reals[{i+1}];"
         for i, kr in enumerate(m.known_reals.keys())
@@ -57,9 +57,9 @@ def _build_get_derived_quantities(m: StanReadySbmlModel) -> str:
                       close_braces_line])
 
 
-def _build_get_kinetics_function(m: StanReadySbmlModel) -> str:
-    first_block = """vector get_kinetics(vector ode_metabolites,
-                    vector kinetic_parameters,
+def _build_get_fluxes_function(m: StanReadySbmlModel) -> str:
+    first_block = """real[] get_fluxes(real[] ode_metabolites,
+                    real[] kinetic_parameters,
                     real[] known_reals){"""
     known_reals_lines = [
         f"  real {kr} = known_reals[{i+1}];"
@@ -85,7 +85,7 @@ def _build_get_kinetics_function(m: StanReadySbmlModel) -> str:
         f"  real {parameter} = {expression};"
         for parameter, expression in m.kinetic_expressions.items()
     ]
-    return_line = f"  return [{', '.join(m.kinetic_expressions.keys())}]';"
+    return_line = f"  return {{{', '.join(m.kinetic_expressions.keys())}}};"
     close_braces_line = "}"
     return '\n'.join([first_block,
                       *known_reals_lines,
@@ -99,18 +99,18 @@ def _build_get_kinetics_function(m: StanReadySbmlModel) -> str:
 
 
 def _build_ode_function(m: StanReadySbmlModel) -> str:
-    definition_line = "vector get_odes(vector fluxes){"
+    definition_line = "real[] get_odes(real[] fluxes){"
     unpack_lines = [
         f"  real {flux} = fluxes[{i+1}];"
         for i, flux in enumerate(m.kinetic_expressions.keys())
     ]
-    return_line_open = "  return ["
+    return_line_open = "  return {"
     return_body_lines = [
         f"    {expression},  // {flux}"
         for flux, expression in m.ode_expressions.items()
     ]
     return_body_lines[-1] = return_body_lines[-1].replace(',', '')
-    return_close_line = "  ]';"
+    return_close_line = "  };"
     close_braces_line = "}"
     return '\n'.join([definition_line,
                       *unpack_lines,
@@ -121,11 +121,12 @@ def _build_ode_function(m: StanReadySbmlModel) -> str:
 
 
 def _build_steady_state_function():
-    return """vector steady_state_equation(vector ode_metabolites,
-                             vector kinetic_parameters,
+    return """real[] steady_state_equation(real t,
+                             real[] ode_metabolites,
+                             real[] kinetic_parameters,
                              real[] known_reals,
                              int[] known_ints){
-    return get_odes(get_kinetics(ode_metabolites, kinetic_parameters, known_reals));\n}"""
+    return get_odes(get_fluxes(ode_metabolites, kinetic_parameters, known_reals));\n}"""
 
 
 if __name__ == '__main__': 

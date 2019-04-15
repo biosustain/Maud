@@ -54,7 +54,7 @@ real Function_for_Glycerol_3_phosphate_oxidase(real Gly3Pc,real K9Gly3Pc,real Vm
   return tot_cell / Vt * Vm9 * Gly3Pc / (K9Gly3Pc * 1 + Gly3Pc);
 }
 
-real[] get_derived_quantities(vector ode_metabolites, real[] known_reals){
+real[] get_derived_quantities(real[] ode_metabolites, real[] known_reals){
   real tot_cell = known_reals[1];
   real glycosome = known_reals[2];
   real cytosol = known_reals[3];
@@ -101,8 +101,8 @@ real[] get_derived_quantities(vector ode_metabolites, real[] known_reals){
   return {Vc, Vg, ATPc, ADPc, ATPg, ADPg, DHAPc, DHAPg, Gly3Pc, Gly3Pg, Gly3P, PGAg, PEPc};
 }
 
-vector get_kinetics(vector ode_metabolites,
-                    vector kinetic_parameters,
+real[] get_fluxes(real[] ode_metabolites,
+                    real[] kinetic_parameters,
                     real[] known_reals){
   real tot_cell = known_reals[1];
   real glycosome = known_reals[2];
@@ -222,10 +222,10 @@ vector get_kinetics(vector ode_metabolites,
   real vPK = Function_for_Pyruvate_kinase(ADPc, ATPc, K12ADP, PEPc, Vm12, Vt, n12, tot_cell);
   real vATPase = cytosol * Function_for_ATPase(ADPc, ATPc, K13, Vt, cytosol, tot_cell);
   real vGlyK = Function_for_Glycerol_kinase(ADPg, ATPg, Gly, Gly3Pg, K14ADPg, K14ATPg, K14Gly, K14Gly3Pg, Vm14, Vm14f, Vm14r, Vt, tot_cell);
-  return [vGlcTr, vHK, vPGI, vPFK, vALD, vTPI, vGAPdh, vGDH, vGPO, vPyrTr, vPGK, vPK, vATPase, vGlyK]';
+  return {vGlcTr, vHK, vPGI, vPFK, vALD, vTPI, vGAPdh, vGDH, vGPO, vPyrTr, vPGK, vPK, vATPase, vGlyK};
 }
 
-vector get_odes(vector fluxes){
+real[] get_odes(real[] fluxes){
   real vGlcTr = fluxes[1];
   real vHK = fluxes[2];
   real vPGI = fluxes[3];
@@ -240,7 +240,7 @@ vector get_odes(vector fluxes){
   real vPK = fluxes[12];
   real vATPase = fluxes[13];
   real vGlyK = fluxes[14];
-  return [
+  return {
     (1.0*vGlcTr-1.0*vHK)/5.7,  // GlcI
     (1.0*vPGK+1.0*vGlyK-1.0*vHK-1.0*vPFK)/0.2446,  // Pg
     (1.0*vHK-1.0*vPGI)/0.2446,  // Glc6P
@@ -254,12 +254,13 @@ vector get_odes(vector fluxes){
     (1.0*vPK-1.0*vPyrTr)/5.4554,  // Pyr
     (1.0*vPGK-1.0*vPK)/5.7,  // Nb
     (1.0*vPK-1.0*vATPase)/5.4554  // Pc
-  ]';
+  };
 }
 
-vector steady_state_equation(vector ode_metabolites,
-                             vector kinetic_parameters,
+real[] steady_state_equation(real t,
+                             real[] ode_metabolites,
+                             real[] kinetic_parameters,
                              real[] known_reals,
                              int[] known_ints){
-    return get_odes(get_kinetics(ode_metabolites, kinetic_parameters, known_reals));
+    return get_odes(get_fluxes(ode_metabolites, kinetic_parameters, known_reals));
 }
