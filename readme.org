@@ -5,4 +5,35 @@ paper:
   sufficient for global and robust coordination of glucose uptake, catabolism,
   energy production and growth in Escherichia coli. PLOS Computational Biology,
   13(2), 1005396. http://dx.doi.org/10.1371/journal.pcbi.1005396
- 
+
+* Cmdstan Instructions
+To build cmdstan:
+
+#+begin_src sh
+cd cmdstan
+git pull
+make stan-update
+make clean-all
+make build
+#+end_src
+
+To build the cmdstan manual:
+
+#+begin_src sh
+cd cmdstan
+make manual
+#+end_src
+
+To compile a model located at `stan/example_model.stan`:
+
+#+begin_src sh
+cd cmdstan
+make ../stan/example_model
+#+end_src
+
+To sample from a compiled model:
+
+#+begin_src sh
+cd stan
+./example_model sample data file=../data_in/example_data.Rdump
+#+end_src
