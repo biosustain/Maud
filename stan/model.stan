@@ -15,27 +15,31 @@ data {
   vector[N_kinetic_parameter] prior_scale;
   real<lower=0> sigma_measurement;
   real known_reals[N_known_real];
-  // algebra solver config
-  vector[N_ode] initial_guess;
+  // ode stuff
+  real initial_state[N_ode];
+  real initial_time;
+  real steady_time;
   real rel_tol;
-  real f_tol;
+  real abs_tol;
   int max_steps;
   // likelihood config
   int<lower=0,upper=1> LIKELIHOOD;
 }
 transformed data {
-  int x_i[0];
+  int known_ints[0];
 }
 parameters {
-  vector<lower=0>[N_kinetic_parameter] kinetic_parameters;
+  real<lower=0> kinetic_parameters[N_kinetic_parameter];
 }
 transformed parameters {
-  vector[N_ode] measurement_hat = algebra_solver(steady_state_equation,
-                                                 initial_guess,
-                                                 kinetic_parameters,
-                                                 known_reals,
-                                                 x_i,
-                                                 rel_tol, f_tol, max_steps);
+  real measurement_hat[N_ode] = integrate_ode_bdf(steady_state_equation,
+                                                  initial_state,
+                                                  initial_time,
+                                                  {steady_time},
+                                                  kinetic_parameters,
+                                                  known_reals,
+                                                  known_ints,
+                                                  rel_tol, abs_tol, max_steps)[1] ;
 }
 model {
   kinetic_parameters ~ lognormal(prior_location, prior_scale);
