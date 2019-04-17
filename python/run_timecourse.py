@@ -35,40 +35,25 @@ import stan_utils
 from sbml_functions import read_sbml_file
 
 # These need to be configured!
-PATH_FROM_HERE_TO_CMDSTAN_DIRECTORY = '../../cloned/cmdstan'
-MODEL_DIRECTORY = 'models/t_brucei'  # this is relative to the cmdstan directory
-MODEL_NAME = 't_brucei'  # this is relative to the cmdstan directory
+PATH_FROM_HERE_TO_CMDSTAN_HOME = '../cmdstan'
+PATH_FROM_HERE_TO_STAN_MODEL = '../stan/autogen/t_brucei_timecourse.stan'
 PATH_FROM_HERE_TO_SBML_FILE = '../data_in/t_brucei.xml'
-PATH_FROM_HERE_TO_KINETICS_FILE = '../stan/autogen/t_brucei.stan'
+PATH_FROM_CMDSTAN_HOME_TO_KINETICS_FILE = '../stan/autogen/t_brucei.stan'
 PATH_FROM_HERE_TO_TIMECOURSE_TEMPLATE = '../stan/timecourse_model_template.stan'
 PATH_FROM_HERE_TO_CMDSTAN_INPUT_DATA_FILE = '../data_out/timecourse_input.Rdump'
 PATH_FROM_HERE_TO_CMDSTAN_OUTPUT_DATA_FILE = '../data_out/t_brucei_timecourse_cmdstan.csv'
-
-
+PATH_FROM_HERE_TO_TIMECOURSE_CSV = '../data_out/t_brucei_timecourse.csv'
 TIME_POINTS = np.linspace(0, 0.5, 101)
 
 if __name__ == '__main__':
+    # get some paths
     here = os.path.dirname(os.path.abspath(__file__))
-    cmdstan_directory = os.path.join(here, PATH_FROM_HERE_TO_CMDSTAN_DIRECTORY)
-
-    # Create stan file with steady state functions and save it to cmdstan directory
-    template_file = os.path.join(here, PATH_FROM_HERE_TO_TIMECOURSE_TEMPLATE)
-    kinetics_file = os.path.join(here, PATH_FROM_HERE_TO_KINETICS_FILE)
-    timecourse_target = os.path.join(cmdstan_directory, MODEL_DIRECTORY, MODEL_NAME + '_timecourse.stan')
-    kinetics_target = os.path.join(cmdstan_directory, MODEL_DIRECTORY, MODEL_NAME + '_kinetics.stan')
-    # copy timecourse model
-    with open(template_file, 'r') as file_in:
-        include_string = os.path.join(MODEL_DIRECTORY, MODEL_NAME + '_kinetics.stan')
-        timecourse_model_code = file_in.read().replace('REPLACE_THIS_WORD', include_string)
-        with open(timecourse_target, 'w') as file_out:
-            file_out.write(timecourse_model_code)
-            file_out.close()
-    # copy kinetics file
-    with open(kinetics_file, 'r') as file_in:
-        kinetics_code = file_in.read()
-        with open(kinetics_target, 'w') as file_out:
-            file_out.write(kinetics_code)
-            file_out.close()
+    cmdstan_directory = os.path.join(here, PATH_FROM_HERE_TO_CMDSTAN_HOME)
+    template_path = os.path.join(here, PATH_FROM_HERE_TO_TIMECOURSE_TEMPLATE)
+    stan_model_path = os.path.join(here, PATH_FROM_HERE_TO_STAN_MODEL)
+    cmdstan_output_data_file = os.path.join(here, PATH_FROM_HERE_TO_CMDSTAN_OUTPUT_DATA_FILE)
+    cmdstan_input_data_file = os.path.join(here, PATH_FROM_HERE_TO_CMDSTAN_INPUT_DATA_FILE)
+    timecourse_csv_path = os.path.join(here, PATH_FROM_HERE_TO_TIMECOURSE_CSV)
 
     # parse sbml file
     m = read_sbml_file(os.path.join(here, PATH_FROM_HERE_TO_SBML_FILE))
@@ -89,16 +74,30 @@ if __name__ == '__main__':
         'abs_tol': 1e-8,
         'max_num_steps': int(1e8)
     }
-    cmdstan_input_data_file = os.path.join(here, PATH_FROM_HERE_TO_CMDSTAN_INPUT_DATA_FILE)
     pystan.misc.stan_rdump(data, cmdstan_input_data_file)
 
-    # run model with cmdstan
-    cmdstan_output_data_file = os.path.join(here, PATH_FROM_HERE_TO_CMDSTAN_OUTPUT_DATA_FILE)
-    stan_utils.run_cmdstan_model(
-        cmdstan_directory=cmdstan_directory,
-        path_from_cmdstan_directory_to_program=os.path.join(MODEL_DIRECTORY, MODEL_NAME + '_timecourse'),
-        cmdstan_input_data_file=cmdstan_input_data_file,
-        cmdstan_output_data_file=cmdstan_output_data_file
+    # write timecourse model based on template
+    with open(template_path, 'r') as f:
+        model_code = f.read().replace(
+            'REPLACE_THIS_WORD', PATH_FROM_CMDSTAN_HOME_TO_KINETICS_FILE
+        )
+        f.close()
+        with open(stan_model_path, 'w') as f:
+            f.write(model_code)
+            f.close()
+
+    # compile model with cmdstan
+    if not os.path.isfile(stan_model_path.replace('.stan', '.hpp')):
+        compile_path =  os.path.relpath(stan_model_path.replace('.stan', ''),
+                                        start=cmdstan_directory)
+        stan_utils.compile_stan_model_with_cmdstan(compile_path)
+
+    method_config = 'sample algorithm=fixed_param num_warmup=0 num_samples=1'
+    stan_utils.run_compiled_cmdstan_model(
+        stan_model_path.replace('.stan', ''),
+        cmdstan_input_data_file,
+        cmdstan_output_data_file,
+        method_config=method_config
     )
     infd = arviz.from_cmdstan([cmdstan_output_data_file],
                               coords={'sim_time': TIME_POINTS,
@@ -118,9 +117,6 @@ if __name__ == '__main__':
         if ax in [axes[0], axes[4]]:
             ax.set_ylabel('Concentration')
     plt.savefig(os.path.join(here, '../data_out/fig.png'))
-    plt.clf()
-    timecourse_filename = 'timecourse_' + MODEL_NAME + '.csv'
-    out_target = os.path.join(here, '../data_out/' + timecourse_filename)
-    print(f'Writing results to {out_target}...')
-    out.to_csv(out_target)
+    print(f'Writing results to {timecourse_csv_path}...')
+    out.to_csv(timecourse_csv_path)
     print('Finished!')

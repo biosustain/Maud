@@ -1,5 +1,6 @@
 functions {
-#include stan/autogen/t_brucei.stan
+//this path is relative to the cmdstan directory
+#include ../stan/autogen/t_brucei.stan  
 }
 data {
   int N_ode;
