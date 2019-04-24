@@ -128,7 +128,7 @@ def _build_steady_state_function():
                              int[] known_ints){
     for (m in 1:size(ode_metabolites)){
       if (ode_metabolites[m] < 0){
-        reject("Metabolite ", m, " is less than zero");
+        reject("Metabolite ", m, " is ", ode_metabolites[m], " but should be greater than zero");
       }
     }
 
