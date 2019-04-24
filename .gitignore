@@ -9,3 +9,4 @@ data_out/*
 *#
 stan/autogen/*
 !stan/autogen/readme.md
+stan/model_*
