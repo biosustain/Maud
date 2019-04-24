@@ -22,7 +22,7 @@ REL_TOL = 1e-13
 ABS_TOL = 1e-6
 MAX_STEPS = int(1e9)
 LIKELIHOOD = 1
-SIGMA_MEASUREMENT = 0.1
+MEASUREMENT_SCALE = 0.05
 
 
 if __name__ == '__main__':
@@ -68,7 +68,7 @@ if __name__ == '__main__':
         'measurement': measurements['measured_value'].values,
         'prior_location': priors['mu'].values,
         'prior_scale': priors['sigma'].values,
-        'sigma_measurement': SIGMA_MEASUREMENT,
+        'measurement_scale': MEASUREMENT_SCALE,
         'known_reals': known_reals.values,
         'initial_state': ode_metabolites.values,
         'initial_time': 0,
