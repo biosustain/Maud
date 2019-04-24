@@ -126,6 +126,12 @@ def _build_steady_state_function():
                              real[] kinetic_parameters,
                              real[] known_reals,
                              int[] known_ints){
+    for (m in 1:size(ode_metabolites)){
+      if (ode_metabolites[m] < 0){
+        reject("Metabolite ", m, " is less than zero");
+      }
+    }
+
     return get_odes(get_fluxes(ode_metabolites, kinetic_parameters, known_reals));\n}"""
 
 
