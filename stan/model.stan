@@ -44,11 +44,11 @@ transformed parameters {
 model {
   kinetic_parameters ~ lognormal(prior_location, prior_scale);
   if (LIKELIHOOD == 1){
-    measurement ~ normal(measurement_hat[measurement_ix], sigma_measurement);
+    measurement ~ lognormal(log(measurement_hat[measurement_ix]), sigma_measurement);
   }
 }
 generated quantities {
   vector[N_ode] measurement_pred;
   for (n in 1:N_ode)
-    measurement_pred[n] = normal_rng(measurement_hat[n], sigma_measurement);
+    measurement_pred[n] = lognormal_rng(log(measurement_hat[n]), sigma_measurement);
 }
