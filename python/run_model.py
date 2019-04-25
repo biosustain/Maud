@@ -22,7 +22,7 @@ REL_TOL = 1e-13
 ABS_TOL = 1e-6
 MAX_STEPS = int(1e9)
 LIKELIHOOD = 1
-SIGMA_MEASUREMENT = 0.1
+MEASUREMENT_SCALE = 0.05
 
 
 if __name__ == '__main__':
@@ -68,7 +68,7 @@ if __name__ == '__main__':
         'measurement': measurements['measured_value'].values,
         'prior_location': priors['mu'].values,
         'prior_scale': priors['sigma'].values,
-        'sigma_measurement': SIGMA_MEASUREMENT,
+        'measurement_scale': MEASUREMENT_SCALE,
         'known_reals': known_reals.values,
         'initial_state': ode_metabolites.values,
         'initial_time': 0,
@@ -98,7 +98,7 @@ if __name__ == '__main__':
     stan_utils.run_compiled_cmdstan_model(stan_model_path.replace('.stan', ''),
                                           input_data_path,
                                           output_data_path,
-                                          method_config="sample num_samples=50 num_warmup=50",
+                                          method_config="sample algorithm=hmc engine=nuts max_depth=15 num_samples=50 num_warmup=50",
                                           refresh_config="refresh=1")
     infd = arviz.from_cmdstan([output_data_path],
                               coords={'kinetic_parameter_names': list(kinetic_parameters.index)},

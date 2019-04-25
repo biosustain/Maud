@@ -13,7 +13,7 @@ data {
   // hardcoded priors
   vector[N_kinetic_parameter] prior_location;
   vector[N_kinetic_parameter] prior_scale;
-  real<lower=0> sigma_measurement;
+  real<lower=0> measurement_scale;
   real known_reals[N_known_real];
   // ode stuff
   real initial_state[N_ode];
@@ -44,11 +44,11 @@ transformed parameters {
 model {
   kinetic_parameters ~ lognormal(prior_location, prior_scale);
   if (LIKELIHOOD == 1){
-    measurement ~ normal(measurement_hat[measurement_ix], sigma_measurement);
+    measurement ~ lognormal(log(measurement_hat[measurement_ix]), measurement_scale);
   }
 }
 generated quantities {
   vector[N_ode] measurement_pred;
   for (n in 1:N_ode)
-    measurement_pred[n] = normal_rng(measurement_hat[n], sigma_measurement);
+    measurement_pred[n] = lognormal_rng(log(measurement_hat[n]), measurement_scale);
 }
