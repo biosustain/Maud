@@ -98,7 +98,7 @@ if __name__ == '__main__':
     stan_utils.run_compiled_cmdstan_model(stan_model_path.replace('.stan', ''),
                                           input_data_path,
                                           output_data_path,
-                                          method_config="sample num_samples=50 num_warmup=50",
+                                          method_config="sample algorithm=hmc engine=nuts max_depth=15 num_samples=50 num_warmup=50",
                                           refresh_config="refresh=1")
     infd = arviz.from_cmdstan([output_data_path],
                               coords={'kinetic_parameter_names': list(kinetic_parameters.index)},
