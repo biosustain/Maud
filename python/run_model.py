@@ -4,26 +4,28 @@ import os
 import pandas as pd
 import pystan
 import stan_utils
-from sbml_functions import read_sbml_file
+from sbml_functions import read_sbml_file, StanReadySbmlModel
+from convert_sbml_to_stan import get_stan_program
 
 PATH_FROM_HERE_TO_SBML_FILE = '../data_in/t_brucei.xml'
 PATH_FROM_HERE_TO_PRIORS_FILE = '../data_in/t_brucei_priors.csv'
 PATH_FROM_HERE_TO_MEASUREMENT_FILE = '../data_in/t_brucei_measurements.csv'
-PATH_FROM_HERE_TO_STAN_MODEL_TEMPLATE = '../stan/model.stan'
-PATH_FROM_HERE_TO_STAN_MODEL = '../stan/model_t_brucei.stan'
+PATH_FROM_HERE_TO_STAN_MODEL_TEMPLATE = '../stan/inference_model_template.stan'
+PATH_FROM_HERE_TO_STAN_MODEL = '../stan/autogen/inference_model_t_brucei.stan'
 PATH_FROM_HERE_TO_CMDSTAN_HOME = '../cmdstan'
 PATH_FROM_HERE_TO_INPUT_DATA = '../data_in/model_input_t_brucei.Rdump'
 PATH_FROM_HERE_TO_INITS = '../data_in/inits_t_brucei.Rdump'
 PATH_FROM_HERE_TO_OUTPUT_DATA = '../data_out/model_output_t_brucei.csv'
 PATH_FROM_HERE_TO_OUTPUT_INFD = '../data_out/infd_t_brucei.nc'
-PATH_FROM_CMDSTAN_HOME_TO_STEADY_STATE_FILE = '../stan/autogen/t_brucei.stan'
+PATH_FROM_CMDSTAN_HOME_TO_ODE_FILE = '../stan/autogen/t_brucei.stan'
 INCLUDE_FILE = 'autogen'
 REL_TOL = 1e-13
 ABS_TOL = 1e-6
 MAX_STEPS = int(1e9)
 LIKELIHOOD = 1
-MEASUREMENT_SCALE = 0.05
-
+MEASUREMENT_SCALE = 0.035
+N_SAMPLES = 100
+N_WARMUP = 100
 
 if __name__ == '__main__':
     here = os.path.dirname(os.path.abspath(__file__))
@@ -37,9 +39,40 @@ if __name__ == '__main__':
     init_path = os.path.join(here, PATH_FROM_HERE_TO_INITS)
     output_data_path = os.path.join(here, PATH_FROM_HERE_TO_OUTPUT_DATA)
     output_infd_path = os.path.join(here, PATH_FROM_HERE_TO_OUTPUT_INFD)
+    ode_path = os.path.join(cmdstan_home, PATH_FROM_CMDSTAN_HOME_TO_ODE_FILE)
 
     # real sbml file
-    sbml_model = read_sbml_file(sbml_file)
+    sbml_model_raw = read_sbml_file(sbml_file)
+
+    # read priors
+    priors = pd.read_csv(priors_path).set_index('Parameter Name')
+
+    # check in case some parameters don't have priors
+    if set(sbml_model_raw.kinetic_parameters.keys()) != set(priors.keys()):
+
+        no_priors = {k: v
+                     for k, v in sbml_model_raw.kinetic_parameters.items()
+                     if k not in priors.index}
+        print(f"Treating these parameters with no priors as constants:\n{no_priors}")
+        new_known_reals = {**sbml_model_raw.known_reals, **no_priors}
+        new_kinetic_parameters = {k: v
+                                  for k, v in sbml_model_raw.kinetic_parameters.items()
+                                  if k in priors.index}
+        sbml_model = StanReadySbmlModel(sbml_model_raw.ode_metabolites,
+                                        new_known_reals,
+                                        new_kinetic_parameters,
+                                        sbml_model_raw.assignment_expressions,
+                                        sbml_model_raw.function_definitions,
+                                        sbml_model_raw.kinetic_expressions,
+                                        sbml_model_raw.ode_expressions)
+    else:
+        sbml_model = sbml_model_raw.copy()
+
+    # convert sbml model to a stan program and write
+    stan_ode_functions = get_stan_program(sbml_model)
+    with open(ode_path, 'w') as f:
+        f.write(stan_ode_functions)
+        f.close()
 
     # get model input
     ode_metabolites = pd.Series(sbml_model.ode_metabolites)
@@ -52,13 +85,8 @@ if __name__ == '__main__':
         .assign(ix_stan=lambda df: range(1, len(df) + 1))
         .dropna(how='any')
     )
-    priors = (
-        pd.read_csv(priors_path)
-        .set_index('Parameter Name')
-        .reindex(kinetic_parameters.index)
-    )
-    priors['mu'] = priors['mu'].fillna(0)
-    priors['sigma'] = priors['sigma'].fillna(0.1)
+    
+    # define input data and write to file
     data = {
         'N_ode': len(ode_metabolites),
         'N_measurement': len(measurements),
@@ -78,13 +106,16 @@ if __name__ == '__main__':
         'max_steps': MAX_STEPS,
         'LIKELIHOOD': LIKELIHOOD
     }
-    inits = {'kinetic_parameters': np.exp(priors['mu'].fillna(0)).values}
     pystan.misc.stan_rdump(data, input_data_path)
+
+    # define initial parameter values and write to file
+    inits = {'kinetic_parameters': priors['Mode'].values}
     pystan.misc.stan_rdump(inits, init_path)
+
     # compile model if necessary
     with open(stan_template_path, 'r') as f:
         model_code = f.read().replace(
-            'REPLACE_THIS_WORD', PATH_FROM_CMDSTAN_HOME_TO_STEADY_STATE_FILE
+            'REPLACE_THIS_WORD', PATH_FROM_CMDSTAN_HOME_TO_ODE_FILE
         ) 
         f.close()
         with open(stan_model_path, 'w') as f:
@@ -93,13 +124,20 @@ if __name__ == '__main__':
     if not os.path.isfile(stan_model_path.replace('.stan', '.hpp')):
         path_from_cmdstan_home_to_program = os.path.relpath(stan_model_path.replace('.stan', ''), start=cmdstan_home)
         stan_utils.compile_stan_model_with_cmdstan(path_from_cmdstan_home_to_program)
+
     # run model
-    extra_config = f"warmup refresh=1 random seed=326553744"
-    stan_utils.run_compiled_cmdstan_model(stan_model_path.replace('.stan', ''),
-                                          input_data_path,
-                                          output_data_path,
-                                          method_config="sample algorithm=hmc engine=nuts max_depth=15 num_samples=50 num_warmup=50",
-                                          refresh_config="refresh=1")
+    method_config = f"""sample algorithm=hmc engine=nuts max_depth=15 \
+                        num_samples={N_SAMPLES} num_warmup={N_WARMUP}"""
+    stan_utils.run_compiled_cmdstan_model(
+        stan_model_path.replace('.stan', ''),
+        input_data_path,
+        output_data_path,
+        method_config=method_config,
+        init_config=f"init={init_path}",
+        refresh_config="refresh=1"
+    )
+
+    # put model output in Arviz format and save
     infd = arviz.from_cmdstan([output_data_path],
                               coords={'kinetic_parameter_names': list(kinetic_parameters.index)},
                               dims={'kinetic_parameters': ['kinetic_parameter_names']})
