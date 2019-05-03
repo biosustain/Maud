@@ -55,9 +55,10 @@ def _get_kinetic_parameters(m):
     out = {}
     reactions = m.getListOfReactions()
     for reaction in reactions:
+        reaction_name = reaction.getId().split('_')[-1]
         parameters = reaction.getKineticLaw().getListOfParameters()
         for parameter in parameters:
-            out[parameter.getId()] = parameter.getValue()
+            out[reaction_name + '_' + parameter.getId()] = parameter.getValue()
     return out
 
 

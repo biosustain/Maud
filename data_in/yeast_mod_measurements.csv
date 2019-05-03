@@ -1,0 +1,7 @@
+metabolite,name,measured_value,pred,ref
+DHAP,Dihydroxyacetone phosphate,1.162,1.584,1.004
+F16bP,Fructose 1 6-bisphosphate,4.583,2.780,6.221
+PEP,Phosphoenol-pyruvate,6.277,0.635,0.098
+P2G,Glycerate,2.109,3.329,1.815
+P3G,Phosphates,0.538,0.613,1.013
+
