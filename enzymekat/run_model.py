@@ -3,12 +3,12 @@ import numpy as np
 import os
 import pandas as pd
 import pystan
-import stan_utils
-from sbml_functions import read_sbml_file, StanReadySbmlModel
-from convert_sbml_to_stan import get_stan_program
+from python_modules import stan_utils, sbml_functions
 
 MODEL_NAME = 'yeast'
-PATH_FROM_HERE_TO_CMDSTAN_HOME = f'../cmdstan'
+RELATIVE_PATH_CMDSTAN = '../cmdstan'
+RELATIVE_PATH_DATA = '../data'
+RELATIVE_PATH_STAN_CODE = 'stan_code'
 REL_TOL = 1e-13
 ABS_TOL = 1e-6
 MAX_STEPS = int(1e9)
@@ -20,31 +20,40 @@ N_CHAINS = 4
 
 if __name__ == '__main__':
     here = os.path.dirname(os.path.abspath(__file__))
-
-    path_from_here_to_sbml_file = f'../data_in/{MODEL_NAME}.xml'
-    path_from_here_to_priors_file = f'../data_in/{MODEL_NAME}_priors.csv'
-    path_from_here_to_measurement_file = f'../data_in/{MODEL_NAME}_measurements.csv'
-    path_from_here_to_stan_model = f'../stan/inference_model_{MODEL_NAME}.stan'
-    path_from_here_to_input_data = f'../data_in/model_input_{MODEL_NAME}.Rdump'
-    path_from_here_to_inits = f'../data_in/inits_{MODEL_NAME}.Rdump'
-    path_from_here_to_output_data = f'../data_out/model_output_{MODEL_NAME}.csv'
-    path_from_here_to_output_infd = f'../data_out/infd_{MODEL_NAME}.nc'
-
-    sbml_file = os.path.join(here, path_from_here_to_sbml_file)
-    stan_model_path = os.path.join(here, path_from_here_to_stan_model)
-    priors_path = os.path.join(here, path_from_here_to_priors_file)
-    measurement_path = os.path.join(here, path_from_here_to_measurement_file)
-    cmdstan_home = os.path.join(here, PATH_FROM_HERE_TO_CMDSTAN_HOME)
-    input_data_path = os.path.join(here, path_from_here_to_input_data)
-    init_path = os.path.join(here, path_from_here_to_inits)
-    output_data_path = os.path.join(here, path_from_here_to_output_data)
-    output_infd_path = os.path.join(here, path_from_here_to_output_infd)
-
+    paths = {
+        'cmdstan': os.path.join(
+            here, RELATIVE_PATH_CMDSTAN
+        ),
+        'priors': os.path.join(
+            here, RELATIVE_PATH_DATA, f'in/{MODEL_NAME}_priors.csv'
+        ),
+        'measurements': os.path.join(
+            here, RELATIVE_PATH_DATA, f'in/{MODEL_NAME}_measurements.csv'
+        ),
+        'stan_model': os.path.join(
+            here, RELATIVE_PATH_STAN_CODE, f'inference_model_{MODEL_NAME}.stan'
+        ),
+        'input_data': os.path.join(
+            here, RELATIVE_PATH_DATA, f'model_input_{MODEL_NAME}.Rdump'
+        ),
+        'inits': os.path.join(
+            here, RELATIVE_PATH_DATA, f'in/inits_{MODEL_NAME}.Rdump'
+        ),
+        'output_data': os.path.join(
+            here, RELATIVE_PATH_DATA, f'out/model_output_{MODEL_NAME}.csv'
+        ),
+        'output_infd': os.path.join(
+            here, RELATIVE_PATH_DATA, f'out/infd_{MODEL_NAME}.nc'
+        ),
+        'sbml_file': os.path.join(
+            here, RELATIVE_PATH_DATA, f'in/{MODEL_NAME}.xml'
+        )
+    }
     # real sbml file
-    sbml_model_raw = read_sbml_file(sbml_file)
+    sbml_model_raw = sbml_functions.read_sbml_file(paths['sbml_file'])
 
     # read priors
-    priors = pd.read_csv(priors_path, sep=';').set_index('parameter')
+    priors = pd.read_csv(paths['priors'], sep=';').set_index('parameter')
 
     # check in case some parameters don't have priors
     if set(sbml_model_raw.kinetic_parameters.keys()) != set(priors.keys()):
@@ -57,13 +66,13 @@ if __name__ == '__main__':
         new_kinetic_parameters = {k: v
                                   for k, v in sbml_model_raw.kinetic_parameters.items()
                                   if k in priors.index}
-        sbml_model = StanReadySbmlModel(sbml_model_raw.ode_metabolites,
-                                        new_known_reals,
-                                        new_kinetic_parameters,
-                                        sbml_model_raw.assignment_expressions,
-                                        sbml_model_raw.function_definitions,
-                                        sbml_model_raw.kinetic_expressions,
-                                        sbml_model_raw.ode_expressions)
+        sbml_model = sbml_functions.StanReadySbmlModel(sbml_model_raw.ode_metabolites,
+                                                       new_known_reals,
+                                                       new_kinetic_parameters,
+                                                       sbml_model_raw.assignment_expressions,
+                                                       sbml_model_raw.function_definitions,
+                                                       sbml_model_raw.kinetic_expressions,
+                                                       sbml_model_raw.ode_expressions)
     else:
         sbml_model = sbml_model_raw.copy()
 
@@ -72,7 +81,7 @@ if __name__ == '__main__':
     known_reals = pd.Series(sbml_model.known_reals)
     kinetic_parameters = pd.Series(sbml_model.kinetic_parameters)
     measurements = (
-        pd.read_csv(measurement_path, index_col='metabolite', squeeze=True)
+        pd.read_csv(paths['measurements'], index_col='metabolite', squeeze=True)
         .reindex(sbml_model.ode_metabolites.keys())
         .reset_index()
         .assign(ix_stan=lambda df: range(1, len(df) + 1))
@@ -99,38 +108,36 @@ if __name__ == '__main__':
         'max_steps': MAX_STEPS,
         'LIKELIHOOD': LIKELIHOOD
     }
-    pystan.misc.stan_rdump(data, input_data_path)
+    pystan.misc.stan_rdump(data, paths['input_data'])
 
     # define initial parameter values and write to file
     inits = {'kinetic_parameters': np.exp(priors['mu'].values)}
-    pystan.misc.stan_rdump(inits, init_path)
+    pystan.misc.stan_rdump(inits, paths['inits'])
 
     # compile model if necessary
-    if not os.path.isfile(stan_model_path.replace('.stan', '.hpp')):
-        path_from_cmdstan_home_to_program = os.path.relpath(
-            stan_model_path.replace('.stan', ''), start=cmdstan_home
+    if not os.path.isfile(paths['stan_model'].replace('.stan', '.hpp')):
+        path_from_cmdstan_to_program = os.path.relpath(
+            paths['stan_model'].replace('.stan', ''), start=paths['cmdstan']
         )
-        stan_utils.compile_stan_model_with_cmdstan(
-            path_from_cmdstan_home_to_program
-        )
+        stan_utils.compile_stan_model_with_cmdstan(path_from_cmdstan_to_program)
 
     # run model
     method_config = f"""sample algorithm=hmc engine=nuts max_depth=15 \
                         num_samples={N_SAMPLES} \
                         num_warmup={N_WARMUP}"""
     stan_utils.run_compiled_cmdstan_model(
-        stan_model_path.replace('.stan', ''),
-        input_data_path,
-        output_data_path,
+        paths['stan_model'].replace('.stan', ''),
+        paths['input_data'],
+        paths['output_data'],
         method_config=method_config,
-        init_config=f"init={init_path}",
+        init_config=f"init={paths['inits']}",
         refresh_config="refresh=5",
         chains=N_CHAINS
     )
 
     # put model output in Arviz format and save
     infd = arviz.from_cmdstan(
-        [output_data_path],
+        [paths['output_data']],
         coords={
             'kinetic_parameter_names': list(kinetic_parameters.index),
             'measurement_names': list(ode_metabolites.index)
@@ -140,5 +147,5 @@ if __name__ == '__main__':
             'measurement_pred': ['measurement_names'],
             'measurement_hat': ['measurement_names']
         })
-    infd.to_netcdf(output_infd_path)
+    infd.to_netcdf(paths['output_infd'])
     print(arviz.summary(infd))
