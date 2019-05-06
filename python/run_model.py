@@ -44,7 +44,7 @@ if __name__ == '__main__':
     sbml_model_raw = read_sbml_file(sbml_file)
 
     # read priors
-    priors = pd.read_csv(priors_path).set_index('parameter')
+    priors = pd.read_csv(priors_path, sep=';').set_index('parameter')
 
     # check in case some parameters don't have priors
     if set(sbml_model_raw.kinetic_parameters.keys()) != set(priors.keys()):
