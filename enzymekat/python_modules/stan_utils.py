@@ -3,12 +3,12 @@ import os
 from multiprocessing import Pool
 
 
-PATH_FROM_HERE_TO_CMDSTAN_HOME = '../cmdstan'
+RELATIVE_PATH_CMDSTAN = '../../cmdstan'
 
 
 def compile_stan_model_with_cmdstan(path_from_cmdstan_home_to_program):
     here = os.path.dirname(os.path.abspath(__file__))
-    cmdstan_home = os.path.join(here, PATH_FROM_HERE_TO_CMDSTAN_HOME)
+    cmdstan_home = os.path.join(here, RELATIVE_PATH_CMDSTAN)
     command = f"cd {cmdstan_home} && make {path_from_cmdstan_home_to_program}"
     os.system(command)
 
