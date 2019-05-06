@@ -7,7 +7,7 @@ import stan_utils
 from sbml_functions import read_sbml_file, StanReadySbmlModel
 from convert_sbml_to_stan import get_stan_program
 
-MODEL_NAME = 'yeast_mod'
+MODEL_NAME = 'yeast'
 PATH_FROM_HERE_TO_CMDSTAN_HOME = f'../cmdstan'
 REL_TOL = 1e-13
 ABS_TOL = 1e-6

@@ -1,5 +1,6 @@
 functions {
-#include REPLACE_THIS_WORD
+#include ../stan/big_k_rate_equations.stan
+#include ../stan/ode_equations_yeast.stan
 }
 data {
   // dimensions
