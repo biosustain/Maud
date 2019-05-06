@@ -14,9 +14,9 @@ ABS_TOL = 1e-6
 MAX_STEPS = int(1e9)
 LIKELIHOOD = 1
 MEASUREMENT_SCALE = 0.05
-N_SAMPLES = 20
-N_WARMUP = 20
-N_CHAINS = 2
+N_SAMPLES = 1000
+N_WARMUP = 1000
+N_CHAINS = 4
 
 if __name__ == '__main__':
     here = os.path.dirname(os.path.abspath(__file__))

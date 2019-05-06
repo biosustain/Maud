@@ -1,3 +1,4 @@
+import numpy as np
 import os
 from multiprocessing import Pool
 
@@ -17,7 +18,7 @@ def run_compiled_cmdstan_model(program_path,
                                output_path,
                                method_config='sample',
                                init_config = '',
-                               random_config='',
+                               random_config=None,
                                refresh_config='',
                                chains=1):
     """Get a compiled cmdstan program to produce a csv of samples
@@ -49,9 +50,11 @@ def run_compiled_cmdstan_model(program_path,
 
     """
     here = os.path.dirname(os.path.abspath(__file__))
-    
+    rng = np.random.RandomState()
     program_directory, program = os.path.split(program_path)
     path_template = output_path.replace('.csv', '{prefix}.csv')
+    if random_config is None:
+        random_config = 'random seed={random}'
     command_template = f"""
         cd {program_directory}
 
@@ -63,7 +66,12 @@ def run_compiled_cmdstan_model(program_path,
         output file={path_template} \
         {refresh_config}
         """
-    commands = [command_template.format(prefix=str(c)) for c in range(chains)]
+    commands = []
+    for c in range(chains):
+        pref = str(c)
+        rand = rng.randint(1, 99999 + 1)
+        command = command_template.format(prefix=pref, random=rand)
+        commands.append(command)
 
     pool = Pool(processes=chains)
     pool.map(os.system, commands)
