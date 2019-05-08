@@ -1,6 +1,6 @@
 functions {
-#include ../stan/big_k_rate_equations.stan
-#include ../stan/ode_equations_yeast.stan
+#include ../enzymekat/stan_code/big_k_rate_equations.stan
+#include ../enzymekat/stan_code/ode_equations_yeast.stan
 }
 data {
   // dimensions
