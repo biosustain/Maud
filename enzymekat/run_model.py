@@ -31,10 +31,10 @@ if __name__ == '__main__':
             here, RELATIVE_PATH_STAN_CODE, f'inference_model_{MODEL_NAME}.stan'
         ),
         'stan_input': os.path.join(
-            here, RELATIVE_PATH_DATA, f'model_input_{MODEL_NAME}.Rdump'
+            here, RELATIVE_PATH_DATA, f'stan_records/model_input_{MODEL_NAME}.Rdump'
         ),
         'inits': os.path.join(
-            here, RELATIVE_PATH_DATA, f'in/inits_{MODEL_NAME}.Rdump'
+            here, RELATIVE_PATH_DATA, f'stan_records/inits_{MODEL_NAME}.Rdump'
         ),
         'output_data': os.path.join(
             here, RELATIVE_PATH_DATA, f'out/model_output_{MODEL_NAME}.csv'
@@ -43,14 +43,13 @@ if __name__ == '__main__':
             here, RELATIVE_PATH_DATA, f'out/infd_{MODEL_NAME}.nc'
         )
     }
+    # define input data and write to file
     data = enzymekat_data.from_toml(paths['data'])
-
     ode_metabolites = (
         data.ode_metabolites
         .assign(ix_stan=lambda df: range(1, len(df) + 1))
     )
     measured_metabolites = ode_metabolites.dropna(subset=['measured_value'])
-    # define input data and write to file
     stan_input = {
         'N_ode': len(ode_metabolites),
         'N_measurement': len(measured_metabolites),
