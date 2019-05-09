@@ -1,13 +1,60 @@
-A repository for Stan models of ecoli glycolysis, based on data from this
-paper:
+Work in progress python application for modelling enzyme kinetics, taking into
+account allosteric effects, obeying the laws of thermodynamics and synthesising
+information/uncertainty from both steady state experiments and the existing
+literature.
 
-- Millard, P., Smallbone, K., & Mendes, P. (2017). Metabolic regulation is
-  sufficient for global and robust coordination of glucose uptake, catabolism,
-  energy production and growth in Escherichia coli. PLOS Computational Biology,
-  13(2), 1005396. http://dx.doi.org/10.1371/journal.pcbi.1005396
+* Model
+The main task that EnzymeKAT addresses is to calculate expectations of a
+probability distribution over possible configurations of kinetic parameters
+that govern a reaction system. This distribution must be thermodynamically
+consistent - i.e. regions of parameter space that break the laws of
+thermodynamics must have zero probability mass - and also reflect the
+pre-experimental and experimental information.
 
-* Cmdstan Instructions
-To build cmdstan:
+EnzymeKAT specifies the probability density of any configuration of kinetic
+parameters as a function of available information using Stan programs
+(e.g.[[https://github.com/biosustain/enzymeKAT/blob/master/enzymekat/stan_code/inference_model_yeast.stan][~inference_model_yeast.stan~]]). Pre-experimental information is represented
+as prior probability distributions over variables representing kinetic
+parameters. Experimental information is represented by a regression model, with
+observed measurements treated as randomly distributed from true values of the
+measured quantities with known error scale. Parameter configurations are mapped
+to true quantity values by solving a system of ordinary differential equations.
+
+Allosteric effects are taken into account through the equations that represent
+the reactions in the system. 
+
+Thermodynamic consistency will be (this is not the case at present) ensured by
+relating kinetic parameters to thermodynamic quantities through [[http://what-when-how.com/molecular-biology/haldane-relationship-molecular-biology/][Haldane
+relationships]]. For each reaction, an informative prior must be specified for
+Gibbs Free energy $\Delta G$ and temperature $T$, and these thermodynamic
+quantities are related to kinetic parameters using the following equation
+
+$$
+\Delta G = -RT\ln K_{eq}
+$$
+
+where $R$ is a known physical constant and $K_{eq}$ is a ratio of kinetic
+parameters.
+
+* Usage
+
+At present EnzymeKAT models only one reaction system, namely yeast, using
+equations and measurements taken from this paper:
+
+- Smallbone, K., Messiha, H. L., Carroll, K. M., Winder, C. L., Malys, N.,
+  Dunn, W. B., Murabito, E., … (2013). A model of yeast glycolysis based on a
+  consistent kinetic characterisation of all its enzymes. FEBS Letters,
+  587(17), 2832–2841. http://dx.doi.org/10.1016/j.febslet.2013.06.043
+
+To run EnzymeKAT you will need to clone this repository using a command like
+this:
+
+#+begin_src bash
+git clone git@github.com:biosustain/enzymeKAT.git
+cd enzymeKAT
+#+end_src
+
+Next build cmdstan (this will take a few minutes):
 
 #+begin_src sh
 cd cmdstan
@@ -17,7 +64,26 @@ make clean-all
 make build
 #+end_src
 
-To build the cmdstan manual:
+Now you should be able to run the model:
+
+#+begin_src bash
+python enzymekat/run_model.py
+#+end_src
+
+This will create files of samples starting with ~model_output_yeast~ in the
+~data/out~ directory as well as saving an arviz [[https://arviz-devs.github.io/arviz/notebooks/XarrayforArviZ.html][InferenceData]] object
+~infd_yeast.nc~ in netcdf format to the same location.
+
+To diagnose whether the model converged well, you can run
+
+#+begin_src bash
+cmdstan/bin/diagnose data/out/model_output_yeast.csv
+#+end_src
+
+* More about cmdstan
+These commands might be useful if you want to find out more about cmdstan.
+
+Build the cmdstan manual:
 
 #+begin_src sh
 cd cmdstan
