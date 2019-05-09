@@ -13,7 +13,7 @@ pre-experimental and experimental information.
 
 EnzymeKAT specifies the probability density of any configuration of kinetic
 parameters as a function of available information using Stan programs
-(e.g.[[https://github.com/biosustain/enzymeKAT/blob/master/enzymekat/stan_code/inference_model_yeast.stan][~inference_model_yeast.stan~]]). Pre-experimental information is represented
+(e.g.[[https://github.com/biosustain/enzymeKAT/blob/master/enzymekat/stan_code/inference_model_yeast.stan][inference_model_yeast.stan]]). Pre-experimental information is represented
 as prior probability distributions over variables representing kinetic
 parameters. Experimental information is represented by a regression model, with
 observed measurements treated as randomly distributed from true values of the
@@ -26,14 +26,13 @@ the reactions in the system.
 Thermodynamic consistency will be (this is not the case at present) ensured by
 relating kinetic parameters to thermodynamic quantities through [[http://what-when-how.com/molecular-biology/haldane-relationship-molecular-biology/][Haldane
 relationships]]. For each reaction, an informative prior must be specified for
-Gibbs Free energy $\Delta G$ and temperature $T$, and these thermodynamic
+Gibbs Free energy \Delta G and temperature T, and these thermodynamic
 quantities are related to kinetic parameters using the following equation
 
-$$
 \Delta G = -RT\ln K_{eq}
-$$
 
-where $R$ is a known physical constant and $K_{eq}$ is a ratio of kinetic
+
+where $R$ is a known physical constant and K_{eq} is a ratio of kinetic
 parameters.
 
 * Usage
