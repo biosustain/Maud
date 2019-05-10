@@ -3,7 +3,7 @@ import numpy as np
 import os
 import pandas as pd
 import pystan
-from python_modules import stan_utils, sbml_functions
+from python_modules import stan_utils, sbml_functions, enzymekat_data
 
 MODEL_NAME = 'yeast'
 RELATIVE_PATH_CMDSTAN = '../cmdstan'
@@ -14,104 +14,65 @@ ABS_TOL = 1e-6
 MAX_STEPS = int(1e9)
 LIKELIHOOD = 1
 MEASUREMENT_SCALE = 0.05
-N_SAMPLES = 1000
-N_WARMUP = 1000
+N_SAMPLES = 200
+N_WARMUP = 200
 N_CHAINS = 4
 
 if __name__ == '__main__':
     here = os.path.dirname(os.path.abspath(__file__))
     paths = {
+        'data': os.path.join(
+            here, RELATIVE_PATH_DATA, f'in/{MODEL_NAME}_data.toml'
+        ),
         'cmdstan': os.path.join(
             here, RELATIVE_PATH_CMDSTAN
-        ),
-        'priors': os.path.join(
-            here, RELATIVE_PATH_DATA, f'in/{MODEL_NAME}_priors.csv'
-        ),
-        'measurements': os.path.join(
-            here, RELATIVE_PATH_DATA, f'in/{MODEL_NAME}_measurements.csv'
         ),
         'stan_model': os.path.join(
             here, RELATIVE_PATH_STAN_CODE, f'inference_model_{MODEL_NAME}.stan'
         ),
-        'input_data': os.path.join(
-            here, RELATIVE_PATH_DATA, f'model_input_{MODEL_NAME}.Rdump'
+        'stan_input': os.path.join(
+            here, RELATIVE_PATH_DATA, f'stan_records/model_input_{MODEL_NAME}.Rdump'
         ),
         'inits': os.path.join(
-            here, RELATIVE_PATH_DATA, f'in/inits_{MODEL_NAME}.Rdump'
+            here, RELATIVE_PATH_DATA, f'stan_records/inits_{MODEL_NAME}.Rdump'
         ),
         'output_data': os.path.join(
             here, RELATIVE_PATH_DATA, f'out/model_output_{MODEL_NAME}.csv'
         ),
         'output_infd': os.path.join(
             here, RELATIVE_PATH_DATA, f'out/infd_{MODEL_NAME}.nc'
-        ),
-        'sbml_file': os.path.join(
-            here, RELATIVE_PATH_DATA, f'in/{MODEL_NAME}.xml'
         )
     }
-    # real sbml file
-    sbml_model_raw = sbml_functions.read_sbml_file(paths['sbml_file'])
-
-    # read priors
-    priors = pd.read_csv(paths['priors'], sep=';').set_index('parameter')
-
-    # check in case some parameters don't have priors
-    if set(sbml_model_raw.kinetic_parameters.keys()) != set(priors.keys()):
-
-        no_priors = {k: v
-                     for k, v in sbml_model_raw.kinetic_parameters.items()
-                     if k not in priors.index}
-        print(f"Treating these parameters with no priors as constants:\n{no_priors}")
-        new_known_reals = {**sbml_model_raw.known_reals, **no_priors}
-        new_kinetic_parameters = {k: v
-                                  for k, v in sbml_model_raw.kinetic_parameters.items()
-                                  if k in priors.index}
-        sbml_model = sbml_functions.StanReadySbmlModel(sbml_model_raw.ode_metabolites,
-                                                       new_known_reals,
-                                                       new_kinetic_parameters,
-                                                       sbml_model_raw.assignment_expressions,
-                                                       sbml_model_raw.function_definitions,
-                                                       sbml_model_raw.kinetic_expressions,
-                                                       sbml_model_raw.ode_expressions)
-    else:
-        sbml_model = sbml_model_raw.copy()
-
-    # get model input
-    ode_metabolites = pd.Series(sbml_model.ode_metabolites)
-    known_reals = pd.Series(sbml_model.known_reals)
-    kinetic_parameters = pd.Series(sbml_model.kinetic_parameters)
-    measurements = (
-        pd.read_csv(paths['measurements'], index_col='metabolite', squeeze=True)
-        .reindex(sbml_model.ode_metabolites.keys())
-        .reset_index()
-        .assign(ix_stan=lambda df: range(1, len(df) + 1))
-        .dropna(how='any')
-    )
-
     # define input data and write to file
-    data = {
+    data = enzymekat_data.from_toml(paths['data'])
+    ode_metabolites = (
+        data.ode_metabolites
+        .assign(ix_stan=lambda df: range(1, len(df) + 1))
+    )
+    measured_metabolites = ode_metabolites.dropna(subset=['measured_value'])
+    stan_input = {
         'N_ode': len(ode_metabolites),
-        'N_measurement': len(measurements),
-        'N_known_real': len(known_reals),
-        'N_kinetic_parameter': len(kinetic_parameters),
-        'measurement_ix': measurements['ix_stan'].values,
-        'measurement': measurements['measured_value'].values,
-        'prior_location': priors['mu'].values,
-        'prior_scale': priors['sigma'].values,
-        'measurement_scale': MEASUREMENT_SCALE,
-        'known_reals': known_reals.values,
-        'initial_state': ode_metabolites.values,
+        'N_measurement': len(measured_metabolites),
+        'N_known_real': len(data.known_reals),
+        'N_kinetic_parameter': len(data.kinetic_parameters),
+        'measurement_ix': measured_metabolites['ix_stan'].values,
+        'measurement': measured_metabolites['measured_value'].values,
+        'prior_location': data.kinetic_parameters['prior_location'].values,
+        'prior_scale': data.kinetic_parameters['prior_scale'].values,
+        'measurement_scale': data.experiment_info['MEASUREMENT_SCALE'],
+        'known_reals': data.known_reals.values,
+        'initial_state': ode_metabolites['initial_value'].values,
         'initial_time': 0,
-        'steady_time': 10,
+        'steady_time': data.experiment_info['STEADY_STATE_TIME'],
         'rel_tol': REL_TOL,
         'abs_tol': ABS_TOL,
         'max_steps': MAX_STEPS,
         'LIKELIHOOD': LIKELIHOOD
     }
-    pystan.misc.stan_rdump(data, paths['input_data'])
+    pystan.misc.stan_rdump(stan_input, paths['stan_input'])
 
     # define initial parameter values and write to file
-    inits = {'kinetic_parameters': np.exp(priors['mu'].values)}
+    inits = {'kinetic_parameters': data.kinetic_parameters['paper'].values}
     pystan.misc.stan_rdump(inits, paths['inits'])
 
     # compile model if necessary
@@ -127,7 +88,7 @@ if __name__ == '__main__':
                         num_warmup={N_WARMUP}"""
     stan_utils.run_compiled_cmdstan_model(
         paths['stan_model'].replace('.stan', ''),
-        paths['input_data'],
+        paths['stan_input'],
         paths['output_data'],
         method_config=method_config,
         init_config=f"init={paths['inits']}",
@@ -139,8 +100,8 @@ if __name__ == '__main__':
     infd = arviz.from_cmdstan(
         [paths['output_data']],
         coords={
-            'kinetic_parameter_names': list(kinetic_parameters.index),
-            'measurement_names': list(ode_metabolites.index)
+            'kinetic_parameter_names': list(data.kinetic_parameters['name']),
+            'measurement_names': list(ode_metabolites['name'])
         },
         dims={
             'kinetic_parameters': ['kinetic_parameter_names'],
