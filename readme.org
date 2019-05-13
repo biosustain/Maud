@@ -3,6 +3,15 @@ account allosteric effects, obeying the laws of thermodynamics and synthesising
 information/uncertainty from both steady state experiments and the existing
 literature.
 
+* Python dependencies
+- pandas
+- pystan
+- numpy
+- matplotlib
+- arviz
+- toml
+- python-libsbml
+
 * Model
 The main task that EnzymeKAT addresses is to calculate expectations of a
 probability distribution over possible configurations of kinetic parameters
