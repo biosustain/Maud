@@ -51,17 +51,16 @@ ADP = 1.72835  # From Smallbone
 [[ode_metabolites]]
 'name' = 'P2G'
 'initial_value' = 0.0677379081099344
-'measured_value' = 2.109
+'measured_value' = 0.538
 
 [[ode_metabolites]]
 'name' = 'P3G'
 'initial_value' = 0.469825011134444
-'measured_value' = 0.538
 
 [[ode_metabolites]]
 'name' = 'PEP'
 'initial_value' = 0.610005413358042
-'measured_value' = 6.277
+'measured_value' = 0.611
 
 [[kinetic_parameters]]
 'name' = 'ENO1_Kp2g'
