@@ -149,7 +149,7 @@ real[] get_odes(real[] fluxes){
   return {
     TDH1+TDH3+TDH2-PGK,   // BPG
     FBA-TPI,   // DHAP
-    influx_fbp + FBA,   // F16bP
+    influx_fbp - FBA,   // F16bP
     FBA+TPI-TDH1-TDH3-TDH2,   // GAP
     GPM-ENO1-ENO2,   // P2G
     PGK-GPM,   // P3G
