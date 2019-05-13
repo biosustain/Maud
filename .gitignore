@@ -14,6 +14,8 @@ data/in/*
 data/out/*
 !data/out/readme.md
 
+enzymekat/stan_code/cached_stan_models/*
+
 *.DS_Store
 *#
 stan/autogen/*
