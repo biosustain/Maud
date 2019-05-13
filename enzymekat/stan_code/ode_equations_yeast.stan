@@ -19,20 +19,22 @@ real[] get_derived_quantities(real[] ode_metabolites, real[] known_reals){
   real TDH2 = known_reals[18];
   real TDH3 = known_reals[19];
   real TPI1 = known_reals[20];
-  real ADP = ode_metabolites[1];
-  real ATP = ode_metabolites[2];
-  real BPG = ode_metabolites[3];
-  real DHAP = ode_metabolites[4];
-  real F16bP = ode_metabolites[5];
-  real GAP = ode_metabolites[6];
-  real NAD = ode_metabolites[7];
-  real P2G = ode_metabolites[8];
-  real P3G = ode_metabolites[9];
-  real PEP = ode_metabolites[10];
+  real influx_fbp = known_reals[21];
+  real outflux_pep = known_reals[22];
+  real NAD = known_reals[23];
+  real NADH = known_reals[24];
+  real ATP = known_reals[25];
+  real ADP = known_reals[26];
+  real BPG = ode_metabolites[1];
+  real DHAP = ode_metabolites[2];
+  real F16bP = ode_metabolites[3];
+  real GAP = ode_metabolites[4];
+  real P2G = ode_metabolites[5];
+  real P3G = ode_metabolites[6];
+  real PEP = ode_metabolites[7];
   real sum_PXG = P2G + P3G;
   real energy_charge = (ATP + ADP / 2) / sum_AXP;
-  real NADH = max({sum_NAD - NAD, 0});
-  return {sum_PXG, energy_charge, NADH};
+  return {sum_PXG, energy_charge};
 }
 
 real[] get_fluxes(real[] ode_metabolites,
@@ -58,16 +60,19 @@ real[] get_fluxes(real[] ode_metabolites,
   real TDH2 = known_reals[18];
   real TDH3 = known_reals[19];
   real TPI1 = known_reals[20];
-  real ADP = ode_metabolites[1];
-  real ATP = ode_metabolites[2];
-  real BPG = ode_metabolites[3];
-  real DHAP = ode_metabolites[4];
-  real F16bP = ode_metabolites[5];
-  real GAP = ode_metabolites[6];
-  real NAD = ode_metabolites[7];
-  real P2G = ode_metabolites[8];
-  real P3G = ode_metabolites[9];
-  real PEP = ode_metabolites[10];
+  real influx_fbp = known_reals[21];
+  real outflux_pep = known_reals[22];
+  real NAD = known_reals[23];
+  real NADH = known_reals[24];
+  real ATP = known_reals[25];
+  real ADP = known_reals[26];
+  real BPG = ode_metabolites[1];
+  real DHAP = ode_metabolites[2];
+  real F16bP = ode_metabolites[3];
+  real GAP = ode_metabolites[4];
+  real P2G = ode_metabolites[5];
+  real P3G = ode_metabolites[6];
+  real PEP = ode_metabolites[7];
   real ENO1_Kp2g = kinetic_parameters[1];
   real ENO1_Kpep = kinetic_parameters[2];
   real ENO1_kcat = kinetic_parameters[3];
@@ -111,43 +116,45 @@ real[] get_fluxes(real[] ode_metabolites,
   real ENO2_Kp2g = kinetic_parameters[41];
   real ENO2_Kpep = kinetic_parameters[42];
   real ENO2_kcat = kinetic_parameters[43];
-  real derived_quantities[3] = get_derived_quantities(ode_metabolites, known_reals);
+  real derived_quantities[2] = get_derived_quantities(ode_metabolites, known_reals);
   real sum_PXG = derived_quantities[1];
   real energy_charge = derived_quantities[2];
-  real NADH = derived_quantities[3];
-  return {cell*reversible_michaelis_menten(P2G,PEP,ENO1*ENO1_kcat,ENO1_Kp2g,ENO1_Kpep,Keq_ENO),
-      cell*ordered_uni_bi(F16bP,DHAP,GAP,FBA1*FBA_kcat,FBA_Kf16bp,FBA_Kdhap,FBA_Kgap,FBA_Kigap,FBA_Keq),
-      cell*reversible_michaelis_menten(P3G,P2G,GPM1*GPM_kcat,GPM_Kp3g,GPM_Kp2g,GPM_Keq),
-      cell*phosphoglycerate_kinase_kinetics(BPG,ADP,P3G,ATP,PGK1*PGK_kcat,PGK_Kbpg,PGK_Kadp,PGK_Kp3g,PGK_Katp,PGK_Keq,PGK_nHadp),
-      cell*two_noncompeting_couples(GAP,NAD,BPG,NADH,TDH1*TDH1_kcat,TDH1_Kgap,TDH1_Knad,TDH1_Kbpg,TDH1_Knadh,Keq_TDH),
-      cell*triphosphate_isomerase_kinetics(DHAP,GAP,TPI1*TPI_kcat,TPI_Kdhap,TPI_Kgap,TPI_Kigap, TPI_Keq),
-      cell*two_noncompeting_couples(GAP,NAD,BPG,NADH,TDH3*TDH3_kcat,TDH3_Kgap,TDH3_Knad,TDH3_Kbpg,TDH3_Knadh,Keq_TDH),
-      cell*two_noncompeting_couples(GAP,NAD,BPG,NADH,TDH1*TDH2_kcat,TDH2_Kgap,TDH2_Knad,TDH2_Kbpg,TDH2_Knadh,Keq_TDH),
-      cell*reversible_michaelis_menten(P2G,PEP,ENO2*ENO2_kcat,ENO2_Kp2g,ENO2_Kpep,Keq_ENO)};
+  return {
+    influx_fbp,
+    cell*reversible_michaelis_menten(P2G,PEP,ENO1*ENO1_kcat,ENO1_Kp2g,ENO1_Kpep,Keq_ENO),
+    cell*ordered_uni_bi(F16bP,DHAP,GAP,FBA1*FBA_kcat,FBA_Kf16bp,FBA_Kdhap,FBA_Kgap,FBA_Kigap,FBA_Keq),
+    cell*reversible_michaelis_menten(P3G,P2G,GPM1*GPM_kcat,GPM_Kp3g,GPM_Kp2g,GPM_Keq),
+    cell*phosphoglycerate_kinase_kinetics(BPG,ADP,P3G,ATP,PGK1*PGK_kcat,PGK_Kbpg,PGK_Kadp,PGK_Kp3g,PGK_Katp,PGK_Keq,PGK_nHadp),
+    cell*two_noncompeting_couples(GAP,NAD,BPG,NADH,TDH1*TDH1_kcat,TDH1_Kgap,TDH1_Knad,TDH1_Kbpg,TDH1_Knadh,Keq_TDH),
+    cell*triphosphate_isomerase_kinetics(DHAP,GAP,TPI1*TPI_kcat,TPI_Kdhap,TPI_Kgap,TPI_Kigap, TPI_Keq),
+    cell*two_noncompeting_couples(GAP,NAD,BPG,NADH,TDH3*TDH3_kcat,TDH3_Kgap,TDH3_Knad,TDH3_Kbpg,TDH3_Knadh,Keq_TDH),
+    cell*two_noncompeting_couples(GAP,NAD,BPG,NADH,TDH1*TDH2_kcat,TDH2_Kgap,TDH2_Knad,TDH2_Kbpg,TDH2_Knadh,Keq_TDH),
+    cell*reversible_michaelis_menten(P2G,PEP,ENO2*ENO2_kcat,ENO2_Kp2g,ENO2_Kpep,Keq_ENO),
+    outflux_pep
+  };
 }
 
 real[] get_odes(real[] fluxes){
-  real ENO1 = fluxes[1];
-  real FBA = fluxes[2];
-  real GPM = fluxes[3];
-  real PGK = fluxes[4];
-  real TDH1 = fluxes[5];
-  real TPI = fluxes[6];
-  real TDH3 = fluxes[7];
-  real TDH2 = fluxes[8];
-  real ENO2 = fluxes[9];
+  real influx_fbp = fluxes[1];
+  real ENO1 = fluxes[2];
+  real FBA = fluxes[3];
+  real GPM = fluxes[4];
+  real PGK = fluxes[5];
+  real TDH1 = fluxes[6];
+  real TPI = fluxes[7];
+  real TDH3 = fluxes[8];
+  real TDH2 = fluxes[9];
+  real ENO2 = fluxes[10];
+  real outflux_pep = fluxes[11];
   return {
-    (-1.0*PGK)/1.0,  // ADP
-      (1.0*PGK)/1.0,  // ATP
-      (1.0*TDH1+1.0*TDH3+1.0*TDH2-1.0*PGK)/1.0,  // BPG
-      (1.0*FBA-1.0*TPI)/1.0,  // DHAP
-      (-1.0*FBA)/1.0,  // F16bP
-      (1.0*FBA+1.0*TPI-1.0*TDH1-1.0*TDH3-1.0*TDH2)/1.0,  // GAP
-      (-1.0*TDH1-1.0*TDH3-1.0*TDH2)/1.0,  // NAD
-      (1.0*GPM-1.0*ENO1-1.0*ENO2)/1.0,  // P2G
-      (1.0*PGK-1.0*GPM)/1.0,  // P3G
-      (1.0*ENO1+1.0*ENO2)/1.0  // PEP
-      };
+    TDH1+TDH3+TDH2-PGK,   // BPG
+    FBA-TPI,   // DHAP
+    influx_fbp - FBA,   // F16bP
+    FBA+TPI-TDH1-TDH3-TDH2,   // GAP
+    GPM-ENO1-ENO2,   // P2G
+    PGK-GPM,   // P3G
+    ENO1+ENO2 - outflux_pep   // PEP
+  };
 }
 
 real[] steady_state_equation(real t,
