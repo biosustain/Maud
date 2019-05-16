@@ -12,6 +12,13 @@ literature.
 - toml
 - python-libsbml
 
+* 'Installation'
+This repository contains cmdstan as a submodule, so to fully clone it you will need to use the ~recursive~ option:
+
+#+begin_src bash
+git clone --recursive git@github.com:biosustain/enzymeKAT.git
+#+end_src
+
 * Model
 The main task that EnzymeKAT addresses is to calculate expectations of a
 probability distribution over possible configurations of kinetic parameters
