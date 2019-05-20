@@ -1,32 +1,29 @@
 real[] get_fluxes(real[] ode_metabolites,
-                  real[] parameters,
+                  real[] params,
                   real[] known_reals){
-  real cell = known_reals[1];
-  real Keq_ADH = known_reals[2];
-  real Keq_ENO = known_reals[3];
-  real Keq_HXK = known_reals[4];
-  real Keq_PYK = known_reals[5];
-  real Keq_TDH = known_reals[6];
-  real NA = known_reals[7];
-  real sum_AXP = known_reals[8];
-  real sum_NAD = known_reals[9];
-  real sum_UXP = known_reals[10];
-  real volume = known_reals[11];
-  real ENO1 = known_reals[12];
-  real ENO2 = known_reals[13];
-  real FBA1 = known_reals[14];
-  real GPM1 = known_reals[15];
-  real PGK1 = known_reals[16];
-  real TDH1 = known_reals[17];
-  real TDH2 = known_reals[18];
-  real TDH3 = known_reals[19];
-  real TPI1 = known_reals[20];
-  real influx_fbp = known_reals[21];
-  real outflux_pep = known_reals[22];
-  real NAD = known_reals[23];
-  real NADH = known_reals[24];
-  real ATP = known_reals[25];
-  real ADP = known_reals[26];
+  // unpacking
+  real NA = known_reals[1];
+  real sum_AXP = known_reals[2];
+  real sum_NAD = known_reals[3];
+  real sum_UXP = known_reals[4];
+  real volume = known_reals[5];
+  real ENO1 = known_reals[6];
+  real ENO2 = known_reals[7];
+  real FBA = known_reals[8];
+  real GPM = known_reals[9];
+  real PGK = known_reals[10];
+  real TDH1 = known_reals[11];
+  real TDH2 = known_reals[12];
+  real TDH3 = known_reals[13];
+  real TPI = known_reals[14];
+  real influx_fbp = known_reals[15];
+  real outflux_pep = known_reals[16];
+  real NAD = known_reals[17];
+  real NADH = known_reals[18];
+  real ATP = known_reals[19];
+  real ADP = known_reals[20];
+  real temperature = known_reals[21];
+  real gas_constant = known_reals[22];
   real BPG = ode_metabolites[1];
   real DHAP = ode_metabolites[2];
   real F16bP = ode_metabolites[3];
@@ -34,89 +31,121 @@ real[] get_fluxes(real[] ode_metabolites,
   real P2G = ode_metabolites[5];
   real P3G = ode_metabolites[6];
   real PEP = ode_metabolites[7];
-  real FBA_delta_g = parameters[1];
-  real TPI_delta_g = parameters[6];
-  real TDH1_delta_g = parameters[10];
-  real TDH2_delta_g = parameters[16];
-  real TDH3_delta_g = parameters[22];
-  real PGK_delta_g = parameters[28];
-  real GPM_delta_g = parameters[34];
-  real ENO1_delta_g = parameters[38];
-  real ENO2_delta_g = parameters[42];
-  real FBA_Ka = parameters[2];
-  real FBA_Kp = parameters[3];
-  real FBA_V1 = parameters[4];
-  real FBA_V2 = parameters[5];
-  real TPI_V1 = parameters[7];
-  real TPI_V2 = parameters[8];
-  real TPI_Ka = parameters[9];
-  real TDH1_Kb = parameters[11];
-  real TDH1_Kia = parameters[12];
-  real TDH1_Kp = parameters[13];
-  real TDH1_V1 = parameters[14];
-  real TDH1_V2 = parameters[15];
-  real TDH2_Kb = parameters[17];
-  real TDH2_Kia = parameters[18];
-  real TDH2_Kp = parameters[19];
-  real TDH2_V1 = parameters[20];
-  real TDH2_V2 = parameters[21];
-  real TDH3_Kb = parameters[23];
-  real TDH3_Kia = parameters[24];
-  real TDH3_Kp = parameters[25];
-  real TDH3_V1 = parameters[26];
-  real TDH3_V2 = parameters[27];
-  real PGK_Kb = parameters[29];
-  real PGK_Kia = parameters[30];
-  real PGK_Kp = parameters[31];
-  real PGK_V1 = parameters[32];
-  real PGK_V2 = parameters[33];
-  real GPM_V1 = parameters[35];
-  real GPM_V2 = parameters[36];
-  real GPM_Ka = parameters[37];
-  real ENO1_V1 = parameters[39];
-  real ENO1_V2 = parameters[40];
-  real ENO1_Ka = parameters[41];
-  real ENO2_V1 = parameters[43];
-  real ENO2_V2 = parameters[44];
-  real ENO2_Ka = parameters[45];
 
+  // thermodynamic parameters
+  real ENO_delta_g = params[1];
+  real FBA_delta_g = params[2];
+  real GPM_delta_g = params[3];
+  real PGK_delta_g = params[4];
+  real TDH_delta_g = params[5];
+  real TPI_delta_g = params[6];
+
+  // kinetic parameters
+  real ENO1_Kcat1 = params[10];
+  real ENO1_Kcat2 = params[11];
+  real ENO1_Ka = params[12];
+  real ENO2_Kcat1 = params[13];
+  real ENO2_Kcat2 = params[14];
+  real ENO2_Ka = params[15];
+  real FBA_Kcat1 = params[16];
+  real FBA_Kcat2 = params[17];
+  real FBA_Kia = params[18];
+  real FBA_Kiq = params[19];
+  real FBA_Ka = params[20];
+  real FBA_Kp = params[21];
+  real FBA_Kq = params[22];
+  real GPM_Kcat1 = params[23];
+  real GPM_Kcat2 = params[24];
+  real GPM_Ka = params[25];
+  real PGK_Kcat1 = params[26];
+  real PGK_Kcat2 = params[27];
+  real PGK_Kia = params[28];
+  real PGK_Kib = params[29];
+  real PGK_Kiq = params[30];
+  real PGK_Ka = params[31];
+  real PGK_Kb = params[32];
+  real PGK_Kp = params[33];
+  real PGK_Kq = params[34];
+  real TDH1_Kcat1 = params[35];
+  real TDH1_Kcat2 = params[36];
+  real TDH1_Kia = params[37];
+  real TDH1_Kib = params[38];
+  real TDH1_Kiq = params[39];
+  real TDH1_Ka = params[40];
+  real TDH1_Kb = params[41];
+  real TDH1_Kp = params[42];
+  real TDH1_Kq = params[43];
+  real TDH2_Kcat1 = params[44];
+  real TDH2_Kcat2 = params[45];
+  real TDH2_Kib = params[46];
+  real TDH2_Kiq = params[47];
+  real TDH2_Kia = params[48];
+  real TDH2_Ka = params[49];
+  real TDH2_Kb = params[50];
+  real TDH2_Kp = params[51];
+  real TDH2_Kq = params[52];
+  real TDH3_Kcat1 = params[53];
+  real TDH3_Kcat2 = params[54];
+  real TDH3_Kia = params[55];
+  real TDH3_Kib = params[56];
+  real TDH3_Kiq = params[57];
+  real TDH3_Ka = params[58];
+  real TDH3_Kb = params[59];
+  real TDH3_Kp = params[60];
+  real TDH3_Kq = params[61];
+  real TPI_Kcat1 = params[62];
+  real TPI_Kcat2 = params[63];
+  real TPI_Ka = params[64];
+  
   // derived numbers
   real sum_PXG = P2G + P3G;
   real energy_charge = (ATP + ADP / 2) / sum_AXP;
 
   // haldane_relationships
-  real FBA_Keq = get_Keq(FBA_delta_g, T, R);
-  real TPI_Keq = get_Keq(TPI_delta_g, T, R);
-  real TDH1_Keq = get_Keq(TDH1_delta_g, T, R);
-  real TDH2_Keq = get_Keq(TDH2_delta_g, T, R);
-  real TDH3_Keq = get_Keq(TDH3_delta_g, T, R);
-  real PGK_Keq = get_Keq(PGK_delta_g, T, R);
-  real GPM_Keq = get_Keq(GPM_delta_g, T, R);
-  real ENO1_Keq = get_Keq(ENO1_delta_g, T, R);
-  real ENO2_Keq = get_Keq(ENO2_delta_g, T, R);
-  real FBA_Kip = get_Kip_ordered_unibi(FBA_Keq, FBA_Kia, FBA_Kq, FBA_V1, FBA_V2);
-  real TPI_Kp = get_Kp_uniuni(TPI_V1, TPI_V2, TPI_Keq, TPI_Ka);
-  real TDH1_Kip = get_Kip_ordered_bibi(TDH1_Kb, TDH1_Keq, TDH1_Kia, TDH1_Kp, TDH1_V1, TDH1_V2);
-  real TDH2_Kip = get_Kip_ordered_bibi(TDH2_Kb, TDH2_Keq, TDH2_Kia, TDH2_Kp, TDH2_V1, TDH2_V2);
-  real TDH3_Kip = get_Kip_ordered_bibi(TDH3_Kb, TDH3_Keq, TDH3_Kia, TDH3_Kp, TDH3_V1, TDH3_V2);
-  real PGK_Kip = get_Kip_ordered_bibi(PGK_Kb, PGK_Keq, PGK_Kia, PGK_Kp, PGK_V1, PGK_V2);
-  real GPM_Kp = get_Kp_uniuni(GPM_V1, GPM_V2, GPM_Keq, ENO1_Ka);
-  real ENO1_Kp = get_Kp_uniuni(ENO1_V1, ENO1_V2, ENO1_Keq, ENO1_Ka);
-  real ENO2_Kp = get_Kp_uniuni(ENO2_V1, ENO2_V2, ENO2_Keq, ENO2_Ka);
+  real FBA_Keq = get_Keq(FBA_delta_g, temperature, gas_constant);
+  real TPI_Keq = get_Keq(TPI_delta_g, temperature, gas_constant);
+  real TDH_Keq = get_Keq(TDH_delta_g, temperature, gas_constant);
+  real PGK_Keq = get_Keq(PGK_delta_g, temperature, gas_constant);
+  real GPM_Keq = get_Keq(GPM_delta_g, temperature, gas_constant);
+  real ENO_Keq = get_Keq(ENO_delta_g, temperature, gas_constant);
+  real FBA_Kip = get_Kip_ordered_unibi(FBA_Keq, FBA_Kia, FBA_Kq, FBA_Kcat1, FBA_Kcat2);
+  real TPI_Kp = get_Kp_uniuni(TPI_Kcat1, TPI_Kcat2, TPI_Keq, TPI_Ka);
+  real TDH1_Kip = get_Kip_ordered_bibi(TDH_Keq, TDH1_Ka, TDH1_Kq, TDH1_Kib, TDH1_Kiq, TDH1_Kcat1, TDH1_Kcat2);
+  real TDH2_Kip = get_Kip_ordered_bibi(TDH_Keq, TDH2_Ka, TDH2_Kq, TDH2_Kib, TDH2_Kiq, TDH2_Kcat1, TDH2_Kcat2);
+  real TDH3_Kip = get_Kip_ordered_bibi(TDH_Keq, TDH3_Ka, TDH3_Kq, TDH3_Kib, TDH3_Kiq, TDH3_Kcat1, TDH3_Kcat2);
+  real PGK_Kip = get_Kip_ordered_bibi(PGK_Keq, PGK_Ka, PGK_Kq, PGK_Kib, PGK_Kiq, PGK_Kcat1, PGK_Kcat2);
+  real GPM_Kp = get_Kp_uniuni(GPM_Kcat1, GPM_Kcat2, GPM_Keq, ENO1_Ka);
+  real ENO1_Kp = get_Kp_uniuni(ENO1_Kcat1, ENO1_Kcat2, ENO_Keq, ENO1_Ka);
+  real ENO2_Kp = get_Kp_uniuni(ENO2_Kcat1, ENO2_Kcat2, ENO_Keq, ENO2_Ka);
 
-  return {
-    influx_fbp,
-    uniuni(ENO1_V1, ENO1_V2, ENO1_A, ENO1_P, ENO1_Ka, ENO1_Kp), // ENO1
-    uniuni(ENO2_V1, ENO2_V2, ENO2_A, ENO2_P, ENO2_Ka, ENO2_Kp), // ENO2
-    ordered_unibi(FBA_A, FBA_Kip, FBA_Ka, FBA_Kq, FBA_Kp, FBA_Q, FBA_V1, FBA_V2), // FBA
-    uniuni(GPM_V1, GPM_V2, GPM_A, GPM_P, GPM_Kq, GPM_Kp),  // GPM
-    ordered_bibi(PGK_Kib, PGK_Kiq, PGK_B, PGK_Kia, PGK_Kip, PGK_P, PGK_Kb, PGK_Kq, PGK_Q, PGK_Ka, PGK_Kp, PGK_V1, PGK_V2),  // PGK
-    ordered_bibi(TDH1_Kib, TDH1_Kiq, TDH1_B, TDH1_Kia, TDH1_Kip, TDH1_P, TDH1_Kb, TDH1_Kq, TDH1_Q, TDH1_Ka, TDH1_Kp, TDH1_V1, TDH1_V2),  // TDH1
-    ordered_bibi(TDH2_Kib, TDH2_Kiq, TDH2_B, TDH2_Kia, TDH2_Kip, TDH2_P, TDH2_Kb, TDH2_Kq, TDH2_Q, TDH2_Ka, TDH2_Kp, TDH2_V1, TDH2_V2),  // TDH2
-    ordered_bibi(TDH3_Kib, TDH3_Kiq, TDH3_B, TDH3_Kia, TDH3_Kip, TDH3_P, TDH3_Kb, TDH3_Kq, TDH3_Q, TDH3_Ka, TDH3_Kp, TDH3_V1, TDH3_V2),  // TDH3
-    uniuni(TPI_V1, TPI_V2, TPI_A, TPI_P, TPI_Kq, TPI_Kp),  // TPI
-    outflux_pep
-  };
+  // fluxes
+  real flux_ENO1 = uniuni(P2G, PEP, ENO1 * ENO1_Kcat1, ENO1 * ENO1_Kcat2, ENO1_Ka, ENO1_Kp);
+  real flux_ENO2 = uniuni(P2G, PEP, ENO2 * ENO2_Kcat1, ENO2 * ENO2_Kcat2, ENO2_Ka, ENO2_Kp);
+  real flux_FBA = ordered_unibi(F16bP, GAP, DHAP,
+                                FBA * FBA_Kcat1, FBA * FBA_Kcat2,
+                                FBA_Ka, FBA_Kp, FBA_Kq,
+                                FBA_Kia, FBA_Kip, FBA_Kiq);
+  real flux_GPM = uniuni(P3G, P2G, GPM * GPM_Kcat1, GPM * GPM_Kcat2, GPM_Ka, GPM_Kp);
+  real flux_PGK = ordered_bibi(BPG, P3G, ADP, ATP,
+                               PGK * PGK_Kcat1, PGK * PGK_Kcat2,
+                               PGK_Ka, PGK_Kb, PGK_Kp, PGK_Kq,
+                               PGK_Kia, PGK_Kib, PGK_Kip, PGK_Kiq);
+  real flux_TDH1 = ordered_bibi(GAP, BPG, NAD, NADH,
+                                TDH1 * TDH1_Kcat1, TDH1 * TDH1_Kcat2,
+                                TDH1_Ka, TDH1_Kb, TDH1_Kp, TDH1_Kq,
+                                TDH1_Kia, TDH1_Kib, TDH1_Kip, TDH1_Kiq);
+  real flux_TDH2 = ordered_bibi(GAP, BPG, NAD, NADH,
+                                TDH2 * TDH2_Kcat1, TDH2 * TDH2_Kcat2,
+                                TDH2_Ka, TDH2_Kb, TDH2_Kp, TDH2_Kq,
+                                TDH2_Kia, TDH2_Kib, TDH2_Kip, TDH2_Kiq);
+  real flux_TDH3 = ordered_bibi(GAP, BPG, NAD, NADH,
+                                TDH3 * TDH3_Kcat1, TDH3 * TDH3_Kcat2,
+                                TDH3_Ka, TDH3_Kb, TDH3_Kp, TDH3_Kq,
+                                TDH3_Kia, TDH3_Kib, TDH3_Kip, TDH3_Kiq);
+  real flux_TPI = uniuni(DHAP, GAP, TPI * TPI_Kcat1, TPI * TPI_Kcat2, TPI_Ka, TPI_Kp);
+  
+  return {influx_fbp, flux_ENO1, flux_ENO2, flux_FBA, flux_GPM, flux_PGK,
+          flux_TDH1, flux_TDH2, flux_TDH3, flux_TPI, outflux_pep};
 }
 
 real[] get_odes(real[] fluxes){
@@ -144,14 +173,16 @@ real[] get_odes(real[] fluxes){
 
 real[] steady_state_equation(real t,
                              real[] ode_metabolites,
-                             real[] parameters,
+                             real[] params,
                              real[] known_reals,
                              int[] known_ints){
   for (m in 1:size(ode_metabolites)){
     if (ode_metabolites[m] < 0){
+      print(ode_metabolites);
+      print(get_fluxes(ode_metabolites, params, known_reals));
       reject("Metabolite ", m, " is ", ode_metabolites[m], " but should be greater than zero");
     }
   }
 
-  return get_odes(get_fluxes(ode_metabolites, parameters, known_reals));
+  return get_odes(get_fluxes(ode_metabolites, params, known_reals));
 }

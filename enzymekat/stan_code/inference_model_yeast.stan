@@ -1,5 +1,6 @@
 functions {
 #include ../enzymekat/stan_code/big_k_rate_equations.stan
+#include ../enzymekat/stan_code/haldane_relationships.stan
 #include ../enzymekat/stan_code/ode_equations_yeast.stan
 }
 data {
@@ -52,12 +53,11 @@ model {
   kinetic_parameters ~ lognormal(prior_location_kinetic, prior_scale_kinetic);
   thermodynamic_parameters ~ normal(prior_location_thermodynamic, prior_scale_thermodynamic);
   if (LIKELIHOOD == 1){
-    measurement ~ lognormal(log(metabolite_concentration_hat[measurement_ix]),
-                            measurement_scale);
+    measurement ~ lognormal(log(metabolite_concentration_hat[measurement_ix]), measurement_scale);
   }
 }
 generated quantities {
   vector[N_ode] measurement_pred;
   for (n in 1:N_ode)
-    measurement_pred[n] = lognormal_rng(log(measurement_hat[n]), measurement_scale);
+    measurement_pred[n] = lognormal_rng(log(metabolite_concentration_hat[n]), measurement_scale);
 }
