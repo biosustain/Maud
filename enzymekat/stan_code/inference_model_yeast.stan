@@ -1,19 +1,23 @@
 functions {
 #include ../enzymekat/stan_code/big_k_rate_equations.stan
+#include ../enzymekat/stan_code/haldane_relationships.stan
 #include ../enzymekat/stan_code/ode_equations_yeast.stan
 }
 data {
   // dimensions
   int<lower=1> N_ode;          // number of ode metabolites
   int<lower=1> N_kinetic_parameter;        // total number of kinetic parameters
+  int<lower=1> N_thermodynamic_parameter;
   int<lower=1> N_known_real;   // number of known reals
   int<lower=1> N_measurement;  // number of measurements of ode metabolites
   // measurements
   int<lower=1,upper=N_ode> measurement_ix[N_measurement];
   vector[N_measurement] measurement;
   // hardcoded priors
-  vector[N_kinetic_parameter] prior_location;
-  vector[N_kinetic_parameter] prior_scale;
+  vector[N_kinetic_parameter] prior_location_kinetic;
+  vector[N_kinetic_parameter] prior_scale_kinetic;
+  vector[N_thermodynamic_parameter] prior_location_thermodynamic;
+  vector[N_thermodynamic_parameter] prior_scale_thermodynamic;
   real<lower=0> measurement_scale;
   real known_reals[N_known_real];
   // ode stuff
@@ -30,26 +34,30 @@ transformed data {
   int known_ints[0];
 }
 parameters {
+  real thermodynamic_parameters[N_thermodynamic_parameter];
   real<lower=0> kinetic_parameters[N_kinetic_parameter];
 }
 transformed parameters {
-  real measurement_hat[N_ode] = integrate_ode_bdf(steady_state_equation,
-                                                  initial_state,
-                                                  initial_time,
-                                                  {steady_time},
-                                                  kinetic_parameters,
-                                                  known_reals,
-                                                  known_ints,
-                                                  rel_tol, abs_tol, max_steps)[1] ;
+  real metabolite_concentration_hat[N_ode] = integrate_ode_bdf(
+    steady_state_equation,
+    initial_state,
+    initial_time,
+    {steady_time},
+    append_array(thermodynamic_parameters, kinetic_parameters),
+    known_reals,
+    known_ints,
+    rel_tol, abs_tol, max_steps
+  )[1];
 }
 model {
-  kinetic_parameters ~ lognormal(prior_location, prior_scale);
+  kinetic_parameters ~ lognormal(prior_location_kinetic, prior_scale_kinetic);
+  thermodynamic_parameters ~ normal(prior_location_thermodynamic, prior_scale_thermodynamic);
   if (LIKELIHOOD == 1){
-    measurement ~ lognormal(log(measurement_hat[measurement_ix]), measurement_scale);
+    measurement ~ lognormal(log(metabolite_concentration_hat[measurement_ix]), measurement_scale);
   }
 }
 generated quantities {
   vector[N_ode] measurement_pred;
   for (n in 1:N_ode)
-    measurement_pred[n] = lognormal_rng(log(measurement_hat[n]), measurement_scale);
+    measurement_pred[n] = lognormal_rng(log(metabolite_concentration_hat[n]), measurement_scale);
 }

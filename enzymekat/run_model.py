@@ -10,7 +10,7 @@ RELATIVE_PATH_CMDSTAN = '../cmdstan'
 RELATIVE_PATH_DATA = '../data'
 RELATIVE_PATH_STAN_CODE = 'stan_code'
 REL_TOL = 1e-13
-ABS_TOL = 1e-6
+ABS_TOL = 1e-9
 MAX_STEPS = int(1e9)
 LIKELIHOOD = 1
 MEASUREMENT_SCALE = 0.05
@@ -52,13 +52,16 @@ if __name__ == '__main__':
     measured_metabolites = ode_metabolites.dropna(subset=['measured_value'])
     stan_input = {
         'N_ode': len(ode_metabolites),
-        'N_measurement': len(measured_metabolites),
-        'N_known_real': len(data.known_reals),
         'N_kinetic_parameter': len(data.kinetic_parameters),
+        'N_known_real': len(data.known_reals),
+        'N_measurement': len(measured_metabolites),
+        'N_thermodynamic_parameter': len(data.thermodynamic_parameters),
         'measurement_ix': measured_metabolites['ix_stan'].values,
         'measurement': measured_metabolites['measured_value'].values,
-        'prior_location': data.kinetic_parameters['prior_location'].values,
-        'prior_scale': data.kinetic_parameters['prior_scale'].values,
+        'prior_location_kinetic': data.kinetic_parameters['prior_location'].values,
+        'prior_scale_kinetic': data.kinetic_parameters['prior_scale'].values,
+        'prior_location_thermodynamic': data.thermodynamic_parameters['prior_location'].values,
+        'prior_scale_thermodynamic': data.thermodynamic_parameters['prior_scale'].values,
         'measurement_scale': data.experiment_info['MEASUREMENT_SCALE'],
         'known_reals': data.known_reals.values,
         'initial_state': ode_metabolites['initial_value'].values,
@@ -72,7 +75,8 @@ if __name__ == '__main__':
     pystan.misc.stan_rdump(stan_input, paths['stan_input'])
 
     # define initial parameter values and write to file
-    inits = {'kinetic_parameters': data.kinetic_parameters['paper'].values}
+    inits = {'kinetic_parameters': np.exp(data.kinetic_parameters['prior_location'].values),
+             'thermodynamic_parameters': data.thermodynamic_parameters['prior_location'].values}
     pystan.misc.stan_rdump(inits, paths['inits'])
 
     # compile model if necessary

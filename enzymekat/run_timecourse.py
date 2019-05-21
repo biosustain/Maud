@@ -25,98 +25,149 @@
     to get a broad overview of how cmdstan works.
 
 """
+
 import arviz
-from matplotlib import pyplot as plt
 import numpy as np
+import os
 import pandas as pd
 import pystan
-import os
-import stan_utils
-from sbml_functions import read_sbml_file
+from matplotlib import pyplot as plt
+from python_modules import stan_utils, sbml_functions, enzymekat_data
 
-# These need to be configured!
-PATH_FROM_HERE_TO_CMDSTAN_HOME = '../cmdstan'
-PATH_FROM_HERE_TO_STAN_MODEL = '../stan/autogen/t_brucei_timecourse.stan'
-PATH_FROM_HERE_TO_SBML_FILE = '../data_in/t_brucei.xml'
-PATH_FROM_CMDSTAN_HOME_TO_KINETICS_FILE = '../stan/autogen/t_brucei.stan'
-PATH_FROM_HERE_TO_TIMECOURSE_TEMPLATE = '../stan/timecourse_model_template.stan'
-PATH_FROM_HERE_TO_CMDSTAN_INPUT_DATA_FILE = '../data_out/timecourse_input.Rdump'
-PATH_FROM_HERE_TO_CMDSTAN_OUTPUT_DATA_FILE = '../data_out/t_brucei_timecourse_cmdstan.csv'
-PATH_FROM_HERE_TO_TIMECOURSE_CSV = '../data_out/t_brucei_timecourse.csv'
-TIME_POINTS = np.linspace(0, 0.5, 101)
+MODEL_NAME = 'yeast'
+RELATIVE_PATH_CMDSTAN = '../cmdstan'
+RELATIVE_PATH_DATA = '../data'
+RELATIVE_PATH_STAN_CODE = 'stan_code'
+REL_TOL = 1e-13
+ABS_TOL = 1e-9
+MAX_STEPS = int(1e9)
+
+N_TIMEPOINTS = 20
+FIRST_TIMEPOINT = 0
+TIMEPOINT_INTERVAL = 0.005
 
 if __name__ == '__main__':
-    # get some paths
     here = os.path.dirname(os.path.abspath(__file__))
-    cmdstan_directory = os.path.join(here, PATH_FROM_HERE_TO_CMDSTAN_HOME)
-    template_path = os.path.join(here, PATH_FROM_HERE_TO_TIMECOURSE_TEMPLATE)
-    stan_model_path = os.path.join(here, PATH_FROM_HERE_TO_STAN_MODEL)
-    cmdstan_output_data_file = os.path.join(here, PATH_FROM_HERE_TO_CMDSTAN_OUTPUT_DATA_FILE)
-    cmdstan_input_data_file = os.path.join(here, PATH_FROM_HERE_TO_CMDSTAN_INPUT_DATA_FILE)
-    timecourse_csv_path = os.path.join(here, PATH_FROM_HERE_TO_TIMECOURSE_CSV)
-
-    # parse sbml file
-    m = read_sbml_file(os.path.join(here, PATH_FROM_HERE_TO_SBML_FILE))
-
-    # save input data for model
-    data = {
-        'N_ode': len(m.ode_metabolites.values()),
-        'N_derived': len(m.assignment_expressions.values()),
-        'N_known_real': len(m.known_reals.values()),
-        'P': len(m.kinetic_parameters.values()),
-        'T': len(TIME_POINTS) - 1,
-        'initial_metabolite_ode': list(m.ode_metabolites.values()),
-        'kinetic_parameters': list(m.kinetic_parameters.values()),
-        'known_reals': list(m.known_reals.values()),
-        'ts': TIME_POINTS[1:],
-        't0': TIME_POINTS[0],
-        'rel_tol': 1e-8,
-        'abs_tol': 1e-8,
-        'max_num_steps': int(1e8)
-    }
-    pystan.misc.stan_rdump(data, cmdstan_input_data_file)
-
-    # write timecourse model based on template
-    with open(template_path, 'r') as f:
-        model_code = f.read().replace(
-            'REPLACE_THIS_WORD', PATH_FROM_CMDSTAN_HOME_TO_KINETICS_FILE
+    paths = {
+        'data': os.path.join(
+            here, RELATIVE_PATH_DATA, f'in/{MODEL_NAME}_data.toml'
+        ),
+        'cmdstan': os.path.join(
+            here, RELATIVE_PATH_CMDSTAN
+        ),
+        'stan_model': os.path.join(
+            here, RELATIVE_PATH_STAN_CODE, f'timecourse_model_{MODEL_NAME}.stan'
+        ),
+        'stan_input': os.path.join(
+            here, RELATIVE_PATH_DATA, f'stan_records/timecourse_model_input_{MODEL_NAME}.Rdump'
+        ),
+        'inits': os.path.join(
+            here, RELATIVE_PATH_DATA, f'stan_records/timeourse_inits_{MODEL_NAME}.Rdump'
+        ),
+        'output_data': os.path.join(
+            here, RELATIVE_PATH_DATA, f'out/timecourse_output_{MODEL_NAME}.csv'
+        ),
+        'output_infd': os.path.join(
+            here, RELATIVE_PATH_DATA, f'out/timecourse_infd_{MODEL_NAME}.nc'
+        ),
+        'fig': os.path.join(
+            here, RELATIVE_PATH_DATA, f'out/timecourse_{MODEL_NAME}.png'
+        ),
+        'flux_fig': os.path.join(
+            here, RELATIVE_PATH_DATA, f'out/timecourse_fluxes_{MODEL_NAME}.png'
         )
-        f.close()
-        with open(stan_model_path, 'w') as f:
-            f.write(model_code)
-            f.close()
 
-    # compile model with cmdstan
-    if not os.path.isfile(stan_model_path.replace('.stan', '.hpp')):
-        compile_path =  os.path.relpath(stan_model_path.replace('.stan', ''),
-                                        start=cmdstan_directory)
-        stan_utils.compile_stan_model_with_cmdstan(compile_path)
+    }
+    # define input data and write to file
+    data = enzymekat_data.from_toml(paths['data'])
+    timepoints = np.linspace(
+        FIRST_TIMEPOINT, FIRST_TIMEPOINT + (TIMEPOINT_INTERVAL * N_TIMEPOINTS),
+        num=N_TIMEPOINTS, endpoint=False
+    )
+    print(timepoints[1:])
+    stan_input = {
+        'N_ode': len(data.ode_metabolites),
+        'N_known_real': len(data.known_reals),
+        'N_kinetic_parameter': len(data.kinetic_parameters),
+        'N_thermodynamic_parameter': len(data.thermodynamic_parameters),
+        'N_timepoint': N_TIMEPOINTS,
+        'N_reaction': len(data.reactions),
+        'kinetic_parameters': np.exp(data.kinetic_parameters['prior_location'].values),
+        'thermodynamic_parameters': data.thermodynamic_parameters['prior_location'].values,
+        'known_reals': data.known_reals.values,
+        'initial_state': data.ode_metabolites['initial_value'].values,
+        'initial_time': timepoints[0],
+        'timepoints': timepoints[1:],
+        'rel_tol': REL_TOL,
+        'abs_tol': ABS_TOL,
+        'max_steps': MAX_STEPS
+    }
+    pystan.misc.stan_rdump(stan_input, paths['stan_input'])
+    # compile model if necessary
+    if not os.path.isfile(paths['stan_model'].replace('.stan', '.hpp')):
+        path_from_cmdstan_to_program = os.path.relpath(
+            paths['stan_model'].replace('.stan', ''), start=paths['cmdstan']
+        )
+        stan_utils.compile_stan_model_with_cmdstan(path_from_cmdstan_to_program)
 
+    # run model
     method_config = 'sample algorithm=fixed_param num_warmup=0 num_samples=1'
     stan_utils.run_compiled_cmdstan_model(
-        stan_model_path.replace('.stan', ''),
-        cmdstan_input_data_file,
-        cmdstan_output_data_file,
+        paths['stan_model'].replace('.stan', ''),
+        paths['stan_input'],
+        paths['output_data'],
         method_config=method_config
     )
-    infd = arviz.from_cmdstan([cmdstan_output_data_file],
-                              coords={'sim_time': TIME_POINTS,
-                                      'metabolite_ode': list(m.ode_metabolites.keys()),
-                                      'metabolite_derived': list(m.assignment_expressions.keys())},
-                              dims={'ode_metabolite_sim': ['sim_time', 'metabolite_ode'],
-                                    'derived_quantity_sim': ['sim_time', 'metabolite_derived']})
-    ode_out = infd.posterior['ode_metabolite_sim'].mean(dim=['chain', 'draw']).to_series().unstack()
-    derived_out = infd.posterior['derived_quantity_sim'].mean(dim=['chain', 'draw']).to_series().unstack()
-    out = ode_out.join(derived_out)
-    out = out.sort_index()
-    f, axes = plt.subplots(5, 6, sharex=True, figsize=[15, 15])
+
+    # put model in Arviz object
+    infd = arviz.from_cmdstan(
+        [paths['output_data']],
+        coords={'metabolite_names': list(data.ode_metabolites['name']),
+                'reaction_names': ['influx_fbp'] + list(data.reactions['name']) + ['outflux_pep'],
+                'timepoint_labels': timepoints},
+        dims={'ode_metabolite_sim': ['timepoint_labels', 'metabolite_names'],
+              'flux_sim': ['timepoint_labels', 'reaction_names']}
+    )
+
+    infd.to_netcdf(paths['output_infd'])
+
+    timecourse = infd.posterior['ode_metabolite_sim'].mean(dim=['chain', 'draw']).to_series().unstack()
+    flux = infd.posterior['flux_sim'].mean(dim=['chain', 'draw']).to_series().unstack()
+
+    plt.clf()
+    f, axes = plt.subplots(2, 4, sharex=True, figsize=[8, 5])
     axes = axes.ravel()
-    for ax, col in zip(axes, out.columns):
-        ax.plot(out.index, out[col])
-        ax.set(title=col, xlabel='Time')
+    for ax, col in zip(axes, timecourse.columns):
+        ax.plot(timecourse.index, timecourse[col])
+        ax.set_title(col)
         if ax in [axes[0], axes[4]]:
             ax.set_ylabel('Concentration')
-    plt.savefig(os.path.join(here, '../data_out/fig.png'))
-    print(f'Writing results to {timecourse_csv_path}...')
-    out.to_csv(timecourse_csv_path)
-    print('Finished!')
+        if ax in axes[4:]:
+            ax.set_xlabel('Time')
+    plt.tight_layout()
+    plt.savefig(paths['fig'])
+
+    plt.clf()
+    f, axes = plt.subplots(3, 4, sharex=True, figsize=[8, 5])
+    axes = axes.ravel()
+    for ax, col in zip(axes, flux.columns):
+        ax.plot(flux.index, flux[col])
+        ax.set_title(col)
+        if ax in [axes[0], axes[4], axes[8]]:
+            ax.set_ylabel('Flux')
+        if ax in axes[8:]:
+            ax.set_xlabel('Time')
+        else:
+            ax.set_xlabel('')
+    plt.tight_layout()
+    plt.savefig(paths['flux_fig'])
+
+
+    print('Timecourse:\n')
+    print(timecourse)
+    print('Fluxes:\n')
+    print(flux)
+    # print(f'Writing results to {timecourse_csv_path}...')
+    # timecourse.to_csv(timecourse_csv_path)
+    # print('Finished!')
+

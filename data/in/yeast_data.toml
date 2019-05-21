@@ -3,12 +3,6 @@ MEASUREMENT_SCALE = 0.05  # metabolite measurement accuracy (log scale)
 STEADY_STATE_TIME = 10  # when is it safe to assume steady state?
 
 [known_reals]
-cell = 1.0
-Keq_ADH = 14492.7536231884
-Keq_ENO = 6.7
-Keq_HXK = 2000.0
-Keq_PYK = 6500.0
-Keq_TDH = 0.00533412710224736
 NA = 6.02214e+20
 sum_AXP = 6.02
 sum_NAD = 1.59
@@ -23,12 +17,14 @@ TDH1 = 0.350864642801396
 TDH2 = 0.0
 TDH3 = 4.20440474648547
 TPI1 = 0.294357819645508
-influx_fbp = 1.88735  # From Smallbone
-outflux_pep = 3.72113  # From Smallbone
+influx_fbp = 0.5 # 1.88735  # From Smallbone
+PEP_const = 6.17791  # set to a value such that PEP_const * [PEP_final] = 3.7747
 NAD = 1.41142  # From Smallbone
 NADH = 0.1785794942  # From Smallbone
 ATP = 3.95146  # From Smallbone
 ADP = 1.72835  # From Smallbone
+temperature = 298.15
+gas_constant = 8.314e-3 # units kJ/mol.K
 
 [[ode_metabolites]]
 'name' = 'BPG'
@@ -62,389 +58,467 @@ ADP = 1.72835  # From Smallbone
 'initial_value' = 0.610005413358042
 'measured_value' = 0.611
 
+[[reactions]]
+name = 'ENO1'
+mechanism = 'uniuni'
+
+[[reactions]]
+name = 'ENO2'
+mechanism = 'uniuni'
+
+[[reactions]]
+name = 'FBA'
+mechanism = 'ordered_unibi'
+
+[[reactions]]
+name = 'GPM'
+mechanism = 'uniuni'
+
+[[reactions]]
+name = 'PGK'
+mechanism = 'ordered_bibi'
+
+[[reactions]]
+name = 'TDH1'
+mechanism = 'ordered_bibi'
+
+[[reactions]]
+name = 'TDH2'
+mechanism = 'ordered_bibi'
+
+[[reactions]]
+name = 'TDH3'
+mechanism = 'ordered_bibi'
+
+[[reactions]]
+name = 'TPI'
+mechanism = 'uniuni'
+
+[[thermodynamic_parameters]]
+'name' = 'delta_g'
+'reaction' = 'ENO'
+'prior_location' = -4.1
+'prior_scale' = 0.6
+
+[[thermodynamic_parameters]]
+'name' = 'delta_g'
+'reaction' = 'FBA'
+'prior_location' = 17.9
+'prior_scale' = 4.4
+
+[[thermodynamic_parameters]]
+'name' = 'delta_g'
+'reaction' = 'GPM'
+'prior_location' = 4.2
+'prior_scale' = 0.7
+
+[[thermodynamic_parameters]]
+'name' = 'delta_g'
+'reaction' = 'PGK'
+'prior_location' = -18.6
+'prior_scale' = 0.9
+
+[[thermodynamic_parameters]]
+'name' = 'delta_g'
+'reaction' = 'TDH'
+'prior_location' = 6.4
+'prior_scale' = 0.8
+
+[[thermodynamic_parameters]]
+'name' = 'delta_g'
+'reaction' = 'TPI'
+'prior_location' = 5.5
+'prior_scale' = 1.1
+'notes' = 'in the direction of forming G3P'
+
 [[kinetic_parameters]]
-'name' = 'ENO1_Kp2g'
-'paper' = 0.043
-'25% error' = 0.01075
+'name' = 'Kcat1'
+'reaction' = 'ENO1'
+'prior_location' = 7.1085
+'prior_scale' = 1.8701
+
+[[kinetic_parameters]]
+'name' = 'Kcat2'
+'reaction' = 'ENO1'
+'prior_location' = 7.1085
+'prior_scale' = 1.8701
+
+[[kinetic_parameters]]
+'name' = 'Ka'
+'reaction' = 'ENO1'
+'metabolite' = 'P2G'
 'prior_location' = -3.11958908
-'prior_scale' = 0.239329051
-'Xmin (68%)' = 0.032611629
-'Xmax (68%)' = 0.053362415
+'prior_scale' = 0.23933
+'note' = 'Smallbone'
 
 [[kinetic_parameters]]
-'name' = 'ENO1_Kpep'
-'paper' = 0.5
-'25% error' = 0.125
-'prior_location' = -0.666181097
-'prior_scale' = 0.239329051
-'Xmin (68%)' = 0.379204994
-'Xmax (68%)' = 0.620493193
+'name' = 'Kcat1'
+'reaction' = 'ENO2'
+'prior_location' = 7.1085
+'prior_scale' = 1.8701
 
 [[kinetic_parameters]]
-'name' = 'ENO1_kcat'
-'paper' = 7.6
-'25% error' = 1.9
-'prior_location' = 2.055114331
-'prior_scale' = 0.239329051
-'Xmin (68%)' = 5.763915911
-'Xmax (68%)' = 9.431496534
+'name' = 'Kcat2'
+'reaction' = 'ENO2'
+'prior_location' = 7.1085
+'prior_scale' = 1.8701
 
 [[kinetic_parameters]]
-'name' = 'FBA_Kdhap'
-'paper' = 2
-'25% error' = 0.5
-'prior_location' = 0.720113264
-'prior_scale' = 0.239329051
-'Xmin (68%)' = 1.516819977
-'Xmax (68%)' = 2.481972772
+'name' = 'Ka'
+'reaction' = 'ENO2'
+'metabolite' = 'P2G'
+'prior_location' = -2.236398396
+'prior_scale' = 0.23933
+'note' = 'Smallbone'
 
 [[kinetic_parameters]]
-'name' = 'FBA_Keq'
-'paper' = 0.069
-'25% error' = 0.01725
-'prior_location' = -2.646682691
-'prior_scale' = 0.239329051
-'Xmin (68%)' = 0.052330289
-'Xmax (68%)' = 0.085628061
+'name' = 'Kcat1'
+'reaction' = 'FBA'
+'prior_location' = 2.4862
+'prior_scale' = 1.3904
 
 [[kinetic_parameters]]
-'name' = 'FBA_Kf16bp'
-'paper' = 0.4507
-'25% error' = 0.112675
+'name' = 'Kcat2'
+'reaction' = 'FBA'
+'prior_location' = 2.4862
+'prior_scale' = 1.3904
+
+[[kinetic_parameters]]
+'name' = 'Kia'
+'reaction' = 'FBA'
+'metabolite' = 'f16bp'
+'prior_location' = 0.9071
+'prior_scale' = 1.7371
+
+[[kinetic_parameters]]
+'name' = 'Kiq'
+'reaction' = 'FBA'
+'metabolite' = 'DHAP'
+'prior_location' = 0.9071
+'prior_scale' = 1.7371
+
+[[kinetic_parameters]]
+'name' = 'Ka'
+'reaction' = 'FBA'
+'metabolite' = 'f16bp'
 'prior_location' = -0.769987266
 'prior_scale' = 0.239329051
-'Xmin (68%)' = 0.341815382
-'Xmax (68%)' = 0.559312564
+'note' = 'Smallbone'
 
 [[kinetic_parameters]]
-'name' = 'FBA_Kgap'
-'paper' = 2.4
-'25% error' = 0.6
+'name' = 'Kp'
+'reaction' = 'FBA'
+'metabolite' = 'GAP'
 'prior_location' = 0.902434821
 'prior_scale' = 0.239329051
-'Xmin (68%)' = 1.820183972
-'Xmax (68%)' = 2.978367327
+'note' = 'Smallbone'
 
 [[kinetic_parameters]]
-'name' = 'FBA_Kigap'
-'paper' = 10
-'25% error' = 2.5
-'prior_location' = 2.329551177
-'prior_scale' = 0.239329051
-'Xmin (68%)' = 7.584099884
-'Xmax (68%)' = 12.40986386
-
-[[kinetic_parameters]]
-'name' = 'FBA_kcat'
-'paper' = 4.139
-'25% error' = 1.03475
-'prior_location' = 1.447420296
-'prior_scale' = 0.239329051
-'Xmin (68%)' = 3.139058942
-'Xmax (68%)' = 5.136442652
-
-[[kinetic_parameters]]
-'name' = 'GPM_Keq'
-'paper' = 0.19
-'25% error' = 0.0475
-'prior_location' = -1.633765123
-'prior_scale' = 0.239329051
-'Xmin (68%)' = 0.144097898
-'Xmax (68%)' = 0.235787413
-
-[[kinetic_parameters]]
-'name' = 'GPM_Kp2g'
-'paper' = 1.41
-'25% error' = 0.3525
-'prior_location' = 0.370555788
-'prior_scale' = 0.239329051
-'Xmin (68%)' = 1.069358084
-'Xmax (68%)' = 1.749790804
-
-[[kinetic_parameters]]
-'name' = 'GPM_Kp3g'
-'paper' = 1.2
-'25% error' = 0.3
-'prior_location' = 0.20928764
-'prior_scale' = 0.239329051
-'Xmin (68%)' = 0.910091986
-'Xmax (68%)' = 1.489183663
-
-[[kinetic_parameters]]
-'name' = 'GPM_kcat'
-'paper' = 400
-'25% error' = 100
-'prior_location' = 6.018430631
-'prior_scale' = 0.239329051
-'Xmin (68%)' = 303.3639953
-'Xmax (68%)' = 496.3945544
-
-[[kinetic_parameters]]
-'name' = 'PGK_Kadp'
-'paper' = 0.2
-'25% error' = 0.05
-'prior_location' = -1.582471829
-'prior_scale' = 0.239329051
-'Xmin (68%)' = 0.151681998
-'Xmax (68%)' = 0.248197277
-
-[[kinetic_parameters]]
-'name' = 'PGK_Katp'
-'paper' = 1.99
-'25% error' = 0.4975
-'prior_location' = 0.715100722
-'prior_scale' = 0.239329051
-'Xmin (68%)' = 1.509235877
-'Xmax (68%)' = 2.469562908
-
-[[kinetic_parameters]]
-'name' = 'PGK_Kbpg'
-'paper' = 0.003
-'25% error' = 0.00075
-'prior_location' = -5.782176907
-'prior_scale' = 0.239329051
-'Xmin (68%)' = 0.00227523
-'Xmax (68%)' = 0.003722959
-
-[[kinetic_parameters]]
-'name' = 'PGK_Keq'
-'paper' = 3200
-'25% error' = 800
-'prior_location' = 8.097872172
-'prior_scale' = 0.239329051
-'Xmin (68%)' = 2426.911963
-'Xmax (68%)' = 3971.156435
-
-[[kinetic_parameters]]
-'name' = 'PGK_Kp3g'
-'paper' = 4.58
-'25% error' = 1.145
-'prior_location' = 1.548665082
-'prior_scale' = 0.239329051
-'Xmin (68%)' = 3.473517747
-'Xmax (68%)' = 5.683717648
-
-[[kinetic_parameters]]
-'name' = 'PGK_kcat'
-'paper' = 58.6
-'25% error' = 14.65
-'prior_location' = 4.09770078
-'prior_scale' = 0.239329051
-'Xmin (68%)' = 44.44282532
-'Xmax (68%)' = 72.72180222
-
-[[kinetic_parameters]]
-'name' = 'PGK_nHadp'
-'paper' = 2
-'25% error' = 0.5
+'name' = 'Kq'
+'reaction' = 'FBA'
+'metabolite' = 'DHAP'
 'prior_location' = 0.720113264
 'prior_scale' = 0.239329051
-'Xmin (68%)' = 1.516819977
-'Xmax (68%)' = 2.481972772
+'note' = 'Smallbone'
 
 [[kinetic_parameters]]
-'name' = 'TDH1_Kbpg'
-'paper' = 0.0098
-'25% error' = 0.00245
-'prior_location' = -4.59840681
+'name' = 'Kcat1'
+'reaction' = 'GPM'
+'prior_location' = 5.3921
+'prior_scale' = 0.8777
+
+[[kinetic_parameters]]
+'name' = 'Kcat2'
+'reaction' = 'GPM'
+'prior_location' = 5.3921
+'prior_scale' = 0.8777
+
+[[kinetic_parameters]]
+'name' = 'Ka'
+'reaction' = 'GPM'
+'metabolite' = 'P3G'
+'prior_location' = 0.20928764
 'prior_scale' = 0.239329051
-'Xmin (68%)' = 0.007432418
-'Xmax (68%)' = 0.012161667
+'note' = 'Smallbone'
 
 [[kinetic_parameters]]
-'name' = 'TDH1_Kgap'
-'paper' = 0.495
-'25% error' = 0.12375
+'name' = 'Kcat1'
+'reaction' = 'PGK'
+'prior_location' = 6.001
+'prior_scale' = 0.6735
+
+[[kinetic_parameters]]
+'name' = 'Kcat2'
+'reaction' = 'PGK'
+'prior_location' = 6.001
+'prior_scale' = 0.6735
+
+[[kinetic_parameters]]
+'name' = 'Kia'
+'reaction' = 'PGK'
+'metabolite' = 'BPG'
+'prior_location' = -0.9887
+'prior_scale' = 1.7034
+
+[[kinetic_parameters]]
+'name' = 'Kib'
+'reaction' = 'PGK'
+'metabolite' = 'ADP'
+'prior_location' = -0.9887
+'prior_scale' = 1.7034
+
+[[kinetic_parameters]]
+'name' = 'Kiq'
+'reaction' = 'PGK'
+'metabolite' = 'ATP'
+'prior_location' = -0.9887
+'prior_scale' = 1.7034
+
+[[kinetic_parameters]]
+'name' = 'Ka'
+'reaction' = 'PGK'
+'metabolite' = 'BPG'
+'prior_location' = -5.782176907
+'prior_scale' = 0.239329051
+'note' = 'Smallbone'
+
+[[kinetic_parameters]]
+'name' = 'Kb'
+'reaction' = 'PGK'
+'metabolite' = 'ADP'
+'prior_location' = -1.582471829
+'prior_scale' = 0.239329051
+'note' = 'Smallbone'
+
+[[kinetic_parameters]]
+'name' = 'Kp'
+'reaction' = 'PGK'
+'metabolite' = 'P3G'
+'prior_location' = 1.548665082
+'prior_scale' = 0.239329051
+'note' = 'Smallbone'
+
+[[kinetic_parameters]]
+'name' = 'Kq'
+'reaction' = 'PGK'
+'metabolite' = 'ATP'
+'prior_location' = 0.715100722
+'prior_scale' = 0.239329051
+'note' = 'Smallbone'
+
+[[kinetic_parameters]]
+'name' = 'Kcat1'
+'reaction' = 'TDH1'
+'prior_location' = 3.3178
+'prior_scale' = 1.4091
+
+[[kinetic_parameters]]
+'name' = 'Kcat2'
+'reaction' = 'TDH1'
+'prior_location' = 3.3178
+'prior_scale' = 1.4091
+
+[[kinetic_parameters]]
+'name' = 'Kia'
+'reaction' = 'TDH1'
+'metabolite' = 'GAP'
+'prior_location' = -0.5195
+'prior_scale' = 1.5278
+
+[[kinetic_parameters]]
+'name' = 'Kib'
+'reaction' = 'TDH1'
+'metabolite' = 'NAD'
+'prior_location' = -0.5195
+'prior_scale' = 1.5278
+
+[[kinetic_parameters]]
+'name' = 'Kiq'
+'reaction' = 'TDH1'
+'metabolite' = 'NADH'
+'prior_location' = -0.5195
+'prior_scale' = 1.5278
+
+[[kinetic_parameters]]
+'name' = 'Ka'
+'reaction' = 'TDH1'
+'metabolite' = 'GAP'
 'prior_location' = -0.676231433
 'prior_scale' = 0.239329051
-'Xmin (68%)' = 0.375412944
-'Xmax (68%)' = 0.614288261
+'note' = 'Smallbone'
 
 [[kinetic_parameters]]
-'name' = 'TDH1_Knad'
-'paper' = 0.09
-'25% error' = 0.0225
+'name' = 'Kb'
+'reaction' = 'TDH1'
+'metabolite' = 'NAD'
 'prior_location' = -2.380979525
 'prior_scale' = 0.239329051
-'Xmin (68%)' = 0.068256899
-'Xmax (68%)' = 0.111688775
+'note' = 'Smallbone'
 
 [[kinetic_parameters]]
-'name' = 'TDH1_Knadh'
-'paper' = 0.06
-'25% error' = 0.015
-'prior_location' = -2.786444633
-'prior_scale' = 0.239329051
-'Xmin (68%)' = 0.045504599
-'Xmax (68%)' = 0.074459183
-
-[[kinetic_parameters]]
-'name' = 'TDH1_kcat'
-'paper' = 19.12
-'25% error' = 4.78
-'prior_location' = 2.977700991
-'prior_scale' = 0.239329051
-'Xmin (68%)' = 14.50079898
-'Xmax (68%)' = 23.7276597
-
-[[kinetic_parameters]]
-'name' = 'TPI_Kdhap'
-'paper' = 6.454
-'25% error' = 1.6135
-'prior_location' = 1.891666177
-'prior_scale' = 0.239329051
-'Xmin (68%)' = 4.894778065
-'Xmax (68%)' = 8.009326136
-
-[[kinetic_parameters]]
-'name' = 'TPI_Keq'
-'paper' = 0.045
-'25% error' = 0.01125
-'prior_location' = -3.074126706
-'prior_scale' = 0.239329051
-'Xmin (68%)' = 0.034128449
-'Xmax (68%)' = 0.055844387
-
-[[kinetic_parameters]]
-'name' = 'TPI_Kgap'
-'paper' = 5.25
-'25% error' = 1.3125
-'prior_location' = 1.68519416
-'prior_scale' = 0.239329051
-'Xmin (68%)' = 3.981652439
-'Xmax (68%)' = 6.515178527
-
-[[kinetic_parameters]]
-'name' = 'TPI_Kigap'
-'paper' = 35.1
-'25% error' = 8.775
-'prior_location' = 3.585167214
-'prior_scale' = 0.239329051
-'Xmin (68%)' = 26.62019059
-'Xmax (68%)' = 43.55862215
-
-[[kinetic_parameters]]
-'name' = 'TPI_kcat'
-'paper' = 564.38
-'25% error' = 141.095
-'prior_location' = 6.362693867
-'prior_scale' = 0.239329051
-'Xmin (68%)' = 428.0314292
-'Xmax (68%)' = 700.3878966
-
-[[kinetic_parameters]]
-'name' = 'TDH3_Kbpg'
-'paper' = 0.909
-'25% error' = 0.22725
-'prior_location' = -0.068444101
-'prior_scale' = 0.239329051
-'Xmin (68%)' = 0.689394679
-'Xmax (68%)' = 1.128056625
-
-[[kinetic_parameters]]
-'name' = 'TDH3_Kgap'
-'paper' = 0.423
-'25% error' = 0.10575
-'prior_location' = -0.833417016
-'prior_scale' = 0.239329051
-'Xmin (68%)' = 0.320807425
-'Xmax (68%)' = 0.524937241
-
-[[kinetic_parameters]]
-'name' = 'TDH3_Knad'
-'paper' = 0.09
-'25% error' = 0.0225
-'prior_location' = -2.380979525
-'prior_scale' = 0.239329051
-'Xmin (68%)' = 0.068256899
-'Xmax (68%)' = 0.111688775
-
-[[kinetic_parameters]]
-'name' = 'TDH3_Knadh'
-'paper' = 0.06
-'25% error' = 0.015
-'prior_location' = -2.786444633
-'prior_scale' = 0.239329051
-'Xmin (68%)' = 0.045504599
-'Xmax (68%)' = 0.074459183
-
-[[kinetic_parameters]]
-'name' = 'TDH3_kcat'
-'paper' = 18.162
-'25% error' = 4.5405
-'prior_location' = 2.926297583
-'prior_scale' = 0.239329051
-'Xmin (68%)' = 13.77424221
-'Xmax (68%)' = 22.53879474
-
-[[kinetic_parameters]]
-'name' = 'TDH2_Kbpg'
-'paper' = 0.0098
-'25% error' = 0.00245
+'name' = 'Kp'
+'reaction' = 'TDH1'
+'metabolite' = 'BPG'
 'prior_location' = -4.59840681
 'prior_scale' = 0.239329051
-'Xmin (68%)' = 0.007432418
-'Xmax (68%)' = 0.012161667
+'note' = 'Smallbone'
 
 [[kinetic_parameters]]
-'name' = 'TDH2_Kgap'
-'paper' = 0.77
-'25% error' = 0.1925
-'prior_location' = -0.234398681
-'prior_scale' = 0.239329051
-'Xmin (68%)' = 0.583975691
-'Xmax (68%)' = 0.955559517
-
-[[kinetic_parameters]]
-'name' = 'TDH2_Knad'
-'paper' = 0.09
-'25% error' = 0.0225
-'prior_location' = -2.380979525
-'prior_scale' = 0.239329051
-'Xmin (68%)' = 0.068256899
-'Xmax (68%)' = 0.111688775
-
-[[kinetic_parameters]]
-'name' = 'TDH2_Knadh'
-'paper' = 0.06
-'25% error' = 0.015
+'name' = 'Kq'
+'reaction' = 'TDH1'
+'metabolite' = 'NADH'
 'prior_location' = -2.786444633
 'prior_scale' = 0.239329051
-'Xmin (68%)' = 0.045504599
-'Xmax (68%)' = 0.074459183
+'note' = 'Smallbone'
 
 [[kinetic_parameters]]
-'name' = 'TDH2_kcat'
-'paper' = 8.633
-'25% error' = 2.15825
-'prior_location' = 2.182558153
-'prior_scale' = 0.239329051
-'Xmin (68%)' = 6.547353429
-'Xmax (68%)' = 10.71343547
+'name' = 'Kcat1'
+'reaction' = 'TDH2'
+'prior_location' = 0
+'prior_scale' = 1
+'note' = 'Unknown'
 
 [[kinetic_parameters]]
-'name' = 'ENO2_Kp2g'
-'paper' = 0.104
-'25% error' = 0.026
-'prior_location' = -2.236398296
-'prior_scale' = 0.239329051
-'Xmin (68%)' = 0.078874639
-'Xmax (68%)' = 0.129062584
+'name' = 'Kcat2'
+'reaction' = 'TDH2'
+'prior_location' = 0
+'prior_scale' = 1
+'note' = 'Unknown'
 
 [[kinetic_parameters]]
-'name' = 'ENO2_Kpep'
-'paper' = 0.5
-'25% error' = 0.125
-'prior_location' = -0.666181097
-'prior_scale' = 0.239329051
-'Xmin (68%)' = 0.379204994
-'Xmax (68%)' = 0.620493193
+'name' = 'Kib'
+'reaction' = 'TDH2'
+'metabolite' = 'NAD'
+'prior_location' = -0.5195
+'prior_scale' = 1.5278
 
 [[kinetic_parameters]]
-'name' = 'ENO2_kcat'
-'paper' = 19.87
-'25% error' = 4.9675
-'prior_location' = 3.01617714
+'name' = 'Kiq'
+'reaction' = 'TDH2'
+'metabolite' = 'NADH'
+'prior_location' = -0.5195
+'prior_scale' = 1.5278
+
+[[kinetic_parameters]]
+'name' = 'Kia'
+'reaction' = 'TDH2'
+'metabolite' = 'GAP'
+'prior_location' = -0.5195
+'prior_scale' = 1.5278
+
+[[kinetic_parameters]]
+'name' = 'Ka'
+'reaction' = 'TDH2'
+'metabolite' = 'GAP'
+'prior_location' = -0.234398681
 'prior_scale' = 0.239329051
-'Xmin (68%)' = 15.06960647
-'Xmax (68%)' = 24.65839949
+'note' = 'Smallbone'
+
+[[kinetic_parameters]]
+'name' = 'Kb'
+'reaction' = 'TDH2'
+'metabolite' = 'NAD'
+'prior_location' = -2.380979525
+'prior_scale' = 0.239329051
+'note' = 'Smallbone'
+
+[[kinetic_parameters]]
+'name' = 'Kp'
+'reaction' = 'TDH2'
+'metabolite' = 'BPG'
+'prior_location' = -4.59840681
+'prior_scale' = 0.239329051
+'note' = 'Smallbone'
+
+[[kinetic_parameters]]
+'name' = 'Kq'
+'reaction' = 'TDH2'
+'metabolite' = 'NADH'
+'prior_location' = -2.786444633
+'prior_scale' = 0.239329051
+'note' = 'Smallbone'
+
+[[kinetic_parameters]]
+'name' = 'Kcat1'
+'reaction' = 'TDH3'
+'prior_location' = 2.5925
+'prior_scale' = 1.42047
+
+[[kinetic_parameters]]
+'name' = 'Kcat2'
+'reaction' = 'TDH3'
+'prior_location' = 2.5925
+'prior_scale' = 1.42047
+
+[[kinetic_parameters]]
+'name' = 'Kia'
+'reaction' = 'TDH3'
+'metabolite' = 'GAP'
+'prior_location' = -0.5195
+'prior_scale' = 1.5278
+
+[[kinetic_parameters]]
+'name' = 'Kib'
+'reaction' = 'TDH3'
+'metabolite' = 'NAD'
+'prior_location' = -0.5195
+'prior_scale' = 1.5278
+
+[[kinetic_parameters]]
+'name' = 'Kiq'
+'reaction' = 'TDH3'
+'metabolite' = 'NADH'
+'prior_location' = -0.5195
+'prior_scale' = 1.5278
+
+[[kinetic_parameters]]
+'name' = 'Ka'
+'reaction' = 'TDH3'
+'metabolite' = 'GAP'
+'prior_location' = -0.833417016
+'prior_scale' = 0.239329051
+'note' = 'Smallbone'
+
+[[kinetic_parameters]]
+'name' = 'Kb'
+'reaction' = 'TDH3'
+'metabolite' = 'NAD'
+'prior_location' = -2.380979525
+'prior_scale' = 0.239329051
+'note' = 'Smallbone'
+
+[[kinetic_parameters]]
+'name' = 'Kp'
+'reaction' = 'TDH3'
+'metabolite' = 'BPG'
+'prior_location' = -0.068444101
+'prior_scale' = 0.239329051
+'note' = 'Smallbone'
+
+[[kinetic_parameters]]
+'name' = 'Kq'
+'reaction' = 'TDH3'
+'metabolite' = 'NADH'
+'prior_location' = -2.786444633
+'prior_scale' = 0.239329051
+'note' = 'Smallbone'
+
+[[kinetic_parameters]]
+'name' = 'Kcat1'
+'reaction' = 'TPI'
+'prior_location' = 8.8231
+'prior_scale' = 0.9772
+
+[[kinetic_parameters]]
+'name' = 'Kcat2'
+'reaction' = 'TPI'
+'prior_location' = 8.8231
+'prior_scale' = 0.9772
+
+[[kinetic_parameters]]
+'name' = 'Ka'
+'reaction' = 'TPI'
+'metabolite' = 'DHAP'
+'prior_location' = 1.891666177
+'prior_scale' = 0.239329051
+'note' = 'Smallbone'

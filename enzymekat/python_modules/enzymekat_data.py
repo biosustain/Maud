@@ -14,10 +14,14 @@ class EnzymeKatData():
                  experiment_info: pd.Series,
                  ode_metabolites: pd.Series,
                  known_reals: pd.Series,
+                 reactions: pd.DataFrame,
+                 thermodynamic_parameters: pd.DataFrame,
                  kinetic_parameters: pd.DataFrame):
         self.experiment_info = experiment_info
         self.ode_metabolites = ode_metabolites
         self.known_reals = known_reals
+        self.reactions = reactions
+        self.thermodynamic_parameters = thermodynamic_parameters
         self.kinetic_parameters = kinetic_parameters
 
 
@@ -27,5 +31,7 @@ def from_toml(path):
         experiment_info=pd.Series(t['experiment_info']),
         ode_metabolites=pd.DataFrame.from_records(t['ode_metabolites']),
         known_reals=pd.Series(t['known_reals']),
+        reactions=pd.DataFrame.from_records(t['reactions']),
+        thermodynamic_parameters=pd.DataFrame.from_records(t['thermodynamic_parameters']),
         kinetic_parameters=pd.DataFrame.from_records(t['kinetic_parameters'])
     )
