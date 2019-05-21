@@ -7,17 +7,17 @@ data {
   // dimensions
   int<lower=1> N_ode;          // number of ode metabolites
   int<lower=1> N_kinetic_parameter;        // total number of kinetic parameters
+  int<lower=1> N_thermodynamic_parameter;
   int<lower=1> N_known_real;   // number of known reals
   int<lower=1> N_measurement;  // number of measurements of ode metabolites
-  int<lower=1> N_reaction;
   // measurements
   int<lower=1,upper=N_ode> measurement_ix[N_measurement];
   vector[N_measurement] measurement;
   // hardcoded priors
   vector[N_kinetic_parameter] prior_location_kinetic;
   vector[N_kinetic_parameter] prior_scale_kinetic;
-  vector[N_reaction] prior_location_thermodynamic;
-  vector[N_reaction] prior_scale_thermodynamic;
+  vector[N_thermodynamic_parameter] prior_location_thermodynamic;
+  vector[N_thermodynamic_parameter] prior_scale_thermodynamic;
   real<lower=0> measurement_scale;
   real known_reals[N_known_real];
   // ode stuff
@@ -34,7 +34,7 @@ transformed data {
   int known_ints[0];
 }
 parameters {
-  real thermodynamic_parameters[N_reaction];
+  real thermodynamic_parameters[N_thermodynamic_parameter];
   real<lower=0> kinetic_parameters[N_kinetic_parameter];
 }
 transformed parameters {
