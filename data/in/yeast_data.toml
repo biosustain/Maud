@@ -28,7 +28,7 @@ gas_constant = 8.314e-3 # units kJ/mol.K
 
 [[ode_metabolites]]
 'name' = 'BPG'
-'initial_value' = 0.000736873499865602
+'initial_value' = 0.1  # 0.000736873499865602
 
 [[ode_metabolites]]
 'name' = 'DHAP'
@@ -46,7 +46,7 @@ gas_constant = 8.314e-3 # units kJ/mol.K
 
 [[ode_metabolites]]
 'name' = 'P2G'
-'initial_value' = 0.0677379081099344
+'initial_value' = 0.538  # 0.0677379081099344
 'measured_value' = 0.538
 
 [[ode_metabolites]]

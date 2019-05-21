@@ -42,9 +42,9 @@ REL_TOL = 1e-13
 ABS_TOL = 1e-9
 MAX_STEPS = int(1e9)
 
-N_TIMEPOINTS = 19
+N_TIMEPOINTS = 20
 FIRST_TIMEPOINT = 0
-TIMEPOINT_INTERVAL = 0.0001
+TIMEPOINT_INTERVAL = 0.005
 
 if __name__ == '__main__':
     here = os.path.dirname(os.path.abspath(__file__))
@@ -139,9 +139,12 @@ if __name__ == '__main__':
     axes = axes.ravel()
     for ax, col in zip(axes, timecourse.columns):
         ax.plot(timecourse.index, timecourse[col])
-        ax.set(title=col, xlabel='Time')
+        ax.set_title(col)
         if ax in [axes[0], axes[4]]:
             ax.set_ylabel('Concentration')
+        if ax in axes[4:]:
+            ax.set_xlabel('Time')
+    plt.tight_layout()
     plt.savefig(paths['fig'])
 
     plt.clf()
