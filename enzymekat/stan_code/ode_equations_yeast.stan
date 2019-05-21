@@ -126,19 +126,19 @@ real[] get_fluxes(real[] ode_metabolites,
                                 FBA_Ka, FBA_Kp, FBA_Kq,
                                 FBA_Kia, FBA_Kip, FBA_Kiq);
   real flux_GPM = uniuni(P3G, P2G, GPM * GPM_Kcat1, GPM * GPM_Kcat2, GPM_Ka, GPM_Kp);
-  real flux_PGK = ordered_bibi(BPG, P3G, ADP, ATP,
+  real flux_PGK = ordered_bibi(BPG, ADP, P3G, ATP,
                                PGK * PGK_Kcat1, PGK * PGK_Kcat2,
                                PGK_Ka, PGK_Kb, PGK_Kp, PGK_Kq,
                                PGK_Kia, PGK_Kib, PGK_Kip, PGK_Kiq);
-  real flux_TDH1 = ordered_bibi(GAP, BPG, NAD, NADH,
+  real flux_TDH1 = ordered_bibi(GAP, NAD, BPG, NADH,
                                 TDH1 * TDH1_Kcat1, TDH1 * TDH1_Kcat2,
                                 TDH1_Ka, TDH1_Kb, TDH1_Kp, TDH1_Kq,
                                 TDH1_Kia, TDH1_Kib, TDH1_Kip, TDH1_Kiq);
-  real flux_TDH2 = ordered_bibi(GAP, BPG, NAD, NADH,
+  real flux_TDH2 = ordered_bibi(GAP, NAD, BPG, NADH,
                                 TDH2 * TDH2_Kcat1, TDH2 * TDH2_Kcat2,
                                 TDH2_Ka, TDH2_Kb, TDH2_Kp, TDH2_Kq,
                                 TDH2_Kia, TDH2_Kib, TDH2_Kip, TDH2_Kiq);
-  real flux_TDH3 = ordered_bibi(GAP, BPG, NAD, NADH,
+  real flux_TDH3 = ordered_bibi(GAP, NAD, BPG, NADH,
                                 TDH3 * TDH3_Kcat1, TDH3 * TDH3_Kcat2,
                                 TDH3_Ka, TDH3_Kb, TDH3_Kp, TDH3_Kq,
                                 TDH3_Kia, TDH3_Kib, TDH3_Kip, TDH3_Kiq);
