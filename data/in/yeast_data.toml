@@ -17,8 +17,8 @@ TDH1 = 0.350864642801396
 TDH2 = 0.0
 TDH3 = 4.20440474648547
 TPI1 = 0.294357819645508
-influx_fbp = 1.88735  # From Smallbone
-outflux_pep = 3.72113  # From Smallbone
+influx_fbp = 0.5 # 1.88735  # From Smallbone
+PEP_const = 6.17791  # set to a value such that PEP_const * [PEP_final] = 3.7747
 NAD = 1.41142  # From Smallbone
 NADH = 0.1785794942  # From Smallbone
 ATP = 3.95146  # From Smallbone
@@ -28,7 +28,7 @@ gas_constant = 8.314e-3 # units kJ/mol.K
 
 [[ode_metabolites]]
 'name' = 'BPG'
-'initial_value' = 0.1  # 0.000736873499865602
+'initial_value' = 0.000736873499865602
 
 [[ode_metabolites]]
 'name' = 'DHAP'
@@ -46,7 +46,7 @@ gas_constant = 8.314e-3 # units kJ/mol.K
 
 [[ode_metabolites]]
 'name' = 'P2G'
-'initial_value' = 0.538  # 0.0677379081099344
+'initial_value' = 0.0677379081099344
 'measured_value' = 0.538
 
 [[ode_metabolites]]
@@ -110,25 +110,25 @@ mechanism = 'uniuni'
 'name' = 'delta_g'
 'reaction' = 'GPM'
 'prior_location' = 4.2
-'prior_scale' = 0.7	
+'prior_scale' = 0.7
 
 [[thermodynamic_parameters]]
 'name' = 'delta_g'
 'reaction' = 'PGK'
 'prior_location' = -18.6
-'prior_scale' = 0.9	
+'prior_scale' = 0.9
 
 [[thermodynamic_parameters]]
 'name' = 'delta_g'
 'reaction' = 'TDH'
 'prior_location' = 6.4
-'prior_scale' = 0.8	
+'prior_scale' = 0.8
 
 [[thermodynamic_parameters]]
 'name' = 'delta_g'
 'reaction' = 'TPI'
 'prior_location' = 5.5
-'prior_scale' = 1.1	
+'prior_scale' = 1.1
 'notes' = 'in the direction of forming G3P'
 
 [[kinetic_parameters]]
@@ -316,7 +316,7 @@ mechanism = 'uniuni'
 'name' = 'Kcat2'
 'reaction' = 'TDH1'
 'prior_location' = 3.3178
-'prior_scale' = 1.4091 
+'prior_scale' = 1.4091
 
 [[kinetic_parameters]]
 'name' = 'Kia'
@@ -442,7 +442,7 @@ mechanism = 'uniuni'
 'name' = 'Kcat1'
 'reaction' = 'TDH3'
 'prior_location' = 2.5925
-'prior_scale' = 1.42047 
+'prior_scale' = 1.42047
 
 [[kinetic_parameters]]
 'name' = 'Kcat2'

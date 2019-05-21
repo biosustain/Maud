@@ -13,4 +13,6 @@ real ordered_unibi(real A, real P, real Q,
                    real Kia, real Kip, real Kiq){
   return (Kip*(A*Kiq*Kp*V1 - Kia*P*Q*V2))/(Ka*Kip*Kiq*Kp + A*Kiq*Kp*(Kip + P) + Kia*Kip*(Kq*P + (Kp + P)*Q));
 }
-
+real irr_mass_action(real A, real V1){
+  return(A*V1);
+}
