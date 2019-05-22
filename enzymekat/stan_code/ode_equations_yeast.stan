@@ -179,8 +179,6 @@ real[] steady_state_equation(real t,
                              int[] known_ints){
   for (m in 1:size(ode_metabolites)){
     if (ode_metabolites[m] < 0){
-      print(ode_metabolites);
-      print(get_fluxes(ode_metabolites, params, known_reals));
       reject("Metabolite ", m, " is ", ode_metabolites[m], " but should be greater than zero");
     }
   }

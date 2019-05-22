@@ -84,7 +84,6 @@ if __name__ == '__main__':
         FIRST_TIMEPOINT, FIRST_TIMEPOINT + (TIMEPOINT_INTERVAL * N_TIMEPOINTS),
         num=N_TIMEPOINTS, endpoint=False
     )
-    print(timepoints[1:])
     stan_input = {
         'N_ode': len(data.ode_metabolites),
         'N_known_real': len(data.known_reals),
