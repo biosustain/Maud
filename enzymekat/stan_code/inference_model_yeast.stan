@@ -59,9 +59,9 @@ model {
 }
 generated quantities {
   vector[N_ode] measurement_pred;
-  vector[N_reaction] flux = get_fluxes(metabolite_concentration_hat,
+  real flux[N_reaction+2] = get_fluxes(metabolite_concentration_hat,
                                        append_array(thermodynamic_parameters, kinetic_parameters),
-                                       known_reals);
+                                     known_reals);
   for (n in 1:N_ode)
     measurement_pred[n] = lognormal_rng(log(metabolite_concentration_hat[n]), measurement_scale);
 }
