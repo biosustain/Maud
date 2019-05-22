@@ -55,6 +55,7 @@ if __name__ == '__main__':
         'N_kinetic_parameter': len(data.kinetic_parameters),
         'N_known_real': len(data.known_reals),
         'N_measurement': len(measured_metabolites),
+        'N_reaction': len(data.reactions),
         'N_thermodynamic_parameter': len(data.thermodynamic_parameters),
         'measurement_ix': measured_metabolites['ix_stan'].values,
         'measurement': measured_metabolites['measured_value'].values,
