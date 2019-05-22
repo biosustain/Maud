@@ -61,14 +61,11 @@ if __name__ == '__main__':
         'stan_input': os.path.join(
             here, RELATIVE_PATH_DATA, f'stan_records/timecourse_model_input_{MODEL_NAME}.Rdump'
         ),
-        'inits': os.path.join(
-            here, RELATIVE_PATH_DATA, f'stan_records/timeourse_inits_{MODEL_NAME}.Rdump'
-        ),
-        'output_data': os.path.join(
+        'output_timecourse': os.path.join(
             here, RELATIVE_PATH_DATA, f'out/timecourse_output_{MODEL_NAME}.csv'
         ),
-        'output_infd': os.path.join(
-            here, RELATIVE_PATH_DATA, f'out/timecourse_infd_{MODEL_NAME}.nc'
+        'output_flux': os.path.join(
+            here, RELATIVE_PATH_DATA, f'out/timecourse_flux_output_{MODEL_NAME}.csv'
         ),
         'fig': os.path.join(
             here, RELATIVE_PATH_DATA, f'out/timecourse_{MODEL_NAME}.png'
@@ -76,7 +73,6 @@ if __name__ == '__main__':
         'flux_fig': os.path.join(
             here, RELATIVE_PATH_DATA, f'out/timecourse_fluxes_{MODEL_NAME}.png'
         )
-
     }
     # define input data and write to file
     data = enzymekat_data.from_toml(paths['data'])
@@ -161,12 +157,11 @@ if __name__ == '__main__':
     plt.tight_layout()
     plt.savefig(paths['flux_fig'])
 
+    timecourse.to_csv(paths['output_timecourse'])
+    timecourse.to_csv(paths['output_flux'])
 
     print('Timecourse:\n')
     print(timecourse)
     print('Fluxes:\n')
     print(flux)
-    # print(f'Writing results to {timecourse_csv_path}...')
-    # timecourse.to_csv(timecourse_csv_path)
-    # print('Finished!')
 
