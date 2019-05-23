@@ -8,6 +8,7 @@ data {
   int<lower=1> N_ode;          // number of ode metabolites
   int<lower=1> N_kinetic_parameter;        // total number of kinetic parameters
   int<lower=1> N_thermodynamic_parameter;
+  int<lower=1> N_reaction;
   int<lower=1> N_known_real;   // number of known reals
   int<lower=1> N_measurement;  // number of measurements of ode metabolites
   // measurements
@@ -58,6 +59,9 @@ model {
 }
 generated quantities {
   vector[N_ode] measurement_pred;
+  real flux[N_reaction+2] = get_fluxes(metabolite_concentration_hat,
+                                       append_array(thermodynamic_parameters, kinetic_parameters),
+                                     known_reals);
   for (n in 1:N_ode)
     measurement_pred[n] = lognormal_rng(log(metabolite_concentration_hat[n]), measurement_scale);
 }
