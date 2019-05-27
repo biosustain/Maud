@@ -61,6 +61,9 @@ if __name__ == '__main__':
         'stan_input': os.path.join(
             here, RELATIVE_PATH_DATA, f'stan_records/timecourse_model_input_{MODEL_NAME}.Rdump'
         ),
+        'output_data': os.path.join(
+            here, RELATIVE_PATH_DATA, f'out/timecourse_model_output_{MODEL_NAME}.csv'
+        ),
         'output_timecourse': os.path.join(
             here, RELATIVE_PATH_DATA, f'out/timecourse_output_{MODEL_NAME}.csv'
         ),
@@ -124,7 +127,6 @@ if __name__ == '__main__':
               'flux_sim': ['timepoint_labels', 'reaction_names']}
     )
 
-    infd.to_netcdf(paths['output_infd'])
 
     timecourse = infd.posterior['ode_metabolite_sim'].mean(dim=['chain', 'draw']).to_series().unstack()
     flux = infd.posterior['flux_sim'].mean(dim=['chain', 'draw']).to_series().unstack()

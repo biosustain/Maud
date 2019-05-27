@@ -1,6 +1,6 @@
 [experiment_info]
 MEASUREMENT_SCALE = 0.05  # metabolite measurement accuracy (log scale)
-STEADY_STATE_TIME = 10  # when is it safe to assume steady state?
+STEADY_STATE_TIME = 30  # when is it safe to assume steady state?
 
 [known_reals]
 NA = 6.02214e+20
@@ -17,7 +17,7 @@ TDH1 = 0.350864642801396
 TDH2 = 0.0
 TDH3 = 4.20440474648547
 TPI1 = 0.294357819645508
-influx_fbp = 0.5 # 1.88735  # From Smallbone
+influx_fbp = 1.88735  # From Smallbone
 PEP_const = 6.17791  # set to a value such that PEP_const * [PEP_final] = 3.7747
 NAD = 1.41142  # From Smallbone
 NADH = 0.1785794942  # From Smallbone
@@ -129,7 +129,7 @@ mechanism = 'uniuni'
 'reaction' = 'TPI'
 'prior_location' = 5.5
 'prior_scale' = 1.1
-'notes' = 'in the direction of forming G3P'
+'notes' = 'in the direction of forming Glyceraldehyde 3-Phosphate'
 
 [[kinetic_parameters]]
 'name' = 'Kcat1'
