@@ -62,7 +62,6 @@ gas_constant = 8.314e-3 # units kJ/mol.K
 'name' = 'Influx'
 'mechanism' = 'Fixed_Exchange'
 
-
 [[reactions]]
 'name' = 'ENO1'
 'mechanism' = 'uniuni'
@@ -534,8 +533,8 @@ gas_constant = 8.314e-3 # units kJ/mol.K
 'note' = 'Smallbone'
 
 [[kinetic_parameters]]
-'name' = 'Vout'
+'name' = 'V_out'
 'reaction' = 'outflux_pep'
-'prior_location' = 0
-'prior_scale' = 0.2
+'prior_location' = 0.49
+'prior_scale' = 0.5
 'note' = 'set to a value such that exp(V_out) * [PEP_final] = 1'
