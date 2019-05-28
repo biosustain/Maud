@@ -12,10 +12,10 @@ RELATIVE_PATH_STAN_CODE = 'stan_code'
 REL_TOL = 1e-13
 ABS_TOL = 1e-9
 MAX_STEPS = int(1e9)
-LIKELIHOOD = 0
+LIKELIHOOD = 1
 MEASUREMENT_SCALE = 0.05
-N_SAMPLES = 200
-N_WARMUP = 200
+N_SAMPLES = 100
+N_WARMUP = 100
 N_CHAINS = 4
 
 if __name__ == '__main__':
@@ -49,21 +49,31 @@ if __name__ == '__main__':
         data.ode_metabolites
         .assign(ix_stan=lambda df: range(1, len(df) + 1))
     )
+    ode_fluxes = (
+        data.reactions
+        .assign(ix_stan=lambda df: range(1, len(df) + 1))
+    )
     measured_metabolites = ode_metabolites.dropna(subset=['measured_value'])
+    measured_flux = ode_fluxes.dropna(subset=['measured_value'])
+
     stan_input = {
         'N_ode': len(ode_metabolites),
         'N_kinetic_parameter': len(data.kinetic_parameters),
         'N_known_real': len(data.known_reals),
         'N_measurement': len(measured_metabolites),
+        'N_flux_measurement': len(measured_flux),
         'N_reaction': len(data.reactions),
         'N_thermodynamic_parameter': len(data.thermodynamic_parameters),
         'measurement_ix': measured_metabolites['ix_stan'].values,
         'measurement': measured_metabolites['measured_value'].values,
+        'flux_measurement_ix': measured_flux['ix_stan'].values,
+        'flux_measurment': measured_flux['measured_value'].values,
         'prior_location_kinetic': data.kinetic_parameters['prior_location'].values,
         'prior_scale_kinetic': data.kinetic_parameters['prior_scale'].values,
         'prior_location_thermodynamic': data.thermodynamic_parameters['prior_location'].values,
         'prior_scale_thermodynamic': data.thermodynamic_parameters['prior_scale'].values,
         'measurement_scale': data.experiment_info['MEASUREMENT_SCALE'],
+        'flux_measurment_scale': data.experiment_info['FLUX_MEASUREMENT_SCALE'],
         'known_reals': data.known_reals.values,
         'initial_state': ode_metabolites['initial_value'].values,
         'initial_time': 0,

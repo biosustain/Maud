@@ -1,6 +1,7 @@
 [experiment_info]
 MEASUREMENT_SCALE = 0.05  # metabolite measurement accuracy (log scale)
-STEADY_STATE_TIME = 10  # when is it safe to assume steady state?
+FLUX_MEASUREMENT_SCALE = 0.05 # flux measurment accuracy
+STEADY_STATE_TIME = 30  # when is it safe to assume steady state?
 
 [known_reals]
 NA = 6.02214e+20
@@ -17,8 +18,7 @@ TDH1 = 0.350864642801396
 TDH2 = 0.0
 TDH3 = 4.20440474648547
 TPI1 = 0.294357819645508
-influx_fbp = 0.5 # 1.88735  # From Smallbone
-PEP_const = 6.17791  # set to a value such that PEP_const * [PEP_final] = 3.7747
+influx_fbp = 0.5
 NAD = 1.41142  # From Smallbone
 NADH = 0.1785794942  # From Smallbone
 ATP = 3.95146  # From Smallbone
@@ -59,40 +59,50 @@ gas_constant = 8.314e-3 # units kJ/mol.K
 'measured_value' = 0.611
 
 [[reactions]]
-name = 'ENO1'
-mechanism = 'uniuni'
+'name' = 'Influx'
+'mechanism' = 'Fixed_Exchange'
+
 
 [[reactions]]
-name = 'ENO2'
-mechanism = 'uniuni'
+'name' = 'ENO1'
+'mechanism' = 'uniuni'
 
 [[reactions]]
-name = 'FBA'
-mechanism = 'ordered_unibi'
+'name' = 'ENO2'
+'mechanism' = 'uniuni'
 
 [[reactions]]
-name = 'GPM'
-mechanism = 'uniuni'
+'name' = 'FBA'
+'mechanism' = 'ordered_unibi'
 
 [[reactions]]
-name = 'PGK'
-mechanism = 'ordered_bibi'
+'name' = 'GPM'
+'mechanism' = 'uniuni'
 
 [[reactions]]
-name = 'TDH1'
-mechanism = 'ordered_bibi'
+'name' = 'PGK'
+'mechanism' = 'ordered_bibi'
 
 [[reactions]]
-name = 'TDH2'
-mechanism = 'ordered_bibi'
+'name' = 'TDH1'
+'mechanism' = 'ordered_bibi'
 
 [[reactions]]
-name = 'TDH3'
-mechanism = 'ordered_bibi'
+'name' = 'TDH2'
+'mechanism' = 'ordered_bibi'
 
 [[reactions]]
-name = 'TPI'
-mechanism = 'uniuni'
+'name' = 'TDH3'
+'mechanism' = 'ordered_bibi'
+
+[[reactions]]
+'name' = 'TPI'
+'mechanism' = 'uniuni'
+
+[[reactions]]
+'name' = 'PEP_outflux'
+'mechanism' = 'irr_mass_action'
+'measured_value' = 1
 
 [[thermodynamic_parameters]]
 'name' = 'delta_g'
@@ -522,3 +532,10 @@ mechanism = 'uniuni'
 'prior_location' = 1.891666177
 'prior_scale' = 0.239329051
 'note' = 'Smallbone'
+
+[[kinetic_parameters]]
+'name' = 'Vout'
+'reaction' = 'outflux_pep'
+'prior_location' = 0
+'prior_scale' = 0.2
+'note' = 'set to a value such that exp(V_out) * [PEP_final] = 1'
