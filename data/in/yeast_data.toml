@@ -138,7 +138,7 @@ gas_constant = 8.314e-3 # units kJ/mol.K
 'reaction' = 'TPI'
 'prior_location' = 5.5
 'prior_scale' = 1.1
-'notes' = 'in the direction of forming G3P'
+'notes' = 'in the direction of forming Glyceraldehyde 3-Phosphate'
 
 [[kinetic_parameters]]
 'name' = 'Kcat1'
