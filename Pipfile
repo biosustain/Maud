@@ -13,6 +13,7 @@ pandas = "*"
 matplotlib = "*"
 python-libsbml = "*"
 toml = "*"
+jupyter = "*"
 
 [requires]
 python_version = "3.7"

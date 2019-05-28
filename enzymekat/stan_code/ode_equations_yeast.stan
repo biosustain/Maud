@@ -17,13 +17,12 @@ real[] get_fluxes(real[] ode_metabolites,
   real TDH3 = known_reals[13];
   real TPI = known_reals[14];
   real influx_fbp = known_reals[15];
-  real mass_action_pep_const = known_reals[16];
-  real NAD = known_reals[17];
-  real NADH = known_reals[18];
-  real ATP = known_reals[19];
-  real ADP = known_reals[20];
-  real temperature = known_reals[21];
-  real gas_constant = known_reals[22];
+  real NAD = known_reals[16];
+  real NADH = known_reals[17];
+  real ATP = known_reals[18];
+  real ADP = known_reals[19];
+  real temperature = known_reals[20];
+  real gas_constant = known_reals[21];
   real BPG = ode_metabolites[1];
   real DHAP = ode_metabolites[2];
   real F16bP = ode_metabolites[3];
@@ -96,7 +95,8 @@ real[] get_fluxes(real[] ode_metabolites,
   real TPI_Kcat1 = params[59];
   real TPI_Kcat2 = params[60];
   real TPI_Ka = params[61];
- 
+  real V_out = params[62];
+
   // derived numbers
   real sum_PXG = P2G + P3G;
   real energy_charge = (ATP + ADP / 2) / sum_AXP;
@@ -143,7 +143,7 @@ real[] get_fluxes(real[] ode_metabolites,
                                 TDH3_Ka, TDH3_Kb, TDH3_Kp, TDH3_Kq,
                                 TDH3_Kia, TDH3_Kib, TDH3_Kip, TDH3_Kiq);
   real flux_TPI = uniuni(DHAP, GAP, TPI * TPI_Kcat1, TPI * TPI_Kcat2, TPI_Ka, TPI_Kp);
-  real outflux_pep = irr_mass_action(PEP, mass_action_pep_const);
+  real outflux_pep = irr_mass_action(PEP, V_out);
 
   return {influx_fbp, flux_ENO1, flux_ENO2, flux_FBA, flux_GPM, flux_PGK,
           flux_TDH1, flux_TDH2, flux_TDH3, flux_TPI, outflux_pep};
