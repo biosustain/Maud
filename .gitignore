@@ -10,6 +10,7 @@ data/in/*
 !data/in/yeast_measurements.csv
 !data/in/inits_yeast.Rdump
 !data/in/model_input_yeast.Rdump
+!data/stan_records/*
 
 data/out/*
 !data/out/readme.md
