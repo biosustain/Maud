@@ -66,8 +66,6 @@ a few minutes):
 
 #+begin_src sh
 cd cmdstan
-git pull
-make stan-update
 make clean-all
 make build
 #+end_src
@@ -117,7 +115,7 @@ To add the public key to your github account, first display its contents with
 this command:
 
 #+begin_src bash
-echo .ssh/id_rsa.pub
+cat .ssh/id_rsa.pub
 #+end_src
 
 Copy the output, then go to the [[https://github.com/settings/keys][github ssh and gpg keys page]], click 'New SSH
@@ -142,8 +140,6 @@ git clone --recursive git@github.com:biosustain/enzymeKAT.git
 *** Building cmdstan
 #+begin_src bash
 cd cmdstan
-git pull
-make stan-update
 make clean-all
 make build
 #+end_src
@@ -153,16 +149,48 @@ Currently enzymeKAT is only tested with python3.7, and the system python3 is
 python3.6.2. To get around this issue we can install a fresh python3.7 with
 pyenv.
 
+First make sure you are in your home directory:
+
 #+begin_src bash
 cd ~
+#+end_src
+
+Now run the pyenv installer:
+
+#+begin_src bash
 curl https://pyenv.run | bash
+#+end_src
+
+Now add the following lines of code to the bottom of your ~.bashrc~ file:
+
+#+begin_src bash
+export PYENV_ROOT="$HOME/.pyenv"
+export PATH="$PYENV_ROOT/bin:$PATH"
+if command -v pyenv 1>/dev/null 2>&1; then
+  eval "$(pyenv init -)"
+fi
+#+end_src
+
+At this point you will need to restart your shell so that your ~PATH~
+environment variable is set correctly:
+
+#+begin_src bash
+exec "$BASH"
+#+end_src
+
+Finally, use pyenv to install python 3.7.2:
+
+#+begin_src bash
 pyenv install 3.7.2
 #+end_src
+
+*** Installing python libraries with pyenv
 
 To install the required python libraries we can use pipenv.
 
 #+begin_src bash
 pip install --user pipenv
+cd Code/enzymeKAT
 pipenv install
 #+end_src
 
