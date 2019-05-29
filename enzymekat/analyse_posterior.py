@@ -2,11 +2,12 @@ import arviz
 from matplotlib import pyplot as plt
 import numpy as np
 import os
+import pandas as pd
 from python_modules import enzymekat_data
 
 RELATIVE_PATHS = {
     'toml_file': '../data/in/yeast_data.toml',
-    'plots_folder': '../data/in',
+    'plots_folder': '../data/out',
     'csv_output': '../data/out/model_output_yeast.csv'
 }
 
@@ -41,12 +42,11 @@ def plot_pairs(infd, var_names, coords=None, log_transform=True, png_location=No
 def plot_pairs_for_reaction(infd, reaction, png_location=None):
     var_names = ['kinetic_parameters', 'thermodynamic_parameters']
     all_coords = infd.posterior.coords
-    kp_names = list(filter(lambda i: reaction in i, all_coords['kinetic_parameter_names']))
-    tp_names = list(filter(lambda i: reaction in i, all_coords['thermodynamic_parameter_names']))
+    kp_names = list(filter(lambda i: reaction in i, all_coords['kinetic_parameter_names'].to_series()))
+    tp_names = list(filter(lambda i: reaction in i, all_coords['thermodynamic_parameter_names'].to_series()))
     coords = {'kinetic_parameter_names': kp_names, 'thermodynamic_parameter_names': tp_names}
-    print(kp_names)
-    print(tp_names)
-    return plot_pairs(infd, var_names, coords, log_transform=True, png_location=png_location)
+    axes = plot_pairs(infd, var_names, coords, log_transform=True, png_location=png_location)
+    return axes
 
 
 if __name__ == '__main__':
@@ -66,7 +66,7 @@ if __name__ == '__main__':
     )
     thermodynamic_parameter_names = data.thermodynamic_parameters['reaction'].tolist()
     metabolite_names = data.ode_metabolites['name'].tolist()
-    flux_names = ['influx_fbp'] + data.reactions['name'].tolist() + ['outflux_pep']
+    flux_names = data.reactions['name'].tolist()
 
     # construct arviz InferenceData object
     infd = arviz.from_cmdstan(
@@ -86,11 +86,21 @@ if __name__ == '__main__':
         }
     )
 
+    # Diagnostics
+    n_samples = int(len(infd.sample_stats['diverging'].to_series()))
+    n_diverging = int(infd.sample_stats['diverging'].to_series().sum())
+    summary = arviz.summary(infd)
+    if n_diverging > 0:
+        print(f"Uh oh! {n_diverging} out of {n_samples} samples diverged.")
+    print("Variables with the highest and lowest r_hat statistics:")
+    print(pd.concat([summary.sort_values('r_hat', ascending=False).head(5),
+                     summary.sort_values('r_hat', ascending=True).head(5)]))
+
     # Pair plots
     plot_pairs_for_reaction(
         infd,
         'ENO',
-        png_location=png_template.format('pair_kinetic')
+        png_location=png_template.format('pair_ENO')
     )
     for var_name in ['thermodynamic_parameters', 'measurement_pred', 'flux']:
         png_name = f'pair_{var_name}'
@@ -100,6 +110,7 @@ if __name__ == '__main__':
             coords=None,
             png_location=png_template.format(png_name)
         )
+    print('Pair plots done')
 
     # Posterior histograms
     for var_name in ['kinetic_parameters', 'measurement_pred', 'thermodynamic_parameters']:
@@ -110,3 +121,4 @@ if __name__ == '__main__':
             var_name,
             png_location=png_template.format(png_name)
         )
+    print('Histograms done')
