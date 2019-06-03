@@ -3,7 +3,7 @@ import numpy as np
 import os
 import pandas as pd
 import pystan
-from python_modules import stan_utils, sbml_functions, enzymekat_data
+from python_modules import stan_utils, conversion, enzymekat_data
 
 MODEL_NAME = 'yeast'
 RELATIVE_PATH_CMDSTAN = '../cmdstan'
@@ -13,7 +13,6 @@ REL_TOL = 1e-13
 ABS_TOL = 1e-9
 MAX_STEPS = int(1e9)
 LIKELIHOOD = 1
-MEASUREMENT_SCALE = 0.05
 N_SAMPLES = 300
 N_WARMUP = 300
 N_CHAINS = 4
@@ -47,7 +46,14 @@ if __name__ == '__main__':
     data = enzymekat_data.from_toml(paths['data'])
     ode_metabolites = (
         data.ode_metabolites
-        .assign(ix_stan=lambda df: range(1, len(df) + 1))
+        .assign(
+            ix_stan=lambda df: range(1, len(df) + 1),
+            measurement_scale=lambda df: df.apply(
+                lambda row: conversion.sem_pct_to_lognormal_sigma(
+                    row['sem_pct'], row['measured_value']
+                ), axis=1
+            )
+        )
     )
     ode_fluxes = (
         data.reactions
@@ -72,7 +78,7 @@ if __name__ == '__main__':
         'prior_scale_kinetic': data.kinetic_parameters['prior_scale'].values,
         'prior_location_thermodynamic': data.thermodynamic_parameters['prior_location'].values,
         'prior_scale_thermodynamic': data.thermodynamic_parameters['prior_scale'].values,
-        'measurement_scale': data.experiment_info['MEASUREMENT_SCALE'],
+        'measurement_scale': measured_metabolites['measurement_scale'].values,
         'flux_measurment_scale': data.experiment_info['FLUX_MEASUREMENT_SCALE'],
         'known_reals': data.known_reals.values,
         'initial_state': ode_metabolites['initial_value'].values,
@@ -84,11 +90,6 @@ if __name__ == '__main__':
         'LIKELIHOOD': LIKELIHOOD
     }
     pystan.misc.stan_rdump(stan_input, paths['stan_input'])
-
-    # define initial parameter values and write to file
-    inits = {'kinetic_parameters': np.exp(data.kinetic_parameters['prior_location'].values),
-             'thermodynamic_parameters': data.thermodynamic_parameters['prior_location'].values}
-    pystan.misc.stan_rdump(inits, paths['inits'])
 
     # compile model if necessary
     if not os.path.isfile(paths['stan_model'].replace('.stan', '.hpp')):
@@ -106,7 +107,6 @@ if __name__ == '__main__':
         paths['stan_input'],
         paths['output_data'],
         method_config=method_config,
-        init_config=f"init={paths['inits']}",
         refresh_config="refresh=5",
         chains=N_CHAINS
     )
@@ -116,12 +116,13 @@ if __name__ == '__main__':
         [paths['output_data']],
         coords={
             'kinetic_parameter_names': list(data.kinetic_parameters['name']),
-            'measurement_names': list(ode_metabolites['name'])
+            'metabolite_names': list(ode_metabolites['name']),
+            'measured_metabolite_names': list(measured_metabolites['name'])
         },
         dims={
             'kinetic_parameters': ['kinetic_parameter_names'],
-            'measurement_pred': ['measurement_names'],
-            'measurement_hat': ['measurement_names']
+            'measurement_pred': ['measured_metabolite_names'],
+            'measurement_hat': ['metabolite_names']
         })
     infd.to_netcdf(paths['output_infd'])
     print(arviz.summary(infd))

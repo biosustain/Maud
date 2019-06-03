@@ -22,7 +22,7 @@ data {
   vector[N_kinetic_parameter] prior_scale_kinetic;
   vector[N_thermodynamic_parameter] prior_location_thermodynamic;
   vector[N_thermodynamic_parameter] prior_scale_thermodynamic;
-  real<lower=0> measurement_scale;
+  vector<lower=0>[N_measurement] measurement_scale;
   real<lower=0> flux_measurment_scale;
   real known_reals[N_known_real];
   // ode stuff
@@ -40,9 +40,11 @@ transformed data {
 }
 parameters {
   real thermodynamic_parameters[N_thermodynamic_parameter];
-  real<lower=0> kinetic_parameters[N_kinetic_parameter];
+  vector[N_kinetic_parameter] log_kinetic_parameters_z;
 }
 transformed parameters {
+  real kinetic_parameters[N_kinetic_parameter] =
+    to_array_1d(exp(prior_location_kinetic + log_kinetic_parameters_z .* prior_scale_kinetic));
   real metabolite_concentration_hat[N_ode] = integrate_ode_bdf(
     steady_state_equation,
     initial_state,
@@ -57,7 +59,7 @@ transformed parameters {
 known_reals);
 }
 model {
-  kinetic_parameters ~ lognormal(prior_location_kinetic, prior_scale_kinetic);
+  log_kinetic_parameters_z ~ normal(0, 1);
   thermodynamic_parameters ~ normal(prior_location_thermodynamic, prior_scale_thermodynamic);
   if (LIKELIHOOD == 1){
     flux_measurment ~ normal(flux_hat[flux_measurement_ix], flux_measurment_scale);
@@ -65,10 +67,10 @@ model {
   }
 }
 generated quantities {
-  vector[N_ode] measurement_pred;
+  vector[N_measurement] measurement_pred;
   real flux[N_reaction] = get_fluxes(metabolite_concentration_hat,
-                                       append_array(thermodynamic_parameters, kinetic_parameters),
+                                     append_array(thermodynamic_parameters, kinetic_parameters),
                                      known_reals);
-  for (n in 1:N_ode)
-    measurement_pred[n] = lognormal_rng(log(metabolite_concentration_hat[n]), measurement_scale);
+  for (n in 1:N_measurement)
+    measurement_pred[n] = lognormal_rng(log(metabolite_concentration_hat[measurement_ix[n]]), measurement_scale[n]);
 }
