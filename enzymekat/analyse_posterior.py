@@ -66,6 +66,7 @@ if __name__ == '__main__':
     )
     thermodynamic_parameter_names = data.thermodynamic_parameters['reaction'].tolist()
     metabolite_names = data.ode_metabolites['name'].tolist()
+    measured_metabolite_names = data.ode_metabolites.dropna(subset=['measured_value'])['name'].tolist()
     flux_names = data.reactions['name'].tolist()
 
     # construct arviz InferenceData object
@@ -75,13 +76,14 @@ if __name__ == '__main__':
             'kinetic_parameter_names': kinetic_parameter_names,
             'thermodynamic_parameter_names': thermodynamic_parameter_names,
             'metabolite_names': metabolite_names,
+            'measured_metabolite_names': measured_metabolite_names,
             'flux_names': flux_names
         },
         dims={
             'kinetic_parameters': ['kinetic_parameter_names'],
             'thermodynamic_parameters': ['thermodynamic_parameter_names'],
             'metabolite_concentration_hat': ['metabolite_names'],
-            'measurement_pred': ['metabolite_names'],
+            'measurement_pred': ['measured_metabolite_names'],
             'flux': ['flux_names']
         }
     )
