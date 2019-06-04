@@ -1,6 +1,6 @@
 [experiment_info]
 FLUX_MEASUREMENT_SCALE = 0.1 # flux measurment accuracy
-STEADY_STATE_TIME = 30  # when is it safe to assume steady state?
+STEADY_STATE_TIME = 300  # when is it safe to assume steady state?
 
 [known_reals]
 ENO1 = 0.686371954155832
@@ -12,7 +12,7 @@ TDH1 = 0.350864642801396
 TDH2 = 0.0
 TDH3 = 4.20440474648547
 TPI1 = 0.294357819645508
-influx_fbp = 0.5
+influx_fbp = 0.5  # Arbitrary value, Smallbone says 1.88
 NAD = 1.41142  # From Smallbone
 NADH = 0.1785794942  # From Smallbone
 ATP = 3.95146  # From Smallbone
