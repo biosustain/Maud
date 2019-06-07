@@ -7,8 +7,6 @@ from python_modules import stan_utils, enzymekat_data
 from python_modules.conversion import sem_pct_to_lognormal_sigma
 
 MODEL_NAME = 'yeast'
-RELATIVE_PATH_DATA = '../data'
-RELATIVE_PATH_STAN_CODE = 'stan_code'
 REL_TOL = 1e-13
 ABS_TOL = 1e-9
 MAX_STEPS = int(1e9)
