@@ -6,14 +6,13 @@ verify_ssl = true
 [dev-packages]
 
 [packages]
-pystan = "*"
 arviz = "*"
 numpy = "*"
 pandas = "*"
 matplotlib = "*"
-python-libsbml = "*"
 toml = "*"
 jupyter = "*"
+cmdstanpy = {editable = true,git = "https://github.com/teddygroves/cmdstanpy.git",ref = "include_path"}
 
 [requires]
 python_version = "3.7"
