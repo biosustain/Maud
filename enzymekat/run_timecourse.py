@@ -1,43 +1,12 @@
-"""
-    Script for running a timecourse based on an sbml file and a stan model
-    generated from it.
-
-    Running the timecourse model requires integrating a stiff ODE system, which
-    isn't possible with pystan at the moment due to a bug (see
-    https://github.com/stan-dev/pystan/pull/518). As a workaround, this script
-    uses cmdstan instead, which works but requires some configuration.
-
-    To run this script you will need to follow these steps:
-
-    1. Download (or `git clone`) a recent cmdstan 
-       (https://github.com/stan-dev/cmdstan/releases)
-    2. Run the following commands from the root of the cmdstan directory
-       - `make stan-update`
-       - `make clean-all`
-       - `make build`
-    3. Create a directory for models e.g. `mkdir models` 
-    4. Create a directory for the specific timecourse model you want to 
-       run, e.g. `mkdir models/t_brucei`
-    5. Configure the upper case variables at the top of this script so that they 
-       point at the things they should do.
-
-    To build a pdf cmdstan manual, run `make manual`. You can also just run `make`
-    to get a broad overview of how cmdstan works.
-
-"""
-
 import arviz
 import numpy as np
 import os
 import pandas as pd
-import pystan
+from cmdstanpy.cmds import compile_model, sample
 from matplotlib import pyplot as plt
-from python_modules import stan_utils, sbml_functions, enzymekat_data
+from python_modules import enzymekat_data
 
 MODEL_NAME = 'yeast'
-RELATIVE_PATH_CMDSTAN = '../cmdstan'
-RELATIVE_PATH_DATA = '../data'
-RELATIVE_PATH_STAN_CODE = 'stan_code'
 REL_TOL = 1e-13
 ABS_TOL = 1e-9
 MAX_STEPS = int(1e9)
@@ -46,37 +15,22 @@ N_TIMEPOINTS = 20
 FIRST_TIMEPOINT = 0
 TIMEPOINT_INTERVAL = 0.005
 
+RELATIVE_PATHS = {
+    'data': f'../data/in/{MODEL_NAME}_data.toml',
+    'stan_includes': 'stan_code',
+    'stan_model': f'stan_code/timecourse_model_{MODEL_NAME}.stan',
+    'output_data': f'../data/out/timecourse_model_output_{MODEL_NAME}.csv',
+    'output_timecourse': f'../data/out/timecourse_output_{MODEL_NAME}.csv',
+    'output_flux': f'../data/out/timecourse_flux_output_{MODEL_NAME}.csv',
+    'fig': f'../data/out/timecourse_{MODEL_NAME}.png',
+    'flux_fig': f'../data/out/timecourse_fluxes_{MODEL_NAME}.png'
+}
+
+
 if __name__ == '__main__':
     here = os.path.dirname(os.path.abspath(__file__))
-    paths = {
-        'data': os.path.join(
-            here, RELATIVE_PATH_DATA, f'in/{MODEL_NAME}_data.toml'
-        ),
-        'cmdstan': os.path.join(
-            here, RELATIVE_PATH_CMDSTAN
-        ),
-        'stan_model': os.path.join(
-            here, RELATIVE_PATH_STAN_CODE, f'timecourse_model_{MODEL_NAME}.stan'
-        ),
-        'stan_input': os.path.join(
-            here, RELATIVE_PATH_DATA, f'stan_records/timecourse_model_input_{MODEL_NAME}.Rdump'
-        ),
-        'output_data': os.path.join(
-            here, RELATIVE_PATH_DATA, f'out/timecourse_model_output_{MODEL_NAME}.csv'
-        ),
-        'output_timecourse': os.path.join(
-            here, RELATIVE_PATH_DATA, f'out/timecourse_output_{MODEL_NAME}.csv'
-        ),
-        'output_flux': os.path.join(
-            here, RELATIVE_PATH_DATA, f'out/timecourse_flux_output_{MODEL_NAME}.csv'
-        ),
-        'fig': os.path.join(
-            here, RELATIVE_PATH_DATA, f'out/timecourse_{MODEL_NAME}.png'
-        ),
-        'flux_fig': os.path.join(
-            here, RELATIVE_PATH_DATA, f'out/timecourse_fluxes_{MODEL_NAME}.png'
-        )
-    }
+    paths = {k: os.path.join(here, v) for k, v in RELATIVE_PATHS.items()}
+
     # define input data and write to file
     data = enzymekat_data.from_toml(paths['data'])
     timepoints = np.linspace(
@@ -100,33 +54,33 @@ if __name__ == '__main__':
         'abs_tol': ABS_TOL,
         'max_steps': MAX_STEPS
     }
-    pystan.misc.stan_rdump(stan_input, paths['stan_input'])
+
     # compile model if necessary
-    if not os.path.isfile(paths['stan_model'].replace('.stan', '.hpp')):
-        path_from_cmdstan_to_program = os.path.relpath(
-            paths['stan_model'].replace('.stan', ''), start=paths['cmdstan']
-        )
-        stan_utils.compile_stan_model_with_cmdstan(path_from_cmdstan_to_program)
+    model = compile_model(
+        paths['stan_model'],
+        include_paths=[paths['stan_includes']]
+    )
 
     # run model
-    method_config = 'sample algorithm=fixed_param num_warmup=0 num_samples=1'
-    stan_utils.run_compiled_cmdstan_model(
-        paths['stan_model'].replace('.stan', ''),
-        paths['stan_input'],
-        paths['output_data'],
-        method_config=method_config
+    posterior_samples = sample(
+        model,
+        chains=1,
+        cores=1,
+        data=stan_input,
+        csv_output_file=paths['output_data'],
+        post_warmup_draws_per_chain=2,
+        warmup_draws_per_chain=2
     )
 
     # put model in Arviz object
-    infd = arviz.from_cmdstan(
-        [paths['output_data']],
+    infd = arviz.from_cmdstanpy(
+        posterior_samples,
         coords={'metabolite_names': list(data.ode_metabolites['name']),
                 'reaction_names': ['influx_fbp'] + list(data.reactions['name']) + ['outflux_pep'],
                 'timepoint_labels': timepoints},
         dims={'ode_metabolite_sim': ['timepoint_labels', 'metabolite_names'],
               'flux_sim': ['timepoint_labels', 'reaction_names']}
     )
-
 
     timecourse = infd.posterior['ode_metabolite_sim'].mean(dim=['chain', 'draw']).to_series().unstack()
     flux = infd.posterior['flux_sim'].mean(dim=['chain', 'draw']).to_series().unstack()
