@@ -57,6 +57,11 @@ transformed parameters {
   )[1];
   real flux_hat[N_reaction] = get_fluxes(metabolite_concentration_hat, append_array(thermodynamic_parameters, kinetic_parameters),
 known_reals);
+  real stability[N_reaction] = fabs(flux_hat);
+  real abs_flux = sum(stability);
+  if (abs_flux > 0.0001){
+    reject("steady state not achieved, sum of absolute fluxes was ", abs_flux);
+  }
 }
 model {
   log_kinetic_parameters_z ~ normal(0, 1);
