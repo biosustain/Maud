@@ -99,11 +99,11 @@ real[] get_fluxes(real[] ode_metabolites,
   real ENO_Keq = get_Keq(ENO_delta_g, temperature, gas_constant);
   real FBA_Kip = get_Kip_ordered_unibi(FBA_Keq, FBA_Kia, FBA_Kq, FBA_Kcat1, FBA_Kcat2);
   real FBA_Kiq = get_Kiq_ordered_unibi(FBA_Keq, FBA_Ka, FBA_Kp, FBA_Kcat1, FBA_Kcat2);
-  real TDH1_Kip = get_Kip_ordered_bibi(TDH_Keq, TDH1_Ka, TDH1_Kq, TDH1_Kib, TDH1_Kiq, TDH1_Kcat1, TDH1_Kcat2);
+  real TDH1_Kip = get_Kip_ordered_bibi(TDH_Keq, TDH1_Ka, TDH1_Kq, TDH1_Kib, TDH1_Kcat1, TDH1_Kcat2);
   real TDH1_Kia = get_Kia_ordered_bibi(TDH_Keq, TDH1_Kb, TDH1_Kp, TDH1_Kiq, TDH1_Kcat1, TDH1_Kcat2);
-  real TDH2_Kip = get_Kip_ordered_bibi(TDH_Keq, TDH2_Ka, TDH2_Kq, TDH2_Kib, TDH2_Kiq, TDH2_Kcat1, TDH2_Kcat2);
+  real TDH2_Kip = get_Kip_ordered_bibi(TDH_Keq, TDH2_Ka, TDH2_Kq, TDH2_Kib, TDH2_Kcat1, TDH2_Kcat2);
   real TDH2_Kia = get_Kia_ordered_bibi(TDH_Keq, TDH2_Kb, TDH2_Kp, TDH2_Kiq, TDH2_Kcat1, TDH2_Kcat2);
-  real TDH3_Kip = get_Kip_ordered_bibi(TDH_Keq, TDH3_Ka, TDH3_Kq, TDH3_Kib, TDH3_Kiq, TDH3_Kcat1, TDH3_Kcat2);
+  real TDH3_Kip = get_Kip_ordered_bibi(TDH_Keq, TDH3_Ka, TDH3_Kq, TDH3_Kib, TDH3_Kcat1, TDH3_Kcat2);
   real TDH3_Kia = get_Kia_ordered_bibi(TDH_Keq, TDH3_Kb, TDH3_Kp, TDH3_Kiq, TDH3_Kcat1, TDH3_Kcat2);
   real PGK_Kip = get_Kip_ordered_bibi(PGK_Keq, PGK_Ka, PGK_Kq, PGK_Kib, PGK_Kiq, PGK_Kcat1, PGK_Kcat2);
 
