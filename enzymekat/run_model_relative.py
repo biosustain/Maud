@@ -5,16 +5,16 @@ import pandas as pd
 import pystan
 from python_modules import stan_utils, conversion, enzymekat_data
 
-MODEL_NAME = 'relative_metabolomics'
+MODEL_NAME = 'training'
 RELATIVE_PATH_CMDSTAN = '../cmdstan'
 RELATIVE_PATH_DATA = '../data'
 RELATIVE_PATH_STAN_CODE = 'stan_code'
 REL_TOL = 1e-13
 ABS_TOL = 1e-9
 MAX_STEPS = int(1e9)
-LIKELIHOOD = 1
-N_SAMPLES = 300
-N_WARMUP = 300
+LIKELIHOOD = 0
+N_SAMPLES = 50
+N_WARMUP = 50
 N_CHAINS = 4
 
 if __name__ == '__main__':
@@ -49,8 +49,8 @@ if __name__ == '__main__':
         .assign(
             ix_stan=lambda df: range(1, len(df) + 1),
             measurement_scale=lambda df: df.apply(
-                lambda row: conversion.sem_pct_to_lognormal_sigma(
-                    row['sem_pct'], row['measured_value']
+                lambda row: conversion.norm_sd_to_lognormal_sd(
+                    row['measured_scale'], row['measured_value']
                 ), axis=1
             )
         )
@@ -61,6 +61,8 @@ if __name__ == '__main__':
     )
     measured_metabolites = ode_metabolites.dropna(subset=['measured_value'])
     measured_flux = ode_fluxes.dropna(subset=['measured_value'])
+
+    print(ode_metabolites['initial_value'].values)
 
     stan_input = {
         'N_ode': len(ode_metabolites),
@@ -76,10 +78,12 @@ if __name__ == '__main__':
         'flux_measurment': measured_flux['measured_value'].values,
         'prior_location_kinetic': data.kinetic_parameters['prior_location'].values,
         'prior_scale_kinetic': data.kinetic_parameters['prior_scale'].values,
+        'prior_enzyme_concentrations': data.enzyme_concentrations['prior_location'].values,
+        'prior_enzyme_scale': data.enzyme_concentrations['prior_scale'].values,
         'prior_location_thermodynamic': data.thermodynamic_parameters['prior_location'].values,
         'prior_scale_thermodynamic': data.thermodynamic_parameters['prior_scale'].values,
-        'measurement_scale': measured_metabolites['measurement_scale'].values,
-        'flux_measurment_scale': data.experiment_info['FLUX_MEASUREMENT_SCALE'],
+        'measurement_scale': ode_metabolites['measurement_scale'].values,
+        'flux_measurment_scale': measured_flux['measured_scale'].values,
         'known_reals': data.known_reals.values,
         'initial_state': ode_metabolites['initial_value'].values,
         'initial_time': 0,
@@ -115,14 +119,11 @@ if __name__ == '__main__':
     infd = arviz.from_cmdstan(
         [paths['output_data']],
         coords={
-            'kinetic_parameter_names': list(data.kinetic_parameters['name']),
-            'metabolite_names': list(ode_metabolites['name']),
-            'measured_metabolite_names': list(measured_metabolites['name'])
-        },
+            'kinetic_parameter_names': [x + y for x, y in zip(data.kinetic_parameters['reaction'], data.kinetic_parameters['name'])],
+            'measurement_names': [x for x in data.ode_metabolites['name']]},
         dims={
             'kinetic_parameters': ['kinetic_parameter_names'],
-            'measurement_pred': ['measured_metabolite_names'],
-            'measurement_hat': ['metabolite_names']
+            'metabolite_concentration_hat': ['measurement_names']
         })
     infd.to_netcdf(paths['output_infd'])
     print(arviz.summary(infd))
