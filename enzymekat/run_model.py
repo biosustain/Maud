@@ -2,8 +2,8 @@ import arviz
 import numpy as np
 import os
 import pandas as pd
-from cmdstanpy.cmds import compile_model, sample
-from python_modules import stan_utils, enzymekat_data
+from cmdstanpy import compile_model, sample
+from python_modules import enzymekat_data
 from python_modules.conversion import sem_pct_to_lognormal_sigma
 
 MODEL_NAME = 'yeast'
