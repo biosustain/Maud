@@ -1,7 +1,7 @@
 {
     "_meta": {
         "hash": {
-            "sha256": "50f1482903c56e1ee2cca65aade3515973d9ab577fd098e6c891693f113043b9"
+            "sha256": "4fb91417e2d647d602ba0f9677a0d90b2f8e455da949a66aefbce6012b982db7"
         },
         "pipfile-spec": 6,
         "requires": {
@@ -26,11 +26,11 @@
         },
         "arviz": {
             "hashes": [
-                "sha256:107df00f6505aba1522d31d90796c56d6d33498a1bb9908e90b70b3ba2d70ab0",
-                "sha256:40cddad16c09a4944071b62c3d2fd0ba8a318bde625af5a4988de8ae085ab3fe"
+                "sha256:b14644d5f4b8320f0dbfb827f4c647b345895d7129f3c59adb9bcdcb0adefe89",
+                "sha256:f888a6168175dacf74bfba8f72e9047fe5f2a70a226a1d9a442f154a430b5f84"
             ],
             "index": "pypi",
-            "version": "==0.4.0"
+            "version": "==0.4.1"
         },
         "attrs": {
             "hashes": [
@@ -86,8 +86,8 @@
         },
         "cmdstanpy": {
             "editable": true,
-            "git": "https://github.com/teddygroves/cmdstanpy.git",
-            "ref": "46af579c7e9b4e32b23fcbdf05fd8cc2b4be63d0"
+            "git": "https://github.com/stan-dev/cmdstanpy",
+            "ref": "37fdcfe93bd523ab01f1a325dc5f8bd83914462f"
         },
         "cycler": {
             "hashes": [

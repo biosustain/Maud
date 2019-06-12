@@ -12,7 +12,7 @@ pandas = "*"
 matplotlib = "*"
 toml = "*"
 jupyter = "*"
-cmdstanpy = {editable = true,git = "https://github.com/teddygroves/cmdstanpy.git",ref = "include_path"}
+cmdstanpy = {editable = true,git = "https://github.com/stan-dev/cmdstanpy"}
 
 [requires]
 python_version = "3.7"
