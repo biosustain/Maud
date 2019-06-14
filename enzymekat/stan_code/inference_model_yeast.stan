@@ -1,7 +1,7 @@
 functions {
-#include ../enzymekat/stan_code/big_k_rate_equations.stan
-#include ../enzymekat/stan_code/haldane_relationships.stan
-#include ../enzymekat/stan_code/ode_equations_yeast.stan
+#include big_k_rate_equations.stan
+#include haldane_relationships.stan
+#include ode_equations_yeast.stan
 }
 data {
   // dimensions
