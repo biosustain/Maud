@@ -1,0 +1,90 @@
+[constants]
+gas_constant = 8.314e-3 # units kJ/mol.K
+
+[[experiment]]
+label = 'condition_1'
+conditions = { temperature = 298.15 }
+measurements = [
+  { label = 'M1', value = 0.1, scale = 0.1, type = 'metabolite' },
+  { label = 'M2', value = 0.1, scale = 0.1, type = 'metabolite' },
+  { label = 'M3', value = 0.1, scale = 0.1, type = 'metabolite' },
+  { label = 'M4', value = 0.1, scale = 0.1, type = 'metabolite' },
+  { label = 'influx_M1', value = 0.1, scale = 0.1, type = 'flux' },
+  { label = 'influx_M4', value = 0.1, scale = 0.1, type = 'flux' }
+]
+
+[[experiment]]
+label = 'condition_2'
+conditions = { temperature = 290.15 }
+measurements = [
+  { label = 'M1', value = 0.1, scale = 0.1, type = 'metabolite' },
+  { label = 'M2', value = 0.1, scale = 0.1, type = 'metabolite' },
+  { label = 'M3', value = 0.1, scale = 0.1, type = 'metabolite' },
+  { label = 'M4', value = 0.1, scale = 0.1, type = 'metabolite' },
+  { label = 'influx_M1', value = 0.1, scale = 0.1, type = 'flux' },
+  { label = 'influx_M4', value = 0.1, scale = 0.1, type = 'flux' }
+]
+
+[[reaction]]
+name = 'influx_M1'
+mechanism = 'irr_mass_action'
+stoichiometry = { -1, M1 = 1 }
+parameters = [
+  { label = 'alpha', loc = 0.1, scale = 0.6, type = 'kinetic' }
+]
+
+[[reaction]]
+name = 'FBA'
+mechanism = 'ordered_unibi'
+allosteric_effectors = ['M4']
+stoichiometry = { M1 = -1, M2 = 1, M3 = 1 }
+parameters = [
+  {label = 'delta_g', loc = 0.1, scale = 0.6, type = 'thermodynamic' },
+  {label = 'Kcat1', loc = 0.1, scale = 0.6, type = 'kinetic' },
+  {label = 'Kcat2', loc = 0.1, scale = 0.6, type = 'kinetic' },
+  {label = 'Ka', loc = 0.1, scale = 0.6, type = 'kinetic' },
+  {label = 'Kp', loc = 0.1, scale = 0.6, type = 'kinetic' },
+  {label = 'Kq', loc = 0.1, scale = 0.6, type = 'kinetic' },
+  {label = 'Kia', loc = 0.1, scale = 0.6, type = 'kinetic' }
+]
+
+[[reaction]]
+name = 'TDH'
+mechanism = 'uniuni'
+substrates = ['M3']
+products = ['M4']
+stoichiometry = { M3 = -1, M4 = 1 }
+parameters = [
+  {label = 'delta_g', loc = 0.1, scale = 0.6, type = 'thermodynamic' },
+  {label = 'Kcat1', loc = 0.1, scale = 0.6, type = 'kinetic' },
+  {label = 'Kcat2', loc = 0.1, scale = 0.6, type = 'kinetic' },
+  {label = 'Ka', loc = 0.1, scale = 0.6, type = 'kinetic' }
+]
+
+[[reaction]]
+name = 'TPI'
+mechanism = 'uniuni'
+stoichiometry = { M2 = -1, M3 = 1 }
+parameters = [
+  {label = 'delta_g', loc = 0.1, scale = 0.6, type = 'thermodynamic' },
+  {label = 'Kcat1', loc = 0.1, scale = 0.6, type = 'kinetic' },
+  {label = 'Kcat2', loc = 0.1, scale = 0.6, type = 'kinetic' },
+  {label = 'Ka', loc = 0.1, scale = 0.6, type = 'kinetic' }
+]
+
+[[reaction]]
+name = 'influx_M2'
+mechanism = 'irr_mass_action'
+stoichiometry = { M2 = 1 }
+parameters = [
+  {label = 'alpha', loc = 0.1, scale = 0.6, type = 'kinetic'}
+]
+
+[[reaction]]
+name = 'influx_M4'
+mechanism = 'irr_mass_action'
+stoichiometry = { M4 = 1 }
+parameters = [
+  {label = 'alpha', loc = 0.1, scale = 0.6, type = 'kinetic'}
+]
+
