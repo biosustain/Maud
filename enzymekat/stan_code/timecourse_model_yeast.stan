@@ -31,21 +31,17 @@ generated quantities {
   real flux_sim[N_timepoint, N_reaction+2];
   real ode_metabolite_sim[N_timepoint,N_ode]; 
   ode_metabolite_sim[1] = initial_state;
-  ode_metabolite_sim[2:N_timepoint] = integrate_ode_bdf(
-                                                        steady_state_equation,
+  ode_metabolite_sim[2:N_timepoint] = integrate_ode_bdf(steady_state_equation,
                                                         initial_state,
                                                         initial_time,
                                                         timepoints,
                                                         append_array(thermodynamic_parameters, kinetic_parameters),
                                                         known_reals,
                                                         known_ints,
-                                                        rel_tol, abs_tol, max_steps
-                                                        );
+                                                        rel_tol, abs_tol, max_steps);
   for (t in 1:N_timepoint){
-    flux_sim[t] = get_fluxes(
-                             ode_metabolite_sim[t],
+    flux_sim[t] = get_fluxes(ode_metabolite_sim[t],
                              append_array(thermodynamic_parameters, kinetic_parameters),
-                             known_reals
-                             );
+                             known_reals);
   }
 }
