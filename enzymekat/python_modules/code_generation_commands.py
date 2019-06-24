@@ -1,13 +1,14 @@
+import os
 import pandas as pd
 from python_modules import code_generation_library as lib
 from python_modules.enzymekat_data import EnzymeKatData
-from typing import List
 
 
-PATHS = {
-    'inference_model_template': 'stan_code/inference_model_template.stan',
-    'steady_state_equation': 'stan_code/steady_state_equation.stan'
+RELATIVE_PATHS = {
+    'inference_model_template': '../stan_code/inference_model_template.stan',
+    'steady_state_equation': '../stan_code/steady_state_equation.stan'
 }
+PATHS = {k: os.path.join(os.path.dirname(__file__), v) for k, v in RELATIVE_PATHS.items()}
 MECHANISM_TO_HALDANE_FUNCTIONS = {
     'uniuni': [lib.create_keq_line],
     'ordered_unibi': [
@@ -62,8 +63,8 @@ def create_fluxes_function(ed: EnzymeKatData) -> str:
         "real [] get_fluxes(real[] metabolites, real[] params, real[] known_reals){\n  "
         + "\n  ".join(haldane_lines)
         + "\n  return {\n    "
-        + "\n    ".join(flux_lines)
-        + "\n  }"
+        + ",\n    ".join(flux_lines)
+        + "\n  };"
         + "\n}"
     )
     
@@ -83,11 +84,11 @@ def create_odes_function(ed: EnzymeKatData) -> str:
                 flux_string = reaction_to_flux[reaction]
                 line += f"{stoich}*{flux_string}"
         metabolite_lines[metabolite] = line
-    return (
+    return u
         "real[] get_odes(real[] fluxes){\n"
         + "  return {\n    "
         + ",\n    ".join(metabolite_lines.values())
-        + "\n  }\n"
+        + "\n  };\n"
         + "}"
     )
         

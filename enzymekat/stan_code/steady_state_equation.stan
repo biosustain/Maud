@@ -4,7 +4,7 @@ real[] steady_state_equation(real t,
                              real[] known_reals,
                              int[] known_ints){
   for (m in 1:size(metabolites)){
-    if (ode_metabolites[m] < 0){
+    if (metabolites[m] < 0){
       reject("Metabolite ", m, " is ", metabolites[m], " but should be greater than zero");
     }
   }

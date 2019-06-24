@@ -73,7 +73,7 @@ def create_uniuni_call(ed: EnzymeKatData, reaction) -> str:
         + f"known_reals[{enzyme_code}]*params[{Kcat1_code}], "
         + f"known_reals[{enzyme_code}]*params[{Kcat2_code}], "
         + f"params[{Ka_code}], "
-        + f"{reaction}_Keq);"
+        + f"{reaction}_Keq)"
     )
 
 
@@ -104,10 +104,10 @@ def create_ordered_unibi_call(ed: EnzymeKatData, reaction) -> str:
         + f"metabolites[{substrate_code}], metabolites[{product_1_code}], metabolites[{product_2_code}], "
         + f"known_reals[{enzyme_code}]*params[{Kcat1_code}], "
         + f"known_reals[{enzyme_code}]*params[{Kcat2_code}], "
-        + ", ".join([f"params[c]" for c in non_multiplied_param_codes])
+        + ", ".join([f"params[{c}]" for c in non_multiplied_param_codes])
         + ", "
         + ", ".join([f"{reaction}_{p}" for p in haldane_params])
-        + ");"
+        + ")"
     )
 
 def create_irr_mass_action_call(ed: EnzymeKatData, reaction) -> str:
@@ -125,7 +125,7 @@ def create_irr_mass_action_call(ed: EnzymeKatData, reaction) -> str:
         .astype(str)
     )
     return (
-        f"irr_mass_action(metabolites[{metabolite_code}], params[{alpha_code}]);"
+        f"irr_mass_action(metabolites[{metabolite_code}], params[{alpha_code}])"
     )
 
 
