@@ -76,7 +76,7 @@ parameters = [
 [[reactions]]
 name = 'influx_M2'
 mechanism = 'irr_mass_action'
-stoichiometry = { M2 = 1 }
+stoichiometry = { M2 = -1 }
 parameters = [
   {label = 'alpha', loc = 0.1, scale = 0.6, type = 'kinetic', true_value = 0.1 }
 ]
@@ -84,7 +84,7 @@ parameters = [
 [[reactions]]
 name = 'influx_M4'
 mechanism = 'irr_mass_action'
-stoichiometry = { M4 = 1 }
+stoichiometry = { M4 = -1 }
 parameters = [
   {label = 'alpha', loc = 0.1, scale = 0.6, type = 'kinetic', true_value = 0.1 }
 ]
