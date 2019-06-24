@@ -84,7 +84,7 @@ def create_odes_function(ed: EnzymeKatData) -> str:
                 flux_string = reaction_to_flux[reaction]
                 line += f"{stoich}*{flux_string}"
         metabolite_lines[metabolite] = line
-    return u
+    return (
         "real[] get_odes(real[] fluxes){\n"
         + "  return {\n    "
         + ",\n    ".join(metabolite_lines.values())
