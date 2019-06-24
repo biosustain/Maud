@@ -30,6 +30,7 @@ class EnzymeKatData():
         self.measurements = self.get_measurements()
         self.known_reals = self.get_known_reals()
         self.parameters = self.get_parameters()
+        self.metabolites = self.get_metabolites()
 
     def get_stoichoimetry(self):
         out = (
@@ -62,15 +63,22 @@ class EnzymeKatData():
         out = {}
         for e in self.experiments:
             out[e['label']] = {**e['conditions'], **self.constants}
-        return pd.DataFrame.from_dict(out)
+        return pd.DataFrame.from_dict(out).assign(stan_code=lambda df: range(1, len(df) + 1))
 
     def get_parameters(self):
         return (
             pd.io.json.json_normalize(self.reactions,
                                       'parameters',
                                       meta='name')
+            .assign(stan_code=lambda df: range(1, len(df) + 1))
             .rename(columns={'name': 'reaction',
                              'label': 'parameter'})
+        )
+
+    def get_metabolites(self):
+        return (
+            pd.DataFrame({'name': self.stoichiometry.columns})
+            .assign(stan_code=lambda df: range(1, len(df) + 1))
         )
             
 

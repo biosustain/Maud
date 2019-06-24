@@ -66,6 +66,9 @@ if __name__ == '__main__':
         'LIKELIHOOD': LIKELIHOOD
     }
 
+    # dump input data
+    jsondump(paths['input_data_file'], input_data)
+
     # compile model if necessary
     model = compile_model(
         paths['stan_model'],
@@ -73,7 +76,6 @@ if __name__ == '__main__':
     )
 
     # run model
-    jsondump(paths['input_data_file'], input_data)
     posterior_samples = sample(
         model,
         chains=N_CHAINS,
