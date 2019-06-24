@@ -3,7 +3,7 @@ import numpy as np
 import os
 import pandas as pd
 from cmdstanpy import compile_model, sample, jsondump
-from python_modules import enzymekat_data
+from python_modules import enzymekat_data, code_generation_commands
 from python_modules.conversion import sem_pct_to_lognormal_sigma
 
 MODEL_NAME = 'toy'
@@ -26,6 +26,10 @@ RELATIVE_PATHS = {
     'output_data': f'../data/model_output{MODEL_NAME}.csv',
     'output_infd': f'../data/infd_{MODEL_NAME}.nc',
 }
+
+
+def match_string_to_file(s: str, path: str):
+    return open(path, 'r').read() == s
 
 if __name__ == '__main__':
     here = os.path.dirname(os.path.abspath(__file__))
@@ -52,7 +56,7 @@ if __name__ == '__main__':
         'is_flux': data.measurements['type'].eq('flux').astype(int).values.tolist(),
         'measurement': data.measurements['value'].values.tolist(),
         'measurement_scale': data.measurements['scale'].values.tolist(),
-        'known_reals': data.known_reals.values.tolist(),
+        'known_reals': data.known_reals.drop('stan_code', axis=1).values.tolist(),
         'prior_location_kinetic': kinetic_parameters['loc'].values.tolist(),
         'prior_scale_kinetic': kinetic_parameters['scale'].values.tolist(),
         'prior_location_thermodynamic': thermodynamic_parameters['loc'].values.tolist(),
@@ -70,10 +74,21 @@ if __name__ == '__main__':
     jsondump(paths['input_data_file'], input_data)
 
     # compile model if necessary
-    model = compile_model(
-        paths['stan_model'],
-        include_paths=[paths['stan_includes']]
-    )
+    stan_code = code_generation_commands.create_stan_model(data)
+    if not match_string_to_file(stan_code, paths['stan_model']):
+        with open(paths['stan_model'], 'w') as f:
+            f.write(stan_code)
+        model = compile_model(
+            paths['stan_model'],
+            include_paths=[paths['stan_includes']],
+            overwrite=True
+        )
+    else:
+        model = compile_model(
+            paths['stan_model'],
+            include_paths=[paths['stan_includes']]
+        )
+        
 
     # run model
     posterior_samples = sample(
