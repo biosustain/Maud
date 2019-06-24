@@ -1,8 +1,43 @@
 functions {
 #include big_k_rate_equations.stan
 #include haldane_relationships.stan
-#include ode_equations_toy.stan
+real [] get_fluxes(real[] metabolites, real[] params, real[] known_reals){
+  real FBA_Keq = get_Keq(params[2], params[5], params[4]);
+  real FBA_Kip = get_Kip_ordered_unibi(FBA_Keq, params[8], params[7], params[3], params[4]);
+  real FBA_Kiq = get_Kiq_ordered_unibi(FBA_Keq, params[5], params[6], params[3], params[4]);
+  real TDH_Keq = get_Keq(params[9], params[5], params[4]);
+  real TPI_Keq = get_Keq(params[13], params[5], params[4]);
+  return {
+    irr_mass_action(metabolites[2], params[1]),
+    ordered_unibi(metabolites[1], metabolites[2], metabolites[3], known_reals[1]*params[3], known_reals[1]*params[4], params[5], params[6], params[7], params[8], FBA_Kip, FBA_Kiq, FBA_Keq),
+    uniuni(metabolites[3], metabolites[4], known_reals[2]*params[10], known_reals[2]*params[11], params[12], TDH_Keq),
+    uniuni(metabolites[2], metabolites[3], known_reals[3]*params[14], known_reals[3]*params[15], params[16], TPI_Keq),
+    irr_mass_action(metabolites[1], params[17]),
+    irr_mass_action(metabolites[1], params[18])
+  };
 }
+real[] get_odes(real[] fluxes){
+  return {
+    1*fluxes[1]-1*fluxes[2],
+    1*fluxes[2]-1*fluxes[4]-1*fluxes[5],
+    1*fluxes[2]-1*fluxes[3]+1*fluxes[4],
+    1*fluxes[3]-1*fluxes[6]
+  };
+}
+real[] steady_state_equation(real t,
+                             real[] metabolites,
+                             real[] params,
+                             real[] known_reals,
+                             int[] known_ints){
+  for (m in 1:size(metabolites)){
+    if (metabolites[m] < 0){
+      reject("Metabolite ", m, " is ", metabolites[m], " but should be greater than zero");
+    }
+  }
+  return get_odes(get_fluxes(metabolites, params, known_reals));
+}
+}
+
 data {
   // dimensions
   int<lower=1> N_metabolite;          // number of ode metabolites
