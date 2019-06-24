@@ -93,14 +93,16 @@ if __name__ == '__main__':
     # run model
     posterior_samples = sample(
         model,
+        data=paths['input_data_file'],
         chains=N_CHAINS,
         cores=4,
-        data_file=paths['input_data_file'],
+        inits=2,
+        save_warmup=True,
+        show_progress=True,
         csv_output_file=paths['output_data'],
-        refresh=REFRESH,
-        post_warmup_draws_per_chain=N_SAMPLES,
-        warmup_draws_per_chain=N_WARMUP,
-        nuts_max_depth=15
+        sampling_iters=N_SAMPLES,
+        warmup_iters=N_WARMUP,
+        max_treedepth=15
     )
 
     # put model output in Arviz format and save
