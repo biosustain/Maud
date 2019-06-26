@@ -2,17 +2,17 @@ import arviz
 import numpy as np
 import os
 import pandas as pd
-from cmdstanpy import compile_model, sample, jsondump
+from cmdstanpy import compile_model, sample, jsondump, summary
 from python_modules import enzymekat_data, code_generation_commands
 from python_modules.conversion import sem_pct_to_lognormal_sigma
 
 MODEL_NAME = 'toy'
 REL_TOL = 1e-13
-ABS_TOL = 1e-9
+ABS_TOL = 1e-12
 MAX_STEPS = int(1e9)
 LIKELIHOOD = 0
-N_SAMPLES = 300
-N_WARMUP = 300
+N_SAMPLES = 10
+N_WARMUP = 10
 N_CHAINS = 4
 N_CORES = 4
 REFRESH = 10
@@ -23,13 +23,16 @@ RELATIVE_PATHS = {
     'stan_includes': 'stan_code',
     'stan_model': f'stan_code/inference_model_{MODEL_NAME}.stan',
     'input_data_file': f'../data/stan_records/input_data_{MODEL_NAME}.json',
-    'output_data': f'../data/model_output{MODEL_NAME}.csv',
+    'output_data': f'../data/model_output_{MODEL_NAME}.csv',
     'output_infd': f'../data/infd_{MODEL_NAME}.nc',
 }
 
 
 def match_string_to_file(s: str, path: str):
-    return open(path, 'r').read() == s
+    if os.path.exists(path):
+        return open(path, 'r').read() == s
+    else:
+        return False
 
 if __name__ == '__main__':
     here = os.path.dirname(os.path.abspath(__file__))
@@ -37,30 +40,31 @@ if __name__ == '__main__':
 
     # define input data
     data = enzymekat_data.from_toml(paths['data'])
-    metabolite_names = list(data.stoichiometry.columns)
-    reaction_names = list(data.stoichiometry.index)
-    kinetic_parameters = data.parameters.query("type == 'kinetic'")
-    thermodynamic_parameters = data.parameters.query("type == 'thermodynamic'")
-    initial_concentration = data.measurements.query("type == 'metabolite'").groupby('metabolite_code')['value'].mean()
+    metabolite_names = data.stoichiometry.columns
+    reaction_names = data.stoichiometry.index
+    initial_concentration = pd.Series({m: 1 for m in metabolite_names})
     input_data = {
         'N_metabolite': len(metabolite_names),
-        'N_kinetic_parameter': len(kinetic_parameters),
-        'N_thermodynamic_parameter': len(thermodynamic_parameters),
+        'N_kinetic_parameter': len(data.kinetic_parameters),
+        'N_thermodynamic_parameter': len(data.thermodynamic_parameters),
         'N_reaction': len(reaction_names),
         'N_known_real': len(data.known_reals),
         'N_experiment': len(data.experiments),
-        'N_measurement': len(data.measurements),
-        'metabolite_ix': data.measurements['metabolite_code'].values.tolist(),
-        'reaction_ix': data.measurements['reaction_code'].values.tolist(),
-        'experiment_ix': data.measurements['experiment_code'].values.tolist(),
-        'is_flux': data.measurements['type'].eq('flux').astype(int).values.tolist(),
-        'measurement': data.measurements['value'].values.tolist(),
-        'measurement_scale': data.measurements['scale'].values.tolist(),
+        'N_measurement_conc': len(data.concentration_measurements),
+        'N_measurement_flux': len(data.flux_measurements),
+        'metabolite_ix': data.concentration_measurements['metabolite_code'].values.tolist(),
+        'experiment_ix_conc': data.concentration_measurements['experiment_code'].values.tolist(),
+        'measurement_conc': data.concentration_measurements['value'].values.tolist(),
+        'measurement_scale_conc': data.concentration_measurements['scale'].values.tolist(),
+        'reaction_ix': data.flux_measurements['reaction_code'].values.tolist(),
+        'experiment_ix_flux': data.flux_measurements['experiment_code'].values.tolist(),
+        'measurement_flux': data.flux_measurements['value'].values.tolist(),
+        'measurement_scale_flux': data.flux_measurements['scale'].values.tolist(),
         'known_reals': data.known_reals.drop('stan_code', axis=1).values.tolist(),
-        'prior_location_kinetic': kinetic_parameters['loc'].values.tolist(),
-        'prior_scale_kinetic': kinetic_parameters['scale'].values.tolist(),
-        'prior_location_thermodynamic': thermodynamic_parameters['loc'].values.tolist(),
-        'prior_scale_thermodynamic': thermodynamic_parameters['scale'].values.tolist(),
+        'prior_location_kinetic': data.kinetic_parameters['loc'].values.tolist(),
+        'prior_scale_kinetic': data.kinetic_parameters['scale'].values.tolist(),
+        'prior_location_thermodynamic': data.thermodynamic_parameters['loc'].values.tolist(),
+        'prior_scale_thermodynamic': data.thermodynamic_parameters['scale'].values.tolist(),
         'initial_concentration': initial_concentration.values.tolist(),
         'initial_time': 0,
         'steady_time': STEADY_STATE_TIME,
@@ -91,12 +95,16 @@ if __name__ == '__main__':
         
 
     # run model
+    inits = {
+        'kinetic_parameters': np.exp(data.kinetic_parameters['loc']).tolist(),
+        'thermodynamic_parameters': data.thermodynamic_parameters['loc'].tolist()
+    }
     posterior_samples = sample(
         model,
         data=paths['input_data_file'],
         chains=N_CHAINS,
         cores=4,
-        inits=2,
+        # inits=inits,
         save_warmup=True,
         show_progress=True,
         csv_output_file=paths['output_data'],
@@ -104,17 +112,4 @@ if __name__ == '__main__':
         warmup_iters=N_WARMUP,
         max_treedepth=15
     )
-
-    # put model output in Arviz format and save
-    infd = arviz.from_cmdstanpy(
-        posterior_samples,
-        coords={
-            'kinetic_parameter_names': list(kinetic_parameters['name']),
-            'metabolite_names': metabolite_names
-        },
-        dims={
-            'kinetic_parameters': ['kinetic_parameter_names'],
-            'measurement_hat': ['metabolite_names']
-        })
-    infd.to_netcdf(paths['output_infd'])
-    print(arviz.summary(infd))
+    print(summary(posterior_samples))
