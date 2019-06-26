@@ -20,7 +20,8 @@ MECHANISM_TO_HALDANE_FUNCTIONS = {
 MECHANISM_TO_FLUX_FUNCTION = {
     'uniuni': lib.create_uniuni_call,
     'ordered_unibi': lib.create_ordered_unibi_call,
-    'irr_mass_action': lib.create_irr_mass_action_call
+    'irr_mass_action': lib.create_irr_mass_action_call,
+    'fixed_flux': lib.create_fixed_flux_call
 }
 
 
