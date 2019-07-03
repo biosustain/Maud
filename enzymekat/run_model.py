@@ -21,9 +21,9 @@ STEADY_STATE_TIME = 100
 RELATIVE_PATHS = {
     'data': f'../data/in/{MODEL_NAME}_data.toml',
     'stan_includes': 'stan_code',
-    'stan_model': f'stan_code/inference_model_{MODEL_NAME}.stan',
+    'stan_model': f'stan_code/autogen/inference_model_{MODEL_NAME}.stan',
     'input_data_file': f'../data/stan_records/input_data_{MODEL_NAME}.json',
-    'output_data': f'../data/model_output_{MODEL_NAME}.csv',
+    'output_data': f'../data/out/model_output_{MODEL_NAME}.csv',
     'output_infd': f'../data/infd_{MODEL_NAME}.nc',
 }
 
