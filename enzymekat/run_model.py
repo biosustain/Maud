@@ -3,16 +3,16 @@ import numpy as np
 import os
 import pandas as pd
 from cmdstanpy import compile_model, sample, jsondump, summary
-from python_modules import enzymekat_data, code_generation_commands
+from python_modules import enzymekat_data, code_generation_commands, utils
 from python_modules.conversion import sem_pct_to_lognormal_sigma
 
-MODEL_NAME = 'toy'
+MODEL_NAME = 'linear'
 REL_TOL = 1e-13
 ABS_TOL = 1e-12
 MAX_STEPS = int(1e9)
-LIKELIHOOD = 0
-N_SAMPLES = 10
-N_WARMUP = 10
+LIKELIHOOD = 1
+N_SAMPLES = 40
+N_WARMUP = 40
 N_CHAINS = 4
 N_CORES = 4
 REFRESH = 10
