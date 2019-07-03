@@ -1,7 +1,6 @@
 import pandas as pd
 import toml
 from typing import Dict, List
-from python_modules.stan_utils import one_index_factorize
 
 
 def expand_series_of_dicts(s):
