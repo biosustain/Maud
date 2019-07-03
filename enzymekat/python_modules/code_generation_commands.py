@@ -40,7 +40,7 @@ def create_functions_block(ed: EnzymeKatData) -> str:
         + "\n"
         + create_odes_function(ed)
         + "\n"
-        + read_stan_code_from_path(PATHS['steady_state_equation'])
+        + create_steady_state_function()
         + "}\n"
     )
 
@@ -93,6 +93,24 @@ def create_odes_function(ed: EnzymeKatData) -> str:
         + "}"
     )
         
+
+def create_steady_state_function():
+    return """real[] steady_state_equation(
+      real t,
+      real[] metabolites,
+      real[] params,
+      real[] known_reals,
+      int[] known_ints
+    ){
+    for (m in 1:size(metabolites)){
+      if (metabolites[m] < 0){
+        reject("Metabolite ", m, " is ", metabolites[m], " but should be greater than zero.");
+      }
+    }
+    return get_odes(get_fluxes(metabolites, params, known_reals));
+    }
+    """
+    
 
 def read_stan_code_from_path(path) -> str:
     with open(path, 'r') as f:
