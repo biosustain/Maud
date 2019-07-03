@@ -16,7 +16,7 @@ N_WARMUP = 40
 N_CHAINS = 4
 N_CORES = 4
 REFRESH = 10
-STEADY_STATE_TIME = 100
+STEADY_STATE_TIME = 200
 
 RELATIVE_PATHS = {
     'data': f'../data/in/{MODEL_NAME}_data.toml',
