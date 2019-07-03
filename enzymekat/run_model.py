@@ -28,12 +28,6 @@ RELATIVE_PATHS = {
 }
 
 
-def match_string_to_file(s: str, path: str):
-    if os.path.exists(path):
-        return open(path, 'r').read() == s
-    else:
-        return False
-
 if __name__ == '__main__':
     here = os.path.dirname(os.path.abspath(__file__))
     paths = {k: os.path.join(here, v) for k, v in RELATIVE_PATHS.items()}
@@ -79,7 +73,7 @@ if __name__ == '__main__':
 
     # compile model if necessary
     stan_code = code_generation_commands.create_stan_model(data)
-    if not match_string_to_file(stan_code, paths['stan_model']):
+    if not utils.match_string_to_file(stan_code, paths['stan_model']):
         with open(paths['stan_model'], 'w') as f:
             f.write(stan_code)
         model = compile_model(
