@@ -2,6 +2,7 @@
 data/cached_stan_models/*.pkl
 */.ipynb_checkpoints/*
 
+data/stan_records/*
 data/in/*
 !data/in/readme.md
 !data/in/yeast.xml
@@ -10,15 +11,12 @@ data/in/*
 !data/in/yeast_measurements.csv
 !data/in/inits_yeast.Rdump
 !data/in/model_input_yeast.Rdump
-!data/stan_records/*
 
 data/out/*
 !data/out/readme.md
 
-enzymekat/stan_code/cached_stan_models/*
+enzymekat/stan_code/autogen/*
+!enzymekat/stan_code/autogen/readme.md
 
 *.DS_Store
 *#
-stan/autogen/*
-!stan/autogen/readme.md
-stan/model_*

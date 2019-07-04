@@ -1,538 +1,163 @@
-[experiment_info]
-FLUX_MEASUREMENT_SCALE = 0.1 # flux measurment accuracy
-STEADY_STATE_TIME = 300  # when is it safe to assume steady state?
-
-[known_reals]
-ENO1 = 0.686371954155832
-ENO2 = 1.97444629317817
-FBA1 = 1.33839465704882
-GPM1 = 0.73000029889707
-PGK1 = 0.257656912658955
-TDH1 = 0.350864642801396
-TDH2 = 0.0
-TDH3 = 4.20440474648547
-TPI1 = 0.294357819645508
-influx_fbp = 0.5  # Arbitrary value, Smallbone says 1.88
+[constants]
+gas_constant = 8.314e-3 # units kJ/mol.K
+concentration_ENO1 = 0.686371954155832
+concentration_ENO2 = 1.97444629317817
+concentration_FBA1 = 1.33839465704882
+concentration_GPM1 = 0.73000029889707
+concentration_PGK1 = 0.257656912658955
+concentration_TDH1 = 0.350864642801396
+concentration_TDH2 = 0.0
+concentration_TDH3 = 4.20440474648547
+concentration_TPI1 = 0.294357819645508
 NAD = 1.41142  # From Smallbone
 NADH = 0.1785794942  # From Smallbone
 ATP = 3.95146  # From Smallbone
 ADP = 1.72835  # From Smallbone
-temperature = 298.15
-gas_constant = 8.314e-3 # units kJ/mol.K
 
-[[ode_metabolites]]
-'name' = 'BPG'
-'initial_value' = 0.000736873499865602
-
-[[ode_metabolites]]
-'name' = 'DHAP'
-'initial_value' = 1.1613768527467
-'measured_value' = 1.162
-'sem_pct' = 18.9
-
-[[ode_metabolites]]
-'name' = 'F16bP'
-'initial_value' = 4.58321859006931
-'measured_value' = 4.583
-'sem_pct' = 20.2
-
-[[ode_metabolites]]
-'name' = 'GAP'
-'initial_value' = 0.315891028770503
-
-[[ode_metabolites]]
-'name' = 'P2G'
-'initial_value' = 0.0677379081099344
-'measured_value' = 0.538
-'sem_pct' = 17.7
-
-[[ode_metabolites]]
-'name' = 'P3G'
-'initial_value' = 0.469825011134444
-
-[[ode_metabolites]]
-'name' = 'PEP'
-'initial_value' = 0.610005413358042
-'measured_value' = 0.611
-'sem_pct' = 23.5
+[[experiments]]
+label = 'Smallbone'
+conditions = {temperature = 298.15}
+measurements = [
+  { label = 'DHAP', value = 1.162, scale = 0.319, type = 'metabolite' },
+  { label = 'F16bP', value = 4.583, scale = 0.3398233969646372, type = 'metabolite' },
+  { label = 'P2G', value = 0.538, scale = 0.29971456576385186, type = 'metabolite' },
+  { label = 'PEP', value = 0.611, scale = 0.3915358455779233, type = 'metabolite' }
+]
 
 [[reactions]]
-'name' = 'Influx'
-'mechanism' = 'Fixed_Exchange'
+label = 'influx_fbp'
+mechanism = 'fixed_flux'
+stoichiometry = { 'F16bP' = 1 }
+parameters = [
+  {label = 'v', loc = 0.5, scale = 0.01, type = 'kinetic' }
+]
 
 [[reactions]]
-'name' = 'ENO1'
-'mechanism' = 'uniuni'
+label = 'ENO1'
+mechanism = 'uniuni'
+stoichiometry = { 'P2G' = -1, 'PEP' = 1 }
+parameters = [
+  {label = 'delta_g', loc = -4.1, scale = 0.6, type = 'thermodynamic' },
+  {label = 'Kcat1', loc = 7.1085, scale = 1.8701, type = 'kinetic' },
+  {label = 'Kcat2', loc = 7.1085, scale = 1.8701, type = 'kinetic' },
+  {label = 'Ka', loc = -3.119589, scale = 0.23933, type = 'kinetic' }
+]
 
 [[reactions]]
-'name' = 'ENO2'
-'mechanism' = 'uniuni'
+label = 'ENO2'
+mechanism = 'uniuni'
+stoichiometry = { 'P2G' = -1, 'PEP' = 1 }
+parameters = [
+  {label = 'delta_g', loc = -4.1, scale = 0.6, type = 'thermodynamic' },
+  {label = 'Kcat1', loc = 7.1085, scale = 1.8701, type = 'kinetic' },
+  {label = 'Kcat2', loc = 7.1085, scale = 1.8701, type = 'kinetic' },
+  {label = 'Ka', loc = -2.23639, scale = 0.23933, type = 'kinetic' }
+]
 
 [[reactions]]
-'name' = 'FBA'
-'mechanism' = 'ordered_unibi'
+label = 'FBA'
+mechanism = 'ordered_unibi'
+stoichiometry = { 'F16bP' = -1, 'DHAP' = 1, 'GAP' = 1 }
+parameters = [
+  {label = 'delta_g', loc = 17.9, scale = 4.4, type = 'thermodynamic' },
+  {label = 'Kcat1', loc = 2.4862, scale = 1.3904, type = 'kinetic' },
+  {label = 'Kcat2', loc = 2.4862, scale = 1.3904, type = 'kinetic' },
+  {label = 'Ka', loc = -0.76998, scale = 0.239329, type = 'kinetic' },
+  {label = 'Kp', loc = 0.90243, scale = 0.239329, type = 'kinetic' },
+  {label = 'Kq', loc = 0.72011, scale = 0.239329, type = 'kinetic' },
+  {label = 'Kia', loc = 0.9071, scale = 1.7371, type = 'kinetic' }
+]
 
 [[reactions]]
-'name' = 'GPM'
-'mechanism' = 'uniuni'
+label = 'GPM'
+mechanism = 'uniuni'
+stoichiometry = { 'P2G' = -1, 'PEP' = 1 }
+parameters = [
+  {label = 'delta_g', loc = 4.2, scale = 0.7, type = 'thermodynamic' },
+  {label = 'Kcat1', loc = 5.3921, scale = 0.8777, type = 'kinetic' },
+  {label = 'Kcat2', loc = 5.3921, scale = 0.8777, type = 'kinetic' },
+  {label = 'Ka', loc = 0.209287, scale = 0.23933, type = 'kinetic' }
+]
 
 [[reactions]]
-'name' = 'PGK'
-'mechanism' = 'ordered_bibi'
+label = 'PGK'
+mechanism = 'ordered_bibi'
+stoichiometry = { 'BPG' = -1, 'ADP' = -1, 'P3G' = 1, 'ATP' = 1}
+parameters = [
+  {label = 'delta_g', loc = -18.6, scale = 0.8, type = 'thermodynamic'},
+  {label = 'Kcat1', loc = 6.001, scale = 0.6735, type = 'kinetic'},
+  {label = 'Kcat2', loc = 6.001, scale = 0.6735, type = 'kinetic'},
+  {label = 'Kib', loc = -0.9887, scale = 1.7034, type = 'kinetic'},
+  {label = 'Kiq', loc = -0.9887, scale = 1.7034, type = 'kinetic'}
+  {label = 'Ka', loc = -5.78217, scale = 0.23933, type = 'kinetic'}
+  {label = 'Kb', loc = -1.58247, scale = 0.23933, type = 'kinetic'}
+  {label = 'Kp', loc = 1.54866, scale = 0.23933, type = 'kinetic'}
+  {label = 'Kq', loc = 0.71510, scale = 0.23933, type = 'kinetic'}
+]
 
 [[reactions]]
-'name' = 'TDH1'
-'mechanism' = 'ordered_bibi'
+label = 'TDH1'
+mechanism = 'ordered_bibi'
+stoichiometry = { 'GAP' = -1, 'NAD' = -1 'BPG' = 1, 'NADH' = 1 }
+parameters = [
+  {label = 'delta_g', loc = 6.4, scale = 0.8, type = 'thermodynamic'},
+  {label = 'Kcat1', loc = 3.3178, scale = 1.4091, type = 'kinetic'},
+  {label = 'Kcat2', loc = 3.3178, scale = 1.4091, type = 'kinetic'},
+  {label = 'Kib', loc = -0.5195, scale = 1.5278, type = 'kinetic'},
+  {label = 'Kiq', loc = -0.5195, scale = 1.5278, type = 'kinetic'}
+  {label = 'Ka', loc = -0.67623, scale = 0.23933, type = 'kinetic'}
+  {label = 'Kb', loc = -2.38097, scale = 0.23933, type = 'kinetic'}
+  {label = 'Kp', loc = -4.59841, scale = 0.23933, type = 'kinetic'}
+  {label = 'Kq', loc = -2.78644, scale = 0.23933, type = 'kinetic'}
+]
 
 [[reactions]]
-'name' = 'TDH2'
-'mechanism' = 'ordered_bibi'
+label = 'TDH2'
+mechanism = 'ordered_bibi'
+stoichiometry = { 'GAP' = -1, 'NAD' = -1 'BPG' = 1, 'NADH' = 1 }
+parameters = [
+  {label = 'delta_g', loc = 6.4, scale = 0.8, type = 'thermodynamic'},
+  {label = 'Kcat1', loc = 0, scale = 1, type = 'kinetic'},
+  {label = 'Kcat2', loc = 0, scale = 1, type = 'kinetic'},
+  {label = 'Kib', loc = -0.5195, scale = 1.5278, type = 'kinetic'},
+  {label = 'Kiq', loc = -0.5195, scale = 1.5278, type = 'kinetic'}
+  {label = 'Ka', loc = -0.23439, scale = 0.23933, type = 'kinetic'}
+  {label = 'Kb', loc = -2.38097, scale = 0.23933, type = 'kinetic'}
+  {label = 'Kp', loc = -4.59841, scale = 0.23933, type = 'kinetic'}
+  {label = 'Kq', loc = -2.78644, scale = 0.23933, type = 'kinetic'}
+]
 
 [[reactions]]
-'name' = 'TDH3'
-'mechanism' = 'ordered_bibi'
+label = 'TDH3'
+mechanism = 'ordered_bibi'
+stoichiometry = { 'GAP' = -1, 'NAD' = -1 'BPG' = 1, 'NADH' = 1 }
+parameters = [
+  {label = 'delta_g', loc = 6.4, scale = 0.8, type = 'thermodynamic'},
+  {label = 'Kcat1', loc = 2.5925, scale = 1.42047, type = 'kinetic'},
+  {label = 'Kcat2', loc = 2.5925, scale = 1.42047, type = 'kinetic'},
+  {label = 'Kib', loc = -0.5195, scale = 1.5278, type = 'kinetic'},
+  {label = 'Kiq', loc = -0.5195, scale = 1.5278, type = 'kinetic'}
+  {label = 'Ka', loc = -0.83341, scale = 0.23933, type = 'kinetic'}
+  {label = 'Kb', loc = -2.38097, scale = 0.23933, type = 'kinetic'}
+  {label = 'Kp', loc = -0.06844, scale = 0.23933, type = 'kinetic'}
+  {label = 'Kq', loc = -2.78644, scale = 0.23933, type = 'kinetic'}
+]
 
 [[reactions]]
-'name' = 'TPI'
-'mechanism' = 'uniuni'
+label = 'TPI'
+mechanism = 'uniuni'
+stoichiometry = { 'DHAP' = -1, 'GAP' = 1 }
+parameters = [
+  {label = 'delta_g', loc = 5.5, scale = 1.1, type = 'thermodynamic' },
+  {label = 'Kcat1', loc = 8.8231, scale = 0.9772, type = 'kinetic' },
+  {label = 'Kcat2', loc = 8.8231, scale = 0.9772, type = 'kinetic' },
+  {label = 'Ka', loc = 1.89166, scale = 0.23933, type = 'kinetic' }
+]
 
 [[reactions]]
-'name' = 'PEP_outflux'
-'mechanism' = 'irr_mass_action'
-'measured_value' = 1
-
-[[thermodynamic_parameters]]
-'name' = 'delta_g'
-'reaction' = 'ENO'
-'prior_location' = -4.1
-'prior_scale' = 0.6
-
-[[thermodynamic_parameters]]
-'name' = 'delta_g'
-'reaction' = 'FBA'
-'prior_location' = 17.9
-'prior_scale' = 4.4
-
-[[thermodynamic_parameters]]
-'name' = 'delta_g'
-'reaction' = 'GPM'
-'prior_location' = 4.2
-'prior_scale' = 0.7
-
-[[thermodynamic_parameters]]
-'name' = 'delta_g'
-'reaction' = 'PGK'
-'prior_location' = -18.6
-'prior_scale' = 0.9
-
-[[thermodynamic_parameters]]
-'name' = 'delta_g'
-'reaction' = 'TDH'
-'prior_location' = 6.4
-'prior_scale' = 0.8
-
-[[thermodynamic_parameters]]
-'name' = 'delta_g'
-'reaction' = 'TPI'
-'prior_location' = 5.5
-'prior_scale' = 1.1
-'notes' = 'in the direction of forming Glyceraldehyde 3-Phosphate'
-
-[[kinetic_parameters]]
-'name' = 'Kcat1'
-'reaction' = 'ENO1'
-'prior_location' = 7.1085
-'prior_scale' = 1.8701
-
-[[kinetic_parameters]]
-'name' = 'Kcat2'
-'reaction' = 'ENO1'
-'prior_location' = 7.1085
-'prior_scale' = 1.8701
-
-[[kinetic_parameters]]
-'name' = 'Ka'
-'reaction' = 'ENO1'
-'metabolite' = 'P2G'
-'prior_location' = -3.11958908
-'prior_scale' = 0.23933
-'note' = 'Smallbone'
-
-[[kinetic_parameters]]
-'name' = 'Kcat1'
-'reaction' = 'ENO2'
-'prior_location' = 7.1085
-'prior_scale' = 1.8701
-
-[[kinetic_parameters]]
-'name' = 'Kcat2'
-'reaction' = 'ENO2'
-'prior_location' = 7.1085
-'prior_scale' = 1.8701
-
-[[kinetic_parameters]]
-'name' = 'Ka'
-'reaction' = 'ENO2'
-'metabolite' = 'P2G'
-'prior_location' = -2.236398396
-'prior_scale' = 0.23933
-'note' = 'Smallbone'
-
-[[kinetic_parameters]]
-'name' = 'Kcat1'
-'reaction' = 'FBA'
-'prior_location' = 2.4862
-'prior_scale' = 1.3904
-
-[[kinetic_parameters]]
-'name' = 'Kcat2'
-'reaction' = 'FBA'
-'prior_location' = 2.4862
-'prior_scale' = 1.3904
-
-[[kinetic_parameters]]
-'name' = 'Kia'
-'reaction' = 'FBA'
-'metabolite' = 'f16bp'
-'prior_location' = 0.9071
-'prior_scale' = 1.7371
-
-# [[kinetic_parameters]]
-# 'name' = 'Kiq'
-# 'reaction' = 'FBA'
-# 'metabolite' = 'DHAP'
-# 'prior_location' = 0.9071
-# 'prior_scale' = 1.7371
-
-[[kinetic_parameters]]
-'name' = 'Ka'
-'reaction' = 'FBA'
-'metabolite' = 'f16bp'
-'prior_location' = -0.769987266
-'prior_scale' = 0.239329051
-'note' = 'Smallbone'
-
-[[kinetic_parameters]]
-'name' = 'Kp'
-'reaction' = 'FBA'
-'metabolite' = 'GAP'
-'prior_location' = 0.902434821
-'prior_scale' = 0.239329051
-'note' = 'Smallbone'
-
-[[kinetic_parameters]]
-'name' = 'Kq'
-'reaction' = 'FBA'
-'metabolite' = 'DHAP'
-'prior_location' = 0.720113264
-'prior_scale' = 0.239329051
-'note' = 'Smallbone'
-
-[[kinetic_parameters]]
-'name' = 'Kcat1'
-'reaction' = 'GPM'
-'prior_location' = 5.3921
-'prior_scale' = 0.8777
-
-[[kinetic_parameters]]
-'name' = 'Kcat2'
-'reaction' = 'GPM'
-'prior_location' = 5.3921
-'prior_scale' = 0.8777
-
-[[kinetic_parameters]]
-'name' = 'Ka'
-'reaction' = 'GPM'
-'metabolite' = 'P3G'
-'prior_location' = 0.20928764
-'prior_scale' = 0.239329051
-'note' = 'Smallbone'
-
-[[kinetic_parameters]]
-'name' = 'Kcat1'
-'reaction' = 'PGK'
-'prior_location' = 6.001
-'prior_scale' = 0.6735
-
-[[kinetic_parameters]]
-'name' = 'Kcat2'
-'reaction' = 'PGK'
-'prior_location' = 6.001
-'prior_scale' = 0.6735
-
-[[kinetic_parameters]]
-'name' = 'Kia'
-'reaction' = 'PGK'
-'metabolite' = 'BPG'
-'prior_location' = -0.9887
-'prior_scale' = 1.7034
-
-[[kinetic_parameters]]
-'name' = 'Kib'
-'reaction' = 'PGK'
-'metabolite' = 'ADP'
-'prior_location' = -0.9887
-'prior_scale' = 1.7034
-
-[[kinetic_parameters]]
-'name' = 'Kiq'
-'reaction' = 'PGK'
-'metabolite' = 'ATP'
-'prior_location' = -0.9887
-'prior_scale' = 1.7034
-
-[[kinetic_parameters]]
-'name' = 'Ka'
-'reaction' = 'PGK'
-'metabolite' = 'BPG'
-'prior_location' = -5.782176907
-'prior_scale' = 0.239329051
-'note' = 'Smallbone'
-
-[[kinetic_parameters]]
-'name' = 'Kb'
-'reaction' = 'PGK'
-'metabolite' = 'ADP'
-'prior_location' = -1.582471829
-'prior_scale' = 0.239329051
-'note' = 'Smallbone'
-
-[[kinetic_parameters]]
-'name' = 'Kp'
-'reaction' = 'PGK'
-'metabolite' = 'P3G'
-'prior_location' = 1.548665082
-'prior_scale' = 0.239329051
-'note' = 'Smallbone'
-
-[[kinetic_parameters]]
-'name' = 'Kq'
-'reaction' = 'PGK'
-'metabolite' = 'ATP'
-'prior_location' = 0.715100722
-'prior_scale' = 0.239329051
-'note' = 'Smallbone'
-
-[[kinetic_parameters]]
-'name' = 'Kcat1'
-'reaction' = 'TDH1'
-'prior_location' = 3.3178
-'prior_scale' = 1.4091
-
-[[kinetic_parameters]]
-'name' = 'Kcat2'
-'reaction' = 'TDH1'
-'prior_location' = 3.3178
-'prior_scale' = 1.4091
-
-# [[kinetic_parameters]]
-# 'name' = 'Kia'
-# 'reaction' = 'TDH1'
-# 'metabolite' = 'GAP'
-# 'prior_location' = -0.5195
-# 'prior_scale' = 1.5278
-
-[[kinetic_parameters]]
-'name' = 'Kib'
-'reaction' = 'TDH1'
-'metabolite' = 'NAD'
-'prior_location' = -0.5195
-'prior_scale' = 1.5278
-
-[[kinetic_parameters]]
-'name' = 'Kiq'
-'reaction' = 'TDH1'
-'metabolite' = 'NADH'
-'prior_location' = -0.5195
-'prior_scale' = 1.5278
-
-[[kinetic_parameters]]
-'name' = 'Ka'
-'reaction' = 'TDH1'
-'metabolite' = 'GAP'
-'prior_location' = -0.676231433
-'prior_scale' = 0.239329051
-'note' = 'Smallbone'
-
-[[kinetic_parameters]]
-'name' = 'Kb'
-'reaction' = 'TDH1'
-'metabolite' = 'NAD'
-'prior_location' = -2.380979525
-'prior_scale' = 0.239329051
-'note' = 'Smallbone'
-
-[[kinetic_parameters]]
-'name' = 'Kp'
-'reaction' = 'TDH1'
-'metabolite' = 'BPG'
-'prior_location' = -4.59840681
-'prior_scale' = 0.239329051
-'note' = 'Smallbone'
-
-[[kinetic_parameters]]
-'name' = 'Kq'
-'reaction' = 'TDH1'
-'metabolite' = 'NADH'
-'prior_location' = -2.786444633
-'prior_scale' = 0.239329051
-'note' = 'Smallbone'
-
-[[kinetic_parameters]]
-'name' = 'Kcat1'
-'reaction' = 'TDH2'
-'prior_location' = 0
-'prior_scale' = 1
-'note' = 'Unknown'
-
-[[kinetic_parameters]]
-'name' = 'Kcat2'
-'reaction' = 'TDH2'
-'prior_location' = 0
-'prior_scale' = 1
-'note' = 'Unknown'
-
-[[kinetic_parameters]]
-'name' = 'Kib'
-'reaction' = 'TDH2'
-'metabolite' = 'NAD'
-'prior_location' = -0.5195
-'prior_scale' = 1.5278
-
-[[kinetic_parameters]]
-'name' = 'Kiq'
-'reaction' = 'TDH2'
-'metabolite' = 'NADH'
-'prior_location' = -0.5195
-'prior_scale' = 1.5278
-
-# [[kinetic_parameters]]
-# 'name' = 'Kia'
-# 'reaction' = 'TDH2'
-# 'metabolite' = 'GAP'
-# 'prior_location' = -0.5195
-# 'prior_scale' = 1.5278
-
-[[kinetic_parameters]]
-'name' = 'Ka'
-'reaction' = 'TDH2'
-'metabolite' = 'GAP'
-'prior_location' = -0.234398681
-'prior_scale' = 0.239329051
-'note' = 'Smallbone'
-
-[[kinetic_parameters]]
-'name' = 'Kb'
-'reaction' = 'TDH2'
-'metabolite' = 'NAD'
-'prior_location' = -2.380979525
-'prior_scale' = 0.239329051
-'note' = 'Smallbone'
-
-[[kinetic_parameters]]
-'name' = 'Kp'
-'reaction' = 'TDH2'
-'metabolite' = 'BPG'
-'prior_location' = -4.59840681
-'prior_scale' = 0.239329051
-'note' = 'Smallbone'
-
-[[kinetic_parameters]]
-'name' = 'Kq'
-'reaction' = 'TDH2'
-'metabolite' = 'NADH'
-'prior_location' = -2.786444633
-'prior_scale' = 0.239329051
-'note' = 'Smallbone'
-
-[[kinetic_parameters]]
-'name' = 'Kcat1'
-'reaction' = 'TDH3'
-'prior_location' = 2.5925
-'prior_scale' = 1.42047
-
-[[kinetic_parameters]]
-'name' = 'Kcat2'
-'reaction' = 'TDH3'
-'prior_location' = 2.5925
-'prior_scale' = 1.42047
-
-# [[kinetic_parameters]]
-# 'name' = 'Kia'
-# 'reaction' = 'TDH3'
-# 'metabolite' = 'GAP'
-# 'prior_location' = -0.5195
-# 'prior_scale' = 1.5278
-
-[[kinetic_parameters]]
-'name' = 'Kib'
-'reaction' = 'TDH3'
-'metabolite' = 'NAD'
-'prior_location' = -0.5195
-'prior_scale' = 1.5278
-
-[[kinetic_parameters]]
-'name' = 'Kiq'
-'reaction' = 'TDH3'
-'metabolite' = 'NADH'
-'prior_location' = -0.5195
-'prior_scale' = 1.5278
-
-[[kinetic_parameters]]
-'name' = 'Ka'
-'reaction' = 'TDH3'
-'metabolite' = 'GAP'
-'prior_location' = -0.833417016
-'prior_scale' = 0.239329051
-'note' = 'Smallbone'
-
-[[kinetic_parameters]]
-'name' = 'Kb'
-'reaction' = 'TDH3'
-'metabolite' = 'NAD'
-'prior_location' = -2.380979525
-'prior_scale' = 0.239329051
-'note' = 'Smallbone'
-
-[[kinetic_parameters]]
-'name' = 'Kp'
-'reaction' = 'TDH3'
-'metabolite' = 'BPG'
-'prior_location' = -0.068444101
-'prior_scale' = 0.239329051
-'note' = 'Smallbone'
-
-[[kinetic_parameters]]
-'name' = 'Kq'
-'reaction' = 'TDH3'
-'metabolite' = 'NADH'
-'prior_location' = -2.786444633
-'prior_scale' = 0.239329051
-'note' = 'Smallbone'
-
-[[kinetic_parameters]]
-'name' = 'Kcat1'
-'reaction' = 'TPI'
-'prior_location' = 8.8231
-'prior_scale' = 0.9772
-
-[[kinetic_parameters]]
-'name' = 'Kcat2'
-'reaction' = 'TPI'
-'prior_location' = 8.8231
-'prior_scale' = 0.9772
-
-[[kinetic_parameters]]
-'name' = 'Ka'
-'reaction' = 'TPI'
-'metabolite' = 'DHAP'
-'prior_location' = 1.891666177
-'prior_scale' = 0.239329051
-'note' = 'Smallbone'
-
-[[kinetic_parameters]]
-'name' = 'V_out'
-'reaction' = 'outflux_pep'
-'prior_location' = 0.49  # try setting to ~10
-'prior_scale' = 0.5
-'note' = 'set to a value such that exp(V_out) * [PEP_final] = 1'
+label = 'outflux_PEP'
+mechanism = 'irr_mass_action'
+stoichiometry = { 'PEP' = -1 }
+parameters = [
+ {label = 'alpha', loc = 0.49, scale = 0.5, type = 'kinetic'}
+]

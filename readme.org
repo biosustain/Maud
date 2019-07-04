@@ -5,18 +5,15 @@ literature.
 
 * Python dependencies
 - pandas
-- pystan
 - numpy
 - matplotlib
 - arviz
 - toml
-- python-libsbml
+- [[https://github.com/stan-dev/cmdstanpy][cmdstanpy]]
 
 * 'Installation'
-This repository contains cmdstan as a submodule, so to fully clone it you will need to use the ~recursive~ option:
-
 #+begin_src bash
-git clone --recursive git@github.com:biosustain/enzymeKAT.git
+git clone git@github.com:biosustain/enzymeKAT.git
 #+end_src
 
 * Model
@@ -36,9 +33,6 @@ observed measurements treated as randomly distributed from true values of the
 measured quantities with known error scale. Parameter configurations are mapped
 to true quantity values by solving a system of ordinary differential equations.
 
-Allosteric effects are taken into account through the equations that represent
-the reactions in the system. 
-
 Thermodynamic consistency will be (this is not the case at present) ensured by
 relating kinetic parameters to thermodynamic quantities through [[http://what-when-how.com/molecular-biology/haldane-relationship-molecular-biology/][Haldane
 relationships]]. For each reaction, an informative prior must be specified for
@@ -52,25 +46,7 @@ where $R$ is a known physical constant and K_{eq} is a ratio of kinetic
 parameters.
 
 * Usage
-
-At present EnzymeKAT models only one reaction system, namely yeast, using
-equations and measurements taken from this paper:
-
-- Smallbone, K., Messiha, H. L., Carroll, K. M., Winder, C. L., Malys, N.,
-  Dunn, W. B., Murabito, E., … (2013). A model of yeast glycolysis based on a
-  consistent kinetic characterisation of all its enzymes. FEBS Letters,
-  587(17), 2832–2841. http://dx.doi.org/10.1016/j.febslet.2013.06.043
-
-The first time you run EnzymeKAT you will need to build cmdstan (this will take
-a few minutes):
-
-#+begin_src sh
-cd cmdstan
-make clean-all
-make build
-#+end_src
-
-Now you should be able to run the model:
+To run a model, use the following python command:
 
 #+begin_src bash
 python enzymekat/run_model.py
@@ -80,199 +56,5 @@ This will create files of samples starting with ~model_output_yeast~ in the
 ~data/out~ directory as well as saving an arviz [[https://arviz-devs.github.io/arviz/notebooks/XarrayforArviZ.html][InferenceData]] object
 ~infd_yeast.nc~ in netcdf format to the same location.
 
-To diagnose whether the model converged well, you can run
+To run a different model, edit `run_model.py`.
 
-#+begin_src bash
-cmdstan/bin/diagnose data/out/model_output_yeast.csv
-#+end_src
-
-** Working with enzymeKAT on the room 522 desktop computer
-It can be convenient to run enzymeKAT models on our desktop computer, which has
-way more cores and memory than our laptops and can also be left running
-overnight without its fans keeping the surrounding neighbourhood awake. This
-guide explains how to do this.
-
-*** Getting to the computer
-#+begin_src bash
-ssh YOUR_NAME@10.75.3.74
-#+end_src
-*** Cloning the enzymeKAT repository
-Check if you have an ssh key
-#+begin_src bash
-ls .ssh id_*
-#+end_src
-
-If nothing is printed, you don't have an ssh key. In this case, run the
-following command and press enter when prompted:
-
-#+begin_src bash
-ssh-keygen -t rsa -C "your_email@example.com"
-#+end_src
-
-You should now have a public and private ssh keys in your ~.ssh~ folder.
-
-To add the public key to your github account, first display its contents with
-this command:
-
-#+begin_src bash
-cat .ssh/id_rsa.pub
-#+end_src
-
-Copy the output, then go to the [[https://github.com/settings/keys][github ssh and gpg keys page]], click 'New SSH
-key', choose a name like 'Room 522 desktop' and paste the contents of the
-clipboard into the box labelled 'key'.
-
-To avoid having to type your passphrase in every time you need to use your new
-ssh key, you can add it to the ssh agent.
-
-#+begin_src bash
-eval "$(ssh-agent -s)"
-ssh-add .ssh/id_rsa
-#+end_src
-
-Now we can clone the enzymeKAT repository:
-#+begin_src bash
-mkdir Code
-cd Code
-git clone --recursive git@github.com:biosustain/enzymeKAT.git
-#+end_src
-
-*** Building cmdstan
-#+begin_src bash
-cd cmdstan
-make clean-all
-make build
-#+end_src
-
-*** Installing python
-Currently enzymeKAT is only tested with python3.7, and the system python3 is
-python3.6.2. To get around this issue we can install a fresh python3.7 with
-pyenv.
-
-First make sure you are in your home directory:
-
-#+begin_src bash
-cd ~
-#+end_src
-
-Now run the pyenv installer:
-
-#+begin_src bash
-curl https://pyenv.run | bash
-#+end_src
-
-Now add the following lines of code to the bottom of your ~.bashrc~ file:
-
-#+begin_src bash
-export PYENV_ROOT="$HOME/.pyenv"
-export PATH="$PYENV_ROOT/bin:$PATH"
-if command -v pyenv 1>/dev/null 2>&1; then
-  eval "$(pyenv init -)"
-fi
-#+end_src
-
-At this point you will need to restart your shell so that your ~PATH~
-environment variable is set correctly:
-
-#+begin_src bash
-exec "$BASH"
-#+end_src
-
-Finally, use pyenv to install python 3.7.2:
-
-#+begin_src bash
-pyenv install 3.7.2
-#+end_src
-
-*** Installing python libraries with pyenv
-
-To install the required python libraries we can use pipenv.
-
-#+begin_src bash
-pip install --user pipenv
-cd Code/enzymeKAT
-pipenv install
-#+end_src
-
-This will create a virtual environment, which you can activate by running
-
-#+begin_src bash
-pipenv shell
-#+end_src
-
-You should now be ready to go - to see if everything worked try running the
-timecourse model:
-
-#+begin_src bash
-python enzymekat/run_timecourse.py
-#+end_src
-
-*** Running enzymeKAT models
-First ssh to the computer and cd to the ~enzymeKAT~ directory
-
-#+begin_src bash
-ssh USERNAME@10.75.3.74
-cd Code/enzymeKAT
-#+end_src
-
-Now run the model. This should be done using [[https://linux.101hacks.com/unix/nohup-command/][nohup]] so that you can log out
-without the model run stopping. 
-
-#+begin_src bash
-nohup python enzymekat/run_model.py &
-#+end_src
-
-PS don't forget the ~&~!
-
-To check that all the expected processes have started and find their PIDs, you
-can run 
-
-#+begin_src bash
-htop
-#+end_src
-
-To quit the htop interface, press ~q~
-
-If you want to kill processes you have started with nohup, you can run
-
-#+begin_src bash
-kill -9 <pid1> <pid2>
-#+end_src
-
-where ~<pid1>~ and ~<pid2>~ are PIDs of processes that you want to kill
-
-You will notice that the normal progress messages won't be printed - this is
-because nohup redirects this output to a file called ~nohup.out~, which you
-should be able to find in the ~enzymeKAT~ directory.
-
-When the model is finished, you will probably want to copy the output to your
-personal computer for analysis. To do this you can use the command [[https://www.garron.me/en/articles/scp.html][scp]]:
-
-#+begin_src bash
-scp USERNAME@10.75.3.74:~/Code/enzymeKAT/data/out/model_output_yeast.csv ~/Downloads
-#+end_src
-
-
-* More about cmdstan
-These commands might be useful if you want to find out more about cmdstan.
-
-Build the cmdstan manual:
-
-#+begin_src sh
-cd cmdstan
-make manual
-#+end_src
-
-To compile a model located at `stan/example_model.stan`:
-
-#+begin_src sh
-cd cmdstan
-make ../stan/example_model
-#+end_src
-
-To sample from a compiled model:
-
-#+begin_src sh
-cd stan
-./example_model sample data file=../data_in/example_data.Rdump
-#+end_src

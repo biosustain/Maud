@@ -52,3 +52,6 @@ real ordered_unibi(real A, real P, real Q,
 real irr_mass_action(real A, real V1){
   return(A*V1);
 }
+real fixed_flux(real f){
+  return f;
+}

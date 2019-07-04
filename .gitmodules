@@ -1,3 +1,0 @@
-[submodule "cmdstan"]
-	path = cmdstan
-	url = git@github.com:stan-dev/cmdstan.git
