@@ -1,12 +1,13 @@
 import arviz
+import click
 import numpy as np
 import os
 import pandas as pd
 from cmdstanpy import compile_model, sample, jsondump, summary
-from python_modules import enzymekat_data, code_generation_commands, utils
-from python_modules.conversion import sem_pct_to_lognormal_sigma
+import enzymekat_data
+import code_generation_commands
+import utils
 
-MODEL_NAME = 'linear'
 REL_TOL = 1e-13
 ABS_TOL = 1e-12
 MAX_STEPS = int(1e9)
@@ -17,23 +18,25 @@ N_CHAINS = 4
 N_CORES = 4
 REFRESH = 10
 STEADY_STATE_TIME = 200
-
 RELATIVE_PATHS = {
-    'data': f'../data/in/{MODEL_NAME}_data.toml',
+    # 'data_in': '../data/in',
     'stan_includes': 'stan_code',
-    'stan_model': f'stan_code/autogen/inference_model_{MODEL_NAME}.stan',
-    'input_data_file': f'../data/stan_records/input_data_{MODEL_NAME}.json',
-    'output_data': f'../data/out/model_output_{MODEL_NAME}.csv',
-    'output_infd': f'../data/infd_{MODEL_NAME}.nc',
+    'stan_autogen': 'stan_code/autogen',
+    'stan_records': '../data/stan_records',
+    'data_out': '../data/out',
 }
 
-
-if __name__ == '__main__':
+@click.command()
+@click.option('--likelihood', default=1, help='Set to 0 for priors-only mode.')
+@click.argument('data_path', type=click.Path(exists=True, dir_okay=False),
+                default='data/in/linear.toml')
+def run_model(data_path, likelihood):
+    model_name = os.path.splitext(os.path.basename(data_path))[0]
     here = os.path.dirname(os.path.abspath(__file__))
     paths = {k: os.path.join(here, v) for k, v in RELATIVE_PATHS.items()}
 
     # define input data
-    data = enzymekat_data.from_toml(paths['data'])
+    data = enzymekat_data.from_toml(data_path)
     metabolite_names = data.stoichiometry.columns
     reaction_names = data.stoichiometry.index
     initial_concentration = pd.Series({m: 1 for m in metabolite_names})
@@ -65,44 +68,54 @@ if __name__ == '__main__':
         'rel_tol': REL_TOL,
         'abs_tol': ABS_TOL,
         'max_steps': MAX_STEPS,
-        'LIKELIHOOD': LIKELIHOOD
+        'LIKELIHOOD': likelihood
     }
 
     # dump input data
-    jsondump(paths['input_data_file'], input_data)
+    input_file = os.path.join(
+        paths['stan_records'], f'input_data_{model_name}.json'
+    )
+    jsondump(input_file, input_data)
 
     # compile model if necessary
     stan_code = code_generation_commands.create_stan_model(data)
-    if not utils.match_string_to_file(stan_code, paths['stan_model']):
-        with open(paths['stan_model'], 'w') as f:
+    stan_file = os.path.join(
+        paths['stan_autogen'], f'inference_model_{model_name}.stan'
+    )
+    if not utils.match_string_to_file(stan_code, stan_file):
+        with open(stan_file, 'w') as f:
             f.write(stan_code)
         model = compile_model(
-            paths['stan_model'],
+            stan_file,
             include_paths=[paths['stan_includes']],
             overwrite=True
         )
     else:
         model = compile_model(
-            paths['stan_model'],
+            stan_file,
             include_paths=[paths['stan_includes']]
         )
-        
 
-    # run model
+    # draw samples
+    csv_output_file = os.path.join(paths['data_out'], f'output_{model_name}.csv')
     inits = {
         'kinetic_parameters': np.exp(data.kinetic_parameters['loc']).tolist(),
         'thermodynamic_parameters': data.thermodynamic_parameters['loc'].tolist()
     }
     posterior_samples = sample(
         model,
-        data=paths['input_data_file'],
+        data=input_file,
         chains=N_CHAINS,
         cores=4,
         inits=inits,
         show_progress=True,
-        csv_output_file=paths['output_data'],
+        csv_output_file=csv_output_file,
         sampling_iters=N_SAMPLES,
         warmup_iters=N_WARMUP,
         max_treedepth=15
     )
     print(summary(posterior_samples))
+
+
+if __name__ == '__main__':
+    run_model()
