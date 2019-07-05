@@ -13,6 +13,7 @@ matplotlib = "*"
 toml = "*"
 jupyter = "*"
 cmdstanpy = {editable = true,git = "https://github.com/stan-dev/cmdstanpy"}
+click = "*"
 
 [requires]
 python_version = "3.7"
