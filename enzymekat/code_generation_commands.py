@@ -1,12 +1,12 @@
 import os
 import pandas as pd
-from python_modules import code_generation_library as lib
-from python_modules.enzymekat_data import EnzymeKatData
+import code_generation_library as lib
+from enzymekat_data import EnzymeKatData
 
 
 RELATIVE_PATHS = {
-    'inference_model_template': '../stan_code/inference_model_template.stan',
-    'steady_state_equation': '../stan_code/steady_state_equation.stan'
+    'inference_model_template': 'stan_code/inference_model_template.stan',
+    'steady_state_equation': 'stan_code/steady_state_equation.stan'
 }
 PATHS = {k: os.path.join(os.path.dirname(__file__), v) for k, v in RELATIVE_PATHS.items()}
 MECHANISM_TO_HALDANE_FUNCTIONS = {

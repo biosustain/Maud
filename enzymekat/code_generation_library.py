@@ -1,5 +1,5 @@
 import pandas as pd
-from python_modules.enzymekat_data import EnzymeKatData
+from enzymekat_data import EnzymeKatData
 
 # functions for writing particular lines
 def create_keq_line(ed: EnzymeKatData, reaction: str) -> str:
