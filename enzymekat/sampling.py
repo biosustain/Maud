@@ -3,8 +3,8 @@ import numpy as np
 import os
 import pandas as pd
 import cmdstanpy
-import enzymekat_data
-import code_generation_commands
+import data_model
+import code_generation
 import utils
 
 RELATIVE_PATHS = {
@@ -32,7 +32,7 @@ def sample(
     paths = {k: os.path.join(here, v) for k, v in RELATIVE_PATHS.items()}
 
     # define input data
-    data = enzymekat_data.from_toml(data_path)
+    data = data_model.from_toml(data_path)
     metabolite_names = data.stoichiometry.columns
     reaction_names = data.stoichiometry.index
     initial_concentration = pd.Series({m: 1 for m in metabolite_names})
@@ -74,7 +74,7 @@ def sample(
     cmdstanpy.jsondump(input_file, input_data)
 
     # compile model if necessary
-    stan_code = code_generation_commands.create_stan_model(data)
+    stan_code = code_generation.create_stan_model(data)
     stan_file = os.path.join(
         paths['stan_autogen'], f'inference_model_{model_name}.stan'
     )
