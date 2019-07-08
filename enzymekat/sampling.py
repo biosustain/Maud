@@ -1,36 +1,32 @@
 import arviz
-import click
 import numpy as np
 import os
 import pandas as pd
-from cmdstanpy import compile_model, sample, jsondump, summary
+import cmdstanpy
 import enzymekat_data
 import code_generation_commands
 import utils
 
-REL_TOL = 1e-13
-ABS_TOL = 1e-12
-MAX_STEPS = int(1e9)
-LIKELIHOOD = 1
-N_SAMPLES = 40
-N_WARMUP = 40
-N_CHAINS = 4
-N_CORES = 4
-REFRESH = 10
-STEADY_STATE_TIME = 200
 RELATIVE_PATHS = {
-    # 'data_in': '../data/in',
     'stan_includes': 'stan_code',
     'stan_autogen': 'stan_code/autogen',
     'stan_records': '../data/stan_records',
     'data_out': '../data/out',
 }
 
-@click.command()
-@click.option('--likelihood', default=1, help='Set to 0 for priors-only mode.')
-@click.argument('data_path', type=click.Path(exists=True, dir_okay=False),
-                default='data/in/linear.toml')
-def run_model(data_path, likelihood):
+
+def sample(
+        data_path: str,
+        rel_tol: float,
+        abs_tol: float,
+        max_steps: int,
+        likelihood: int,
+        n_samples: int,
+        n_warmup: int,
+        n_chains: int,
+        n_cores: int,
+        steady_state_time: float
+):
     model_name = os.path.splitext(os.path.basename(data_path))[0]
     here = os.path.dirname(os.path.abspath(__file__))
     paths = {k: os.path.join(here, v) for k, v in RELATIVE_PATHS.items()}
@@ -64,10 +60,10 @@ def run_model(data_path, likelihood):
         'prior_scale_thermodynamic': data.thermodynamic_parameters['scale'].values.tolist(),
         'initial_concentration': initial_concentration.values.tolist(),
         'initial_time': 0,
-        'steady_time': STEADY_STATE_TIME,
-        'rel_tol': REL_TOL,
-        'abs_tol': ABS_TOL,
-        'max_steps': MAX_STEPS,
+        'steady_time': steady_state_time,
+        'rel_tol': rel_tol,
+        'abs_tol': abs_tol,
+        'max_steps': max_steps,
         'LIKELIHOOD': likelihood
     }
 
@@ -75,7 +71,7 @@ def run_model(data_path, likelihood):
     input_file = os.path.join(
         paths['stan_records'], f'input_data_{model_name}.json'
     )
-    jsondump(input_file, input_data)
+    cmdstanpy.jsondump(input_file, input_data)
 
     # compile model if necessary
     stan_code = code_generation_commands.create_stan_model(data)
@@ -85,13 +81,13 @@ def run_model(data_path, likelihood):
     if not utils.match_string_to_file(stan_code, stan_file):
         with open(stan_file, 'w') as f:
             f.write(stan_code)
-        model = compile_model(
+        model = cmdstanpy.compile_model(
             stan_file,
             include_paths=[paths['stan_includes']],
             overwrite=True
         )
     else:
-        model = compile_model(
+        model = cmdstanpy.compile_model(
             stan_file,
             include_paths=[paths['stan_includes']]
         )
@@ -102,20 +98,15 @@ def run_model(data_path, likelihood):
         'kinetic_parameters': np.exp(data.kinetic_parameters['loc']).tolist(),
         'thermodynamic_parameters': data.thermodynamic_parameters['loc'].tolist()
     }
-    posterior_samples = sample(
+    return cmdstanpy.sample(
         model,
         data=input_file,
-        chains=N_CHAINS,
+        chains=n_chains,
         cores=4,
         inits=inits,
         show_progress=True,
         csv_output_file=csv_output_file,
-        sampling_iters=N_SAMPLES,
-        warmup_iters=N_WARMUP,
+        sampling_iters=n_samples,
+        warmup_iters=n_warmup,
         max_treedepth=15
     )
-    print(summary(posterior_samples))
-
-
-if __name__ == '__main__':
-    run_model()
