@@ -11,9 +11,28 @@ literature.
 - toml
 - [[https://github.com/stan-dev/cmdstanpy][cmdstanpy]]
 
-* 'Installation'
+* Installation
 #+begin_src bash
-git clone git@github.com:biosustain/enzymeKAT.git
+pip install -e git+ssh://git@github.com/biosustain/enzymeKAT.git@cli#egg=enzymekat
+#+end_src
+
+* Usage
+To run the simple linear model, use the following command:
+
+#+begin_src bash
+enzymekat sample
+#+end_src
+
+This will use the data file at ~data/in/linar.toml~ to create a Stan program at
+~enzymekat/stan_code/autogen/inference_model_linear.stan~, compile it into a
+C++ Stan model, draw samples from the resulting posterior and store them in
+files starting with ~data/out/model_output_linear~.
+
+The ~sample~ command can be configured in a few ways - to check out all the
+options try running
+
+#+begin_src bash
+enzymekat sample --help
 #+end_src
 
 * Model
@@ -44,17 +63,4 @@ quantities are related to kinetic parameters using the following equation
 
 where $R$ is a known physical constant and K_{eq} is a ratio of kinetic
 parameters.
-
-* Usage
-To run a model, use the following python command:
-
-#+begin_src bash
-python enzymekat/run_model.py
-#+end_src
-
-This will create files of samples starting with ~model_output_yeast~ in the
-~data/out~ directory as well as saving an arviz [[https://arviz-devs.github.io/arviz/notebooks/XarrayforArviZ.html][InferenceData]] object
-~infd_yeast.nc~ in netcdf format to the same location.
-
-To run a different model, edit `run_model.py`.
 
