@@ -12,8 +12,10 @@ literature.
 - [[https://github.com/stan-dev/cmdstanpy][cmdstanpy]]
 
 * Installation
+First run this command to install enzymeKAT and its python dependencies:
 #+begin_src bash
 pip install -e git+ssh://git@github.com/biosustain/enzymeKAT.git@cli#egg=enzymekat
+install_cmdstan
 #+end_src
 
 * Usage
