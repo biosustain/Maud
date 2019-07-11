@@ -2,7 +2,7 @@
 
 import click
 from cmdstanpy import summary
-import sampling
+from enzymekat import sampling
 
 SAMPLING_DEFAULTS = {
     'rel_tol': 1e-13,

@@ -3,9 +3,7 @@ import numpy as np
 import os
 import pandas as pd
 import cmdstanpy
-import data_model
-import code_generation
-import utils
+from enzymekat import code_generation, data_model, utils
 
 RELATIVE_PATHS = {
     'stan_includes': 'stan_code',

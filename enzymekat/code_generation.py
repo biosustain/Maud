@@ -1,18 +1,22 @@
 import os
 import pandas as pd
-from data_model import EnzymeKatData
+from enzymekat.data_model import EnzymeKatData
 
 
-RELATIVE_PATHS = {
-    'inference_model_template': 'stan_code/inference_model_template.stan',
+TEMPLATE_RELATIVE_PATHS = {
+    'inference': 'stan_code/inference_model_template.stan',
+    'simulation': 'stan_code/simulation_model_template.stan',
 }
-PATHS = {k: os.path.join(os.path.dirname(__file__), v) for k, v in RELATIVE_PATHS.items()}
 
 
-def create_stan_model(ed: EnzymeKatData) -> str:
+def create_stan_model(ed: EnzymeKatData, template: str = 'inference') -> str:
+    paths = {
+        k: os.path.join(os.path.dirname(__file__), v)
+        for k, v in TEMPLATE_RELATIVE_PATHS.items()
+    }
+    template_code = read_stan_code_from_path(paths[template])
     functions_block = create_functions_block(ed)
-    inference_model_template = read_stan_code_from_path(PATHS['inference_model_template'])
-    return functions_block + '\n' + inference_model_template
+    return functions_block + '\n' + template_code
 
 
 def create_functions_block(ed: EnzymeKatData) -> str:
