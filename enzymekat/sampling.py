@@ -76,14 +76,18 @@ def sample(
     stan_file = os.path.join(
         paths['stan_autogen'], f'inference_model_{model_name}.stan'
     )
-    if not utils.match_string_to_file(stan_code, stan_file):
+    exe_file = stan_file[:-5]
+    no_need_to_compile = (
+        os.path.exists(exe_file)
+        and utils.match_string_to_file(stan_code, stan_file)
+    )
+    if no_need_to_compile:
+        model = cmdstanpy.Model(stan_file=stan_file, exe_file=exe_file)
+    else:
         with open(stan_file, 'w') as f:
             f.write(stan_code)
         model = cmdstanpy.Model(stan_file)
         model.compile(include_paths=[paths['stan_includes']], overwrite=True)
-    else:
-        exe_file = stan_file[:-5]
-        model = cmdstanpy.Model(exe_file=exe_file)
 
     # draw samples
     csv_output_file = os.path.join(paths['data_out'], f'output_{model_name}.csv')
