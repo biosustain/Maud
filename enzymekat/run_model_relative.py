@@ -5,16 +5,16 @@ import pandas as pd
 import pystan
 from python_modules import stan_utils, conversion, enzymekat_data
 
-MODEL_NAME = 'training'
+MODEL_NAME = 'relative_metabolomics'
 RELATIVE_PATH_CMDSTAN = '../cmdstan'
 RELATIVE_PATH_DATA = '../data'
 RELATIVE_PATH_STAN_CODE = 'stan_code'
 REL_TOL = 1e-13
 ABS_TOL = 1e-9
 MAX_STEPS = int(1e9)
-LIKELIHOOD = 0
-N_SAMPLES = 50
-N_WARMUP = 50
+LIKELIHOOD = 1
+N_SAMPLES = 100
+N_WARMUP = 100
 N_CHAINS = 4
 
 if __name__ == '__main__':
@@ -62,8 +62,6 @@ if __name__ == '__main__':
     measured_metabolites = ode_metabolites.dropna(subset=['measured_value'])
     measured_flux = ode_fluxes.dropna(subset=['measured_value'])
 
-    print(ode_metabolites['initial_value'].values)
-
     stan_input = {
         'N_ode': len(ode_metabolites),
         'N_kinetic_parameter': len(data.kinetic_parameters),
@@ -73,7 +71,7 @@ if __name__ == '__main__':
         'N_reaction': len(data.reactions),
         'N_thermodynamic_parameter': len(data.thermodynamic_parameters),
         'measurement_ix': measured_metabolites['ix_stan'].values,
-        'measurement': measured_metabolites['measured_value'].values,
+        'measurement': np.divide(measured_metabolites['measured_value'].values,np.array([10, 0.1, 5, 12, 0.5])),
         'flux_measurement_ix': measured_flux['ix_stan'].values,
         'flux_measurment': measured_flux['measured_value'].values,
         'prior_location_kinetic': data.kinetic_parameters['prior_location'].values,
