@@ -44,7 +44,6 @@ parameters {
   real thermodynamic_parameters[N_thermodynamic_parameter];
   vector[N_kinetic_parameter] log_kinetic_parameters_z;
   real<lower=0> enzyme_concentrations[N_reaction];
-  real<lower=0> metabolite_scaling[N_ode];
 }
 transformed parameters {
   real kinetic_parameters[N_kinetic_parameter] =
@@ -64,12 +63,6 @@ transformed parameters {
 known_reals);
   real stability[N_ode] = fabs(get_odes(flux_hat));
   real abs_flux = sum(stability);
-  real relative_metabolite_hat[N_ode];
-
-  for (i in 1:N_ode){
-    relative_metabolite_hat[i] = metabolite_concentration_hat[i] / metabolite_scaling[i];
-  }
-
   if (abs_flux > 0.001){
     reject("steady state not achieved, sum of absolute fluxes was ", abs_flux);
   }
@@ -79,9 +72,8 @@ model {
   enzyme_concentrations ~ normal(prior_enzyme_concentrations, prior_enzyme_scale);
   thermodynamic_parameters ~ normal(prior_location_thermodynamic, prior_scale_thermodynamic);
   if (LIKELIHOOD == 1){
-    metabolite_scaling ~ lognormal(1, 1);
     flux_measurment ~ normal(flux_hat[flux_measurement_ix], flux_measurment_scale);
-    measurement ~ lognormal(log(relative_metabolite_hat[measurement_ix]), measurement_scale);
+    measurement ~ lognormal(log(metabolite_concentration_hat[measurement_ix]), measurement_scale);
   }
 }
 generated quantities {
