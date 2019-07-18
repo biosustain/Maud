@@ -1,7 +1,7 @@
 """Functions that are exposed to the command line interface live here."""
 
 import click
-from cmdstanpy import summary
+import cmdstanpy
 from enzymekat import sampling, simulation
 import os
 
@@ -69,4 +69,10 @@ def sample(data_path, **kwargs):
               help="ODE solver's maximum steps parameter")
 def simulate(data_path, **kwargs):
     """Simulate measurements given parameter values from data_path."""
-    runset = simulation.simulate(data_path, **kwargs)
+    stanfit, simulations = simulation.simulate(data_path, **kwargs)
+    print('\nSimulated flux measurements:\n',
+          simulations['flux_measurements'].round(2))
+    print('\nSimulated metabolite concentration measurements:\n',
+          simulations['concentration_measurements'].round(2))
+    print('\nSimulated metabolite fluxes (at steady state these are zero):\n',
+          simulations['metabolite_fluxes'].round(2))
