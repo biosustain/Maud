@@ -34,15 +34,16 @@ def sample(
     metabolite_names = data.stoichiometry.columns
     reaction_names = data.stoichiometry.index
     initial_concentration = pd.Series({m: 1 for m in metabolite_names})
+    is_log_scale = data.parameters['is_kinetic'] | data.parameters['is_allosteric']
     input_data = {
         'N_metabolite': len(metabolite_names),
-        'N_kinetic_parameter': len(data.kinetic_parameters),
-        'N_thermodynamic_parameter': len(data.thermodynamic_parameters),
+        'N_param': len(data.parameters),
+        'N_log_scale_param': len(data.parameters.loc[is_log_scale]),
         'N_reaction': len(reaction_names),
-        'N_known_real': len(data.known_reals),
         'N_experiment': len(data.experiments),
-        'N_measurement_conc': len(data.concentration_measurements),
+        'N_known_real': len(data.known_reals),
         'N_measurement_flux': len(data.flux_measurements),
+        'N_measurement_conc': len(data.concentration_measurements),
         'metabolite_ix': data.concentration_measurements['metabolite_code'].values.tolist(),
         'experiment_ix_conc': data.concentration_measurements['experiment_code'].values.tolist(),
         'measurement_conc': data.concentration_measurements['value'].values.tolist(),
@@ -52,10 +53,9 @@ def sample(
         'measurement_flux': data.flux_measurements['value'].values.tolist(),
         'measurement_scale_flux': data.flux_measurements['scale'].values.tolist(),
         'known_reals': data.known_reals.drop('stan_code', axis=1).values.tolist(),
-        'prior_location_kinetic': data.kinetic_parameters['loc'].values.tolist(),
-        'prior_scale_kinetic': data.kinetic_parameters['scale'].values.tolist(),
-        'prior_location_thermodynamic': data.thermodynamic_parameters['loc'].values.tolist(),
-        'prior_scale_thermodynamic': data.thermodynamic_parameters['scale'].values.tolist(),
+        'prior_location': data.parameters['loc'].values.tolist(),
+        'prior_scale': data.parameters['scale'].values.tolist(),
+        'is_log_scale': is_log_scale.astype(int).values.tolist(),
         'initial_concentration': initial_concentration.values.tolist(),
         'initial_time': 0,
         'steady_time': steady_state_time,
@@ -91,11 +91,9 @@ def sample(
 
     # draw samples
     csv_output_file = os.path.join(paths['data_out'], f'output_{model_name}.csv')
-    inits = {
-        'kinetic_parameters': np.exp(data.kinetic_parameters['loc']).tolist(),
-        'thermodynamic_parameters': data.thermodynamic_parameters['loc'].tolist()
-    }
+    inits = {'params': np.where(is_log_scale, np.exp(input_data['prior_location']), input_data['prior_location'])}
     return model.sample(
+        model,
         data=input_file,
         chains=n_chains,
         cores=4,
@@ -104,5 +102,6 @@ def sample(
         csv_basename=csv_output_file,
         sampling_iters=n_samples,
         warmup_iters=n_warmup,
-        max_treedepth=15
+        max_treedepth=15,
+        adapt_delta=0.9
     )

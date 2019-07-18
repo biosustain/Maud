@@ -1,12 +1,13 @@
 [constants]
 gas_constant = 8.314e-3 # units kJ/mol.K
+
+[[experiment]]
+label = 'condition_1'
+temperature = 298.15
+concentration_r1 = 0.1
 concentration_r2 = 1
 concentration_r3 = 1
 concentration_r6 = 1
-
-[[experiments]]
-label = 'condition_1'
-conditions = { temperature = 298.15 }
 measurements = [
   { label = 'M1', value = 0.1, scale = 0.1, type = 'metabolite' },
   { label = 'M2', value = 0.1, scale = 0.1, type = 'metabolite' },
@@ -16,9 +17,13 @@ measurements = [
   { label = 'r4', value = 0.1, scale = 0.1, type = 'flux' }
 ]
 
-[[experiments]]
+[[experiment]]
 label = 'condition_2'
-conditions = { temperature = 290.15 }
+temperature = 298.15
+concentration_r1 = 0.1
+concentration_r2 = 1
+concentration_r3 = 1
+concentration_r6 = 1
 measurements = [
   { label = 'M1', value = 0.1, scale = 0.1, type = 'metabolite' },
   { label = 'M2', value = 0.1, scale = 0.1, type = 'metabolite' },
@@ -28,15 +33,12 @@ measurements = [
   { label = 'r4', value = 0.1, scale = 0.1, type = 'flux' }
 ]
 
-[[reactions]]
+[[reaction]]
 name = 'r1'
 mechanism = 'fixed_flux'
 stoichiometry = { M1 = 1 }
-parameters = [
-  {label = 'v', loc = 0, scale = 0.5, type = 'kinetic', true_value = 0.1 },
-]
 
-[[reactions]]
+[[reaction]]
 name = 'r2'
 mechanism = 'ordered_unibi'
 stoichiometry = { M1 = -1, M2 = 1, M3 = 1 }
@@ -50,7 +52,7 @@ parameters = [
   {label = 'Kia', loc = 0, scale = 0.5, type = 'kinetic', true_value = 0.1 }
 ]
 
-[[reactions]]
+[[reaction]]
 name = 'r3'
 mechanism = 'uniuni'
 stoichiometry = { M3 = -1, M4 = 1 }
@@ -61,7 +63,7 @@ parameters = [
   {label = 'Ka', loc = 0, scale = 0.5, type = 'kinetic', true_value = 0.1 }
 ]
 
-[[reactions]]
+[[reaction]]
 name = 'r4'
 mechanism = 'irr_mass_action'
 stoichiometry = { M4 = -1 }
@@ -69,7 +71,7 @@ parameters = [
   {label = 'alpha', loc = 0, scale = 0.5, type = 'kinetic', true_value = 0.1 }
 ]
 
-[[reactions]]
+[[reaction]]
 name = 'r5'
 mechanism = 'irr_mass_action'
 stoichiometry = { M2 = -1 }
@@ -77,7 +79,7 @@ parameters = [
   {label = 'alpha', loc = 0, scale = 0.5, type = 'kinetic', true_value = 0.1 }
 ]
 
-[[reactions]]
+[[reaction]]
 name = 'r6'
 mechanism = 'uniuni'
 stoichiometry = { M2 = -1, M3 = 1 }

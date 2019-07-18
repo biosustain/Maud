@@ -1,13 +1,13 @@
 data {
   // dimensions
-  int<lower=1> N_metabolite;          // number of ode metabolites
-  int<lower=1> N_kinetic_parameter;        // total number of kinetic parameters
-  int<lower=1> N_thermodynamic_parameter;
+  int<lower=1> N_metabolite;
+  int<lower=1> N_param;
+  int<lower=1,upper=N_param> N_log_scale_param;
   int<lower=1> N_reaction;
   int<lower=1> N_experiment;
-  int<lower=1> N_known_real;   // number of known reals
-  int<lower=1> N_measurement_flux; // number of measured fluxes
-  int<lower=1> N_measurement_conc; // number of measured concentrations
+  int<lower=1> N_known_real;
+  int<lower=1> N_measurement_flux;
+  int<lower=1> N_measurement_conc;
   // measurements
   int<lower=0,upper=N_metabolite> metabolite_ix[N_measurement_conc];
   int<lower=1,upper=N_experiment> experiment_ix_conc[N_measurement_conc];
@@ -19,10 +19,9 @@ data {
   vector<lower=0>[N_measurement_flux] measurement_scale_flux;
   // hardcoded
   real known_reals[N_known_real, N_experiment];
-  vector[N_kinetic_parameter] prior_location_kinetic;
-  vector[N_kinetic_parameter] prior_scale_kinetic;
-  vector[N_thermodynamic_parameter] prior_location_thermodynamic;
-  vector[N_thermodynamic_parameter] prior_scale_thermodynamic;
+  vector[N_param] prior_location;
+  vector[N_param] prior_scale;
+  vector[N_param] is_log_scale;
   // ode stuff
   real initial_concentration[N_metabolite];
   real initial_time;
@@ -37,8 +36,7 @@ transformed data {
   int known_ints[0];
 }
 parameters {
-  real thermodynamic_parameters[N_thermodynamic_parameter];
-  real<lower=0> kinetic_parameters[N_kinetic_parameter];
+  real params[N_param];
 }
 transformed parameters {
   real metabolite_concentration[N_metabolite, N_experiment];
@@ -49,19 +47,22 @@ transformed parameters {
                         initial_concentration,
                         initial_time,
                         {steady_time},
-                        append_array(thermodynamic_parameters, kinetic_parameters),
+                        params,
                         known_reals[,e],
                         known_ints,
                         rel_tol, abs_tol, max_steps)[1];
-    flux[,e] =
-      get_fluxes(metabolite_concentration[,e],
-                 append_array(thermodynamic_parameters, kinetic_parameters),
-                 known_reals[,e]);
+    flux[,e] = get_fluxes(metabolite_concentration[,e], params, known_reals[,e]);
   }
 }
 model {
-  kinetic_parameters ~ lognormal(prior_location_kinetic, prior_scale_kinetic);
-  thermodynamic_parameters ~ normal(prior_location_thermodynamic, prior_scale_thermodynamic);
+  for (p in 1:N_param){
+    if (is_log_scale[p]){
+      params[p] ~ lognormal(prior_location[p], prior_scale[p]);
+    }
+    else {
+      params[p] ~ normal(prior_location[p], prior_scale[p]);
+    }
+  }
   if (LIKELIHOOD == 1){
     vector[N_measurement_conc] conc_hat;
     vector[N_measurement_flux] flux_hat;

@@ -1,6 +1,7 @@
 import pandas as pd
 import toml
 from typing import Dict, List
+from functools import reduce
 
 
 def expand_series_of_dicts(s):
@@ -26,10 +27,11 @@ class EnzymeKatData():
         self.experiments = experiments
         self.reactions = reactions
         self.stoichiometry = self.get_stoichiometry()
+        self.metabolite_codes = self.get_metabolite_codes()
+        self.reaction_codes = self.get_reaction_codes()
         self.flux_measurements, self.concentration_measurements = self.get_measurements()
         self.known_reals = self.get_known_reals()
-        self.kinetic_parameters, self.thermodynamic_parameters = self.get_parameters()
-        self.stan_codes = self.get_stan_codes()
+        self.parameters = self.get_parameters()
 
     def get_stoichiometry(self):
         S = (
@@ -44,17 +46,24 @@ class EnzymeKatData():
         S.columns.name = 'metabolite'
         return S
 
+    def get_metabolite_codes(self):
+        S = self.get_stoichiometry()
+        return dict(zip(S.columns, range(1, len(S.columns) + 1)))
+
+    def get_reaction_codes(self):
+        S = self.get_stoichiometry()
+        return dict(zip(S.index, range(1, len(S.index) + 1)))
+
     def get_measurements(self):
-        stan_codes = self.get_stan_codes()
+        metabolite_codes = self.get_metabolite_codes()
+        reaction_codes = self.get_reaction_codes()
         measurements = pd.io.json.json_normalize(
             self.experiments,
             'measurements',
             meta=['label'],
             meta_prefix='experiment_'
         )
-        measurements['reaction_code'] = measurements['label'].map(stan_codes['reaction'].get)
-        measurements['metabolite_code'] = measurements['label'].map(stan_codes['metabolite'].get)
-        measurements['experiment_code'] = measurements['experiment_label'].map(stan_codes['experiment'].get)
+        measurements['experiment_code'] = measurements['experiment_label'].factorize()[0] + 1
         flux_measurements, conc_measurements = (
             measurements
             .query(f"type == '{t}'")
@@ -63,53 +72,49 @@ class EnzymeKatData():
             .rename(columns={'label': t + '_label'})
             for t in ['flux', 'metabolite']
         )
-        flux_measurements['reaction_code'] = flux_measurements['reaction_code'].astype(int)
-        conc_measurements['metabolite_code'] = conc_measurements['metabolite_code'].astype(int)
+        flux_measurements['reaction_code'] = flux_measurements['flux_label'].map(reaction_codes.get)
+        conc_measurements['metabolite_code'] = conc_measurements['metabolite_label'].map(metabolite_codes.get)
         return flux_measurements, conc_measurements
-
-    def get_stan_codes(self):
-        S = self.get_stoichiometry()
-        known_reals = self.get_known_reals()
-        kinetic_parameters, thermodynamic_parameters = self.get_parameters()
-        experiment_labels = [e['label'] for e in self.experiments]
-        reaction_codes = dict(zip(S.index, range(1, len(S.index) + 1)))
-        metabolite_codes = dict(zip(S.columns, range(1, len(S.columns) + 1)))
-        experiment_codes = dict(zip(experiment_labels, range(1, len(experiment_labels) + 1)))
-        known_real_codes = dict(zip(known_reals.index, range(1, len(known_reals.index) + 1)))
-        kinetic_parameter_codes = dict(zip(kinetic_parameters['label'],
-                                           range(1, len(kinetic_parameters) + 1)))
-        thermodynamic_parameter_codes = dict(zip(thermodynamic_parameters['label'],
-                                                 range(1, len(kinetic_parameters) + 1)))
-        return {'reaction': reaction_codes,
-                'metabolite': metabolite_codes,
-                'experiment': experiment_codes,
-                'known_real': known_real_codes,
-                'kinetic_parameter': kinetic_parameter_codes,
-                'thermodynamic_parameter': thermodynamic_parameter_codes}
 
     def get_known_reals(self):
         out = {}
         for e in self.experiments:
-            out[e['label']] = {**e['conditions'], **self.constants}
+            conditions = {k: v for k, v in e.items() if type(v) in [float, int]}
+            out[e['label']] = {**conditions, **self.constants}
         return pd.DataFrame.from_dict(out).assign(stan_code=lambda df: range(1, len(df) + 1))
 
     def get_parameters(self):
-        parameters = (
-            pd.io.json.json_normalize(self.reactions,
-                                      'parameters',
+        reactions = self.reactions
+        for r in reactions:  # json_normalize doesn't work with missing record path
+            if 'parameters' not in r.keys():
+                r['parameters'] = []
+        pars = (
+            pd.io.json.json_normalize(reactions,
+                                      record_path='parameters',
                                       meta='name')
             .rename(columns={'name': 'reaction', 'label': 'parameter'})
-            .assign(label=lambda df: df['reaction'].str.cat(df['parameter'], sep='_'))
+            .assign(
+                is_kinetic=lambda df: df['type'].eq('kinetic').astype(int),
+                is_allosteric=lambda df: df['type'].eq('allosteric').astype(int),
+                stan_code=lambda df: range(1, len(df) + 1)
+            ))
+        label_cols = (
+            ['reaction', 'parameter', 'metabolite']
+            if 'metabolite' in pars.columns
+            else ['reaction', 'parameter']
         )
-        kinetic_parameters = parameters.query("type == 'kinetic'").copy()
-        thermodynamic_parameters = parameters.query("type == 'thermodynamic'").copy()
-        return kinetic_parameters, thermodynamic_parameters
+        pars['label'] = pars[label_cols].apply(lambda row: '_'.join(row.dropna().astype(str)), axis=1)
+        return pars
 
 
 def from_toml(path):
     t = toml.load(path)
     return EnzymeKatData(
         constants=t['constants'],
-        experiments=t['experiments'],
-        reactions=t['reactions']
+        experiments=t['experiment'],
+        reactions=t['reaction']
     )
+
+
+def join_string_values(df):
+    return df.apply(lambda x: '_'.join(x.dropna().astype(str)), axis=1)
