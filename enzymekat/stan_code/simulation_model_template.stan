@@ -28,6 +28,12 @@ data {
 transformed data {
   int known_ints[0];
 }
+parameters {
+  real z;
+}
+model {
+  z ~ normal(0, 1);
+}
 generated quantities {
   vector[N_measurement_flux] flux_pred;
   vector[N_measurement_conc] conc_pred;
@@ -36,15 +42,14 @@ generated quantities {
     real metabolite_concentration[N_metabolite, N_experiment];
     real flux[N_reaction, N_experiment];
     for (e in 1:N_experiment){
-      metabolite_concentration[,e] =
-        integrate_ode_bdf(steady_state_equation,
-                          initial_concentration,
-                          initial_time,
-                          {steady_time},
-                          params,
-                          known_reals[,e],
-                          known_ints,
-                          rel_tol, abs_tol, max_steps)[1];
+      metabolite_concentration[,e] = integrate_ode_bdf(steady_state_equation,
+                                                       initial_concentration,
+                                                       initial_time,
+                                                       {steady_time},
+                                                       params,
+                                                       known_reals[,e],
+                                                       known_ints,
+                                                       rel_tol, abs_tol, max_steps)[1];
       flux[,e] = get_fluxes(metabolite_concentration[,e], params, known_reals[,e]);
       metabolite_flux[, e] = get_odes(flux[, e]);
     }
