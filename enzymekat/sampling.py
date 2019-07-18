@@ -93,7 +93,6 @@ def sample(
     csv_output_file = os.path.join(paths['data_out'], f'output_{model_name}.csv')
     inits = {'params': np.where(is_log_scale, np.exp(input_data['prior_location']), input_data['prior_location'])}
     return model.sample(
-        model,
         data=input_file,
         chains=n_chains,
         cores=4,
