@@ -94,6 +94,7 @@ def sample(
     inits = {'params': np.where(is_log_scale, np.exp(input_data['prior_location']), input_data['prior_location'])}
     return model.sample(
         data=input_file,
+        cores=4,
         chains=n_chains,
         inits=inits,
         show_progress=True,
@@ -103,5 +104,5 @@ def sample(
         max_treedepth=15,
         adapt_delta=0.9,
         save_warmup=True,
-        step_size=0.1
+        step_size=0.01
     )

@@ -104,8 +104,9 @@ def simulate(
         'metabolite': ed.concentration_measurements['metabolite_label'].values,
         'simulated_value': sim.loc[conc_ixs].values
     })
-    met_out_met, met_out_exp = zip(*itertools.product(
-        list(ed.stoichiometry.columns), [e['label'] for e in ed.experiments]
+    met_out_exp, met_out_met = zip(*itertools.product(
+        [e['label'] for e in ed.experiments],
+        list(ed.stoichiometry.columns)
     ))
     met_out = pd.DataFrame({
         'experiment': met_out_exp,
