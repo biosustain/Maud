@@ -1,7 +1,6 @@
 """Functions that are exposed to the command line interface live here."""
 
 import click
-from cmdstanpy import summary
 from enzymekat import sampling
 import os
 
@@ -52,5 +51,5 @@ pass
                 default=get_example_path(RELATIVE_PATH_EXAMPLE))
 def sample(data_path, **kwargs):
     """Sample from the model defined by the data at data_path."""
-    runset = sampling.sample(data_path, **kwargs)
-    print(summary(runset))
+    stanfit = sampling.sample(data_path, **kwargs)
+    print(stanfit.summary())
