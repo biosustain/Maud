@@ -94,13 +94,15 @@ def sample(
     inits = {'params': np.where(is_log_scale, np.exp(input_data['prior_location']), input_data['prior_location'])}
     return model.sample(
         data=input_file,
-        chains=n_chains,
         cores=4,
+        chains=n_chains,
         inits=inits,
         show_progress=True,
         csv_basename=csv_output_file,
         sampling_iters=n_samples,
         warmup_iters=n_warmup,
         max_treedepth=15,
-        adapt_delta=0.9
+        adapt_delta=0.9,
+        save_warmup=True,
+        step_size=0.01
     )

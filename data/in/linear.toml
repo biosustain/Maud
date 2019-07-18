@@ -7,20 +7,20 @@ temperature = 298.15
 concentration_r1 = 0.3
 concentration_r2 = 1
 measurements = [
-  { label = 'M1', value = 0.2, scale = 0.1, type = 'metabolite' },
-  { label = 'M2', value = 0.2, scale = 0.1, type = 'metabolite' },
-  { label = 'r3', value = 0.3, scale = 0.1, type = 'flux' }
+  { label = 'M1', value = 0.78, scale = 0.1, type = 'metabolite' },
+  { label = 'M2', value = 0.66, scale = 0.1, type = 'metabolite' },
+  { label = 'r3', value = 0.29, scale = 0.1, type = 'flux' }
 ]
 
 [[experiment]]
 label = 'condition_2'
 temperature = 298.15
-concentration_r1 = 0.1
+concentration_r1 = 0.2
 concentration_r2 = 1
 measurements = [
-  { label = 'M1', value = 0.1, scale = 0.1, type = 'metabolite' },
-  { label = 'M2', value = 0.1, scale = 0.1, type = 'metabolite' },
-  { label = 'r3', value = 0.1, scale = 0.1, type = 'flux' }
+  { label = 'M1', value = 0.37, scale = 0.1, type = 'metabolite' },
+  { label = 'M2', value = 0.36, scale = 0.1, type = 'metabolite' },
+  { label = 'r3', value = 0.21, scale = 0.1, type = 'flux' }
 ]
 
 [[reaction]]
@@ -33,12 +33,12 @@ name = 'r2'
 mechanism = 'uniuni'
 stoichiometry = { M1 = -1, M2 = 1 }
 parameters = [
-  { label = 'delta_g', loc = -1, scale = 0.5, type = 'thermodynamic', true_value = 0.1 },
-  { label = 'Kcat1', loc = 0, scale = 0.6, type = 'kinetic', true_value = 0.1 },
-  { label = 'Kcat2', loc = 0, scale = 0.6, type = 'kinetic', true_value = 0.1 },
-  { label = 'Ka', loc = 0, scale = 0.6, type = 'kinetic', true_value = 0.1 },
-  { label = 'dissociation_constant_t', metabolite = 'M1', loc= 0, scale = 0.6, type = 'allosteric', true_value = 0.1},
-  { label = 'transfer_constant', loc= 0, scale = 0.6, type = 'allosteric', true_value = 0.1},
+  { label = 'delta_g', loc = -1, scale = 0.5, type = 'thermodynamic', true_value = -2 },
+  { label = 'Kcat1', loc = 0, scale = 0.6, type = 'kinetic', true_value = 1.3 },
+  { label = 'Kcat2', loc = 0, scale = 0.6, type = 'kinetic', true_value = 1 },
+  { label = 'Ka', loc = 0, scale = 0.6, type = 'kinetic', true_value = 0.4 },
+  { label = 'dissociation_constant_t', metabolite = 'M1', loc= 0, scale = 0.6, type = 'allosteric', true_value = 2},
+  { label = 'transfer_constant', loc= 0, scale = 0.6, type = 'allosteric', true_value = 1.1},
 ]
 allosteric_inhibitors = ['M1']
 
@@ -47,5 +47,5 @@ name = 'r3'
 mechanism = 'irr_mass_action'
 stoichiometry = { M2 = -1 }
 parameters = [
-  { label = 'alpha', loc = 0, scale = 0.6, type = 'kinetic', true_value = 0.1 }
+  { label = 'alpha', loc = 0, scale = 0.6, type = 'kinetic', true_value = 0.5 }
 ]
