@@ -52,6 +52,7 @@ pass
                 default=get_example_path(RELATIVE_PATH_EXAMPLE))
 def sample(data_path, **kwargs):
     """Sample from the model defined by the data at data_path."""
+<<<<<<< HEAD
     runset = sampling.sample(data_path, **kwargs)
     print(summary(runset))
 
@@ -70,3 +71,7 @@ def sample(data_path, **kwargs):
 def simulate(data_path, **kwargs):
     """Simulate measurements given parameter values from data_path."""
     runset = simulation.simulate(data_path, **kwargs)
+=======
+    stanfit = sampling.sample(data_path, **kwargs)
+    print(stanfit.summary())
+>>>>>>> cmdstanpy_update

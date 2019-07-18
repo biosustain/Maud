@@ -69,38 +69,36 @@ def sample(
     input_file = os.path.join(
         paths['stan_records'], f'input_data_{model_name}.json'
     )
-    cmdstanpy.jsondump(input_file, input_data)
+    cmdstanpy.utils.jsondump(input_file, input_data)
 
     # compile model if necessary
     stan_code = code_generation.create_stan_model(data)
     stan_file = os.path.join(
         paths['stan_autogen'], f'inference_model_{model_name}.stan'
     )
-    if not utils.match_string_to_file(stan_code, stan_file):
+    exe_file = stan_file[:-5]
+    no_need_to_compile = (
+        os.path.exists(exe_file)
+        and utils.match_string_to_file(stan_code, stan_file)
+    )
+    if no_need_to_compile:
+        model = cmdstanpy.Model(stan_file=stan_file, exe_file=exe_file)
+    else:
         with open(stan_file, 'w') as f:
             f.write(stan_code)
-        model = cmdstanpy.compile_model(
-            stan_file,
-            include_paths=[paths['stan_includes']],
-            overwrite=True
-        )
-    else:
-        model = cmdstanpy.compile_model(
-            stan_file,
-            include_paths=[paths['stan_includes']]
-        )
+        model = cmdstanpy.Model(stan_file)
+        model.compile(include_paths=[paths['stan_includes']], overwrite=True)
 
     # draw samples
     csv_output_file = os.path.join(paths['data_out'], f'output_{model_name}.csv')
     inits = {'params': np.where(is_log_scale, np.exp(input_data['prior_location']), input_data['prior_location'])}
-    return cmdstanpy.sample(
-        model,
+    return model.sample(
         data=input_file,
         chains=n_chains,
         cores=4,
         inits=inits,
         show_progress=True,
-        csv_output_file=csv_output_file,
+        csv_basename=csv_output_file,
         sampling_iters=n_samples,
         warmup_iters=n_warmup,
         max_treedepth=15,
