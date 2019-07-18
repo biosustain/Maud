@@ -2,7 +2,7 @@
 
 import click
 from cmdstanpy import summary
-from enzymekat import sampling
+from enzymekat import sampling, simulation
 import os
 
 SAMPLING_DEFAULTS = {
@@ -54,3 +54,19 @@ def sample(data_path, **kwargs):
     """Sample from the model defined by the data at data_path."""
     runset = sampling.sample(data_path, **kwargs)
     print(summary(runset))
+
+
+@cli.command()
+@click.argument('data_path', type=click.Path(exists=True, dir_okay=False),
+                default=get_example_path(RELATIVE_PATH_EXAMPLE))
+@click.option('--steady_state_time', default=SAMPLING_DEFAULTS['steady_state_time'],
+              help="Number of time units to simulate ODEs for")
+@click.option('--rel_tol', default=SAMPLING_DEFAULTS['rel_tol'],
+              help="ODE solver's relative tolerance parameter")
+@click.option('--abs_tol', default=SAMPLING_DEFAULTS['abs_tol'],
+              help="ODE solver's absolute tolerance parameter")
+@click.option('--max_steps', default=SAMPLING_DEFAULTS['max_steps'],
+              help="ODE solver's maximum steps parameter")
+def simulate(data_path, **kwargs):
+    """Simulate measurements given parameter values from data_path."""
+    runset = simulation.simulate(data_path, **kwargs)
