@@ -2,7 +2,6 @@ data {
   // dimensions
   int<lower=1> N_metabolite;
   int<lower=1> N_param;
-  int<lower=1,upper=N_param> N_log_scale_param;
   int<lower=1> N_reaction;
   int<lower=1> N_experiment;
   int<lower=1> N_known_real;
@@ -21,7 +20,6 @@ data {
   real known_reals[N_known_real, N_experiment];
   vector[N_param] prior_location;
   vector[N_param] prior_scale;
-  vector[N_param] is_log_scale;
   // ode stuff
   real initial_concentration[N_metabolite];
   real initial_time;
@@ -36,7 +34,7 @@ transformed data {
   int known_ints[0];
 }
 parameters {
-  real params[N_param];
+  real<lower=0> params[N_param];
 }
 transformed parameters {
   real metabolite_concentration[N_metabolite, N_experiment];
@@ -54,14 +52,7 @@ transformed parameters {
   }
 }
 model {
-  for (p in 1:N_param){
-    if (is_log_scale[p]){
-      params[p] ~ lognormal(prior_location[p], prior_scale[p]);
-    }
-    else {
-      params[p] ~ normal(prior_location[p], prior_scale[p]);
-    }
-  }
+  params ~ lognormal(prior_location, prior_scale);
   if (LIKELIHOOD == 1){
     vector[N_measurement_conc] conc_hat;
     vector[N_measurement_flux] flux_hat;
