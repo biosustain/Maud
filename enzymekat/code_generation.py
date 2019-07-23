@@ -34,9 +34,8 @@ def create_functions_block(ed: EnzymeKatData) -> str:
 
 def create_fluxes_function(ed: EnzymeKatData) -> str:
     mechanism_to_haldane_functions = {
-        'uniuni': [create_keq_line],
+        'uniuni': [],
         'ordered_unibi': [
-            create_keq_line,
             create_Kip_ordered_unibi_line,
             create_Kiq_ordered_unibi_line
         ],
@@ -132,23 +131,13 @@ def read_stan_code_from_path(path) -> str:
 
 
 # functions for writing particular lines
-def create_keq_line(ed: EnzymeKatData, reaction: str) -> str:
-    delta_g_code = ed.parameters.set_index('label').loc[f"{reaction}_delta_g", 'stan_code']
-    temperature_code = ed.known_reals.loc['temperature', 'stan_code']
-    gas_constant_code = ed.known_reals.loc['gas_constant', 'stan_code']
-    return (
-        "real {0}_Keq = get_Keq(params[{1}], known_reals[{2}], known_reals[{3}]);"
-        .format(reaction, str(delta_g_code), str(temperature_code), str(gas_constant_code))
-    )
-
-
 def create_Kip_ordered_unibi_line(ed: EnzymeKatData, reaction: str) -> str:
     codes = ed.parameters.groupby('label')['stan_code'].first().to_dict()
-    kinetic_params = ['Kia', 'Kq', 'Kcat1', 'Kcat2']
+    kinetic_params = ['Keq', 'Kia', 'Kq', 'Kcat1', 'Kcat2']
     kinetic_param_codes = [codes[reaction + '_' + p] for p in kinetic_params]
     kinetic_params_str = ", ".join([f"params[{str(c)}]" for c in kinetic_param_codes])
     return ''.join([
-        f"real {reaction}_Kip = get_Kip_ordered_unibi({reaction}_Keq, ",
+        f"real {reaction}_Kip = get_Kip_ordered_unibi(",
         kinetic_params_str,
         ");"
     ])
@@ -156,11 +145,11 @@ def create_Kip_ordered_unibi_line(ed: EnzymeKatData, reaction: str) -> str:
 
 def create_Kiq_ordered_unibi_line(ed: EnzymeKatData, reaction: str) -> str:
     codes = ed.parameters.groupby('label')['stan_code'].first().to_dict()
-    kinetic_params = ['Ka', 'Kp', 'Kcat1', 'Kcat2']
+    kinetic_params = ['Keq', 'Ka', 'Kp', 'Kcat1', 'Kcat2']
     kinetic_param_codes = [codes[reaction + '_' + p] for p in kinetic_params]
     kinetic_params_str = ", ".join([f"params[{str(c)}]" for c in kinetic_param_codes])
     return ''.join([
-        f"real {reaction}_Kiq = get_Kiq_ordered_unibi({reaction}_Keq, ",
+        f"real {reaction}_Kiq = get_Kiq_ordered_unibi(",
         kinetic_params_str,
         ");"
     ])
@@ -208,7 +197,7 @@ def create_regulatory_call(ed: EnzymeKatData, reaction: dict) -> str:
     
 
 def get_args_uniuni(ed: EnzymeKatData, reaction: str) -> str:
-    kinetic_params = ['Kcat1', 'Kcat2', 'Ka']
+    kinetic_params = ['Kcat1', 'Kcat2', 'Ka', 'Keq']
     met_codes = ed.metabolite_codes
     param_codes = ed.parameters.groupby('label')['stan_code'].first().to_dict()
     kr_codes = ed.known_reals['stan_code']
@@ -223,15 +212,14 @@ def get_args_uniuni(ed: EnzymeKatData, reaction: str) -> str:
         kp_strs[Kcat] = f"{enzyme_concentration}*{kp_strs[Kcat]}"
     S_str = f"metabolites[{str(substrate_code)}]"
     P_str = f"metabolites[{str(product_code)}]"
-    Keq_str = f"{reaction}_Keq"
     return ''.join([
         f"{S_str}, {P_str}, {kp_strs['Kcat1']}, ",
-        f"{kp_strs['Kcat2']}, {kp_strs['Ka']}, {Keq_str}"
+        f"{kp_strs['Kcat2']}, {kp_strs['Ka']}, {kp_strs['Keq']}"
     ]) 
 
 
 def get_args_ordered_unibi(ed: EnzymeKatData, reaction) -> str:
-    kinetic_params = ['Kcat1', 'Kcat2', 'Ka', 'Kp', 'Kq', 'Kia']
+    kinetic_params = ['Kcat1', 'Kcat2', 'Ka', 'Kp', 'Kq', 'Kia', 'Keq']
     met_codes = ed.metabolite_codes
     param_codes = ed.parameters.groupby('label')['stan_code'].first().to_dict()
     kr_codes = ed.known_reals['stan_code']
@@ -249,14 +237,13 @@ def get_args_ordered_unibi(ed: EnzymeKatData, reaction) -> str:
     S_str = f"metabolites[{str(substrate_code)}]"
     P1_str = f"metabolites[{str(product_1_code)}]"
     P2_str = f"metabolites[{str(product_2_code)}]"
-    Keq_str = f"{reaction}_Keq"
     Kip_str = f"{reaction}_Kip"
     Kiq_str = f"{reaction}_Kiq"
     return ''.join([
         f"{S_str}, {P1_str}, {P2_str}, ",
         f"{kp_strs['Kcat1']}, {kp_strs['Kcat2']}, ",
         f"{kp_strs['Ka']}, {kp_strs['Kp']}, {kp_strs['Kq']}, {kp_strs['Kia']}, ",
-        f"{Kip_str}, {Kiq_str}, {Keq_str}",
+        f"{Kip_str}, {Kiq_str}, {kp_strs['Keq']}",
     ])
 
 def get_args_irr_mass_action(ed: EnzymeKatData, reaction) -> str:
