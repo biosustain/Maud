@@ -33,7 +33,11 @@ def sample(
     data = data_model.from_toml(data_path)
     metabolite_names = data.stoichiometry.columns
     reaction_names = data.stoichiometry.index
-    initial_concentration = pd.Series({m: 1 for m in metabolite_names})
+    unbalanced_index = []
+    for m in data.unbalanced_metabolite['metabolites']:
+        unbalanced_index.append(np.where(metabolite_names == m)[0][0]+1)
+    unbalanced_met_arr = [[int(x), int(y)] for x in unbalanced_index for y in np.arange(1, len(data.experiments)+1)]
+    initial_concentration = np.ones((len(metabolite_names), len(data.experiments)))
     input_data = {
         'N_metabolite': len(metabolite_names),
         'N_param': len(data.parameters),
@@ -42,6 +46,7 @@ def sample(
         'N_known_real': len(data.known_reals),
         'N_measurement_flux': len(data.flux_measurements),
         'N_measurement_conc': len(data.concentration_measurements),
+        'N_unbalanced_metabolites': len(unbalanced_met_arr),
         'metabolite_ix': data.concentration_measurements['metabolite_code'].values.tolist(),
         'experiment_ix_conc': data.concentration_measurements['experiment_code'].values.tolist(),
         'measurement_conc': data.concentration_measurements['value'].values.tolist(),
@@ -50,10 +55,11 @@ def sample(
         'experiment_ix_flux': data.flux_measurements['experiment_code'].values.tolist(),
         'measurement_flux': data.flux_measurements['value'].values.tolist(),
         'measurement_scale_flux': data.flux_measurements['scale'].values.tolist(),
+        'unbalanced_met_arr': unbalanced_met_arr,
         'known_reals': data.known_reals.drop('stan_code', axis=1).values.tolist(),
         'prior_location': data.parameters['loc'].values.tolist(),
         'prior_scale': data.parameters['scale'].values.tolist(),
-        'initial_concentration': initial_concentration.values.tolist(),
+        'initial_concentration': initial_concentration.astype(float),
         'initial_time': 0,
         'steady_time': steady_state_time,
         'rel_tol': rel_tol,
@@ -88,7 +94,8 @@ def sample(
 
     # draw samples
     csv_output_file = os.path.join(paths['data_out'], f'output_{model_name}.csv')
-    return model.sample(
+
+    fit = model.sample(
         data=input_file,
         cores=4,
         chains=n_chains,
@@ -97,5 +104,44 @@ def sample(
         sampling_iters=n_samples,
         warmup_iters=n_warmup,
         max_treedepth=15,
+        adapt_delta=0.9,
         save_warmup=True,
+        step_size=0.01
     )
+
+    infd_posterior = (
+        arviz.from_cmdstanpy(
+            posterior=fit,
+            posterior_predictive=['flux_pred', 'conc_pred'],
+            observed_data={'flux_pred': input_data['measurement_flux'],
+                           'conc_pred': input_data['measurement_conc']},
+            coords={
+                'reactions': reaction_names,
+                'metabolites': metabolite_names,
+                'experiments': [x['label'] for x in data.experiments],
+                'parameter_names':  (
+                [f'{x}-{y}' for x, y in zip(data.parameters['reaction'], data.parameters['parameter'])]
+                ),
+                'flux_measurements': (
+                    [f'{x}-{y}' for x, y in zip(data.flux_measurements['reaction_code'], data.flux_measurements['experiment_code'])]
+                ),
+                'concentration_measurements': (
+                    [f'{x}-{y}' for x, y in zip(data.concentration_measurements['metabolite_code'], data.concentration_measurements['experiment_code'])]
+                )
+            },
+            dims={
+                'metabolite_concentration': ['metabolites', 'experiments'],
+                'flux': ['reactions', 'experiments'],
+                'params': ['parameter_names'],
+                'conc_pred': ['concentration_measurements'],
+                'flux_pred': ['flux_measurements'],
+
+            }
+        )
+    )
+
+    infd_posterior.to_netcdf(os.path.join(
+        paths['data_out'], f'model_inference_{model_name}.nc'
+    ))
+
+    return fit

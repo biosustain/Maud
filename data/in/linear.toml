@@ -1,13 +1,14 @@
 [constants]
 gas_constant = 8.314e-3 # units kJ/mol.K
 
+
 [[experiment]]
 label = 'condition_1'
 concentration_r1 = 0.3
 concentration_r2 = 1
 measurements = [
-  { label = 'M1', value = 0.78, scale = 0.1, type = 'metabolite' },
-  { label = 'M2', value = 0.66, scale = 0.1, type = 'metabolite' },
+  { label = 'M1', value = 0.57, scale = 0.1, type = 'metabolite' },
+  { label = 'M2', value = 0.37, scale = 0.1, type = 'metabolite' },
   { label = 'r3', value = 0.29, scale = 0.1, type = 'flux' }
 ]
 

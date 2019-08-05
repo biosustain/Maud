@@ -22,10 +22,12 @@ class EnzymeKatData():
     def __init__(self,
                  constants: Dict,
                  experiments: Dict,
-                 reactions: Dict):
+                 reactions: Dict,
+                 unbalanced_mets: Dict):
         self.constants = constants
         self.experiments = experiments
         self.reactions = reactions
+        self.unbalanced_metabolite = unbalanced_mets
         self.stoichiometry = self.get_stoichiometry()
         self.metabolite_codes = self.get_metabolite_codes()
         self.reaction_codes = self.get_reaction_codes()
@@ -112,7 +114,8 @@ def from_toml(path):
     return EnzymeKatData(
         constants=t['constants'],
         experiments=t['experiment'],
-        reactions=t['reaction']
+        reactions=t['reaction'],
+        unbalanced_mets=t['unbalanced_metabolites']
     )
 
 
