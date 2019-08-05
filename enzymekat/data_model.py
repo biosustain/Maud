@@ -22,12 +22,11 @@ class EnzymeKatData():
     def __init__(self,
                  constants: Dict,
                  experiments: Dict,
-                 reactions: Dict,
-                 unbalanced_mets: Dict):
+                 reactions: Dict):
         self.constants = constants
         self.experiments = experiments
         self.reactions = reactions
-        self.unbalanced_metabolite = unbalanced_mets
+        self.metabolites = self.get_metabolites()
         self.stoichiometry = self.get_stoichiometry()
         self.metabolite_codes = self.get_metabolite_codes()
         self.reaction_codes = self.get_reaction_codes()
@@ -48,9 +47,28 @@ class EnzymeKatData():
         S.columns.name = 'metabolite'
         return S
 
-    def get_metabolite_codes(self):
+    def get_unbalanced_metabolites(self):
         S = self.get_stoichiometry()
-        return dict(zip(S.columns, range(1, len(S.columns) + 1)))
+        produced_but_not_consumed = S.gt(0).any(axis=0) & S.ge(0).all(axis=0)
+        consumed_but_not_produced = S.lt(0).any(axis=0) & S.le(0).all(axis=0)
+        unbalanced = produced_but_not_consumed | consumed_but_not_produced
+        return S.columns[unbalanced]
+
+    def get_metabolites(self):
+        S = self.get_stoichiometry()
+        metabolite_names = S.columns
+        stan_codes = range(1, len(metabolite_names) + 1)
+        constant_metabolites = self.get_unbalanced_metabolites()
+        is_constant = [m in constant_metabolites for m in metabolite_names]
+        return pd.DataFrame({
+            'name': metabolite_names,
+            'stan_code': stan_codes,
+            'is_constant': is_constant
+        })
+
+    def get_metabolite_codes(self):
+        metabolites = self.get_metabolites()
+        return metabolites.set_index('name')['stan_code'].to_dict()
 
     def get_reaction_codes(self):
         S = self.get_stoichiometry()
@@ -114,8 +132,7 @@ def from_toml(path):
     return EnzymeKatData(
         constants=t['constants'],
         experiments=t['experiment'],
-        reactions=t['reaction'],
-        unbalanced_mets=t['unbalanced_metabolites']
+        reactions=t['reaction']
     )
 
 

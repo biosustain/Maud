@@ -31,13 +31,22 @@ def sample(
 
     # define input data
     data = data_model.from_toml(data_path)
+    metabolites = data.metabolites
     metabolite_names = data.stoichiometry.columns
+    constant_metabolites = data.metabolites.loc[lambda df: df['is_constant']]
     reaction_names = data.stoichiometry.index
-    unbalanced_index = []
-    for m in data.unbalanced_metabolite['metabolites']:
-        unbalanced_index.append(np.where(metabolite_names == m)[0][0]+1)
-    unbalanced_met_arr = [[int(x), int(y)] for x in unbalanced_index for y in np.arange(1, len(data.experiments)+1)]
-    initial_concentration = np.ones((len(metabolite_names), len(data.experiments)))
+    constant_metabolite_measurements = (
+        data.concentration_measurements
+        .groupby(['metabolite_code', 'experiment_code'])['value'].first()
+        .loc[constant_metabolites['stan_code'].values]
+    )
+    initial_concentration = pd.DataFrame(
+        1,
+        index=metabolites['stan_code'].unique(),
+        columns=range(1, len(data.experiments) + 1)
+    )
+    for (met_code, exp_code), value in constant_metabolite_measurements.iteritems():
+        initial_concentration.loc[met_code, exp_code] = value
     input_data = {
         'N_metabolite': len(metabolite_names),
         'N_param': len(data.parameters),
@@ -46,7 +55,6 @@ def sample(
         'N_known_real': len(data.known_reals),
         'N_measurement_flux': len(data.flux_measurements),
         'N_measurement_conc': len(data.concentration_measurements),
-        'N_unbalanced_metabolites': len(unbalanced_met_arr),
         'metabolite_ix': data.concentration_measurements['metabolite_code'].values.tolist(),
         'experiment_ix_conc': data.concentration_measurements['experiment_code'].values.tolist(),
         'measurement_conc': data.concentration_measurements['value'].values.tolist(),
@@ -55,11 +63,10 @@ def sample(
         'experiment_ix_flux': data.flux_measurements['experiment_code'].values.tolist(),
         'measurement_flux': data.flux_measurements['value'].values.tolist(),
         'measurement_scale_flux': data.flux_measurements['scale'].values.tolist(),
-        'unbalanced_met_arr': unbalanced_met_arr,
         'known_reals': data.known_reals.drop('stan_code', axis=1).values.tolist(),
         'prior_location': data.parameters['loc'].values.tolist(),
         'prior_scale': data.parameters['scale'].values.tolist(),
-        'initial_concentration': initial_concentration.astype(float),
+        'initial_concentration': initial_concentration.astype(float).values,
         'initial_time': 0,
         'steady_time': steady_state_time,
         'rel_tol': rel_tol,

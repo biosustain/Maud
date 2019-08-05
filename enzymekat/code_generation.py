@@ -86,13 +86,13 @@ def create_fluxes_function(ed: EnzymeKatData) -> str:
 
 def create_odes_function(ed: EnzymeKatData) -> str:
     S = ed.stoichiometry
+    constant_metabolites = ed.metabolites.loc[lambda df: df['is_constant'], 'name'].values
     fluxes = [f"fluxes[{str(i)}]" for i in range(1, len(S.index) + 1)]
     reaction_to_flux = dict(zip(S.index, fluxes))
     metabolite_lines = {m: '' for m in S.columns}
     for metabolite in S.columns:
-        if metabolite in ed.unbalanced_metabolite['metabolites']:
-            line = metabolite_lines[metabolite]
-            line += '0'
+        if metabolite in constant_metabolites:
+            line = '0'
         else:
             line = metabolite_lines[metabolite]
             for reaction in S.index:
@@ -107,7 +107,7 @@ def create_odes_function(ed: EnzymeKatData) -> str:
         "real[] get_odes(real[] fluxes){",
         "  return {",
         ",\n    ".join(metabolite_lines.values()),
-        "\n  };",
+        "  };",
         "}"
     ])
 
