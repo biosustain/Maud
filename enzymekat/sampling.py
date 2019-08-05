@@ -35,20 +35,9 @@ def sample(
     metabolite_names = data.stoichiometry.columns
     constant_metabolites = data.metabolites.loc[lambda df: df['is_constant']]
     reaction_names = data.stoichiometry.index
-    constant_metabolite_measurements = (
-        data.concentration_measurements
-        .groupby(['metabolite_code', 'experiment_code'])['value'].first()
-        .loc[constant_metabolites['stan_code'].values]
-    )
-    initial_concentration = pd.DataFrame(
-        1,
-        index=metabolites['stan_code'].unique(),
-        columns=range(1, len(data.experiments) + 1)
-    )
-    for (met_code, exp_code), value in constant_metabolite_measurements.iteritems():
-        initial_concentration.loc[met_code, exp_code] = value
     input_data = {
         'N_metabolite': len(metabolite_names),
+        'N_constant_metabolite': len(constant_metabolites),
         'N_param': len(data.parameters),
         'N_reaction': len(reaction_names),
         'N_experiment': len(data.experiments),
@@ -66,7 +55,7 @@ def sample(
         'known_reals': data.known_reals.drop('stan_code', axis=1).values.tolist(),
         'prior_location': data.parameters['loc'].values.tolist(),
         'prior_scale': data.parameters['scale'].values.tolist(),
-        'initial_concentration': initial_concentration.astype(float).values,
+        'constant_metabolite_ix': constant_metabolites['stan_code'].values.tolist(),
         'initial_time': 0,
         'steady_time': steady_state_time,
         'rel_tol': rel_tol,
