@@ -36,7 +36,7 @@ transformed data {
 }
 parameters {
   real<lower=0> params[N_param];
-  real<lower=0> constant_metabolite_concentration[N_constant_metabolite];
+  real<lower=0> constant_metabolite_concentration[N_constant_metabolite, N_experiment];
 }
 transformed parameters {
   real metabolite_concentration[N_metabolite, N_experiment];
@@ -44,7 +44,7 @@ transformed parameters {
   for (e in 1:N_experiment){
     real initial_concentration[N_metabolite] = rep_array(1.0, N_metabolite);
     for (m in 1:N_constant_metabolite){
-      initial_concentration[constant_metabolite_ix[m]] = constant_metabolite_concentration[m];
+      initial_concentration[constant_metabolite_ix[m]] = constant_metabolite_concentration[m, e];
     }
     metabolite_concentration[,e] = integrate_ode_bdf(steady_state_equation,
                                                      initial_concentration,

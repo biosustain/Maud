@@ -1,6 +1,5 @@
 [constants]
 gas_constant = 8.314e-3 # units kJ/mol.K
-constant_metabolites = []
 
 [[experiment]]
 label = 'condition_1'
@@ -45,7 +44,7 @@ name = 'r1'
 mechanism = 'uniuni'
 stoichiometry = { M1 = 1, M1_ex = -1 }
 parameters = [
-  {label = 'Keq', loc = 1.8, scale = 0.2, type = 'thermodynamic', true_value = 2 },
+  {label = 'Keq', loc = 0, scale = 0.2, type = 'thermodynamic', true_value = 2 },
   {label = 'Kcat1', loc = 2.1, scale = 0.3, type = 'kinetic', true_value = 1.8 },
   {label = 'Kcat2', loc = 0.0, scale = 0.5, type = 'kinetic', true_value = 0.1 },
   {label = 'Ka', loc = 0.0, scale = 0.5, type = 'kinetic', true_value = 0.1 }
@@ -81,7 +80,7 @@ name = 'r4'
 mechanism = 'uniuni'
 stoichiometry = { M4 = -1, M4_ex = 1 }
 parameters = [
-  {label = 'Keq', loc = 1.8, scale = 0.2, type = 'thermodynamic', true_value = 2 },
+  {label = 'Keq', loc = 0, scale = 0.1, type = 'thermodynamic', true_value = 2 },
   {label = 'Kcat1', loc = 2.1, scale = 0.3, type = 'kinetic', true_value = 1.8 },
   {label = 'Kcat2', loc = 0.0, scale = 0.5, type = 'kinetic', true_value = 0.1 },
   {label = 'Ka', loc = 0.0, scale = 0.5, type = 'kinetic', true_value = 0.1 }
@@ -92,7 +91,7 @@ name = 'r5'
 mechanism = 'uniuni'
 stoichiometry = { M2 = -1, M2_ex = 1 }
 parameters = [
-  {label = 'Keq', loc = 1.8, scale = 0.2, type = 'thermodynamic', true_value = 2 },
+  {label = 'Keq', loc = 0, scale = 0.1, type = 'thermodynamic', true_value = 2 },
   {label = 'Kcat1', loc = 2.1, scale = 0.3, type = 'kinetic', true_value = 1.8 },
   {label = 'Kcat2', loc = 0.0, scale = 0.5, type = 'kinetic', true_value = 0.1 },
   {label = 'Ka', loc = 0.0, scale = 0.5, type = 'kinetic', true_value = 0.1 }
