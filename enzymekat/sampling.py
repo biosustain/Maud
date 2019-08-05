@@ -100,9 +100,8 @@ def sample(
         sampling_iters=n_samples,
         warmup_iters=n_warmup,
         max_treedepth=15,
-        adapt_delta=0.9,
-        save_warmup=True,
-        step_size=0.01
+        adapt_delta=0.8,
+        save_warmup=True
     )
 
     infd_posterior = (
