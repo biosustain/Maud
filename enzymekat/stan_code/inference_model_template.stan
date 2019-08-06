@@ -6,8 +6,8 @@ data {
   int<lower=1> N_reaction;
   int<lower=1> N_experiment;
   int<lower=1> N_known_real;
-  int<lower=0> N_measurement_flux;
-  int<lower=0> N_measurement_conc;
+  int<lower=1> N_measurement_flux;
+  int<lower=1> N_measurement_conc;
   // measurements
   int<lower=0,upper=N_metabolite> metabolite_ix[N_measurement_conc];
   int<lower=1,upper=N_experiment> experiment_ix_conc[N_measurement_conc];
