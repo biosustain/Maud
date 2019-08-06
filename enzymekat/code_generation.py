@@ -1,6 +1,10 @@
 import os
 import pandas as pd
 from enzymekat.data_model import EnzymeKatData
+import jinja2
+
+template_dir = os.path.join(os.path.dirname(__file__), 'templates')
+jinja_env = jinja2.Environment(loader=jinja2.FileSystemLoader(template_dir))
 
 
 TEMPLATE_RELATIVE_PATHS = {
@@ -33,6 +37,8 @@ def create_functions_block(ed: EnzymeKatData) -> str:
 
 
 def create_fluxes_function(ed: EnzymeKatData) -> str:
+
+    fluxes_template = jinja_env.get_template('fluxes_template.stan')
     mechanism_to_haldane_functions = {
         'uniuni': [],
         'ordered_unibi': [
@@ -73,17 +79,12 @@ def create_fluxes_function(ed: EnzymeKatData) -> str:
             free_enzyme_ratio_lines.append(free_enzyme_ratio_line)
             flux_line = f"{flux_line} * {regulatory_component}"
         flux_lines.append(flux_line)
-    return '\n  '.join([
-        "real [] get_fluxes(real[] metabolites, real[] params, real[] known_reals){",
-        "\n  ".join(haldane_lines + free_enzyme_ratio_lines),
-        "return {",
-        ",\n    ".join(flux_lines),
-        "};",
-        "}",
-    ])
+
+    return fluxes_template.render(haldanes=haldane_lines, free_enzyme_ratio=free_enzyme_ratio_lines, fluxes=flux_lines)
 
 
 def create_odes_function(ed: EnzymeKatData) -> str:
+    ode_template = jinja_env.get_template('ode_rates_template.stan')
     S = ed.stoichiometry
     fluxes = [f"fluxes[{str(i)}]" for i in range(1, len(S.index) + 1)]
     reaction_to_flux = dict(zip(S.index, fluxes))
@@ -98,32 +99,13 @@ def create_odes_function(ed: EnzymeKatData) -> str:
                 flux_string = reaction_to_flux[reaction]
                 line += f"{stoich}*{flux_string}"
         metabolite_lines[metabolite] = line
-    return '\n'.join([
-        "real[] get_odes(real[] fluxes){",
-        "  return {",
-        ",\n    ".join(metabolite_lines.values()),
-        "\n  };",
-        "}"
-    ])
-        
+    return ode_template.render(ode_stoic=metabolite_lines.values())
+
 
 def create_steady_state_function():
-    return """real[] steady_state_equation(
-      real t,
-      real[] metabolites,
-      real[] params,
-      real[] known_reals,
-      int[] known_ints
-    ){
-    for (m in 1:size(metabolites)){
-      if (metabolites[m] < 0){
-        reject("Metabolite ", m, " is ", metabolites[m], " but should be greater than zero.");
-      }
-    }
-    return get_odes(get_fluxes(metabolites, params, known_reals));
-    }
-    """
-    
+    ss_template = jinja_env.get_template('steady_state_template.stan')
+    return ss_template.render()
+
 
 def read_stan_code_from_path(path) -> str:
     with open(path, 'r') as f:
@@ -141,7 +123,7 @@ def create_Kip_ordered_unibi_line(ed: EnzymeKatData, reaction: str) -> str:
         kinetic_params_str,
         ");"
     ])
-    
+
 
 def create_Kiq_ordered_unibi_line(ed: EnzymeKatData, reaction: str) -> str:
     codes = ed.parameters.groupby('label')['stan_code'].first().to_dict()
@@ -194,7 +176,7 @@ def create_regulatory_call(ed: EnzymeKatData, reaction: dict) -> str:
             f"{transfer_constant_str}",
             ")"
         ])
-    
+
 
 def get_args_uniuni(ed: EnzymeKatData, reaction: str) -> str:
     kinetic_params = ['Kcat1', 'Kcat2', 'Ka', 'Keq']
@@ -215,7 +197,7 @@ def get_args_uniuni(ed: EnzymeKatData, reaction: str) -> str:
     return ''.join([
         f"{S_str}, {P_str}, {kp_strs['Kcat1']}, ",
         f"{kp_strs['Kcat2']}, {kp_strs['Ka']}, {kp_strs['Keq']}"
-    ]) 
+    ])
 
 
 def get_args_ordered_unibi(ed: EnzymeKatData, reaction) -> str:
