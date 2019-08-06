@@ -31,11 +31,13 @@ def sample(
 
     # define input data
     data = data_model.from_toml(data_path)
+    metabolites = data.metabolites
     metabolite_names = data.stoichiometry.columns
+    constant_metabolites = data.metabolites.loc[lambda df: df['is_constant']]
     reaction_names = data.stoichiometry.index
-    initial_concentration = pd.Series({m: 1 for m in metabolite_names})
     input_data = {
         'N_metabolite': len(metabolite_names),
+        'N_constant_metabolite': len(constant_metabolites),
         'N_param': len(data.parameters),
         'N_reaction': len(reaction_names),
         'N_experiment': len(data.experiments),
@@ -53,7 +55,7 @@ def sample(
         'known_reals': data.known_reals.drop('stan_code', axis=1).values.tolist(),
         'prior_location': data.parameters['loc'].values.tolist(),
         'prior_scale': data.parameters['scale'].values.tolist(),
-        'initial_concentration': initial_concentration.values.tolist(),
+        'constant_metabolite_ix': constant_metabolites['stan_code'].values.tolist(),
         'initial_time': 0,
         'steady_time': steady_state_time,
         'rel_tol': rel_tol,
@@ -88,7 +90,8 @@ def sample(
 
     # draw samples
     csv_output_file = os.path.join(paths['data_out'], f'output_{model_name}.csv')
-    return model.sample(
+
+    fit = model.sample(
         data=input_file,
         cores=4,
         chains=n_chains,
@@ -97,5 +100,43 @@ def sample(
         sampling_iters=n_samples,
         warmup_iters=n_warmup,
         max_treedepth=15,
-        save_warmup=True,
+        adapt_delta=0.8,
+        save_warmup=True
     )
+
+    infd_posterior = (
+        arviz.from_cmdstanpy(
+            posterior=fit,
+            posterior_predictive=['flux_pred', 'conc_pred'],
+            observed_data={'flux_pred': input_data['measurement_flux'],
+                           'conc_pred': input_data['measurement_conc']},
+            coords={
+                'reactions': reaction_names,
+                'metabolites': metabolite_names,
+                'experiments': [x['label'] for x in data.experiments],
+                'parameter_names':  (
+                [f'{x}-{y}' for x, y in zip(data.parameters['reaction'], data.parameters['parameter'])]
+                ),
+                'flux_measurements': (
+                    [f'{x}-{y}' for x, y in zip(data.flux_measurements['reaction_code'], data.flux_measurements['experiment_code'])]
+                ),
+                'concentration_measurements': (
+                    [f'{x}-{y}' for x, y in zip(data.concentration_measurements['metabolite_code'], data.concentration_measurements['experiment_code'])]
+                )
+            },
+            dims={
+                'metabolite_concentration': ['metabolites', 'experiments'],
+                'flux': ['reactions', 'experiments'],
+                'params': ['parameter_names'],
+                'conc_pred': ['concentration_measurements'],
+                'flux_pred': ['flux_measurements'],
+
+            }
+        )
+    )
+
+    infd_posterior.to_netcdf(os.path.join(
+        paths['data_out'], f'model_inference_{model_name}.nc'
+    ))
+
+    return fit

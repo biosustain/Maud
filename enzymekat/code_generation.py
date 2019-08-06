@@ -6,6 +6,7 @@ from enzymekat.data_model import EnzymeKatData
 TEMPLATE_RELATIVE_PATHS = {
     'inference': 'stan_code/inference_model_template.stan',
     'simulation': 'stan_code/simulation_model_template.stan',
+    'relative': 'stan_code/relative_model_template.stan'
 }
 
 
@@ -85,27 +86,31 @@ def create_fluxes_function(ed: EnzymeKatData) -> str:
 
 def create_odes_function(ed: EnzymeKatData) -> str:
     S = ed.stoichiometry
+    constant_metabolites = ed.metabolites.loc[lambda df: df['is_constant'], 'name'].values
     fluxes = [f"fluxes[{str(i)}]" for i in range(1, len(S.index) + 1)]
     reaction_to_flux = dict(zip(S.index, fluxes))
     metabolite_lines = {m: '' for m in S.columns}
     for metabolite in S.columns:
-        line = metabolite_lines[metabolite]
-        for reaction in S.index:
-            s = S.loc[reaction, metabolite]
-            if s != 0:
-                positive_and_not_first = s > 0 and line != ''
-                stoich = '+' + str(s) if positive_and_not_first else str(s)
-                flux_string = reaction_to_flux[reaction]
-                line += f"{stoich}*{flux_string}"
+        if metabolite in constant_metabolites:
+            line = '0'
+        else:
+            line = metabolite_lines[metabolite]
+            for reaction in S.index:
+                s = S.loc[reaction, metabolite]
+                if s != 0:
+                    positive_and_not_first = s > 0 and line != ''
+                    stoich = '+' + str(s) if positive_and_not_first else str(s)
+                    flux_string = reaction_to_flux[reaction]
+                    line += f"{stoich}*{flux_string}"
         metabolite_lines[metabolite] = line
     return '\n'.join([
         "real[] get_odes(real[] fluxes){",
         "  return {",
         ",\n    ".join(metabolite_lines.values()),
-        "\n  };",
+        "  };",
         "}"
     ])
-        
+
 
 def create_steady_state_function():
     return """real[] steady_state_equation(
@@ -123,7 +128,7 @@ def create_steady_state_function():
     return get_odes(get_fluxes(metabolites, params, known_reals));
     }
     """
-    
+
 
 def read_stan_code_from_path(path) -> str:
     with open(path, 'r') as f:
@@ -141,7 +146,7 @@ def create_Kip_ordered_unibi_line(ed: EnzymeKatData, reaction: str) -> str:
         kinetic_params_str,
         ");"
     ])
-    
+
 
 def create_Kiq_ordered_unibi_line(ed: EnzymeKatData, reaction: str) -> str:
     codes = ed.parameters.groupby('label')['stan_code'].first().to_dict()
@@ -194,7 +199,7 @@ def create_regulatory_call(ed: EnzymeKatData, reaction: dict) -> str:
             f"{transfer_constant_str}",
             ")"
         ])
-    
+
 
 def get_args_uniuni(ed: EnzymeKatData, reaction: str) -> str:
     kinetic_params = ['Kcat1', 'Kcat2', 'Ka', 'Keq']
@@ -215,7 +220,7 @@ def get_args_uniuni(ed: EnzymeKatData, reaction: str) -> str:
     return ''.join([
         f"{S_str}, {P_str}, {kp_strs['Kcat1']}, ",
         f"{kp_strs['Kcat2']}, {kp_strs['Ka']}, {kp_strs['Keq']}"
-    ]) 
+    ])
 
 
 def get_args_ordered_unibi(ed: EnzymeKatData, reaction) -> str:

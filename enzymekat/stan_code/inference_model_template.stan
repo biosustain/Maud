@@ -1,6 +1,7 @@
 data {
   // dimensions
   int<lower=1> N_metabolite;
+  int<lower=1> N_constant_metabolite;
   int<lower=1> N_param;
   int<lower=1> N_reaction;
   int<lower=1> N_experiment;
@@ -20,8 +21,8 @@ data {
   real known_reals[N_known_real, N_experiment];
   vector[N_param] prior_location;
   vector[N_param] prior_scale;
+  int constant_metabolite_ix[N_constant_metabolite];
   // ode stuff
-  real initial_concentration[N_metabolite];
   real initial_time;
   real steady_time;
   real rel_tol;
@@ -35,11 +36,16 @@ transformed data {
 }
 parameters {
   real<lower=0> params[N_param];
+  real<lower=0> constant_metabolite_concentration[N_constant_metabolite, N_experiment];
 }
 transformed parameters {
   real metabolite_concentration[N_metabolite, N_experiment];
   real flux[N_reaction, N_experiment];
   for (e in 1:N_experiment){
+    real initial_concentration[N_metabolite] = rep_array(1.0, N_metabolite);
+    for (m in 1:N_constant_metabolite){
+      initial_concentration[constant_metabolite_ix[m]] = constant_metabolite_concentration[m, e];
+    }
     metabolite_concentration[,e] = integrate_ode_bdf(steady_state_equation,
                                                      initial_concentration,
                                                      initial_time,
@@ -49,7 +55,7 @@ transformed parameters {
                                                      known_ints,
                                                      rel_tol, abs_tol, max_steps)[1];
     flux[,e] = get_fluxes(metabolite_concentration[,e], params, known_reals[,e]);
-  }
+ }
 }
 model {
   params ~ lognormal(prior_location, prior_scale);
@@ -69,7 +75,7 @@ model {
 generated quantities {
   vector[N_measurement_flux] flux_pred;
   vector[N_measurement_conc] conc_pred;
-  real metabolite_flux[N_metabolite, N_experiment]; 
+  real metabolite_flux[N_metabolite, N_experiment];
   for (e in 1:N_experiment){
     metabolite_flux[, e] = get_odes(flux[, e]);
   }
@@ -77,7 +83,7 @@ generated quantities {
     conc_pred[mc] = lognormal_rng(log(metabolite_concentration[metabolite_ix[mc], experiment_ix_conc[mc]]),
                                   measurement_scale_conc[mc]);
   }
-         for (mf in 1:N_measurement_flux){
-           flux_pred[mf] = normal_rng(flux[reaction_ix[mf], experiment_ix_flux[mf]], measurement_scale_flux[mf]);
-         }
+  for (mf in 1:N_measurement_flux){
+    flux_pred[mf] = normal_rng(flux[reaction_ix[mf], experiment_ix_flux[mf]], measurement_scale_flux[mf]);
+  }
 }
