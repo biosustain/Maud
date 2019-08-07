@@ -1,11 +1,7 @@
 import os
 import pandas as pd
 from enzymekat.data_model import EnzymeKatData
-import jinja2
-
-template_dir = os.path.join(os.path.dirname(__file__), 'templates')
-jinja_env = jinja2.Environment(loader=jinja2.FileSystemLoader(template_dir))
-
+from jinja2 import Template
 
 TEMPLATE_RELATIVE_PATHS = {
     'inference': 'stan_code/inference_model_template.stan',
@@ -39,7 +35,17 @@ def create_functions_block(ed: EnzymeKatData) -> str:
 
 def create_fluxes_function(ed: EnzymeKatData) -> str:
 
-    fluxes_template = jinja_env.get_template('fluxes_template.stan')
+    fluxes_code_block = Template("""real [] get_fluxes(real[] metabolites, real[] params, real[] known_reals){  {% for haldane in haldanes %}
+    {{haldane}}{%- endfor %}
+
+  {% for fe in free_enzyme_ratio %}
+    {{fe}}{%- endfor %}
+
+  return{   {% for flux in fluxes %}
+      {{flux}}{{"," if not loop.last}}{%- endfor %}
+    };
+  }""")
+
     mechanism_to_haldane_functions = {
         'uniuni': [],
         'ordered_unibi': [
@@ -53,9 +59,6 @@ def create_fluxes_function(ed: EnzymeKatData) -> str:
         'irr_mass_action': get_args_irr_mass_action,
         'fixed_flux': get_args_fixed_flux
     }
-    top = """
-    real [] get_fluxes(real[] metabolites, real[] params, real[] known_reals){
-    """
     haldane_lines = []
     free_enzyme_ratio_lines = []
     flux_lines = []
@@ -81,11 +84,15 @@ def create_fluxes_function(ed: EnzymeKatData) -> str:
             flux_line = f"{flux_line} * {regulatory_component}"
         flux_lines.append(flux_line)
 
-    return fluxes_template.render(haldanes=haldane_lines, free_enzyme_ratio=free_enzyme_ratio_lines, fluxes=flux_lines)
+    return fluxes_code_block.render(haldanes=haldane_lines, free_enzyme_ratio=free_enzyme_ratio_lines, fluxes=flux_lines)
 
 
 def create_odes_function(ed: EnzymeKatData) -> str:
-    ode_template = jinja_env.get_template('ode_rates_template.stan')
+    ode_code_block = Template("""real[] get_odes(real[] fluxes){
+  return {  {% for ode in ode_stoic %}
+      {{ode}}{{"," if not loop.last}}{%- endfor %}
+  };
+}""")
     S = ed.stoichiometry
     constant_metabolites = ed.metabolites.loc[lambda df: df['is_constant'], 'name'].values
     fluxes = [f"fluxes[{str(i)}]" for i in range(1, len(S.index) + 1)]
@@ -104,12 +111,25 @@ def create_odes_function(ed: EnzymeKatData) -> str:
                     flux_string = reaction_to_flux[reaction]
                     line += f"{stoich}*{flux_string}"
         metabolite_lines[metabolite] = line
-    return ode_template.render(ode_stoic=metabolite_lines.values())
+    return ode_code_block.render(ode_stoic=metabolite_lines.values())
 
 
 def create_steady_state_function():
-    ss_template = jinja_env.get_template('steady_state_template.stan')
-    return ss_template.render()
+    ss_code_block = Template("""real[] steady_state_equation(
+          real t,
+          real[] metabolites,
+          real[] params,
+          real[] known_reals,
+          int[] known_ints
+        ){
+        for (m in 1:size(metabolites)){
+          if (metabolites[m] < 0){
+            reject("Metabolite ", m, " is ", metabolites[m], " but should be greater than zero.");
+          }
+        }
+        return get_odes(get_fluxes(metabolites, params, known_reals));
+    }""")
+    return ss_code_block.render()
 
 
 def read_stan_code_from_path(path) -> str:
