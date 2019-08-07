@@ -10,14 +10,14 @@ concentration_r4 = 1.5
 concentration_r5 = 1.5
 concentration_r6 = 1
 measurements = [
-  { label = 'M1', value = 2.28, scale = 0.1, type = 'metabolite' },
-  { label = 'M1_ex', value = 10, scale = 1, type = 'metabolite' },
-  { label = 'M2', value = 0.29, scale = 0.05, type = 'metabolite' },
-  { label = 'M2_ex', value = 20, scale = 1, type = 'metabolite' },
-  { label = 'M3', value = 0.34, scale = 0.05, type = 'metabolite' },
-  { label = 'M4', value = 0.30, scale = 0.05, type = 'metabolite' },
-  { label = 'M4_ex', value = 30, scale = 1, type = 'metabolite' },
-  { label = 'r1', value = 0.31, scale = 0.05, type = 'flux' }
+  { label = 'M1', value = 0.50, scale = 0.1, type = 'metabolite' },
+  { label = 'M1_ex', value = 1.17, scale = 0.1, type = 'metabolite' },
+  { label = 'M2', value = 1.26, scale = 0.05, type = 'metabolite' },
+  { label = 'M2_ex', value = 0.98, scale = 0.1, type = 'metabolite' },
+  { label = 'M3', value = 0.5, scale = 0.05, type = 'metabolite' },
+  { label = 'M4', value = 0.93, scale = 0.05, type = 'metabolite' },
+  { label = 'M4_ex', value = 1.19, scale = 0.1, type = 'metabolite' },
+  { label = 'r1', value = 0.05, scale = 0.05, type = 'flux' }
 ]
 
 [[experiment]]
@@ -29,14 +29,14 @@ concentration_r4 = 1
 concentration_r5 = 1
 concentration_r6 = 1
 measurements = [
-  { label = 'M1', value = 0.25, scale = 0.05, type = 'metabolite' },
-  { label = 'M1_ex', value = 10, scale = 1, type = 'metabolite' },
-  { label = 'M2', value = 0.11, scale = 0.05, type = 'metabolite' },
-  { label = 'M2_ex', value = 20, scale = 1, type = 'metabolite' },
-  { label = 'M3', value = 0.07, scale = 0.02, type = 'metabolite' },
-  { label = 'M4', value = 0.06, scale = 0.02, type = 'metabolite' },
-  { label = 'M4_ex', value = 30, scale = 1, type = 'metabolite' },
-  { label = 'r1', value = 0.15, scale = 0.05, type = 'flux' }
+  { label = 'M1', value = 0.48, scale = 0.05, type = 'metabolite' },
+  { label = 'M1_ex', value = 0.96, scale = 0.1, type = 'metabolite' },
+  { label = 'M2', value = 1.32, scale = 0.05, type = 'metabolite' },
+  { label = 'M2_ex', value = 0.90, scale = 0.1, type = 'metabolite' },
+  { label = 'M3', value = 0.49, scale = 0.02, type = 'metabolite' },
+  { label = 'M4', value = 0.96, scale = 0.02, type = 'metabolite' },
+  { label = 'M4_ex', value = 0.99, scale = 0.1, type = 'metabolite' },
+  { label = 'r1', value = 0.02, scale = 0.05, type = 'flux' }
 ]
 
 [[reaction]]
@@ -44,11 +44,14 @@ name = 'r1'
 mechanism = 'uniuni'
 stoichiometry = { M1 = 1, M1_ex = -1 }
 parameters = [
-  {label = 'Keq', loc = 0, scale = 0.2, type = 'thermodynamic', true_value = 2 },
+  {label = 'Keq', loc = 0, scale = 0.01, type = 'thermodynamic', true_value = 1 },
   {label = 'Kcat1', loc = 2.1, scale = 0.3, type = 'kinetic', true_value = 1.8 },
   {label = 'Kcat2', loc = 0.0, scale = 0.5, type = 'kinetic', true_value = 0.1 },
   {label = 'Ka', loc = 0.0, scale = 0.5, type = 'kinetic', true_value = 0.1 }
+  { label = 'dissociation_constant_t', metabolite = 'M4', loc= 0, scale = 0.6, type = 'allosteric', true_value = 2},
+  { label = 'transfer_constant', loc= 0, scale = 0.6, type = 'allosteric', true_value = 1.1},
 ]
+allosteric_inhibitors = ['M4']
 
 [[reaction]]
 name = 'r2'
@@ -80,7 +83,7 @@ name = 'r4'
 mechanism = 'uniuni'
 stoichiometry = { M4 = -1, M4_ex = 1 }
 parameters = [
-  {label = 'Keq', loc = 0, scale = 0.1, type = 'thermodynamic', true_value = 2 },
+  {label = 'Keq', loc = 0, scale = 0.01, type = 'thermodynamic', true_value = 1 },
   {label = 'Kcat1', loc = 2.1, scale = 0.3, type = 'kinetic', true_value = 1.8 },
   {label = 'Kcat2', loc = 0.0, scale = 0.5, type = 'kinetic', true_value = 0.1 },
   {label = 'Ka', loc = 0.0, scale = 0.5, type = 'kinetic', true_value = 0.1 }
@@ -91,7 +94,7 @@ name = 'r5'
 mechanism = 'uniuni'
 stoichiometry = { M2 = -1, M2_ex = 1 }
 parameters = [
-  {label = 'Keq', loc = 0, scale = 0.1, type = 'thermodynamic', true_value = 2 },
+  {label = 'Keq', loc = 0, scale = 0.01, type = 'thermodynamic', true_value = 1 },
   {label = 'Kcat1', loc = 2.1, scale = 0.3, type = 'kinetic', true_value = 1.8 },
   {label = 'Kcat2', loc = 0.0, scale = 0.5, type = 'kinetic', true_value = 0.1 },
   {label = 'Ka', loc = 0.0, scale = 0.5, type = 'kinetic', true_value = 0.1 }
