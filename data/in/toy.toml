@@ -47,7 +47,7 @@ parameters = [
   {label = 'Keq', loc = 0, scale = 0.01, type = 'thermodynamic', true_value = 1 },
   {label = 'Kcat1', loc = 2.1, scale = 0.3, type = 'kinetic', true_value = 1.8 },
   {label = 'Kcat2', loc = 0.0, scale = 0.5, type = 'kinetic', true_value = 0.1 },
-  {label = 'Ka', loc = 0.0, scale = 0.5, type = 'kinetic', true_value = 0.1 }
+  {label = 'Ka', loc = 0.0, scale = 0.5, type = 'kinetic', true_value = 0.1 },
   { label = 'dissociation_constant_t', metabolite = 'M4', loc= 0, scale = 0.6, type = 'allosteric', true_value = 2},
   { label = 'transfer_constant', loc= 0, scale = 0.6, type = 'allosteric', true_value = 1.1},
 ]
