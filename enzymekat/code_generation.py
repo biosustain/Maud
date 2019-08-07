@@ -35,7 +35,6 @@ def create_functions_block(ed: EnzymeKatData) -> str:
 
 def create_fluxes_function(ed: EnzymeKatData) -> str:
     mechanism_to_haldane_functions = {
-        'uniuni': [],
         'ordered_unibi': [
             create_Kip_ordered_unibi_line,
             create_Kiq_ordered_unibi_line
