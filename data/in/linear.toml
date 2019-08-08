@@ -1,15 +1,16 @@
 [constants]
 gas_constant = 8.314e-3 # units kJ/mol.K
 
-
 [[experiment]]
 label = 'condition_1'
 concentration_r1 = 0.3
 concentration_r2 = 1
 concentration_r3 = 1
+unbalanced_metabolite_priors = [
+  { label = 'M1_ex', loc = 2, scale = 0.05 },
+  { label = 'M2_ex', loc = 1, scale = 0.05 },
+]
 measurements = [
-  { label = 'M1_ex', value = 2, scale = 0.05, type = 'metabolite' },
-  { label = 'M2_ex', value = 1, scale = 0.05, type = 'metabolite' },
   { label = 'M1', value = 0.8, scale = 0.1, type = 'metabolite' },
   { label = 'M2', value = 1.5, scale = 0.1, type = 'metabolite' },
   { label = 'r3', value = 0.29, scale = 0.1, type = 'flux' }
@@ -20,9 +21,11 @@ label = 'condition_2'
 concentration_r1 = 0.2
 concentration_r2 = 1
 concentration_r3 = 1
+unbalanced_metabolite_priors = [
+  { label = 'M1_ex', loc = 2, scale = 0.05 },
+  { label = 'M2_ex', loc = 1, scale = 0.05 },
+]
 measurements = [
-  { label = 'M1_ex', value = 2, scale = 0.05, type = 'metabolite' },
-  { label = 'M2_ex', value = 1, scale = 0.05, type = 'metabolite' },
   { label = 'M1', value = 0.7, scale = 0.1, type = 'metabolite' },
   { label = 'M2', value = 1.4, scale = 0.1, type = 'metabolite' },
   { label = 'r3', value = 0.21, scale = 0.1, type = 'flux' }
