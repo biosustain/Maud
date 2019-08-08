@@ -10,7 +10,7 @@ SAMPLING_DEFAULTS = {
     'abs_tol': 1e-12,
     'max_steps': int(1e9),
     'likelihood': 1,
-    'n_samples': 100,
+    'n_samples': 150,
     'n_warmup': 100,
     'n_chains': 4,
     'n_cores': 4,
