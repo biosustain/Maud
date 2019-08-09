@@ -74,5 +74,3 @@ def simulate(data_path, **kwargs):
           simulations['flux_measurements'].round(2))
     print('\nSimulated metabolite concentration measurements:\n',
           simulations['concentration_measurements'].round(2))
-    print('\nSimulated metabolite fluxes (at steady state these are zero):\n',
-          simulations['metabolite_fluxes'].round(2))
