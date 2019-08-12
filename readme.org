@@ -3,18 +3,37 @@ account allosteric effects, obeying the laws of thermodynamics and synthesising
 information/uncertainty from both steady state experiments and the existing
 literature.
 
+* Requirements
+- Python 3.7
+- A C++ toolchain
+
 * Python dependencies
-- pandas
-- numpy
-- matplotlib
-- arviz
-- toml
-- [[https://github.com/stan-dev/cmdstanpy][cmdstanpy]]
+See [[https://github.com/biosustain/enzymeKAT/blob/master/setup.cfg][setup.cfg]].
 
 * Installation
-First run this command to install enzymeKAT and its python dependencies:
+First create a fresh Python 3.7 virtual environment and then activate it:
+
+#+begin_src bash
+sudo pip3.7 install virtualenv          # if virtualenv isn't installed already
+python3.7 -m virtualenv enzymekat_venv  # choose any name you like!
+source enzymekat_venv/bin/activate
+#+end_src
+
+Run this command to install enzymeKAT and its python dependencies:
+
 #+begin_src bash
 pip install -e git+ssh://git@github.com/biosustain/enzymeKAT.git#egg=enzymekat
+#+end_src
+
+This step requires that you have ssh access to the enzymekat github repository
+This is unavoidable while the repository remains private, but should be
+achievable if you can see this readme.
+
+Cmdstanpy depends on [[https://github.com/stan-dev/cmdstan][cmdstan]], which needs to be installed too. Fortunately,
+cmdstanpy comes with a command line script that installs cmdstan, so this step
+is pretty simple:
+
+#+begin_src bash
 install_cmdstan
 #+end_src
 

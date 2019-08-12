@@ -93,12 +93,12 @@ def create_odes_function(ed: EnzymeKatData) -> str:
   };
 }""")
     S = ed.stoichiometry
-    constant_metabolites = ed.metabolites.loc[lambda df: df['is_constant'], 'name'].values
+    unbalanced_metabolites = ed.metabolites.loc[lambda df: df['is_unbalanced'], 'name'].values
     fluxes = [f"fluxes[{str(i)}]" for i in range(1, len(S.index) + 1)]
     reaction_to_flux = dict(zip(S.index, fluxes))
     metabolite_lines = {m: '' for m in S.columns}
     for metabolite in S.columns:
-        if metabolite in constant_metabolites:
+        if metabolite in unbalanced_metabolites:
             line = '0'
         else:
             line = metabolite_lines[metabolite]
@@ -138,7 +138,7 @@ def read_stan_code_from_path(path) -> str:
 
 # functions for writing particular lines
 def create_Kip_ordered_unibi_line(ed: EnzymeKatData, reaction: str) -> str:
-    codes = ed.parameters.groupby('label')['stan_code'].first().to_dict()
+    codes = ed.kinetic_parameters.groupby('label')['stan_code'].first().to_dict()
     kinetic_params = ['Keq', 'Kia', 'Kq', 'Kcat1', 'Kcat2']
     kinetic_param_codes = [codes[reaction + '_' + p] for p in kinetic_params]
     kinetic_params_str = ", ".join([f"params[{str(c)}]" for c in kinetic_param_codes])
@@ -150,7 +150,7 @@ def create_Kip_ordered_unibi_line(ed: EnzymeKatData, reaction: str) -> str:
 
 
 def create_Kiq_ordered_unibi_line(ed: EnzymeKatData, reaction: str) -> str:
-    codes = ed.parameters.groupby('label')['stan_code'].first().to_dict()
+    codes = ed.kinetic_parameters.groupby('label')['stan_code'].first().to_dict()
     kinetic_params = ['Keq', 'Ka', 'Kp', 'Kcat1', 'Kcat2']
     kinetic_param_codes = [codes[reaction + '_' + p] for p in kinetic_params]
     kinetic_params_str = ", ".join([f"params[{str(c)}]" for c in kinetic_param_codes])
@@ -162,8 +162,8 @@ def create_Kiq_ordered_unibi_line(ed: EnzymeKatData, reaction: str) -> str:
 
 
 def create_regulatory_call(ed: EnzymeKatData, reaction: dict) -> str:
-    param_codes = ed.parameters.groupby('label')['stan_code'].first().to_dict()
-    met_codes = ed.metabolite_codes
+    param_codes = ed.kinetic_parameters.groupby('label')['stan_code'].first().to_dict()
+    met_codes = ed.stan_codes['metabolite']
     if set(reaction.keys()).intersection({'allosteric_inhibitors', 'allosteric_activators'}) == set():
         return None
     else:
@@ -204,8 +204,8 @@ def create_regulatory_call(ed: EnzymeKatData, reaction: dict) -> str:
 
 def get_args_uniuni(ed: EnzymeKatData, reaction: str) -> str:
     kinetic_params = ['Kcat1', 'Kcat2', 'Ka', 'Keq']
-    met_codes = ed.metabolite_codes
-    param_codes = ed.parameters.groupby('label')['stan_code'].first().to_dict()
+    met_codes = ed.stan_codes['metabolite']
+    param_codes = ed.kinetic_parameters.groupby('label')['stan_code'].first().to_dict()
     kr_codes = ed.known_reals['stan_code']
     substrate = ed.stoichiometry.loc[reaction].loc[lambda df: df == -1].index[0]
     product = ed.stoichiometry.loc[reaction].loc[lambda df: df == 1].index[0]
@@ -226,8 +226,8 @@ def get_args_uniuni(ed: EnzymeKatData, reaction: str) -> str:
 
 def get_args_ordered_unibi(ed: EnzymeKatData, reaction) -> str:
     kinetic_params = ['Kcat1', 'Kcat2', 'Ka', 'Kp', 'Kq', 'Kia', 'Keq']
-    met_codes = ed.metabolite_codes
-    param_codes = ed.parameters.groupby('label')['stan_code'].first().to_dict()
+    met_codes = ed.stan_codes['metabolite']
+    param_codes = ed.kinetic_parameters.groupby('label')['stan_code'].first().to_dict()
     kr_codes = ed.known_reals['stan_code']
     substrate = ed.stoichiometry.loc[reaction].loc[lambda df: df == -1].index[0]
     product_1, product_2 = ed.stoichiometry.loc[reaction].loc[lambda df: df == 1].index
@@ -253,8 +253,8 @@ def get_args_ordered_unibi(ed: EnzymeKatData, reaction) -> str:
     ])
 
 def get_args_irr_mass_action(ed: EnzymeKatData, reaction) -> str:
-    met_codes = ed.metabolite_codes
-    param_codes = ed.parameters.groupby('label')['stan_code'].first().to_dict()
+    met_codes = ed.stan_codes['metabolite']
+    param_codes = ed.kinetic_parameters.groupby('label')['stan_code'].first().to_dict()
     met = ed.stoichiometry.loc[reaction].loc[lambda df: df != 0].index[0]
     met_code = str(met_codes[met])
     alpha_code = str(param_codes[reaction + '_alpha'])
