@@ -29,10 +29,19 @@ def simulate(
     # define input data
     ed = data_model.from_toml(data_path)
     metabolite_names = ed.stoichiometry.columns
+    constant_metabolites = ed.metabolites.loc[lambda df: df['is_constant']]
+    constant_metabolite_concentrations = (
+        ed.concentration_measurements
+        .set_index(['metabolite_code', 'experiment_code'])
+        .loc[constant_metabolites['stan_code'].values]
+        ['value']
+        .unstack()
+        .values
+    )
     reaction_names = ed.stoichiometry.index
-    initial_concentration = pd.Series({m: 1 for m in metabolite_names})
     input_data = {
         'N_metabolite': len(metabolite_names),
+        'N_constant_metabolite': len(constant_metabolites),
         'N_param': len(ed.parameters),
         'N_reaction': len(reaction_names),
         'N_experiment': len(ed.experiments),
@@ -47,7 +56,8 @@ def simulate(
         'measurement_scale_flux': ed.flux_measurements['scale'].values.tolist(),
         'known_reals': ed.known_reals.drop('stan_code', axis=1).values.tolist(),
         'params': ed.parameters['true_value'].tolist(),
-        'initial_concentration': initial_concentration.values.tolist(),
+        'constant_metabolite_ix': constant_metabolites['stan_code'].values.tolist(),
+        'constant_metabolite_concentration': constant_metabolite_concentrations,
         'initial_time': 0,
         'steady_time': steady_state_time,
         'rel_tol': rel_tol,

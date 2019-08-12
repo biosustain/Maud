@@ -36,7 +36,7 @@ name = 'r1'
 mechanism = 'uniuni'
 stoichiometry = { M1_ex = -1, M1 = 1}
 parameters = [
-  { label = 'Keq', loc = 0, scale = 0.05, type = 'kinetic', true_value = 0 },
+  { label = 'Keq', loc = 0, scale = 0.05, type = 'kinetic', true_value = 1 },
   { label = 'Kcat1', loc = 0, scale = 0.6, type = 'kinetic', true_value = 1.3 },
   { label = 'Kcat2', loc = 0, scale = 0.6, type = 'kinetic', true_value = 1 },
   { label = 'Ka', loc = 0, scale = 0.6, type = 'kinetic', true_value = 0.4 },
@@ -61,7 +61,7 @@ name = 'r3'
 mechanism = 'uniuni'
 stoichiometry = { M2 = -1, M2_ex = 1}
 parameters = [
-  { label = 'Keq', loc = 0, scale = 0.05, type = 'kinetic', true_value = 0 },
+  { label = 'Keq', loc = 0, scale = 0.05, type = 'kinetic', true_value = 1 },
   { label = 'Kcat1', loc = 0, scale = 0.6, type = 'kinetic', true_value = 1.3 },
   { label = 'Kcat2', loc = 0, scale = 0.6, type = 'kinetic', true_value = 1 },
   { label = 'Ka', loc = 0, scale = 0.6, type = 'kinetic', true_value = 0.4 },

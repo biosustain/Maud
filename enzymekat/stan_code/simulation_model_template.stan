@@ -1,6 +1,7 @@
 data {
   // dimensions
   int<lower=1> N_metabolite;
+  int<lower=1> N_constant_metabolite;
   int<lower=1> N_param;
   int<lower=1> N_reaction;
   int<lower=1> N_experiment;
@@ -17,8 +18,10 @@ data {
   // hardcoded
   real known_reals[N_known_real, N_experiment];
   real params[N_param];
+  real<lower=0> constant_metabolite_concentration[N_constant_metabolite, N_experiment];
+  int<lower=1,upper=N_metabolite> constant_metabolite_ix[N_constant_metabolite];
   // ode stuff
-  real initial_concentration[N_metabolite];
+  /* real initial_concentration[N_metabolite]; */
   real initial_time;
   real steady_time;
   real rel_tol;
@@ -42,6 +45,11 @@ generated quantities {
     real metabolite_concentration[N_metabolite, N_experiment];
     real flux[N_reaction, N_experiment];
     for (e in 1:N_experiment){
+      real initial_concentration[N_metabolite] = rep_array(1.0, N_metabolite);
+      for (m in 1:N_constant_metabolite){
+        initial_concentration[constant_metabolite_ix[m]] = constant_metabolite_concentration[m, e];
+      }
+      print(initial_concentration);
       metabolite_concentration[,e] = integrate_ode_bdf(steady_state_equation,
                                                        initial_concentration,
                                                        initial_time,
