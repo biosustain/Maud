@@ -106,7 +106,7 @@ model {
 }
 generated quantities {
   vector[N_concentration_measurement_training] simulated_concentration_measurement;
-  vector[N_concentration_measurement_holdout+N_flux_measurement_holdout] log_lik;
+  vector[N_concentration_measurement_holdout+N_flux_measurement_holdout] log_like;
   real initial_concentration[N_balanced+N_unbalanced];
   real concentration_holdout[N_balanced+N_unbalanced, N_holdout_experiments];
   real concentration_hat_holdout[N_concentration_measurement_holdout];
@@ -148,7 +148,7 @@ generated quantities {
     concentration_hat_holdout[mc] = concentration_holdout[ix_holdout_concentration_measurement[mc],
                           ig_holdout_concentration_experiment[mc]];
 
-    log_lik[mc] = lognormal_lpdf(concentration_measurement_holdout[mc]|concentration_hat_holdout[mc],
+    log_like[mc] = lognormal_lpdf(concentration_measurement_holdout[mc]|concentration_hat_holdout[mc],
                                   concentration_measurement_scale_holdout[mc]);
   }
 
@@ -156,6 +156,6 @@ generated quantities {
     flux_hat_holdout[mf] = flux_holdout[ix_holdout_flux_measurement[mf],
                                 ig_holdout_flux_experiment[mf]];
 
-    log_lik[mf+N_concentration_measurement_holdout] = normal_lpdf(flux_measurement_holdout[mf]|flux_hat_holdout[mf],                                               flux_measurement_scale_holdout[mf]);
+    log_like[mf+N_concentration_measurement_holdout] = normal_lpdf(flux_measurement_holdout[mf]|flux_hat_holdout[mf],                                               flux_measurement_scale_holdout[mf]);
   }
 }

@@ -103,10 +103,10 @@ def sample(
             'N_flux_measurement_holdout': len(flux_holdout),
             'N_concentration_measurement_training': len(concentration_training),
             'N_concentration_measurement_holdout': len(concentration_holdout),
-            'N_training_experiment': len(Training_experiments),
-            'N_holdout_experiments': len(Holdout_experiments),
-            'Training_experiments': Training_experiments,
-            'Holdout_experiments': Holdout_experiments,
+            'N_training_experiment': len(training_experiments),
+            'N_holdout_experiments': len(holdout_experiments),
+            'training_experiments': training_experiments,
+            'holdout_experiments': holdout_experiments,
             'pos_balanced': balanced_metabolites['stan_code'].values,
             'pos_unbalanced': unbalanced_metabolites['stan_code'].values,
             # 'ix_experiment_concentration_measurement': ed.concentration_measurements['experiment_code'].values,
@@ -189,9 +189,11 @@ def sample(
             save_warmup=True
         )
 
-        log_likelihood['{}'.format(i)] = fit.get_drawset(params=['log_lik']).sum(axis=1)
-   
+        log_likelihood['{}'.format(i)] = fit.get_drawset(params=['log_like']).sum(axis=1)
+
     log_likelihood_path = os.path.join(paths['data_out'],f'log_likelihood_validitation_{model_name}.csv')
-    
-    print("Saving table of log likelihoods to {}".format(log_likelihood_path)
+
+    print("Saving table of log likelihoods to {}".format(log_likelihood_path))
     log_likelihood.to_csv(log_likelihood_path)
+
+    return fit

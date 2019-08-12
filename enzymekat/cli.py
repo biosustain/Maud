@@ -10,8 +10,8 @@ SAMPLING_DEFAULTS = {
     'abs_tol': 1e-12,
     'max_steps': int(1e9),
     'likelihood': 1,
-    'n_samples': 150,
-    'n_warmup': 100,
+    'n_samples': 5,
+    'n_warmup': 5,
     'n_chains': 4,
     'n_cores': 4,
     'steady_state_time': 1000
@@ -102,3 +102,4 @@ def simulate(data_path, **kwargs):
 def sample_CV(data_path, **kwargs):
     """Sample from the model defined by the data at data_path."""
     stanfit = sampling_CV.sample(data_path, **kwargs)
+    print(stanfit.summary())
