@@ -101,4 +101,3 @@ def simulate(data_path, **kwargs):
 def sample_CV(data_path, **kwargs):
     """Sample from the model defined by the data at data_path."""
     stanfit = sampling_CV.sample(data_path, **kwargs)
-    print(stanfit.summary())
