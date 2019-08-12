@@ -28,31 +28,44 @@ def simulate(
 
     # define input data
     ed = data_model.from_toml(data_path)
+    metabolites = ed.metabolites
     metabolite_names = ed.stoichiometry.columns
+    unbalanced_metabolites = ed.metabolites.query('is_unbalanced')
+    balanced_metabolites = ed.metabolites.query('~is_unbalanced')
     reaction_names = ed.stoichiometry.index
-    initial_concentration = pd.Series({m: 1 for m in metabolite_names})
+    concentration_unbalanced = (
+        ed.unbalanced_metabolite_priors
+        .set_index(['metabolite_code', 'experiment_code'])
+        ['true_value']
+        .unstack()
+        .values
+        .tolist()
+    )
     input_data = {
-        'N_metabolite': len(metabolite_names),
-        'N_param': len(ed.parameters),
+        'N_balanced': len(balanced_metabolites),
+        'N_unbalanced': len(unbalanced_metabolites),
+        'N_kinetic_parameter': len(ed.kinetic_parameters),
         'N_reaction': len(reaction_names),
         'N_experiment': len(ed.experiments),
         'N_known_real': len(ed.known_reals),
-        'N_measurement_flux': len(ed.flux_measurements),
-        'N_measurement_conc': len(ed.concentration_measurements),
-        'metabolite_ix': ed.concentration_measurements['metabolite_code'].values.tolist(),
-        'experiment_ix_conc': ed.concentration_measurements['experiment_code'].values.tolist(),
-        'measurement_scale_conc': ed.concentration_measurements['scale'].values.tolist(),
-        'reaction_ix': ed.flux_measurements['reaction_code'].values.tolist(),
-        'experiment_ix_flux': ed.flux_measurements['experiment_code'].values.tolist(),
-        'measurement_scale_flux': ed.flux_measurements['scale'].values.tolist(),
+        'N_flux_measurement': len(ed.flux_measurements),
+        'N_concentration_measurement': len(ed.concentration_measurements),
+        'pos_balanced': balanced_metabolites['stan_code'].values,
+        'pos_unbalanced': unbalanced_metabolites['stan_code'].values,
+        'ix_experiment_concentration_measurement': ed.concentration_measurements['experiment_code'].values,
+        'ix_experiment_flux_measurement': ed.flux_measurements['experiment_code'].values,
+        'ix_metabolite_concentration_measurement': ed.concentration_measurements['metabolite_code'].values,
+        'ix_reaction_flux_measurement': ed.flux_measurements['reaction_code'].values,
+        'flux_measurement_scale': ed.flux_measurements['scale'].values,
+        'concentration_measurement_scale': ed.concentration_measurements['scale'].values,
+        'kinetic_parameter': ed.kinetic_parameters['true_value'].values,
+        'concentration_unbalanced': concentration_unbalanced,
         'known_reals': ed.known_reals.drop('stan_code', axis=1).values.tolist(),
-        'params': ed.parameters['true_value'].tolist(),
-        'initial_concentration': initial_concentration.values.tolist(),
         'initial_time': 0,
         'steady_time': steady_state_time,
         'rel_tol': rel_tol,
         'abs_tol': abs_tol,
-        'max_steps': max_steps,
+        'max_steps': max_steps
     }
 
     # dump input data
@@ -82,40 +95,37 @@ def simulate(
     # get samples
     csv_basename = os.path.join(paths['data_out'], f'simulation_output_{model_name}.csv')
     stanfit = model.sample(data=input_file,
-                        csv_basename=csv_basename,
-                        adapt_engaged=False,
-                        warmup_iters=0,
-                        sampling_iters=1,
-                        chains=1,
-                        cores=1)
+                          csv_basename=csv_basename,
+                          adapt_engaged=False,
+                          warmup_iters=0,
+                          sampling_iters=1,
+                          chains=1,
+                          cores=1)
+    sim_conc, sim_flux, sim_bal_rocs = (
+        stanfit.get_drawset([var]).iloc[0].values
+        for var in ['simulated_concentration_measurement',
+                    'simulated_flux_measurement',
+                    'balanced_metabolite_rate_of_change']
+    )
+    out_conc = (
+        ed.concentration_measurements[['metabolite_label', 'experiment_label']]
+        .rename(columns={'metabolite_label': 'metabolite',
+                         'experiment_label': 'experiment'})
+        .assign(simulated_measurement=sim_conc)
+        .round(2)
+    )
+    out_flux = (
+        ed.flux_measurements[['flux_label', 'experiment_label']]
+        .rename(columns={'flux_label': 'reaction',
+                         'experiment_label': 'experiment'})
+        .assign(simulated_measurement=sim_flux)
+        .round(2)
 
-    # prettify simulations
-    sim = stanfit.get_drawset().iloc[0]
-    flux_ixs = [i for i in sim.index if 'flux_pred' in i]
-    conc_ixs = [i for i in sim.index if 'conc_pred' in i]
-    met_ixs = [i for i in sim.index if 'metabolite_flux' in i]
-    flux_out = pd.DataFrame({
-        'experiment': ed.flux_measurements['experiment_label'].values,
-        'reaction': ed.flux_measurements['flux_label'].values,
-        'simulated_value': sim.loc[flux_ixs].values
-    })
-    conc_out = pd.DataFrame({
-        'experiment': ed.concentration_measurements['experiment_label'].values,
-        'metabolite': ed.concentration_measurements['metabolite_label'].values,
-        'simulated_value': sim.loc[conc_ixs].values
-    })
-    met_out_exp, met_out_met = zip(*itertools.product(
-        [e['label'] for e in ed.experiments],
-        list(ed.stoichiometry.columns)
-    ))
-    met_out = pd.DataFrame({
-        'experiment': met_out_exp,
-        'metabolite': met_out_met,
-        'simulated_value': sim.loc[met_ixs].values
-
-    })
-    simulations = {'flux_measurements': flux_out,
-                   'concentration_measurements': conc_out,
-                   'metabolite_fluxes': met_out}
+    )
+    if any(x > 0.01 for x in sim_bal_rocs):
+        print('Uh oh! Some metabolites appear to not get to steady state:\n',
+              sim_bal_rocs)
+    simulations = {'flux_measurements': out_flux,
+                   'concentration_measurements': out_conc}
     return stanfit, simulations
 

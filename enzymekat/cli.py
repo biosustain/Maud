@@ -77,6 +77,7 @@ def simulate(data_path, **kwargs):
     print('\nSimulated metabolite fluxes (at steady state these are zero):\n',
           simulations['metabolite_fluxes'].round(2))
 
+
 @cli.command()
 @click.option('--rel_tol', default=SAMPLING_DEFAULTS['rel_tol'],
               help="ODE solver's relative tolerance parameter")
