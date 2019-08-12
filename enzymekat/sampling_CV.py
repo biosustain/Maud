@@ -62,16 +62,16 @@ def sample(
     log_likelihood = pd.DataFrame()
     for i in np.arange(1, len(ed.experiments)+1):
         exp_list = np.arange(1, len(ed.experiments)+1)
-        Holdout_experiments = [int(i)]
-        Training_experiment_list = [x != i for x in exp_list]
-        Training_experiments_int = exp_list[Training_experiment_list].tolist()
-        Training_experiments = [int(x) for x in Training_experiments_int]
+        holdout_experiments = [int(i)]
+        training_experiment_list = [x != i for x in exp_list]
+        training_experiments_int = exp_list[training_experiment_list].tolist()
+        training_experiments = [int(x) for x in training_experiments_int]
 
-        flux_holdout_list = [x in Holdout_experiments for x in ed.flux_measurements['experiment_code']]
-        concentration_holdout_list = [x in Holdout_experiments for x in ed.concentration_measurements['experiment_code']]
+        flux_holdout_list = [x in holdout_experiments for x in ed.flux_measurements['experiment_code']]
+        concentration_holdout_list = [x in holdout_experiments for x in ed.concentration_measurements['experiment_code']]
 
-        flux_training_list = [ x in Training_experiments for x in ed.flux_measurements['experiment_code']]
-        concentration_training_list = [x in Training_experiments for x in ed.concentration_measurements['experiment_code']]
+        flux_training_list = [ x in training_experiments for x in ed.flux_measurements['experiment_code']]
+        concentration_training_list = [x in training_experiments for x in ed.concentration_measurements['experiment_code']]
 
         flux_holdout = ed.flux_measurements[flux_holdout_list]
         concentration_holdout = ed.concentration_measurements[concentration_holdout_list]
@@ -93,8 +93,8 @@ def sample(
         input_data = {
             'N_balanced': len(balanced_metabolites),
             'N_unbalanced': len(unbalanced_metabolites),
-            'N_training_experiments': len(Training_experiments),
-            'N_holdout_experiments': len(Holdout_experiments),
+            'N_training_experiments': len(training_experiments),
+            'N_holdout_experiments': len(holdout_experiments),
             'N_kinetic_parameter': len(ed.kinetic_parameters),
             'N_reaction': len(reaction_names),
             'N_experiment': len(ed.experiments),
@@ -189,8 +189,9 @@ def sample(
             save_warmup=True
         )
 
-        log_likelihood['{}'.format(i)] = fit.get_drawset(params=['log_likelihood_sum'])['log_likelihood_sum']
-
+        log_likelihood['{}'.format(i)] = fit.get_drawset(params=['log_lik']).sum(axis=1)
+   
     log_likelihood_path = os.path.join(paths['data_out'],f'log_likelihood_validitation_{model_name}.csv')
-
+    
+    print("Saving table of log likelihoods to {}".format(log_likelihood_path)
     log_likelihood.to_csv(log_likelihood_path)
