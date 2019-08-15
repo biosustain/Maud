@@ -2,16 +2,17 @@
 
 import click
 import cmdstanpy
-from enzymekat import sampling, simulation, sampling_CV
+from enzymekat import sampling, simulation, sampling_CV, sampling_relative_CV, plotting
 import os
+
 
 SAMPLING_DEFAULTS = {
     'rel_tol': 1e-13,
     'abs_tol': 1e-12,
     'max_steps': int(1e9),
     'likelihood': 1,
-    'n_samples': 5,
-    'n_warmup': 5,
+    'n_samples': 200,
+    'n_warmup': 150,
     'n_chains': 4,
     'n_cores': 4,
     'steady_state_time': 1000
@@ -71,11 +72,9 @@ def simulate(data_path, **kwargs):
     """Simulate measurements given parameter values from data_path."""
     stanfit, simulations = simulation.simulate(data_path, **kwargs)
     print('\nSimulated flux measurements:\n',
-          simulations['flux_measurements'].round(2))
+          simulations['flux_measurements'])
     print('\nSimulated metabolite concentration measurements:\n',
-          simulations['concentration_measurements'].round(2))
-    print('\nSimulated metabolite fluxes (at steady state these are zero):\n',
-          simulations['metabolite_fluxes'].round(2))
+          simulations['concentration_measurements'])
 
 
 @cli.command()
@@ -103,3 +102,17 @@ def sample_CV(data_path, **kwargs):
     """Sample from the model defined by the data at data_path."""
     stanfit = sampling_CV.sample(data_path, **kwargs)
     print(stanfit.summary())
+
+
+@cli.command()
+@click.argument('model_name')
+@click.argument('model_type',
+              default='inference')
+def plot(model_name, model_type):
+    """Plots the following figures: Concentration correlations
+                                    Concentration distributions
+                                    Kinetic parameter correlations
+                                    Kinetic parameter distributions
+                                    Flux distributions"""
+
+    plotting.plot_distributions(model_name, model_type)
