@@ -12,6 +12,7 @@ RELATIVE_PATHS = {
     'data_out': '../data/out',
 }
 
+
 def reorder_indicies(indexed_list):
     current_value_indexed = indexed_list[0]
     index = 1
@@ -152,9 +153,9 @@ def sample(
         cmdstanpy.utils.jsondump(input_file, input_data)
 
         # compile model if necessary
-        stan_code = code_generation.create_stan_model(ed, template='validation')
+        stan_code = code_generation.create_stan_model(ed, template='relative_validation')
         stan_file = os.path.join(
-            paths['stan_autogen'], f'inference_model_validation_{model_name}.stan'
+            paths['stan_autogen'], f'relative_model_validation_{model_name}.stan'
         )
         exe_file = stan_file[:-5]
         no_need_to_compile = (
@@ -170,11 +171,11 @@ def sample(
             model.compile(include_paths=[paths['stan_includes']], overwrite=True)
 
         # draw samples
-        directory_name = os.path.join(paths['data_out'], f'output_{model_name}_validation')
+        directory_name = os.path.join(paths['data_out'], f'output_{model_name}_validation_relative')
         if not os.path.exists(directory_name):
             os.mkdir(directory_name)
 
-        csv_output_file = os.path.join(directory_name, f'validation_{i}')
+        csv_output_file = os.path.join(directory_name, f'validation_relative_{i}')
 
         fit = model.sample(
             data=input_file,
@@ -191,9 +192,7 @@ def sample(
 
         log_likelihood['{}'.format(i)] = fit.get_drawset(params=['log_like']).sum(axis=1)
 
-    log_likelihood_path = os.path.join(
-                                paths['data_out'],
-                                f'log_likelihood_validation_{model_name}.csv')
+    log_likelihood_path = os.path.join(paths['data_out'],f'log_likelihood_validation_relative_{model_name}.csv')
 
     print("Saving table of log likelihoods to {}".format(log_likelihood_path))
     log_likelihood.to_csv(log_likelihood_path)

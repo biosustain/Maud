@@ -7,7 +7,8 @@ TEMPLATE_RELATIVE_PATHS = {
     'inference': 'stan_code/inference_model_template.stan',
     'simulation': 'stan_code/simulation_model_template.stan',
     'relative': 'stan_code/relative_model_template.stan',
-    'validation': 'stan_code/inference_model_CV_template.stan'
+    'validation': 'stan_code/inference_model_CV_template.stan',
+    'relative_validation': 'stan_code/relative_model_CV_template.stan'
 }
 
 
