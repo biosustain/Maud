@@ -8,8 +8,8 @@ data {
   int<lower=1> N_known_real;
   int<lower=1> N_flux_measurement;
   int<lower=1> N_concentration_measurement;
-  // position of balanced and unbalanced metabolites in overall metabolite array 
-  int<lower=1,upper=N_balanced+N_unbalanced> pos_balanced[N_balanced];      
+  // position of balanced and unbalanced metabolites in overall metabolite array
+  int<lower=1,upper=N_balanced+N_unbalanced> pos_balanced[N_balanced];
   int<lower=1,upper=N_balanced+N_unbalanced> pos_unbalanced[N_unbalanced];
   // which measurement goes with which experiment
   int<lower=1,upper=N_experiment> ix_experiment_concentration_measurement[N_concentration_measurement];
@@ -65,9 +65,9 @@ transformed parameters {
   }
 }
 model {
-  kinetic_parameter ~ lognormal(prior_location_kinetic_parameter, prior_scale_kinetic_parameter);
+  kinetic_parameter ~ lognormal(log(prior_location_kinetic_parameter), prior_scale_kinetic_parameter);
   for (e in 1:N_experiment){
-    concentration_unbalanced[,e] ~ lognormal(prior_location_unbalanced[,e], prior_scale_unbalanced[,e]);
+    prior_location_unbalanced[,e] ~ lognormal(log(concentration_unbalanced[,e]), prior_scale_unbalanced[,e]);
   }
   if (LIKELIHOOD == 1){
     real concentration_hat[N_concentration_measurement];

@@ -86,9 +86,9 @@ transformed parameters {
   }
 }
 model {
-  kinetic_parameter ~ lognormal(prior_location_kinetic_parameter, prior_scale_kinetic_parameter);
+  kinetic_parameter ~ lognormal(log(prior_location_kinetic_parameter), prior_scale_kinetic_parameter);
   for (e in 1:N_experiment){
-    concentration_unbalanced[,e] ~ lognormal(prior_location_unbalanced[,e], prior_scale_unbalanced[,e]);
+    prior_location_unbalanced[,e] ~ lognormal(log(concentration_unbalanced[,e]), prior_scale_unbalanced[,e]);
   }
   if (LIKELIHOOD == 1){
     real concentration_hat[N_concentration_measurement_training];
