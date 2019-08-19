@@ -3,23 +3,25 @@ gas_constant = 8.314e-3 # units kJ/mol.K
 
 [[experiment]]
 label = 'condition_1'
-concentration_r1 = 0.31
+concentration_r1 = 0.3
 concentration_r2 = 1.5
 concentration_r3 = 2
 concentration_r4 = 1.5
 concentration_r5 = 1.5
 concentration_r6 = 1
 unbalanced_metabolite_priors = [
-  { label = 'M1_ex', loc = 1, scale = 0.4, true_value = 10 },
-  { label = 'M2_ex', loc = 2, scale = 0.4, true_value = 20 },
-  { label = 'M4_ex', loc = 3, scale = 0.4, true_value = 30 }
+  { label = 'M1_ex', loc = 8.1, scale = 0.1, true_value = 8 },
+  { label = 'M2_ex', loc = 1.25, scale = 0.1, true_value = 1.2 },
+  { label = 'M4_ex', loc = 1.45, scale = 0.1, true_value = 1.5 }
 ]
 measurements = [
-  { label = 'M1', value = 2.28, scale = 0.1, type = 'metabolite' },
-  { label = 'M2', value = 0.29, scale = 0.05, type = 'metabolite' },
-  { label = 'M3', value = 0.34, scale = 0.05, type = 'metabolite' },
-  { label = 'M4', value = 0.30, scale = 0.05, type = 'metabolite' },
-  { label = 'r1', value = 0.31, scale = 0.05, type = 'flux' }
+  { label = 'M1', value = 2.55, scale = 0.1, type = 'metabolite' },
+  { label = 'M2', value = 1.98, scale = 0.1, type = 'metabolite' },
+  { label = 'M3', value = 0.94, scale = 0.1, type = 'metabolite' },
+  { label = 'M4', value = 1.71, scale = 0.1, type = 'metabolite' },
+  { label = 'r1', value = 0.054, scale = 0.002, type = 'flux' },
+  { label = 'r4', value = 0.019, scale = 0.002, type = 'flux' },
+  { label = 'r5', value = 0.088, scale = 0.003, type = 'flux' }
 ]
 
 [[experiment]]
@@ -31,16 +33,41 @@ concentration_r4 = 1
 concentration_r5 = 1
 concentration_r6 = 1
 unbalanced_metabolite_priors = [
-  { label = 'M1_ex', loc = 1, scale = 0.4, true_value = 10 },
-  { label = 'M2_ex', loc = 2, scale = 0.4, true_value = 20 },
-  { label = 'M4_ex', loc = 3, scale = 0.4, true_value = 30 },
+  { label = 'M1_ex', loc = 8.0, scale = 0.1, true_value = 8 },
+  { label = 'M2_ex', loc = 1.15, scale = 0.1, true_value = 1.2 },
+  { label = 'M4_ex', loc = 1.5, scale = 0.1, true_value = 1.5 }
 ]
 measurements = [
-  { label = 'M1', value = 0.25, scale = 0.05, type = 'metabolite' },
-  { label = 'M2', value = 0.11, scale = 0.05, type = 'metabolite' },
-  { label = 'M3', value = 0.07, scale = 0.02, type = 'metabolite' },
-  { label = 'M4', value = 0.06, scale = 0.02, type = 'metabolite' },
-  { label = 'r1', value = 0.15, scale = 0.05, type = 'flux' }
+  { label = 'M1', value = 2.16, scale = 0.1, type = 'metabolite' },
+  { label = 'M2', value = 2.00, scale = 0.1, type = 'metabolite' },
+  { label = 'M3', value = 0.85, scale = 0.1, type = 'metabolite' },
+  { label = 'M4', value = 1.60, scale = 0.1, type = 'metabolite' },
+  { label = 'r1', value = 0.0334, scale = 0.01, type = 'flux' },
+  { label = 'r4', value = 0.0061, scale = 0.001, type = 'flux' },
+  { label = 'r5', value = 0.0603, scale = 0.01, type = 'flux' }
+]
+
+[[experiment]]
+label = 'condition_3'
+concentration_r1 = 2
+concentration_r2 = 1
+concentration_r3 = 2
+concentration_r4 = 2
+concentration_r5 = 1.5
+concentration_r6 = 1
+unbalanced_metabolite_priors = [
+  { label = 'M1_ex', loc = 7.9, scale = 0.1, true_value = 8 },
+  { label = 'M2_ex', loc = 1.2, scale = 0.1, true_value = 1.2 },
+  { label = 'M4_ex', loc = 1.5, scale = 0.1, true_value = 1.5 }
+]
+measurements = [
+  { label = 'M1', value = 5.77, scale = 0.1, type = 'metabolite' },
+  { label = 'M2', value = 1.99, scale = 0.1, type = 'metabolite' },
+  { label = 'M3', value = 0.94, scale = 0.1, type = 'metabolite' },
+  { label = 'M4', value = 1.68, scale = 0.1, type = 'metabolite' },
+  { label = 'r1', value = 0.0567, scale = 0.01, type = 'flux' },
+  { label = 'r4', value = 0.0227, scale = 0.005, type = 'flux' },
+  { label = 'r5', value = 0.0889, scale = 0.01, type = 'flux' }
 ]
 
 [[reaction]]
@@ -48,12 +75,12 @@ name = 'r1'
 mechanism = 'uniuni'
 stoichiometry = { M1 = 1, M1_ex = -1 }
 parameters = [
-  {label = 'Keq', loc = 0, scale = 0.01, type = 'thermodynamic', true_value = 1 },
-  {label = 'Kcat1', loc = 2.1, scale = 0.3, type = 'kinetic', true_value = 1.8 },
-  {label = 'Kcat2', loc = 0.0, scale = 0.5, type = 'kinetic', true_value = 0.1 },
-  {label = 'Ka', loc = 0.0, scale = 0.5, type = 'kinetic', true_value = 0.1 },
-  { label = 'dissociation_constant_t', metabolite = 'M4', loc= 0, scale = 0.6, type = 'allosteric', true_value = 2},
-  { label = 'transfer_constant', loc= 0, scale = 0.6, type = 'allosteric', true_value = 1.1},
+  {label = 'Keq', loc = 1, scale = 0.01, type = 'thermodynamic', true_value = 1 },
+  {label = 'Kcat1', loc = 1.7, scale = 0.1, type = 'kinetic', true_value = 1.8 },
+  {label = 'Kcat2', loc = 0.11, scale = 0.1, type = 'kinetic', true_value = 0.1 },
+  {label = 'Ka', loc = 0.09, scale = 0.15, type = 'kinetic', true_value = 0.1 },
+  { label = 'dissociation_constant_t', metabolite = 'M4', loc= 2.1, scale = 0.1, type = 'allosteric', true_value = 2},
+  { label = 'transfer_constant', loc= 1.0, scale = 0.1, type = 'allosteric', true_value = 1.1},
 ]
 allosteric_inhibitors = ['M4']
 
@@ -62,13 +89,13 @@ name = 'r2'
 mechanism = 'ordered_unibi'
 stoichiometry = { M1 = -1, M2 = 1, M3 = 1 }
 parameters = [
-  {label = 'Keq', loc = 2, scale = 0.5, type = 'thermodynamic', true_value = 3 },
-  {label = 'Kcat1', loc = 0.5, scale = 0.5, type = 'kinetic', true_value = 0.75 },
-  {label = 'Kcat2', loc = 0.2, scale = 0.3, type = 'kinetic', true_value = 0.1 },
-  {label = 'Ka', loc = 0.6, scale = 0.4, type = 'kinetic', true_value = 1.0 },
-  {label = 'Kp', loc = 1.0, scale = 0.5, type = 'kinetic', true_value = 1.4 },
-  {label = 'Kq', loc = 1.2, scale = 0.5, type = 'kinetic', true_value = 1.5 },
-  {label = 'Kia', loc = 0.6, scale = 0.5, type = 'kinetic', true_value = 0.9 }
+  {label = 'Keq', loc = 2.8, scale = 0.1, type = 'thermodynamic', true_value = 3 },
+  {label = 'Kcat1', loc = 0.7, scale = 0.1, type = 'kinetic', true_value = 0.75 },
+  {label = 'Kcat2', loc = 0.15, scale = 0.2, type = 'kinetic', true_value = 0.1 },
+  {label = 'Ka', loc = 1.2, scale = 0.2, type = 'kinetic', true_value = 1.0 },
+  {label = 'Kp', loc = 1.3, scale = 0.1, type = 'kinetic', true_value = 1.4 },
+  {label = 'Kq', loc = 1.6, scale = 0.1, type = 'kinetic', true_value = 1.5 },
+  {label = 'Kia', loc = 1.0, scale = 0.2, type = 'kinetic', true_value = 0.9 }
 ]
 
 [[reaction]]
@@ -76,10 +103,10 @@ name = 'r3'
 mechanism = 'uniuni'
 stoichiometry = { M3 = -1, M4 = 1 }
 parameters = [
-  {label = 'Keq', loc = 1.8, scale = 0.2, type = 'thermodynamic', true_value = 2 },
+  {label = 'Keq', loc = 1.9, scale = 0.1, type = 'thermodynamic', true_value = 2 },
   {label = 'Kcat1', loc = 2.1, scale = 0.3, type = 'kinetic', true_value = 1.8 },
-  {label = 'Kcat2', loc = 0.0, scale = 0.5, type = 'kinetic', true_value = 0.1 },
-  {label = 'Ka', loc = 0.0, scale = 0.5, type = 'kinetic', true_value = 0.1 }
+  {label = 'Kcat2', loc = 0.1, scale = 0.1, type = 'kinetic', true_value = 0.1 },
+  {label = 'Ka', loc = 0.1, scale = 0.1, type = 'kinetic', true_value = 0.1 }
 ]
 
 [[reaction]]
@@ -87,7 +114,7 @@ name = 'r4'
 mechanism = 'uniuni'
 stoichiometry = { M4 = -1, M4_ex = 1 }
 parameters = [
-  {label = 'Keq', loc = 0, scale = 0.01, type = 'thermodynamic', true_value = 1 },
+  {label = 'Keq', loc = 1, scale = 0.01, type = 'thermodynamic', true_value = 1 },
   {label = 'Kcat1', loc = 2.1, scale = 0.3, type = 'kinetic', true_value = 1.8 },
   {label = 'Kcat2', loc = 0.0, scale = 0.5, type = 'kinetic', true_value = 0.1 },
   {label = 'Ka', loc = 0.0, scale = 0.5, type = 'kinetic', true_value = 0.1 }
@@ -98,10 +125,10 @@ name = 'r5'
 mechanism = 'uniuni'
 stoichiometry = { M2 = -1, M2_ex = 1 }
 parameters = [
-  {label = 'Keq', loc = 0, scale = 0.01, type = 'thermodynamic', true_value = 1 },
-  {label = 'Kcat1', loc = 2.1, scale = 0.3, type = 'kinetic', true_value = 1.8 },
-  {label = 'Kcat2', loc = 0.0, scale = 0.5, type = 'kinetic', true_value = 0.1 },
-  {label = 'Ka', loc = 0.0, scale = 0.5, type = 'kinetic', true_value = 0.1 }
+  {label = 'Keq', loc = 1.1, scale = 0.1, type = 'thermodynamic', true_value = 1 },
+  {label = 'Kcat1', loc = 1.9, scale = 0.1, type = 'kinetic', true_value = 1.8 },
+  {label = 'Kcat2', loc = 0.11, scale = 0.1, type = 'kinetic', true_value = 0.1 },
+  {label = 'Ka', loc = 0.2, scale = 0.1, type = 'kinetic', true_value = 0.2 }
 ]
 
 [[reaction]]
@@ -109,8 +136,8 @@ name = 'r6'
 mechanism = 'uniuni'
 stoichiometry = { M2 = -1, M3 = 1 }
 parameters = [
-  {label = 'Keq', loc = 0.2, scale = 0.1, type = 'thermodynamic', true_value = 0.3 },
-  {label = 'Kcat1', loc = 1.3, scale = 0.5, type = 'kinetic', true_value = 0.9 },
-  {label = 'Kcat2', loc = 0.2, scale = 0.5, type = 'kinetic', true_value = 0.1 }
-  {label = 'Ka', loc = 0.1, scale = 0.2, type = 'kinetic', true_value = 0.3 }
+  {label = 'Keq', loc = 0.3, scale = 0.1, type = 'thermodynamic', true_value = 0.3 },
+  {label = 'Kcat1', loc = 1.0, scale = 0.15, type = 'kinetic', true_value = 0.9 },
+  {label = 'Kcat2', loc = 0.1, scale = 0.05, type = 'kinetic', true_value = 0.1 }
+  {label = 'Ka', loc = 0.29, scale = 0.05, type = 'kinetic', true_value = 0.3 }
 ]
