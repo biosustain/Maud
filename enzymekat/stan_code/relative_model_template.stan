@@ -45,11 +45,11 @@ transformed data {
 parameters {
   real<lower=0> kinetic_parameter[N_kinetic_parameter];
   real<lower=0> concentration_unbalanced[N_unbalanced, N_experiment];
-  real<lower=0> scaling_factor_unbalanced[N_unbalanced, N_experiment];
-  real<lower=0> scaling_factor_balanced[N_balanced, N_experiment]
+  real<lower=0> scaling_factor[N_unbalanced+N_balanced];
 }
 transformed parameters {
   real concentration[N_balanced+N_unbalanced, N_experiment];
+  real scaled_concentration[N_balanced+N_unbalanced, N_experiment];
   real flux[N_reaction, N_experiment];
   for (e in 1:N_experiment){
     real initial_concentration[N_balanced+N_unbalanced];
@@ -65,23 +65,29 @@ transformed parameters {
                                           rel_tol, abs_tol, max_steps)[1];
     flux[,e] = get_fluxes(concentration[,e], kinetic_parameter, known_reals[,e]);
   }
+
+  for (e in 1:N_experiment){
+    for (m in 1:(N_unbalanced+N_balanced)){
+      scaled_concentration[m, e] = concentration[m, e]/scaling_factor[m];
+    }
+  }
 }
 model {
   kinetic_parameter ~ lognormal(prior_location_kinetic_parameter, prior_scale_kinetic_parameter);
   for (e in 1:N_experiment){
-    concentration_unbalanced[,e] ~ lognormal(prior_location_unbalanced[,e], prior_scale_unbalanced[,e])./scaling_factor_unbalanced[,e];
+    prior_location_unbalanced[,e] ~ lognormal(log(scaled_concentration[pos_unbalanced,e]), prior_scale_unbalanced[,e]);
   }
   if (LIKELIHOOD == 1){
     real concentration_hat[N_concentration_measurement];
     real flux_hat[N_flux_measurement];
     for (mc in 1:N_concentration_measurement){
-      concentration_hat[mc] = concentration[ix_metabolite_concentration_measurement[mc],
+      concentration_hat[mc] = scaled_concentration[ix_metabolite_concentration_measurement[mc],
                                             ix_experiment_concentration_measurement[mc]];
     }
     for (mf in 1:N_flux_measurement){
       flux_hat[mf] = flux[ix_reaction_flux_measurement[mf], ix_experiment_flux_measurement[mf]];
     }
-    concentration_measurement ~ lognormal(log(concentration_hat), concentration_measurement_scale)./scaling_factor_balanced[,e];
+    concentration_measurement ~ lognormal(log(concentration_hat), concentration_measurement_scale);
     flux_measurement ~ normal(flux_hat, flux_measurement_scale);
   }
 }

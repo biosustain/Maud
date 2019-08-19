@@ -16,7 +16,7 @@ RELATIVE_PATHS = {
 }
 
 
-def sample_relative(
+def sample(
         data_path: str,
         rel_tol: float,
         abs_tol: float,
@@ -33,36 +33,45 @@ def sample_relative(
     paths = {k: os.path.join(here, v) for k, v in RELATIVE_PATHS.items()}
 
     # define input data
-    data = data_model.from_toml(data_path)
-    metabolite_names = data.stoichiometry.columns
-    reaction_names = data.stoichiometry.index
-    unbalanced_index = []
-    for m in data.unbalanced_metabolite['metabolites']:
-        unbalanced_index.append(np.where(metabolite_names == m)[0][0]+1)
-    unbalanced_met_arr = [[int(x), int(y)] for x in unbalanced_index for y in np.arange(1, len(data.experiments)+1)]
-    initial_concentration = np.ones((len(metabolite_names), len(data.experiments)))
+    ed = data_model.from_toml(data_path)
+    metabolites = ed.metabolites
+    metabolite_names = ed.stoichiometry.columns
+    unbalanced_metabolites = ed.metabolites.query('is_unbalanced')
+    balanced_metabolites = ed.metabolites.query('~is_unbalanced')
+    reaction_names = ed.stoichiometry.index
+    unbalanced_loc, unbalanced_scale = (
+        ed.unbalanced_metabolite_priors
+        .set_index(['metabolite_code', 'experiment_code'])
+        [col]
+        .unstack()
+        .values
+        .tolist()
+        for col in ['loc', 'scale']
+    )
     input_data = {
-        'N_metabolite': len(metabolite_names),
-        'N_param': len(data.parameters),
+        'N_balanced': len(balanced_metabolites),
+        'N_unbalanced': len(unbalanced_metabolites),
+        'N_kinetic_parameter': len(ed.kinetic_parameters),
         'N_reaction': len(reaction_names),
-        'N_experiment': len(data.experiments),
-        'N_known_real': len(data.known_reals),
-        'N_measurement_flux': len(data.flux_measurements),
-        'N_measurement_conc': len(data.concentration_measurements),
-        'N_unbalanced_metabolites': len(unbalanced_met_arr),
-        'metabolite_ix': data.concentration_measurements['metabolite_code'].values.tolist(),
-        'experiment_ix_conc': data.concentration_measurements['experiment_code'].values.tolist(),
-        'measurement_conc': data.concentration_measurements['value'].values.tolist(),
-        'measurement_scale_conc': data.concentration_measurements['scale'].values.tolist(),
-        'reaction_ix': data.flux_measurements['reaction_code'].values.tolist(),
-        'experiment_ix_flux': data.flux_measurements['experiment_code'].values.tolist(),
-        'measurement_flux': data.flux_measurements['value'].values.tolist(),
-        'measurement_scale_flux': data.flux_measurements['scale'].values.tolist(),
-        'unbalanced_met_arr': unbalanced_met_arr,
-        'known_reals': data.known_reals.drop('stan_code', axis=1).values.tolist(),
-        'prior_location': data.parameters['loc'].values.tolist(),
-        'prior_scale': data.parameters['scale'].values.tolist(),
-        'initial_concentration': initial_concentration.astype(float),
+        'N_experiment': len(ed.experiments),
+        'N_known_real': len(ed.known_reals),
+        'N_flux_measurement': len(ed.flux_measurements),
+        'N_concentration_measurement': len(ed.concentration_measurements),
+        'pos_balanced': balanced_metabolites['stan_code'].values,
+        'pos_unbalanced': unbalanced_metabolites['stan_code'].values,
+        'ix_experiment_concentration_measurement': ed.concentration_measurements['experiment_code'].values,
+        'ix_experiment_flux_measurement': ed.flux_measurements['experiment_code'].values,
+        'ix_metabolite_concentration_measurement': ed.concentration_measurements['metabolite_code'].values,
+        'ix_reaction_flux_measurement': ed.flux_measurements['reaction_code'].values,
+        'flux_measurement': ed.flux_measurements['value'].values,
+        'concentration_measurement': ed.concentration_measurements['value'].values,
+        'flux_measurement_scale': ed.flux_measurements['scale'].values,
+        'concentration_measurement_scale': ed.concentration_measurements['scale'].values,
+        'prior_location_kinetic_parameter': ed.kinetic_parameters['loc'].values,
+        'prior_scale_kinetic_parameter': ed.kinetic_parameters['scale'].values,
+        'prior_location_unbalanced': unbalanced_loc,
+        'prior_scale_unbalanced': unbalanced_scale,
+        'known_reals': ed.known_reals.drop('stan_code', axis=1).values.tolist(),
         'initial_time': 0,
         'steady_time': steady_state_time,
         'rel_tol': rel_tol,
@@ -71,6 +80,7 @@ def sample_relative(
         'LIKELIHOOD': likelihood
     }
 
+
     # dump input data
     input_file = os.path.join(
         paths['stan_records'], f'input_data_{model_name}.json'
@@ -78,7 +88,7 @@ def sample_relative(
     cmdstanpy.utils.jsondump(input_file, input_data)
 
     # compile model if necessary
-    stan_code = code_generation.create_stan_model(data, template='relative')
+    stan_code = code_generation.create_stan_model(ed, template='relative')
     stan_file = os.path.join(
         paths['stan_autogen'], f'relative_model_{model_name}.stan'
     )
@@ -96,7 +106,7 @@ def sample_relative(
         model.compile(include_paths=[paths['stan_includes']], overwrite=True)
 
     # draw samples
-    csv_output_file = os.path.join(paths['data_out'], f'rel_output_{model_name}.csv')
+    csv_output_file = os.path.join(paths['data_out'], f'relative_output_{model_name}.csv')
 
     fit = model.sample(
         data=input_file,
@@ -107,39 +117,37 @@ def sample_relative(
         sampling_iters=n_samples,
         warmup_iters=n_warmup,
         max_treedepth=15,
-        adapt_delta=0.9,
-        save_warmup=True,
-        step_size=0.01
+        adapt_delta=0.8,
+        save_warmup=True
     )
 
     infd_posterior = (
         arviz.from_cmdstanpy(
             posterior=fit,
-            posterior_predictive=['flux_pred', 'conc_pred'],
-            observed_data={'flux_pred': input_data['measurement_flux'],
-                           'conc_pred': input_data['measurement_conc']},
+            posterior_predictive=['simulated_flux_measurement', 'simulated_concentration_measurement'],
+            observed_data={'simulated_flux_measurement': input_data['flux_measurement'],
+                           'simulated_concentration_measurement': input_data['concentration_measurement']},
             coords={
                 'reactions': reaction_names,
                 'metabolites': metabolite_names,
-                'experiments': [x['label'] for x in data.experiments],
+                'experiments': [x['label'] for x in ed.experiments],
                 'parameter_names':  (
-                [f'{x}-{y}' for x, y in zip(data.parameters['reaction'], data.parameters['parameter'])]
+                [f'{x}-{y}' for x, y in zip(ed.kinetic_parameters['reaction'], ed.kinetic_parameters['parameter'])]
                 ),
                 'flux_measurements': (
-                    [f'{x}-{y}' for x, y in zip(data.flux_measurements['reaction_code'], data.flux_measurements['experiment_code'])]
+                    [f'{x}-{y}' for x, y in zip(ed.flux_measurements['reaction_code'], ed.flux_measurements['experiment_code'])]
                 ),
                 'concentration_measurements': (
-                    [f'{x}-{y}' for x, y in zip(data.concentration_measurements['metabolite_code'], data.concentration_measurements['experiment_code'])]
-                ),
-                'scaling_factor': data.concentration_measurements['metabolite_code']
+                    [f'{x}-{y}' for x, y in zip(ed.concentration_measurements['metabolite_code'], ed.concentration_measurements['experiment_code'])]
+                )
             },
             dims={
-                'metabolite_concentration': ['metabolites', 'experiments'],
+                'concentration': ['metabolites', 'experiments'],
                 'flux': ['reactions', 'experiments'],
-                'params': ['parameter_names'],
-                'conc_pred': ['concentration_measurements'],
-                'flux_pred': ['flux_measurements'],
-                'scale_fact': ['scaling_factor']
+                'kinetic_parameter': ['parameter_names'],
+                'simulated_concentration_measurement': ['concentration_measurements'],
+                'simulated_flux_measurement': ['flux_measurements'],
+                'scaled_concentration': ['metabolites', 'experiments']
 
             }
         )
