@@ -62,8 +62,11 @@ def plot_distribution_for_fluxs(infd, experiment, figure_path):
     return axes
 
 
-def plot_pairs_condition_concentrations(infd, experiment, figure_path):
-    var_names = ['concentration']
+def plot_pairs_condition_concentrations(infd, experiment, figure_path, type):
+    if type == 'inference':
+        var_names = ['concentration']
+    elif type == 'relative_inference':
+        var_names = ['scaled_concentration']
     all_coords = infd.posterior.coords
     experiment_names = list(filter(lambda i: experiment in i, all_coords['experiments'].to_series()))
     coords = {'experiments': experiment_names}
@@ -72,7 +75,7 @@ def plot_pairs_condition_concentrations(infd, experiment, figure_path):
     return axes
 
 
-def plot_distributions_condition_concentrations(infd, experiment, figure_path):
+def plot_distributions_condition_concentrations(infd, experiment, figure_path, type):
     plt.close('all')
     n_rows = round(len(infd.posterior.metabolites)/3+0.5)
     fig, axes = plt.subplots(n_rows, 3,
@@ -85,25 +88,40 @@ def plot_distributions_condition_concentrations(infd, experiment, figure_path):
     max_bin_list = []
 
     for met in metabolite_list:
-        min_bin_list.append(np.min(infd.posterior.concentration.loc[{
-                                                'metabolites': [met],
-                                                'experiments': [experiment]
-                                                }]))
-        max_bin_list.append(np.max(infd.posterior.concentration.loc[{
-                                                'metabolites': [met],
-                                                'experiments': [experiment]
-                                                }]))
+        if type == 'inference':
+            min_bin_list.append(np.min(infd.posterior.concentration.loc[{
+                                                    'metabolites': [met],
+                                                    'experiments': [experiment]
+                                                    }]))
+            max_bin_list.append(np.max(infd.posterior.concentration.loc[{
+                                                    'metabolites': [met],
+                                                    'experiments': [experiment]
+                                                    }]))
+        elif type == 'relative_inference':
+            min_bin_list.append(np.min(infd.posterior.scaled_concentration.loc[{
+                                                    'metabolites': [met],
+                                                    'experiments': [experiment]
+                                                    }]))
+            max_bin_list.append(np.max(infd.posterior.scaled_concentration.loc[{
+                                                    'metabolites': [met],
+                                                    'experiments': [experiment]
+                                                    }]))
 
     bin_list = [np.logspace(np.log10(x), np.log10(y), 20)
                 for x, y in zip(min_bin_list,
                                 max_bin_list)]
 
     for ax, met, bin in zip(axes.ravel(),
-                                 metabolite_list,
-                                 bin_list):
+                            metabolite_list,
+                            bin_list):
+        if type == 'inference':
+            val = infd.posterior.concentration.loc[{'experiments': experiment,
+                                                    'metabolites': met}]
+        elif type == 'relative_inference':
+            val = infd.posterior.scaled_concentration.loc[
+                                                {'experiments': experiment,
+                                                 'metabolites': met}]
 
-        val = infd.posterior.concentration.loc[{'experiments': experiment,
-                                              'metabolites': met}]
         ax.hist(val.to_series().ravel(), bins=bin)
         if ax.get_xticks()[1] >= 0:
             ax.semilogx()
@@ -151,12 +169,14 @@ def plot_distributions(model_name: str, model_type: str='inference'):
         plt.figure()
         plot_pairs_condition_concentrations(data,
                                             cond,
-                                            paths['output_figure_path'])
+                                            paths['output_figure_path'],
+                                            model_type)
 
         plt.figure()
         plot_distributions_condition_concentrations(data,
                                                     cond,
-                                                    paths['output_figure_path'])
+                                                    paths['output_figure_path'],
+                                                    model_type)
 
         plt.figure()
         plot_correlation_for_fluxs(data,
