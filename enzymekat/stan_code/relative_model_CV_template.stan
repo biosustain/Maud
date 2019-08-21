@@ -95,7 +95,7 @@ transformed parameters {
 }
 model {
   real scaled_unbalanced[N_unbalanced, N_experiment];
-  kinetic_parameter ~ lognormal(prior_location_kinetic_parameter, prior_scale_kinetic_parameter);
+  kinetic_parameter ~ lognormal(log(prior_location_kinetic_parameter), prior_scale_kinetic_parameter);
   for (e in 1:N_experiment){
     for (m in 1:N_unbalanced){
       scaled_unbalanced[m,e] = concentration_unbalanced[m,e]/scaling_factor[pos_unbalanced[m]];
@@ -159,7 +159,7 @@ generated quantities {
     concentration_hat_holdout[mc] = scaled_concentration_holdout[ix_holdout_concentration_measurement[mc],
                           ig_holdout_concentration_experiment[mc]];
 
-    log_like[mc] = lognormal_lpdf(concentration_measurement_holdout[mc]|concentration_hat_holdout[mc],
+    log_like[mc] = lognormal_lpdf(concentration_measurement_holdout[mc]|log(concentration_hat_holdout[mc]),
                                   concentration_measurement_scale_holdout[mc]);
   }
 

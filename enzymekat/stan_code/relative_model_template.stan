@@ -73,7 +73,7 @@ transformed parameters {
   }
 }
 model {
-  kinetic_parameter ~ lognormal(prior_location_kinetic_parameter, prior_scale_kinetic_parameter);
+  kinetic_parameter ~ lognormal(log(prior_location_kinetic_parameter), prior_scale_kinetic_parameter);
   for (e in 1:N_experiment){
     prior_location_unbalanced[,e] ~ lognormal(log(scaled_concentration[pos_unbalanced,e]), prior_scale_unbalanced[,e]);
   }
