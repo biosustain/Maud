@@ -19,9 +19,9 @@ measurements = [
   { label = 'M2', value = 1.98, scale = 0.1, type = 'metabolite' },
   { label = 'M3', value = 0.94, scale = 0.1, type = 'metabolite' },
   { label = 'M4', value = 1.71, scale = 0.1, type = 'metabolite' },
-  { label = 'r1', value = 0.054, scale = 0.002, type = 'flux' },
-  { label = 'r4', value = 0.019, scale = 0.002, type = 'flux' },
-  { label = 'r5', value = 0.088, scale = 0.003, type = 'flux' }
+  { label = 'r1', value = 0.054, scale = 0.01, type = 'flux' },
+  { label = 'r4', value = 0.019, scale = 0.005, type = 'flux' },
+  { label = 'r5', value = 0.088, scale = 0.01, type = 'flux' }
 ]
 
 [[experiment]]
@@ -42,9 +42,9 @@ measurements = [
   { label = 'M2', value = 2.00, scale = 0.1, type = 'metabolite' },
   { label = 'M3', value = 0.85, scale = 0.1, type = 'metabolite' },
   { label = 'M4', value = 1.60, scale = 0.1, type = 'metabolite' },
-  { label = 'r1', value = 0.0334, scale = 0.01, type = 'flux' },
-  { label = 'r4', value = 0.0061, scale = 0.001, type = 'flux' },
-  { label = 'r5', value = 0.0603, scale = 0.01, type = 'flux' }
+  { label = 'r1', value = 0.033, scale = 0.01, type = 'flux' },
+  { label = 'r4', value = 0.006, scale = 0.001, type = 'flux' },
+  { label = 'r5', value = 0.06, scale = 0.01, type = 'flux' }
 ]
 
 [[experiment]]
@@ -65,9 +65,9 @@ measurements = [
   { label = 'M2', value = 1.99, scale = 0.1, type = 'metabolite' },
   { label = 'M3', value = 0.94, scale = 0.1, type = 'metabolite' },
   { label = 'M4', value = 1.68, scale = 0.1, type = 'metabolite' },
-  { label = 'r1', value = 0.0567, scale = 0.01, type = 'flux' },
-  { label = 'r4', value = 0.0227, scale = 0.005, type = 'flux' },
-  { label = 'r5', value = 0.0889, scale = 0.01, type = 'flux' }
+  { label = 'r1', value = 0.057, scale = 0.01, type = 'flux' },
+  { label = 'r4', value = 0.023, scale = 0.005, type = 'flux' },
+  { label = 'r5', value = 0.089, scale = 0.01, type = 'flux' }
 ]
 
 [[reaction]]
@@ -115,9 +115,9 @@ mechanism = 'uniuni'
 stoichiometry = { M4 = -1, M4_ex = 1 }
 parameters = [
   {label = 'Keq', loc = 1, scale = 0.01, type = 'thermodynamic', true_value = 1 },
-  {label = 'Kcat1', loc = 2.1, scale = 0.3, type = 'kinetic', true_value = 1.8 },
-  {label = 'Kcat2', loc = 0.0, scale = 0.5, type = 'kinetic', true_value = 0.1 },
-  {label = 'Ka', loc = 0.0, scale = 0.5, type = 'kinetic', true_value = 0.1 }
+  {label = 'Kcat1', loc = 2.0, scale = 0.2, type = 'kinetic', true_value = 1.8 },
+  {label = 'Kcat2', loc = 0.1, scale = 0.1, type = 'kinetic', true_value = 0.1 },
+  {label = 'Ka', loc = 0.1, scale = 0.1, type = 'kinetic', true_value = 0.1 }
 ]
 
 [[reaction]]
