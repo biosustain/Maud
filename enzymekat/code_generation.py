@@ -53,10 +53,24 @@ def create_fluxes_function(ed: EnzymeKatData) -> str:
             create_Kip_ordered_unibi_line,
             create_Kiq_ordered_unibi_line
         ],
+        'ordered_bibi': [
+            create_Kia_ordered_bibi_line,
+            create_Kip_ordered_bibi_line
+        ],
+        'pingpong': [
+            create_Kip_pingpong_line
+        ],
+        'ordered_terbi': [
+            create_Kip_ordered_terbi_line,
+            create_Kiq_ordered_terbi_line
+        ]
     }
     mechanism_to_args_function = {
         'uniuni': get_args_uniuni,
         'ordered_unibi': get_args_ordered_unibi,
+        'ordered_bibi': get_args_ordered_bibi,
+        'pingpong': get_args_pingpong,
+        'ordered_terbi': get_args_ordered_terbi,
         'irr_mass_action': get_args_irr_mass_action,
         'fixed_flux': get_args_fixed_flux
     }
@@ -162,6 +176,66 @@ def create_Kiq_ordered_unibi_line(ed: EnzymeKatData, reaction: str) -> str:
         ");"
     ])
 
+def create_Kip_ordered_bibi_line(ed: EnzymeKatData, reaction: str) -> str:
+    codes = ed.kinetic_parameters.groupby('label')['stan_code'].first().to_dict()
+    kinetic_params = ['Keq', 'Ka', 'Kq', 'Kib', 'Kiq', 'V1', 'V2']
+    kinetic_param_codes = [codes[reaction + '_' + p] for p in kinetic_params]
+    kinetic_params_str = ", ".join([f"params[{str(c)}]" for c in kinetic_param_codes])
+    return ''.join([
+        f"real {reaction}_Kiq = get_Kiq_ordered_unibi(",
+        kinetic_params_str,
+        ");"
+    ])
+
+
+
+def create_Kia_ordered_bibi_line(ed: EnzymeKatData, reaction: str) -> str:
+    codes = ed.kinetic_parameters.groupby('label')['stan_code'].first().to_dict()
+    kinetic_params = ['Keq', 'Kb', 'Kp', 'Kiq', 'V1', 'V2']
+    kinetic_param_codes = [codes[reaction + '_' + p] for p in kinetic_params]
+    kinetic_params_str = ", ".join([f"params[{str(c)}]" for c in kinetic_param_codes])
+    return ''.join([
+        f"real {reaction}_Kiq = get_Kiq_ordered_unibi(",
+        kinetic_params_str,
+        ");"
+    ])
+
+
+def create_Kip_pingpong_line(ed: EnzymeKatData, reaction: str) -> str:
+    codes = ed.kinetic_parameters.groupby('label')['stan_code'].first().to_dict()
+    kinetic_params = ['Keq', 'Ka', 'Kb', 'Kq', 'V1', 'V2']
+    kinetic_param_codes = [codes[reaction + '_' + p] for p in kinetic_params]
+    kinetic_params_str = ", ".join([f"params[{str(c)}]" for c in kinetic_param_codes])
+    return ''.join([
+        f"real {reaction}_Kiq = get_Kiq_ordered_unibi(",
+        kinetic_params_str,
+        ");"
+    ])
+
+
+def create_Kip_ordered_terbi_line(ed: EnzymeKatData, reaction: str) -> str:
+    codes = ed.kinetic_parameters.groupby('label')['stan_code'].first().to_dict()
+    kinetic_params = ['Keq', 'Kia', 'Kib', 'Kic', 'Kiq']
+    kinetic_param_codes = [codes[reaction + '_' + p] for p in kinetic_params]
+    kinetic_params_str = ", ".join([f"params[{str(c)}]" for c in kinetic_param_codes])
+    return ''.join([
+        f"real {reaction}_Kiq = get_Kiq_ordered_unibi(",
+        kinetic_params_str,
+        ");"
+    ])
+
+
+def create_Kiq_ordered_terbi_line(ed: EnzymeKatData, reaction: str) -> str:
+    codes = ed.kinetic_parameters.groupby('label')['stan_code'].first().to_dict()
+    kinetic_params = ['Keq', 'Kc', 'Kp', 'Kia', 'Kib', 'V1', 'V2']
+    kinetic_param_codes = [codes[reaction + '_' + p] for p in kinetic_params]
+    kinetic_params_str = ", ".join([f"params[{str(c)}]" for c in kinetic_param_codes])
+    return ''.join([
+        f"real {reaction}_Kiq = get_Kiq_ordered_unibi(",
+        kinetic_params_str,
+        ");"
+    ])
+
 
 def create_regulatory_call(ed: EnzymeKatData, reaction: dict) -> str:
     param_codes = ed.kinetic_parameters.groupby('label')['stan_code'].first().to_dict()
@@ -187,8 +261,8 @@ def create_regulatory_call(ed: EnzymeKatData, reaction: dict) -> str:
         if 'allosteric_activators' in reaction.keys():
             activator_codes = [met_codes[m] for m in reaction['allosteric_activators']]
             activators_str = "{{{}}}".format(", ".join(map(lambda c: f'metabolites[{str(c)}]', activator_codes)))
-            dissociation_constant_t_codes = [
-                param_codes[reaction['name'] + '_dissociation_constant_t_' + metabolite]
+            dissociation_constant_r_codes = [
+                param_codes[reaction['name'] + '_dissociation_constant_r_' + metabolite]
                 for metabolite in reaction['allosteric_activators']
             ]
             dissociation_constant_r_str = "{{{}}}".format(', '.join(map(lambda c: f"params[{c}]", dissociation_constant_r_codes)))
@@ -252,6 +326,93 @@ def get_args_ordered_unibi(ed: EnzymeKatData, reaction) -> str:
         f"{kp_strs['Kcat1']}, {kp_strs['Kcat2']}, ",
         f"{kp_strs['Ka']}, {kp_strs['Kp']}, {kp_strs['Kq']}, {kp_strs['Kia']}, ",
         f"{Kip_str}, {Kiq_str}, {kp_strs['Keq']}",
+    ])
+
+def get_args_ordered_bibi(ed: EnzymeKatData, reaction) -> str:
+    kinetic_params = ['Kcat1', 'Kcat2', 'Ka', 'Kb', 'Kp', 'Kq', 'Kia', 'Kib', 'Kip', 'Kiq', 'Keq']
+    met_codes = ed.stan_codes['metabolite']
+    param_codes = ed.kinetic_parameters.groupby('label')['stan_code'].first().to_dict()
+    kr_codes = ed.known_reals['stan_code']
+    substrate_1, substrate_2 = ed.stoichiometry.loc[reaction].loc[lambda df: df == -1].index
+    product_1, product_2 = ed.stoichiometry.loc[reaction].loc[lambda df: df == 1].index
+    substrate_1_code, substrate_2_code, product_1_code, product_2_code = (
+        met_codes[metabolite] for metabolite in [substrate_1, substrate_2, product_1, product_2]
+    )
+    enzyme_code = kr_codes[f'concentration_{reaction}']
+    enzyme_concentration = f"known_reals[{str(enzyme_code)}]"
+    kp_codes = {kp: param_codes[f"{reaction}_{kp}"] for kp in kinetic_params}
+    kp_strs = {kp: f"params[{str(c)}]" for kp, c in kp_codes.items()}
+    for Kcat in ["Kcat1", "Kcat2"]:
+        kp_strs[Kcat] = f"{enzyme_concentration}*{kp_strs[Kcat]}"
+    S1_str = f"metabolites[{str(substrate_1_code)}]"
+    S2_str = f"metabolites[{str(substrate_2_code)}]"
+    P1_str = f"metabolites[{str(product_1_code)}]"
+    P2_str = f"metabolites[{str(product_2_code)}]"
+    Kia_str = f"{reaction}_Kia"
+    Kip_str = f"{reaction}_Kip"
+    return ''.join([
+        f"{S1_str}, {S2_str}, {P1_str}, {P2_str}, ",
+        f"{kp_strs['Kcat1']}, {kp_strs['Kcat2']}, ",
+        f"{kp_strs['Ka']}, {kp_strs['Kb']}, {kp_strs['Kp']}, {kp_strs['Kq']}, ",
+        f"{Kia_str}, {kp_strs['Kib']}, {Kip_str}, {kp_strs['Kiq']}, {kp_strs['Keq']}"
+    ])
+
+def get_args_pingpong(ed: EnzymeKatData, reaction) -> str:
+    kinetic_params = ['Kcat1', 'Kcat2', 'Ka', 'Kb', 'Kp', 'Kq', 'Kia', 'Kib', 'Kip', 'Kiq', 'Keq']
+    met_codes = ed.stan_codes['metabolite']
+    param_codes = ed.kinetic_parameters.groupby('label')['stan_code'].first().to_dict()
+    kr_codes = ed.known_reals['stan_code']
+    substrate_1, substrate_2 = ed.stoichiometry.loc[reaction].loc[lambda df: df == -1].index
+    product_1, product_2 = ed.stoichiometry.loc[reaction].loc[lambda df: df == 1].index
+    substrate_1_code, substrate_2_code, product_1_code, product_2_code = (
+        met_codes[metabolite] for metabolite in [substrate_1, substrate_2, product_1, product_2]
+    )
+    enzyme_code = kr_codes[f'concentration_{reaction}']
+    enzyme_concentration = f"known_reals[{str(enzyme_code)}]"
+    kp_codes = {kp: param_codes[f"{reaction}_{kp}"] for kp in kinetic_params}
+    kp_strs = {kp: f"params[{str(c)}]" for kp, c in kp_codes.items()}
+    for Kcat in ["Kcat1", "Kcat2"]:
+        kp_strs[Kcat] = f"{enzyme_concentration}*{kp_strs[Kcat]}"
+    S1_str = f"metabolites[{str(substrate_1_code)}]"
+    S2_str = f"metabolites[{str(substrate_2_code)}]"
+    P1_str = f"metabolites[{str(product_1_code)}]"
+    P2_str = f"metabolites[{str(product_2_code)}]"
+    Kip_str = f"{reaction}_Kip"
+    return ''.join([
+        f"{S1_str}, {S2_str}, {P1_str}, {P2_str}, ",
+        f"{kp_strs['Kcat1']}, {kp_strs['Kcat2']}, ",
+        f"{kp_strs['Ka']}, {kp_strs['Kb']}, {kp_strs['Kp']}, {kp_strs['Kq']}, ",
+        f"{kp_strs['Kia']}, {kp_strs['Kib']}, {Kip_str}, {kp_strs['Kiq']}, {kp_strs['Keq']}"
+    ])
+
+def get_args_ordered_terbi(ed: EnzymeKatData, reaction) -> str:
+    kinetic_params = ['Kcat1', 'Kcat2', 'Ka', 'Kb', 'Kc', 'Kp', 'Kq', 'Kia', 'Kic', 'Kib', 'Kip', 'Kiq', 'Keq']
+    met_codes = ed.stan_codes['metabolite']
+    param_codes = ed.kinetic_parameters.groupby('label')['stan_code'].first().to_dict()
+    kr_codes = ed.known_reals['stan_code']
+    substrate_1, substrate_2, substrate_3 = ed.stoichiometry.loc[reaction].loc[lambda df: df == -1].index
+    product_1, product_2 = ed.stoichiometry.loc[reaction].loc[lambda df: df == 1].index
+    substrate_1_code, substrate_2_code, substrate_3_code, product_1_code, product_2_code = (
+        met_codes[metabolite] for metabolite in [substrate_1, substrate_2, substrate_3, product_1, product_2]
+    )
+    enzyme_code = kr_codes[f'concentration_{reaction}']
+    enzyme_concentration = f"known_reals[{str(enzyme_code)}]"
+    kp_codes = {kp: param_codes[f"{reaction}_{kp}"] for kp in kinetic_params}
+    kp_strs = {kp: f"params[{str(c)}]" for kp, c in kp_codes.items()}
+    for Kcat in ["Kcat1", "Kcat2"]:
+        kp_strs[Kcat] = f"{enzyme_concentration}*{kp_strs[Kcat]}"
+    S1_str = f"metabolites[{str(substrate_1_code)}]"
+    S2_str = f"metabolites[{str(substrate_2_code)}]"
+    S3_str = f"metabolites[{str(substrate_3_code)}]"
+    P1_str = f"metabolites[{str(product_1_code)}]"
+    P2_str = f"metabolites[{str(product_2_code)}]"
+    Kip_str = f"{reaction}_Kip"
+    Kiq_str = f"{reaction}_Kiq"
+    return ''.join([
+        f"{S1_str}, {S2_str}, {S3_str}, {P1_str}, {P2_str}, ",
+        f"{kp_strs['Kcat1']}, {kp_strs['Kcat2']}, ",
+        f"{kp_strs['Ka']}, {kp_strs['Kb']}, {kp_strs['Kp']}, {kp_strs['Kq']}, ",
+        f"{kp_strs['Kia']}, {kp_strs['Kib']}, {kp_strs['Kic']}, {Kip_str}, {Kiq_str}, {kp_strs['Keq']}"
     ])
 
 def get_args_irr_mass_action(ed: EnzymeKatData, reaction) -> str:
