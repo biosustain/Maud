@@ -74,9 +74,10 @@ class EnzymeKatData():
 
     def get_unbalanced_metabolite_names(self):
         S = self.get_stoichiometry()
-        produced_but_not_consumed = S.gt(0).any(axis=0) & S.ge(0).all(axis=0)
-        consumed_but_not_produced = S.lt(0).any(axis=0) & S.le(0).all(axis=0)
-        is_unbalanced = produced_but_not_consumed | consumed_but_not_produced
+        list_of_unbalanced = self.experiments[0]['unbalanced_metabolite_priors']
+        unbalanced_names = [x['label'] for x in list_of_unbalanced]
+        metabolite_names = list(S.columns)
+        is_unbalanced = [x in unbalanced_names for x in metabolite_names]
         return S.columns[is_unbalanced]
 
     def get_unbalanced_metabolite_priors(self):
