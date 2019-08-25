@@ -62,7 +62,7 @@ def create_fluxes_function(ed: EnzymeKatData) -> str:
         ],
         'ordered_terbi': [
             create_Kip_ordered_terbi_line,
-            create_Kiq_ordered_terbi_line
+            create_Kp_ordered_terbi_line
         ]
     }
     mechanism_to_args_function = {
@@ -178,11 +178,11 @@ def create_Kiq_ordered_unibi_line(ed: EnzymeKatData, reaction: str) -> str:
 
 def create_Kip_ordered_bibi_line(ed: EnzymeKatData, reaction: str) -> str:
     codes = ed.kinetic_parameters.groupby('label')['stan_code'].first().to_dict()
-    kinetic_params = ['Keq', 'Ka', 'Kq', 'Kib', 'Kiq', 'V1', 'V2']
+    kinetic_params = ['Keq', 'Ka', 'Kq', 'Kib', 'Kiq', 'Kcat1', 'Kcat2']
     kinetic_param_codes = [codes[reaction + '_' + p] for p in kinetic_params]
     kinetic_params_str = ", ".join([f"params[{str(c)}]" for c in kinetic_param_codes])
     return ''.join([
-        f"real {reaction}_Kiq = get_Kiq_ordered_unibi(",
+        f"real {reaction}_Kip = get_Kip_ordered_bibi(",
         kinetic_params_str,
         ");"
     ])
@@ -191,11 +191,11 @@ def create_Kip_ordered_bibi_line(ed: EnzymeKatData, reaction: str) -> str:
 
 def create_Kia_ordered_bibi_line(ed: EnzymeKatData, reaction: str) -> str:
     codes = ed.kinetic_parameters.groupby('label')['stan_code'].first().to_dict()
-    kinetic_params = ['Keq', 'Kb', 'Kp', 'Kiq', 'V1', 'V2']
+    kinetic_params = ['Keq', 'Kb', 'Kp', 'Kiq', 'Kcat1', 'Kcat2']
     kinetic_param_codes = [codes[reaction + '_' + p] for p in kinetic_params]
     kinetic_params_str = ", ".join([f"params[{str(c)}]" for c in kinetic_param_codes])
     return ''.join([
-        f"real {reaction}_Kiq = get_Kiq_ordered_unibi(",
+        f"real {reaction}_Kia = get_Kia_ordered_bibi(",
         kinetic_params_str,
         ");"
     ])
@@ -203,11 +203,11 @@ def create_Kia_ordered_bibi_line(ed: EnzymeKatData, reaction: str) -> str:
 
 def create_Kip_pingpong_line(ed: EnzymeKatData, reaction: str) -> str:
     codes = ed.kinetic_parameters.groupby('label')['stan_code'].first().to_dict()
-    kinetic_params = ['Keq', 'Ka', 'Kb', 'Kq', 'V1', 'V2']
+    kinetic_params = ['Keq', 'Ka', 'Kb', 'Kq', 'Kcat1', 'Kcat2']
     kinetic_param_codes = [codes[reaction + '_' + p] for p in kinetic_params]
     kinetic_params_str = ", ".join([f"params[{str(c)}]" for c in kinetic_param_codes])
     return ''.join([
-        f"real {reaction}_Kiq = get_Kiq_ordered_unibi(",
+        f"real {reaction}_Kip = get_Kip_pingpong(",
         kinetic_params_str,
         ");"
     ])
@@ -219,19 +219,19 @@ def create_Kip_ordered_terbi_line(ed: EnzymeKatData, reaction: str) -> str:
     kinetic_param_codes = [codes[reaction + '_' + p] for p in kinetic_params]
     kinetic_params_str = ", ".join([f"params[{str(c)}]" for c in kinetic_param_codes])
     return ''.join([
-        f"real {reaction}_Kiq = get_Kiq_ordered_unibi(",
+        f"real {reaction}_Kip = get_Kip_ordered_terbi(",
         kinetic_params_str,
         ");"
     ])
 
 
-def create_Kiq_ordered_terbi_line(ed: EnzymeKatData, reaction: str) -> str:
+def create_Kp_ordered_terbi_line(ed: EnzymeKatData, reaction: str) -> str:
     codes = ed.kinetic_parameters.groupby('label')['stan_code'].first().to_dict()
-    kinetic_params = ['Keq', 'Kc', 'Kp', 'Kia', 'Kib', 'V1', 'V2']
+    kinetic_params = ['Keq', 'Kc', 'Kia', 'Kib', 'Kiq', 'Kcat1', 'Kcat2']
     kinetic_param_codes = [codes[reaction + '_' + p] for p in kinetic_params]
     kinetic_params_str = ", ".join([f"params[{str(c)}]" for c in kinetic_param_codes])
     return ''.join([
-        f"real {reaction}_Kiq = get_Kiq_ordered_unibi(",
+        f"real {reaction}_Kp = get_Kp_ordered_terbi(",
         kinetic_params_str,
         ");"
     ])
@@ -329,7 +329,7 @@ def get_args_ordered_unibi(ed: EnzymeKatData, reaction) -> str:
     ])
 
 def get_args_ordered_bibi(ed: EnzymeKatData, reaction) -> str:
-    kinetic_params = ['Kcat1', 'Kcat2', 'Ka', 'Kb', 'Kp', 'Kq', 'Kia', 'Kib', 'Kip', 'Kiq', 'Keq']
+    kinetic_params = ['Kcat1', 'Kcat2', 'Ka', 'Kb', 'Kp', 'Kq', 'Kib', 'Kiq', 'Keq']
     met_codes = ed.stan_codes['metabolite']
     param_codes = ed.kinetic_parameters.groupby('label')['stan_code'].first().to_dict()
     kr_codes = ed.known_reals['stan_code']
@@ -358,7 +358,7 @@ def get_args_ordered_bibi(ed: EnzymeKatData, reaction) -> str:
     ])
 
 def get_args_pingpong(ed: EnzymeKatData, reaction) -> str:
-    kinetic_params = ['Kcat1', 'Kcat2', 'Ka', 'Kb', 'Kp', 'Kq', 'Kia', 'Kib', 'Kip', 'Kiq', 'Keq']
+    kinetic_params = ['Kcat1', 'Kcat2', 'Ka', 'Kb', 'Kp', 'Kq', 'Kia', 'Kib', 'Kiq', 'Keq']
     met_codes = ed.stan_codes['metabolite']
     param_codes = ed.kinetic_parameters.groupby('label')['stan_code'].first().to_dict()
     kr_codes = ed.known_reals['stan_code']
@@ -386,7 +386,7 @@ def get_args_pingpong(ed: EnzymeKatData, reaction) -> str:
     ])
 
 def get_args_ordered_terbi(ed: EnzymeKatData, reaction) -> str:
-    kinetic_params = ['Kcat1', 'Kcat2', 'Ka', 'Kb', 'Kc', 'Kp', 'Kq', 'Kia', 'Kic', 'Kib', 'Kip', 'Kiq', 'Keq']
+    kinetic_params = ['Kcat1', 'Kcat2', 'Ka', 'Kb', 'Kc', 'Kq', 'Kia', 'Kib', 'Kic', 'Kiq', 'Keq']
     met_codes = ed.stan_codes['metabolite']
     param_codes = ed.kinetic_parameters.groupby('label')['stan_code'].first().to_dict()
     kr_codes = ed.known_reals['stan_code']
@@ -407,12 +407,12 @@ def get_args_ordered_terbi(ed: EnzymeKatData, reaction) -> str:
     P1_str = f"metabolites[{str(product_1_code)}]"
     P2_str = f"metabolites[{str(product_2_code)}]"
     Kip_str = f"{reaction}_Kip"
-    Kiq_str = f"{reaction}_Kiq"
+    Kp_str = f"{reaction}_Kp"
     return ''.join([
         f"{S1_str}, {S2_str}, {S3_str}, {P1_str}, {P2_str}, ",
         f"{kp_strs['Kcat1']}, {kp_strs['Kcat2']}, ",
-        f"{kp_strs['Ka']}, {kp_strs['Kb']}, {kp_strs['Kp']}, {kp_strs['Kq']}, ",
-        f"{kp_strs['Kia']}, {kp_strs['Kib']}, {kp_strs['Kic']}, {Kip_str}, {Kiq_str}, {kp_strs['Keq']}"
+        f"{kp_strs['Ka']}, {kp_strs['Kb']}, {kp_strs['Kc']}, {Kp_str}, {kp_strs['Kq']}, ",
+        f"{kp_strs['Kia']}, {kp_strs['Kib']}, {kp_strs['Kic']}, {Kip_str}, {kp_strs['Kiq']}, {kp_strs['Keq']}"
     ])
 
 def get_args_irr_mass_action(ed: EnzymeKatData, reaction) -> str:

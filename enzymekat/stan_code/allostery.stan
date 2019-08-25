@@ -31,7 +31,7 @@ real get_free_enzyme_ratio_ordered_unibi(real A, real P, real Q,
   return num / denom;
 }
 
-real get_free_enzyme_ratio_ordered_bibi((real A, real B, real P, real Q,
+real get_free_enzyme_ratio_ordered_bibi(real A, real B, real P, real Q,
                    real V1, real V2,
                    real Ka, real Kb, real Kp, real Kq,
                    real Kia, real Kib, real Kip, real Kiq,
@@ -43,19 +43,19 @@ real get_free_enzyme_ratio_ordered_bibi((real A, real B, real P, real Q,
     + Ka*V2*B
     + V2*A*B
     + Kq*V1*P/Keq
-    + Kp*v1*Q/Keq
+    + Kp*V1*Q/Keq
     + V1*P*Q/Keq
     + Kq*V1*A*P/(Kia*Keq)
     + Ka*V2*B*Q/Kiq
     + V2*A*B*P/Kip
-    + V1*B*P*Q/(Kib*Keq)
+    + V1*B*P*Q/(Kib*Keq);
   return num / denom;
 }
 
-real get_free_enzyme_ratio_ordered_terbi((real A, real B, real P, real Q,
+real get_free_enzyme_ratio_ordered_terbi(real A, real B, real C, real P, real Q,
                    real V1, real V2,
-                   real Ka, real Kb, real Kp, real Kq,
-                   real Kia, real Kib, real Kip, real Kiq,
+                   real Ka, real Kb, real Kc, real Kp, real Kq,
+                   real Kia, real Kib, real Kic, real Kip, real Kiq,
                    real Keq){
   real num = Kq*V1*P/Keq + Ka*V2*B*C + Kia*Kb*V2*C + Kia*Kib*Kc*V2;
   real denom = 
@@ -78,3 +78,4 @@ real get_free_enzyme_ratio_ordered_terbi((real A, real B, real P, real Q,
     + Kq*V1*A*B*C*P/(Kia*Kib*Kic*Keq)
     + Ka*V2*B*C*P*Q/(Kip*Kiq);
   return num / denom;
+}
