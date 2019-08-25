@@ -86,9 +86,10 @@ transformed parameters {
   }
 }
 model {
-  kinetic_parameter ~ lognormal(prior_location_kinetic_parameter, prior_scale_kinetic_parameter);
+  kinetic_parameter ~ lognormal(log(prior_location_kinetic_parameter), prior_scale_kinetic_parameter);
   for (e in 1:N_experiment){
-    concentration_unbalanced[,e] ~ lognormal(prior_location_unbalanced[,e], prior_scale_unbalanced[,e]);
+    concentration_unbalanced[,e] ~ lognormal(log(prior_location_unbalanced[,e]),
+                                              prior_scale_unbalanced[,e]);
   }
   if (LIKELIHOOD == 1){
     real concentration_hat[N_concentration_measurement_training];
@@ -148,7 +149,7 @@ generated quantities {
     concentration_hat_holdout[mc] = concentration_holdout[ix_holdout_concentration_measurement[mc],
                           ig_holdout_concentration_experiment[mc]];
 
-    log_like[mc] = lognormal_lpdf(concentration_measurement_holdout[mc]|concentration_hat_holdout[mc],
+    log_like[mc] = lognormal_lpdf(concentration_measurement_holdout[mc]|log(concentration_hat_holdout[mc]),
                                   concentration_measurement_scale_holdout[mc]);
   }
 
