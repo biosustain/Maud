@@ -6,9 +6,10 @@ from enzymekat import sampling, simulation, sampling_CV
 import os
 
 SAMPLING_DEFAULTS = {
-    'rel_tol': 1e-13,
-    'abs_tol': 1e-12,
-    'max_steps': int(1e9),
+    'f_tol_as': 1e-4,
+    'rel_tol_as': 1e-9,
+    'abs_tol_as': 1e-6,
+    'max_steps_as': int(1e7),
     'likelihood': 1,
     'n_samples': 5,
     'n_warmup': 5,
@@ -30,12 +31,12 @@ pass
 
 
 @cli.command()
-@click.option('--rel_tol', default=SAMPLING_DEFAULTS['rel_tol'],
-              help="ODE solver's relative tolerance parameter")
-@click.option('--abs_tol', default=SAMPLING_DEFAULTS['abs_tol'],
-              help="ODE solver's absolute tolerance parameter")
-@click.option('--max_steps', default=SAMPLING_DEFAULTS['max_steps'],
-              help="ODE solver's maximum steps parameter")
+@click.option('--f_tol', default=SAMPLING_DEFAULTS['f_tol_as'],
+              help="Algebra solver's functional tolerance parameter")
+@click.option('--rel_tol', default=SAMPLING_DEFAULTS['rel_tol_as'],
+              help="Algebra solver's absolute tolerance parameter")
+@click.option('--max_steps', default=SAMPLING_DEFAULTS['max_steps_as'],
+              help="Algebra solver's maximum steps parameter")
 @click.option('--likelihood', default=SAMPLING_DEFAULTS['likelihood'],
               help="Whether (1) or not (0) to run the model in likelihood mode")
 @click.option('--n_samples', default=SAMPLING_DEFAULTS['n_samples'],
