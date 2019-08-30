@@ -62,12 +62,12 @@ def sample(data_path, **kwargs):
                 default=get_example_path(RELATIVE_PATH_EXAMPLE))
 @click.option('--steady_state_time', default=SAMPLING_DEFAULTS['steady_state_time'],
               help="Number of time units to simulate ODEs for")
-@click.option('--rel_tol', default=SAMPLING_DEFAULTS['rel_tol'],
-              help="ODE solver's relative tolerance parameter")
-@click.option('--abs_tol', default=SAMPLING_DEFAULTS['abs_tol'],
-              help="ODE solver's absolute tolerance parameter")
-@click.option('--max_steps', default=SAMPLING_DEFAULTS['max_steps'],
-              help="ODE solver's maximum steps parameter")
+@click.option('--rel_tol', default=SAMPLING_DEFAULTS['f_tol_as'],
+              help="Algebra solver's relative tolerance parameter")
+@click.option('--f_tol', default=SAMPLING_DEFAULTS['abs_tol_as'],
+              help="Algebra solver's functional tolerance parameter")
+@click.option('--max_steps', default=SAMPLING_DEFAULTS['max_steps_as'],
+              help="Algebra solver's maximum steps parameter")
 def simulate(data_path, **kwargs):
     """Simulate measurements given parameter values from data_path."""
     stanfit, simulations = simulation.simulate(data_path, **kwargs)
@@ -75,16 +75,14 @@ def simulate(data_path, **kwargs):
           simulations['flux_measurements'].round(2))
     print('\nSimulated metabolite concentration measurements:\n',
           simulations['concentration_measurements'].round(2))
-    print('\nSimulated metabolite fluxes (at steady state these are zero):\n',
-          simulations['metabolite_fluxes'].round(2))
 
 
 @cli.command()
-@click.option('--rel_tol', default=SAMPLING_DEFAULTS['rel_tol'],
+@click.option('--rel_tol', default=SAMPLING_DEFAULTS['rel_tol_as'],
               help="ODE solver's relative tolerance parameter")
-@click.option('--abs_tol', default=SAMPLING_DEFAULTS['abs_tol'],
+@click.option('--abs_tol', default=SAMPLING_DEFAULTS['abs_tol_as'],
               help="ODE solver's absolute tolerance parameter")
-@click.option('--max_steps', default=SAMPLING_DEFAULTS['max_steps'],
+@click.option('--max_steps', default=SAMPLING_DEFAULTS['max_steps_as'],
               help="ODE solver's maximum steps parameter")
 @click.option('--likelihood', default=SAMPLING_DEFAULTS['likelihood'],
               help="Whether (1) or not (0) to run the model in likelihood mode")
