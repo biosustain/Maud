@@ -29,6 +29,7 @@ class Metabolite:
         """
         self.id = id
         self.name = name if name is not None else id
+        self.balanced = balanced
         self.compartment = compartment
 ​
 ​
