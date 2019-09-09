@@ -1,0 +1,109 @@
+[[compartments]]
+id = 'c'
+name = 'cytosol'
+volume = 1
+
+[[metabolites]]
+id = 'M1_ex'
+name = 'External metabolite number 1'
+balanced = false
+compartment = 'cytosol'
+
+[[metabolites]]
+id = 'M2_ex'
+name = 'External metabolite number 2'
+balanced = false
+compartment = 'cytosol'
+
+[[metabolites]]
+id = 'M1'
+name = 'Metabolite number 1'
+balanced = true
+compartment = 'cytosol'
+
+[[metabolites]]
+id = 'M2'
+name = 'Metabolite number 2'
+balanced = true
+compartment = 'cytosol'
+
+[[experiments]]
+id = 'condition_1'
+metadata = """ 
+ A bat got in the bioreactor.
+"""
+[experiments.measurements]
+enzyme = [
+  {target='r1', value=0.3, uncertainty=0.05},
+  {target='r2', value=1, uncertainty=0.05},
+  {target='r3', value=1, uncertainty=0.05},
+]
+metabolite = [
+  {target='M1_ex', value=2, uncertainty=0.05},
+  {target='M2_ex', value=1, uncertainty=0.05},
+  {target='M1', value=0.8, uncertainty=0.1},
+  {target='M2', value=1.5, uncertainty=0.1},
+]
+reaction = [
+  {target='r3', value=0.29, uncertainty=0.1}
+]
+
+[[experiments]]
+id = 'condition_2'
+metadata = """
+ I may have mixed up some/all of the numbers.
+"""
+[experiments.measurements]
+enzyme = [
+  {target='r1', value=0.2, uncertainty=0.05},
+  {target='r2', value=1, uncertainty=0.05},
+  {target='r3', value=1, uncertainty=0.05},
+]
+metabolite = [
+  {target='M1_ex', value=2, uncertainty=0.05},
+  {target='M2_ex', value=1, uncertainty=0.05},
+  {target='M1', value=0.7, uncertainty=0.1},
+  {target='M2', value=1.4, uncertainty=0.1},
+]
+reaction = [
+  {target='r3', value=0.21, uncertainty=0.1}
+]
+
+[[reactions]]
+id = 'r1'
+name = 'reaction number 1'
+mechanism = 'uniuni'
+stoichiometry = { M1_ex = -1, M1 = 1}
+parameters = [
+  { label = 'Keq', loc = 0, scale = 0.05},
+  { label = 'Kcat1', loc = 0, scale = 0.6},
+  { label = 'Kcat2', loc = 0, scale = 0.6},
+  { label = 'Ka', loc = 0, scale = 0.6},
+]
+
+[[reactions]]
+id = 'r2'
+name = 'reaction number 2'
+mechanism = 'uniuni'
+stoichiometry = { M1 = -1, M2 = 1 }
+parameters = [
+  { label = 'Keq', loc = 1.1, scale = 0.5},
+  { label = 'Kcat1', loc = 0, scale = 0.6},
+  { label = 'Kcat2', loc = 0, scale = 0.6},
+  { label = 'Ka', loc = 0, scale = 0.6},
+  { label = 'dissociation_constant_t', metabolite = 'M1', loc= 0, scale = 0.6},
+  { label = 'transfer_constant', loc= 0, scale = 0.6},
+]
+allosteric_inhibitors = ['M1']
+
+[[reactions]]
+id = 'r3'
+name = 'reaction number 3'
+mechanism = 'uniuni'
+stoichiometry = { M2 = -1, M2_ex = 1}
+parameters = [
+  { label = 'Keq', loc = 0, scale = 0.05},
+  { label = 'Kcat1', loc = 0, scale = 0.6},
+  { label = 'Kcat2', loc = 0, scale = 0.6},
+  { label = 'Ka', loc = 0, scale = 0.6},
+]
