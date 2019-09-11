@@ -68,17 +68,18 @@ def load_enzymekat_input_from_toml(filepath: str, id: str ='eki') -> EnzymeKatIn
     for e in parsed_toml['experiments']:
         experiment = Experiment(id=e['id'])
         measurements = {}
-        for measurement_type in ['metabolite', 'enzyme', 'reaction']:
+        for target_type in ['metabolite', 'enzyme', 'reaction']:
             type_msmts = {}
-            for m in e['measurements'][measurement_type]:
+            for m in e['measurements'][target_type]:
                 msmt = Measurement(
+                    target_id=m['target_id'],
                     value=m['value'],
                     uncertainty=m['uncertainty'],
                     scale='ln',
-                    measurement_type=measurement_type
+                    target_type=target_type
                 )
-                type_msmts.update({m['target']: msmt})
-            measurements[measurement_type] = type_msmts
+                type_msmts.update({m['target_id']: msmt})
+            measurements[target_type] = type_msmts
         experiment.met_meas.update(measurements['metabolite'])
         experiment.rxn_meas.update(measurements['reaction'])
         experiment.enz_meas.update(measurements['enzyme'])

@@ -128,22 +128,25 @@ class Reaction:
 
 class Measurement:
     def __init__(self,
+                 target_id: str,
                  value: float,
                  uncertainty: float = None,
                  scale: str = None,
-                 measurement_type: str = None):
+                 target_type: str = None):
         """
         Constructor for measurement object.
 
+        :param target_id: id of the thing being measured
         :param value: value for the measurement
         :param uncertainty: uncertainty associated to the measurent
         :param scale: scale of the measurement, e.g. 'log10' or 'linear
-        :param measurement_type: type of the measurement, e.g. 'met concentration', 'rxn flux', 'enzyme concentration', etc.
+        :param target_type: type of thing being measured, e.g. 'metabolite', 'reaction', 'enzyme'.
         """
+        self.target_id = target_id
         self.value = value
         self.uncertainty = uncertainty
         self.scale = scale
-        self.measurement_type = measurement_type
+        self.target_type = target_type
 
 
 class Experiment:

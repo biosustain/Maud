@@ -36,16 +36,16 @@ unbalanced_metabolite_priors = [
 ]
 [experiments.measurements]
 enzyme = [
-  {target='r1', value=0.3, uncertainty=0.05},
-  {target='r2', value=1, uncertainty=0.05},
-  {target='r3', value=1, uncertainty=0.05},
+  {target_id='r1', value=0.3, uncertainty=0.05},
+  {target_id='r2', value=1, uncertainty=0.05},
+  {target_id='r3', value=1, uncertainty=0.05},
 ]
 metabolite = [
-  {target='M1', value=0.8, uncertainty=0.1},
-  {target='M2', value=1.5, uncertainty=0.1},
+  {target_id='M1', value=0.8, uncertainty=0.1},
+  {target_id='M2', value=1.5, uncertainty=0.1},
 ]
 reaction = [
-  {target='r3', value=0.29, uncertainty=0.1}
+  {target_id='r3', value=0.29, uncertainty=0.1}
 ]
 
 [[experiments]]
@@ -57,16 +57,16 @@ unbalanced_metabolite_priors = [
 ]
 [experiments.measurements]
 enzyme = [
-  {target='r1', value=0.2, uncertainty=0.05},
-  {target='r2', value=1, uncertainty=0.05},
-  {target='r3', value=1, uncertainty=0.05},
+  {target_id='r1', value=0.2, uncertainty=0.05},
+  {target_id='r2', value=1, uncertainty=0.05},
+  {target_id='r3', value=1, uncertainty=0.05},
 ]
 metabolite = [
-  {target='M1', value=0.7, uncertainty=0.1},
-  {target='M2', value=1.4, uncertainty=0.1},
+  {target_id='M1', value=0.7, uncertainty=0.1},
+  {target_id='M2', value=1.4, uncertainty=0.1},
 ]
 reaction = [
-  {target='r3', value=0.21, uncertainty=0.1}
+  {target_id='r3', value=0.21, uncertainty=0.1}
 ]
 
 [[reactions]]
