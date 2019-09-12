@@ -107,7 +107,7 @@ class Reaction:
         self.enzymes = enzymes
 
 
-class KineticSystem:
+class KineticModel:
     def __init__(self, model_id: str):
         """
         Constructor for representation of a system of metabolic reactions.
@@ -199,16 +199,16 @@ class Prior:
 
 class EnzymeKatInput:
     def __init__(self,
-                 kinetic_system: KineticSystem,
-                 prior_specification: Dict[str, Prior],
-                 experimental_data: Dict[str, Experiment] = defaultdict()):
+                 kinetic_model: KineticModel,
+                 priors: Dict[str, Prior],
+                 experiments: Dict[str, Experiment] = defaultdict()):
         """
         Everything that is needed to run EnzymeKat.
         
         :param kinetic_system: a KineticSystem object
-        :param prior_specification: a dictionary mapping prior ids to Prior objects
-        :param experimental_data: a dictionary mapping experiment ids to Experiment objects
+        :param priors: a dictionary mapping prior ids to Prior objects
+        :param experiments: a dictionary mapping experiment ids to Experiment objects
         """
-        self.kinetic_system = kinetic_system
-        self.prior_specification = prior_specification
-        self.experimental_data = experimental_data
+        self.kinetic_model = kinetic_model
+        self.priors = priors
+        self.experiments = experiments
