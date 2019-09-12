@@ -55,41 +55,22 @@ class Modifier:
         self.modifier_type = modifier_type
 
 
-class LSPrior:
-    """
-    A prior distribuition with a location and a scale.
-    
-    :param location: a number specifying the location of the distribution
-    :param scale: a number specifying the scale of the distribution
-
-    """
-    def __init__(self, location: float,
-                 scale: float,
-                 distribution: str = None):
-        self.location = location
-        self.scale = scale
-        self.distribution = distribution
-
-
 class Parameter:
     def __init__(self,
                  id: str,
                  reaction_id: str,
-                 metabolite_id: str = None,
-                 prior: LSPrior = None):
+                 metabolite_id: str = None):
         """
         Constructor for parameter object.
         
         :param id: parameter id
         :param reaction_id: id of the reaction associated with the parameter
         :param metabolite_id: id of the metabolite associated with the parameter if any
-        :param prior: location and scale of the parameter's prior distribution
 
         """
         self.id = id
         self.reaction_id = reaction_id
         self.metabolite_id = metabolite_id
-        self.prior = prior
 
 
 class Reaction:
@@ -126,6 +107,22 @@ class Reaction:
         self.enzymes = enzymes
 
 
+class KineticSystem:
+    def __init__(self, model_id: str):
+        """
+        Constructor for representation of a system of metabolic reactions.
+
+        All attributes apart from model_id are initialized as empty defaultdicts.
+
+        Each of the dictionary will be of the form {'entity_id': entity_object}, where entity stands for metabolite,
+        reaction, compartment, or condition, at the moment.
+        """
+        self.model_id = model_id
+        self.metabolites = defaultdict()
+        self.reactions = defaultdict()
+        self.compartments = defaultdict()
+
+
 class Measurement:
     def __init__(self,
                  target_id: str,
@@ -155,7 +152,6 @@ class Experiment:
                  met_meas: Dict[str, Measurement] = defaultdict(),
                  rxn_meas: Dict[str, Measurement] = defaultdict(),
                  enz_meas: Dict[str, Measurement] = defaultdict(),
-                 unb_met_priors: Dict[str, LSPrior] = defaultdict(),
                  metadata: str = None):
 
         """
@@ -166,27 +162,53 @@ class Experiment:
         :param met_meas: metabolite measurements as a dictionary of the form {'met_id', measurement}
         :param rxn_meas: reaction measurements as a dictionary of the form {'rxn_id', measurement}
         :param enz_meas: enzyme measurements as a dictionary of the form {'enz_id', measurement}
-        :param unb_met_priors: dictionary mapping unbalanced metabolites to priors, with the form {'met_id': prior}
         :param metadata: any info about the condition
         """
         self.id = id
         self.met_meas = met_meas
         self.rxn_meas = rxn_meas
         self.enz_meas = enz_meas
-        self.unb_met_priors = unb_met_priors
         self.metadata = metadata
 
 
+class Prior:
+    def __init__(self,
+                 id: str,
+                 target_id: str,
+                 location: float,
+                 scale: float,
+                 target_type: str):
+        """
+        A prior distribuition.
+
+        As currently implemented, the target must be a single parameter and the
+        distribution must have a location and a scale.
+        
+        :param id: a string identifying the prior object
+        :param target_id: a string identifying the thing that has a prior distribution.
+        :param location: a number specifying the location of the distribution
+        :param scale: a number specifying the scale of the distribution
+        :param target_type: a string describing the target, e.g. 'kinetic_parameter' or 'unbalanced_metabolite'
+        """
+        self.id = id
+        self.target_id = target_id
+        self.location = location
+        self.scale = scale
+        self.target_type = target_type
+
+
 class EnzymeKatInput:
-    def __init__(self, model_id):
+    def __init__(self,
+                 kinetic_system: KineticSystem,
+                 prior_specification: Dict[str, Prior],
+                 experimental_data: Dict[str, Experiment] = defaultdict()):
         """
-        Constructor for the model object,
-        All attributes apart from model_id are initialized as empty defaultdics.
-        Each of the dictionary will be of the form {'entity_id': entity_object}, where entity stands for metabolite,
-        reaction, compartment, or condition, at the moment.
+        Everything that is needed to run EnzymeKat.
+        
+        :param kinetic_system: a KineticSystem object
+        :param prior_specification: a dictionary mapping prior ids to Prior objects
+        :param experimental_data: a dictionary mapping experiment ids to Experiment objects
         """
-        self.model_id = model_id
-        self.metabolites = defaultdict()
-        self.reactions = defaultdict()
-        self.compartments = defaultdict()
-        self.experiments = defaultdict()
+        self.kinetic_system = kinetic_system
+        self.prior_specification = prior_specification
+        self.experimental_data = experimental_data
