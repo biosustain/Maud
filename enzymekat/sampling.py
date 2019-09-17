@@ -15,8 +15,8 @@ RELATIVE_PATHS = {
 
 def sample(
         data_path: str,
+        f_tol: float,
         rel_tol: float,
-        abs_tol: float,
         max_steps: int,
         likelihood: int,
         n_samples: int,
@@ -41,8 +41,6 @@ def sample(
         .set_index(['metabolite_code', 'experiment_code'])
         [col]
         .unstack()
-        .values
-        .tolist()
         for col in ['loc', 'scale']
     )
     input_data = {
@@ -53,26 +51,23 @@ def sample(
         'N_experiment': len(ed.experiments),
         'N_known_real': len(ed.known_reals),
         'N_flux_measurement': len(ed.flux_measurements),
-        'N_concentration_measurement': len(ed.concentration_measurements),
-        'pos_balanced': balanced_metabolites['stan_code'].values,
-        'pos_unbalanced': unbalanced_metabolites['stan_code'].values,
-        'ix_experiment_concentration_measurement': ed.concentration_measurements['experiment_code'].values,
-        'ix_experiment_flux_measurement': ed.flux_measurements['experiment_code'].values,
-        'ix_metabolite_concentration_measurement': ed.concentration_measurements['metabolite_code'].values,
-        'ix_reaction_flux_measurement': ed.flux_measurements['reaction_code'].values,
-        'flux_measurement': ed.flux_measurements['value'].values,
-        'concentration_measurement': ed.concentration_measurements['value'].values,
-        'flux_measurement_scale': ed.flux_measurements['scale'].values,
-        'concentration_measurement_scale': ed.concentration_measurements['scale'].values,
-        'prior_location_kinetic_parameter': ed.kinetic_parameters['loc'].values,
+        'N_conc_measurement': len(ed.concentration_measurements),
+        'experiment_yconc': ed.concentration_measurements['experiment_code'].values,
+        'metabolite_yconc': ed.concentration_measurements['metabolite_code'].values,
+        'yconc': ed.concentration_measurements['value'].values,
+        'sigma_conc': ed.concentration_measurements['scale'].values,
+        'experiment_yflux': ed.flux_measurements['experiment_code'].values,
+        'reaction_yflux': ed.flux_measurements['reaction_code'].values,
+        'yflux': ed.flux_measurements['value'].values,
+        'sigma_flux': ed.flux_measurements['scale'].values,
+        'prior_loc_kinetic_parameter': ed.kinetic_parameters['loc'].values,
         'prior_scale_kinetic_parameter': ed.kinetic_parameters['scale'].values,
-        'prior_location_unbalanced': unbalanced_loc,
-        'prior_scale_unbalanced': unbalanced_scale,
-        'known_reals': ed.known_reals.drop('stan_code', axis=1).values.tolist(),
-        'initial_time': 0,
-        'steady_time': steady_state_time,
+        'prior_loc_unbalanced': unbalanced_loc.values.tolist(),
+        'prior_scale_unbalanced': unbalanced_scale.values.tolist(),
+        'xr': ed.known_reals.drop('stan_code', axis=1).T.values.tolist(),
+        'balanced_guess': [1. for m in range(len(balanced_metabolites))],
         'rel_tol': rel_tol,
-        'abs_tol': abs_tol,
+        'f_tol': f_tol,
         'max_steps': max_steps,
         'LIKELIHOOD': likelihood
     }
@@ -108,7 +103,6 @@ def sample(
         data=input_file,
         cores=4,
         chains=n_chains,
-        show_progress=True,
         csv_basename=csv_output_file,
         sampling_iters=n_samples,
         warmup_iters=n_warmup,
@@ -120,9 +114,9 @@ def sample(
     infd_posterior = (
         arviz.from_cmdstanpy(
             posterior=fit,
-            posterior_predictive=['simulated_flux_measurement', 'simulated_concentration_measurement'],
-            observed_data={'simulated_flux_measurement': input_data['flux_measurement'],
-                           'simulated_concentration_measurement': input_data['concentration_measurement']},
+            posterior_predictive=['yflux_sim', 'yconc_sim'],
+            observed_data={'yflux_sim': input_data['yflux'],
+                           'yconc_sim': input_data['yconc']},
             coords={
                 'reactions': reaction_names,
                 'metabolites': metabolite_names,
@@ -138,11 +132,11 @@ def sample(
                 )
             },
             dims={
-                'concentration': ['metabolites', 'experiments'],
-                'flux': ['reactions', 'experiments'],
+                'conc': ['experiments', 'metabolites'],
+                'flux': ['experiments', 'reactions'],
                 'kinetic_parameter': ['parameter_names'],
-                'simulated_concentration_measurement': ['concentration_measurements'],
-                'simulated_flux_measurement': ['flux_measurements'],
+                'yconc_sim': ['concentration_measurements'],
+                'yflux_sim': ['flux_measurements'],
 
             }
         )
