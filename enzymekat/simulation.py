@@ -19,7 +19,7 @@ def simulate(
         data_path: str,
         steady_state_time: float,
         rel_tol: float,
-        abs_tol: float,
+        f_tol: float,
         max_steps: int
 ):
     model_name = os.path.splitext(os.path.basename(data_path))[0]
@@ -38,8 +38,6 @@ def simulate(
         .set_index(['metabolite_code', 'experiment_code'])
         ['true_value']
         .unstack()
-        .values
-        .tolist()
     )
     input_data = {
         'N_balanced': len(balanced_metabolites),
@@ -49,23 +47,20 @@ def simulate(
         'N_experiment': len(ed.experiments),
         'N_known_real': len(ed.known_reals),
         'N_flux_measurement': len(ed.flux_measurements),
-        'N_concentration_measurement': len(ed.concentration_measurements),
-        'pos_balanced': balanced_metabolites['stan_code'].values,
-        'pos_unbalanced': unbalanced_metabolites['stan_code'].values,
-        'ix_experiment_concentration_measurement': ed.concentration_measurements['experiment_code'].values,
-        'ix_experiment_flux_measurement': ed.flux_measurements['experiment_code'].values,
-        'ix_metabolite_concentration_measurement': ed.concentration_measurements['metabolite_code'].values,
-        'ix_reaction_flux_measurement': ed.flux_measurements['reaction_code'].values,
-        'flux_measurement_scale': ed.flux_measurements['scale'].values,
-        'concentration_measurement_scale': ed.concentration_measurements['scale'].values,
+        'N_conc_measurement': len(ed.concentration_measurements),
+        'experiment_yconc': ed.concentration_measurements['experiment_code'].values,
+        'metabolite_yconc': ed.concentration_measurements['metabolite_code'].values,
+        'sigma_conc': ed.concentration_measurements['scale'].values,
+        'experiment_yflux': ed.flux_measurements['experiment_code'].values,
+        'reaction_yflux': ed.flux_measurements['reaction_code'].values,
+        'sigma_flux': ed.flux_measurements['scale'].values,
         'kinetic_parameter': ed.kinetic_parameters['true_value'].values,
-        'concentration_unbalanced': concentration_unbalanced,
-        'known_reals': ed.known_reals.drop('stan_code', axis=1).values.tolist(),
-        'initial_time': 0,
-        'steady_time': steady_state_time,
+        'unbalanced': concentration_unbalanced.T.values,
+        'xr': ed.known_reals.drop('stan_code', axis=1).T.values.tolist(),
+        'balanced_guess': [1. for m in range(len(balanced_metabolites))],
         'rel_tol': rel_tol,
-        'abs_tol': abs_tol,
-        'max_steps': max_steps
+        'f_tol': f_tol,
+        'max_steps': max_steps,
     }
 
     # dump input data
@@ -101,11 +96,9 @@ def simulate(
                           sampling_iters=1,
                           chains=1,
                           cores=1)
-    sim_conc, sim_flux, sim_bal_rocs = (
+    sim_conc, sim_flux = (
         stanfit.get_drawset([var]).iloc[0].values
-        for var in ['simulated_concentration_measurement',
-                    'simulated_flux_measurement',
-                    'balanced_metabolite_rate_of_change']
+        for var in ['yconc_sim', 'yflux_sim']
     )
     out_conc = (
         ed.concentration_measurements[['metabolite_label', 'experiment_label']]
@@ -122,9 +115,6 @@ def simulate(
         .round(2)
 
     )
-    if any(x > 0.01 for x in sim_bal_rocs):
-        print('Uh oh! Some metabolites appear to not get to steady state:\n',
-              sim_bal_rocs)
     simulations = {'flux_measurements': out_flux,
                    'concentration_measurements': out_conc}
     return stanfit, simulations

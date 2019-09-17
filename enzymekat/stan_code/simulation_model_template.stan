@@ -7,70 +7,48 @@ data {
   int<lower=1> N_experiment;
   int<lower=1> N_known_real;
   int<lower=1> N_flux_measurement;
-  int<lower=1> N_concentration_measurement;
-  // position of balanced and unbalanced metabolites in overall metabolite array 
-  int<lower=1,upper=N_balanced+N_unbalanced> pos_balanced[N_balanced];      
-  int<lower=1,upper=N_balanced+N_unbalanced> pos_unbalanced[N_unbalanced];
-  // which measurement goes with which experiment
-  int<lower=1,upper=N_experiment> ix_experiment_concentration_measurement[N_concentration_measurement];
-  int<lower=1,upper=N_experiment> ix_experiment_flux_measurement[N_flux_measurement];
-  // which measurement goes with which reaction or metabolite
-  int<lower=1,upper=N_balanced+N_unbalanced> ix_metabolite_concentration_measurement[N_concentration_measurement];
-  int<lower=1,upper=N_reaction> ix_reaction_flux_measurement[N_flux_measurement];
-  // measurement scales, i.e. how much the measured values deviate from the true values
-  vector<lower=0>[N_flux_measurement] flux_measurement_scale;
-  vector<lower=0>[N_concentration_measurement] concentration_measurement_scale;
+  int<lower=1> N_conc_measurement;
+  // measurements
+  int<lower=1,upper=N_experiment> experiment_yconc[N_conc_measurement];
+  int<lower=1,upper=N_balanced+N_unbalanced> metabolite_yconc[N_conc_measurement];
+  vector<lower=0>[N_conc_measurement] sigma_conc;
+  int<lower=1,upper=N_experiment> experiment_yflux[N_flux_measurement];
+  int<lower=1,upper=N_reaction> reaction_yflux[N_flux_measurement];
+  vector<lower=0>[N_flux_measurement] sigma_flux;
   // hardcoded numbers
-  real known_reals[N_known_real, N_experiment];
-  real<lower=0> kinetic_parameter[N_kinetic_parameter];
-  real<lower=0> concentration_unbalanced[N_unbalanced, N_experiment];
-  // ode stuff
-  real initial_time;
-  real steady_time;
+  real xr[N_experiment, N_known_real];
+  vector<lower=0>[N_balanced] balanced_guess;
+  vector<lower=0>[N_kinetic_parameter] kinetic_parameter;
+  vector<lower=0>[N_unbalanced] unbalanced[N_experiment];
+  // ode configuration
   real rel_tol;
-  real abs_tol;
+  real f_tol;
   int max_steps;
 }
 transformed data {
-  int known_ints[0];
+  int xi[0];
 }
 parameters {
   real z;
 }
 model {
-  z ~ normal(0, 1);
+  z ~ std_normal();
 }
 generated quantities {
-  vector[N_concentration_measurement] simulated_concentration_measurement;
-  vector[N_flux_measurement] simulated_flux_measurement;
-  real concentration[N_balanced+N_unbalanced, N_experiment];
-  real flux[N_reaction, N_experiment];
-  real balanced_metabolite_rate_of_change[N_balanced, N_experiment];
+  vector[N_conc_measurement] yconc_sim;
+  vector[N_flux_measurement] yflux_sim;
+  vector<lower=0>[N_balanced+N_unbalanced] conc[N_experiment];
+  vector[N_reaction] flux[N_experiment];
   for (e in 1:N_experiment){
-    real initial_concentration[N_balanced+N_unbalanced];
-    initial_concentration[pos_balanced] = rep_array(1.0, N_balanced);
-    initial_concentration[pos_unbalanced] = concentration_unbalanced[,e];
-    concentration[,e] = integrate_ode_bdf(steady_state_equation,
-                                          initial_concentration,
-                                          initial_time,
-                                          {steady_time},
-                                          kinetic_parameter,
-                                          known_reals[,e],
-                                          known_ints,
-                                          rel_tol, abs_tol, max_steps)[1];
-    flux[,e] = get_fluxes(concentration[,e], kinetic_parameter, known_reals[,e]);
-    balanced_metabolite_rate_of_change[, e] = get_odes(flux[, e])[pos_balanced];
+    vector[N_unbalanced+N_kinetic_parameter] theta = append_row(unbalanced[e], kinetic_parameter);
+    conc[e, { {{-balanced_codes|join(',')-}} }] = algebra_solver(steady_state_system, balanced_guess, theta, xr[e], xi, rel_tol, f_tol, max_steps);
+    conc[e, { {{-unbalanced_codes|join(',')-}} }] = unbalanced[e];
+    flux[e] = get_fluxes(to_array_1d(conc[e]), to_array_1d(kinetic_parameter), xr[e]);
   }
-  for (mc in 1:N_concentration_measurement){
-    simulated_concentration_measurement[mc] =
-      lognormal_rng(log(concentration[ix_metabolite_concentration_measurement[mc],
-                                      ix_experiment_concentration_measurement[mc]]),
-                    concentration_measurement_scale[mc]);
+  for (c in 1:N_conc_measurement){
+    yconc_sim[c] = lognormal_rng(log(conc[experiment_yconc[c], metabolite_yconc[c]]), sigma_conc[c]);
   }
-  for (mf in 1:N_flux_measurement){
-    simulated_flux_measurement[mf] =
-      normal_rng(flux[ix_reaction_flux_measurement[mf],
-                      ix_experiment_flux_measurement[mf]],
-                 flux_measurement_scale[mf]);
+  for (f in 1:N_flux_measurement){
+    yflux_sim[f] = normal_rng(flux[experiment_yflux[f], reaction_yflux[f]], sigma_flux[f]);
   }
 }
