@@ -22,13 +22,18 @@ JINJA_TEMPLATES = [
     'functions_block.stan',
     'ode_function.stan',
     'fluxes_function.stan',
-    'steady_state_system.stan'
+    'steady_state_function.stan'
 ]
 MECHANISM_TEMPLATES = {
     'uniuni': Template(
         "uniuni(m[{{S0}}], m[{{P0}}], e[{{enz}}]*p[{{Kcat1}}], e[{{enz}}]*p[{{Kcat2}}], p[{{Ka}}], p[{{Keq}}])"
     )
 }
+
+
+def codify(l: Iterable[str]):
+    return dict(zip(l, range(1, len(l) + 1)))
+
 
 def get_templates(template_files=JINJA_TEMPLATES):
     out = {}
@@ -58,7 +63,7 @@ def create_stan_program(eki: EnzymeKatInput, model_type: str) -> str:
         kinetic_model, templates['ode_function']
     )
     steady_state_function = create_steady_state_function(
-        kinetic_model, templates['steady_state_system']
+        kinetic_model, templates['steady_state_function']
     )
     functions_block = templates['functions_block'].render(
         fluxes_function=fluxes_function,
@@ -71,7 +76,7 @@ def create_stan_program(eki: EnzymeKatInput, model_type: str) -> str:
 
 def create_ode_function(kinetic_model: KineticModel, template: Template) -> str:
     rxns = kinetic_model.reactions
-    rxn_id_to_stan = dict(zip(rxns.keys(), range(1, len(rxns.keys()) + 1)))
+    rxn_id_to_stan = codify(rxns.keys())
     metabolite_lines = []
     for met_id, met in kinetic_model.metabolites.items():
         if not met.balanced:
@@ -109,6 +114,7 @@ def create_steady_state_function(
         unbalanced_codes=unbalanced_codes
     )
 
+
 def create_Kip_ordered_unibi_line(param_codes: dict, rxn_id: str) -> str:
     template = Template(
         "real {{rxn_id}}_Kip = get_Kip_ordered_unibi({{Keq}}, {{Ka}}, {{Kp}}, {{Kcat1}}, {{Kcat2}});"
@@ -121,6 +127,7 @@ def create_Kip_ordered_unibi_line(param_codes: dict, rxn_id: str) -> str:
         Kcat1=param_codes[rxn_id + 'Kcat1'],
         Kcat2=param_codes[rxn_id + 'Kcat2'],
     )
+
 
 def create_Kiq_ordered_unibi_line(param_codes: dict, rxn_id: str) -> str:
     template = Template(
@@ -227,10 +234,6 @@ def get_regulatory_string(inhibitor_codes, param_codes, enzyme_name):
         diss_t_str=diss_t_str,
         transfer_constant_code=transfer_constant_code
     )
-
-    
-def codify(l: Iterable[str]):
-    return dict(zip(l, range(1, len(l) + 1)))
 
 
 def get_metabolite_codes(kinetic_model: KineticModel) -> Dict[str, int]:
