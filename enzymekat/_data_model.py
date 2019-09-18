@@ -58,31 +58,54 @@ class Modifier:
 class Parameter:
     def __init__(self,
                  id: str,
-                 reaction_id: str,
+                 enzyme_id: str,
                  metabolite_id: str = None):
         """
         Constructor for parameter object.
         
         :param id: parameter id
-        :param reaction_id: id of the reaction associated with the parameter
+        :param enzyme_id: id of the enzyme associated with the parameter
         :param metabolite_id: id of the metabolite associated with the parameter if any
 
         """
         self.id = id
-        self.reaction_id = reaction_id
+        self.enzyme_id = enzyme_id
         self.metabolite_id = metabolite_id
 
 
+class Enzyme:
+    def __init__(self,
+                 id: str,
+                 reaction_id: str,
+                 name: str,
+                 mechanism: str,
+                 parameters: Dict[str, Parameter],
+                 modifiers: Dict[str, Modifier] = defaultdict()):
+        """
+        Constructor for the enzyme object.
+        
+        :param id: a string identifying the enzyme
+        :param reaction_id: the id of the reaction the enzyme catalyses
+        :param name: human-understandable name for the enzyme
+        :param mechanism: enzyme mechanism as a string
+        :param modifiers: modifiers, given as {'modifier_id': modifier_object}
+        :param parameters: enzyme parameters, give as {'parameter_id': parameter_object}
+        """
+        self.id = id
+        self.name = name
+        self.mechanism = mechanism
+        self.modifiers = modifiers
+        self.parameters = parameters
+
+
 class Reaction:
-    def __init__(self, id: str,
+    def __init__(self,
+                 id: str,
                  name: str = None,
                  reversible: bool = True,
                  is_exchange: bool = None,
-                 stoichiometry: Dict = defaultdict(),
-                 modifiers: Dict[str, Modifier] = defaultdict(),
-                 parameters: Dict[str, Parameter] = defaultdict(),
-                 rate_law: str = None,
-                 enzymes: set = None):
+                 stoichiometry: Dict[str, float] = defaultdict(),
+                 enzymes: Dict[str, Enzyme] = defaultdict()):
         """
         Constructor for the reaction object.
 
@@ -91,19 +114,13 @@ class Reaction:
         :param reversible: whether or not reaction is reversible.
         :param is_exchange: whether or not reaction is an exchange reaction.
         :param stoichiometry: reaction stoichiometry, e.g. for the reaction: 1.5 f6p <-> fdp we have {'f6p'; -1.5, 'fdp': 1}
-        :param modifiers: reaction modifiers, given as {'modifier_id': modifier_object}
-        :param parameters: reaction parameters, give as {'parameter_id', parameter_object}
-        :param rate_law: reaction rate law(s) given as a string (?)
-        :param enzymes: set of enzymes that catalyze the reaction
+        :param enzymes: Dictionary mapping enzyme ids to Enzyme objects
         """
         self.id = id
         self.name = name if name is not None else id
         self.reversible = reversible
         self.is_exchange = is_exchange
         self.stoichiometry = stoichiometry
-        self.modifiers = modifiers
-        self.parameters = parameters
-        self.rate_law = rate_law
         self.enzymes = enzymes
 
 

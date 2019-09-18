@@ -3,6 +3,7 @@ from enzymekat._data_model import (
     KineticModel,
     Metabolite,
     Reaction,
+    Enzyme,
     Modifier,
     Parameter,
     Prior,
@@ -10,6 +11,7 @@ from enzymekat._data_model import (
     Measurement,
     Compartment
 )
+from collections import defaultdict
 import toml
 
 MECHANISM_TO_PARAM_IDS = {
@@ -42,25 +44,42 @@ def load_enzymekat_input_from_toml(filepath: str, id: str ='eki') -> EnzymeKatIn
         )
         kinetic_model.metabolites.update({met.id: met})
     for r in parsed_toml['reactions']:
-        rxn_params = {}
-        for param_id in MECHANISM_TO_PARAM_IDS[r['mechanism']]:
-            rxn_params.update({param_id: Parameter(param_id, r['id'])})
-        if 'allosteric_inhibitors' in r.keys():
-            rxn_modifiers = {}
-            for met in r['allosteric_inhibitors']:
-                rxn_modifiers[met] = Modifier(met, 'allosteric_inhibition')
-        else:
-            rxn_modifiers = None
+        rxn_enzymes = {}
+        for e in r['enzymes']:
+            params = {
+                param_id: Parameter(param_id, e['id'])
+                for param_id in MECHANISM_TO_PARAM_IDS[e['mechanism']]
+            }
+            allosteric_inhibitors = defaultdict()
+            if 'allosteric_inhibitors' in e.keys():
+                allosteric_params = {
+                    'transfer_constant': Parameter('transfer_constant', e['id'])
+                }
+                for inhibitor_id in e['allosteric_inhibitors']:
+                    allosteric_inhibitors.update({
+                        inhibitor_id: Modifier(inhibitor_id, 'allosteric_inhibition')
+                    })
+                    diss_t_const_id = f"dissociation_constant_t_{inhibitor_id}"
+                    allosteric_params.update(
+                        {diss_t_const_id: Parameter(diss_t_const_id, e['id'], inhibitor_id)}
+                    )
+                params.update(allosteric_params)
+            enz = Enzyme(
+                id=e['id'],
+                name=e['name'],
+                reaction_id=r['id'],
+                mechanism=e['mechanism'],
+                parameters=params,
+                modifiers=allosteric_inhibitors
+            )
+            rxn_enzymes.update({enz.id: enz})
         rxn = Reaction(
             id=r['id'],
-            name=r['name'] if r['name'] else None,
+            name=r['name'],
             reversible=r['reversible'] if 'reversible' in r.keys() else None,
             is_exchange=r['is_exchange'] if 'is_exchange' in r.keys() else None,
             stoichiometry=r['stoichiometry'],
-            modifiers=rxn_modifiers,
-            parameters=rxn_params,
-            rate_law=r['rate_law'] if 'rate_law' in r.keys() else None,
-            enzymes=r['enzymes'] if 'enzymes' in r.keys() else None 
+            enzymes=rxn_enzymes
         )
         kinetic_model.reactions.update({rxn.id: rxn})
     experiments = {}
