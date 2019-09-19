@@ -166,9 +166,7 @@ class Measurement:
 class Experiment:
     def __init__(self,
                  id: str,
-                 met_meas: Dict[str, Measurement] = defaultdict(),
-                 rxn_meas: Dict[str, Measurement] = defaultdict(),
-                 enz_meas: Dict[str, Measurement] = defaultdict(),
+                 measurements: Dict[str, Dict[str, Measurement]] = defaultdict(),
                  metadata: str = None):
 
         """
@@ -176,15 +174,12 @@ class Experiment:
 
         :param id: condition id
         :param unbalanced_met_info:
-        :param met_meas: metabolite measurements as a dictionary of the form {'met_id', measurement}
-        :param rxn_meas: reaction measurements as a dictionary of the form {'rxn_id', measurement}
-        :param enz_meas: enzyme measurements as a dictionary of the form {'enz_id', measurement}
+        :param measurements: dictionary mapping keys 'enzyme', 'metabolite' and
+            'reaction' to dictionaries with the form {target id: measurement}
         :param metadata: any info about the condition
         """
         self.id = id
-        self.met_meas = met_meas
-        self.rxn_meas = rxn_meas
-        self.enz_meas = enz_meas
+        self.measurements = measurements
         self.metadata = metadata
 
 
@@ -194,7 +189,8 @@ class Prior:
                  target_id: str,
                  location: float,
                  scale: float,
-                 target_type: str):
+                 target_type: str,
+                 experiment_id: str = None):
         """
         A prior distribuition.
 
@@ -205,13 +201,17 @@ class Prior:
         :param target_id: a string identifying the thing that has a prior distribution.
         :param location: a number specifying the location of the distribution
         :param scale: a number specifying the scale of the distribution
-        :param target_type: a string describing the target, e.g. 'kinetic_parameter' or 'unbalanced_metabolite'
+        :param target_type: a string describing the target, e.g. 
+            'kinetic_parameter', 'enzyme' or 'unbalanced_metabolite'
+        :param experiment_id: id of the relevant experiment (for enzymes or 
+             unbalanced metabolites)
         """
         self.id = id
         self.target_id = target_id
         self.location = location
         self.scale = scale
         self.target_type = target_type
+        self.experiment_id = experiment_id
 
 
 class EnzymeKatInput:

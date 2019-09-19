@@ -3,7 +3,7 @@ import numpy as np
 import os
 import pandas as pd
 import cmdstanpy
-from enzymekat import code_generation, data_model, utils
+from enzymekat import _code_generation, _io, utils
 
 RELATIVE_PATHS = {
     'stan_includes': 'stan_code',
@@ -30,41 +30,70 @@ def sample(
     paths = {k: os.path.join(here, v) for k, v in RELATIVE_PATHS.items()}
 
     # define input data
-    ed = data_model.from_toml(data_path)
-    metabolites = ed.metabolites
-    metabolite_names = ed.stoichiometry.columns
-    unbalanced_metabolites = ed.metabolites.query('is_unbalanced')
-    balanced_metabolites = ed.metabolites.query('~is_unbalanced')
-    reaction_names = ed.stoichiometry.index
-    unbalanced_loc, unbalanced_scale = (
-        ed.unbalanced_metabolite_priors
-        .set_index(['metabolite_code', 'experiment_code'])
-        [col]
-        .unstack()
-        for col in ['loc', 'scale']
+    eki = _io.load_enzymekat_input_from_toml(data_path)
+    prior_df = pd.DataFrame.from_records(
+        [[p.id, p.experiment_id, p.target_id, p.location, p.scale, p.target_type]
+         for p in eki.priors.values()],
+        columns=['id', 'experiment_id', 'target_id', 'location', 'scale', 'target_type']
     )
+    metabolites = eki.kinetic_model.metabolites
+    reactions = eki.kinetic_model.reactions
+    enzymes = {k: v for r in reactions.values() for k, v in r.enzymes.items()}
+    balanced_metabolites = {k: v for k, v in metabolites.items() if v.balanced}
+    unbalanced_metabolites = {k: v for k, v in metabolites.items() if not v.balanced}
+    unbalanced_metabolite_priors, kinetic_parameter_priors, enzyme_priors = (
+        prior_df.loc[lambda df: df['target_type'] == target_type]
+        for target_type in ['unbalanced_metabolite', 'kinetic_parameter', 'enzyme']
+    )
+    prior_loc_unb, prior_loc_enzyme, prior_scale_unb, prior_scale_enzyme = (
+        df.set_index(['target_id', 'experiment_id'])[col].unstack()
+        for col in ['location', 'scale']
+        for df in [unbalanced_metabolite_priors, enzyme_priors]
+    )
+    enzyme_measurements, metabolite_measurements, reaction_measurements = (
+        pd.DataFrame([
+            [exp.id, meas.target_id, meas.value, meas.uncertainty]
+            for exp in eki.experiments.values()
+            for meas in exp.measurements[measurement_type].values()
+        ], columns=['experiment_id', 'target_id', 'value', 'uncertainty'])
+        for measurement_type in ['enzyme', 'metabolite', 'reaction']
+    )
+    # stan codes
+    experiment_codes = utils.codify(eki.experiments.keys())
+    reaction_codes = utils.codify(reactions.keys())
+    enzyme_codes = utils.codify(enzymes.keys())
+    metabolite_codes = utils.codify(metabolites.keys())
     input_data = {
         'N_balanced': len(balanced_metabolites),
         'N_unbalanced': len(unbalanced_metabolites),
-        'N_kinetic_parameter': len(ed.kinetic_parameters),
-        'N_reaction': len(reaction_names),
-        'N_experiment': len(ed.experiments),
-        'N_known_real': len(ed.known_reals),
-        'N_flux_measurement': len(ed.flux_measurements),
-        'N_conc_measurement': len(ed.concentration_measurements),
-        'experiment_yconc': ed.concentration_measurements['experiment_code'].values,
-        'metabolite_yconc': ed.concentration_measurements['metabolite_code'].values,
-        'yconc': ed.concentration_measurements['value'].values,
-        'sigma_conc': ed.concentration_measurements['scale'].values,
-        'experiment_yflux': ed.flux_measurements['experiment_code'].values,
-        'reaction_yflux': ed.flux_measurements['reaction_code'].values,
-        'yflux': ed.flux_measurements['value'].values,
-        'sigma_flux': ed.flux_measurements['scale'].values,
-        'prior_loc_kinetic_parameter': ed.kinetic_parameters['loc'].values,
-        'prior_scale_kinetic_parameter': ed.kinetic_parameters['scale'].values,
-        'prior_loc_unbalanced': unbalanced_loc.values.tolist(),
-        'prior_scale_unbalanced': unbalanced_scale.values.tolist(),
-        'xr': ed.known_reals.drop('stan_code', axis=1).T.values.tolist(),
+        'N_kinetic_parameter': len(kinetic_parameter_priors),
+        'N_reaction': len(reactions),
+        'N_enzyme': len(enzymes),
+        'N_experiment': len(eki.experiments),
+        'N_flux_measurement': len(reaction_measurements),
+        'N_conc_measurement': len(metabolite_measurements),
+        'experiment_yconc': (
+            metabolite_measurements['experiment_id'].map(experiment_codes).values
+        ),
+        'metabolite_yconc': (
+            metabolite_measurements['target_id'].map(metabolite_codes).values
+        ),
+        'yconc': metabolite_measurements['value'].values,
+        'sigma_conc': metabolite_measurements['uncertainty'].values,
+        'experiment_yflux': (
+            reaction_measurements['experiment_id'].map(experiment_codes).values
+        ),
+        'reaction_yflux': (
+            reaction_measurements['target_id'].map(reaction_codes).values
+        ),
+        'yflux': reaction_measurements['value'].values,
+        'sigma_flux': reaction_measurements['uncertainty'].values,
+        'prior_loc_kinetic_parameter': kinetic_parameter_priors['location'].values,
+        'prior_scale_kinetic_parameter': kinetic_parameter_priors['scale'].values,
+        'prior_loc_unbalanced': prior_loc_unb.values,
+        'prior_scale_unbalanced': prior_scale_unb.values,
+        'prior_loc_enzyme': prior_loc_enzyme.values,
+        'prior_scale_enzyme':prior_scale_enzyme.values,
         'balanced_guess': [1. for m in range(len(balanced_metabolites))],
         'rel_tol': rel_tol,
         'f_tol': f_tol,
@@ -79,7 +108,7 @@ def sample(
     cmdstanpy.utils.jsondump(input_file, input_data)
 
     # compile model if necessary
-    stan_code = code_generation.create_stan_model(ed)
+    stan_code = _code_generation.create_stan_program(eki, 'inference_model_template')
     stan_file = os.path.join(
         paths['stan_autogen'], f'inference_model_{model_name}.stan'
     )

@@ -57,7 +57,7 @@ def load_enzymekat_input_from_toml(filepath: str, id: str ='eki') -> EnzymeKatIn
                 }
                 for inhibitor_id in e['allosteric_inhibitors']:
                     allosteric_inhibitors.update({
-                        inhibitor_id: Modifier(inhibitor_id, 'allosteric_inhibition')
+                        inhibitor_id: Modifier(inhibitor_id, 'allosteric_inhibitor')
                     })
                     diss_t_const_id = f"dissociation_constant_t_{inhibitor_id}"
                     allosteric_params.update(
@@ -85,37 +85,34 @@ def load_enzymekat_input_from_toml(filepath: str, id: str ='eki') -> EnzymeKatIn
     experiments = {}
     for e in parsed_toml['experiments']:
         experiment = Experiment(id=e['id'])
-        measurements = {}
         for target_type in ['metabolite', 'enzyme', 'reaction']:
-            type_msmts = {}
+            type_measurements = {}
             for m in e[target_type + '_measurements']:
-                msmt = Measurement(
+                measurement = Measurement(
                     target_id=m['target_id'],
                     value=m['value'],
                     uncertainty=m['uncertainty'],
                     scale='ln',
                     target_type=target_type
                 )
-                type_msmts.update({m['target_id']: msmt})
-            measurements[target_type] = type_msmts
-        experiment.met_meas.update(measurements['metabolite'])
-        experiment.rxn_meas.update(measurements['reaction'])
-        experiment.enz_meas.update(measurements['enzyme'])
+                type_measurements.update({m['target_id']: measurement})
+            experiment.measurements.update({target_type: type_measurements})
         experiments.update({experiment.id: experiment})
     priors = {}
-    for um_id, umps in parsed_toml['priors']['unbalanced_metabolites'].items():
+    for exp_id, umps in parsed_toml['priors']['unbalanced_metabolites'].items():
         for ump in umps:
-            prior_id = f"{um_id}_{ump['target_id']}"
+            prior_id = f"{exp_id}_{ump['target_id']}"
             priors[prior_id] = Prior(
                 id = prior_id,
                 target_id = ump['target_id'],
                 location=ump['location'],
                 scale=ump['scale'],
-                target_type='unbalanced_metabolite'
+                target_type='unbalanced_metabolite',
+                experiment_id=exp_id
             )
-    for kp_id, kpps in parsed_toml['priors']['kinetic_parameters'].items():
+    for enz_id, kpps in parsed_toml['priors']['kinetic_parameters'].items():
         for kpp in kpps:
-            prior_id = f"{kp_id}_{kpp['target_id']}"
+            prior_id = f"{enz_id}_{kpp['target_id']}"
             priors[prior_id] = Prior(
                 id = prior_id,
                 target_id = kpp['target_id'],
@@ -123,6 +120,18 @@ def load_enzymekat_input_from_toml(filepath: str, id: str ='eki') -> EnzymeKatIn
                 scale=kpp['scale'],
                 target_type='kinetic_parameter'
             )
+    for exp_id, eps in parsed_toml['priors']['enzymes'].items():
+        for ep in eps:
+            prior_id = f"{exp_id}_{ep['target_id']}"
+            priors[prior_id] = Prior(
+                id = prior_id,
+                target_id = ep['target_id'],
+                location=ep['location'],
+                scale=ep['scale'],
+                target_type='enzyme',
+                experiment_id=exp_id
+            )
+
     return EnzymeKatInput(kinetic_model=kinetic_model,
                           priors=priors,
                           experiments=experiments)

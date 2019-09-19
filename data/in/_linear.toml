@@ -121,3 +121,14 @@ condition_2 = [
   {target_id='M1_ex', location=2, scale=0.05},
   {target_id='M2_ex', location=1, scale=0.05},
 ]
+[priors.enzymes]
+condition_1 = [
+  {target_id='r1', location=1, scale=0.05},
+  {target_id='r2', location=1, scale=0.05},
+  {target_id='r3', location=1, scale=0.05},
+]
+condition_2 = [
+  {target_id='r1', location=1.5, scale=0.05},
+  {target_id='r2', location=1.5, scale=0.05},
+  {target_id='r3', location=1.5, scale=0.05},
+]

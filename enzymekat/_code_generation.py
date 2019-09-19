@@ -15,6 +15,7 @@ from enzymekat._data_model import (
 from jinja2 import Template, Environment, PackageLoader, select_autoescape
 from textwrap import dedent
 from typing import Dict, List, Iterable
+from enzymekat.utils import codify
 
 JINJA_TEMPLATES = [
     'inference_model_template.stan',
@@ -26,21 +27,14 @@ JINJA_TEMPLATES = [
 ]
 MECHANISM_TEMPLATES = {
     'uniuni': Template(
-        "uniuni(m[{{S0}}], m[{{P0}}], e[{{enz}}]*p[{{Kcat1}}], e[{{enz}}]*p[{{Kcat2}}], p[{{Ka}}], p[{{Keq}}])"
+        "uniuni(m[{{S0}}], m[{{P0}}], p[{{enz}}]*p[{{Kcat1}}], p[{{enz}}]*p[{{Kcat2}}], p[{{Ka}}], p[{{Keq}}])"
     )
 }
 
 
-def codify(l: Iterable[str]):
-    return dict(zip(l, range(1, len(l) + 1)))
-
-
 def get_templates(template_files=JINJA_TEMPLATES):
     out = {}
-    env = Environment(
-        loader=PackageLoader('enzymekat', 'stan_code'),
-        autoescape=select_autoescape(['stan'])
-    )
+    env = Environment(loader=PackageLoader('enzymekat', 'stan_code'))
     for template_file in template_files:
         template_name = os.path.splitext(template_file)[0]
         out[template_name] = env.get_template(template_file)
@@ -56,6 +50,15 @@ def create_stan_program(eki: EnzymeKatInput, model_type: str) -> str:
     """
     templates = get_templates()
     kinetic_model = eki.kinetic_model
+    met_codes = codify(kinetic_model.metabolites.keys())
+    balanced_codes = [
+        met_codes[met_id] for met_id, met in kinetic_model.metabolites.items()
+        if met.balanced
+    ]
+    unbalanced_codes = [
+        met_codes[met_id] for met_id, met in kinetic_model.metabolites.items()
+        if not met.balanced
+    ]
     fluxes_function = create_fluxes_function(
         kinetic_model, templates['fluxes_function']
     )
@@ -70,7 +73,10 @@ def create_stan_program(eki: EnzymeKatInput, model_type: str) -> str:
         ode_function=ode_function,
         steady_state_function=steady_state_function
     )
-    lower_blocks = templates[model_type].render()
+    lower_blocks = templates[model_type].render(
+        balanced_codes=balanced_codes,
+        unbalanced_codes=unbalanced_codes
+    )
     return functions_block + '\n' + lower_blocks
 
 
@@ -153,6 +159,7 @@ def create_fluxes_function(kinetic_model: KineticModel, template: Template) -> s
     par_codes = get_parameter_codes(kinetic_model)
     met_codes = get_metabolite_codes(kinetic_model)
     enz_codes = get_enzyme_codes(kinetic_model)
+    par_codes_in_enz_context = {k: v+len(enz_codes) for k, v in par_codes.items()}
     haldane_lines = []
     free_enzyme_ratio_lines = []
     flux_lines = []
@@ -171,10 +178,10 @@ def create_fluxes_function(kinetic_model: KineticModel, template: Template) -> s
             if enz.mechanism in mechanism_to_haldane_functions.keys():
                 haldane_functions = mechanism_to_haldane_functions[rxn.mechanism]
                 for haldane_function in haldane_functions:
-                    haldane_line = haldane_function(par_codes, enz.id)
+                    haldane_line = haldane_function(par_codes_in_enz_context, enz.id)
                     haldane_lines.append(haldane_line)
             # make catalytic effect string
-            enz_param_codes = {k[len(enz_id)+1:]: v for k, v in par_codes.items() if enz_id in k}
+            enz_param_codes = {k[len(enz_id)+1:]: v for k, v in par_codes_in_enz_context.items() if enz_id in k}
             enz_code = enz_codes[enz.id]
             mechanism_args = {**substrate_codes, **product_codes, **{'enz': enz_code}, **enz_param_codes}
             catalytic_string = MECHANISM_TEMPLATES[enz.mechanism].render(mechanism_args)
@@ -193,7 +200,7 @@ def create_fluxes_function(kinetic_model: KineticModel, template: Template) -> s
                     mod_id: met_codes[mod_id] for mod_id in allosteric_inhibitors.keys()
                 }
                 regulatory_string = get_regulatory_string(
-                    allosteric_inhibitor_codes, par_codes, enz.id
+                    allosteric_inhibitor_codes, par_codes_in_enz_context, enz.id
                 )
                 enzyme_flux_string = catalytic_string + '*' + regulatory_string
             else:
@@ -210,10 +217,10 @@ def create_fluxes_function(kinetic_model: KineticModel, template: Template) -> s
 
 def get_regulatory_string(inhibitor_codes, param_codes, enzyme_name):
     regulatory_template = Template("""get_regulatory_effect(
-        {},
+        empty_array,
         {{inhibitor_str}},
         free_enzyme_ratio_{{enzyme_name}},
-        {},
+        empty_array,
         {{diss_t_str}},
         p[{{transfer_constant_code}}]
     )""".replace(' ', '').replace('\n', ''))
