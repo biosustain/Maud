@@ -1,4 +1,4 @@
-from enzymekat._data_model import (
+from enzymekat.data_model import (
     EnzymeKatInput,
     KineticModel,
     Metabolite,

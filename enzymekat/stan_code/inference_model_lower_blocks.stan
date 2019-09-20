@@ -54,8 +54,8 @@ transformed parameters {
 model {
   kinetic_parameter ~ lognormal(prior_loc_kinetic_parameter, prior_scale_kinetic_parameter);
   for (e in 1:N_experiment){
-    unbalanced[e] ~ lognormal(prior_loc_unbalanced[,e], prior_scale_unbalanced[,e]);
-    enzyme_concentration[e] ~ lognormal(prior_loc_enzyme[,e], prior_scale_enzyme[,e]);
+    unbalanced[e] ~ lognormal(log(prior_loc_unbalanced[,e]), prior_scale_unbalanced[,e]);
+    enzyme_concentration[e] ~ lognormal(log(prior_loc_enzyme[,e]), prior_scale_enzyme[,e]);
   }
   if (LIKELIHOOD == 1){
     for (c in 1:N_conc_measurement){

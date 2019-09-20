@@ -3,7 +3,7 @@ import numpy as np
 import os
 import pandas as pd
 import cmdstanpy
-from enzymekat import _code_generation, _io, utils
+from enzymekat import code_generation, io, utils
 
 RELATIVE_PATHS = {
     'stan_includes': 'stan_code',
@@ -23,14 +23,14 @@ def sample(
         n_warmup: int,
         n_chains: int,
         n_cores: int,
-        steady_state_time: float
+        time_step: float
 ):
     model_name = os.path.splitext(os.path.basename(data_path))[0]
     here = os.path.dirname(os.path.abspath(__file__))
     paths = {k: os.path.join(here, v) for k, v in RELATIVE_PATHS.items()}
 
     # define input data
-    eki = _io.load_enzymekat_input_from_toml(data_path)
+    eki = io.load_enzymekat_input_from_toml(data_path)
     prior_df = pd.DataFrame.from_records(
         [[p.id, p.experiment_id, p.target_id, p.location, p.scale, p.target_type]
          for p in eki.priors.values()],
@@ -108,7 +108,7 @@ def sample(
     cmdstanpy.utils.jsondump(input_file, input_data)
 
     # compile model if necessary
-    stan_code = _code_generation.create_stan_program(eki, 'inference_model_template')
+    stan_code = code_generation.create_stan_program(eki, 'inference', time_step)
     stan_file = os.path.join(
         paths['stan_autogen'], f'inference_model_{model_name}.stan'
     )
@@ -137,7 +137,10 @@ def sample(
         warmup_iters=n_warmup,
         max_treedepth=15,
         adapt_delta=0.8,
-        save_warmup=True
+        save_warmup=True,
+        inits={'kinetic_parameter': np.exp(kinetic_parameter_priors['location']).T.values,
+               'unbalanced': np.exp(prior_loc_unb).T.values,
+               'enzyme_concentration': np.exp(prior_loc_enzyme).T.values}
     )
 
     infd_posterior = (
@@ -147,25 +150,27 @@ def sample(
             observed_data={'yflux_sim': input_data['yflux'],
                            'yconc_sim': input_data['yconc']},
             coords={
-                'reactions': reaction_names,
-                'metabolites': metabolite_names,
-                'experiments': [x['label'] for x in ed.experiments],
-                'parameter_names':  (
-                [f'{x}-{y}' for x, y in zip(ed.kinetic_parameters['reaction'], ed.kinetic_parameters['parameter'])]
-                ),
-                'flux_measurements': (
-                    [f'{x}-{y}' for x, y in zip(ed.flux_measurements['reaction_code'], ed.flux_measurements['experiment_code'])]
-                ),
-                'concentration_measurements': (
-                    [f'{x}-{y}' for x, y in zip(ed.concentration_measurements['metabolite_code'], ed.concentration_measurements['experiment_code'])]
-                )
+                'reactions': list(reaction_codes.keys()),
+                'metabolites': list(metabolite_codes.keys()),
+                'experiments': list(experiment_codes.keys()),
+                'enzymes': list(enzyme_codes.keys()),
+                'kinetic_parameter_names': kinetic_parameter_priors['id'].tolist(),
+                'reaction_measurements': [
+                    str(experiment_codes[row['experiment_id']]) + '_' + str(reaction_codes[row['target_id']])
+                    for _, row in reaction_measurements.iterrows()
+                ],
+                'metabolite_measurements': [
+                    str(experiment_codes[row['experiment_id']]) + '_' + str(metabolite_codes[row['target_id']])
+                    for _, row in metabolite_measurements.iterrows()
+                ],
             },
             dims={
                 'conc': ['experiments', 'metabolites'],
                 'flux': ['experiments', 'reactions'],
-                'kinetic_parameter': ['parameter_names'],
-                'yconc_sim': ['concentration_measurements'],
-                'yflux_sim': ['flux_measurements'],
+                'kinetic_parameter': ['kinetic_parameter_names'],
+                'enzyme_concentration': ['experiments', 'enzymes'],
+                'yconc_sim': ['metabolite_measurements'],
+                'yflux_sim': ['reaction_measurements'],
 
             }
         )
