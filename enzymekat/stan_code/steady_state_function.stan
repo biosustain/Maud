@@ -16,6 +16,6 @@ vector steady_state_function(vector balanced, vector theta, real[] xr, int[] xi)
     xr,
     rep_array(0, 1),
     1e-4, 1e-4, 1e4
-                                   )[1, { {{-balanced_codes|join(',')-}} }]; 
+  )[1, { {{-balanced_codes|join(',')-}} }]; 
   return to_vector(balanced_new) - balanced;
 }
