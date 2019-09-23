@@ -50,13 +50,13 @@ def sample(
         for col in ['location', 'scale']
         for df in [unbalanced_metabolite_priors, enzyme_priors]
     )
-    enzyme_measurements, metabolite_measurements, reaction_measurements = (
+    metabolite_measurements, reaction_measurements = (
         pd.DataFrame([
             [exp.id, meas.target_id, meas.value, meas.uncertainty]
             for exp in eki.experiments.values()
             for meas in exp.measurements[measurement_type].values()
         ], columns=['experiment_id', 'target_id', 'value', 'uncertainty'])
-        for measurement_type in ['enzyme', 'metabolite', 'reaction']
+        for measurement_type in ['metabolite', 'reaction']
     )
     # stan codes
     experiment_codes = utils.codify(eki.experiments.keys())

@@ -60,11 +60,6 @@ mechanism = 'uniuni'
 [[experiments]]
 id = 'condition_1'
 metadata = "A bat got in the bioreactor."
-enzyme_measurements = [
-  {target_id='r1', value=0.3, uncertainty=0.05},
-  {target_id='r2', value=1, uncertainty=0.05},
-  {target_id='r3', value=1, uncertainty=0.05},
-]
 metabolite_measurements = [
   {target_id='M1', value=0.8, uncertainty=0.1},
   {target_id='M2', value=1.5, uncertainty=0.1},
@@ -76,11 +71,6 @@ reaction_measurements = [
 [[experiments]]
 id = 'condition_2'
 metadata = "I may have mixed up some/all of the numbers."
-enzyme_measurements = [
-  {target_id='r1', value=0.2, uncertainty=0.05},
-  {target_id='r2', value=1, uncertainty=0.05},
-  {target_id='r3', value=1, uncertainty=0.05},
-]
 metabolite_measurements = [
   {target_id='M1', value=0.7, uncertainty=0.1},
   {target_id='M2', value=1.4, uncertainty=0.1},
