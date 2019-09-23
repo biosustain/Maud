@@ -166,11 +166,11 @@ def create_fluxes_function(kinetic_model: KineticModel, template: Template) -> s
     free_enzyme_ratio_lines = []
     flux_lines = []
     for rxn_id, rxn in kinetic_model.reactions.items():
-        substrate_ids = [met_id for met_id, s in rxn.stoichiometry.items() if s > 0]
+        substrate_ids = [met_id for met_id, s in rxn.stoichiometry.items() if s < 0]
         substrate_codes = {
             'S' + str(i): met_codes[met_id] for i, met_id in enumerate(substrate_ids)
         }
-        product_ids = [met_id for met_id, s in rxn.stoichiometry.items() if s < 0]
+        product_ids = [met_id for met_id, s in rxn.stoichiometry.items() if s > 0]
         product_codes = {
             'P' + str(i): met_codes[met_id] for i, met_id in enumerate(product_ids)
         }
