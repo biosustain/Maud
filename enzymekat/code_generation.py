@@ -1,317 +1,266 @@
+"""
+    Functions for generating Stan programs from EnzymeKatInput objects.
+
+    The only function that should be used outside this module is
+    `create_stan_program`.
+
+"""
+
 import os
 import pandas as pd
-from enzymekat.data_model import EnzymeKatData
-from jinja2 import Template
-from textwrap import dedent
+from enzymekat.data_model import EnzymeKatInput, KineticModel
+from jinja2 import Template, Environment, PackageLoader
+from typing import Dict, List
+from enzymekat.utils import codify
 
-TEMPLATE_RELATIVE_PATHS = {
-    'inference': 'stan_code/inference_model_template.stan',
-    'simulation': 'stan_code/simulation_model_template.stan',
-    'relative': 'stan_code/relative_model_template.stan',
-    'validation': 'stan_code/inference_model_CV_template.stan'
+JINJA_TEMPLATE_FILES = [
+    'inference_model_lower_blocks.stan',
+    'functions_block.stan',
+    'ode_function.stan',
+    'fluxes_function.stan',
+    'steady_state_function.stan'
+]
+MECHANISM_TEMPLATES = {
+    'uniuni': Template(
+        "uniuni(m[{{S0}}], m[{{P0}}], p[{{enz}}]*p[{{Kcat1}}], p[{{enz}}]*p[{{Kcat2}}], p[{{Ka}}], p[{{Keq}}])"
+    )
 }
 
 
-def create_stan_model(ed: EnzymeKatData, template: str = 'inference') -> str:
-    paths = {
-        k: os.path.join(os.path.dirname(__file__), v)
-        for k, v in TEMPLATE_RELATIVE_PATHS.items()
-    }
-    unbalanced_codes = ed.metabolites.query('is_unbalanced')['stan_code'].tolist()
-    balanced_codes = ed.metabolites.query('~is_unbalanced')['stan_code'].tolist()
+def create_stan_program(eki: EnzymeKatInput, model_type: str, time_step=0.05) -> str:
+    """
+    Create a stan program from an EnzymeKatInput.
 
-    stan_template_str = read_stan_code_from_path(paths[template])
-    
-    template_code = Template(stan_template_str).render(balanced_codes=balanced_codes,
-                                                       unbalanced_codes=unbalanced_codes)
-    functions_block = create_functions_block(ed)
-    return functions_block + '\n' + template_code
+    :param eki: an EnzymeKatInput object
+    :param model_type: String describing the model, e.g. 'inference', 
+        'simulation'. So far only 'inference' is implemented.
+    :param time_step: How far ahead the ode simulates
+    """
+    templates = get_templates()
+    kinetic_model = eki.kinetic_model
+    met_codes = codify(kinetic_model.metabolites.keys())
+    balanced_codes = [
+        met_codes[met_id] for met_id, met in kinetic_model.metabolites.items()
+        if met.balanced
+    ]
+    unbalanced_codes = [
+        met_codes[met_id] for met_id, met in kinetic_model.metabolites.items()
+        if not met.balanced
+    ]
+    fluxes_function = create_fluxes_function(
+        kinetic_model, templates['fluxes_function']
+    )
+    ode_function = create_ode_function(
+        kinetic_model, templates['ode_function']
+    )
+    steady_state_function = create_steady_state_function(
+        kinetic_model, templates['steady_state_function'], time_step
+    )
+    functions_block = templates['functions_block'].render(
+        fluxes_function=fluxes_function,
+        ode_function=ode_function,
+        steady_state_function=steady_state_function
+    )
+    if model_type == 'inference':
+        lower_blocks = templates['inference_model_lower_blocks'].render(
+            balanced_codes=balanced_codes,
+            unbalanced_codes=unbalanced_codes
+        )
+    else:
+        raise ValueError(
+            "Model types other than 'inference' are not yet supported."
+        )
+    return functions_block + '\n' + lower_blocks
 
 
-def create_functions_block(ed: EnzymeKatData) -> str:
-    return '\n'.join([
-        "functions {",
-        "#include big_k_rate_equations.stan",
-        "#include haldane_relationships.stan",
-        "#include allostery.stan",
-        create_fluxes_function(ed),
-        create_ode_function(ed),
-        create_steady_state_function(ed),
-        "}"
-    ])
+def get_templates(template_files=JINJA_TEMPLATE_FILES) -> Dict[str, Template]:
+    out = {}
+    env = Environment(loader=PackageLoader('enzymekat', 'stan_code'))
+    for template_file in template_files:
+        template_name = os.path.splitext(template_file)[0]
+        out[template_name] = env.get_template(template_file)
+    return out
 
 
-def create_fluxes_function(ed: EnzymeKatData) -> str:
+def create_ode_function(kinetic_model: KineticModel, template: Template) -> str:
+    rxns = kinetic_model.reactions
+    rxn_id_to_stan = codify(rxns.keys())
+    metabolite_lines = []
+    for met_id, met in kinetic_model.metabolites.items():
+        if not met.balanced:
+            line = '0'
+        else:
+            line = ''
+            for rxn_id, rxn in rxns.items():
+                if met_id in rxn.stoichiometry.keys():
+                    stoich = rxn.stoichiometry[met_id]
+                    prefix = '+' if stoich > 0 and line != '' else ''
+                    rxn_stan = rxn_id_to_stan[rxn_id]
+                    line += prefix + str(stoich) + '*fluxes[{}]'.format(rxn_stan)
+        metabolite_lines.append(line)
+    return template.render(ode_stoic=metabolite_lines, N_flux=len(rxns))
+                    
 
-    fluxes_function_template = Template(dedent(
-        """
-        vector get_fluxes(real[] m, real[] p, real[] xr){
-          {%- for haldane in haldanes %}
-          {{haldane}}
-          {%- endfor %}
-        
-          {%- for fe in free_enzyme_ratio %} 
-          {{fe}}
-          {%- endfor %}
-          return [   
-            {%- for flux in fluxes %} 
-            {{flux}}{{"," if not loop.last}} 
-            {%- endfor %}
-          ]';
-        }
-        """
-    ))
+def create_steady_state_function(
+        kinetic_model: KineticModel,
+        template: Template,
+        time_step: float
+) -> str:
+    mets = kinetic_model.metabolites
+    met_codes = dict(zip(mets.keys(), range(1, len(mets) + 1)))
+    balanced_codes = [
+        met_codes[met_id] for met_id, met in mets.items() if met.balanced
+    ]
+    unbalanced_codes = [
+        met_codes[met_id] for met_id, met in mets.items() if not met.balanced
+    ]
+    return template.render(
+        N_balanced=len(balanced_codes),
+        N_unbalanced=len(unbalanced_codes),
+        time_step=time_step,
+        balanced_codes=balanced_codes,
+        unbalanced_codes=unbalanced_codes
+    )
 
+
+def create_Kip_ordered_unibi_line(param_codes: dict, rxn_id: str) -> str:
+    template = Template(
+        "real {{rxn_id}}_Kip = get_Kip_ordered_unibi({{Keq}}, {{Ka}}, {{Kp}}, {{Kcat1}}, {{Kcat2}});"
+    )
+    return template.render(
+        rxn_id=rxn_id,
+        Keq=param_codes[rxn_id + '_Keq'],
+        Kia=param_codes[rxn_id + 'Kia'],
+        Kq=param_codes[rxn_id + 'Kq'],
+        Kcat1=param_codes[rxn_id + 'Kcat1'],
+        Kcat2=param_codes[rxn_id + 'Kcat2'],
+    )
+
+
+def create_Kiq_ordered_unibi_line(param_codes: dict, rxn_id: str) -> str:
+    template = Template(
+        "real {{rxn_id}}_Kiq = get_Kiq_ordered_unibi({{Keq}}, {{Ka}}, {{Kp}}, {{Kcat1}}, {{Kcat2}});"
+    )
+    return template.render(
+        rxn_id=rxn_id,
+        Keq=param_codes[rxn_id + 'Keq'],
+        Kia=param_codes[rxn_id + 'Kia'],
+        Kq=param_codes[rxn_id + 'Kq'],
+        Kcat1=param_codes[rxn_id + 'Kcat1'],
+        Kcat2=param_codes[rxn_id + 'Kcat2'],
+    )
+
+
+def create_fluxes_function(kinetic_model: KineticModel, template: Template) -> str:
     mechanism_to_haldane_functions = {
         'ordered_unibi': [
             create_Kip_ordered_unibi_line,
             create_Kiq_ordered_unibi_line
         ],
     }
-    mechanism_to_args_function = {
-        'uniuni': get_args_uniuni,
-        'ordered_unibi': get_args_ordered_unibi,
-        'irr_mass_action': get_args_irr_mass_action,
-        'fixed_flux': get_args_fixed_flux
-    }
+    par_codes = get_parameter_codes(kinetic_model)
+    met_codes = get_metabolite_codes(kinetic_model)
+    enz_codes = get_enzyme_codes(kinetic_model)
+    par_codes_in_enz_context = {k: v+len(enz_codes) for k, v in par_codes.items()}
     haldane_lines = []
     free_enzyme_ratio_lines = []
     flux_lines = []
-    for r in ed.reactions:
-        mechanism = r['mechanism']
-        if mechanism in mechanism_to_haldane_functions.keys():
-            haldane_functions = mechanism_to_haldane_functions[mechanism]
-            for f in haldane_functions:
-                l = f(ed, r['name'])
-                haldane_lines.append(l)
-        args_function = mechanism_to_args_function[mechanism]
-        args = args_function(ed, r['name'])
-        flux_line = f"{mechanism}({args})"
-        regulatory_component = create_regulatory_call(ed, r)
-        if regulatory_component is not None:
-            empty_array_line = "real empty_array[0];"
-            if len(free_enzyme_ratio_lines) == 0:
-                free_enzyme_ratio_lines.append(empty_array_line)
-            free_enzyme_ratio_line = (
-                f"real free_enzyme_ratio_{r['name']} = get_free_enzyme_ratio_{mechanism}({args});"
-            )
-            free_enzyme_ratio_lines.append(free_enzyme_ratio_line)
-            flux_line = f"{flux_line} * {regulatory_component}"
+    for rxn_id, rxn in kinetic_model.reactions.items():
+        substrate_ids = [met_id for met_id, s in rxn.stoichiometry.items() if s < 0]
+        substrate_codes = {
+            'S' + str(i): met_codes[met_id] for i, met_id in enumerate(substrate_ids)
+        }
+        product_ids = [met_id for met_id, s in rxn.stoichiometry.items() if s > 0]
+        product_codes = {
+            'P' + str(i): met_codes[met_id] for i, met_id in enumerate(product_ids)
+        }
+        enzyme_flux_strings = []
+        for enz_id, enz in rxn.enzymes.items():
+            # make haldane relationship lines if necessary
+            if enz.mechanism in mechanism_to_haldane_functions.keys():
+                haldane_functions = mechanism_to_haldane_functions[rxn.mechanism]
+                for haldane_function in haldane_functions:
+                    haldane_line = haldane_function(par_codes_in_enz_context, enz.id)
+                    haldane_lines.append(haldane_line)
+            # make catalytic effect string
+            enz_param_codes = {k[len(enz_id)+1:]: v for k, v in par_codes_in_enz_context.items() if enz_id in k}
+            enz_code = enz_codes[enz.id]
+            mechanism_args = {**substrate_codes, **product_codes, **{'enz': enz_code}, **enz_param_codes}
+            catalytic_string = MECHANISM_TEMPLATES[enz.mechanism].render(mechanism_args)
+            if any(enz.modifiers):
+                # make free enzyme ratio line
+                free_enzyme_ratio_line = Template(
+                    "real free_enzyme_ratio_{{enzyme}} = get_free_enzyme_ratio_{{catalytic_string}};"
+                ).render(enzyme=enz_id, catalytic_string=catalytic_string)
+                free_enzyme_ratio_lines.append(free_enzyme_ratio_line)
+                # make regulatory effect string
+                allosteric_inhibitors = {
+                    mod_id: mod for mod_id, mod in enz.modifiers.items()
+                    if mod.modifier_type == 'allosteric_inhibitor'
+                }
+                allosteric_inhibitor_codes = {
+                    mod_id: met_codes[mod_id] for mod_id in allosteric_inhibitors.keys()
+                }
+                regulatory_string = get_regulatory_string(
+                    allosteric_inhibitor_codes, par_codes_in_enz_context, enz.id
+                )
+                enzyme_flux_string = catalytic_string + '*' + regulatory_string
+            else:
+                enzyme_flux_string = catalytic_string
+            enzyme_flux_strings.append(enzyme_flux_string)
+        flux_line = '+'.join(enzyme_flux_strings)
         flux_lines.append(flux_line)
-
-    return fluxes_function_template.render(
+    return template.render(
         haldanes=haldane_lines,
         free_enzyme_ratio=free_enzyme_ratio_lines,
         fluxes=flux_lines
     )
 
 
-def create_ode_function(ed: EnzymeKatData) -> str:
-    ode_function_template = Template(dedent(
-        """
-        real[] ode_func(real t, real[] m, real[] p, real[] xr, int[] xi){
-          vector[{{N_flux}}] fluxes = get_fluxes(m, p, xr);
-          return {
-            {%- for ode in ode_stoic %}
-            {{ode}}{{"," if not loop.last}}
-            {%- endfor %}
-          };
-        }
-        """
-    ))
-    S = ed.stoichiometry
-    unbalanced_metabolites = ed.metabolites.loc[lambda df: df['is_unbalanced'], 'name'].values
-    fluxes = [f"fluxes[{str(i)}]" for i in range(1, len(S.index) + 1)]
-    reaction_to_flux = dict(zip(S.index, fluxes))
-    metabolite_lines = {m: '' for m in S.columns}
-    for metabolite in S.columns:
-        if metabolite in unbalanced_metabolites:
-            line = '0'
-        else:
-            line = metabolite_lines[metabolite]
-            for reaction in S.index:
-                s = S.loc[reaction, metabolite]
-                if s != 0:
-                    positive_and_not_first = s > 0 and line != ''
-                    stoich = '+' + str(s) if positive_and_not_first else str(s)
-                    flux_string = reaction_to_flux[reaction]
-                    line += f"{stoich}*{flux_string}"
-        metabolite_lines[metabolite] = line
-    return ode_function_template.render(ode_stoic=metabolite_lines.values(), N_flux=len(fluxes))
-
-
-def create_steady_state_function(ed: EnzymeKatData, time_step: float = 0.05):
-    steady_state_function_template = Template(dedent(
-        """
-        vector steady_state_system(vector balanced, vector theta, real[] xr, int[] xi){
-          int N_unbalanced = {{N_unbalanced}};
-          int N_balanced = {{N_balanced}};
-          real initial_time = 0;
-          real time_step = {{time_step}};
-          real conc[{{N_balanced + N_unbalanced}}];
-          real balanced_new[{{N_balanced}}];
-          conc[{ {{-balanced_codes|join(',')-}} }] = to_array_1d(balanced);
-          conc[{ {{-unbalanced_codes|join(',')-}} }] = to_array_1d(theta[1:{{N_unbalanced}}]);
-          balanced_new = integrate_ode_bdf(
-            ode_func,
-            conc,
-            initial_time,
-            rep_array(time_step, 1),
-            to_array_1d(theta[N_unbalanced+1:]),
-            xr,
-            rep_array(0, 1),
-            1e-5, 1e-5, 1e3
-          )[1, { {{-balanced_codes|join(',')-}} }]; 
-          return to_vector(balanced_new) - balanced;
-        }
-        """
-    ))
-    time_step = time_step
-    unbalanced_codes = ed.metabolites.query('is_unbalanced')['stan_code'].tolist()
-    balanced_codes = ed.metabolites.query('~is_unbalanced')['stan_code'].tolist()
-    N_balanced = len(balanced_codes)
-    N_unbalanced = len(unbalanced_codes)
-    return steady_state_function_template.render(
-        N_balanced=N_balanced,
-        N_unbalanced=N_unbalanced,
-        time_step=time_step,
-        balanced_codes=balanced_codes,
-        unbalanced_codes=unbalanced_codes,
+def get_regulatory_string(inhibitor_codes, param_codes, enzyme_name):
+    regulatory_template = Template("""get_regulatory_effect(
+        empty_array,
+        {{inhibitor_str}},
+        free_enzyme_ratio_{{enzyme_name}},
+        empty_array,
+        {{diss_t_str}},
+        p[{{transfer_constant_code}}]
+    )""".replace(' ', '').replace('\n', ''))
+    inhibitor_template = Template("{ {{-inhibitor_strs|join(',')-}} }")
+    diss_t_template = Template("{ {{-diss_t_strs|join(',')-}} }")
+    diss_t_param_codes = [
+        param_codes[enzyme_name + '_dissociation_constant_t_' + inhibitor_name]
+        for inhibitor_name in inhibitor_codes.keys()
+    ]
+    transfer_constant_code = param_codes[enzyme_name + '_transfer_constant']
+    inhibitor_strs = [f'm[{c}]' for c in inhibitor_codes.values()]
+    diss_t_strs = [f'p[{c}]' for c in diss_t_param_codes]
+    diss_t_str = diss_t_template.render(diss_t_strs=diss_t_strs)
+    inhibitor_str = inhibitor_template.render(inhibitor_strs=inhibitor_strs)
+    return regulatory_template.render(
+        inhibitor_str=inhibitor_str,
+        enzyme_name=enzyme_name,
+        diss_t_str=diss_t_str,
+        transfer_constant_code=transfer_constant_code
     )
 
 
-def read_stan_code_from_path(path) -> str:
-    with open(path, 'r') as f:
-        return f.read()
+def get_metabolite_codes(kinetic_model: KineticModel) -> Dict[str, int]:
+    return codify(kinetic_model.metabolites.keys())
 
 
-# functions for writing particular lines
-def create_Kip_ordered_unibi_line(ed: EnzymeKatData, reaction: str) -> str:
-    codes = ed.kinetic_parameters.groupby('label')['stan_code'].first().to_dict()
-    kinetic_params = ['Keq', 'Kia', 'Kq', 'Kcat1', 'Kcat2']
-    kinetic_param_codes = [codes[reaction + '_' + p] for p in kinetic_params]
-    kinetic_params_str = ", ".join([f"p[{str(c)}]" for c in kinetic_param_codes])
-    return ''.join([
-        f"real {reaction}_Kip = get_Kip_ordered_unibi(",
-        kinetic_params_str,
-        ");"
-    ])
+def get_enzyme_codes(kinetic_model: KineticModel) -> Dict[str, int]:
+    enzyme_ids = []
+    for rxn_id, rxn in kinetic_model.reactions.items():
+        for enz_id, _ in rxn.enzymes.items():
+            enzyme_ids.append(enz_id)
+    return codify(enzyme_ids)
 
 
-def create_Kiq_ordered_unibi_line(ed: EnzymeKatData, reaction: str) -> str:
-    codes = ed.kinetic_parameters.groupby('label')['stan_code'].first().to_dict()
-    kinetic_params = ['Keq', 'Ka', 'Kp', 'Kcat1', 'Kcat2']
-    kinetic_param_codes = [codes[reaction + '_' + p] for p in kinetic_params]
-    kinetic_params_str = ", ".join([f"p[{str(c)}]" for c in kinetic_param_codes])
-    return ''.join([
-        f"real {reaction}_Kiq = get_Kiq_ordered_unibi(",
-        kinetic_params_str,
-        ");"
-    ])
-
-
-def create_regulatory_call(ed: EnzymeKatData, reaction: dict) -> str:
-    param_codes = ed.kinetic_parameters.groupby('label')['stan_code'].first().to_dict()
-    met_codes = ed.stan_codes['metabolite']
-    if set(reaction.keys()).intersection({'allosteric_inhibitors', 'allosteric_activators'}) == set():
-        return None
-    else:
-        transfer_constant_code = param_codes[reaction['name'] + '_transfer_constant']
-        transfer_constant_str = f"p[{transfer_constant_code}]"
-        free_enzyme_ratio_str = f"free_enzyme_ratio_{reaction['name']}"
-        inhibitors_str = "empty_array"
-        dissociation_constant_t_str = "empty_array"
-        activators_str = "empty_array"
-        dissociation_constant_r_str = "empty_array"
-        if 'allosteric_inhibitors' in reaction.keys():
-            inhibitor_codes = [met_codes[m] for m in reaction['allosteric_inhibitors']]
-            inhibitors_str = "{{{}}}".format(", ".join(map(lambda c: f'm[{str(c)}]', inhibitor_codes)))
-            dissociation_constant_t_codes = [
-                param_codes[reaction['name'] + '_dissociation_constant_t_' + metabolite]
-                for metabolite in reaction['allosteric_inhibitors']
-            ]
-            dissociation_constant_t_str = "{{{}}}".format(', '.join(map(lambda c: f"p[{c}]", dissociation_constant_t_codes)))
-        if 'allosteric_activators' in reaction.keys():
-            activator_codes = [met_codes[m] for m in reaction['allosteric_activators']]
-            activators_str = "{{{}}}".format(", ".join(map(lambda c: f'm[{str(c)}]', activator_codes)))
-            dissociation_constant_t_codes = [
-                param_codes[reaction['name'] + '_dissociation_constant_t_' + metabolite]
-                for metabolite in reaction['allosteric_activators']
-            ]
-            dissociation_constant_r_str = "{{{}}}".format(', '.join(map(lambda c: f"p[{c}]", dissociation_constant_r_codes)))
-        return ''.join([
-            f"get_regulatory_effect(",
-            f"{activators_str}, ",
-            f"{inhibitors_str}, ",
-            f"{free_enzyme_ratio_str}, ",
-            f"{dissociation_constant_r_str}, ",
-            f"{dissociation_constant_t_str}, ",
-            f"{transfer_constant_str}",
-            ")"
-        ])
-
-
-def get_args_uniuni(ed: EnzymeKatData, reaction: str) -> str:
-    kinetic_params = ['Kcat1', 'Kcat2', 'Ka', 'Keq']
-    met_codes = ed.stan_codes['metabolite']
-    param_codes = ed.kinetic_parameters.groupby('label')['stan_code'].first().to_dict()
-    kr_codes = ed.known_reals['stan_code']
-    substrate = ed.stoichiometry.loc[reaction].loc[lambda df: df == -1].index[0]
-    product = ed.stoichiometry.loc[reaction].loc[lambda df: df == 1].index[0]
-    substrate_code, product_code = met_codes[substrate], met_codes[product]
-    enzyme_code = kr_codes[f'concentration_{reaction}']
-    enzyme_concentration = f"xr[{str(enzyme_code)}]"
-    kp_codes = {kp: param_codes[f"{reaction}_{kp}"] for kp in kinetic_params}
-    kp_strs = {kp: f"p[{str(c)}]" for kp, c in kp_codes.items()}
-    for Kcat in ["Kcat1", "Kcat2"]:
-        kp_strs[Kcat] = f"{enzyme_concentration}*{kp_strs[Kcat]}"
-    S_str = f"m[{str(substrate_code)}]"
-    P_str = f"m[{str(product_code)}]"
-    return ''.join([
-        f"{S_str}, {P_str}, {kp_strs['Kcat1']}, ",
-        f"{kp_strs['Kcat2']}, {kp_strs['Ka']}, {kp_strs['Keq']}"
-    ])
-
-
-def get_args_ordered_unibi(ed: EnzymeKatData, reaction) -> str:
-    kinetic_params = ['Kcat1', 'Kcat2', 'Ka', 'Kp', 'Kq', 'Kia', 'Keq']
-    met_codes = ed.stan_codes['metabolite']
-    param_codes = ed.kinetic_parameters.groupby('label')['stan_code'].first().to_dict()
-    kr_codes = ed.known_reals['stan_code']
-    substrate = ed.stoichiometry.loc[reaction].loc[lambda df: df == -1].index[0]
-    product_1, product_2 = ed.stoichiometry.loc[reaction].loc[lambda df: df == 1].index
-    substrate_code, product_1_code, product_2_code = (
-        met_codes[metabolite] for metabolite in [substrate, product_1, product_2]
-    )
-    enzyme_code = kr_codes[f'concentration_{reaction}']
-    enzyme_concentration = f"xr[{str(enzyme_code)}]"
-    kp_codes = {kp: param_codes[f"{reaction}_{kp}"] for kp in kinetic_params}
-    kp_strs = {kp: f"p[{str(c)}]" for kp, c in kp_codes.items()}
-    for Kcat in ["Kcat1", "Kcat2"]:
-        kp_strs[Kcat] = f"{enzyme_concentration}*{kp_strs[Kcat]}"
-    S_str = f"m[{str(substrate_code)}]"
-    P1_str = f"m[{str(product_1_code)}]"
-    P2_str = f"m[{str(product_2_code)}]"
-    Kip_str = f"{reaction}_Kip"
-    Kiq_str = f"{reaction}_Kiq"
-    return ''.join([
-        f"{S_str}, {P1_str}, {P2_str}, ",
-        f"{kp_strs['Kcat1']}, {kp_strs['Kcat2']}, ",
-        f"{kp_strs['Ka']}, {kp_strs['Kp']}, {kp_strs['Kq']}, {kp_strs['Kia']}, ",
-        f"{Kip_str}, {Kiq_str}, {kp_strs['Keq']}",
-    ])
-
-def get_args_irr_mass_action(ed: EnzymeKatData, reaction) -> str:
-    met_codes = ed.stan_codes['metabolite']
-    param_codes = ed.kinetic_parameters.groupby('label')['stan_code'].first().to_dict()
-    met = ed.stoichiometry.loc[reaction].loc[lambda df: df != 0].index[0]
-    met_code = str(met_codes[met])
-    alpha_code = str(param_codes[reaction + '_alpha'])
-    met_str = f"m[{met_code}]"
-    alpha_str = f"p[{alpha_code}]"
-    return f"{met_str}, {alpha_str}"
-
-def get_args_fixed_flux(ed: EnzymeKatData, reaction) -> str:
-    kr_code = ed.known_reals.loc[f'concentration_{reaction}', 'stan_code']
-    kr_str = f"xr[{str(kr_code)}]"
-    return f"{kr_str}"
+def get_parameter_codes(kinetic_model: KineticModel) -> Dict[str, int]:
+    parameter_ids = []
+    for rxn_id, rxn in kinetic_model.reactions.items():
+        for enz_id, enz in rxn.enzymes.items():
+            for par_id, par in enz.parameters.items():
+                parameter_ids.append(enz_id + '_' + par_id)
+    return codify(parameter_ids)

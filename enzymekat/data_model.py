@@ -1,178 +1,231 @@
-import pandas as pd
-from pandas.io.json import json_normalize
-import toml
+"""Definitions of Enzymekat-specific objects"""
+
+from collections import defaultdict
 from typing import Dict, List
 
+class Compartment:
+    def __init__(self, id : str,
+                 name: str = None,
+                 volume: float = 1.0):
+        """
+        Constructor for compartment objects.
+​
+        :param id: compartment id, use a BiGG id if possible.
+        :param name: compartment name.
+        :param volume: compartment volume.
+        """
+        self.id = id
+        self.name = name if name is not None else id
+        self.volume = volume
 
-def expand_series_of_dicts(s):
-    """get a dataframe from a series whose values are dictionaries"""
-    return pd.DataFrame.from_records(s.values, index=s.index)
+
+class Metabolite:
+    def __init__(self, id: str,
+                 name: str = None,
+                 balanced: bool = None,
+                 compartment: Compartment = None):
+        """
+        Constructor for metabolite objects.
+​
+        :param id: metabolite id, use a BiGG id if possible.
+        :param name: metabolite name.
+        :param balanced: Doe this metabolite have an unchanging concentration at steady state?
+        :param compartment: compartment for the metabolite.
+        """
+        self.id = id
+        self.name = name if name is not None else id
+        self.balanced = balanced
+        self.compartment = compartment
 
 
-
-class EnzymeKatData():
-    """Object with all the data that is needed to fit an enzymeKat model, namely:
-
-      - Information about the experimental setup (measurement accuracy, time to
-        steady state)
-      - Information about kinetic parameters
-      - Information about ode metabolites
-
-    """
+class Modifier:
     def __init__(self,
-                 constants: Dict,
-                 experiments: List[Dict],
-                 reactions: Dict):
-        self.constants = constants
+                 metabolite: Metabolite,
+                 modifier_type: str = None):
+        """
+        Constructor for modifier objects.
+        
+        :param met: the metabolite that is the modifier 
+        :param allosteric: whether or not the modifier is allosteric
+        :param modifier_type: what is the modifier type: 'activator', 'inhibitor', 'competitive inhibitor',
+        'uncompetitive inhibitor', or 'noncompetitive inhibitor' 
+        """
+        self.metabolite = metabolite
+        self.allosteric = modifier_type in ['inhibitor']
+        self.modifier_type = modifier_type
+
+
+class Parameter:
+    def __init__(self,
+                 id: str,
+                 enzyme_id: str,
+                 metabolite_id: str = None):
+        """
+        Constructor for parameter object.
+        
+        :param id: parameter id
+        :param enzyme_id: id of the enzyme associated with the parameter
+        :param metabolite_id: id of the metabolite associated with the parameter if any
+
+        """
+        self.id = id
+        self.enzyme_id = enzyme_id
+        self.metabolite_id = metabolite_id
+
+
+class Enzyme:
+    def __init__(self,
+                 id: str,
+                 reaction_id: str,
+                 name: str,
+                 mechanism: str,
+                 parameters: Dict[str, Parameter],
+                 modifiers: Dict[str, Modifier] = defaultdict()):
+        """
+        Constructor for the enzyme object.
+        
+        :param id: a string identifying the enzyme
+        :param reaction_id: the id of the reaction the enzyme catalyses
+        :param name: human-understandable name for the enzyme
+        :param mechanism: enzyme mechanism as a string
+        :param modifiers: modifiers, given as {'modifier_id': modifier_object}
+        :param parameters: enzyme parameters, give as {'parameter_id': parameter_object}
+        """
+        self.id = id
+        self.name = name
+        self.mechanism = mechanism
+        self.modifiers = modifiers
+        self.parameters = parameters
+
+
+class Reaction:
+    def __init__(self,
+                 id: str,
+                 name: str = None,
+                 reversible: bool = True,
+                 is_exchange: bool = None,
+                 stoichiometry: Dict[str, float] = defaultdict(),
+                 enzymes: Dict[str, Enzyme] = defaultdict()):
+        """
+        Constructor for the reaction object.
+
+        :param id: reaction id, use a BiGG id if possible.
+        :param name: reaction name.
+        :param reversible: whether or not reaction is reversible.
+        :param is_exchange: whether or not reaction is an exchange reaction.
+        :param stoichiometry: reaction stoichiometry, e.g. for the reaction: 1.5 f6p <-> fdp we have {'f6p'; -1.5, 'fdp': 1}
+        :param enzymes: Dictionary mapping enzyme ids to Enzyme objects
+        """
+        self.id = id
+        self.name = name if name is not None else id
+        self.reversible = reversible
+        self.is_exchange = is_exchange
+        self.stoichiometry = stoichiometry
+        self.enzymes = enzymes
+
+
+class KineticModel:
+    def __init__(self, model_id: str):
+        """
+        Constructor for representation of a system of metabolic reactions.
+
+        All attributes apart from model_id are initialized as empty defaultdicts.
+
+        Each of the dictionary will be of the form {'entity_id': entity_object}, where entity stands for metabolite,
+        reaction, compartment, or condition, at the moment.
+        """
+        self.model_id = model_id
+        self.metabolites = defaultdict()
+        self.reactions = defaultdict()
+        self.compartments = defaultdict()
+
+
+class Measurement:
+    def __init__(self,
+                 target_id: str,
+                 value: float,
+                 uncertainty: float = None,
+                 scale: str = None,
+                 target_type: str = None):
+        """
+        Constructor for measurement object.
+
+        :param target_id: id of the thing being measured
+        :param value: value for the measurement
+        :param uncertainty: uncertainty associated to the measurent
+        :param scale: scale of the measurement, e.g. 'log10' or 'linear
+        :param target_type: type of thing being measured, e.g. 'metabolite', 'reaction', 'enzyme'.
+        """
+        self.target_id = target_id
+        self.value = value
+        self.uncertainty = uncertainty
+        self.scale = scale
+        self.target_type = target_type
+
+
+class Experiment:
+    def __init__(self,
+                 id: str,
+                 measurements: Dict[str, Dict[str, Measurement]] = defaultdict(),
+                 metadata: str = None):
+
+        """
+        Constructor for condition object.
+
+        :param id: condition id
+        :param unbalanced_met_info:
+        :param measurements: dictionary mapping keys 'enzyme', 'metabolite' and
+            'reaction' to dictionaries with the form {target id: measurement}
+        :param metadata: any info about the condition
+        """
+        self.id = id
+        self.measurements = measurements
+        self.metadata = metadata
+
+
+class Prior:
+    def __init__(self,
+                 id: str,
+                 target_id: str,
+                 location: float,
+                 scale: float,
+                 target_type: str,
+                 experiment_id: str = None):
+        """
+        A prior distribuition.
+
+        As currently implemented, the target must be a single parameter and the
+        distribution must have a location and a scale.
+        
+        :param id: a string identifying the prior object
+        :param target_id: a string identifying the thing that has a prior distribution.
+        :param location: a number specifying the location of the distribution
+        :param scale: a number specifying the scale of the distribution
+        :param target_type: a string describing the target, e.g. 
+            'kinetic_parameter', 'enzyme' or 'unbalanced_metabolite'
+        :param experiment_id: id of the relevant experiment (for enzymes or 
+             unbalanced metabolites)
+        """
+        self.id = id
+        self.target_id = target_id
+        self.location = location
+        self.scale = scale
+        self.target_type = target_type
+        self.experiment_id = experiment_id
+
+
+class EnzymeKatInput:
+    def __init__(self,
+                 kinetic_model: KineticModel,
+                 priors: Dict[str, Prior],
+                 experiments: Dict[str, Experiment] = defaultdict()):
+        """
+        Everything that is needed to run EnzymeKat.
+        
+        :param kinetic_system: a KineticSystem object
+        :param priors: a dictionary mapping prior ids to Prior objects
+        :param experiments: a dictionary mapping experiment ids to Experiment objects
+        """
+        self.kinetic_model = kinetic_model
+        self.priors = priors
         self.experiments = experiments
-        self.reactions = reactions
-        self.stoichiometry = self.get_stoichiometry()
-        self.stan_codes = self.get_stan_codes()
-        self.metabolites = self.get_metabolites()
-        self.flux_measurements, self.concentration_measurements = self.get_measurements()
-        self.known_reals = self.get_known_reals()
-        self.kinetic_parameters = self.get_kinetic_parameters()
-        self.unbalanced_metabolite_priors = self.get_unbalanced_metabolite_priors()
-
-    def get_stoichiometry(self):
-        S = (
-            pd.DataFrame.from_records(self.reactions)
-            .set_index('name')
-            ['stoichiometry']
-            .pipe(expand_series_of_dicts)
-            .fillna(0)
-            .astype(int)
-        )
-        S.index.name = 'reaction'
-        S.columns.name = 'metabolite'
-        return S
-
-    def get_stan_codes(self):
-
-        def map_to_codes(l: List[str]):
-            return dict(zip(l, range(1, len(l) + 1)))
-
-        S = self.get_stoichiometry()
-        experiments = self.experiments
-        reactions = self.reactions
-        reaction_names = list(S.index.unique())
-        metabolite_names = list(S.columns.unique())
-        experiment_names = [e['label'] for e in experiments]
-        kinetic_parameter_names = []
-        for r in reactions:
-            for p in r['parameters']:
-                name = r['name'] + '_' + p['label']
-                if 'metabolite' in p.keys():
-                    name = name + '_' + p['metabolite']
-                kinetic_parameter_names.append(name)
-        return {
-            'reaction': map_to_codes(reaction_names),
-            'metabolite': map_to_codes(metabolite_names),
-            'experiment': map_to_codes(experiment_names),
-            'kinetic_parameter': map_to_codes(kinetic_parameter_names)
-        }
-
-    def get_unbalanced_metabolite_names(self):
-        S = self.get_stoichiometry()
-        produced_but_not_consumed = S.gt(0).any(axis=0) & S.ge(0).all(axis=0)
-        consumed_but_not_produced = S.lt(0).any(axis=0) & S.le(0).all(axis=0)
-        is_unbalanced = produced_but_not_consumed | consumed_but_not_produced
-        return S.columns[is_unbalanced]
-
-    def get_unbalanced_metabolite_priors(self):
-        stan_codes = self.get_stan_codes()
-        experiments = self.experiments
-        metabolite_codes = pd.Series(stan_codes['metabolite'], name='metabolite_code')
-        experiment_codes = pd.Series(stan_codes['experiment'], name='experiment_code')
-        priors = (
-            pd.io.json.json_normalize(experiments,
-                                      record_path='unbalanced_metabolite_priors',
-                                      meta='label',
-                                      meta_prefix='experiment_')
-            .rename(columns={'label': 'metabolite'})
-        )
-        # correct dtypes - they are object but should be str
-        object_columns = ['metabolite', 'experiment_label']
-        priors[object_columns] = priors[object_columns].astype(str)
-        return (
-            priors
-            .join(metabolite_codes, on='metabolite')
-            .join(experiment_codes, on='experiment_label')
-        )
-
-    def get_metabolites(self):
-        S = self.get_stoichiometry()
-        metabolite_names = S.columns
-        stan_codes = pd.Series(self.get_stan_codes()['metabolite'], name='stan_code')
-        unbalanced_metabolite_names = self.get_unbalanced_metabolite_names()
-        is_unbalanced = [m in unbalanced_metabolite_names for m in metabolite_names]
-        return pd.DataFrame({
-            'name': metabolite_names,
-            'is_unbalanced': is_unbalanced
-        }).join(stan_codes, on='name')
-
-    def get_measurements(self):
-        stan_codes = self.get_stan_codes()
-        experiments = self.experiments
-        metabolite_codes = stan_codes['metabolite']
-        reaction_codes = stan_codes['reaction']
-        experiment_codes = stan_codes['experiment']
-        measurements = pd.io.json.json_normalize(
-            experiments,
-            'measurements',
-            meta=['label'],
-            meta_prefix='experiment_'
-        )
-        flux_measurements, conc_measurements = (
-            measurements
-            .query(f"type == '{t}'")
-            .dropna(how='all', axis=1)
-            .copy()
-            .rename(columns={'label': t + '_label'})
-            for t in ['flux', 'metabolite']
-        )
-        flux_measurements['reaction_code'] = flux_measurements['flux_label'].map(reaction_codes.get)
-        flux_measurements['experiment_code'] = flux_measurements['experiment_label'].map(experiment_codes.get)
-        conc_measurements['metabolite_code'] = conc_measurements['metabolite_label'].map(metabolite_codes.get)
-        conc_measurements['experiment_code'] = conc_measurements['experiment_label'].map(experiment_codes.get)
-        return flux_measurements, conc_measurements
-
-    def get_known_reals(self):
-        out = {}
-        for e in self.experiments:
-            conditions = {k: v for k, v in e.items() if type(v) in [float, int]}
-            out[e['label']] = {**conditions, **self.constants}
-        return pd.DataFrame.from_dict(out).assign(stan_code=lambda df: range(1, len(df) + 1))
-
-    def get_kinetic_parameters(self):
-        reactions = self.reactions
-        stan_codes = pd.Series(self.get_stan_codes()['kinetic_parameter'], name='stan_code')
-        for r in reactions:  # json_normalize doesn't work with missing record path
-            if 'parameters' not in r.keys():
-                r['parameters'] = []
-        pars = (
-            json_normalize(reactions, record_path='parameters', meta='name')
-            .rename(columns={'name': 'reaction', 'label': 'parameter'})
-            .assign(is_allosteric=lambda df: df['type'].eq('allosteric').astype(int))
-        )
-        label_cols = (
-            ['reaction', 'parameter', 'metabolite']
-            if 'metabolite' in pars.columns
-            else ['reaction', 'parameter']
-        )
-        pars['label'] = pars[label_cols].apply(lambda row: '_'.join(row.dropna().astype(str)), axis=1)
-        pars = pars.join(stan_codes, on='label')
-        return pars
-
-
-def from_toml(path):
-    t = toml.load(path)
-    return EnzymeKatData(
-        constants=t['constants'],
-        experiments=t['experiment'],
-        reactions=t['reaction']
-    )
-
-
-def join_string_values(df):
-    return df.apply(lambda x: '_'.join(x.dropna().astype(str)), axis=1)
