@@ -82,24 +82,24 @@ reaction_measurements = [
 ###### Priors ######
 [priors.kinetic_parameters]
 r1 = [
-  { target_id = 'Keq', location = 0, scale = 0.05},
-  { target_id = 'Kcat1', location = 0, scale = 0.6},
-  { target_id = 'Kcat2', location = 0, scale = 0.6},
-  { target_id = 'Ka', location = 0, scale = 0.6},
+  { target_id = 'Keq', location = 1, scale = 0.05},
+  { target_id = 'Kcat1', location = 1, scale = 0.6},
+  { target_id = 'Kcat2', location = 1, scale = 0.6},
+  { target_id = 'Ka', location = 1, scale = 0.6},
 ]
 r2 = [
   { target_id = 'Keq', location = 1.1, scale = 0.5},
-  { target_id = 'Kcat1', location = 0, scale = 0.6},
-  { target_id = 'Kcat2', location = 0, scale = 0.6},
-  { target_id = 'Ka', location = 0, scale = 0.6},
-  { target_id = 'dissociation_constant_t', metabolite = 'M1', location= 0, scale = 0.6},
-  { target_id = 'transfer_constant', location= 0, scale = 0.6},
+  { target_id = 'Kcat1', location = 1, scale = 0.6},
+  { target_id = 'Kcat2', location = 1, scale = 0.6},
+  { target_id = 'Ka', location = 1, scale = 0.6},
+  { target_id = 'dissociation_constant_t', metabolite = 'M1', location= 1, scale = 0.6},
+  { target_id = 'transfer_constant', location= 1, scale = 0.6},
 ]
 r3 = [
-  { target_id = 'Keq', location = 0, scale = 0.05},
-  { target_id = 'Kcat1', location = 0, scale = 0.6},
-  { target_id = 'Kcat2', location = 0, scale = 0.6},
-  { target_id = 'Ka', location = 0, scale = 0.6},
+  { target_id = 'Keq', location = 1, scale = 0.05},
+  { target_id = 'Kcat1', location = 1, scale = 0.6},
+  { target_id = 'Kcat2', location = 1, scale = 0.6},
+  { target_id = 'Ka', location = 1, scale = 0.6},
 ]
 
 [priors.unbalanced_metabolites]
