@@ -3,7 +3,7 @@ import numpy as np
 import os
 import pandas as pd
 import cmdstanpy
-from enzymekat import code_generation, io, utils
+from maud import code_generation, io, utils
 
 RELATIVE_PATHS = {
     'stan_includes': 'stan_code',
@@ -30,7 +30,7 @@ def sample(
     paths = {k: os.path.join(here, v) for k, v in RELATIVE_PATHS.items()}
 
     # define input data
-    eki = io.load_enzymekat_input_from_toml(data_path)
+    eki = io.load_maud_input_from_toml(data_path)
     prior_df = pd.DataFrame.from_records(
         [[p.id, p.experiment_id, p.target_id, p.location, p.scale, p.target_type]
          for p in eki.priors.values()],
