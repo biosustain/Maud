@@ -17,10 +17,9 @@
 from collections import defaultdict
 from typing import Dict, List
 
+
 class Compartment:
-    def __init__(self, id : str,
-                 name: str = None,
-                 volume: float = 1.0):
+    def __init__(self, id: str, name: str = None, volume: float = 1.0):
         """
         Constructor for compartment objects.
 ​
@@ -34,10 +33,13 @@ class Compartment:
 
 
 class Metabolite:
-    def __init__(self, id: str,
-                 name: str = None,
-                 balanced: bool = None,
-                 compartment: Compartment = None):
+    def __init__(
+        self,
+        id: str,
+        name: str = None,
+        balanced: bool = None,
+        compartment: Compartment = None,
+    ):
         """
         Constructor for metabolite objects.
 ​
@@ -53,9 +55,7 @@ class Metabolite:
 
 
 class Modifier:
-    def __init__(self,
-                 metabolite: Metabolite,
-                 modifier_type: str = None):
+    def __init__(self, metabolite: Metabolite, modifier_type: str = None):
         """
         Constructor for modifier objects.
         
@@ -65,15 +65,12 @@ class Modifier:
         'uncompetitive inhibitor', or 'noncompetitive inhibitor' 
         """
         self.metabolite = metabolite
-        self.allosteric = modifier_type in ['inhibitor']
+        self.allosteric = modifier_type in ["inhibitor"]
         self.modifier_type = modifier_type
 
 
 class Parameter:
-    def __init__(self,
-                 id: str,
-                 enzyme_id: str,
-                 metabolite_id: str = None):
+    def __init__(self, id: str, enzyme_id: str, metabolite_id: str = None):
         """
         Constructor for parameter object.
         
@@ -88,13 +85,15 @@ class Parameter:
 
 
 class Enzyme:
-    def __init__(self,
-                 id: str,
-                 reaction_id: str,
-                 name: str,
-                 mechanism: str,
-                 parameters: Dict[str, Parameter],
-                 modifiers: Dict[str, Modifier] = defaultdict()):
+    def __init__(
+        self,
+        id: str,
+        reaction_id: str,
+        name: str,
+        mechanism: str,
+        parameters: Dict[str, Parameter],
+        modifiers: Dict[str, Modifier] = defaultdict(),
+    ):
         """
         Constructor for the enzyme object.
         
@@ -113,13 +112,15 @@ class Enzyme:
 
 
 class Reaction:
-    def __init__(self,
-                 id: str,
-                 name: str = None,
-                 reversible: bool = True,
-                 is_exchange: bool = None,
-                 stoichiometry: Dict[str, float] = defaultdict(),
-                 enzymes: Dict[str, Enzyme] = defaultdict()):
+    def __init__(
+        self,
+        id: str,
+        name: str = None,
+        reversible: bool = True,
+        is_exchange: bool = None,
+        stoichiometry: Dict[str, float] = defaultdict(),
+        enzymes: Dict[str, Enzyme] = defaultdict(),
+    ):
         """
         Constructor for the reaction object.
 
@@ -155,12 +156,14 @@ class KineticModel:
 
 
 class Measurement:
-    def __init__(self,
-                 target_id: str,
-                 value: float,
-                 uncertainty: float = None,
-                 scale: str = None,
-                 target_type: str = None):
+    def __init__(
+        self,
+        target_id: str,
+        value: float,
+        uncertainty: float = None,
+        scale: str = None,
+        target_type: str = None,
+    ):
         """
         Constructor for measurement object.
 
@@ -178,10 +181,12 @@ class Measurement:
 
 
 class Experiment:
-    def __init__(self,
-                 id: str,
-                 measurements: Dict[str, Dict[str, Measurement]] = defaultdict(),
-                 metadata: str = None):
+    def __init__(
+        self,
+        id: str,
+        measurements: Dict[str, Dict[str, Measurement]] = defaultdict(),
+        metadata: str = None,
+    ):
 
         """
         Constructor for condition object.
@@ -198,13 +203,15 @@ class Experiment:
 
 
 class Prior:
-    def __init__(self,
-                 id: str,
-                 target_id: str,
-                 location: float,
-                 scale: float,
-                 target_type: str,
-                 experiment_id: str = None):
+    def __init__(
+        self,
+        id: str,
+        target_id: str,
+        location: float,
+        scale: float,
+        target_type: str,
+        experiment_id: str = None,
+    ):
         """
         A prior distribuition.
 
@@ -229,10 +236,12 @@ class Prior:
 
 
 class MaudInput:
-    def __init__(self,
-                 kinetic_model: KineticModel,
-                 priors: Dict[str, Prior],
-                 experiments: Dict[str, Experiment] = defaultdict()):
+    def __init__(
+        self,
+        kinetic_model: KineticModel,
+        priors: Dict[str, Prior],
+        experiments: Dict[str, Experiment] = defaultdict(),
+    ):
         """
         Everything that is needed to run Maud.
         
