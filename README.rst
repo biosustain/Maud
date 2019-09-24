@@ -2,29 +2,9 @@
 Maud
 =============================
 
-.. image:: https://img.shields.io/pypi/v/maud.svg
-   :target: https://pypi.org/project/maud/
-   :alt: Current PyPI Version
-
-.. image:: https://img.shields.io/pypi/pyversions/maud.svg
-   :target: https://pypi.org/project/maud/
-   :alt: Supported Python Versions
-
 .. image:: https://img.shields.io/pypi/l/maud.svg
    :target: https://www.apache.org/licenses/LICENSE-2.0
    :alt: Apache Software License Version 2.0
-
-.. image:: https://img.shields.io/travis/teddygroves/maud/master.svg?label=Travis%20CI
-   :target: https://travis-ci.org/teddygroves/maud
-   :alt: Travis CI
-
-.. image:: https://ci.appveyor.com/api/projects/status/github/teddygroves/maud?branch=master&svg=true
-   :target: https://ci.appveyor.com/project/teddygroves/maud
-   :alt: AppVeyor
-
-.. image:: https://codecov.io/gh/teddygroves/maud/branch/master/graph/badge.svg
-   :target: https://codecov.io/gh/teddygroves/maud
-   :alt: Codecov
 
 .. image:: https://img.shields.io/badge/code%20style-black-000000.svg
    :target: https://github.com/ambv/black
@@ -54,7 +34,7 @@ This step requires that you have ssh access to the Maud github repository
 This is unavoidable while the repository remains private, but should be
 achievable if you can see this readme.
 
-Cmdstanpy depends on [[https://github.com/stan-dev/cmdstan][cmdstan]], which needs to be installed too. Fortunately,
+Cmdstanpy depends on `cmdstan<https://github.com/stan-dev/cmdstan>`_, which needs to be installed too. Fortunately,
 cmdstanpy comes with a command line script that installs cmdstan, so this step
 is pretty simple:
 
