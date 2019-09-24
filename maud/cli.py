@@ -2,7 +2,7 @@
 
 import click
 import cmdstanpy
-from enzymekat import sampling
+from maud import sampling
 import os
 
 SAMPLING_DEFAULTS = {
@@ -26,7 +26,7 @@ def get_example_path(relative_path_example):
 @click.group()
 @click.help_option("--help", "-h")
 def cli():
-    """Main entry point for enzymeKAT's command line interface."""
+    """Main entry point for Maud's command line interface."""
 pass
 
 

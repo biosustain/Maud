@@ -15,8 +15,8 @@ data/in/*
 data/out/*
 !data/out/readme.md
 
-enzymekat/stan_code/autogen/*
-!enzymekat/stan_code/autogen/readme.md
+maud/stan_code/autogen/*
+!maud/stan_code/autogen/readme.md
 
 *.DS_Store
 *#

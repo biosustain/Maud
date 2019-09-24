@@ -1,5 +1,5 @@
-from enzymekat.data_model import (
-    EnzymeKatInput,
+from maud.data_model import (
+    MaudInput,
     KineticModel,
     Metabolite,
     Reaction,
@@ -18,9 +18,9 @@ MECHANISM_TO_PARAM_IDS = {
     'uniuni': ['Keq', 'Kcat1', 'Kcat2', 'Ka']
 }
 
-def load_enzymekat_input_from_toml(filepath: str, id: str ='eki') -> EnzymeKatInput:
+def load_maud_input_from_toml(filepath: str, id: str ='mi') -> MaudInput:
     """
-    Load an EnzymeKatInput object from a suitable toml file
+    Load an MaudInput object from a suitable toml file
     
     :param filepath: path to a toml file
     :param id: id for the output object
@@ -132,7 +132,7 @@ def load_enzymekat_input_from_toml(filepath: str, id: str ='eki') -> EnzymeKatIn
                 experiment_id=exp_id
             )
 
-    return EnzymeKatInput(kinetic_model=kinetic_model,
+    return MaudInput(kinetic_model=kinetic_model,
                           priors=priors,
                           experiments=experiments)
 

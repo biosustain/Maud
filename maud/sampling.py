@@ -3,7 +3,7 @@ import numpy as np
 import os
 import pandas as pd
 import cmdstanpy
-from enzymekat import code_generation, io, utils
+from maud import code_generation, io, utils
 
 RELATIVE_PATHS = {
     'stan_includes': 'stan_code',
@@ -30,14 +30,14 @@ def sample(
     paths = {k: os.path.join(here, v) for k, v in RELATIVE_PATHS.items()}
 
     # define input data
-    eki = io.load_enzymekat_input_from_toml(data_path)
+    mi = io.load_maud_input_from_toml(data_path)
     prior_df = pd.DataFrame.from_records(
         [[p.id, p.experiment_id, p.target_id, p.location, p.scale, p.target_type]
-         for p in eki.priors.values()],
+         for p in mi.priors.values()],
         columns=['id', 'experiment_id', 'target_id', 'location', 'scale', 'target_type']
     )
-    metabolites = eki.kinetic_model.metabolites
-    reactions = eki.kinetic_model.reactions
+    metabolites = mi.kinetic_model.metabolites
+    reactions = mi.kinetic_model.reactions
     enzymes = {k: v for r in reactions.values() for k, v in r.enzymes.items()}
     balanced_metabolites = {k: v for k, v in metabolites.items() if v.balanced}
     unbalanced_metabolites = {k: v for k, v in metabolites.items() if not v.balanced}
@@ -53,13 +53,13 @@ def sample(
     metabolite_measurements, reaction_measurements = (
         pd.DataFrame([
             [exp.id, meas.target_id, meas.value, meas.uncertainty]
-            for exp in eki.experiments.values()
+            for exp in mi.experiments.values()
             for meas in exp.measurements[measurement_type].values()
         ], columns=['experiment_id', 'target_id', 'value', 'uncertainty'])
         for measurement_type in ['metabolite', 'reaction']
     )
     # stan codes
-    experiment_codes = utils.codify(eki.experiments.keys())
+    experiment_codes = utils.codify(mi.experiments.keys())
     reaction_codes = utils.codify(reactions.keys())
     enzyme_codes = utils.codify(enzymes.keys())
     metabolite_codes = utils.codify(metabolites.keys())
@@ -69,7 +69,7 @@ def sample(
         'N_kinetic_parameter': len(kinetic_parameter_priors),
         'N_reaction': len(reactions),
         'N_enzyme': len(enzymes),
-        'N_experiment': len(eki.experiments),
+        'N_experiment': len(mi.experiments),
         'N_flux_measurement': len(reaction_measurements),
         'N_conc_measurement': len(metabolite_measurements),
         'experiment_yconc': (
@@ -108,7 +108,7 @@ def sample(
     cmdstanpy.utils.jsondump(input_file, input_data)
 
     # compile model if necessary
-    stan_code = code_generation.create_stan_program(eki, 'inference', time_step)
+    stan_code = code_generation.create_stan_program(mi, 'inference', time_step)
     stan_file = os.path.join(
         paths['stan_autogen'], f'inference_model_{model_name}.stan'
     )

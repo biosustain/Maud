@@ -1,5 +1,5 @@
 """
-    Functions for generating Stan programs from EnzymeKatInput objects.
+    Functions for generating Stan programs from MaudInput objects.
 
     The only function that should be used outside this module is
     `create_stan_program`.
@@ -8,10 +8,10 @@
 
 import os
 import pandas as pd
-from enzymekat.data_model import EnzymeKatInput, KineticModel
+from maud.data_model import MaudInput, KineticModel
 from jinja2 import Template, Environment, PackageLoader
 from typing import Dict, List
-from enzymekat.utils import codify
+from maud.utils import codify
 
 JINJA_TEMPLATE_FILES = [
     'inference_model_lower_blocks.stan',
@@ -27,17 +27,17 @@ MECHANISM_TEMPLATES = {
 }
 
 
-def create_stan_program(eki: EnzymeKatInput, model_type: str, time_step=0.05) -> str:
+def create_stan_program(mi: MaudInput, model_type: str, time_step=0.05) -> str:
     """
-    Create a stan program from an EnzymeKatInput.
+    Create a stan program from an MaudInput.
 
-    :param eki: an EnzymeKatInput object
+    :param mi: an MaudInput object
     :param model_type: String describing the model, e.g. 'inference', 
         'simulation'. So far only 'inference' is implemented.
     :param time_step: How far ahead the ode simulates
     """
     templates = get_templates()
-    kinetic_model = eki.kinetic_model
+    kinetic_model = mi.kinetic_model
     met_codes = codify(kinetic_model.metabolites.keys())
     balanced_codes = [
         met_codes[met_id] for met_id, met in kinetic_model.metabolites.items()
@@ -75,7 +75,7 @@ def create_stan_program(eki: EnzymeKatInput, model_type: str, time_step=0.05) ->
 
 def get_templates(template_files=JINJA_TEMPLATE_FILES) -> Dict[str, Template]:
     out = {}
-    env = Environment(loader=PackageLoader('enzymekat', 'stan_code'))
+    env = Environment(loader=PackageLoader('maud', 'stan_code'))
     for template_file in template_files:
         template_name = os.path.splitext(template_file)[0]
         out[template_name] = env.get_template(template_file)

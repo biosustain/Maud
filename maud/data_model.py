@@ -1,4 +1,4 @@
-"""Definitions of Enzymekat-specific objects"""
+"""Definitions of Maud-specific objects"""
 
 from collections import defaultdict
 from typing import Dict, List
@@ -214,13 +214,13 @@ class Prior:
         self.experiment_id = experiment_id
 
 
-class EnzymeKatInput:
+class MaudInput:
     def __init__(self,
                  kinetic_model: KineticModel,
                  priors: Dict[str, Prior],
                  experiments: Dict[str, Experiment] = defaultdict()):
         """
-        Everything that is needed to run EnzymeKat.
+        Everything that is needed to run Maud.
         
         :param kinetic_system: a KineticSystem object
         :param priors: a dictionary mapping prior ids to Prior objects

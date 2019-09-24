@@ -15,17 +15,17 @@ First create a fresh Python 3.7 virtual environment and then activate it:
 
 #+begin_src bash
 sudo pip3.7 install virtualenv          # if virtualenv isn't installed already
-python3.7 -m virtualenv enzymekat_venv  # choose any name you like!
-source enzymekat_venv/bin/activate
+python3.7 -m virtualenv maud_venv  # choose any name you like!
+source maud_venv/bin/activate
 #+end_src
 
-Run this command to install enzymeKAT and its python dependencies:
+Run this command to install Maud and its python dependencies:
 
 #+begin_src bash
-pip install -e git+ssh://git@github.com/biosustain/enzymeKAT.git#egg=enzymekat
+pip install -e git+ssh://git@github.com/biosustain/Maud.git#egg=maud
 #+end_src
 
-This step requires that you have ssh access to the enzymekat github repository
+This step requires that you have ssh access to the Maud github repository
 This is unavoidable while the repository remains private, but should be
 achievable if you can see this readme.
 
@@ -41,11 +41,11 @@ install_cmdstan
 To run the simple linear model, use the following command:
 
 #+begin_src bash
-enzymekat sample
+maud sample
 #+end_src
 
 This will use the data file at ~data/in/linar.toml~ to create a Stan program at
-~enzymekat/stan_code/autogen/inference_model_linear.stan~, compile it into a
+~maud/stan_code/autogen/inference_model_linear.stan~, compile it into a
 C++ Stan model, draw samples from the resulting posterior and store them in
 files starting with ~data/out/model_output_linear~.
 
@@ -53,20 +53,20 @@ The ~sample~ command can be configured in a few ways - to check out all the
 options try running
 
 #+begin_src bash
-enzymekat sample --help
+maud sample --help
 #+end_src
 
 * Model
-The main task that EnzymeKAT addresses is to calculate expectations of a
+The main task that Maud addresses is to calculate expectations of a
 probability distribution over possible configurations of kinetic parameters
 that govern a reaction system. This distribution must be thermodynamically
 consistent - i.e. regions of parameter space that break the laws of
 thermodynamics must have zero probability mass - and also reflect the
 pre-experimental and experimental information.
 
-EnzymeKAT specifies the probability density of any configuration of kinetic
+Maud specifies the probability density of any configuration of kinetic
 parameters as a function of available information using Stan programs
-(e.g.[[https://github.com/biosustain/enzymeKAT/blob/master/enzymekat/stan_code/inference_model_yeast.stan][inference_model_yeast.stan]]). Pre-experimental information is represented
+(e.g.[[https://github.com/biosustain/Maud/blob/master/maud/stan_code/inference_model_yeast.stan][inference_model_yeast.stan]]). Pre-experimental information is represented
 as prior probability distributions over variables representing kinetic
 parameters. Experimental information is represented by a regression model, with
 observed measurements treated as randomly distributed from true values of the
