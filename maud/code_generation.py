@@ -27,17 +27,17 @@ MECHANISM_TEMPLATES = {
 }
 
 
-def create_stan_program(eki: MaudInput, model_type: str, time_step=0.05) -> str:
+def create_stan_program(mi: MaudInput, model_type: str, time_step=0.05) -> str:
     """
     Create a stan program from an MaudInput.
 
-    :param eki: an MaudInput object
+    :param mi: an MaudInput object
     :param model_type: String describing the model, e.g. 'inference', 
         'simulation'. So far only 'inference' is implemented.
     :param time_step: How far ahead the ode simulates
     """
     templates = get_templates()
-    kinetic_model = eki.kinetic_model
+    kinetic_model = mi.kinetic_model
     met_codes = codify(kinetic_model.metabolites.keys())
     balanced_codes = [
         met_codes[met_id] for met_id, met in kinetic_model.metabolites.items()

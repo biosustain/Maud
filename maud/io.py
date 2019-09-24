@@ -18,7 +18,7 @@ MECHANISM_TO_PARAM_IDS = {
     'uniuni': ['Keq', 'Kcat1', 'Kcat2', 'Ka']
 }
 
-def load_maud_input_from_toml(filepath: str, id: str ='eki') -> MaudInput:
+def load_maud_input_from_toml(filepath: str, id: str ='mi') -> MaudInput:
     """
     Load an MaudInput object from a suitable toml file
     
