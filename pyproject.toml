@@ -1,0 +1,15 @@
+[build-system]
+requires = [
+  'setuptools>=40.6.0',
+  'wheel'
+]
+
+[tool.black]
+line-length = 88
+python-version = ['py37', 'py38']
+exclude = '''
+(
+    __init__.py
+    | _version.py
+)
+'''

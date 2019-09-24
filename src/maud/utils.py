@@ -1,6 +1,3 @@
-#!/usr/bin/env python
-
-
 # Copyright (c) 2019, Novo Nordisk Foundation Center for Biosustainability, Technical University of Denmark.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -15,13 +12,24 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-
-"""Set up the Maud package."""
-
-
-import versioneer
-from setuptools import setup
+import numpy as np
+import os
+import pandas as pd
+from typing import Iterable
 
 
-# All other arguments are defined in `setup.cfg`.
-setup(version=versioneer.get_version(), cmdclass=versioneer.get_cmdclass())
+def match_string_to_file(s: str, path: str):
+    if os.path.exists(path):
+        return open(path, 'r').read() == s
+    else:
+        return False
+
+
+def sem_pct_to_lognormal_sigma(sem_pct, mean, n=3):
+    sem = sem_pct/100 * mean
+    s = sem * np.sqrt(n)
+    return (np.sqrt(np.log(1 + (s ** 2)/(mean ** 2))))
+    
+
+def codify(l: Iterable[str]):
+    return dict(zip(l, range(1, len(l) + 1)))
