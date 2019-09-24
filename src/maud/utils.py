@@ -1,4 +1,5 @@
-# Copyright (c) 2019, Novo Nordisk Foundation Center for Biosustainability, Technical University of Denmark.
+# Copyright (c) 2019, Novo Nordisk Foundation Center for Biosustainability,
+# Technical University of Denmark.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -12,11 +13,12 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+"""General purpose utility functions."""
+
 import os
 from typing import Iterable
 
 import numpy as np
-import pandas as pd
 
 
 def match_string_to_file(s: str, path: str):

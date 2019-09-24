@@ -1,4 +1,5 @@
-# Copyright (c) 2019, Novo Nordisk Foundation Center for Biosustainability, Technical University of Denmark.
+# Copyright (c) 2019, Novo Nordisk Foundation Center for Biosustainability,
+# Technical University of Denmark.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -18,7 +19,6 @@
 import os
 
 import click
-import cmdstanpy
 
 from maud import sampling
 
@@ -46,7 +46,7 @@ def get_example_path(relative_path_example):
 @click.group()
 @click.help_option("--help", "-h")
 def cli():
-    """Main entry point for Maud's command line interface."""
+    """Use Maud's command line interface."""
 
 
 pass

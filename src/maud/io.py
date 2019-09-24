@@ -1,4 +1,5 @@
-# Copyright (c) 2019, Novo Nordisk Foundation Center for Biosustainability, Technical University of Denmark.
+# Copyright (c) 2019, Novo Nordisk Foundation Center for Biosustainability,
+# Technical University of Denmark.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -11,6 +12,12 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+
+"""Functions for loading MaudInput objects.
+
+(and at some point in the future also saving MaudOutput objects)
+
+"""
 
 from collections import defaultdict
 
@@ -36,8 +43,8 @@ MECHANISM_TO_PARAM_IDS = {"uniuni": ["Keq", "Kcat1", "Kcat2", "Ka"]}
 
 def load_maud_input_from_toml(filepath: str, id: str = "mi") -> MaudInput:
     """
-    Load an MaudInput object from a suitable toml file
-    
+    Load an MaudInput object from a suitable toml file.
+
     :param filepath: path to a toml file
     :param id: id for the output object
 

@@ -1,4 +1,5 @@
-# Copyright (c) 2019, Novo Nordisk Foundation Center for Biosustainability, Technical University of Denmark.
+# Copyright (c) 2019, Novo Nordisk Foundation Center for Biosustainability,
+# Technical University of Denmark.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -13,17 +14,14 @@
 # limitations under the License.
 
 """
-    Functions for generating Stan programs from MaudInput objects.
+Functions for generating Stan programs from MaudInput objects.
 
-    The only function that should be used outside this module is
-    `create_stan_program`.
-
+The only function that should be used outside this module is `create_stan_program`.
 """
 
 import os
-from typing import Dict, List
+from typing import Dict
 
-import pandas as pd
 from jinja2 import Environment, PackageLoader, Template
 
 from maud.data_model import KineticModel, MaudInput
@@ -39,7 +37,10 @@ JINJA_TEMPLATE_FILES = [
 ]
 MECHANISM_TEMPLATES = {
     "uniuni": Template(
-        "uniuni(m[{{S0}}], m[{{P0}}], p[{{enz}}]*p[{{Kcat1}}], p[{{enz}}]*p[{{Kcat2}}], p[{{Ka}}], p[{{Keq}}])"
+        "uniuni("
+        "m[{{S0}}], m[{{P0}}], p[{{enz}}]*p[{{Kcat1}}],p[{{enz}}]*p[{{Kcat2}}],"
+        "p[{{Ka}}],p[{{Keq}}]"
+        ")"
     )
 }
 
@@ -49,7 +50,7 @@ def create_stan_program(mi: MaudInput, model_type: str, time_step=0.05) -> str:
     Create a stan program from an MaudInput.
 
     :param mi: an MaudInput object
-    :param model_type: String describing the model, e.g. 'inference', 
+    :param model_type: String describing the model, e.g. 'inference',
         'simulation'. So far only 'inference' is implemented.
     :param time_step: How far ahead the ode simulates
     """
@@ -135,7 +136,8 @@ def create_steady_state_function(
 
 def create_Kip_ordered_unibi_line(param_codes: dict, rxn_id: str) -> str:
     template = Template(
-        "real {{rxn_id}}_Kip = get_Kip_ordered_unibi({{Keq}}, {{Ka}}, {{Kp}}, {{Kcat1}}, {{Kcat2}});"
+        "real {{rxn_id}}_Kip = "
+        "get_Kip_ordered_unibi({{Keq}}, {{Ka}}, {{Kp}}, {{Kcat1}}, {{Kcat2}});"
     )
     return template.render(
         rxn_id=rxn_id,
@@ -149,7 +151,8 @@ def create_Kip_ordered_unibi_line(param_codes: dict, rxn_id: str) -> str:
 
 def create_Kiq_ordered_unibi_line(param_codes: dict, rxn_id: str) -> str:
     template = Template(
-        "real {{rxn_id}}_Kiq = get_Kiq_ordered_unibi({{Keq}}, {{Ka}}, {{Kp}}, {{Kcat1}}, {{Kcat2}});"
+        "real {{rxn_id}}_Kiq = "
+        "get_Kiq_ordered_unibi({{Keq}}, {{Ka}}, {{Kp}}, {{Kcat1}}, {{Kcat2}});"
     )
     return template.render(
         rxn_id=rxn_id,
@@ -172,7 +175,7 @@ def create_fluxes_function(kinetic_model: KineticModel, template: Template) -> s
     haldane_lines = []
     free_enzyme_ratio_lines = []
     flux_lines = []
-    for rxn_id, rxn in kinetic_model.reactions.items():
+    for _, rxn in kinetic_model.reactions.items():
         substrate_ids = [met_id for met_id, s in rxn.stoichiometry.items() if s < 0]
         substrate_codes = {
             "S" + str(i): met_codes[met_id] for i, met_id in enumerate(substrate_ids)
@@ -206,7 +209,8 @@ def create_fluxes_function(kinetic_model: KineticModel, template: Template) -> s
             if any(enz.modifiers):
                 # make free enzyme ratio line
                 free_enzyme_ratio_line = Template(
-                    "real free_enzyme_ratio_{{enzyme}} = get_free_enzyme_ratio_{{catalytic_string}};"
+                    "real free_enzyme_ratio_{{enzyme}} = "
+                    "get_free_enzyme_ratio_{{catalytic_string}};"
                 ).render(enzyme=enz_id, catalytic_string=catalytic_string)
                 free_enzyme_ratio_lines.append(free_enzyme_ratio_line)
                 # make regulatory effect string
@@ -274,7 +278,7 @@ def get_metabolite_codes(kinetic_model: KineticModel) -> Dict[str, int]:
 
 def get_enzyme_codes(kinetic_model: KineticModel) -> Dict[str, int]:
     enzyme_ids = []
-    for rxn_id, rxn in kinetic_model.reactions.items():
+    for _, rxn in kinetic_model.reactions.items():
         for enz_id, _ in rxn.enzymes.items():
             enzyme_ids.append(enz_id)
     return codify(enzyme_ids)
@@ -282,8 +286,8 @@ def get_enzyme_codes(kinetic_model: KineticModel) -> Dict[str, int]:
 
 def get_parameter_codes(kinetic_model: KineticModel) -> Dict[str, int]:
     parameter_ids = []
-    for rxn_id, rxn in kinetic_model.reactions.items():
+    for _, rxn in kinetic_model.reactions.items():
         for enz_id, enz in rxn.enzymes.items():
-            for par_id, par in enz.parameters.items():
+            for par_id, _ in enz.parameters.items():
                 parameter_ids.append(enz_id + "_" + par_id)
     return codify(parameter_ids)
