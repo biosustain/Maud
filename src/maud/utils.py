@@ -12,10 +12,11 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import numpy as np
 import os
-import pandas as pd
 from typing import Iterable
+
+import numpy as np
+import pandas as pd
 
 
 def match_string_to_file(s: str, path: str):

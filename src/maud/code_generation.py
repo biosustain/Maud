@@ -21,11 +21,14 @@
 """
 
 import os
-import pandas as pd
-from maud.data_model import MaudInput, KineticModel
-from jinja2 import Template, Environment, PackageLoader
 from typing import Dict, List
+
+import pandas as pd
+from jinja2 import Environment, PackageLoader, Template
+
+from maud.data_model import KineticModel, MaudInput
 from maud.utils import codify
+
 
 JINJA_TEMPLATE_FILES = [
     "inference_model_lower_blocks.stan",

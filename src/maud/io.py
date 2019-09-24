@@ -12,21 +12,24 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from collections import defaultdict
+
+import toml
+
 from maud.data_model import (
-    MaudInput,
-    KineticModel,
-    Metabolite,
-    Reaction,
+    Compartment,
     Enzyme,
+    Experiment,
+    KineticModel,
+    MaudInput,
+    Measurement,
+    Metabolite,
     Modifier,
     Parameter,
     Prior,
-    Experiment,
-    Measurement,
-    Compartment,
+    Reaction,
 )
-from collections import defaultdict
-import toml
+
 
 MECHANISM_TO_PARAM_IDS = {"uniuni": ["Keq", "Kcat1", "Kcat2", "Ka"]}
 

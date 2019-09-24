@@ -12,12 +12,15 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import arviz
-import numpy as np
 import os
-import pandas as pd
+
+import arviz
 import cmdstanpy
+import numpy as np
+import pandas as pd
+
 from maud import code_generation, io, utils
+
 
 RELATIVE_PATHS = {
     "stan_includes": "stan_code",

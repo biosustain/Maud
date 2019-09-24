@@ -15,10 +15,13 @@
 
 """Functions that are exposed to the command line interface live here."""
 
+import os
+
 import click
 import cmdstanpy
+
 from maud import sampling
-import os
+
 
 SAMPLING_DEFAULTS = {
     "f_tol_as": 1e-6,
