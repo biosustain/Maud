@@ -34,7 +34,7 @@ This step requires that you have ssh access to the Maud github repository
 This is unavoidable while the repository remains private, but should be
 achievable if you can see this readme.
 
-Cmdstanpy depends on `cmdstan<https://github.com/stan-dev/cmdstan>`_, which needs to be installed too. Fortunately,
+Cmdstanpy depends on `cmdstan <https://github.com/stan-dev/cmdstan>`_, which needs to be installed too. Fortunately,
 cmdstanpy comes with a command line script that installs cmdstan, so this step
 is pretty simple:
 
