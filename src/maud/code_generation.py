@@ -20,7 +20,7 @@ The only function that should be used outside this module is `create_stan_progra
 """
 
 import os
-from typing import Dict
+from typing import Dict, List
 
 from jinja2 import Environment, PackageLoader, Template
 
@@ -28,7 +28,7 @@ from maud.data_model import KineticModel, MaudInput
 from maud.utils import codify
 
 
-JINJA_TEMPLATE_FILES = [
+TEMPLATE_FILES = [
     "inference_model_lower_blocks.stan",
     "functions_block.stan",
     "ode_function.stan",
@@ -88,7 +88,12 @@ def create_stan_program(mi: MaudInput, model_type: str, time_step=0.05) -> str:
     return functions_block + "\n" + lower_blocks
 
 
-def get_templates(template_files=JINJA_TEMPLATE_FILES) -> Dict[str, Template]:
+def get_templates(template_files: List[str] = TEMPLATE_FILES) -> Dict[str, Template]:
+    """Load jinja templates from files.
+
+    :param template_files: A list of paths to template files
+    """
+
     out = {}
     env = Environment(loader=PackageLoader("maud", "stan_code"))
     for template_file in template_files:
@@ -98,6 +103,12 @@ def get_templates(template_files=JINJA_TEMPLATE_FILES) -> Dict[str, Template]:
 
 
 def create_ode_function(kinetic_model: KineticModel, template: Template) -> str:
+    """Get a Stan function specifying metabolite rates of change.
+
+    :param kinetic_model: a KineticModel object
+    :param template: a jinja template
+    """
+
     rxns = kinetic_model.reactions
     rxn_id_to_stan = codify(rxns.keys())
     metabolite_lines = []
@@ -119,6 +130,18 @@ def create_ode_function(kinetic_model: KineticModel, template: Template) -> str:
 def create_steady_state_function(
     kinetic_model: KineticModel, template: Template, time_step: float
 ) -> str:
+    """Get a Stan function for finding the steady state of the system.
+
+    This is a function that can be input to Stan's algebra solver, whose return
+    value is zero when the system is at steady state.
+
+    :param kinetic_model: A KineticModel object
+    :param template: A jinja template
+    :param time_step: A number specifying how far into the future the ode
+    solver should simulate the system in order to find an evolved state to
+    compare with the initial state
+    """
+
     mets = kinetic_model.metabolites
     met_codes = dict(zip(mets.keys(), range(1, len(mets) + 1)))
     balanced_codes = [met_codes[met_id] for met_id, met in mets.items() if met.balanced]
@@ -134,7 +157,13 @@ def create_steady_state_function(
     )
 
 
-def create_Kip_ordered_unibi_line(param_codes: dict, rxn_id: str) -> str:
+def create_Kip_ordered_unibi_line(param_codes: Dict[str, int], rxn_id: str) -> str:
+    """Get Kip from other parameters based on the uniuni Haldane relationship.
+
+    :param param_codes: dictionary mapping parameter names to integer indexes
+    :param rxn_id: id of the reaction
+    """
+
     template = Template(
         "real {{rxn_id}}_Kip = "
         "get_Kip_ordered_unibi({{Keq}}, {{Ka}}, {{Kp}}, {{Kcat1}}, {{Kcat2}});"
@@ -150,6 +179,11 @@ def create_Kip_ordered_unibi_line(param_codes: dict, rxn_id: str) -> str:
 
 
 def create_Kiq_ordered_unibi_line(param_codes: dict, rxn_id: str) -> str:
+    """Get Kiq from other parameters based on the uniuni Haldane relationship.
+
+    :param param_codes: dictionary mapping parameter names to integer indexes
+    :param rxn_id: id of the reaction
+    """
     template = Template(
         "real {{rxn_id}}_Kiq = "
         "get_Kiq_ordered_unibi({{Keq}}, {{Ka}}, {{Kp}}, {{Kcat1}}, {{Kcat2}});"
@@ -165,6 +199,12 @@ def create_Kiq_ordered_unibi_line(param_codes: dict, rxn_id: str) -> str:
 
 
 def create_fluxes_function(kinetic_model: KineticModel, template: Template) -> str:
+    """Get a Stan function that maps metabolite/parameter configurations to fluxes.
+
+    :param kinetic_model: A KineticModel object
+    :param template: A jinja template
+    """
+
     mechanism_to_haldane_functions = {
         "ordered_unibi": [create_Kip_ordered_unibi_line, create_Kiq_ordered_unibi_line]
     }
@@ -238,7 +278,17 @@ def create_fluxes_function(kinetic_model: KineticModel, template: Template) -> s
     )
 
 
-def get_regulatory_string(inhibitor_codes, param_codes, enzyme_name):
+def get_regulatory_string(
+    inhibitor_codes: Dict[str, int], param_codes: Dict[str, int], enzyme_name: str
+) -> str:
+    """Create a call to the Stan function get_regulatory_effect.
+
+    :param inhibitor_codes: dictionary mapping ids of inhibitor metabolites to
+    integer indexes
+    :param param_codes: dictionary mapping ids of parameters to integer indexes
+    :param enzyme_name: string id of enzyme
+    """
+
     regulatory_template = Template(
         """get_regulatory_effect(
         empty_array,
@@ -273,10 +323,20 @@ def get_regulatory_string(inhibitor_codes, param_codes, enzyme_name):
 
 
 def get_metabolite_codes(kinetic_model: KineticModel) -> Dict[str, int]:
+    """Get a dictionary mapping metabolite ids to integer indexes.
+
+    :param kinetic_model: A KineticModel object
+    """
+
     return codify(kinetic_model.metabolites.keys())
 
 
 def get_enzyme_codes(kinetic_model: KineticModel) -> Dict[str, int]:
+    """Get a dictionary mapping enzyme ids to integer indexes.
+
+    :param kinetic_model: A KineticModel object
+    """
+
     enzyme_ids = []
     for _, rxn in kinetic_model.reactions.items():
         for enz_id, _ in rxn.enzymes.items():
@@ -285,6 +345,11 @@ def get_enzyme_codes(kinetic_model: KineticModel) -> Dict[str, int]:
 
 
 def get_parameter_codes(kinetic_model: KineticModel) -> Dict[str, int]:
+    """Get a dictionary mapping parameter ids to integer indexes.
+
+    :param kinetic_model: A KineticModel object
+    """
+
     parameter_ids = []
     for _, rxn in kinetic_model.reactions.items():
         for enz_id, enz in rxn.enzymes.items():

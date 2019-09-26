@@ -39,6 +39,8 @@ RELATIVE_PATH_EXAMPLE = "../../data/in/linear.toml"
 
 
 def get_example_path(relative_path_example):
+    """Get absolute path to file containing example input."""
+
     here = os.path.dirname(os.path.abspath(__file__))
     return os.path.join(here, relative_path_example)
 

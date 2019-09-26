@@ -45,6 +45,22 @@ def sample(
     n_cores: int,
     time_step: float,
 ):
+    """Get samples from a posterior distribution.
+
+    :param data_path: A path to a toml file containing input data
+    :param f_tol: Sets algebra solver's f_tol control parameter
+    :param rel_tol: Sets algebra solver's rel_tol control parameter
+    :param max_steps: Sets algebra solver's max_steps control parameter
+    :param likelihood: Set to zero if you don't want the model to include information
+    from experimental data.
+    :param n_samples: Number of post-warmup samples
+    :param n_warmup: Number of warmup samples
+    :param n_chains: Number of MCMC chains to run
+    :param n_cores: Number of cores to try and use
+    :param time_step: Amount of time for the ode solver to simulate in order to compare
+    initial state with evolved state
+    """
+
     model_name = os.path.splitext(os.path.basename(data_path))[0]
     here = os.path.dirname(os.path.abspath(__file__))
     paths = {k: os.path.join(here, v) for k, v in RELATIVE_PATHS.items()}
