@@ -1,7 +1,5 @@
-#!/usr/bin/env python
-
-
-# Copyright (c) 2019, Novo Nordisk Foundation Center for Biosustainability, Technical University of Denmark.
+# Copyright (c) 2019, Novo Nordisk Foundation Center for Biosustainability,
+# Technical University of Denmark.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -15,13 +13,12 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-
-"""Set up the Maud package."""
-
-
-import versioneer
-from setuptools import setup
+"""Define general helper functions."""
 
 
-# All other arguments are defined in `setup.cfg`.
-setup(version=versioneer.get_version(), cmdclass=versioneer.get_cmdclass())
+from depinfo import print_dependencies
+
+
+def show_versions():
+    """Print dependency information."""
+    print_dependencies("maud")
