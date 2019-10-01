@@ -20,6 +20,7 @@ The only function that should be used outside this module is `create_stan_progra
 """
 
 import os
+import numpy as np
 from typing import Dict, List
 
 from jinja2 import Environment, PackageLoader, Template
@@ -353,7 +354,7 @@ def create_fluxes_function(kinetic_model: KineticModel, template: Template) -> s
                 if enz_id in k
             }
             enz_code = enz_codes[enz.id]
-            if enz.mechanism is "modular_rate_law":
+            if enz.mechanism == "modular_rate_law":
                 mechanism_args = {
                     "Tr": ("Tr_{}").format(enz_id),
                     "Dr": ("Dr_{}").format(enz_id),
@@ -460,6 +461,8 @@ def get_modular_rate_codes(rxn_id, substrate_info, product_info, par_codes, met_
     product_parameter_ids = [par_codes[prod] for prod in prod_key_list]
     substrate_block = zip(substrate_codes, substrate_parameter_ids, substrate_stoic)
     product_block = zip(product_codes, product_parameter_ids, product_stoic)
+    substrate_block = [list(a) for a in substrate_block]
+    product_block = [list(a) for a in product_block]
     return [substrate_block, product_block]
 
 
