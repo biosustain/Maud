@@ -20,7 +20,6 @@ The only function that should be used outside this module is `create_stan_progra
 """
 
 import os
-import numpy as np
 from typing import Dict, List
 
 from jinja2 import Environment, PackageLoader, Template
