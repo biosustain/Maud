@@ -1,14 +1,23 @@
-import maud.code_generation as code_generation
-import maud.io as io
+"""Unit tests for code generation functions."""
+
 import os
 
-LINEAR_TOML_PATH = os.path.join(os.path.dirname(__file__), '../data/linear.toml')
-LINEAR_STAN_CODE_PATH = os.path.join(os.path.dirname(__file__), '../data/linear.stan')
+import maud.code_generation as code_generation
+import maud.io as io
 
 
-def test_create_inference_program(request):
-    mi = io.load_maud_input_from_toml(LINEAR_TOML_PATH)
-    correct_stan_code = open(LINEAR_STAN_CODE_PATH, 'r').read()
-    generated_stan_code = code_generation.create_stan_program(mi, 'inference')
-    assert generated_stan_code == correct_stan_code
-    
+here = os.path.dirname(__file__)
+data_path = os.path.join(here, "../data")
+
+
+def test_create_stan_program():
+    """Test that the function create_stan_program behaves as expected."""
+    correct_stan_code_filenames = {"inference": "linear.stan"}
+    toml_input_path = os.path.join(data_path, "linear.toml")
+    mi = io.load_maud_input_from_toml(toml_input_path)
+    for model_type in ["inference"]:
+        stan_code_filename = correct_stan_code_filenames[model_type]
+        correct_stan_code_path = os.path.join(data_path, stan_code_filename)
+        correct_stan_code = open(correct_stan_code_path, "r").read()
+        generated_stan_code = code_generation.create_stan_program(mi, model_type)
+        assert generated_stan_code == correct_stan_code
