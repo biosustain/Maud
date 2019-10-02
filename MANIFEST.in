@@ -1,2 +1,3 @@
 include versioneer.py
 include src/maud/_version.py
+recursive-include tests/data *
