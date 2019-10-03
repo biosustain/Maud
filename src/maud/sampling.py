@@ -23,6 +23,7 @@ import numpy as np
 import pandas as pd
 
 from maud import code_generation, io, utils
+from scipy.linalg import null_space as null_space
 
 
 RELATIVE_PATHS = {
@@ -32,6 +33,20 @@ RELATIVE_PATHS = {
     "data_out": "../../data/out",
 }
 
+
+def get_full_stoichiometry(kinetic_model, enzyme_codes, metabolite_codes):
+    """Gets the full stoichiometric matrix for each isoenzyme
+
+    :param kinetic_model: A Kinetic Model object
+    :param enzyme_codes: the codified enzyme codes
+    """
+    S = pd.DataFrame(index=enzyme_codes, columns=metabolite_codes)
+    for _, rxn in kinetic_model.reactions.items():
+        for enz_id, _ in rxn.enzymes.items():
+            for met, stoic in rxn.stoichiometry.items():
+                S.loc[enz_id, met] = stoic
+    S.fillna(0, inplace=True)
+    return S
 
 def sample(
     data_path: str,
@@ -111,6 +126,17 @@ def sample(
     reaction_codes = utils.codify(reactions.keys())
     enzyme_codes = utils.codify(enzymes.keys())
     metabolite_codes = utils.codify(metabolites.keys())
+    full_stoic = get_full_stoichiometry(mi.kinetic_model, enzyme_codes, metabolite_codes)
+    flux_nullspace = null_space(np.transpose(np.matrix(full_stoic)))
+    flux_nullspace[(flux_nullspace < 10e-10) & (flux_nullspace > -10e-10)] = 0
+
+    if not flux_nullspace.any():
+        wegschneider_mat = np.identity(len(enzyme_codes))
+        n_loops = len(enzyme_codes)
+    else:
+        wegschneider_mat = null_space(np.transpose(flux_nullspace))
+        n_loops = np.shape(wegschneider_mat)[1]
+    
     input_data = {
         "N_balanced": len(balanced_metabolites),
         "N_unbalanced": len(unbalanced_metabolites),
@@ -120,6 +146,7 @@ def sample(
         "N_experiment": len(mi.experiments),
         "N_flux_measurement": len(reaction_measurements),
         "N_conc_measurement": len(metabolite_measurements),
+        "N_loops": n_loops,
         "experiment_yconc": (
             metabolite_measurements["experiment_id"].map(experiment_codes).values
         ),
@@ -143,6 +170,7 @@ def sample(
         "prior_loc_enzyme": prior_loc_enzyme.values,
         "prior_scale_enzyme": prior_scale_enzyme.values,
         "balanced_guess": [1.0 for m in range(len(balanced_metabolites))],
+        "ln_equilibrium_basis": wegschneider_mat,
         "rel_tol": rel_tol,
         "f_tol": f_tol,
         "max_steps": max_steps,
