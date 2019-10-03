@@ -25,6 +25,8 @@ data {
   real prior_loc_enzyme[N_enzyme, N_experiment];
   real<lower=0> prior_scale_enzyme[N_enzyme, N_experiment];
   vector<lower=0>[N_balanced] balanced_guess;
+  // network properties
+  real ln_equilibrium_basis[N_enzyme, N_loops];
   // algebra solver configuration
   real rel_tol;
   real f_tol;
@@ -40,10 +42,12 @@ parameters {
   vector<lower=0>[N_kinetic_parameter] kinetic_parameter;
   vector<lower=0>[N_unbalanced] unbalanced[N_experiment];
   vector<lower=0>[N_enzyme] enzyme_concentration[N_experiment];
+  vector[N_loops] basis_contribution;
 }
 transformed parameters {
   vector<lower=0>[N_balanced+N_unbalanced] conc[N_experiment];
   vector[N_reaction] flux[N_experiment];
+  kinetic_parameter[{ {{-Keq_position|join(',')-}} }] = ln_equilibrium_basis*basis_contribution;
   for (e in 1:N_experiment){
     vector[N_unbalanced+N_enzyme+N_kinetic_parameter] theta = append_row(unbalanced[e], append_row(enzyme_concentration[e], kinetic_parameter));
     conc[e, { {{-balanced_codes|join(',')-}} }] = algebra_solver(steady_state_function, balanced_guess, theta, xr, xi, rel_tol, f_tol, max_steps);
