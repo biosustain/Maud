@@ -132,10 +132,10 @@ def sample(
 
     if not flux_nullspace.any():
         wegschneider_mat = np.identity(len(enzyme_codes))
-        n_loops = len(enzyme_codes)
+        stoichiometry_rank = len(enzyme_codes)
     else:
         wegschneider_mat = null_space(np.transpose(flux_nullspace))
-        n_loops = np.shape(wegschneider_mat)[1]
+        stoichiometry_rank = np.shape(wegschneider_mat)[1]
     
     input_data = {
         "N_balanced": len(balanced_metabolites),
@@ -146,7 +146,7 @@ def sample(
         "N_experiment": len(mi.experiments),
         "N_flux_measurement": len(reaction_measurements),
         "N_conc_measurement": len(metabolite_measurements),
-        "N_loops": n_loops,
+        "stoichiometric_rank": stoichiometry_rank,
         "experiment_yconc": (
             metabolite_measurements["experiment_id"].map(experiment_codes).values
         ),

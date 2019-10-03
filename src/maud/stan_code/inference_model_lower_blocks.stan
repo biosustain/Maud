@@ -8,7 +8,7 @@ data {
   int<lower=1> N_experiment;
   int<lower=1> N_flux_measurement;
   int<lower=1> N_conc_measurement;
-  int<lower=1> N_loops;
+  int<lower=1> stoichiometric_rank;
   // measurements
   int<lower=1,upper=N_experiment> experiment_yconc[N_conc_measurement];
   int<lower=1,upper=N_balanced+N_unbalanced> metabolite_yconc[N_conc_measurement];
@@ -27,7 +27,7 @@ data {
   real<lower=0> prior_scale_enzyme[N_enzyme, N_experiment];
   vector<lower=0>[N_balanced] balanced_guess;
   // network properties
-  matrix[N_enzyme, N_loops] ln_equilibrium_basis;
+  matrix[N_enzyme, stoichiometric_rank] ln_equilibrium_basis;
   // algebra solver configuration
   real rel_tol;
   real f_tol;
@@ -44,7 +44,7 @@ parameters {
   vector<lower=0>[N_kinetic_parameter] kinetic_parameter;
   vector<lower=0>[N_unbalanced] unbalanced[N_experiment];
   vector<lower=0>[N_enzyme] enzyme_concentration[N_experiment];
-  matrix[N_loops, 1] basis_contribution;
+  matrix[stoichiometric_ranks, 1] basis_contribution;
 }
 transformed parameters {
   vector<lower=0>[N_balanced+N_unbalanced] conc[N_experiment];
