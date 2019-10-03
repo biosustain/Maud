@@ -39,38 +39,38 @@ TEMPLATE_FILES = [
 ]
 MECHANISM_TEMPLATES = {
     "uniuni": Template(
-        """uniuni(m[{{S0}}], m[{{P0}}], p[{{enz}}]*p[{{Kcat1}}],
-                  p[{{enz}}]*p[{{Kcat2}}], p[{{Ka}}], p[{{Keq}}])"""
+        "uniuni(m[{{S0}}],m[{{P0}}],p[{{enz}}]*p[{{Kcat1}}],"
+        "p[{{enz}}]*p[{{Kcat2}}],p[{{Ka}}],p[{{Keq}}])"
     ),
     "ordered_unibi": Template(
-        """ordered_unibi(m[{{S0}}], m[{{P0}}], m[{{P1}}],
-                         p[{{enz}}]*p[{{Kcat1}}], p[{{enz}}]*p[{{Kcat2}}],
-                         p[{{Ka}}], p[{{Kp}}], p[{{Kq}}],
-                         p[{{Kia}}], p[{{Kip}}], p[{{Kiq}}],
-                         p[{{Keq}}]"""
+        "ordered_unibi(m[{{S0}}],m[{{P0}}],m[{{P1}}],"
+        "p[{{enz}}]*p[{{Kcat1}}],p[{{enz}}]*p[{{Kcat2}}],"
+        "p[{{Ka}}],p[{{Kp}}],p[{{Kq}}],"
+        "p[{{Kia}}],p[{{Kip}}],p[{{Kiq}}],"
+        "p[{{Keq}}])"
     ),
     "ordered_bibi": Template(
-        """ordered_bibi(m[{{S0}}], m[{{S1}}], m[{{P0}}], m[{{P1}}],
-                        p[{{enz}}]*p[{{Kcat1}}], p[{{enz}}]*p[{{Kcat2}}],
-                        p[{{Ka}}], p[{{Kb}}], p[{{Kp}}], p[{{Kq}}],
-                        p[{{Kia}}], p[{{Kib}}], p[{{Kip}}], p[{{Kiq}}],
-                        p[{{Keq}}]"""
+        "ordered_bibi(m[{{S0}}],m[{{S1}}],m[{{P0}}],m[{{P1}}],"
+        "p[{{enz}}]*p[{{Kcat1}}],p[{{enz}}]*p[{{Kcat2}}],"
+        "p[{{Ka}}],p[{{Kb}}],p[{{Kp}}],p[{{Kq}}],"
+        "p[{{Kia}}],p[{{Kib}}],p[{{Kip}}],p[{{Kiq}}],"
+        "p[{{Keq}}])"
     ),
     "pingpong": Template(
-        """pingpong(m[{{S0}}], m[{{S1}}], m[{{P0}}], m[{{P1}}],
-                    p[{{enz}}]*p[{{Kcat1}}], p[{{enz}}]*p[{{Kcat2}}],
-                    p[{{Ka}}], p[{{Kb}}], p[{{Kp}}], p[{{Kq}}],
-                    p[{{Kia}}], p[{{Kib}}], p[{{Kip}}], p[{{Kiq}}],
-                    p[{{Keq}}]"""
+        "pingpong(m[{{S0}}],m[{{S1}}],m[{{P0}}],m[{{P1}}],"
+        "p[{{enz}}]*p[{{Kcat1}}],p[{{enz}}]*p[{{Kcat2}}],"
+        "p[{{Ka}}],p[{{Kb}}],p[{{Kp}}],p[{{Kq}}],"
+        "p[{{Kia}}],p[{{Kib}}],p[{{Kip}}],p[{{Kiq}}],"
+        "p[{{Keq}}])"
     ),
     "ordered_terbi": Template(
-        """ordered_terbi(m[{{S0}}], m[{{S1}}], m[{{S2}}], m[{{P0}}], m[{{P1}}],
-                         p[{{enz}}]*p[{{Kcat1}}], p[{{enz}}]*p[{{Kcat2}}],
-                         p[{{Ka}}], p[{{Kb}}], p[{{Kc}}], p[{{Kp}}], p[{{Kq}}],
-                         p[{{Kia}}], p[{{Kib}}], p[{{Kic}}], p[{{Kip}}], p[{{Kiq}}],
-                         p[{{Keq}}]"""
+        "ordered_terbi(m[{{S0}}],m[{{S1}}],m[{{S2}}],m[{{P0}}],m[{{P1}}],"
+        "p[{{enz}}]*p[{{Kcat1}}],p[{{enz}}]*p[{{Kcat2}}],"
+        "p[{{Ka}}],p[{{Kb}}],p[{{Kc}}],p[{{Kp}}],p[{{Kq}}],"
+        "p[{{Kia}}],p[{{Kib}}],p[{{Kic}}],p[{{Kip}}],p[{{Kiq}}],"
+        "p[{{Keq}}])"
     ),
-    "modular_rate_law": Template("modular_rate_law({{Tr}}, {{Dr}})"),
+    "modular_rate_law": Template("modular_rate_law({{Tr}},{{Dr}})"),
 }
 
 
