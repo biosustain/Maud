@@ -20,7 +20,6 @@ The only function that should be used outside this module is `create_stan_progra
 """
 
 import os
-import numpy as np
 from typing import Dict, List
 
 from jinja2 import Environment, PackageLoader, Template
@@ -311,14 +310,16 @@ def create_fluxes_function(kinetic_model: KineticModel, template: Template) -> s
     flux_lines = []
     for _, rxn in kinetic_model.reactions.items():
         substrate_ids = [
-            [met_id, s] for met_id, s in rxn.stoichiometry.items() if s < 0
+            met_id for met_id, s in rxn.stoichiometry.items() if s < 0
         ]
         substrate_codes = {
-            "S" + str(i): met_codes[met_id[0]] for i, met_id in enumerate(substrate_ids)
+            "S" + str(i): met_codes[met_id] for i, met_id in enumerate(substrate_ids)
         }
-        product_ids = [[met_id, s] for met_id, s in rxn.stoichiometry.items() if s > 0]
+        product_ids = [
+            met_id for met_id, s in rxn.stoichiometry.items() if s > 0
+        ]
         product_codes = {
-            "P" + str(i): met_codes[met_id[0]] for i, met_id in enumerate(product_ids)
+            "P" + str(i): met_codes[met_id] for i, met_id in enumerate(product_ids)
         }
         enzyme_flux_strings = []
         for enz_id, enz in rxn.enzymes.items():
@@ -328,13 +329,21 @@ def create_fluxes_function(kinetic_model: KineticModel, template: Template) -> s
                 for haldane_function in haldane_functions:
                     haldane_line = haldane_function(par_codes_in_enz_context, enz.id)
                     haldane_lines.append(haldane_line)
+            substrate_stoichiometries = [
+                [substrate_id, rxn.stoichiometry[substrate_id]]
+                for substrate_id in substrate_ids
+            ]
+            product_stoichiometries = [
+                [product_id, rxn.stoichiometry[product_id]]
+                for product_id in product_ids
+            ]
             # make modular rate law if necessary
             if enz.mechanism == "modular_rate_law":
                 enz_code = enz_codes[enz.id]
                 substrate_block, product_block = get_modular_rate_codes(
                     enz_id,
-                    substrate_ids,
-                    product_ids,
+                    substrate_stoichiometries,
+                    product_stoichiometries,
                     par_codes_in_enz_context,
                     met_codes,
                 )
@@ -446,24 +455,20 @@ def get_regulatory_string(
 
 
 def get_modular_rate_codes(rxn_id, substrate_info, product_info, par_codes, met_codes):
-    possible_substrate_keys = ["a", "b", "c", "d"]
-    possible_product_keys = ["p", "q", "r", "s"]
-    substrate_codes = [met_codes[x[0]] for x in substrate_info]
-    product_codes = [met_codes[x[0]] for x in product_info]
-    substrate_stoic = [x[1] for x in substrate_info]
-    product_stoic = [x[1] for x in product_info]
-    substrate_keys = [possible_substrate_keys[i[0]] for i in enumerate(substrate_codes)]
-    product_keys = [possible_product_keys[i[0]] for i in enumerate(product_codes)]
-    sub_key_list = [rxn_id + ("_K{}").format(key) for key in substrate_keys]
-    prod_key_list = [rxn_id + ("_K{}").format(key) for key in product_keys]
-
-    substrate_parameter_ids = [par_codes[sub] for sub in sub_key_list]
-    product_parameter_ids = [par_codes[prod] for prod in prod_key_list]
-    substrate_block = zip(substrate_codes, substrate_parameter_ids, substrate_stoic)
-    product_block = zip(product_codes, product_parameter_ids, product_stoic)
-    substrate_block = [list(a) for a in substrate_block]
-    product_block = [list(a) for a in product_block]
-    return [substrate_block, product_block]
+    substrate_keys = ["a", "b", "c", "d"]
+    product_keys = ["p", "q", "r", "s"]
+    substrate_input = []
+    product_input = []
+    for info, keys in zip([substrate_info, product_info], [substrate_keys, product_keys]):
+        for i, (met_id, stoic) in enumerate(info):
+            param_id = rxn_id + "_K" + keys[i]
+            param_code = par_codes[param_id]
+            met_code = met_codes[met_id]
+            if stoic < 0:
+                substrate_input.append([met_code, param_code, stoic])
+            elif stoic > 0:
+                product_input.append([met_code, param_code, stoic])
+    return [substrate_input, product_input]
 
 
 def get_metabolite_codes(kinetic_model: KineticModel) -> Dict[str, int]:
