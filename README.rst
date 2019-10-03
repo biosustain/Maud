@@ -65,5 +65,4 @@ Copyright
 =========
 
 * Copyright (c) 2019, Novo Nordisk Foundation Center for Biosustainability, Technical University of Denmark.
-* Free software distributed under the `Apache Software License 2.0 
-  <https://www.apache.org/licenses/LICENSE-2.0>`_.
+* Free software distributed under the `GNU General Public License 3.0 <https://www.gnu.org/licenses/>`_
