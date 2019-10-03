@@ -3,6 +3,9 @@ vector get_fluxes(real[] m, real[] p){
   {%- for haldane in haldanes %}
   {{haldane}}
   {%- endfor %}
+  {%- for modular_coefficient in modular_coefficients %}
+  {{modular_coefficient}}
+  {%- endfor %}
   {%- for fe in free_enzyme_ratio %} 
   {{fe}}
   {%- endfor %}
