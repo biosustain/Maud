@@ -474,7 +474,7 @@ def get_modular_rate_codes(
     met_codes: Dict[str, int],
 ):
     """Get codes that can be put into the modular rate law jinja template.
-    
+
     The function returns a list containing lists substrate_input and
     product_input. Each of these is a list containing lists with the form
     [met_code, param_code, stoic] for each substrate and product.
