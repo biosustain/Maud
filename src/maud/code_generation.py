@@ -39,37 +39,38 @@ TEMPLATE_FILES = [
 ]
 MECHANISM_TEMPLATES = {
     "uniuni": Template(
-        "uniuni(m[{{S0}}], m[{{P0}}], p[{{enz}}]*p[{{Kcat1}}], p[{{enz}}]*p[{{Kcat2}}], p[{{Ka}}], p[{{Keq}}])"
+        "uniuni(m[{{S0}}],m[{{P0}}],p[{{enz}}]*p[{{Kcat1}}],"
+        "p[{{enz}}]*p[{{Kcat2}}],p[{{Ka}}],p[{{Keq}}])"
     ),
     "ordered_unibi": Template(
-        """ordered_unibi(m[{{S0}}], m[{{P0}}], m[{{P1}}], 
-                         p[{{enz}}]*p[{{Kcat1}}], p[{{enz}}]*p[{{Kcat2}}], 
-                         p[{{Ka}}], p[{{Kp}}], p[{{Kq}}],
-                         p[{{Kia}}], p[{{Kip}}], p[{{Kiq}}],
-                         p[{{Keq}}]"""
+        "ordered_unibi(m[{{S0}}],m[{{P0}}],m[{{P1}}],"
+        "p[{{enz}}]*p[{{Kcat1}}],p[{{enz}}]*p[{{Kcat2}}],"
+        "p[{{Ka}}],p[{{Kp}}],p[{{Kq}}],"
+        "p[{{Kia}}],p[{{Kip}}],p[{{Kiq}}],"
+        "p[{{Keq}}])"
     ),
     "ordered_bibi": Template(
-        """ordered_bibi(m[{{S0}}], m[{{S1}}], m[{{P0}}], m[{{P1}}], 
-                        p[{{enz}}]*p[{{Kcat1}}], p[{{enz}}]*p[{{Kcat2}}], 
-                        p[{{Ka}}], p[{{Kb}}], p[{{Kp}}], p[{{Kq}}],
-                        p[{{Kia}}], p[{{Kib}}], p[{{Kip}}], p[{{Kiq}}],
-                        p[{{Keq}}]"""
+        "ordered_bibi(m[{{S0}}],m[{{S1}}],m[{{P0}}],m[{{P1}}],"
+        "p[{{enz}}]*p[{{Kcat1}}],p[{{enz}}]*p[{{Kcat2}}],"
+        "p[{{Ka}}],p[{{Kb}}],p[{{Kp}}],p[{{Kq}}],"
+        "p[{{Kia}}],p[{{Kib}}],p[{{Kip}}],p[{{Kiq}}],"
+        "p[{{Keq}}])"
     ),
     "pingpong": Template(
-        """pingpong(m[{{S0}}], m[{{S1}}], m[{{P0}}], m[{{P1}}], 
-                    p[{{enz}}]*p[{{Kcat1}}], p[{{enz}}]*p[{{Kcat2}}], 
-                    p[{{Ka}}], p[{{Kb}}], p[{{Kp}}], p[{{Kq}}],
-                    p[{{Kia}}], p[{{Kib}}], p[{{Kip}}], p[{{Kiq}}],
-                    p[{{Keq}}]"""
+        "pingpong(m[{{S0}}],m[{{S1}}],m[{{P0}}],m[{{P1}}],"
+        "p[{{enz}}]*p[{{Kcat1}}],p[{{enz}}]*p[{{Kcat2}}],"
+        "p[{{Ka}}],p[{{Kb}}],p[{{Kp}}],p[{{Kq}}],"
+        "p[{{Kia}}],p[{{Kib}}],p[{{Kip}}],p[{{Kiq}}],"
+        "p[{{Keq}}])"
     ),
     "ordered_terbi": Template(
-        """ordered_terbi(m[{{S0}}], m[{{S1}}], m[{{S2}}], m[{{P0}}], m[{{P1}}], 
-                         p[{{enz}}]*p[{{Kcat1}}], p[{{enz}}]*p[{{Kcat2}}], 
-                         p[{{Ka}}], p[{{Kb}}], p[{{Kc}}], p[{{Kp}}], p[{{Kq}}],
-                         p[{{Kia}}], p[{{Kib}}], p[{{Kic}}], p[{{Kip}}], p[{{Kiq}}],
-                         p[{{Keq}}]"""
+        "ordered_terbi(m[{{S0}}],m[{{S1}}],m[{{S2}}],m[{{P0}}],m[{{P1}}],"
+        "p[{{enz}}]*p[{{Kcat1}}],p[{{enz}}]*p[{{Kcat2}}],"
+        "p[{{Ka}}],p[{{Kb}}],p[{{Kc}}],p[{{Kp}}],p[{{Kq}}],"
+        "p[{{Kia}}],p[{{Kib}}],p[{{Kic}}],p[{{Kip}}],p[{{Kiq}}],"
+        "p[{{Keq}}])"
     ),
-    "modular_rate_law": Template("modular_rate_law({{Tr}}, {{Dr}})"),
+    "modular_rate_law": Template("modular_rate_law({{Tr}},{{Dr}})"),
 }
 
 
@@ -186,8 +187,10 @@ def create_steady_state_function(
 
 
 def create_Kip_ordered_unibi_line(param_codes: dict, rxn_id: str) -> str:
+    """Generate Kip for mechanism ordered_unibi using the Haldane relationship."""
     template = Template(
-        "real {{rxn_id}}_Kip = get_Kip_ordered_unibi({{Keq}}, {{Ka}}, {{Kp}}, {{Kcat1}}, {{Kcat2}});"
+        "real {{rxn_id}}_Kip = get_Kip_ordered_unibi({{Keq}}, {{Ka}}, {{Kp}}, "
+        "{{Kcat1}}, {{Kcat2}});"
     )
     return template.render(
         rxn_id=rxn_id,
@@ -200,8 +203,10 @@ def create_Kip_ordered_unibi_line(param_codes: dict, rxn_id: str) -> str:
 
 
 def create_Kiq_ordered_unibi_line(param_codes: dict, rxn_id: str) -> str:
+    """Generate Kiq for mechanism ordered_unibi using the Haldane relationship."""
     template = Template(
-        "real {{rxn_id}}_Kiq = get_Kiq_ordered_unibi({{Keq}}, {{Ka}}, {{Kp}}, {{Kcat1}}, {{Kcat2}});"
+        "real {{rxn_id}}_Kiq = get_Kiq_ordered_unibi({{Keq}}, {{Ka}}, {{Kp}}, "
+        "{{Kcat1}}, {{Kcat2}});"
     )
     return template.render(
         rxn_id=rxn_id,
@@ -214,8 +219,10 @@ def create_Kiq_ordered_unibi_line(param_codes: dict, rxn_id: str) -> str:
 
 
 def create_Kia_ordered_bibi_line(param_codes: dict, rxn_id: str) -> str:
+    """Generate Kia for mechanism ordered_bibi using the Haldane relationship."""
     template = Template(
-        "real {{rxn_id}}_Kia = get_Kiq_ordered_unibi({{Keq}}, {{Ka}}, {{Kq}}, {{Kib}}, {{V1}}, {{V2}});"
+        "real {{rxn_id}}_Kia = get_Kiq_ordered_unibi({{Keq}}, {{Ka}}, {{Kq}}, "
+        "{{Kib}}, {{V1}}, {{V2}});"
     )
     return template.render(
         rxn_id=rxn_id,
@@ -229,8 +236,10 @@ def create_Kia_ordered_bibi_line(param_codes: dict, rxn_id: str) -> str:
 
 
 def create_Kip_ordered_bibi_line(param_codes: dict, rxn_id: str) -> str:
+    """Generate Kip for mechanism ordered_bibi using the Haldane relationship."""
     template = Template(
-        "real {{rxn_id}}_Kia = get_Kiq_ordered_unibi({{Keq}}, {{Kb}}, {{Kp}}, {{Kiq}}, {{V1}}, {{V2}});"
+        "real {{rxn_id}}_Kia = get_Kiq_ordered_unibi({{Keq}}, {{Kb}}, {{Kp}}, "
+        "{{Kiq}}, {{V1}}, {{V2}});"
     )
     return template.render(
         rxn_id=rxn_id,
@@ -244,8 +253,10 @@ def create_Kip_ordered_bibi_line(param_codes: dict, rxn_id: str) -> str:
 
 
 def create_Kip_pingpong_line(param_codes: dict, rxn_id: str) -> str:
+    """Generate Kip for mechanism pingpong using the Haldane relationship."""
     template = Template(
-        "real {{rxn_id}}_Kia = get_Kiq_ordered_unibi({{Keq}}, {{Ka}}, {{Kb}}, {{Kq}}, {{V1}}, {{V2}});"
+        "real {{rxn_id}}_Kia = get_Kiq_ordered_unibi({{Keq}}, {{Ka}}, {{Kb}}, {{Kq}},"
+        " {{V1}}, {{V2}});"
     )
     return template.render(
         rxn_id=rxn_id,
@@ -259,8 +270,10 @@ def create_Kip_pingpong_line(param_codes: dict, rxn_id: str) -> str:
 
 
 def create_Kip_ordered_terbi_line(param_codes: dict, rxn_id: str) -> str:
+    """Generate Kip for mechanism ordered_terbi using the Haldane relationship."""
     template = Template(
-        "real {{rxn_id}}_Kia = get_Kiq_ordered_unibi({{Keq}}, {{Kc}}, {{Kia}}, {{Kib}}, {{Kiq}}, {{V2}}, {{V2}});"
+        "real {{rxn_id}}_Kia = get_Kiq_ordered_unibi({{Keq}}, {{Kc}}, {{Kia}}, "
+        "{{Kib}}, {{Kiq}}, {{V2}}, {{V2}});"
     )
     return template.render(
         rxn_id=rxn_id,
@@ -275,8 +288,10 @@ def create_Kip_ordered_terbi_line(param_codes: dict, rxn_id: str) -> str:
 
 
 def create_Kp_ordered_terbi_line(param_codes: dict, rxn_id: str) -> str:
+    """Generate Kp for mechanism ordered_terbi using the Haldane relationship."""
     template = Template(
-        "real {{rxn_id}}_Kia = get_Kiq_ordered_unibi({{Keq}}, {{Kia}}, {{Kib}}, {{Kic}}, {{Kiq}});"
+        "real {{rxn_id}}_Kia = get_Kiq_ordered_unibi({{Keq}}, {{Kia}}, {{Kib}}, "
+        "{{Kic}}, {{Kiq}});"
     )
     return template.render(
         rxn_id=rxn_id,
@@ -310,15 +325,11 @@ def create_fluxes_function(kinetic_model: KineticModel, template: Template) -> s
     free_enzyme_ratio_lines = []
     flux_lines = []
     for _, rxn in kinetic_model.reactions.items():
-        substrate_ids = [
-            met_id for met_id, s in rxn.stoichiometry.items() if s < 0
-        ]
+        substrate_ids = [met_id for met_id, s in rxn.stoichiometry.items() if s < 0]
         substrate_codes = {
             "S" + str(i): met_codes[met_id] for i, met_id in enumerate(substrate_ids)
         }
-        product_ids = [
-            met_id for met_id, s in rxn.stoichiometry.items() if s > 0
-        ]
+        product_ids = [met_id for met_id, s in rxn.stoichiometry.items() if s > 0]
         product_codes = {
             "P" + str(i): met_codes[met_id] for i, met_id in enumerate(product_ids)
         }
@@ -455,12 +466,35 @@ def get_regulatory_string(
     )
 
 
-def get_modular_rate_codes(rxn_id, substrate_info, product_info, par_codes, met_codes):
+def get_modular_rate_codes(
+    rxn_id: str,
+    substrate_info: List[List],
+    product_info: List[List],
+    par_codes: Dict[str, int],
+    met_codes: Dict[str, int],
+):
+    """Get codes that can be put into the modular rate law jinja template.
+
+    The function returns a list containing lists substrate_input and
+    product_input. Each of these is a list containing lists with the form
+    [met_code, param_code, stoic] for each substrate and product.
+
+    :param rxn_id: id of the reaction
+    :param substrate_info: list containing lists with the form [met_id, stoic]
+    where met_id is a string and stoic is a float
+    :param product_info: list containing lists with the form [met_id, stoic]
+    where met_id is a string and stoic is a float
+    :param par_codes: dictionary mapping parameter ids to integers
+    :param met_codes: dictionary mapping metabolite ids to integers
+    """
+
     substrate_keys = ["a", "b", "c", "d"]
     product_keys = ["p", "q", "r", "s"]
     substrate_input = []
     product_input = []
-    for info, keys in zip([substrate_info, product_info], [substrate_keys, product_keys]):
+    for info, keys in zip(
+        [substrate_info, product_info], [substrate_keys, product_keys]
+    ):
         for i, (met_id, stoic) in enumerate(info):
             param_id = rxn_id + "_K" + keys[i]
             param_code = par_codes[param_id]
