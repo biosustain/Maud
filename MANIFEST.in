@@ -1,4 +1,4 @@
 include versioneer.py
 include src/maud/_version.py
 recursive-include tests/data *
-include src/maud/stan_code *.stan
+recursive-include src/maud/stan_code *.stan
