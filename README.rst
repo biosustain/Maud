@@ -21,6 +21,7 @@ Install
 First create a fresh Python 3.7 virtual environment and then activate it:
 
 .. code-block:: console
+
     sudo pip3.7 install virtualenv     # if virtualenv isn't installed already
     python3.7 -m virtualenv maud_venv  # choose any name you like!
     source maud_venv/bin/activate
@@ -28,6 +29,7 @@ First create a fresh Python 3.7 virtual environment and then activate it:
 Run this command to install Maud and its python dependencies:
 
 .. code-block:: console
+
     pip install -e git+ssh://git@github.com/biosustain/Maud.git#egg=maud
 
 This step requires that you have ssh access to the Maud github repository
@@ -39,6 +41,7 @@ cmdstanpy comes with a command line script that installs cmdstan, so this step
 is pretty simple:
 
 .. code-block:: console
+
     install_cmdstan
 
 
@@ -47,6 +50,7 @@ Usage
 To run the simple linear model, use the following command:
 
 .. code-block:: console
+
     maud sample
 
 This will use the data file at `data/in/linar.toml` to create a Stan program at
@@ -58,6 +62,7 @@ The `sample` command can be configured in a few ways - to check out all the
 options try running
 
 .. code-block:: console
+
     maud sample --help
 
 
@@ -65,5 +70,4 @@ Copyright
 =========
 
 * Copyright (c) 2019, Novo Nordisk Foundation Center for Biosustainability, Technical University of Denmark.
-* Free software distributed under the `Apache Software License 2.0 
-  <https://www.apache.org/licenses/LICENSE-2.0>`_.
+* Free software distributed under the `GNU General Public License 3.0 <https://www.gnu.org/licenses/>`_

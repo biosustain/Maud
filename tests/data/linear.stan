@@ -3,12 +3,12 @@ functions{
 #include haldane_relationships.stan
 #include allostery.stan
   vector get_fluxes(real[] m, real[] p){
-  real empty_array[0]; 
-  real free_enzyme_ratio_r2 = get_free_enzyme_ratio_uniuni(m[3], m[4], p[2]*p[9], p[2]*p[10], p[11], p[8]);
-  return [ 
-    uniuni(m[1], m[3], p[1]*p[5], p[1]*p[6], p[7], p[4]), 
-    uniuni(m[3], m[4], p[2]*p[9], p[2]*p[10], p[11], p[8])*get_regulatory_effect(empty_array,{m[3]},free_enzyme_ratio_r2,empty_array,{p[13]},p[12]), 
-    uniuni(m[4], m[2], p[3]*p[15], p[3]*p[16], p[17], p[14])
+  real empty_array[0];
+  real free_enzyme_ratio_r2 = get_free_enzyme_ratio_uniuni(m[3],m[4],p[2]*p[9],p[2]*p[10],p[11],p[8]);
+  return [
+    uniuni(m[1],m[3],p[1]*p[5],p[1]*p[6],p[7],p[4]),
+    uniuni(m[3],m[4],p[2]*p[9],p[2]*p[10],p[11],p[8])*get_regulatory_effect(empty_array,{m[3]},free_enzyme_ratio_r2,empty_array,{p[13]},p[12]),
+    uniuni(m[4],m[2],p[3]*p[15],p[3]*p[16],p[17],p[14])
   ]';
 }
   real[] ode_func(real t, real[] m, real[] p, real[] xr, int[] xi){

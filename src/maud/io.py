@@ -1,17 +1,18 @@
-# Copyright (c) 2019, Novo Nordisk Foundation Center for Biosustainability,
+# Copyright (C) 2019 Novo Nordisk Foundation Center for Biosustainability,
 # Technical University of Denmark.
 #
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
 #
-#     https://www.apache.org/licenses/LICENSE-2.0
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
 #
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 """Functions for loading MaudInput objects.
 
@@ -38,7 +39,25 @@ from maud.data_model import (
 )
 
 
-MECHANISM_TO_PARAM_IDS = {"uniuni": ["Keq", "Kcat1", "Kcat2", "Ka"]}
+MECHANISM_TO_PARAM_IDS = {
+    "uniuni": ["Keq", "Kcat1", "Kcat2", "Ka"],
+    "ordered_unibi": ["Keq", "Kcat1", "Kcat2", "Ka", "Kp", "Kq", "Kia"],
+    "ordered_bibi": ["Keq", "Kcat1", "Kcat2", "Ka", "Kb", "Kp", "Kq", "Kib", "Kia"],
+    "ping_pong": ["Keq", "Kcat1", "Kcat2", "Ka", "Kb", "Kp", "Kq", "Kib", "Kia", "Kiq"],
+    "ordered_terbi": [
+        "Keq",
+        "Kcat1",
+        "Kcat2",
+        "Ka",
+        "Kb",
+        "Kc",
+        "Kq",
+        "Kia",
+        "Kib",
+        "Kic",
+        "Kiq",
+    ],
+}
 
 
 def load_maud_input_from_toml(filepath: str, id: str = "mi") -> MaudInput:
@@ -65,10 +84,17 @@ def load_maud_input_from_toml(filepath: str, id: str = "mi") -> MaudInput:
     for r in parsed_toml["reactions"]:
         rxn_enzymes = {}
         for e in r["enzymes"]:
-            params = {
-                param_id: Parameter(param_id, e["id"])
-                for param_id in MECHANISM_TO_PARAM_IDS[e["mechanism"]]
-            }
+            if e["mechanism"] == "modular_rate_law":
+                params = {
+                    param_id["target_id"]: Parameter(param_id["target_id"], e["id"])
+                    for param_id in parsed_toml["priors"]["kinetic_parameters"][e["id"]]
+                }
+            else:
+                params = {
+                    param_id: Parameter(param_id, e["id"])
+                    for param_id in MECHANISM_TO_PARAM_IDS[e["mechanism"]]
+                }
+
             allosteric_inhibitors = defaultdict()
             if "allosteric_inhibitors" in e.keys():
                 allosteric_params = {

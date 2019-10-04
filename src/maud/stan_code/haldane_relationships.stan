@@ -18,11 +18,20 @@ real get_Kip_ordered_unibi(real Keq, real Kia, real Kq, real V1, real V2){
 real get_Kiq_ordered_unibi(real Keq, real Ka, real Kp, real V1, real V2){
   return Keq*V2*Ka / (V1*Kp);
 }
-real get_Kip_ordered_bibi(real Keq, real Ka, real Kq, real Kib, real Kiq, real V1, real V2){
+real get_Kip_ordered_bibi(real Keq, real Ka, real Kq, real Kib, real V1, real V2){
   return  Ka*Keq*Kib*V2^2 / (Kq*V1^2);
 }
 real get_Kia_ordered_bibi(real Keq, real Kb, real Kp, real Kiq, real V1, real V2){
   return V1*Kp*Kiq / (V2*Keq*Kb);
+}
+real get_Kp_ping_pong(real Keq, real Ka, real Kb, real Kq, real V1, real V2){
+  return (V2/V1)^2*Keq*Ka*Kb/Kq;
+}
+real get_Kp_ordered_terbi(real Keq, real Kc, real Kia, real Kib, real Kiq, real V1, real V2){
+  return Keq*V2*Kia*Kib*Kc/(V1*Kiq);
+}
+real get_Kip_ordered_terbi(real Keq, real Kia, real Kib, real Kic, real Kiq){
+  return Keq*Kia*Kib*Kic/Kiq;
 }
 
 /* Function for getting Keq from delta g, temperature and gas constant*/

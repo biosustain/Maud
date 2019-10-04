@@ -1,0 +1,124 @@
+###### Kinetic model ######
+[[compartments]]
+id = 'c'
+name = 'cytosol'
+volume = 1
+
+[[metabolites]]
+id = 'M1_ex'
+name = 'External metabolite number 1'
+balanced = false
+compartment = 'cytosol'
+
+[[metabolites]]
+id = 'M2_ex'
+name = 'External metabolite number 2'
+balanced = false
+compartment = 'cytosol'
+
+[[metabolites]]
+id = 'M1'
+name = 'Metabolite number 1'
+balanced = true
+compartment = 'cytosol'
+
+[[metabolites]]
+id = 'M2'
+name = 'Metabolite number 2'
+balanced = true
+compartment = 'cytosol'
+
+[[reactions]]
+id = 'r1'
+name = 'reaction number 1'
+stoichiometry = { M1_ex = -1, M1 = 1}
+[[reactions.enzymes]]
+id = 'r1'
+name = 'the enzyme that catalyses reaction r1'
+mechanism = 'uniuni'
+
+[[reactions]]
+id = 'r2'
+name = 'reaction number 2'
+stoichiometry = { M1 = -1, M2 = 1 }
+[[reactions.enzymes]]
+id = 'r2'
+name = 'the enzyme that catalyses reaction r2'
+mechanism = 'uniuni'
+allosteric_inhibitors = ['M1']
+
+[[reactions]]
+id = 'r3'
+name = 'reaction number 3'
+stoichiometry = { M2 = -1, M2_ex = 1}
+[[reactions.enzymes]]
+id = 'r3'
+name = 'the enzyme that catalyses reaction r3'
+mechanism = 'uniuni'
+
+###### Experimental data ######
+[[experiments]]
+id = 'condition_1'
+metadata = "A bat got in the bioreactor."
+metabolite_measurements = [
+  {target_id='M1', value=0.8, uncertainty=0.1},
+  {target_id='M2', value=1.5, uncertainty=0.1},
+]
+reaction_measurements = [
+  {target_id='r3', value=0.29, uncertainty=0.1}
+]
+
+[[experiments]]
+id = 'condition_2'
+metadata = "I may have mixed up some/all of the numbers."
+metabolite_measurements = [
+  {target_id='M1', value=0.7, uncertainty=0.1},
+  {target_id='M2', value=1.4, uncertainty=0.1},
+]
+reaction_measurements = [
+  {target_id='r3', value=0.21, uncertainty=0.1}
+]
+
+###### Priors ######
+[priors.kinetic_parameters]
+r1 = [
+  { target_id = 'Keq', location = 1, scale = 0.05},
+  { target_id = 'Kcat1', location = 1, scale = 0.6},
+  { target_id = 'Kcat2', location = 1, scale = 0.6},
+  { target_id = 'Ka', location = 1, scale = 0.6},
+]
+r2 = [
+  { target_id = 'Keq', location = 1.1, scale = 0.5},
+  { target_id = 'Kcat1', location = 1, scale = 0.6},
+  { target_id = 'Kcat2', location = 1, scale = 0.6},
+  { target_id = 'Ka', location = 1, scale = 0.6},
+  { target_id = 'dissociation_constant_t', metabolite = 'M1', location= 1, scale = 0.6},
+  { target_id = 'transfer_constant', location= 1, scale = 0.6},
+]
+r3 = [
+  { target_id = 'Keq', location = 1, scale = 0.05},
+  { target_id = 'Kcat1', location = 1, scale = 0.6},
+  { target_id = 'Kcat2', location = 1, scale = 0.6},
+  { target_id = 'Ka', location = 1, scale = 0.6},
+]
+
+[priors.unbalanced_metabolites]
+condition_1 = [
+  {target_id='M1_ex', location=2, scale=0.05},
+  {target_id='M2_ex', location=1, scale=0.05},
+]
+condition_2 = [
+  {target_id='M1_ex', location=2, scale=0.05},
+  {target_id='M2_ex', location=1, scale=0.05},
+]
+[priors.enzymes]
+condition_1 = [
+  {target_id='r1', location=1, scale=0.05},
+  {target_id='r2', location=1, scale=0.05},
+  {target_id='r3', location=1, scale=0.05},
+]
+condition_2 = [
+  {target_id='r1', location=1.5, scale=0.05},
+  {target_id='r2', location=1.5, scale=0.05},
+  {target_id='r3', location=1.5, scale=0.05},
+]
