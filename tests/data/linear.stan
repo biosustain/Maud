@@ -52,6 +52,7 @@ data {
   int<lower=1> N_experiment;
   int<lower=1> N_flux_measurement;
   int<lower=1> N_conc_measurement;
+  int<lower=1> stoichiometric_rank;
   // measurements
   int<lower=1,upper=N_experiment> experiment_yconc[N_conc_measurement];
   int<lower=1,upper=N_balanced+N_unbalanced> metabolite_yconc[N_conc_measurement];
@@ -69,6 +70,8 @@ data {
   real prior_loc_enzyme[N_enzyme, N_experiment];
   real<lower=0> prior_scale_enzyme[N_enzyme, N_experiment];
   vector<lower=0>[N_balanced] balanced_guess;
+  // network properties
+  matrix[N_enzyme, stoichiometric_rank] ln_equilibrium_basis;
   // algebra solver configuration
   real rel_tol;
   real f_tol;
@@ -79,17 +82,24 @@ data {
 transformed data {
   real xr[0];
   int xi[0];
+  int<lower=0> Keq_pos[N_enzyme] = {1,5,11};
 }
 parameters {
   vector<lower=0>[N_kinetic_parameter] kinetic_parameter;
   vector<lower=0>[N_unbalanced] unbalanced[N_experiment];
   vector<lower=0>[N_enzyme] enzyme_concentration[N_experiment];
+  matrix[stoichiometric_rank, 1] basis_contribution;
 }
 transformed parameters {
   vector<lower=0>[N_balanced+N_unbalanced] conc[N_experiment];
   vector[N_reaction] flux[N_experiment];
+  vector[N_kinetic_parameter] updated_kinetic_parameters = kinetic_parameter;
+  matrix[1, N_enzyme] Keq = exp(ln_equilibrium_basis*basis_contribution)';
+  for (k in 1:N_enzyme){
+    updated_kinetic_parameters[Keq_pos[k]] = Keq[1, k];
+  }
   for (e in 1:N_experiment){
-    vector[N_unbalanced+N_enzyme+N_kinetic_parameter] theta = append_row(unbalanced[e], append_row(enzyme_concentration[e], kinetic_parameter));
+    vector[N_unbalanced+N_enzyme+N_kinetic_parameter] theta = append_row(unbalanced[e], append_row(enzyme_concentration[e], updated_kinetic_parameters));
     conc[e, {3,4}] = algebra_solver(steady_state_function, balanced_guess, theta, xr, xi, rel_tol, f_tol, max_steps);
     conc[e, {1,2}] = unbalanced[e];
     flux[e] = get_fluxes(to_array_1d(conc[e]), append_array(to_array_1d(enzyme_concentration[e]), to_array_1d(kinetic_parameter)));

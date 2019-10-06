@@ -97,11 +97,7 @@ def create_stan_program(mi: MaudInput, model_type: str, time_step=0.05) -> str:
         for met_id, met in kinetic_model.metabolites.items()
         if not met.balanced
     ]
-    keq_position = [
-        par_codes[par_id]
-        for par_id in par_codes.keys()
-        if 'Keq' in par_id
-    ]
+    keq_position = [par_codes[par_id] for par_id in par_codes.keys() if "Keq" in par_id]
     fluxes_function = create_fluxes_function(
         kinetic_model, templates["fluxes_function"]
     )
@@ -116,7 +112,9 @@ def create_stan_program(mi: MaudInput, model_type: str, time_step=0.05) -> str:
     )
     if model_type == "inference":
         lower_blocks = templates["inference_model_lower_blocks"].render(
-            balanced_codes=balanced_codes, unbalanced_codes=unbalanced_codes, Keq_position=keq_position
+            balanced_codes=balanced_codes,
+            unbalanced_codes=unbalanced_codes,
+            Keq_position=keq_position,
         )
     else:
         raise ValueError("Model types other than 'inference' are not yet supported.")

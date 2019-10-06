@@ -35,11 +35,16 @@ RELATIVE_PATHS = {
 }
 
 
-def get_full_stoichiometry(kinetic_model, enzyme_codes, metabolite_codes):
+def get_full_stoichiometry(
+    kinetic_model: KineticModel,
+    enzyme_codes: Dict[str, int],
+    metabolite_codes: Dict[str, int],
+):
     """Gets the full stoichiometric matrix for each isoenzyme
 
     :param kinetic_model: A Kinetic Model object
     :param enzyme_codes: the codified enzyme codes
+    :param metabolite_codes: the codified metabolite codes
     """
     S = pd.DataFrame(index=enzyme_codes, columns=metabolite_codes)
     for _, rxn in kinetic_model.reactions.items():
@@ -48,6 +53,7 @@ def get_full_stoichiometry(kinetic_model, enzyme_codes, metabolite_codes):
                 S.loc[enz_id, met] = stoic
     S.fillna(0, inplace=True)
     return S
+
 
 def sample(
     data_path: str,
@@ -127,7 +133,9 @@ def sample(
     reaction_codes = utils.codify(reactions.keys())
     enzyme_codes = utils.codify(enzymes.keys())
     metabolite_codes = utils.codify(metabolites.keys())
-    full_stoic = get_full_stoichiometry(mi.kinetic_model, enzyme_codes, metabolite_codes)
+    full_stoic = get_full_stoichiometry(
+        mi.kinetic_model, enzyme_codes, metabolite_codes
+    )
     flux_nullspace = null_space(np.transpose(np.matrix(full_stoic)))
     flux_nullspace[(flux_nullspace < 10e-10) & (flux_nullspace > -10e-10)] = 0
 
@@ -137,7 +145,7 @@ def sample(
     else:
         wegschneider_mat = null_space(np.transpose(flux_nullspace))
         stoichiometry_rank = np.shape(wegschneider_mat)[1]
-    
+
     input_data = {
         "N_balanced": len(balanced_metabolites),
         "N_unbalanced": len(unbalanced_metabolites),

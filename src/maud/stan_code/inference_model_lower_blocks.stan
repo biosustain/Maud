@@ -44,7 +44,7 @@ parameters {
   vector<lower=0>[N_kinetic_parameter] kinetic_parameter;
   vector<lower=0>[N_unbalanced] unbalanced[N_experiment];
   vector<lower=0>[N_enzyme] enzyme_concentration[N_experiment];
-  matrix[stoichiometric_ranks, 1] basis_contribution;
+  matrix[stoichiometric_rank, 1] basis_contribution;
 }
 transformed parameters {
   vector<lower=0>[N_balanced+N_unbalanced] conc[N_experiment];
