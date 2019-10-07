@@ -17,6 +17,7 @@
 """Code for sampling from a posterior distribution."""
 
 import os
+from typing import Dict
 
 import arviz
 import cmdstanpy
@@ -24,6 +25,7 @@ import numpy as np
 import pandas as pd
 
 from maud import code_generation, io, utils
+from maud.data_model import KineticModel
 from scipy.linalg import null_space as null_space
 
 
@@ -40,7 +42,7 @@ def get_full_stoichiometry(
     enzyme_codes: Dict[str, int],
     metabolite_codes: Dict[str, int],
 ):
-    """Gets the full stoichiometric matrix for each isoenzyme
+    """Get full stoichiometric matrix for each isoenzyme.
 
     :param kinetic_model: A Kinetic Model object
     :param enzyme_codes: the codified enzyme codes
