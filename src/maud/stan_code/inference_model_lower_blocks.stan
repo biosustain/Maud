@@ -2,7 +2,7 @@ data {
   // dimensions
   int<lower=1> N_balanced;    // 'Balanced' metabolites must have constant concentration at steady state
   int<lower=1> N_unbalanced;  // 'Unbalanced' metabolites can have changing concentration at steady state
-  int<lower=1> N_kinetic_parameter;
+  int<lower=1> N_kinetic_parameters;
   int<lower=1> N_reaction;
   int<lower=1> N_enzyme;
   int<lower=1> N_experiment;
@@ -19,8 +19,8 @@ data {
   vector[N_flux_measurement] yflux;
   vector<lower=0>[N_flux_measurement] sigma_flux;
   // hardcoded priors
-  vector[N_kinetic_parameter] prior_loc_kinetic_parameter;
-  vector<lower=0>[N_kinetic_parameter] prior_scale_kinetic_parameter;
+  vector[N_kinetic_parameters] prior_loc_kinetic_parameters;
+  vector<lower=0>[N_kinetic_parameters] prior_scale_kinetic_parameters;
   real prior_loc_unbalanced[N_unbalanced, N_experiment];
   real<lower=0> prior_scale_unbalanced[N_unbalanced, N_experiment];
   real prior_loc_enzyme[N_enzyme, N_experiment];
@@ -41,28 +41,27 @@ transformed data {
   int<lower=0> Keq_pos[N_enzyme] = { {{-Keq_position|join(',')-}} };
 }
 parameters {
-  vector<lower=0>[N_kinetic_parameter] kinetic_parameter;
+  vector<lower=0>[N_kinetic_parameters] kinetic_parameters_raw;
   vector<lower=0>[N_unbalanced] unbalanced[N_experiment];
   vector<lower=0>[N_enzyme] enzyme_concentration[N_experiment];
-  matrix[stoichiometric_rank, 1] basis_contribution;
+  vector[stoichiometric_rank] basis_contribution;
 }
 transformed parameters {
   vector<lower=0>[N_balanced+N_unbalanced] conc[N_experiment];
   vector[N_reaction] flux[N_experiment];
-  vector[N_kinetic_parameter] updated_kinetic_parameters = kinetic_parameter;
-  matrix[1, N_enzyme] Keq = exp(ln_equilibrium_basis*basis_contribution)';
-  for (k in 1:N_enzyme){
-    updated_kinetic_parameters[Keq_pos[k]] = Keq[1, k];
-  }
+  vector[N_kinetic_parameters] kinetic_parameters = kinetic_parameters_raw;
+  vector[N_enzyme] Keq = exp(ln_equilibrium_basis*basis_contribution);
+  kinetic_parameters[Keq_pos] = Keq;
+  
   for (e in 1:N_experiment){
-    vector[N_unbalanced+N_enzyme+N_kinetic_parameter] theta = append_row(unbalanced[e], append_row(enzyme_concentration[e], updated_kinetic_parameters));
+    vector[N_unbalanced+N_enzyme+N_kinetic_parameters] theta = append_row(unbalanced[e], append_row(enzyme_concentration[e], kinetic_parameters));
     conc[e, { {{-balanced_codes|join(',')-}} }] = algebra_solver(steady_state_function, balanced_guess, theta, xr, xi, rel_tol, f_tol, max_steps);
     conc[e, { {{-unbalanced_codes|join(',')-}} }] = unbalanced[e];
-    flux[e] = get_fluxes(to_array_1d(conc[e]), append_array(to_array_1d(enzyme_concentration[e]), to_array_1d(kinetic_parameter)));
+    flux[e] = get_fluxes(to_array_1d(conc[e]), append_array(to_array_1d(enzyme_concentration[e]), to_array_1d(kinetic_parameters)));
   }
 }
 model {
-  kinetic_parameter ~ lognormal(log(prior_loc_kinetic_parameter), prior_scale_kinetic_parameter);
+  kinetic_parameters ~ lognormal(log(prior_loc_kinetic_parameters), prior_scale_kinetic_parameters);
   for (e in 1:N_experiment){
     unbalanced[e] ~ lognormal(log(prior_loc_unbalanced[,e]), prior_scale_unbalanced[,e]);
     enzyme_concentration[e] ~ lognormal(log(prior_loc_enzyme[,e]), prior_scale_enzyme[,e]);

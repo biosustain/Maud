@@ -139,7 +139,6 @@ def sample(
         mi.kinetic_model, enzyme_codes, metabolite_codes
     )
     flux_nullspace = null_space(np.transpose(np.matrix(full_stoic)))
-    flux_nullspace[(flux_nullspace < 10e-10) & (flux_nullspace > -10e-10)] = 0
 
     if not flux_nullspace.any():
         wegschneider_mat = np.identity(len(enzyme_codes))
@@ -151,7 +150,7 @@ def sample(
     input_data = {
         "N_balanced": len(balanced_metabolites),
         "N_unbalanced": len(unbalanced_metabolites),
-        "N_kinetic_parameter": len(kinetic_parameter_priors),
+        "N_kinetic_parameters": len(kinetic_parameter_priors),
         "N_reaction": len(reactions),
         "N_enzyme": len(enzymes),
         "N_experiment": len(mi.experiments),
@@ -174,8 +173,8 @@ def sample(
         ),
         "yflux": reaction_measurements["value"].values,
         "sigma_flux": reaction_measurements["uncertainty"].values,
-        "prior_loc_kinetic_parameter": kinetic_parameter_priors["location"].values,
-        "prior_scale_kinetic_parameter": kinetic_parameter_priors["scale"].values,
+        "prior_loc_kinetic_parameters": kinetic_parameter_priors["location"].values,
+        "prior_scale_kinetic_parameters": kinetic_parameter_priors["scale"].values,
         "prior_loc_unbalanced": prior_loc_unb.values,
         "prior_scale_unbalanced": prior_scale_unb.values,
         "prior_loc_enzyme": prior_loc_enzyme.values,
