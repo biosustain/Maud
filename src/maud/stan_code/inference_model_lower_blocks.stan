@@ -61,7 +61,12 @@ transformed parameters {
   }
 }
 model {
+  matrix[N_enzyme, stoichiometric_rank] Keq_repeat;
+  for (r in 1:stoichiometric_rank){
+    Keq_repeat[,r] = Keq;
+  }
   kinetic_parameters ~ lognormal(log(prior_loc_kinetic_parameters), prior_scale_kinetic_parameters);
+  target += sum(log(fabs(diagonal(ln_equilibrium_basis)))) + sum(ln_equilibrium_basis * basis_contribution);
   for (e in 1:N_experiment){
     unbalanced[e] ~ lognormal(log(prior_loc_unbalanced[,e]), prior_scale_unbalanced[,e]);
     enzyme_concentration[e] ~ lognormal(log(prior_loc_enzyme[,e]), prior_scale_enzyme[,e]);
