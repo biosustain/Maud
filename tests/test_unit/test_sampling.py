@@ -16,12 +16,13 @@ def test_get_input_data():
     expected = {
         "N_balanced": 2,
         "N_unbalanced": 2,
-        "N_kinetic_parameter": 14,
+        "N_kinetic_parameters": 14,
         "N_reaction": 3,
         "N_enzyme": 3,
         "N_experiment": 2,
         "N_flux_measurement": 2,
         "N_conc_measurement": 4,
+        "stoichiometric_rank": 3,
         "experiment_yconc": [1, 1, 2, 2],
         "metabolite_yconc": [3, 4, 3, 4],
         "yconc": [0.8, 1.5, 0.7, 1.4],
@@ -30,7 +31,7 @@ def test_get_input_data():
         "reaction_yflux": [3, 3],
         "yflux": [0.29, 0.21],
         "sigma_flux": [0.1, 0.1],
-        "prior_loc_kinetic_parameter": [
+        "prior_loc_kinetic_parameters": [
             1.0,
             1.0,
             1.0,
@@ -46,7 +47,7 @@ def test_get_input_data():
             1.0,
             1.0,
         ],
-        "prior_scale_kinetic_parameter": [
+        "prior_scale_kinetic_parameters": [
             0.05,
             0.6,
             0.6,
@@ -67,6 +68,7 @@ def test_get_input_data():
         "prior_loc_enzyme": [[1.0, 1.5], [1.0, 1.5], [1.0, 1.5]],
         "prior_scale_enzyme": [[0.05, 0.05], [0.05, 0.05], [0.05, 0.05]],
         "balanced_guess": [1.0, 1.0],
+        "ln_equilibrium_basis": [[1.0, 0.0, 0.0], [0.0, 1.0, 0.0], [0.0, 0.0, 1.0]],
         "rel_tol": 1e-09,
         "f_tol": 1e-06,
         "max_steps": 1000000000,

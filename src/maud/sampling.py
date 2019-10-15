@@ -20,10 +20,11 @@ import os
 from typing import Dict
 
 import cmdstanpy
+import numpy as np
 import pandas as pd
 
 from maud import code_generation, io, utils
-from maud.data_model import KineticModel
+from maud.data_model import KineticModel, MaudInput
 from scipy.linalg import null_space as null_space
 
 
@@ -165,18 +166,19 @@ def get_input_data(
     )
     experiment_codes = utils.codify(mi.experiments.keys())
     reaction_codes = utils.codify(reactions.keys())
-    metabolite_codes = utils.codify(metabolites.keys())
+    enzyme_codes = code_generation.get_enzyme_codes(mi.kinetic_model)
+    metabolite_codes = code_generation.get_metabolite_codes(mi.kinetic_model)
     full_stoic = get_full_stoichiometry(
         mi.kinetic_model, enzyme_codes, metabolite_codes
     )
     flux_nullspace = null_space(np.transpose(np.matrix(full_stoic)))
 
     if not flux_nullspace.any():
-        wegschneider_mat = np.identity(len(enzyme_codes))
+        wegscheider_mat = np.identity(len(enzyme_codes))
         stoichiometry_rank = len(enzyme_codes)
     else:
-        wegschneider_mat = null_space(np.transpose(flux_nullspace))
-        stoichiometry_rank = np.shape(wegschneider_mat)[1]
+        wegscheider_mat = null_space(np.transpose(flux_nullspace))
+        stoichiometry_rank = np.shape(wegscheider_mat)[1]
 
     return {
         "N_balanced": len(balanced_metabolites),
@@ -211,7 +213,7 @@ def get_input_data(
         "prior_loc_enzyme": prior_loc_enzyme.values,
         "prior_scale_enzyme": prior_scale_enzyme.values,
         "balanced_guess": [1.0 for m in range(len(balanced_metabolites))],
-        "ln_equilibrium_basis": wegschneider_mat,
+        "ln_equilibrium_basis": wegscheider_mat,
         "rel_tol": rel_tol,
         "f_tol": f_tol,
         "max_steps": max_steps,
