@@ -1,6 +1,5 @@
 """Unit tests for code generation functions."""
 
-import difflib
 import os
 
 import maud.code_generation as code_generation
@@ -22,8 +21,8 @@ def test_create_stan_program():
         correct_stan_code = open(correct_stan_code_path, "r").read()
         generated_stan_code = code_generation.create_stan_program(mi, model_type)
 
-        diff = difflib.unified_diff(
-            correct_stan_code.strip().splitlines(1),
-            generated_stan_code.strip().splitlines(1),
-        )
-        assert len(list(diff)) == 0
+        correct_lines = correct_stan_code.strip().splitlines(1)
+        generated_lines = generated_stan_code.strip().splitlines(1)
+
+        for i, c in enumerate(correct_lines):
+            assert c == generated_lines[i]

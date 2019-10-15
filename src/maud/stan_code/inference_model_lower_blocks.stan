@@ -67,11 +67,9 @@ transformed parameters {
   vector[N_reaction] flux[N_experiment];
   vector[N_kinetic_parameters] kinetic_parameters;
   vector[N_enzyme] Keq = exp(ln_equilibrium_basis*basis_contribution);
-  real count=1;
   kinetic_parameters[Keq_pos] = Keq;
   kinetic_parameters[not_Keq_pos] = kinetic_parameters_raw;
-  
-  
+
   for (e in 1:N_experiment){
     vector[N_unbalanced+N_enzyme+N_kinetic_parameters] theta = append_row(unbalanced[e], append_row(enzyme_concentration[e], kinetic_parameters));
     conc[e, { {{-balanced_codes|join(',')-}} }] = algebra_solver(steady_state_function, balanced_guess, theta, xr, xi, rel_tol, f_tol, max_steps);

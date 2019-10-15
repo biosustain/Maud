@@ -83,9 +83,25 @@ transformed data {
   real xr[0];
   int xi[0];
   int<lower=0> Keq_pos[N_enzyme] = {1,5,11};
+  int<lower=0> not_Keq_pos[N_kinetic_parameters-N_enzyme];
+  {
+    int current_pos=1;
+    for (i in 1:N_kinetic_parameters){
+      int insert = 1;
+      for (k in Keq_pos){
+        if (i == k){
+          insert = 0;
+        }
+      }
+      if (insert == 1){
+        not_Keq_pos[current_pos] = i;
+        current_pos += 1;
+      }
+    }
+  }
 }
 parameters {
-  vector<lower=0>[N_kinetic_parameters] kinetic_parameters_raw;
+  vector<lower=0>[N_kinetic_parameters-N_enzyme] kinetic_parameters_raw;
   vector<lower=0>[N_unbalanced] unbalanced[N_experiment];
   vector<lower=0>[N_enzyme] enzyme_concentration[N_experiment];
   vector[stoichiometric_rank] basis_contribution;
@@ -93,10 +109,11 @@ parameters {
 transformed parameters {
   vector<lower=0>[N_balanced+N_unbalanced] conc[N_experiment];
   vector[N_reaction] flux[N_experiment];
-  vector[N_kinetic_parameters] kinetic_parameters = kinetic_parameters_raw;
+  vector[N_kinetic_parameters] kinetic_parameters;
   vector[N_enzyme] Keq = exp(ln_equilibrium_basis*basis_contribution);
   kinetic_parameters[Keq_pos] = Keq;
-  
+  kinetic_parameters[not_Keq_pos] = kinetic_parameters_raw;
+
   for (e in 1:N_experiment){
     vector[N_unbalanced+N_enzyme+N_kinetic_parameters] theta = append_row(unbalanced[e], append_row(enzyme_concentration[e], kinetic_parameters));
     conc[e, {3,4}] = algebra_solver(steady_state_function, balanced_guess, theta, xr, xi, rel_tol, f_tol, max_steps);
@@ -105,7 +122,12 @@ transformed parameters {
   }
 }
 model {
+  matrix[N_enzyme, stoichiometric_rank] Keq_repeat;
+  for (r in 1:stoichiometric_rank){
+    Keq_repeat[,r] = Keq;
+  }
   kinetic_parameters ~ lognormal(log(prior_loc_kinetic_parameters), prior_scale_kinetic_parameters);
+  target += sum(log(fabs(singular_values(ln_equilibrium_basis .* Keq_repeat))));
   for (e in 1:N_experiment){
     unbalanced[e] ~ lognormal(log(prior_loc_unbalanced[,e]), prior_scale_unbalanced[,e]);
     enzyme_concentration[e] ~ lognormal(log(prior_loc_enzyme[,e]), prior_scale_enzyme[,e]);
