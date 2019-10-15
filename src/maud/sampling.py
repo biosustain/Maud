@@ -19,9 +19,7 @@
 import os
 from typing import Dict
 
-import arviz
 import cmdstanpy
-import numpy as np
 import pandas as pd
 
 from maud import code_generation, io, utils
@@ -31,7 +29,7 @@ from scipy.linalg import null_space as null_space
 
 RELATIVE_PATHS = {
     "stan_includes": "stan_code",
-    "stan_autogen": "stan_code/autogen",
+    "autogen": "stan_code/autogen",
     "stan_records": "../../data/stan_records",
     "data_out": "../../data/out",
 }
@@ -68,8 +66,8 @@ def sample(
     n_chains: int,
     n_cores: int,
     time_step: float,
-):
-    """Get samples from a posterior distribution.
+) -> cmdstanpy.StanFit:
+    """Sample from a posterior distribution.
 
     :param data_path: A path to a toml file containing input data
     :param f_tol: Sets algebra solver's f_tol control parameter
@@ -89,8 +87,43 @@ def sample(
     here = os.path.dirname(os.path.abspath(__file__))
     paths = {k: os.path.join(here, v) for k, v in RELATIVE_PATHS.items()}
 
-    # define input data
     mi = io.load_maud_input_from_toml(data_path)
+
+    input_data = get_input_data(mi, f_tol, rel_tol, max_steps, likelihood)
+    input_file = os.path.join(paths["stan_records"], f"input_data_{model_name}.json")
+    cmdstanpy.utils.jsondump(input_file, input_data)
+
+    stan_file = os.path.join(paths["autogen"], f"inference_model_{model_name}.stan")
+    stan_code = code_generation.create_stan_program(mi, "inference", time_step)
+    no_exe_file = not os.path.exists(stan_file[:-5])
+    change_in_stan_code = not utils.match_string_to_file(stan_code, stan_file)
+    need_to_overwrite = no_exe_file or change_in_stan_code
+    model = cmdstanpy.Model(stan_file=stan_file)
+    model.compile(include_paths=[paths["stan_includes"]], overwrite=need_to_overwrite)
+
+    return model.sample(
+        data=input_file,
+        cores=4,
+        chains=n_chains,
+        csv_basename=os.path.join(paths["data_out"], f"output_{model_name}.csv"),
+        sampling_iters=n_samples,
+        warmup_iters=n_warmup,
+        max_treedepth=15,
+        save_warmup=True,
+    )
+
+
+def get_input_data(
+    mi: MaudInput, f_tol: float, rel_tol: float, max_steps: int, likelihood: int
+) -> dict:
+    """Put a MaudInput and some config numbers into a Stan-friendly dictionary.
+
+    :param mi: a MaudInput object
+    :param f_tol: Sets algebra solver's f_tol control parameter
+    :param rel_tol: Sets algebra solver's rel_tol control parameter
+    :param max_steps: Sets algebra solver's max_steps control parameter
+    :param likelihood: Set to zero if you don't want the model to include information
+    """
     prior_df = pd.DataFrame.from_records(
         [
             [p.id, p.experiment_id, p.target_id, p.location, p.scale, p.target_type]
@@ -130,10 +163,8 @@ def sample(
         )
         for measurement_type in ["metabolite", "reaction"]
     )
-    # stan codes
     experiment_codes = utils.codify(mi.experiments.keys())
     reaction_codes = utils.codify(reactions.keys())
-    enzyme_codes = utils.codify(enzymes.keys())
     metabolite_codes = utils.codify(metabolites.keys())
     full_stoic = get_full_stoichiometry(
         mi.kinetic_model, enzyme_codes, metabolite_codes
@@ -147,7 +178,7 @@ def sample(
         wegschneider_mat = null_space(np.transpose(flux_nullspace))
         stoichiometry_rank = np.shape(wegschneider_mat)[1]
 
-    input_data = {
+    return {
         "N_balanced": len(balanced_metabolites),
         "N_unbalanced": len(unbalanced_metabolites),
         "N_kinetic_parameters": len(kinetic_parameter_priors),
@@ -186,86 +217,3 @@ def sample(
         "max_steps": max_steps,
         "LIKELIHOOD": likelihood,
     }
-
-    # dump input data
-    input_file = os.path.join(paths["stan_records"], f"input_data_{model_name}.json")
-    cmdstanpy.utils.jsondump(input_file, input_data)
-
-    # compile model if necessary
-    stan_code = code_generation.create_stan_program(mi, "inference", time_step)
-    stan_file = os.path.join(
-        paths["stan_autogen"], f"inference_model_{model_name}.stan"
-    )
-    exe_file = stan_file[:-5]
-    no_need_to_compile = os.path.exists(exe_file) and utils.match_string_to_file(
-        stan_code, stan_file
-    )
-    if no_need_to_compile:
-        model = cmdstanpy.Model(stan_file=stan_file, exe_file=exe_file)
-    else:
-        with open(stan_file, "w") as f:
-            f.write(stan_code)
-        model = cmdstanpy.Model(stan_file)
-        model.compile(include_paths=[paths["stan_includes"]], overwrite=True)
-
-    # draw samples
-    csv_output_file = os.path.join(paths["data_out"], f"output_{model_name}.csv")
-
-    fit = model.sample(
-        data=input_file,
-        cores=4,
-        chains=n_chains,
-        csv_basename=csv_output_file,
-        sampling_iters=n_samples,
-        warmup_iters=n_warmup,
-        max_treedepth=15,
-        adapt_delta=0.8,
-        save_warmup=True,
-        inits={
-            "kinetic_parameter": np.exp(kinetic_parameter_priors["location"]).T.values,
-            "unbalanced": np.exp(prior_loc_unb).T.values,
-            "enzyme_concentration": np.exp(prior_loc_enzyme).T.values,
-        },
-    )
-
-    infd_posterior = arviz.from_cmdstanpy(
-        posterior=fit,
-        posterior_predictive=["yflux_sim", "yconc_sim"],
-        observed_data={
-            "yflux_sim": input_data["yflux"],
-            "yconc_sim": input_data["yconc"],
-        },
-        coords={
-            "reactions": list(reaction_codes.keys()),
-            "metabolites": list(metabolite_codes.keys()),
-            "experiments": list(experiment_codes.keys()),
-            "enzymes": list(enzyme_codes.keys()),
-            "kinetic_parameter_names": kinetic_parameter_priors["id"].tolist(),
-            "reaction_measurements": [
-                str(experiment_codes[row["experiment_id"]])
-                + "_"
-                + str(reaction_codes[row["target_id"]])
-                for _, row in reaction_measurements.iterrows()
-            ],
-            "metabolite_measurements": [
-                str(experiment_codes[row["experiment_id"]])
-                + "_"
-                + str(metabolite_codes[row["target_id"]])
-                for _, row in metabolite_measurements.iterrows()
-            ],
-        },
-        dims={
-            "conc": ["experiments", "metabolites"],
-            "flux": ["experiments", "reactions"],
-            "kinetic_parameter": ["kinetic_parameter_names"],
-            "enzyme_concentration": ["experiments", "enzymes"],
-            "yconc_sim": ["metabolite_measurements"],
-            "yflux_sim": ["reaction_measurements"],
-        },
-    )
-
-    infd_posterior.to_netcdf(
-        os.path.join(paths["data_out"], f"model_inference_{model_name}.nc")
-    )
-
-    return fit
