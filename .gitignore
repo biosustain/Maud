@@ -15,8 +15,13 @@ data/in/*
 data/out/*
 !data/out/readme.md
 
-maud/stan_code/autogen/*
-!maud/stan_code/autogen/readme.md
+src/maud/stan_code/autogen/*
+!src/maud/stan_code/autogen/readme.md
 
 *.DS_Store
 *#
+
+.tox
+venv
+src/maud.egg-info
+pip-wheel-metadata
