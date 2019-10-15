@@ -99,6 +99,9 @@ def sample(
     no_exe_file = not os.path.exists(stan_file[:-5])
     change_in_stan_code = not utils.match_string_to_file(stan_code, stan_file)
     need_to_overwrite = no_exe_file or change_in_stan_code
+    if need_to_overwrite:
+        with open(stan_file, "w") as f:
+            f.write(stan_code)
     model = cmdstanpy.Model(stan_file=stan_file)
     model.compile(include_paths=[paths["stan_includes"]], overwrite=need_to_overwrite)
 
