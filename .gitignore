@@ -24,3 +24,8 @@ docs/_templates/*
 
 *.DS_Store
 *#
+
+.tox
+venv
+src/maud.egg-info
+pip-wheel-metadata

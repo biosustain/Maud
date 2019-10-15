@@ -17,12 +17,15 @@
 """Code for sampling from a posterior distribution."""
 
 import os
+from typing import Dict
 
 import cmdstanpy
+import numpy as np
 import pandas as pd
 
 from maud import code_generation, io, utils
-from maud.data_model import MaudInput
+from maud.data_model import KineticModel, MaudInput
+from scipy.linalg import null_space as null_space
 
 
 RELATIVE_PATHS = {
@@ -31,6 +34,26 @@ RELATIVE_PATHS = {
     "stan_records": "../../data/stan_records",
     "data_out": "../../data/out",
 }
+
+
+def get_full_stoichiometry(
+    kinetic_model: KineticModel,
+    enzyme_codes: Dict[str, int],
+    metabolite_codes: Dict[str, int],
+):
+    """Get full stoichiometric matrix for each isoenzyme.
+
+    :param kinetic_model: A Kinetic Model object
+    :param enzyme_codes: the codified enzyme codes
+    :param metabolite_codes: the codified metabolite codes
+    """
+    S = pd.DataFrame(index=enzyme_codes, columns=metabolite_codes)
+    for _, rxn in kinetic_model.reactions.items():
+        for enz_id, _ in rxn.enzymes.items():
+            for met, stoic in rxn.stoichiometry.items():
+                S.loc[enz_id, met] = stoic
+    S.fillna(0, inplace=True)
+    return S
 
 
 def sample(
@@ -143,16 +166,30 @@ def get_input_data(
     )
     experiment_codes = utils.codify(mi.experiments.keys())
     reaction_codes = utils.codify(reactions.keys())
-    metabolite_codes = utils.codify(metabolites.keys())
+    enzyme_codes = code_generation.get_enzyme_codes(mi.kinetic_model)
+    metabolite_codes = code_generation.get_metabolite_codes(mi.kinetic_model)
+    full_stoic = get_full_stoichiometry(
+        mi.kinetic_model, enzyme_codes, metabolite_codes
+    )
+    flux_nullspace = null_space(np.transpose(np.matrix(full_stoic)))
+
+    if not flux_nullspace.any():
+        wegscheider_mat = np.identity(len(enzyme_codes))
+        stoichiometry_rank = len(enzyme_codes)
+    else:
+        wegscheider_mat = null_space(np.transpose(flux_nullspace))
+        stoichiometry_rank = np.shape(wegscheider_mat)[1]
+
     return {
         "N_balanced": len(balanced_metabolites),
         "N_unbalanced": len(unbalanced_metabolites),
-        "N_kinetic_parameter": len(kinetic_parameter_priors),
+        "N_kinetic_parameters": len(kinetic_parameter_priors),
         "N_reaction": len(reactions),
         "N_enzyme": len(enzymes),
         "N_experiment": len(mi.experiments),
         "N_flux_measurement": len(reaction_measurements),
         "N_conc_measurement": len(metabolite_measurements),
+        "stoichiometric_rank": stoichiometry_rank,
         "experiment_yconc": (
             metabolite_measurements["experiment_id"].map(experiment_codes).values
         ),
@@ -169,13 +206,14 @@ def get_input_data(
         ),
         "yflux": reaction_measurements["value"].values,
         "sigma_flux": reaction_measurements["uncertainty"].values,
-        "prior_loc_kinetic_parameter": kinetic_parameter_priors["location"].values,
-        "prior_scale_kinetic_parameter": kinetic_parameter_priors["scale"].values,
+        "prior_loc_kinetic_parameters": kinetic_parameter_priors["location"].values,
+        "prior_scale_kinetic_parameters": kinetic_parameter_priors["scale"].values,
         "prior_loc_unbalanced": prior_loc_unb.values,
         "prior_scale_unbalanced": prior_scale_unb.values,
         "prior_loc_enzyme": prior_loc_enzyme.values,
         "prior_scale_enzyme": prior_scale_enzyme.values,
         "balanced_guess": [1.0 for m in range(len(balanced_metabolites))],
+        "ln_equilibrium_basis": wegscheider_mat,
         "rel_tol": rel_tol,
         "f_tol": f_tol,
         "max_steps": max_steps,

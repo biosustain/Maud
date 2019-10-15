@@ -19,8 +19,9 @@
 """Set up the Maud package."""
 
 
-import versioneer
 from setuptools import setup
+
+import versioneer
 
 
 # All other arguments are defined in `setup.cfg`.
