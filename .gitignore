@@ -18,6 +18,10 @@ data/out/*
 src/maud/stan_code/autogen/*
 !src/maud/stan_code/autogen/readme.md
 
+docs/_build/*
+docs/_static/*
+docs/_templates/*
+
 *.DS_Store
 *#
 
