@@ -46,28 +46,28 @@ MECHANISM_TEMPLATES = {
         "ordered_unibi(m[{{S0}}],m[{{P0}}],m[{{P1}}],"
         "p[{{enz}}]*p[{{Kcat1}}],p[{{enz}}]*p[{{Kcat2}}],"
         "p[{{Ka}}],p[{{Kp}}],p[{{Kq}}],"
-        "p[{{Kia}}],p[{{Kip}}],p[{{Kiq}}],"
+        "p[{{Kia}}],{{enz_id}}_Kip,{{enz_id}}_Kiq],"
         "p[{{Keq}}])"
     ),
     "ordered_bibi": Template(
         "ordered_bibi(m[{{S0}}],m[{{S1}}],m[{{P0}}],m[{{P1}}],"
         "p[{{enz}}]*p[{{Kcat1}}],p[{{enz}}]*p[{{Kcat2}}],"
         "p[{{Ka}}],p[{{Kb}}],p[{{Kp}}],p[{{Kq}}],"
-        "p[{{Kia}}],p[{{Kib}}],p[{{Kip}}],p[{{Kiq}}],"
+        "{{enz_id}}_Kia,p[{{Kib}}],{{enz_id}}_Kip,p[{{Kiq}}],"
         "p[{{Keq}}])"
     ),
     "pingpong": Template(
         "pingpong(m[{{S0}}],m[{{S1}}],m[{{P0}}],m[{{P1}}],"
         "p[{{enz}}]*p[{{Kcat1}}],p[{{enz}}]*p[{{Kcat2}}],"
         "p[{{Ka}}],p[{{Kb}}],p[{{Kp}}],p[{{Kq}}],"
-        "p[{{Kia}}],p[{{Kib}}],p[{{Kip}}],p[{{Kiq}}],"
+        "p[{{Kia}}],p[{{Kib}}],{{enz_id}}_Kip,p[{{Kiq}}],"
         "p[{{Keq}}])"
     ),
     "ordered_terbi": Template(
         "ordered_terbi(m[{{S0}}],m[{{S1}}],m[{{S2}}],m[{{P0}}],m[{{P1}}],"
         "p[{{enz}}]*p[{{Kcat1}}],p[{{enz}}]*p[{{Kcat2}}],"
-        "p[{{Ka}}],p[{{Kb}}],p[{{Kc}}],p[{{Kp}}],p[{{Kq}}],"
-        "p[{{Kia}}],p[{{Kib}}],p[{{Kic}}],p[{{Kip}}],p[{{Kiq}}],"
+        "p[{{Ka}}],p[{{Kb}}],p[{{Kc}}],{{enz_id}}_Kp,p[{{Kq}}],"
+        "p[{{Kia}}],p[{{Kib}}],p[{{Kic}}],{{enz_id}}_Kip,p[{{Kiq}}],"
         "p[{{Keq}}])"
     ),
     "modular_rate_law": Template("modular_rate_law({{Tr}},{{Dr}})"),
@@ -193,8 +193,8 @@ def create_steady_state_function(
 def create_Kip_ordered_unibi_line(param_codes: dict, rxn_id: str) -> str:
     """Generate Kip for mechanism ordered_unibi using the Haldane relationship."""
     template = Template(
-        "real {{rxn_id}}_Kip = get_Kip_ordered_unibi({{Keq}}, {{Ka}}, {{Kp}}, "
-        "{{Kcat1}}, {{Kcat2}});"
+        "real {{rxn_id}}_Kip = get_Kip_ordered_unibi(p[{{Keq}}], p[{{Ka}}], p[{{Kp}}], "
+        "p[{{Kcat1}}], p[{{Kcat2}}]);"
     )
     return template.render(
         rxn_id=rxn_id,
@@ -209,8 +209,8 @@ def create_Kip_ordered_unibi_line(param_codes: dict, rxn_id: str) -> str:
 def create_Kiq_ordered_unibi_line(param_codes: dict, rxn_id: str) -> str:
     """Generate Kiq for mechanism ordered_unibi using the Haldane relationship."""
     template = Template(
-        "real {{rxn_id}}_Kiq = get_Kiq_ordered_unibi({{Keq}}, {{Ka}}, {{Kp}}, "
-        "{{Kcat1}}, {{Kcat2}});"
+        "real {{rxn_id}}_Kiq = get_Kiq_ordered_unibi(p[{{Keq}}], p[{{Ka}}], p[{{Kp}}], "
+        "p[{{Kcat1}}], p[{{Kcat2}}]);"
     )
     return template.render(
         rxn_id=rxn_id,
@@ -225,13 +225,13 @@ def create_Kiq_ordered_unibi_line(param_codes: dict, rxn_id: str) -> str:
 def create_Kia_ordered_bibi_line(param_codes: dict, rxn_id: str) -> str:
     """Generate Kia for mechanism ordered_bibi using the Haldane relationship."""
     template = Template(
-        "real {{rxn_id}}_Kia = get_Kiq_ordered_unibi({{Keq}}, {{Ka}}, {{Kq}}, "
-        "{{Kib}}, {{V1}}, {{V2}});"
+        "real {{rxn_id}}_Kia = get_Kia_ordered_bibi(p[{{Keq}}], p[{{Ka}}], p[{{Kq}}], "
+        "p[{{Kib}}], p[{{Kcat1}}], p[{{Kcat2}}]);"
     )
     return template.render(
         rxn_id=rxn_id,
         Keq=param_codes[rxn_id + "_" + "Keq"],
-        Ka=param_codes[rxn_id + "_" + "Kia"],
+        Ka=param_codes[rxn_id + "_" + "Ka"],
         Kq=param_codes[rxn_id + "_" + "Kq"],
         Kib=param_codes[rxn_id + "_" + "Kib"],
         Kcat1=param_codes[rxn_id + "_" + "Kcat1"],
@@ -242,8 +242,8 @@ def create_Kia_ordered_bibi_line(param_codes: dict, rxn_id: str) -> str:
 def create_Kip_ordered_bibi_line(param_codes: dict, rxn_id: str) -> str:
     """Generate Kip for mechanism ordered_bibi using the Haldane relationship."""
     template = Template(
-        "real {{rxn_id}}_Kia = get_Kiq_ordered_unibi({{Keq}}, {{Kb}}, {{Kp}}, "
-        "{{Kiq}}, {{V1}}, {{V2}});"
+        "real {{rxn_id}}_Kip = get_Kip_ordered_bibi(p[{{Keq}}], p[{{Kb}}], p[{{Kp}}], "
+        "p[{{Kiq}}], p[{{Kcat1}}], p[{{Kcat2}}]);"
     )
     return template.render(
         rxn_id=rxn_id,
@@ -259,8 +259,8 @@ def create_Kip_ordered_bibi_line(param_codes: dict, rxn_id: str) -> str:
 def create_Kip_pingpong_line(param_codes: dict, rxn_id: str) -> str:
     """Generate Kip for mechanism pingpong using the Haldane relationship."""
     template = Template(
-        "real {{rxn_id}}_Kia = get_Kiq_ordered_unibi({{Keq}}, {{Ka}}, {{Kb}}, {{Kq}},"
-        " {{V1}}, {{V2}});"
+        "real {{rxn_id}}_Kip = get_Kip_pingpong({{Keq}}, {{Ka}}, {{Kb}}, {{Kq}},"
+        " {{Kcat1}}, {{Kcat2}});"
     )
     return template.render(
         rxn_id=rxn_id,
@@ -276,8 +276,8 @@ def create_Kip_pingpong_line(param_codes: dict, rxn_id: str) -> str:
 def create_Kip_ordered_terbi_line(param_codes: dict, rxn_id: str) -> str:
     """Generate Kip for mechanism ordered_terbi using the Haldane relationship."""
     template = Template(
-        "real {{rxn_id}}_Kia = get_Kiq_ordered_unibi({{Keq}}, {{Kc}}, {{Kia}}, "
-        "{{Kib}}, {{Kiq}}, {{V2}}, {{V2}});"
+        "real {{rxn_id}}_Kip = get_Kip_ordered_terbi({{Keq}}, {{Kc}}, {{Kia}}, "
+        "{{Kib}}, {{Kiq}}, {{Kcat1}}, {{Kcat2}});"
     )
     return template.render(
         rxn_id=rxn_id,
@@ -294,7 +294,7 @@ def create_Kip_ordered_terbi_line(param_codes: dict, rxn_id: str) -> str:
 def create_Kp_ordered_terbi_line(param_codes: dict, rxn_id: str) -> str:
     """Generate Kp for mechanism ordered_terbi using the Haldane relationship."""
     template = Template(
-        "real {{rxn_id}}_Kia = get_Kiq_ordered_unibi({{Keq}}, {{Kia}}, {{Kib}}, "
+        "real {{rxn_id}}_Kp = get_Kiq_ordered_terbi({{Keq}}, {{Kia}}, {{Kib}}, "
         "{{Kic}}, {{Kiq}});"
     )
     return template.render(
@@ -341,7 +341,7 @@ def create_fluxes_function(kinetic_model: KineticModel, template: Template) -> s
         for enz_id, enz in rxn.enzymes.items():
             # make haldane relationship lines if necessary
             if enz.mechanism in mechanism_to_haldane_functions.keys():
-                haldane_functions = mechanism_to_haldane_functions[rxn.mechanism]
+                haldane_functions = mechanism_to_haldane_functions[enz.mechanism]
                 for haldane_function in haldane_functions:
                     haldane_line = haldane_function(par_codes_in_enz_context, enz.id)
                     haldane_lines.append(haldane_line)
@@ -390,6 +390,7 @@ def create_fluxes_function(kinetic_model: KineticModel, template: Template) -> s
                     **product_codes,
                     **{"enz": enz_code},
                     **enz_param_codes,
+                    "enz_id": enz_id,
                 }
 
             catalytic_string = MECHANISM_TEMPLATES[enz.mechanism].render(mechanism_args)
