@@ -42,8 +42,8 @@ from maud.data_model import (
 MECHANISM_TO_PARAM_IDS = {
     "uniuni": ["Keq", "Kcat1", "Kcat2", "Ka"],
     "ordered_unibi": ["Keq", "Kcat1", "Kcat2", "Ka", "Kp", "Kq", "Kia"],
-    "ordered_bibi": ["Keq", "Kcat1", "Kcat2", "Ka", "Kb", "Kp", "Kq", "Kib", "Kia"],
-    "ping_pong": ["Keq", "Kcat1", "Kcat2", "Ka", "Kb", "Kp", "Kq", "Kib", "Kia", "Kiq"],
+    "ordered_bibi": ["Keq", "Kcat1", "Kcat2", "Ka", "Kb", "Kp", "Kq", "Kib", "Kiq"],
+    "ping_pong": ["Keq", "Kcat1", "Kcat2", "Ka", "Kb", "Kp", "Kq", "Kia", "Kib", "Kiq"],
     "ordered_terbi": [
         "Keq",
         "Kcat1",
