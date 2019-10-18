@@ -410,7 +410,6 @@ def create_fluxes_function(kinetic_model: KineticModel, template: Template) -> s
                 }
 
             catalytic_string = MECHANISM_TEMPLATES[enz.mechanism].render(mechanism_args)
-            print(catalytic_string)
             if any(enz.modifiers):
                 # make free enzyme ratio line
                 free_enzyme_ratio_line = Template(
