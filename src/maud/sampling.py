@@ -147,9 +147,14 @@ def get_input_data(
     enzymes = {k: v for r in reactions.values() for k, v in r.enzymes.items()}
     balanced_metabolites = {k: v for k, v in metabolites.items() if v.balanced}
     unbalanced_metabolites = {k: v for k, v in metabolites.items() if not v.balanced}
-    unbalanced_metabolite_priors, kinetic_parameter_priors, enzyme_priors = (
+    unbalanced_metabolite_priors, kinetic_parameter_priors, dg_priors, enzyme_priors = (
         prior_df.loc[lambda df: df["target_type"] == target_type]
-        for target_type in ["unbalanced_metabolite", "kinetic_parameter", "enzyme"]
+        for target_type in [
+            "unbalanced_metabolite",
+            "kinetic_parameter",
+            "thermodynamic_parameter",
+            "enzyme",
+        ]
     )
     prior_loc_unb, prior_loc_enzyme, prior_scale_unb, prior_scale_enzyme = (
         df.set_index(["target_id", "experiment_id"])[col].unstack()
@@ -176,12 +181,12 @@ def get_input_data(
     )
     flux_nullspace = null_space(np.transpose(np.matrix(full_stoic)))
 
-    if not flux_nullspace.any():
-        wegscheider_mat = np.identity(len(enzyme_codes))
-        stoichiometry_rank = len(enzyme_codes)
-    else:
+    if flux_nullspace.any():
         wegscheider_mat = null_space(np.transpose(flux_nullspace))
         stoichiometry_rank = np.shape(wegscheider_mat)[1]
+    else:
+        wegscheider_mat = np.identity(len(enzyme_codes))
+        stoichiometry_rank = len(enzyme_codes)
 
     return {
         "N_balanced": len(balanced_metabolites),
@@ -209,16 +214,18 @@ def get_input_data(
         ),
         "yflux": reaction_measurements["value"].values,
         "sigma_flux": reaction_measurements["uncertainty"].values,
+        "prior_loc_delta_g": dg_priors["location"].values,
+        "prior_scale_delta_g": dg_priors["scale"].values,
         "prior_loc_kinetic_parameters": kinetic_parameter_priors["location"].values,
         "prior_scale_kinetic_parameters": kinetic_parameter_priors["scale"].values,
         "prior_loc_unbalanced": prior_loc_unb.values,
         "prior_scale_unbalanced": prior_scale_unb.values,
         "prior_loc_enzyme": prior_loc_enzyme.values,
         "prior_scale_enzyme": prior_scale_enzyme.values,
-        "balanced_guess": [1.0 for m in range(len(balanced_metabolites))],
-        "ln_equilibrium_basis": wegscheider_mat,
-        "rel_tol": rel_tol,
-        "f_tol": f_tol,
-        "max_steps": max_steps,
+        "as_guess": [1.0 for m in range(len(balanced_metabolites))],
+        "delta_g_kernel": wegscheider_mat,
+        "rtol": rel_tol,
+        "ftol": f_tol,
+        "steps": max_steps,
         "LIKELIHOOD": likelihood,
     }
