@@ -12,7 +12,7 @@ vector steady_state_function(vector balanced, vector theta, real[] xr, int[] xi)
     conc,
     initial_time,
     rep_array(time_step, 1),
-    to_array_1d(theta[N_unbalanced+1:]),
+    to_array_1d(theta),
     xr,
     rep_array(0, 1),
     1e-8, 1e-8, 1e5

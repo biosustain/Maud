@@ -82,13 +82,11 @@ reaction_measurements = [
 ###### Priors ######
 [priors.kinetic_parameters]
 r1 = [
-  { target_id = 'Keq', location = 1, scale = 0.05},
   { target_id = 'Kcat1', location = 1, scale = 0.6},
   { target_id = 'Kcat2', location = 1, scale = 0.6},
   { target_id = 'Ka', location = 1, scale = 0.6},
 ]
 r2 = [
-  { target_id = 'Keq', location = 1.1, scale = 0.5},
   { target_id = 'Kcat1', location = 1, scale = 0.6},
   { target_id = 'Kcat2', location = 1, scale = 0.6},
   { target_id = 'Ka', location = 1, scale = 0.6},
@@ -96,10 +94,16 @@ r2 = [
   { target_id = 'transfer_constant', location= 1, scale = 0.6},
 ]
 r3 = [
-  { target_id = 'Keq', location = 1, scale = 0.05},
   { target_id = 'Kcat1', location = 1, scale = 0.6},
   { target_id = 'Kcat2', location = 1, scale = 0.6},
   { target_id = 'Ka', location = 1, scale = 0.6},
+]
+
+[priors.thermodynamic_parameters]
+marginal_dgs = [
+  { target_id = 'r1', location = 0, scale = 0.05},
+  { target_id = 'r2', location = 1, scale = 0.5},
+  { target_id = 'r3', location = 0, scale = 0.05},
 ]
 
 [priors.unbalanced_metabolites]
@@ -111,6 +115,7 @@ condition_2 = [
   {target_id='M1_ex', location=2, scale=0.05},
   {target_id='M2_ex', location=1, scale=0.05},
 ]
+
 [priors.enzymes]
 condition_1 = [
   {target_id='r1', location=1, scale=0.05},
