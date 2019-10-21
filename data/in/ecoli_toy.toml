@@ -1,10 +1,15 @@
+[[compartments]]
+id = "c"
+name = "cytosol"
+volume = 1
+
 [[reactions]]
 id = "PGI"
 name = "Glucose-6-phosphate isomerase"
 [[reactions.enzymes]]
 id = "PGI"
 name = "Glucose-6-phosphate isomerase"
-mechanism = "MECHANISM"
+mechanism = "modular_rate_law"
 
 
 [reactions.stoichiometry]
@@ -16,7 +21,7 @@ name = "Fructose-bisphosphatase"
 [[reactions.enzymes]]
 id = "FBP"
 name = "Fructose-bisphosphatase"
-mechanism = "MECHANISM"
+mechanism = "modular_rate_law"
 
 
 [reactions.stoichiometry]
@@ -28,7 +33,7 @@ name = "Fructose-bisphosphate aldolase"
 [[reactions.enzymes]]
 id = "FBA"
 name = "Fructose-bisphosphate aldolase"
-mechanism = "MECHANISM"
+mechanism = "modular_rate_law"
 
 
 [reactions.stoichiometry]
@@ -41,7 +46,7 @@ name = "Triose-phosphate isomerase"
 [[reactions.enzymes]]
 id = "TPI"
 name = "Triose-phosphate isomerase"
-mechanism = "MECHANISM"
+mechanism = "modular_rate_law"
 
 
 [reactions.stoichiometry]
@@ -53,7 +58,7 @@ name = "Glyceraldehyde-3-phosphate dehydrogenase"
 [[reactions.enzymes]]
 id = "GAPD"
 name = "Glyceraldehyde-3-phosphate dehydrogenase"
-mechanism = "MECHANISM"
+mechanism = "modular_rate_law"
 
 
 [reactions.stoichiometry]
@@ -67,7 +72,7 @@ name = "Phosphoglycerate kinase"
 [[reactions.enzymes]]
 id = "PGK"
 name = "Phosphoglycerate kinase"
-mechanism = "MECHANISM"
+mechanism = "modular_rate_law"
 
 
 [reactions.stoichiometry]
@@ -81,7 +86,7 @@ name = "Phosphoglycerate mutase"
 [[reactions.enzymes]]
 id = "PGM"
 name = "Phosphoglycerate mutase"
-mechanism = "MECHANISM"
+mechanism = "modular_rate_law"
 
 
 [reactions.stoichiometry]
@@ -93,7 +98,7 @@ name = "Enolase"
 [[reactions.enzymes]]
 id = "ENO"
 name = "Enolase"
-mechanism = "MECHANISM"
+mechanism = "modular_rate_law"
 
 
 [reactions.stoichiometry]
@@ -105,7 +110,7 @@ name = "Glucose 6-phosphate dehydrogenase"
 [[reactions.enzymes]]
 id = "G6PDH2r"
 name = "Glucose 6-phosphate dehydrogenase"
-mechanism = "MECHANISM"
+mechanism = "modular_rate_law"
 
 
 [reactions.stoichiometry]
@@ -119,7 +124,7 @@ name = "6-phosphogluconolactonase"
 [[reactions.enzymes]]
 id = "PGL"
 name = "6-phosphogluconolactonase"
-mechanism = "MECHANISM"
+mechanism = "modular_rate_law"
 
 
 [reactions.stoichiometry]
@@ -131,7 +136,7 @@ name = "Phosphogluconate dehydrogenase"
 [[reactions.enzymes]]
 id = "GND"
 name = "Phosphogluconate dehydrogenase"
-mechanism = "MECHANISM"
+mechanism = "modular_rate_law"
 
 
 [reactions.stoichiometry]
@@ -146,7 +151,7 @@ name = "Ribose-5-phosphate isomerase"
 [[reactions.enzymes]]
 id = "RPI"
 name = "Ribose-5-phosphate isomerase"
-mechanism = "MECHANISM"
+mechanism = "modular_rate_law"
 
 
 [reactions.stoichiometry]
@@ -158,7 +163,7 @@ name = "Ribulose 5-phosphate 3-epimerase"
 [[reactions.enzymes]]
 id = "RPE"
 name = "Ribulose 5-phosphate 3-epimerase"
-mechanism = "MECHANISM"
+mechanism = "modular_rate_law"
 
 
 [reactions.stoichiometry]
@@ -170,7 +175,7 @@ name = "Transketolase"
 [[reactions.enzymes]]
 id = "TKT1"
 name = "Transketolase"
-mechanism = "MECHANISM"
+mechanism = "modular_rate_law"
 
 
 [reactions.stoichiometry]
@@ -184,7 +189,7 @@ name = "Transketolase"
 [[reactions.enzymes]]
 id = "TKT2"
 name = "Transketolase"
-mechanism = "MECHANISM"
+mechanism = "modular_rate_law"
 
 
 [reactions.stoichiometry]
@@ -198,7 +203,7 @@ name = "Transaldolase"
 [[reactions.enzymes]]
 id = "TALA"
 name = "Transaldolase"
-mechanism = "MECHANISM"
+mechanism = "modular_rate_law"
 
 
 [reactions.stoichiometry]
@@ -212,7 +217,7 @@ name = "6-phosphogluconate dehydratase"
 [[reactions.enzymes]]
 id = "EDD"
 name = "6-phosphogluconate dehydratase"
-mechanism = "MECHANISM"
+mechanism = "modular_rate_law"
 
 
 [reactions.stoichiometry]
@@ -224,97 +229,13 @@ name = "2-dehydro-3-deoxy-phosphogluconate aldolase"
 [[reactions.enzymes]]
 id = "EDA"
 name = "2-dehydro-3-deoxy-phosphogluconate aldolase"
-mechanism = "MECHANISM"
+mechanism = "modular_rate_law"
 
 
 [reactions.stoichiometry]
 2ddg6p_c = -1
 g3p_c = 1
 pyr_c = 1
-[[metabolites]]
-id = "g6p_c"
-name = "D-Glucose 6-phosphate"
-balanced = false
-compartment = "cytosol"
-
-[[metabolites]]
-id = "atp_c"
-name = "ATP C10H12N5O13P3"
-balanced = false
-compartment = "cytosol"
-
-[[metabolites]]
-id = "co2_c"
-name = "CO2 CO2"
-balanced = false
-compartment = "cytosol"
-
-[[metabolites]]
-id = "s7p_c"
-name = "Sedoheptulose 7-phosphate"
-balanced = false
-compartment = "cytosol"
-
-[[metabolites]]
-id = "xu5p__D_c"
-name = "D-Xylulose 5-phosphate"
-balanced = false
-compartment = "cytosol"
-
-[[metabolites]]
-id = "r5p_c"
-name = "Alpha-D-Ribose 5-phosphate"
-balanced = false
-compartment = "cytosol"
-
-[[metabolites]]
-id = "pep_c"
-name = "Phosphoenolpyruvate"
-balanced = false
-compartment = "cytosol"
-
-[[metabolites]]
-id = "e4p_c"
-name = "D-Erythrose 4-phosphate"
-balanced = false
-compartment = "cytosol"
-
-[[metabolites]]
-id = "2ddg6p_c"
-name = "2-Dehydro-3-deoxy-D-gluconate 6-phosphate"
-balanced = false
-compartment = "cytosol"
-
-[[metabolites]]
-id = "2pg_c"
-name = "D-Glycerate 2-phosphate"
-balanced = false
-compartment = "cytosol"
-
-[[metabolites]]
-id = "nadp_c"
-name = "Nicotinamide adenine dinucleotide phosphate"
-balanced = false
-compartment = "cytosol"
-
-[[metabolites]]
-id = "adp_c"
-name = "ADP C10H12N5O10P2"
-balanced = false
-compartment = "cytosol"
-
-[[metabolites]]
-id = "g3p_c"
-name = "Glyceraldehyde 3-phosphate"
-balanced = false
-compartment = "cytosol"
-
-[[metabolites]]
-id = "f6p_c"
-name = "D-Fructose 6-phosphate"
-balanced = false
-compartment = "cytosol"
-
 [[metabolites]]
 id = "fdp_c"
 name = "D-Fructose 1,6-bisphosphate"
@@ -334,8 +255,32 @@ balanced = false
 compartment = "cytosol"
 
 [[metabolites]]
-id = "nadh_c"
-name = "Nicotinamide adenine dinucleotide - reduced"
+id = "co2_c"
+name = "CO2 CO2"
+balanced = false
+compartment = "cytosol"
+
+[[metabolites]]
+id = "e4p_c"
+name = "D-Erythrose 4-phosphate"
+balanced = false
+compartment = "cytosol"
+
+[[metabolites]]
+id = "r5p_c"
+name = "Alpha-D-Ribose 5-phosphate"
+balanced = false
+compartment = "cytosol"
+
+[[metabolites]]
+id = "f6p_c"
+name = "D-Fructose 6-phosphate"
+balanced = false
+compartment = "cytosol"
+
+[[metabolites]]
+id = "nadp_c"
+name = "Nicotinamide adenine dinucleotide phosphate"
 balanced = false
 compartment = "cytosol"
 
@@ -346,8 +291,26 @@ balanced = false
 compartment = "cytosol"
 
 [[metabolites]]
-id = "13dpg_c"
-name = "3-Phospho-D-glyceroyl phosphate"
+id = "2pg_c"
+name = "D-Glycerate 2-phosphate"
+balanced = false
+compartment = "cytosol"
+
+[[metabolites]]
+id = "g3p_c"
+name = "Glyceraldehyde 3-phosphate"
+balanced = false
+compartment = "cytosol"
+
+[[metabolites]]
+id = "g6p_c"
+name = "D-Glucose 6-phosphate"
+balanced = false
+compartment = "cytosol"
+
+[[metabolites]]
+id = "xu5p__D_c"
+name = "D-Xylulose 5-phosphate"
 balanced = false
 compartment = "cytosol"
 
@@ -358,20 +321,56 @@ balanced = false
 compartment = "cytosol"
 
 [[metabolites]]
+id = "nadph_c"
+name = "Nicotinamide adenine dinucleotide phosphate - reduced"
+balanced = false
+compartment = "cytosol"
+
+[[metabolites]]
+id = "nadh_c"
+name = "Nicotinamide adenine dinucleotide - reduced"
+balanced = false
+compartment = "cytosol"
+
+[[metabolites]]
+id = "adp_c"
+name = "ADP C10H12N5O10P2"
+balanced = false
+compartment = "cytosol"
+
+[[metabolites]]
+id = "atp_c"
+name = "ATP C10H12N5O13P3"
+balanced = false
+compartment = "cytosol"
+
+[[metabolites]]
 id = "nad_c"
 name = "Nicotinamide adenine dinucleotide"
 balanced = false
 compartment = "cytosol"
 
 [[metabolites]]
-id = "ru5p__D_c"
-name = "D-Ribulose 5-phosphate"
+id = "s7p_c"
+name = "Sedoheptulose 7-phosphate"
 balanced = false
 compartment = "cytosol"
 
 [[metabolites]]
-id = "nadph_c"
-name = "Nicotinamide adenine dinucleotide phosphate - reduced"
+id = "pep_c"
+name = "Phosphoenolpyruvate"
+balanced = false
+compartment = "cytosol"
+
+[[metabolites]]
+id = "2ddg6p_c"
+name = "2-Dehydro-3-deoxy-D-gluconate 6-phosphate"
+balanced = false
+compartment = "cytosol"
+
+[[metabolites]]
+id = "13dpg_c"
+name = "3-Phospho-D-glyceroyl phosphate"
 balanced = false
 compartment = "cytosol"
 
@@ -381,11 +380,13 @@ name = "3-Phospho-D-glycerate"
 balanced = false
 compartment = "cytosol"
 
+[[metabolites]]
+id = "ru5p__D_c"
+name = "D-Ribulose 5-phosphate"
+balanced = false
+compartment = "cytosol"
+
 [[experiments]]
 
 [[priors]]
 
-[compartments]
-id = "c"
-name = "cytosol"
-volume = 1
