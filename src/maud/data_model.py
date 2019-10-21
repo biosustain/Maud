@@ -80,10 +80,17 @@ class Parameter:
     :param metabolite_id: id of the metabolite associated with the parameter if any
     """
 
-    def __init__(self, id: str, enzyme_id: str, metabolite_id: str = None):
+    def __init__(
+        self,
+        id: str,
+        enzyme_id: str,
+        metabolite_id: str = None,
+        is_thermodynamic: bool = False,
+    ):
         self.id = id
         self.enzyme_id = enzyme_id
         self.metabolite_id = metabolite_id
+        self.is_thermodynamic = is_thermodynamic
 
 
 class Enzyme:
@@ -225,7 +232,7 @@ class Prior:
     :param location: a number specifying the location of the distribution
     :param scale: a number specifying the scale of the distribution
     :param target_type: a string describing the target, e.g. 'kinetic_parameter',
-    'enzyme' or 'unbalanced_metabolite'
+    'enzyme', 'thermodynamic_parameter' or 'unbalanced_metabolite'
     :param experiment_id: id of the relevant experiment (for enzymes or unbalanced
     metabolites)
     """
