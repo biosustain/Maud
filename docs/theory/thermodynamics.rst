@@ -24,16 +24,16 @@ an ordered unibi mechanism are as follows:
 
 Second, the thermodynamic parameters in a network must not jointly imply that
 it is possible to create or destroy energy simply by following a series of
-reactions round in a loop. In other words, that the product of all Keq
-parameters in any loop must be exactly 1. This requirement can be represented
-mathematically as the following Wegscheider condition:
+reactions round in a loop. This implies that, at equilibrium, the net change in
+Gibbs free energy due to the reactions in a loop should be exactly zero. In
+mathematical notation:
 
 .. math::
-   N(S)^T\ln\mathbf{k_{eq}} = \mathbf{0}
+   \Sigma_{i\in loop}\Delta G_i = 0
 
-In this equation :math:`N(S)` represents the right nullspace of the network's
-stoichiometric matrix :math:`S`, i.e. the set of all flux vectors
-:math:`\mathbf{v}` such that :math:`S\mathbf{v} = \mathbf{0}`.
+Since there is a one-to-one relationship between :math:`k_eq`s and
+:math:`DeltaG`s, this condition further constrains the feasible area of
+thermodynamic parameter space for networks with loops.
 
 How Maud ensures thermodynamic consistency
 ==========================================
@@ -47,25 +47,32 @@ the :math:`k_{ip}` and :math:`k_{iq}` parameters are fixed as follows:
    k_{ip} = \frac{k_{eq}k_{ia}k_{cat2}}{k_{q}k_{cat1}} \\
    k_{iq} = \frac{k_{eq}k_{cat2}k_{a}}{k_{cat1}k_{p}}
 
-In order to avoid free energy loops, Maud sets :math:`k_{eq}` parameters
-according to the following equation
+In order to avoid free energy loops, Maud generates :math:`k_{eq}` parameters
+from :math:`\Delta G` parameters according to the following equation:
 
 .. math::
-   \mathbf{k_{eq}} = \exp(L\mathbf{b})
+   \mathbf{k_{eq}} = \exp(\frac{\Delta G}{-RT})
 
-where :math:`L` is a kernel of the set of possible solutions to the network's
-Wegscheider equation, which is precomputed, and :math:`\mathbf{b}` is a vector
-of random variables, whose length matches the width of :math:`L`. In the case
-where the network has no loops, the width of `L` will be the same as the number
-of reactions and the values of :math:`\mathbf{b}` will directly determine those
-of :math:`\mathbf{k_{eq}}`. If there are loops, :math:`\mathbf{b}` will have
-fewer elements than :math:`\mathbf{k_{eq}}`.
+where R is the universal gas constant and T is the temperature in kelvin
+(currently this is assumed to be 298). :math:`Delta G` parameters, in turn, are
+generated as follows:
+
+.. math::
+   \Delta G = K\mathbf{b}
 
 
-Jacobian adjustments
-====================
-It is important for Maud to be able to represent information about marginal
-values of :math:`\mathbf{k_{eq}}` that may be available from *in vitro*
-measurements. This is done by setting prior distributions on the transformed
-:math:`\mathbf{k_{eq}}` values, and adjusting the distribution to take into
-account the transformation.
+where :math:`\mathbf{b}` of auxiliary basis parameters whose length is the same
+as the rank of the network's stoichiometric matrix and :math:`K =
+N(N(S^{T})^{T})` is a matrix generated from the network's stoichiometric matrix
+:math:`S` so as to ensure that :math:`\Delta G` sums to zero for loops.
+
+In the case where the network has no loops, the width of `K` will be a diagonal
+matrix and the basis parameters directly determine to the :math:`\Delta G`s. If
+there are loops, there will be fewer basis parameters than :math:`\Delta G`s.
+
+Information about marginal values of :math:`Delta G` - for example from *in
+vitro* measurements - is represented directly as prior distributions on the
+transformed :math:`Delta G` parameters. Since the transformation from basis
+parameters to :math:`Delta G`s is linear and the posterior only needs to be
+ascertained up to proportionality, there is no need for any adjustments to take
+into account the effect of this transformation.
