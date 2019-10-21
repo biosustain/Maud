@@ -40,12 +40,11 @@ from maud.data_model import (
 
 
 MECHANISM_TO_PARAM_IDS = {
-    "uniuni": ["Keq", "Kcat1", "Kcat2", "Ka"],
-    "ordered_unibi": ["Keq", "Kcat1", "Kcat2", "Ka", "Kp", "Kq", "Kia"],
-    "ordered_bibi": ["Keq", "Kcat1", "Kcat2", "Ka", "Kb", "Kp", "Kq", "Kib", "Kiq"],
-    "ping_pong": ["Keq", "Kcat1", "Kcat2", "Ka", "Kb", "Kp", "Kq", "Kia", "Kib", "Kiq"],
+    "uniuni": ["Kcat1", "Kcat2", "Ka"],
+    "ordered_unibi": ["Kcat1", "Kcat2", "Ka", "Kp", "Kq", "Kia"],
+    "ordered_bibi": ["Kcat1", "Kcat2", "Ka", "Kb", "Kp", "Kq", "Kib", "Kiq"],
+    "ping_pong": ["Kcat1", "Kcat2", "Ka", "Kb", "Kp", "Kq", "Kia", "Kib", "Kiq"],
     "ordered_terbi": [
-        "Keq",
         "Kcat1",
         "Kcat2",
         "Ka",
@@ -94,7 +93,7 @@ def load_maud_input_from_toml(filepath: str, id: str = "mi") -> MaudInput:
                     param_id: Parameter(param_id, e["id"])
                     for param_id in MECHANISM_TO_PARAM_IDS[e["mechanism"]]
                 }
-
+            params["delta_g"] = Parameter("delta_g", e["id"], is_thermodynamic=True)
             allosteric_inhibitors = defaultdict()
             if "allosteric_inhibitors" in e.keys():
                 allosteric_params = {
@@ -148,6 +147,17 @@ def load_maud_input_from_toml(filepath: str, id: str = "mi") -> MaudInput:
             experiment.measurements.update({target_type: type_measurements})
         experiments.update({experiment.id: experiment})
     priors = {}
+    for marginal_dg in parsed_toml["priors"]["thermodynamic_parameters"][
+        "marginal_dgs"
+    ]:
+        prior_id = f"{marginal_dg['target_id']}_dg"
+        priors[prior_id] = Prior(
+            id=prior_id,
+            target_id=marginal_dg["target_id"],
+            location=marginal_dg["location"],
+            scale=marginal_dg["scale"],
+            target_type="thermodynamic_parameter",
+        )
     for exp_id, umps in parsed_toml["priors"]["unbalanced_metabolites"].items():
         for ump in umps:
             prior_id = f"{exp_id}_{ump['target_id']}"

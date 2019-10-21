@@ -86,7 +86,7 @@ def create_stan_program(mi: MaudInput, model_type: str, time_step=0.05) -> str:
     templates = get_templates()
     kinetic_model = mi.kinetic_model
     met_codes = get_metabolite_codes(kinetic_model)
-    par_codes = get_parameter_codes(kinetic_model)
+    par_codes = get_kinetic_parameter_codes(kinetic_model)
     balanced_codes = [
         met_codes[met_id]
         for met_id, met in kinetic_model.metabolites.items()
@@ -190,7 +190,7 @@ def create_steady_state_function(
     )
 
 
-def create_Kip_ordered_unibi_line(param_codes: dict, rxn_id: str) -> str:
+def create_Kip_ordered_unibi_line(kp_codes: dict, thermo_code: int, rxn_id: str) -> str:
     """Generate Kip for mechanism ordered_unibi using the Haldane relationship."""
     template = Template(
         "real {{rxn_id}}_Kip = get_Kip_ordered_unibi(p[{{Keq}}], p[{{Ka}}], p[{{Kp}}], "
@@ -198,15 +198,15 @@ def create_Kip_ordered_unibi_line(param_codes: dict, rxn_id: str) -> str:
     )
     return template.render(
         rxn_id=rxn_id,
-        Keq=param_codes[rxn_id + "_" + "Keq"],
-        Kia=param_codes[rxn_id + "_" + "Kia"],
-        Kq=param_codes[rxn_id + "_" + "Kq"],
-        Kcat1=param_codes[rxn_id + "_" + "Kcat1"],
-        Kcat2=param_codes[rxn_id + "_" + "Kcat2"],
+        Keq=thermo_code,
+        Kia=kp_codes[rxn_id + "_" + "Kia"],
+        Kq=kp_codes[rxn_id + "_" + "Kq"],
+        Kcat1=kp_codes[rxn_id + "_" + "Kcat1"],
+        Kcat2=kp_codes[rxn_id + "_" + "Kcat2"],
     )
 
 
-def create_Kiq_ordered_unibi_line(param_codes: dict, rxn_id: str) -> str:
+def create_Kiq_ordered_unibi_line(kp_codes: dict, thermo_code: int, rxn_id: str) -> str:
     """Generate Kiq for mechanism ordered_unibi using the Haldane relationship."""
     template = Template(
         "real {{rxn_id}}_Kiq = get_Kiq_ordered_unibi(p[{{Keq}}], p[{{Ka}}], p[{{Kp}}], "
@@ -214,15 +214,15 @@ def create_Kiq_ordered_unibi_line(param_codes: dict, rxn_id: str) -> str:
     )
     return template.render(
         rxn_id=rxn_id,
-        Keq=param_codes[rxn_id + "_" + "Keq"],
-        Kia=param_codes[rxn_id + "_" + "Kia"],
-        Kq=param_codes[rxn_id + "_" + "Kq"],
-        Kcat1=param_codes[rxn_id + "_" + "Kcat1"],
-        Kcat2=param_codes[rxn_id + "_" + "Kcat2"],
+        Keq=thermo_code,
+        Kia=kp_codes[rxn_id + "_" + "Kia"],
+        Kq=kp_codes[rxn_id + "_" + "Kq"],
+        Kcat1=kp_codes[rxn_id + "_" + "Kcat1"],
+        Kcat2=kp_codes[rxn_id + "_" + "Kcat2"],
     )
 
 
-def create_Kia_ordered_bibi_line(param_codes: dict, rxn_id: str) -> str:
+def create_Kia_ordered_bibi_line(kp_codes: dict, thermo_code: int, rxn_id: str) -> str:
     """Generate Kia for mechanism ordered_bibi using the Haldane relationship."""
     template = Template(
         "real {{rxn_id}}_Kia = get_Kia_ordered_bibi(p[{{Keq}}], p[{{Ka}}], p[{{Kq}}], "
@@ -230,16 +230,16 @@ def create_Kia_ordered_bibi_line(param_codes: dict, rxn_id: str) -> str:
     )
     return template.render(
         rxn_id=rxn_id,
-        Keq=param_codes[rxn_id + "_" + "Keq"],
-        Ka=param_codes[rxn_id + "_" + "Ka"],
-        Kq=param_codes[rxn_id + "_" + "Kq"],
-        Kib=param_codes[rxn_id + "_" + "Kib"],
-        Kcat1=param_codes[rxn_id + "_" + "Kcat1"],
-        Kcat2=param_codes[rxn_id + "_" + "Kcat2"],
+        Keq=thermo_code,
+        Ka=kp_codes[rxn_id + "_" + "Ka"],
+        Kq=kp_codes[rxn_id + "_" + "Kq"],
+        Kib=kp_codes[rxn_id + "_" + "Kib"],
+        Kcat1=kp_codes[rxn_id + "_" + "Kcat1"],
+        Kcat2=kp_codes[rxn_id + "_" + "Kcat2"],
     )
 
 
-def create_Kip_ordered_bibi_line(param_codes: dict, rxn_id: str) -> str:
+def create_Kip_ordered_bibi_line(kp_codes: dict, thermo_code: int, rxn_id: str) -> str:
     """Generate Kip for mechanism ordered_bibi using the Haldane relationship."""
     template = Template(
         "real {{rxn_id}}_Kip = get_Kip_ordered_bibi(p[{{Keq}}], p[{{Kb}}], p[{{Kp}}], "
@@ -247,16 +247,16 @@ def create_Kip_ordered_bibi_line(param_codes: dict, rxn_id: str) -> str:
     )
     return template.render(
         rxn_id=rxn_id,
-        Keq=param_codes[rxn_id + "_" + "Keq"],
-        Kb=param_codes[rxn_id + "_" + "Kb"],
-        Kp=param_codes[rxn_id + "_" + "Kp"],
-        Kiq=param_codes[rxn_id + "_" + "Kiq"],
-        Kcat1=param_codes[rxn_id + "_" + "Kcat1"],
-        Kcat2=param_codes[rxn_id + "_" + "Kcat2"],
+        Keq=thermo_code,
+        Kb=kp_codes[rxn_id + "_" + "Kb"],
+        Kp=kp_codes[rxn_id + "_" + "Kp"],
+        Kiq=kp_codes[rxn_id + "_" + "Kiq"],
+        Kcat1=kp_codes[rxn_id + "_" + "Kcat1"],
+        Kcat2=kp_codes[rxn_id + "_" + "Kcat2"],
     )
 
 
-def create_Kip_pingpong_line(param_codes: dict, rxn_id: str) -> str:
+def create_Kip_pingpong_line(kp_codes: dict, thermo_code: int, rxn_id: str) -> str:
     """Generate Kip for mechanism pingpong using the Haldane relationship."""
     template = Template(
         "real {{rxn_id}}_Kip = get_Kip_pingpong({{Keq}}, {{Ka}}, {{Kb}}, {{Kq}},"
@@ -264,16 +264,16 @@ def create_Kip_pingpong_line(param_codes: dict, rxn_id: str) -> str:
     )
     return template.render(
         rxn_id=rxn_id,
-        Keq=param_codes[rxn_id + "_" + "Keq"],
-        Ka=param_codes[rxn_id + "_" + "Ka"],
-        Kb=param_codes[rxn_id + "_" + "Kb"],
-        Kq=param_codes[rxn_id + "_" + "Kq"],
-        Kcat1=param_codes[rxn_id + "_" + "Kcat1"],
-        Kcat2=param_codes[rxn_id + "_" + "Kcat2"],
+        Keq=thermo_code,
+        Ka=kp_codes[rxn_id + "_" + "Ka"],
+        Kb=kp_codes[rxn_id + "_" + "Kb"],
+        Kq=kp_codes[rxn_id + "_" + "Kq"],
+        Kcat1=kp_codes[rxn_id + "_" + "Kcat1"],
+        Kcat2=kp_codes[rxn_id + "_" + "Kcat2"],
     )
 
 
-def create_Kip_ordered_terbi_line(param_codes: dict, rxn_id: str) -> str:
+def create_Kip_ordered_terbi_line(kp_codes: dict, thermo_code: int, rxn_id: str) -> str:
     """Generate Kip for mechanism ordered_terbi using the Haldane relationship."""
     template = Template(
         "real {{rxn_id}}_Kip = get_Kip_ordered_terbi({{Keq}}, {{Kc}}, {{Kia}}, "
@@ -281,17 +281,17 @@ def create_Kip_ordered_terbi_line(param_codes: dict, rxn_id: str) -> str:
     )
     return template.render(
         rxn_id=rxn_id,
-        Keq=param_codes[rxn_id + "_" + "Keq"],
-        Kc=param_codes[rxn_id + "_" + "Kc"],
-        Kia=param_codes[rxn_id + "_" + "Kia"],
-        Kib=param_codes[rxn_id + "_" + "Kib"],
-        Kiq=param_codes[rxn_id + "_" + "Kiq"],
-        Kcat1=param_codes[rxn_id + "_" + "Kcat1"],
-        Kcat2=param_codes[rxn_id + "_" + "Kcat2"],
+        Keq=thermo_code,
+        Kc=kp_codes[rxn_id + "_" + "Kc"],
+        Kia=kp_codes[rxn_id + "_" + "Kia"],
+        Kib=kp_codes[rxn_id + "_" + "Kib"],
+        Kiq=kp_codes[rxn_id + "_" + "Kiq"],
+        Kcat1=kp_codes[rxn_id + "_" + "Kcat1"],
+        Kcat2=kp_codes[rxn_id + "_" + "Kcat2"],
     )
 
 
-def create_Kp_ordered_terbi_line(param_codes: dict, rxn_id: str) -> str:
+def create_Kp_ordered_terbi_line(kp_codes: dict, thermo_code: int, rxn_id: str) -> str:
     """Generate Kp for mechanism ordered_terbi using the Haldane relationship."""
     template = Template(
         "real {{rxn_id}}_Kp = get_Kiq_ordered_terbi({{Keq}}, {{Kia}}, {{Kib}}, "
@@ -299,11 +299,11 @@ def create_Kp_ordered_terbi_line(param_codes: dict, rxn_id: str) -> str:
     )
     return template.render(
         rxn_id=rxn_id,
-        Keq=param_codes[rxn_id + "_" + "Keq"],
-        Kia=param_codes[rxn_id + "_" + "Kia"],
-        Kib=param_codes[rxn_id + "_" + "Kib"],
-        Kic=param_codes[rxn_id + "_" + "Kic"],
-        Kiq=param_codes[rxn_id + "_" + "Kiq"],
+        Keq=thermo_code,
+        Kia=kp_codes[rxn_id + "_" + "Kia"],
+        Kib=kp_codes[rxn_id + "_" + "Kib"],
+        Kic=kp_codes[rxn_id + "_" + "Kic"],
+        Kiq=kp_codes[rxn_id + "_" + "Kiq"],
     )
 
 
@@ -320,10 +320,23 @@ def create_fluxes_function(kinetic_model: KineticModel, template: Template) -> s
         "pingpong": [create_Kip_pingpong_line],
         "ordered_terbi": [create_Kip_ordered_terbi_line, create_Kp_ordered_terbi_line],
     }
-    par_codes = get_parameter_codes(kinetic_model)
+    unbalanced = [m for m in kinetic_model.metabolites.values() if not m.balanced]
+    kp_codes = get_kinetic_parameter_codes(kinetic_model)
+    thermo_codes = get_thermo_codes(kinetic_model)
     met_codes = get_metabolite_codes(kinetic_model)
     enz_codes = get_enzyme_codes(kinetic_model)
-    par_codes_in_enz_context = {k: v + len(enz_codes) for k, v in par_codes.items()}
+
+    # Add increments to codes so they can be referred to in context of stacked
+    # theta vector in the Stan model. This is necessary because only one vector
+    # of random variables can be passed into the algebra solver.
+    enz_codes_in_theta, thermo_codes_in_theta, kp_codes_in_theta = (
+        {k: v + increment for k, v in original_codes.items()}
+        for increment, original_codes in [
+            (len(unbalanced), enz_codes),
+            (len(unbalanced) + len(enz_codes), thermo_codes),
+            (len(unbalanced) + len(enz_codes) + len(thermo_codes), kp_codes),
+        ]
+    )
     haldane_lines = []
     modular_lines = []
     free_enzyme_ratio_lines = []
@@ -343,7 +356,9 @@ def create_fluxes_function(kinetic_model: KineticModel, template: Template) -> s
             if enz.mechanism in mechanism_to_haldane_functions.keys():
                 haldane_functions = mechanism_to_haldane_functions[enz.mechanism]
                 for haldane_function in haldane_functions:
-                    haldane_line = haldane_function(par_codes_in_enz_context, enz.id)
+                    haldane_line = haldane_function(
+                        kp_codes_in_theta, thermo_codes_in_theta[enz.id], enz.id
+                    )
                     haldane_lines.append(haldane_line)
             substrate_stoichiometries = [
                 [substrate_id, rxn.stoichiometry[substrate_id]]
@@ -355,19 +370,19 @@ def create_fluxes_function(kinetic_model: KineticModel, template: Template) -> s
             ]
             # make modular rate law if necessary
             if enz.mechanism == "modular_rate_law":
-                enz_code = enz_codes[enz.id]
+                enz_code = enz_codes_in_theta[enz.id]
                 substrate_block, product_block = get_modular_rate_codes(
                     enz_id,
                     substrate_stoichiometries,
                     product_stoichiometries,
-                    par_codes_in_enz_context,
+                    kp_codes_in_theta,
                     met_codes,
                 )
                 modular_line = modular_template.render(
                     enz_id=enz_id,
                     enz=enz_code,
-                    Kcat1=par_codes_in_enz_context[enz_id + "_" + "Kcat1"],
-                    Keq=par_codes_in_enz_context[enz_id + "_" + "Keq"],
+                    Kcat1=kp_codes_in_theta[enz_id + "_" + "Kcat1"],
+                    Keq=thermo_codes_in_theta[enz_id + "_delta_g"],
                     substrate_list=substrate_block,
                     product_list=product_block,
                 )
@@ -375,7 +390,7 @@ def create_fluxes_function(kinetic_model: KineticModel, template: Template) -> s
             # make catalytic effect string
             enz_param_codes = {
                 k[len(enz_id) + 1 :]: v
-                for k, v in par_codes_in_enz_context.items()
+                for k, v in kp_codes_in_theta.items()
                 if enz_id in k
             }
             enz_code = enz_codes[enz.id]
@@ -391,6 +406,7 @@ def create_fluxes_function(kinetic_model: KineticModel, template: Template) -> s
                     **{"enz": enz_code},
                     **enz_param_codes,
                     "enz_id": enz_id,
+                    "Keq": thermo_codes_in_theta[enz_id + "_delta_g"],
                 }
 
             catalytic_string = MECHANISM_TEMPLATES[enz.mechanism].render(mechanism_args)
@@ -411,7 +427,7 @@ def create_fluxes_function(kinetic_model: KineticModel, template: Template) -> s
                     mod_id: met_codes[mod_id] for mod_id in allosteric_inhibitors.keys()
                 }
                 regulatory_string = get_regulatory_string(
-                    allosteric_inhibitor_codes, par_codes_in_enz_context, enz.id
+                    allosteric_inhibitor_codes, kp_codes_in_theta, enz.id
                 )
                 enzyme_flux_string = catalytic_string + "*" + regulatory_string
             else:
@@ -477,7 +493,7 @@ def get_modular_rate_codes(
     product_info: List[List],
     par_codes: Dict[str, int],
     met_codes: Dict[str, int],
-):
+) -> List[List[int]]:
     """Get codes that can be put into the modular rate law jinja template.
 
     The function returns a list containing lists substrate_input and
@@ -533,8 +549,8 @@ def get_enzyme_codes(kinetic_model: KineticModel) -> Dict[str, int]:
     return codify(enzyme_ids)
 
 
-def get_parameter_codes(kinetic_model: KineticModel) -> Dict[str, int]:
-    """Get a dictionary mapping parameter ids to integer indexes.
+def get_kinetic_parameter_codes(kinetic_model: KineticModel) -> Dict[str, int]:
+    """Get a dictionary mapping kinetic_parameter ids to integer indexes.
 
     :param kinetic_model: A KineticModel object
     """
@@ -542,6 +558,21 @@ def get_parameter_codes(kinetic_model: KineticModel) -> Dict[str, int]:
     parameter_ids = []
     for _, rxn in kinetic_model.reactions.items():
         for enz_id, enz in rxn.enzymes.items():
-            for par_id, _ in enz.parameters.items():
-                parameter_ids.append(enz_id + "_" + par_id)
+            for par_id, par in enz.parameters.items():
+                if not par.is_thermodynamic:
+                    parameter_ids.append(enz_id + "_" + par_id)
+    return codify(parameter_ids)
+
+
+def get_thermo_codes(kinetic_model: KineticModel) -> Dict[str, int]:
+    """Get a dictionary mapping enzyme ids to integer indexes.
+
+    :param kinetic_model: A KineticModel object
+    """
+    parameter_ids = []
+    for _, rxn in kinetic_model.reactions.items():
+        for enz_id, enz in rxn.enzymes.items():
+            for par_id, par in enz.parameters.items():
+                if par.is_thermodynamic:
+                    parameter_ids.append(enz_id + "_" + par_id)
     return codify(parameter_ids)
