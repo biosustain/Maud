@@ -21,6 +21,8 @@ from typing import Dict, Iterable
 
 import numpy as np
 
+from maud.data_model import KineticModel
+
 
 def match_string_to_file(s: str, path: str) -> bool:
     """Check if a string is the same as the contents of a file."""
@@ -40,3 +42,54 @@ def sem_pct_to_lognormal_sigma(sem_pct, mean, n=3):
 def codify(l: Iterable[str]) -> Dict[str, int]:
     """Turn an iterable of strings into a dictionary mapping them to integer indexes."""
     return dict(zip(l, range(1, len(l) + 1)))
+
+
+def get_metabolite_codes(kinetic_model: KineticModel) -> Dict[str, int]:
+    """Get a dictionary mapping metabolite ids to integer indexes.
+
+    :param kinetic_model: A KineticModel object
+    """
+
+    return codify(kinetic_model.metabolites.keys())
+
+
+def get_enzyme_codes(kinetic_model: KineticModel) -> Dict[str, int]:
+    """Get a dictionary mapping enzyme ids to integer indexes.
+
+    :param kinetic_model: A KineticModel object
+    """
+
+    enzyme_ids = []
+    for _, rxn in kinetic_model.reactions.items():
+        for enz_id, _ in rxn.enzymes.items():
+            enzyme_ids.append(enz_id)
+    return codify(enzyme_ids)
+
+
+def get_kinetic_parameter_codes(kinetic_model: KineticModel) -> Dict[str, int]:
+    """Get a dictionary mapping kinetic_parameter ids to integer indexes.
+
+    :param kinetic_model: A KineticModel object
+    """
+
+    parameter_ids = []
+    for _, rxn in kinetic_model.reactions.items():
+        for enz_id, enz in rxn.enzymes.items():
+            for par_id, par in enz.parameters.items():
+                if not par.is_thermodynamic:
+                    parameter_ids.append(enz_id + "_" + par_id)
+    return codify(parameter_ids)
+
+
+def get_thermo_codes(kinetic_model: KineticModel) -> Dict[str, int]:
+    """Get a dictionary mapping enzyme ids to integer indexes.
+
+    :param kinetic_model: A KineticModel object
+    """
+    parameter_ids = []
+    for _, rxn in kinetic_model.reactions.items():
+        for enz_id, enz in rxn.enzymes.items():
+            for par_id, par in enz.parameters.items():
+                if par.is_thermodynamic:
+                    parameter_ids.append(enz_id + "_" + par_id)
+    return codify(parameter_ids)
