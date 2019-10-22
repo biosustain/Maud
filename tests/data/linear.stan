@@ -37,7 +37,7 @@ functions{
     to_array_1d(theta),
     xr,
     rep_array(0, 1),
-    1e-8, 1e-8, 1e5
+    1e-8, 1e-12, 1e5
   )[1, {3,4}]; 
   return to_vector(balanced_new) - balanced;
 }

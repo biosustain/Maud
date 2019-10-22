@@ -189,50 +189,51 @@ def get_input_data(
         wegscheider_mat = np.identity(len(enzyme_codes))
         stoichiometry_rank = len(enzyme_codes)
 
-    return [{
-        "N_balanced": len(balanced_metabolites),
-        "N_unbalanced": len(unbalanced_metabolites),
-        "N_kinetic_parameters": len(kinetic_parameter_priors),
-        "N_reaction": len(reactions),
-        "N_enzyme": len(enzymes),
-        "N_experiment": len(mi.experiments),
-        "N_flux_measurement": len(reaction_measurements),
-        "N_conc_measurement": len(metabolite_measurements),
-        "stoichiometric_rank": stoichiometry_rank,
-        "experiment_yconc": (
-            metabolite_measurements["experiment_id"].map(experiment_codes).values
-        ),
-        "metabolite_yconc": (
-            metabolite_measurements["target_id"].map(metabolite_codes).values
-        ),
-        "yconc": metabolite_measurements["value"].values,
-        "sigma_conc": metabolite_measurements["uncertainty"].values,
-        "experiment_yflux": (
-            reaction_measurements["experiment_id"].map(experiment_codes).values
-        ),
-        "reaction_yflux": (
-            reaction_measurements["target_id"].map(reaction_codes).values
-        ),
-        "yflux": reaction_measurements["value"].values,
-        "sigma_flux": reaction_measurements["uncertainty"].values,
-        "prior_loc_delta_g": dg_priors["location"].values,
-        "prior_scale_delta_g": dg_priors["scale"].values,
-        "prior_loc_kinetic_parameters": kinetic_parameter_priors["location"].values,
-        "prior_scale_kinetic_parameters": kinetic_parameter_priors["scale"].values,
-        "prior_loc_unbalanced": prior_loc_unb.values,
-        "prior_scale_unbalanced": prior_scale_unb.values,
-        "prior_loc_enzyme": prior_loc_enzyme.values,
-        "prior_scale_enzyme": prior_scale_enzyme.values,
-        "as_guess": [0.01 for m in range(len(balanced_metabolites))],
-        "delta_g_kernel": wegscheider_mat,
-        "rtol": rel_tol,
-        "ftol": f_tol,
-        "steps": max_steps,
-        "LIKELIHOOD": likelihood,
-    },
+    return [
         {
-        "kinetic_parameters": kinetic_parameter_priors["location"].values,
-        "unbalanced": np.transpose(prior_loc_unb.values),
-        "enzyme_concentration": np.transpose(prior_loc_enzyme.values),
-    }
+            "N_balanced": len(balanced_metabolites),
+            "N_unbalanced": len(unbalanced_metabolites),
+            "N_kinetic_parameters": len(kinetic_parameter_priors),
+            "N_reaction": len(reactions),
+            "N_enzyme": len(enzymes),
+            "N_experiment": len(mi.experiments),
+            "N_flux_measurement": len(reaction_measurements),
+            "N_conc_measurement": len(metabolite_measurements),
+            "stoichiometric_rank": stoichiometry_rank,
+            "experiment_yconc": (
+                metabolite_measurements["experiment_id"].map(experiment_codes).values
+            ),
+            "metabolite_yconc": (
+                metabolite_measurements["target_id"].map(metabolite_codes).values
+            ),
+            "yconc": metabolite_measurements["value"].values,
+            "sigma_conc": metabolite_measurements["uncertainty"].values,
+            "experiment_yflux": (
+                reaction_measurements["experiment_id"].map(experiment_codes).values
+            ),
+            "reaction_yflux": (
+                reaction_measurements["target_id"].map(reaction_codes).values
+            ),
+            "yflux": reaction_measurements["value"].values,
+            "sigma_flux": reaction_measurements["uncertainty"].values,
+            "prior_loc_delta_g": dg_priors["location"].values,
+            "prior_scale_delta_g": dg_priors["scale"].values,
+            "prior_loc_kinetic_parameters": kinetic_parameter_priors["location"].values,
+            "prior_scale_kinetic_parameters": kinetic_parameter_priors["scale"].values,
+            "prior_loc_unbalanced": prior_loc_unb.values,
+            "prior_scale_unbalanced": prior_scale_unb.values,
+            "prior_loc_enzyme": prior_loc_enzyme.values,
+            "prior_scale_enzyme": prior_scale_enzyme.values,
+            "as_guess": [0.01 for m in range(len(balanced_metabolites))],
+            "delta_g_kernel": wegscheider_mat,
+            "rtol": rel_tol,
+            "ftol": f_tol,
+            "steps": max_steps,
+            "LIKELIHOOD": likelihood,
+        },
+        {
+            "kinetic_parameters": kinetic_parameter_priors["location"].values,
+            "unbalanced": np.transpose(prior_loc_unb.values),
+            "enzyme_concentration": np.transpose(prior_loc_enzyme.values),
+        },
     ]
