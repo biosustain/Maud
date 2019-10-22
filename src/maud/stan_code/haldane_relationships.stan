@@ -9,7 +9,7 @@ Keq parameter. Copied from this paper:
 
 */
 
-real get_Kp_uniuni(real V1, real Ka, real V2, real Keq){
+real get_Kp_uniuni(real Keq, real V1, real Ka, real V2){
   return Keq * V2 * Ka / V1;
 }
 real get_Kip_ordered_unibi(real Keq, real Kia, real Kq, real V1, real V2){
