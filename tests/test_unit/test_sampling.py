@@ -63,7 +63,7 @@ def test_get_input_data():
         "prior_scale_unbalanced": [[0.05, 0.05], [0.05, 0.05]],
         "prior_loc_enzyme": [[1.0, 1.5], [1.0, 1.5], [1.0, 1.5]],
         "prior_scale_enzyme": [[0.05, 0.05], [0.05, 0.05], [0.05, 0.05]],
-        "as_guess": [1.0, 1.0],
+        "as_guess": [0.01, 0.01],
         "delta_g_kernel": [[1.0, 0.0, 0.0], [0.0, 1.0, 0.0], [0.0, 0.0, 1.0]],
         "rtol": 1e-09,
         "ftol": 1e-06,
@@ -72,7 +72,7 @@ def test_get_input_data():
     }
     toml_input_path = os.path.join(data_path, "linear.toml")
     mi = io.load_maud_input_from_toml(toml_input_path)
-    actual = sampling.get_input_data(mi, 1e-06, 1e-09, int(1e9), 1)
+    actual, _ = sampling.get_input_data(mi, 1e-06, 1e-09, int(1e9), 1)
     assert actual.keys() == expected.keys()
     for k in actual.keys():
         assert_equal(actual[k], expected[k])
