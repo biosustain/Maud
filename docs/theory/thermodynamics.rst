@@ -31,8 +31,8 @@ mathematical notation:
 .. math::
    \Sigma_{i\in loop}\Delta G_i = 0
 
-Since there is a one-to-one relationship between :math:`k_eq`s and
-:math:`DeltaG`s, this condition further constrains the feasible area of
+Since there is a one-to-one relationship between :math:`k_eq` s and
+:math:`DeltaG` s, this condition further constrains the feasible area of
 thermodynamic parameter space for networks with loops.
 
 How Maud ensures thermodynamic consistency
@@ -63,16 +63,16 @@ generated as follows:
 
 where :math:`\mathbf{b}` of auxiliary basis parameters whose length is the same
 as the rank of the network's stoichiometric matrix and :math:`K =
-N(N(S^{T})^{T})` is a matrix generated from the network's stoichiometric matrix
+Nullspace(Nullspace(S^{T})^{T})` is a matrix generated from the network's stoichiometric matrix
 :math:`S` so as to ensure that :math:`\Delta G` sums to zero for loops.
 
 In the case where the network has no loops, the width of `K` will be a diagonal
-matrix and the basis parameters directly determine to the :math:`\Delta G`s. If
-there are loops, there will be fewer basis parameters than :math:`\Delta G`s.
+matrix and the basis parameters directly determine to the :math:`\Delta G` s. If
+there are loops, there will be fewer basis parameters than :math:`\Delta G` s.
 
 Information about marginal values of :math:`Delta G` - for example from *in
 vitro* measurements - is represented directly as prior distributions on the
 transformed :math:`Delta G` parameters. Since the transformation from basis
-parameters to :math:`Delta G`s is linear and the posterior only needs to be
+parameters to :math:`Delta G` s is linear and the posterior only needs to be
 ascertained up to proportionality, there is no need for any adjustments to take
 into account the effect of this transformation.
