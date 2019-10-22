@@ -13,7 +13,7 @@ In order to build the documentation locally you will need to have `sphinx
 environment. If you don't, you should be able to install it with the following
 command line incantation:
 
-..code: bash
+.. code:: bash
 
     pip install -U Sphinx
 
@@ -25,7 +25,7 @@ can check all the available options by running :code:`make` from the
 
 In order to create a set of html pages, run
 
-..code: bash
+.. code:: bash
 
     make html
 
@@ -34,7 +34,7 @@ opening the file :code:`docs/_build/html/index.html` in your browser.
 
 Alternatively, to create a pdf version of the documentation, run
 
-..code: bash
+.. code:: bash
 
     make latexpdf
 
