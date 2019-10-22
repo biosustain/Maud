@@ -20,8 +20,8 @@ command line incantation:
 Sphinx turns the source files in the `docs
 <https://github.com/biosustain/Maud/tree/master/docs>`_ directory into nicely
 formatted and structured output files in the directory :code:`docs/_build`. You
-can check all the available options by running :code:`make` from the
-:code:`docs` directory.
+can check all the available options by running :code:`make` from the docs
+directory.
 
 In order to create a set of html pages, run
 
@@ -45,7 +45,7 @@ Contributing to the documentation
 =================================
 
 To add new documentation, either edit an existing :code:`.rst` file in the
-:code:`docs` directory, or add a new one and edit the file `docs/index.rst
+docs directory, or add a new one and edit the file `docs/index.rst
 <https://github.com/biosustain/Maud/blob/master/docs/index.rst>`_ so that the
 new file is included in the :code:`toctree` list.
 
