@@ -61,7 +61,7 @@ def test_get_regulatory_string():
 
 
 def test_mechanism_templates():
-    """Test that mechanism templates are as expected"""
+    """Test that mechanism templates are as expected."""
     codes = {
         "S0": 1,
         "S1": 2,
@@ -79,7 +79,7 @@ def test_mechanism_templates():
         "Kq": 9,
         "Kia": 10,
         "Kib": 11,
-        "Kib": 12,
+        "Kic": 12,
         "Kiq": 13,
         "Tr": 1,
         "Dr": 2,
@@ -87,28 +87,21 @@ def test_mechanism_templates():
     enzyme_id = "e1"
     expected_calls = {
         "uniuni": "uniuni(m[1],m[4],p[1]*p[3],p[1]*p[4],p[5],p[2])",
-        "ordered_unibi": (
-            "ordered_unibi(m[1],m[4],m[5],p[1]*p[3],p[1]*p[4],p[5],"
-            "p[8],p[9],p[10],e1_Kip,e1_Kiq],p[2])"
-        ),
-        "ordered_bibi": (
-            "ordered_bibi(m[1],m[2],m[4],m[5],p[1]*p[3],p[1]*p[4],p[5],"
-            "p[6],p[8],p[9],e1_Kia,p[12],e1_Kip,p[13],p[2])"
-        ),
-        "pingpong": (
-            "pingpong(m[1],m[2],m[4],m[5],p[1]*p[3],p[1]*p[4],p[5],p[6],"
-            "p[8],p[9],p[10],p[12],e1_Kip,p[13],p[2])"
-        ),
-        "ordered_terbi": (
-            "ordered_terbi(m[1],m[2],m[3],m[4],m[5],p[1]*p[3],p[1]*p[4],"
-            "p[5],p[6],p[7],e1_Kp,p[9],p[10],p[12],p[],e1_Kip,p[13],p[2])"
-        ),
+        "ordered_unibi": "ordered_unibi(m[1],m[4],m[5],p[1]*p[3],p[1]*p[4],p[5],"
+        "p[8],p[9],p[10],e1_Kip,e1_Kiq],p[2])",
+        "ordered_bibi": "ordered_bibi(m[1],m[2],m[4],m[5],p[1]*p[3],p[1]*p[4],"
+        "p[5],p[6],p[8],p[9],e1_Kia,p[11],e1_Kip,p[13],p[2])",
+        "pingpong": "pingpong(m[1],m[2],m[4],m[5],p[1]*p[3],p[1]*p[4],p[5],p[6],"
+        "p[8],p[9],p[10],p[11],e1_Kip,p[13],p[2])",
+        "ordered_terbi": "ordered_terbi(m[1],m[2],m[3],m[4],m[5],p[1]*p[3],"
+        "p[1]*p[4],p[5],p[6],p[7],e1_Kp,p[9],p[10],p[11],p[12],e1_Kip,p[13],p[2])",
         "modular_rate_law": "modular_rate_law(1,2)",
     }
     generated_calls = {
         mechanism: template.render({**codes, **{"enz_id": enzyme_id}})
         for mechanism, template in code_generation.MECHANISM_TEMPLATES.items()
     }
+    print(generated_calls)
     for mechanism, generated_call in generated_calls.items():
         expected_call = expected_calls[mechanism]
         assert generated_call == expected_call
