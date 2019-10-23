@@ -105,7 +105,7 @@ def test_mechanism_templates():
         expected_call = expected_calls[mechanism]
         assert generated_call == expected_call
 
-        
+
 def test_get_modular_rate_codes():
     """Check that the function get_modular_rate_codes works as expected."""
     rxn_id = "r"
