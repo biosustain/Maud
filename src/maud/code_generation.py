@@ -26,7 +26,13 @@ from typing import Dict, List
 from jinja2 import Environment, PackageLoader, Template
 
 from maud.data_model import KineticModel, MaudInput
-from maud.utils import codify
+from maud.utils import (
+    codify,
+    get_enzyme_codes,
+    get_kinetic_parameter_codes,
+    get_metabolite_codes,
+    get_thermo_codes,
+)
 
 
 TEMPLATE_FILES = [
@@ -71,6 +77,22 @@ MECHANISM_TEMPLATES = {
         "p[{{Keq}}])"
     ),
     "modular_rate_law": Template("modular_rate_law({{Tr}},{{Dr}})"),
+}
+
+HALDANE_PARAMS = {
+    "ordered_unibi": {
+        "Kip": ["Keq", "Kia", "Kq", "Kcat1", "Kcat2"],
+        "Kiq": ["Keq", "Ka", "Kp", "Kcat1", "Kcat2"],
+    },
+    "ordered_bibi": {
+        "Kia": ["Keq", "Kb", "Kp", "Kiq", "Kcat1", "Kcat2"],
+        "Kip": ["Keq", "Ka", "Kq", "Kib", "Kcat1", "Kcat2"],
+    },
+    "pingpong": {"Kp": ["Keq", "Ka", "Kb", "Kq", "Kcat1", "Kcat2"]},
+    "ordered_terbi": {
+        "Kip": ["Keq", "Kia", "Kib", "Kic", "Kiq"],
+        "Kp": ["Keq", "Kc", "Kia", "Kib", "Kiq", "Kcat1", "Kcat2"],
+    },
 }
 
 
@@ -190,120 +212,47 @@ def create_steady_state_function(
     )
 
 
-def create_Kip_ordered_unibi_line(kp_codes: dict, thermo_code: int, rxn_id: str) -> str:
-    """Generate Kip for mechanism ordered_unibi using the Haldane relationship."""
+def create_haldane_line(
+    param_codes: Dict[str, int],
+    derived_param: str,
+    mechanism: str,
+    enz_id: str,
+    haldane_params: Dict[str, Dict[str, List[str]]],
+) -> str:
+    """Create a call to one of the functions in `haldane_relationships.stan`.
+
+    :param param_codes: dictionary mapping parameters (both thermodynamic and
+    kinetic) to integer indexes
+
+    :param derived_param: string identifying the derived parameter. Must be one
+    of the second-level keys in HALDANE_PARAMS.
+
+    :param mechanism: string identifying the relevant mechanism. Must be one of
+    the first-level keys in HALDANE_PARAMS.
+
+    :param enz_id: string identifying the relevant enzyme.
+
+    :param haldane_params: nested dictionary mapping mechanisms to derived
+    parameters to lists of arguments to the relevant haldane function.
+
+    """
+
+    params_in_order = haldane_params[mechanism][derived_param]
+    param_codes_in_order = [
+        param_codes[enz_id + "_" + param] for param in params_in_order
+    ]
     template = Template(
-        "real {{rxn_id}}_Kip = get_Kip_ordered_unibi(p[{{Keq}}], p[{{Ka}}], p[{{Kp}}], "
-        "p[{{Kcat1}}], p[{{Kcat2}}]);"
+        "real {{enz_id}}_{{derived_param}} = "
+        "get_{{derived_param}}_{{mechanism}}("
+        "{% for code in param_codes_in_order %}"
+        "p[{{code}}]{% if not loop.last %},{% endif %}"
+        "{% endfor %});"
     )
     return template.render(
-        rxn_id=rxn_id,
-        Keq=thermo_code,
-        Kia=kp_codes[rxn_id + "_" + "Kia"],
-        Kq=kp_codes[rxn_id + "_" + "Kq"],
-        Kcat1=kp_codes[rxn_id + "_" + "Kcat1"],
-        Kcat2=kp_codes[rxn_id + "_" + "Kcat2"],
-    )
-
-
-def create_Kiq_ordered_unibi_line(kp_codes: dict, thermo_code: int, rxn_id: str) -> str:
-    """Generate Kiq for mechanism ordered_unibi using the Haldane relationship."""
-    template = Template(
-        "real {{rxn_id}}_Kiq = get_Kiq_ordered_unibi(p[{{Keq}}], p[{{Ka}}], p[{{Kp}}], "
-        "p[{{Kcat1}}], p[{{Kcat2}}]);"
-    )
-    return template.render(
-        rxn_id=rxn_id,
-        Keq=thermo_code,
-        Kia=kp_codes[rxn_id + "_" + "Kia"],
-        Kq=kp_codes[rxn_id + "_" + "Kq"],
-        Kcat1=kp_codes[rxn_id + "_" + "Kcat1"],
-        Kcat2=kp_codes[rxn_id + "_" + "Kcat2"],
-    )
-
-
-def create_Kia_ordered_bibi_line(kp_codes: dict, thermo_code: int, rxn_id: str) -> str:
-    """Generate Kia for mechanism ordered_bibi using the Haldane relationship."""
-    template = Template(
-        "real {{rxn_id}}_Kia = get_Kia_ordered_bibi(p[{{Keq}}], p[{{Ka}}], p[{{Kq}}], "
-        "p[{{Kib}}], p[{{Kcat1}}], p[{{Kcat2}}]);"
-    )
-    return template.render(
-        rxn_id=rxn_id,
-        Keq=thermo_code,
-        Ka=kp_codes[rxn_id + "_" + "Ka"],
-        Kq=kp_codes[rxn_id + "_" + "Kq"],
-        Kib=kp_codes[rxn_id + "_" + "Kib"],
-        Kcat1=kp_codes[rxn_id + "_" + "Kcat1"],
-        Kcat2=kp_codes[rxn_id + "_" + "Kcat2"],
-    )
-
-
-def create_Kip_ordered_bibi_line(kp_codes: dict, thermo_code: int, rxn_id: str) -> str:
-    """Generate Kip for mechanism ordered_bibi using the Haldane relationship."""
-    template = Template(
-        "real {{rxn_id}}_Kip = get_Kip_ordered_bibi(p[{{Keq}}], p[{{Kb}}], p[{{Kp}}], "
-        "p[{{Kiq}}], p[{{Kcat1}}], p[{{Kcat2}}]);"
-    )
-    return template.render(
-        rxn_id=rxn_id,
-        Keq=thermo_code,
-        Kb=kp_codes[rxn_id + "_" + "Kb"],
-        Kp=kp_codes[rxn_id + "_" + "Kp"],
-        Kiq=kp_codes[rxn_id + "_" + "Kiq"],
-        Kcat1=kp_codes[rxn_id + "_" + "Kcat1"],
-        Kcat2=kp_codes[rxn_id + "_" + "Kcat2"],
-    )
-
-
-def create_Kip_pingpong_line(kp_codes: dict, thermo_code: int, rxn_id: str) -> str:
-    """Generate Kip for mechanism pingpong using the Haldane relationship."""
-    template = Template(
-        "real {{rxn_id}}_Kip = get_Kip_pingpong({{Keq}}, {{Ka}}, {{Kb}}, {{Kq}},"
-        " {{Kcat1}}, {{Kcat2}});"
-    )
-    return template.render(
-        rxn_id=rxn_id,
-        Keq=thermo_code,
-        Ka=kp_codes[rxn_id + "_" + "Ka"],
-        Kb=kp_codes[rxn_id + "_" + "Kb"],
-        Kq=kp_codes[rxn_id + "_" + "Kq"],
-        Kcat1=kp_codes[rxn_id + "_" + "Kcat1"],
-        Kcat2=kp_codes[rxn_id + "_" + "Kcat2"],
-    )
-
-
-def create_Kip_ordered_terbi_line(kp_codes: dict, thermo_code: int, rxn_id: str) -> str:
-    """Generate Kip for mechanism ordered_terbi using the Haldane relationship."""
-    template = Template(
-        "real {{rxn_id}}_Kip = get_Kip_ordered_terbi({{Keq}}, {{Kc}}, {{Kia}}, "
-        "{{Kib}}, {{Kiq}}, {{Kcat1}}, {{Kcat2}});"
-    )
-    return template.render(
-        rxn_id=rxn_id,
-        Keq=thermo_code,
-        Kc=kp_codes[rxn_id + "_" + "Kc"],
-        Kia=kp_codes[rxn_id + "_" + "Kia"],
-        Kib=kp_codes[rxn_id + "_" + "Kib"],
-        Kiq=kp_codes[rxn_id + "_" + "Kiq"],
-        Kcat1=kp_codes[rxn_id + "_" + "Kcat1"],
-        Kcat2=kp_codes[rxn_id + "_" + "Kcat2"],
-    )
-
-
-def create_Kp_ordered_terbi_line(kp_codes: dict, thermo_code: int, rxn_id: str) -> str:
-    """Generate Kp for mechanism ordered_terbi using the Haldane relationship."""
-    template = Template(
-        "real {{rxn_id}}_Kp = get_Kiq_ordered_terbi({{Keq}}, {{Kia}}, {{Kib}}, "
-        "{{Kic}}, {{Kiq}});"
-    )
-    return template.render(
-        rxn_id=rxn_id,
-        Keq=thermo_code,
-        Kia=kp_codes[rxn_id + "_" + "Kia"],
-        Kib=kp_codes[rxn_id + "_" + "Kib"],
-        Kic=kp_codes[rxn_id + "_" + "Kic"],
-        Kiq=kp_codes[rxn_id + "_" + "Kiq"],
+        param_codes_in_order=param_codes_in_order,
+        derived_param=derived_param,
+        mechanism=mechanism,
+        enz_id=enz_id,
     )
 
 
@@ -314,12 +263,6 @@ def create_fluxes_function(kinetic_model: KineticModel, template: Template) -> s
     :param template: A jinja template
     """
     modular_template = get_templates()["modular_rate_law"]
-    mechanism_to_haldane_functions = {
-        "ordered_unibi": [create_Kip_ordered_unibi_line, create_Kiq_ordered_unibi_line],
-        "ordered_bibi": [create_Kia_ordered_bibi_line, create_Kip_ordered_bibi_line],
-        "pingpong": [create_Kip_pingpong_line],
-        "ordered_terbi": [create_Kip_ordered_terbi_line, create_Kp_ordered_terbi_line],
-    }
     unbalanced = [m for m in kinetic_model.metabolites.values() if not m.balanced]
     kp_codes = get_kinetic_parameter_codes(kinetic_model)
     thermo_codes = get_thermo_codes(kinetic_model)
@@ -353,11 +296,15 @@ def create_fluxes_function(kinetic_model: KineticModel, template: Template) -> s
         enzyme_flux_strings = []
         for enz_id, enz in rxn.enzymes.items():
             # make haldane relationship lines if necessary
-            if enz.mechanism in mechanism_to_haldane_functions.keys():
-                haldane_functions = mechanism_to_haldane_functions[enz.mechanism]
-                for haldane_function in haldane_functions:
-                    haldane_line = haldane_function(
-                        kp_codes_in_theta, thermo_codes_in_theta[enz.id], enz.id
+            if enz.mechanism in HALDANE_PARAMS.keys():
+                derived_params = HALDANE_PARAMS[enz.mechanism].keys()
+                for derived_param in derived_params:
+                    haldane_line = create_haldane_line(
+                        {**kp_codes_in_theta, **thermo_codes_in_theta},
+                        derived_param,
+                        enz.mechanism,
+                        enz.id,
+                        HALDANE_PARAMS,
                     )
                     haldane_lines.append(haldane_line)
             substrate_stoichiometries = [
@@ -525,54 +472,3 @@ def get_modular_rate_codes(
             elif stoic > 0:
                 product_input.append([met_code, param_code, stoic])
     return [substrate_input, product_input]
-
-
-def get_metabolite_codes(kinetic_model: KineticModel) -> Dict[str, int]:
-    """Get a dictionary mapping metabolite ids to integer indexes.
-
-    :param kinetic_model: A KineticModel object
-    """
-
-    return codify(kinetic_model.metabolites.keys())
-
-
-def get_enzyme_codes(kinetic_model: KineticModel) -> Dict[str, int]:
-    """Get a dictionary mapping enzyme ids to integer indexes.
-
-    :param kinetic_model: A KineticModel object
-    """
-
-    enzyme_ids = []
-    for _, rxn in kinetic_model.reactions.items():
-        for enz_id, _ in rxn.enzymes.items():
-            enzyme_ids.append(enz_id)
-    return codify(enzyme_ids)
-
-
-def get_kinetic_parameter_codes(kinetic_model: KineticModel) -> Dict[str, int]:
-    """Get a dictionary mapping kinetic_parameter ids to integer indexes.
-
-    :param kinetic_model: A KineticModel object
-    """
-
-    parameter_ids = []
-    for _, rxn in kinetic_model.reactions.items():
-        for enz_id, enz in rxn.enzymes.items():
-            for par_id, par in enz.parameters.items():
-                if not par.is_thermodynamic:
-                    parameter_ids.append(enz_id + "_" + par_id)
-    return codify(parameter_ids)
-
-
-def get_thermo_codes(kinetic_model: KineticModel) -> Dict[str, int]:
-    """Get a dictionary mapping enzyme ids to integer indexes.
-
-    :param kinetic_model: A KineticModel object
-    """
-    parameter_ids = []
-    for _, rxn in kinetic_model.reactions.items():
-        for enz_id, enz in rxn.enzymes.items():
-            for par_id, par in enz.parameters.items():
-                if par.is_thermodynamic:
-                    parameter_ids.append(enz_id + "_" + par_id)
-    return codify(parameter_ids)
