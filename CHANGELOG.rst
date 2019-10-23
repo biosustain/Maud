@@ -10,7 +10,7 @@ Next Release
 * Tools for validating user input
 
 
-0.2.0 (2019-10-23)
+0.2.1 (2019-10-23)
 ------------------
 * Tests for code generation functions
 * Strategy for avoiding free energy loops
