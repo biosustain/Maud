@@ -24,6 +24,7 @@ from collections import defaultdict
 
 import toml
 
+from maud import validation
 from maud.data_model import (
     Compartment,
     Enzyme,
@@ -150,7 +151,7 @@ def load_maud_input_from_toml(filepath: str, id: str = "mi") -> MaudInput:
     for marginal_dg in parsed_toml["priors"]["thermodynamic_parameters"][
         "marginal_dgs"
     ]:
-        prior_id = f"{marginal_dg['target_id']}_dg"
+        prior_id = f"{marginal_dg['target_id']}_delta_g"
         priors[prior_id] = Prior(
             id=prior_id,
             target_id=marginal_dg["target_id"],
@@ -172,6 +173,8 @@ def load_maud_input_from_toml(filepath: str, id: str = "mi") -> MaudInput:
     for enz_id, kpps in parsed_toml["priors"]["kinetic_parameters"].items():
         for kpp in kpps:
             prior_id = f"{enz_id}_{kpp['target_id']}"
+            if "metabolite" in kpp.keys():
+                prior_id += "_" + kpp["metabolite"]
             priors[prior_id] = Prior(
                 id=prior_id,
                 target_id=kpp["target_id"],
@@ -191,6 +194,6 @@ def load_maud_input_from_toml(filepath: str, id: str = "mi") -> MaudInput:
                 experiment_id=exp_id,
             )
 
-    return MaudInput(
-        kinetic_model=kinetic_model, priors=priors, experiments=experiments
-    )
+    mi = MaudInput(kinetic_model=kinetic_model, priors=priors, experiments=experiments)
+    validation.validate_maud_input(mi)
+    return mi

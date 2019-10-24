@@ -1,0 +1,109 @@
+# Copyright (C) 2019 Novo Nordisk Foundation Center for Biosustainability,
+# Technical University of Denmark.
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <https://www.gnu.org/licenses/>.
+
+"""Functions for validating Maud objects."""
+
+from maud import data_model
+
+
+def validate_maud_input(mi: data_model.MaudInput):
+    """Check that priors, experiments and kinetic model are consistent."""
+    km = mi.kinetic_model
+    km_unb_mets = [met.id for met in km.metabolites.values() if not met.balanced]
+    km_balanced_mets = [met.id for met in km.metabolites.values() if met.balanced]
+    km_rxns = [rxn.id for rxn in km.reactions.values()]
+    km_enzs = [enz.id for rxn in km.reactions.values() for enz in rxn.enzymes.values()]
+    km_pars = [
+        p
+        for rxn in km.reactions.values()
+        for enz in rxn.enzymes.values()
+        for p in enz.parameters.values()
+    ]
+    km_tps = [p.enzyme_id + "_" + p.id for p in km_pars if p.is_thermodynamic]
+    km_kps = [p.enzyme_id + "_" + p.id for p in km_pars if not p.is_thermodynamic]
+    prior_kps, prior_tps = (
+        [pid for pid, p in mi.priors.items() if p.target_type == t]
+        for t in ["kinetic_parameter", "thermodynamic_parameter"]
+    )
+    prior_enzs, prior_unb_mets = (
+        [
+            (p.experiment_id, p.target_id)
+            for p in mi.priors.values()
+            if p.target_type == t
+        ]
+        for t in ["enzyme", "unbalanced_metabolite"]
+    )
+    for kp in prior_kps:
+        if kp not in km_kps:
+            raise ValueError(
+                f"kinetic parameter {kp} has a prior but is not in the kinetic model."
+            )
+    for kp in km_kps:
+        if kp not in prior_kps:
+            raise ValueError(
+                f"kinetic parameter {kp} is in the kinetic model but has no prior."
+            )
+    for tp in prior_tps:
+        if tp not in km_tps:
+            raise ValueError(
+                f"thermodynamic parameter {tp} has a prior but is not in the kinetic"
+                " model."
+            )
+    for tp in km_tps:
+        if tp not in prior_tps:
+            raise ValueError(
+                f"thermodynamic parameter {tp} is in the kinetic model but has no"
+                " prior."
+            )
+    for exp_id, met_id in prior_unb_mets:
+        if met_id not in km_unb_mets:
+            raise ValueError(
+                f"unbalanced metabolite {met_id} has a prior in experiment {exp_id} but"
+                " is not in the kinetic model."
+            )
+    for met_id in km_unb_mets:
+        for exp_id in mi.experiments.keys():
+            if (exp_id, met_id) not in prior_unb_mets:
+                raise ValueError(
+                    f"unbalanced metabolite {met_id} is in the kinetic model but has no"
+                    " prior in experiment {exp_id}."
+                )
+    for exp_id, enz_id in prior_enzs:
+        if enz_id not in km_enzs:
+            raise ValueError(
+                f"enzyme {enz_id} in experiment {exp_id} has a prior but is not in the"
+                " kinetic model."
+            )
+    for enz_id in km_enzs:
+        for exp_id in mi.experiments.keys():
+            if exp_id + "_" + enz_id not in map("_".join, prior_enzs):
+                raise ValueError(
+                    f"enzyme {enz_id} is in the kinetic model but has no prior in"
+                    " experiment {exp_id}."
+                )
+    for exp in mi.experiments.values():
+        for meas in exp.measurements["metabolite"].values():
+            if meas.target_id not in km_unb_mets + km_balanced_mets:
+                raise ValueError(
+                    f"metabolite {meas.target_id} is measured in experiment {exp.id}"
+                    "but is not in the kinetic model {mi.kinetic_model.model_id}."
+                )
+        for meas in exp.measurements["reaction"].values():
+            if meas.target_id not in km_rxns:
+                raise ValueError(
+                    f"reaction {meas.target_id} is measured in experiment {exp.id}"
+                    "but is not in the kinetic model {mi.kinetic_model.model_id}."
+                )
