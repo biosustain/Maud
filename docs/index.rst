@@ -15,6 +15,7 @@ Welcome to Maud's documentation!
    theory/computation
    theory/enzyme_kinetics
    theory/statistics
+   theory/thermodynamics
    implementation/data_model
 
 
