@@ -59,10 +59,12 @@ To run the simple linear model, use the following command:
 
     maud sample
 
-This will use the data file at `data/in/linar.toml` to create a Stan program at
-`maud/stan_code/autogen/inference_model_linear.stan`, compile it into a
+This will use the data file at `data/in/linar.toml
+<https://github.com/biosustain/Maud/blob/master/data/in/linear.toml>`_ to
+create a Stan program at
+:code:`maud/stan_code/autogen/inference_model_linear.stan`, compile it into a
 C++ Stan model, draw samples from the resulting posterior and store them in
-files starting with `data/out/model_output_linear`.
+files starting with :code:`data/out/model_output_linear`.
 
 The `sample` command can be configured in a few ways - to check out all the
 options try running
