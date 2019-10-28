@@ -1,6 +1,6 @@
-======================================
-Thermodynamic parameters
-======================================
+==============
+Thermodynamics
+==============
 
 Each enzyme in a reaction network model has a thermodynamic parameter called
 :math:`k_{eq}`, which represents how much energy the corresponding chemical
@@ -9,8 +9,8 @@ greater than 1) from its environment. This document explains how the laws of
 thermodynamics constrain these parameters and how Maud ensures that these
 constraints are satisfied.
 
-Thermodynamic constraints
-=========================
+Why the laws of thermodynamics impose constraints
+=================================================
 
 Thermodynamic parameters are constrained in two main ways.
 

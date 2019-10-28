@@ -1,5 +1,6 @@
-Background on relevant statistical issues
-=========================================
+==================
+Statistical issues
+==================
 
 This document addresses statistical questions to do with Maud, such as:
 
