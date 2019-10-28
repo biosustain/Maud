@@ -12,6 +12,7 @@ Welcome to Maud's documentation!
 
    usage/installation
    usage/inputting
+   usage/post_installation_usage
 
 .. toctree::
    :maxdepth: 2
