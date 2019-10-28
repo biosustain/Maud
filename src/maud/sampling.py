@@ -22,10 +22,10 @@ from typing import Dict
 import cmdstanpy
 import numpy as np
 import pandas as pd
+from scipy.linalg import null_space as null_space
 
 from maud import code_generation, io, utils
 from maud.data_model import KineticModel, MaudInput
-from scipy.linalg import null_space as null_space
 
 
 RELATIVE_PATHS = {
