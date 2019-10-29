@@ -83,7 +83,7 @@ data {
 transformed data {
   real xr[0];
   int xi[0];
-  real minus_RT = - 8.314 * 298.15;
+  real minus_RT = - 0.008314 * 298.15;
 }
 parameters {
   vector[stoichiometric_rank] delta_g_basis_contribution;
