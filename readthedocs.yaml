@@ -21,4 +21,5 @@ python:
        extra_requirements:
            - development
      - method: setuptools
+       path: src/maud
   system_packages: true
