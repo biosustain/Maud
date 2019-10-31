@@ -28,6 +28,8 @@ author = 'Novo Nordisk Foundation Center for Biosustainability, Technical Univer
 # extensions coming with Sphinx (named 'sphinx.ext.*') or your custom
 # ones.
 extensions = [
+    'sphinx.ext.autodoc',
+    'sphinx_click.ext'
 ]
 
 # Add any paths that contain templates here, relative to this directory.
@@ -50,3 +52,6 @@ html_theme = 'alabaster'
 # relative to this directory. They are copied after the builtin static files,
 # so a file named "default.css" will overwrite the builtin "default.css".
 html_static_path = ['_static']
+
+# So that readthedocs will look for index.rst rather than contents.rst
+master_doc = 'index'

@@ -1,0 +1,5 @@
+language: python
+python: ["3.7"]
+sudo: false
+install: ["pip install -e .[development]"]
+script: ["tox"]

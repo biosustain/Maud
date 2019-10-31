@@ -1,20 +1,26 @@
-=============================
+====
 Maud
-=============================
+====
 
-.. image:: https://img.shields.io/pypi/l/maud.svg
-   :target: https://www.apache.org/licenses/LICENSE-2.0
-   :alt: Apache Software License Version 2.0
+.. image:: https://img.shields.io/badge/License-GPLv3-blue.svg
+   :target: https://www.gnu.org/licenses/gpl-3.0
+   :alt: GNU General Public License 3.0
 
 .. image:: https://img.shields.io/badge/code%20style-black-000000.svg
    :target: https://github.com/ambv/black
    :alt: Black
 
+.. image:: https://img.shields.io/badge/Contributor%20Covenant-v1.4%20adopted-ff69b4.svg
+   :target: https://www.contributor-covenant.org/
+   :alt: Contributor Covenant Version 1.4
 
-Maud is an application that fits Bayesian statistical models of metabolic
-networks. It aims to take into account allosteric effects, ensure that the laws
-of thermodynamics are obeyed and to synthesise information from both steady
-state experiments and the existing literature.
+Maud is a work-in-progress application that fits Bayesian statistical models of
+metabolic networks using `Python <https://www.python.org/>`_ and `Stan
+<https://mc-stan.org>`_.
+
+Maud aims to take into account allosteric effects, ensure that the laws of
+thermodynamics are obeyed and to synthesise information from both steady state
+experiments and the existing literature.
 
 Install
 =======
@@ -36,9 +42,9 @@ This step requires that you have ssh access to the Maud github repository
 This is unavoidable while the repository remains private, but should be
 achievable if you can see this readme.
 
-Cmdstanpy depends on `cmdstan <https://github.com/stan-dev/cmdstan>`_, which needs to be installed too. Fortunately,
-cmdstanpy comes with a command line script that installs cmdstan, so this step
-is pretty simple:
+Cmdstanpy depends on `cmdstan <https://github.com/stan-dev/cmdstan>`_, which
+needs to be installed too. Fortunately, cmdstanpy comes with a command line
+script that installs cmdstan, so this step is pretty simple:
 
 .. code-block:: console
 
@@ -53,10 +59,12 @@ To run the simple linear model, use the following command:
 
     maud sample
 
-This will use the data file at `data/in/linar.toml` to create a Stan program at
-`maud/stan_code/autogen/inference_model_linear.stan`, compile it into a
+This will use the data file at `data/in/linar.toml
+<https://github.com/biosustain/Maud/blob/master/data/in/linear.toml>`_ to
+create a Stan program at
+:code:`maud/stan_code/autogen/inference_model_linear.stan`, compile it into a
 C++ Stan model, draw samples from the resulting posterior and store them in
-files starting with `data/out/model_output_linear`.
+files starting with :code:`data/out/model_output_linear`.
 
 The `sample` command can be configured in a few ways - to check out all the
 options try running
