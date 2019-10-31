@@ -22,10 +22,10 @@ from typing import Dict
 import cmdstanpy
 import numpy as np
 import pandas as pd
+from scipy.linalg import null_space as null_space
 
 from maud import code_generation, io, utils
 from maud.data_model import KineticModel, MaudInput
-from scipy.linalg import null_space as null_space
 
 
 RELATIVE_PATHS = {
@@ -67,7 +67,7 @@ def sample(
     n_chains: int,
     n_cores: int,
     time_step: float,
-) -> cmdstanpy.StanFit:
+) -> cmdstanpy.CmdStanMCMC:
     """Sample from a posterior distribution.
 
     :param data_path: A path to a toml file containing input data
@@ -102,8 +102,8 @@ def sample(
     if need_to_overwrite:
         with open(stan_file, "w") as f:
             f.write(stan_code)
-    model = cmdstanpy.Model(stan_file=stan_file)
-    model.compile(include_paths=[paths["stan_includes"]], overwrite=need_to_overwrite)
+    model = cmdstanpy.CmdStanModel(stan_file=stan_file)
+    model.compile(include_paths=[paths["stan_includes"]])
 
     return model.sample(
         data=input_file,

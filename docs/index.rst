@@ -8,13 +8,25 @@ Welcome to Maud's documentation!
 
 .. toctree::
    :maxdepth: 2
-   :caption: Contents:
+   :caption: How to use Maud:
 
    usage/installation
    usage/inputting
+   usage/post_installation_usage
+
+.. toctree::
+   :maxdepth: 2
+   :caption: Theoretical background:
+
    theory/computation
    theory/enzyme_kinetics
    theory/statistics
+   theory/thermodynamics
+
+.. toctree::
+   :maxdepth: 2
+   :caption: Implementation details:
+
    implementation/data_model
 
 

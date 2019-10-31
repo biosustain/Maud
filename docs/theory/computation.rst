@@ -1,5 +1,6 @@
-Background on relevant computational issues
-===========================================
+===========
+Computation
+===========
 
 This document addresses questions about computation, for example:
 
