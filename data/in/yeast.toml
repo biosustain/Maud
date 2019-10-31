@@ -179,53 +179,53 @@ reaction_measurements = [
 ###### Priors ######
 [priors.kinetic_parameters]
 GLCt1 = [
-  { target_id = 'Kcat1', location = 3.35, scale =  0.1},
-  { target_id = 'Ka', location = 0.9, scale =  0.1},
-  { target_id = 'Kp', location = 0.9, scale =  0.1},
+  { target_id = 'Kcat1', location = 3.35, scale = 0.1},
+  { target_id = 'Ka', location = 0.9, scale = 0.1},
+  { target_id = 'Kp', location = 0.9, scale = 0.1},
 ]
 HEX1 = [
-  { target_id = 'Kcat1', location = 63.2, scale =  0.1},
-  { target_id = 'Ka', location = 0.2, scale =  0.1},
-  { target_id = 'Kb', location = 0.195, scale =  0.1},
-  { target_id = 'Kp', location = 30, scale =  0.1},
-  { target_id = 'Kq', location = 0.23, scale =  0.1},
+  { target_id = 'Kcat1', location = 63.2, scale = 0.1},
+  { target_id = 'Ka', location = 0.2, scale = 0.1},
+  { target_id = 'Kb', location = 0.195, scale = 0.1},
+  { target_id = 'Kp', location = 30, scale = 0.1},
+  { target_id = 'Kq', location = 0.23, scale = 0.1},
 ]
 PGI = [
-  { target_id = 'Kcat1', location = 487, scale =  0.1},
-  { target_id = 'Ka', location = 1.03, scale =  0.1},
-  { target_id = 'Kp', location = 0.31, scale =  0.1},
+  { target_id = 'Kcat1', location = 487, scale = 0.1},
+  { target_id = 'Ka', location = 1.03, scale = 0.1},
+  { target_id = 'Kp', location = 0.31, scale = 0.1},
 ]
 PFK = [
-  { target_id = 'Kcat1', location = 209, scale =  0.1},
-  { target_id = 'Ka', location = 0.1, scale =  0.1},
-  { target_id = 'Kb', location = 0.71, scale =  0.1},
-  { target_id = 'Kp', location = 0.111, scale =  0.1},
-  { target_id = 'Kq', location = 1, scale =  0.1},
+  { target_id = 'Kcat1', location = 209, scale = 0.1},
+  { target_id = 'Ka', location = 0.1, scale = 0.1},
+  { target_id = 'Kb', location = 0.71, scale = 0.1},
+  { target_id = 'Kp', location = 0.111, scale = 0.1},
+  { target_id = 'Kq', location = 1, scale = 0.1},
 ]
 FBA = [
-  { target_id = 'Kcat1', location = 4.14, scale =  0.1},
-  { target_id = 'Ka', location = 0.45, scale =  0.1},
-  { target_id = 'Kp', location = 2, scale =  0.1},
-  { target_id = 'Kq', location = 2.4, scale =  0.1},
+  { target_id = 'Kcat1', location = 4.14, scale = 0.1},
+  { target_id = 'Ka', location = 0.45, scale = 0.1},
+  { target_id = 'Kp', location = 2, scale = 0.1},
+  { target_id = 'Kq', location = 2.4, scale = 0.1},
 ]
 TPI = [
-  { target_id = 'Kcat1', location = 564, scale =  0.1},
-  { target_id = 'Ka', location = 6.454, scale =  0.1},
-  { target_id = 'Kp', location = 5.25, scale =  0.1},
+  { target_id = 'Kcat1', location = 564, scale = 0.1},
+  { target_id = 'Ka', location = 6.454, scale = 0.1},
+  { target_id = 'Kp', location = 5.25, scale = 0.1},
 ]
 GAPD = [
-  { target_id = 'Kcat1', location = 19, scale =  0.1},
-  { target_id = 'Ka', location = 0.423, scale =  0.1},
-  { target_id = 'Kb', location = 0.09, scale =  0.1},
-  { target_id = 'Kp', location = 0.06, scale =  0.1},
-  { target_id = 'Kq', location = 0.909, scale =  0.1},
+  { target_id = 'Kcat1', location = 19, scale = 0.1},
+  { target_id = 'Ka', location = 0.423, scale = 0.1},
+  { target_id = 'Kb', location = 0.09, scale = 0.1},
+  { target_id = 'Kp', location = 0.06, scale = 0.1},
+  { target_id = 'Kq', location = 0.909, scale = 0.1},
 ]
 PGK = [
-  { target_id = 'Kcat1', location = 58.6, scale =  0.1},
-  { target_id = 'Ka', location = 0.2, scale =  0.1},
-  { target_id = 'Kb', location = 0.003, scale =  0.1},
-  { target_id = 'Kp', location = 4.58, scale =  0.1},
-  { target_id = 'Kq', location = 1.99, scale =  0.1},
+  { target_id = 'Kcat1', location = 58.6, scale = 0.1},
+  { target_id = 'Ka', location = 0.2, scale = 0.1},
+  { target_id = 'Kb', location = 0.003, scale = 0.1},
+  { target_id = 'Kp', location = 4.58, scale = 0.1},
+  { target_id = 'Kq', location = 1.99, scale = 0.1},
 ]
 
 [priors.thermodynamic_parameters]
