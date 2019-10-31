@@ -166,14 +166,24 @@ def get_input_data(
         for df in [unbalanced_metabolite_priors, enzyme_priors]
     )
 
-    unbalanced_metabolite_index = [met for met in metabolite_codes.keys() if met in unbalanced_metabolites]
+    unbalanced_metabolite_index = [
+        met for met in metabolite_codes.keys() if met in unbalanced_metabolites
+    ]
     enzyme_index = [enz for enz in enzyme_codes]
     experiment_index = [exp for exp in experiment_codes]
 
-    prior_loc_unb = prior_loc_unb.reindex(index = unbalanced_metabolite_index, columns = experiment_index)
-    prior_scale_unb = prior_scale_unb.reindex(index = unbalanced_metabolite_index, columns = experiment_index)
-    prior_loc_enzyme = prior_loc_enzyme.reindex(index = enzyme_index, columns = experiment_index)
-    prior_scale_enzyme = prior_scale_enzyme.reindex(index = enzyme_index, columns = experiment_index)
+    prior_loc_unb = prior_loc_unb.reindex(
+        index=unbalanced_metabolite_index, columns=experiment_index
+    )
+    prior_scale_unb = prior_scale_unb.reindex(
+        index=unbalanced_metabolite_index, columns=experiment_index
+    )
+    prior_loc_enzyme = prior_loc_enzyme.reindex(
+        index=enzyme_index, columns=experiment_index
+    )
+    prior_scale_enzyme = prior_scale_enzyme.reindex(
+        index=enzyme_index, columns=experiment_index
+    )
 
     metabolite_measurements, reaction_measurements = (
         pd.DataFrame(
