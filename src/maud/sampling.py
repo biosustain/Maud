@@ -145,6 +145,9 @@ def get_input_data(
     )
     metabolites = mi.kinetic_model.metabolites
     reactions = mi.kinetic_model.reactions
+    enzyme_codes = code_generation.get_enzyme_codes(mi.kinetic_model)
+    experiment_codes = utils.codify(mi.experiments.keys())
+    metabolite_codes = code_generation.get_metabolite_codes(mi.kinetic_model)
     enzymes = {k: v for r in reactions.values() for k, v in r.enzymes.items()}
     balanced_metabolites = {k: v for k, v in metabolites.items() if v.balanced}
     unbalanced_metabolites = {k: v for k, v in metabolites.items() if not v.balanced}
@@ -162,6 +165,16 @@ def get_input_data(
         for col in ["location", "scale"]
         for df in [unbalanced_metabolite_priors, enzyme_priors]
     )
+
+    unbalanced_metabolite_index = [met for met in metabolite_codes.keys() if met in unbalanced_metabolites]
+    enzyme_index = [enz for enz in enzyme_codes]
+    experiment_index = [exp for exp in experiment_codes]
+
+    prior_loc_unb = prior_loc_unb.reindex(index = unbalanced_metabolite_index, columns = experiment_index)
+    prior_scale_unb = prior_scale_unb.reindex(index = unbalanced_metabolite_index, columns = experiment_index)
+    prior_loc_enzyme = prior_loc_enzyme.reindex(index = enzyme_index, columns = experiment_index)
+    prior_scale_enzyme = prior_scale_enzyme.reindex(index = enzyme_index, columns = experiment_index)
+
     metabolite_measurements, reaction_measurements = (
         pd.DataFrame(
             [
@@ -173,10 +186,8 @@ def get_input_data(
         )
         for measurement_type in ["metabolite", "reaction"]
     )
-    experiment_codes = utils.codify(mi.experiments.keys())
+
     reaction_codes = utils.codify(reactions.keys())
-    enzyme_codes = code_generation.get_enzyme_codes(mi.kinetic_model)
-    metabolite_codes = code_generation.get_metabolite_codes(mi.kinetic_model)
     full_stoic = get_full_stoichiometry(
         mi.kinetic_model, enzyme_codes, metabolite_codes
     )
