@@ -145,23 +145,34 @@ def get_input_data(
     )
     metabolites = mi.kinetic_model.metabolites
     reactions = mi.kinetic_model.reactions
+    reaction_codes = utils.codify(reactions.keys())
+    enzyme_codes = code_generation.get_enzyme_codes(mi.kinetic_model)
+    experiment_codes = utils.codify(mi.experiments.keys())
+    metabolite_codes = code_generation.get_metabolite_codes(mi.kinetic_model)
+    unb_metabolite_codes = {
+        k: v for k, v in metabolite_codes.items() if not metabolites[k].balanced
+    }
     enzymes = {k: v for r in reactions.values() for k, v in r.enzymes.items()}
     balanced_metabolites = {k: v for k, v in metabolites.items() if v.balanced}
     unbalanced_metabolites = {k: v for k, v in metabolites.items() if not v.balanced}
-    unbalanced_metabolite_priors, kinetic_parameter_priors, dg_priors, enzyme_priors = (
+    kinetic_parameter_priors, dg_priors = (
         prior_df.loc[lambda df: df["target_type"] == target_type]
-        for target_type in [
-            "unbalanced_metabolite",
-            "kinetic_parameter",
-            "thermodynamic_parameter",
-            "enzyme",
-        ]
+        for target_type in ["kinetic_parameter", "thermodynamic_parameter"]
     )
     prior_loc_unb, prior_loc_enzyme, prior_scale_unb, prior_scale_enzyme = (
-        df.set_index(["target_id", "experiment_id"])[col].unstack()
+        prior_df.loc[lambda df: df["target_type"] == target_type]
+        .set_index(["target_id", "experiment_id"])[col]
+        .unstack()
+        .loc[list(codes.keys()), list(experiment_codes.keys())]
         for col in ["location", "scale"]
-        for df in [unbalanced_metabolite_priors, enzyme_priors]
+        for target_type, codes in [
+            ("unbalanced_metabolite", unb_metabolite_codes),
+            ("enzyme", enzyme_codes),
+        ]
     )
+
+    print(prior_loc_unb)
+
     metabolite_measurements, reaction_measurements = (
         pd.DataFrame(
             [
@@ -173,10 +184,6 @@ def get_input_data(
         )
         for measurement_type in ["metabolite", "reaction"]
     )
-    experiment_codes = utils.codify(mi.experiments.keys())
-    reaction_codes = utils.codify(reactions.keys())
-    enzyme_codes = code_generation.get_enzyme_codes(mi.kinetic_model)
-    metabolite_codes = code_generation.get_metabolite_codes(mi.kinetic_model)
     full_stoic = get_full_stoichiometry(
         mi.kinetic_model, enzyme_codes, metabolite_codes
     )

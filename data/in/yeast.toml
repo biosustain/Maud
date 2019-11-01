@@ -84,17 +84,17 @@ compartment = 'cytosol'
 [[metabolites]]
 id = 'dhap_c'
 name = 'dihydroxyacetone phosphate'
-balanced = true
+balanced = false
 compartment = 'cytosol'
 
 # Glycolysis
 [[reactions]]
-id = 'GCLt1'
-name = 'GCLt1'
+id = 'GLCt1'
+name = 'GLCt1'
 stoichiometry = { glc__D_e = -1, glc__D_c = 1}
 [[reactions.enzymes]]
-id = 'GCLt1'
-name = 'GCLt1'
+id = 'GLCt1'
+name = 'GLCt1'
 mechanism = "modular_rate_law"
 
 [[reactions]]
@@ -164,35 +164,35 @@ mechanism = "modular_rate_law"
 id = 'condition_1'
 metadata = "Condition 1"
 metabolite_measurements = [
-  { target_id = 'glc__D_c', value = 0.6, uncertainty = 0.05},
-  { target_id = 'g6p_c', value = 1.2, uncertainty = 0.1},
-  { target_id = 'f6p_c', value = 0.3, uncertainty = 0.1},
-  { target_id = 'f16p_c', value = 2.8, uncertainty = 0.1},
-  { target_id = 'g3p_c', value = 0.067, uncertainty = 0.1},
-  { target_id = 'dhap_c', value = 1.58, uncertainty = 0.1},
-  { target_id = '13dpg_c', value = 0.0016, uncertainty = 0.1},
+  { target_id = 'glc__D_c', value = 0.63, uncertainty = 0.05},
+  { target_id = 'g6p_c', value = 1.21, uncertainty = 0.05},
+  { target_id = 'f6p_c', value = 0.32, uncertainty = 0.05},
+  { target_id = 'f16p_c', value = 2.78, uncertainty = 0.05},
+  { target_id = 'g3p_c', value = 0.067, uncertainty = 0.05},
+  { target_id = '13dpg_c', value = 0.0016, uncertainty = 0.05},
 ]
 reaction_measurements = [
-  { target_id = 'GCLt1', value = 1.99, uncertainty = 0.2},
+  { target_id = 'GLCt1', value = 1.88, uncertainty = 0.05},
+  { target_id = 'TPI', value = 1.83, uncertainty = 0.05},
 ]
 
 ###### Priors ######
 [priors.kinetic_parameters]
-GCLt1 = [
+GLCt1 = [
   { target_id = 'Kcat1', location = 3.35, scale = 0.1},
   { target_id = 'Ka', location = 0.9, scale = 0.1},
   { target_id = 'Kp', location = 0.9, scale = 0.1},
 ]
 HEX1 = [
   { target_id = 'Kcat1', location = 63.2, scale = 0.1},
-  { target_id = 'Ka', location = 0.15, scale = 0.1},
-  { target_id = 'Kb', location = 0.293, scale = 0.1},
+  { target_id = 'Ka', location = 0.2, scale = 0.1},
+  { target_id = 'Kb', location = 0.195, scale = 0.1},
   { target_id = 'Kp', location = 30, scale = 0.1},
   { target_id = 'Kq', location = 0.23, scale = 0.1},
 ]
 PGI = [
-  { target_id = 'Kcat1', location = 487, scale = 0.2},
-  { target_id = 'Ka', location = 1.018, scale = 0.1},
+  { target_id = 'Kcat1', location = 487, scale = 0.1},
+  { target_id = 'Ka', location = 1.03, scale = 0.1},
   { target_id = 'Kp', location = 0.31, scale = 0.1},
 ]
 PFK = [
@@ -203,7 +203,7 @@ PFK = [
   { target_id = 'Kq', location = 1, scale = 0.1},
 ]
 FBA = [
-  { target_id = 'Kcat1', location = 2, scale = 2},
+  { target_id = 'Kcat1', location = 4.14, scale = 0.1},
   { target_id = 'Ka', location = 0.45, scale = 0.1},
   { target_id = 'Kp', location = 2, scale = 0.1},
   { target_id = 'Kq', location = 2.4, scale = 0.1},
@@ -214,7 +214,7 @@ TPI = [
   { target_id = 'Kp', location = 5.25, scale = 0.1},
 ]
 GAPD = [
-  { target_id = 'Kcat1', location = 2, scale = 2},
+  { target_id = 'Kcat1', location = 19, scale = 0.1},
   { target_id = 'Ka', location = 0.423, scale = 0.1},
   { target_id = 'Kb', location = 0.09, scale = 0.1},
   { target_id = 'Kp', location = 0.06, scale = 0.1},
@@ -230,34 +230,35 @@ PGK = [
 
 [priors.thermodynamic_parameters]
 marginal_dgs = [
-  { target_id = 'GLCT1', location = 1, scale = 0.05},
-  { target_id = 'HEX1', location = -17.3, scale = 0.9},
-  { target_id = 'PGI', location = 2.5, scale = 0.8},
-  { target_id = 'PFK', location = -15, scale = 1.3},
-  { target_id = 'FBA', location = 19.8, scale = 1.0},
-  { target_id = 'TPI', location = -5.5, scale = 1.1},
-  { target_id = 'GAPD', location = 7.8, scale = 0.8},
-  { target_id = 'PGK', location = 18.5, scale = 0.9},
+  { target_id = 'GLCt1', location = 0, scale = 0.05},
+  { target_id = 'HEX1', location = -18.8, scale = 0.9},
+  { target_id = 'PGI', location = -3.1, scale = 0.8},
+  { target_id = 'PFK', location = -16.6, scale = 1.3},
+  { target_id = 'FBA', location = -6.6, scale = 1.0},
+  { target_id = 'TPI', location = -7.7, scale = 1.1},
+  { target_id = 'GAPD', location = 13.0, scale = 0.8},
+  { target_id = 'PGK', location = -20.0, scale = 0.9},
 ]
 
 [priors.unbalanced_metabolites]
 condition_1 = [
-  { target_id = 'glc__D_e', location = 10, scale = 1.0 },
+  { target_id = 'glc__D_e', location = 74, scale = 0.05 },
   { target_id = 'atp_c', location = 3.95, scale = 0.05 },
-  { target_id = 'adp_c', location = 1.72, scale = 0.05 },
+  { target_id = 'adp_c', location = 1.73, scale = 0.05 },
   { target_id = 'nad_c', location = 1.41, scale = 0.05 },
   { target_id = 'nadh_c', location = 0.178, scale = 0.05 },
+  { target_id = 'dhap_c', location = 1.58, scale = 0.05},
   { target_id = '3pg_c', location = 0.52, scale = 0.05 },
 ]
 [priors.enzymes]
 condition_1 = [
   # Glycolysis
-  {target_id='GCLt1', location=1, scale=0.05},
-  {target_id='HEX1', location=0.062, scale=0.05},
+  {target_id='GLCt1', location=1, scale=0.05},
+  {target_id='HEX1', location=0.062, scale=0.1},
   {target_id='PGI', location=0.138, scale=0.05},
-  {target_id='PFK', location=0.047, scale=0.05},
+  {target_id='PFK', location=0.085, scale=0.05},
   {target_id='FBA', location=1.34, scale=0.05},
   {target_id='TPI', location=0.295, scale=0.05},
-  {target_id='GAPD', location=0.007, scale=0.05},
+  {target_id='GAPD', location=4.2, scale=0.05},
   {target_id='PGK', location=0.258, scale=0.05},
 ]
