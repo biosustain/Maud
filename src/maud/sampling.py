@@ -171,8 +171,6 @@ def get_input_data(
         ]
     )
 
-    print(prior_loc_unb)
-
     metabolite_measurements, reaction_measurements = (
         pd.DataFrame(
             [
