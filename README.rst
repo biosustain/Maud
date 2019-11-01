@@ -14,6 +14,10 @@ Maud
    :target: https://www.contributor-covenant.org/
    :alt: Contributor Covenant Version 1.4
 
+.. image:: https://readthedocs.org/projects/maud-metabolic-models/badge/?version=latest
+   :target: https://maud-metabolic-models.readthedocs.io/en/latest/?badge=latest
+   :alt: Documentation Status
+
 Maud is a work-in-progress application that fits Bayesian statistical models of
 metabolic networks using `Python <https://www.python.org/>`_ and `Stan
 <https://mc-stan.org>`_.
