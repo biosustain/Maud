@@ -149,42 +149,29 @@ def get_input_data(
     enzyme_codes = code_generation.get_enzyme_codes(mi.kinetic_model)
     experiment_codes = utils.codify(mi.experiments.keys())
     metabolite_codes = code_generation.get_metabolite_codes(mi.kinetic_model)
+    unb_metabolite_codes = {
+        k: v for k, v in metabolite_codes.items() if not metabolites[k].balanced
+    }
     enzymes = {k: v for r in reactions.values() for k, v in r.enzymes.items()}
     balanced_metabolites = {k: v for k, v in metabolites.items() if v.balanced}
     unbalanced_metabolites = {k: v for k, v in metabolites.items() if not v.balanced}
-    unbalanced_metabolite_priors, kinetic_parameter_priors, dg_priors, enzyme_priors = (
+    kinetic_parameter_priors, dg_priors = (
         prior_df.loc[lambda df: df["target_type"] == target_type]
-        for target_type in [
-            "unbalanced_metabolite",
-            "kinetic_parameter",
-            "thermodynamic_parameter",
-            "enzyme",
-        ]
+        for target_type in ["kinetic_parameter", "thermodynamic_parameter"]
     )
     prior_loc_unb, prior_loc_enzyme, prior_scale_unb, prior_scale_enzyme = (
-        df.set_index(["target_id", "experiment_id"])[col].unstack()
+        prior_df.loc[lambda df: df["target_type"] == target_type]
+        .set_index(["target_id", "experiment_id"])[col]
+        .unstack()
+        .loc[list(codes.keys()), list(experiment_codes.keys())]
         for col in ["location", "scale"]
-        for df in [unbalanced_metabolite_priors, enzyme_priors]
+        for target_type, codes in [
+            ("unbalanced_metabolite", unb_metabolite_codes),
+            ("enzyme", enzyme_codes),
+        ]
     )
 
-    unbalanced_metabolite_index = [
-        met for met in metabolite_codes.keys() if met in unbalanced_metabolites
-    ]
-    enzyme_index = [enz for enz in enzyme_codes]
-    experiment_index = [exp for exp in experiment_codes]
-
-    prior_loc_unb = prior_loc_unb.reindex(
-        index=unbalanced_metabolite_index, columns=experiment_index
-    )
-    prior_scale_unb = prior_scale_unb.reindex(
-        index=unbalanced_metabolite_index, columns=experiment_index
-    )
-    prior_loc_enzyme = prior_loc_enzyme.reindex(
-        index=enzyme_index, columns=experiment_index
-    )
-    prior_scale_enzyme = prior_scale_enzyme.reindex(
-        index=enzyme_index, columns=experiment_index
-    )
+    print(prior_loc_unb)
 
     metabolite_measurements, reaction_measurements = (
         pd.DataFrame(
