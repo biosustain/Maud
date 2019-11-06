@@ -36,15 +36,12 @@ First create a fresh Python 3.7 virtual environment and then activate it:
     python3.7 -m virtualenv maud_venv  # choose any name you like!
     source maud_venv/bin/activate
 
-Run this command to install Maud and its python dependencies:
+To install the latest Maud and its python dependencies to your new virtual
+environment from the latest master branch, run this command:
 
 .. code-block:: console
 
-    pip install -e git+ssh://git@github.com/biosustain/Maud.git#egg=maud
-
-This step requires that you have ssh access to the Maud github repository
-This is unavoidable while the repository remains private, but should be
-achievable if you can see this readme.
+    pip install https://github.com/biosustain/Maud/archive/master.zip
 
 Cmdstanpy depends on `cmdstan <https://github.com/stan-dev/cmdstan>`_, which
 needs to be installed too. Fortunately, cmdstanpy comes with a command line
