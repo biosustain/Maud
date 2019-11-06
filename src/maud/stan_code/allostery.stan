@@ -77,4 +77,6 @@ real get_free_enzyme_ratio_ordered_terbi(real A, real B, real C, real P, real Q,
     + Ka*V2*B*C*P*Q/(Kip*Kiq);
   return num / denom;
 }
-
+real get_free_enzyme_ratio_modular_rate_law(real Tr, real Dr){
+  return 1 / (Dr);
+}

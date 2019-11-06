@@ -88,6 +88,7 @@ def load_maud_input_from_toml(filepath: str, id: str = "mi") -> MaudInput:
                 params = {
                     param_id["target_id"]: Parameter(param_id["target_id"], e["id"])
                     for param_id in parsed_toml["priors"]["kinetic_parameters"][e["id"]]
+                    if param_id["target_id"] not in ['dissociation_constant_t', 'transfer_constant']
                 }
             else:
                 params = {
