@@ -88,7 +88,8 @@ def load_maud_input_from_toml(filepath: str, id: str = "mi") -> MaudInput:
                 params = {
                     param_id["target_id"]: Parameter(param_id["target_id"], e["id"])
                     for param_id in parsed_toml["priors"]["kinetic_parameters"][e["id"]]
-                    if param_id["target_id"] not in ['dissociation_constant_t', 'transfer_constant']
+                    if param_id["target_id"]
+                    not in ["dissociation_constant_t", "transfer_constant"]
                 }
             else:
                 params = {
@@ -100,10 +101,15 @@ def load_maud_input_from_toml(filepath: str, id: str = "mi") -> MaudInput:
             allosteric_activators = defaultdict()
             competitive_inhibitors = defaultdict()
             allosteric_params = defaultdict()
-            if any([x in ['allosteric_inhibitors', 'allosteric_activators'] for x in e.keys()]):
+            if any(
+                [
+                    x in ["allosteric_inhibitors", "allosteric_activators"]
+                    for x in e.keys()
+                ]
+            ):
                 allosteric_params = {
-                        "transfer_constant": Parameter("transfer_constant", e["id"])
-                    }
+                    "transfer_constant": Parameter("transfer_constant", e["id"])
+                }
             if "allosteric_inhibitors" in e.keys():
                 for inhibitor_id in e["allosteric_inhibitors"]:
                     allosteric_inhibitors.update(
@@ -139,14 +145,14 @@ def load_maud_input_from_toml(filepath: str, id: str = "mi") -> MaudInput:
                         {inhibitor_id: Modifier(inhibitor_id, "competitive_inhibitor")}
                     )
                     inhibition_constant_id = f"inhibition_constant_{inhibitor_id}"
-                    competitive_params.update(
+                    allosteric_params.update(
                         {
                             inhibition_constant_id: Parameter(
                                 inhibition_constant_id, e["id"], inhibitor_id
                             )
                         }
                     )
-            
+
             enz = Enzyme(
                 id=e["id"],
                 name=e["name"],
