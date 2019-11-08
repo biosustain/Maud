@@ -7,10 +7,24 @@ This document explains the assumptions about enzyme kinetics that Maud uses.
 Modular rate law
 ================
 
-This section outlines the assumptions made with the modular rate law, and includes a derivation of 2 substrate (A, B),
+This section outlines the assumptions made with the modular rate law, and includes a derivation of a 2 substrate (A, B),
 2 product (P, Q) random mechanism with competitive inhibitor I. It also highlights the general structure of the
 modular rate law used in Maud. The modular rate law framework was taken from [1],
-and was adapted to suit our structure.
+and was adapted to suit our structure. The general rate structure for the modular rate
+law is given below
+
+.. math::
+    v =  E_t f \frac{kcat_{1}\prod_{i, substrate}
+    (\frac{X_i}{K_{m, i}})^{|n_i|} 
+    - kcat_{2}\prod_{i, product}(\frac{X_i}{K_{m, i}})^{|n_i|}}{D + D^{reg}}.
+
+Where, :math:`E_t` is the total enzyme concentration, :math:`f` is a regulatory function, :math:`D`
+accounts for free enzyme amounts through substrate and product binding, and, :math:`D^{reg}` 
+considers specific binding regulation [1]. :math:`n_i` is the stoichiometric value for each metabolite
+in the reaction, however, in [1] it is considered as a structure number accounting for
+cooperativity. In the Maud framework, cooperativity (allostery) is integrated using the generalised
+MWC model seperating the regulatory modulators from the catalytic rate.
+
 
 Assumptions
 -----------
@@ -29,55 +43,60 @@ Example: 2 products and 2 substrate network
 .. figure:: random-bibi.png
 
     A random mechanism with 2 products and 2 substrates with a slow conversion step. All of the reactant
-    binding/release steps are in rapid equilibrium.
+    binding/release steps are in rapid equilibrium. All enzyme states :math:`E_X` and metabolites
+    will be in terms of concentrations, however the square brackets will be removed for
+    readability.
 
-For a random Bi-Bi network with the above assumptions, the rate will be the following:
+For a random Bi-Bi network with the above assumptions, the rate will be the following
 
 .. math::
-   v = E_t \frac{kcat_1 a' b' - kcat_2 p' q'}{(1 + a')(1 + b') + (1 + p')(1 + q') -1}
+   v = E_t \frac{kcat_1 a' b' - kcat_2 p' q'}{(1 + a')(1 + b') + (1 + p')(1 + q') -1}.
 
-where for metabolite X the corresponding term is given by,
+where, for metabolite X the corresponding term is given by
 
 .. math::
    x' &= \frac{X}{K_m^{x}} \\
-   K_m^{x} &= \frac{[X] \bullet [E_{i-1}]}{[E_i]}
+   K_m^{x} &= \frac{X \bullet E_{X, unbound}}{[E_{X, bound}]}.
 
-where :math:`E_{i-1}` is the enzyme state not bound to metabolite X, and,
-:math:`E_i` is the enzyme state bound to metabolite X
+Because we assume binding to be independent of order of addition, there can be
+multiple relationships for a given :math:`K_m^{x}` (:math:`K_m^{A} = \frac{A \bullet E}{EA}
+ = \frac{A \bullet EB}{EAB}`
 
-A derivation is shown below. The rate is determined by the interconversion between substrate to product and using
-elementary mass action kinetics is:
+The rate is determined by the conversion from substrate to product and using
+elementary mass action kinetics is
 
 .. math::
-   v = kcat_1 EAB - kcat_2 EPQ
+   v = kcat_1 EAB - kcat_2 EPQ.
 
-Because of the rapid equilibrium assumption the dissociation constants are assumed 
-for the Michaelis Menten constants. EAB and EPQ can be written in terms of free
-enzyme concentration and total enzyme concentration and metabolite concentrations. In this case:
+Because of the rapid equilibrium assumption, the Michaelis-Menten constants are approximated 
+by the dissociation constants. All enzyme state concentrations can be determined from the free
+enzyme concentration and metabolite concentrations. In this case
 
 .. math::
    EA &= a' E_0  \\
    EB &= b' E_0  \\
-   EAB &= a' EB = b' EA = a' b' E_0 \\
+   EAB &= a' EB = b' EA = a' b' E_0 \\\\
    EP &= p' E_0  \\
    EQ &= q' E_0  \\
-   EPQ &= p' EQ = q' EP = p' q' E_0 \\
-   E_0 &= E_t - \sum_{i} E_i \\
-   E_0 &= E_t - E_0 (a' + b' + a' b' + p' + q' + p' q') \\
-   E_0 / E_t &= \Theta \\
-   \Theta &= \frac{1}{1 + a' + b' + a' b' + p' + q' + p' q'}
+   EPQ &= p' EQ = q' EP = p' q' E_0.
+
+With the free enzyme concentration being a function of free enzyme ratio :math:`\theta` and
+total enzyme concentration
+
+.. math::
+   E_0 &= E_t - \sum_{i, bound} E_i \\
+    &= E_t - E_0 (a' + b' + a' b' + p' + q' + p' q') \\
+    &= E_t \theta
+
+where
+
+.. math::
+    \theta = \frac{1}{1 + a' + b' + a' b' + p' + q' + p' q'}.
    
-
-After substituting the enzyme concentrations into the rate
-equation it becomes:
+After substituting the enzyme concentrations into the rate equation it becomes
 
 .. math::
-   v = E_0 (kcat_1 a' b' - kcat_2 p' q')
-
-where the free enzyme amount :math:`E_0` is defined by:
-
-.. math::
-   E_0 = \frac{E_t}{(1 + a')(1 + b') + (1 + p')(1 + q') -1}
+   v = E_t \theta (kcat_1 a' b' - kcat_2 p' q').
 
 Competitive inhibition
 ----------------------
@@ -93,20 +112,25 @@ product.
 
 As described in [1], competitive inhibition is accounted for in the denominator
 term of the rate equation. It's easy to see how this occurs when you look at the free
-enzyme concentration:
+enzyme concentration
 
 .. math::
-   EI = i' E_0
+   EI = i' E_0.
 
-therefore,
-
-.. math::
-    \Theta = \frac{1}{1 + a' + b' + a' b' + p' + q' + p' q' + i'}
-
-which can then be substituted into the original rate equation with the form:
+by using the previous 
 
 .. math::
-   v = E_t \frac{kcat_1 a' b' - kcat_2 p' q'}{(1 + a')(1 + b') + (1 + p')(1 + q') + i' -1}
+    E_0 &= E_t - \sum_{i,bound} E_i \\
+
+and
+
+.. math::
+    \theta = \frac{1}{1 + a' + b' + a' b' + p' + q' + p' q' + i'}.
+
+which can then be substituted into the original rate equation with the form
+
+.. math::
+   v = E_t \frac{kcat_1 a' b' - kcat_2 p' q'}{(1 + a')(1 + b') + (1 + p')(1 + q') + i' -1}.
 
 Allostery
 ---------
