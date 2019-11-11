@@ -52,7 +52,7 @@ MECHANISM_TEMPLATES = {
         "ordered_unibi(m[{{S0}}],m[{{P0}}],m[{{P1}}],"
         "p[{{enz}}]*p[{{Kcat1}}],p[{{enz}}]*p[{{Kcat2}}],"
         "p[{{Ka}}],p[{{Kp}}],p[{{Kq}}],"
-        "p[{{Kia}}],{{enz_id}}_Kip,{{enz_id}}_Kiq],"
+        "p[{{Kia}}],{{enz_id}}_Kip,{{enz_id}}_Kiq,"
         "p[{{Keq}}])"
     ),
     "ordered_bibi": Template(
@@ -81,17 +81,17 @@ MECHANISM_TEMPLATES = {
 
 HALDANE_PARAMS = {
     "ordered_unibi": {
-        "Kip": ["Keq", "Kia", "Kq", "Kcat1", "Kcat2"],
-        "Kiq": ["Keq", "Ka", "Kp", "Kcat1", "Kcat2"],
+        "Kip": ["delta_g", "Kia", "Kq", "Kcat1", "Kcat2"],
+        "Kiq": ["delta_g", "Ka", "Kp", "Kcat1", "Kcat2"],
     },
     "ordered_bibi": {
-        "Kia": ["Keq", "Kb", "Kp", "Kiq", "Kcat1", "Kcat2"],
-        "Kip": ["Keq", "Ka", "Kq", "Kib", "Kcat1", "Kcat2"],
+        "Kia": ["delta_g", "Kb", "Kp", "Kiq", "Kcat1", "Kcat2"],
+        "Kip": ["delta_g", "Ka", "Kq", "Kib", "Kcat1", "Kcat2"],
     },
-    "pingpong": {"Kp": ["Keq", "Ka", "Kb", "Kq", "Kcat1", "Kcat2"]},
+    "pingpong": {"Kp": ["delta_g", "Ka", "Kb", "Kq", "Kcat1", "Kcat2"]},
     "ordered_terbi": {
-        "Kip": ["Keq", "Kia", "Kib", "Kic", "Kiq"],
-        "Kp": ["Keq", "Kc", "Kia", "Kib", "Kiq", "Kcat1", "Kcat2"],
+        "Kip": ["delta_g", "Kia", "Kib", "Kic", "Kiq"],
+        "Kp": ["delta_g", "Kc", "Kia", "Kib", "Kiq", "Kcat1", "Kcat2"],
     },
 }
 
