@@ -31,7 +31,13 @@ def test_create_haldane_line():
     """Test that the function create_haldane_line behaves as expected."""
     rxn_id = "tr"
     mechanism = "ordered_unibi"
-    param_codes = {"tr_delta_g": 1, "tr_Kia": 2, "tr_Kq": 3, "tr_Kcat1": 4, "tr_Kcat2": 5}
+    param_codes = {
+        "tr_delta_g": 1,
+        "tr_Kia": 2,
+        "tr_Kq": 3,
+        "tr_Kcat1": 4,
+        "tr_Kcat2": 5,
+    }
     expected_line = "real tr_Kip = get_Kip_ordered_unibi(p[1],p[2],p[3],p[4],p[5]);"
     generated_line = code_generation.create_haldane_line(
         param_codes, "Kip", mechanism, rxn_id, code_generation.HALDANE_PARAMS
