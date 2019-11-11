@@ -31,7 +31,7 @@ def test_create_haldane_line():
     """Test that the function create_haldane_line behaves as expected."""
     rxn_id = "tr"
     mechanism = "ordered_unibi"
-    param_codes = {"tr_Keq": 1, "tr_Kia": 2, "tr_Kq": 3, "tr_Kcat1": 4, "tr_Kcat2": 5}
+    param_codes = {"tr_delta_g": 1, "tr_Kia": 2, "tr_Kq": 3, "tr_Kcat1": 4, "tr_Kcat2": 5}
     expected_line = "real tr_Kip = get_Kip_ordered_unibi(p[1],p[2],p[3],p[4],p[5]);"
     generated_line = code_generation.create_haldane_line(
         param_codes, "Kip", mechanism, rxn_id, code_generation.HALDANE_PARAMS
@@ -87,7 +87,7 @@ def test_mechanism_templates():
     expected_calls = {
         "uniuni": "uniuni(m[1],m[4],p[1]*p[3],p[1]*p[4],p[5],p[2])",
         "ordered_unibi": "ordered_unibi(m[1],m[4],m[5],p[1]*p[3],p[1]*p[4],p[5],"
-        "p[8],p[9],p[10],e1_Kip,e1_Kiq],p[2])",
+        "p[8],p[9],p[10],e1_Kip,e1_Kiq,p[2])",
         "ordered_bibi": "ordered_bibi(m[1],m[2],m[4],m[5],p[1]*p[3],p[1]*p[4],"
         "p[5],p[6],p[8],p[9],e1_Kia,p[11],e1_Kip,p[13],p[2])",
         "pingpong": "pingpong(m[1],m[2],m[4],m[5],p[1]*p[3],p[1]*p[4],p[5],p[6],"
