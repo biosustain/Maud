@@ -14,12 +14,19 @@ and was adapted to suit our structure. The general rate structure for the modula
 law is given below
 
 .. math::
-    v =  E_t f \frac{kcat_{1}\prod_{i, substrate}
-    (\frac{X_i}{K_{m, i}})^{|n_i|} 
-    - kcat_{2}\prod_{i, product}(\frac{X_i}{K_{m, i}})^{|n_i|}}{D + D^{reg}}.
+    v =  E_t f \frac{T}{D + D^{reg}}
 
-Where, :math:`E_t` is the total enzyme concentration, :math:`f` is a regulatory function, :math:`D`
-accounts for free enzyme amounts through substrate and product binding, and, :math:`D^{reg}` 
+where,
+
+.. math::
+    T = kcat_{1}\prod_{i, substrate}
+    (\frac{X_i}{K_{m, i}})^{|n_i|} 
+    - kcat_{2}\prod_{i, product}(\frac{X_i}{K_{m, i}})^{|n_i|} \\
+
+    D = \prod_{i, substrate}(1 + \frac{X_i}{K_{m, i}})^{|n_i|} 
+    + \prod_{i, product}(1 + \frac{X_i}{K_{m, i}})^{|n_i|}.
+
+Additionally, :math:`E_t` is the total enzyme concentration, :math:`f` is a regulatory function, and , :math:`D^{reg}` 
 considers specific binding regulation [1]. :math:`n_i` is the stoichiometric value for each metabolite
 in the reaction, however, in [1] it is considered as a structure number accounting for
 cooperativity. In the Maud framework, cooperativity (allostery) is integrated using the generalised
@@ -59,8 +66,8 @@ where, for metabolite X the corresponding term is given by
    K_m^{x} &= \frac{X \bullet E_{X, unbound}}{[E_{X, bound}]}.
 
 Because we assume binding to be independent of order of addition, there can be
-multiple relationships for a given :math:`K_m^{x}` (:math:`K_m^{A} = \frac{A \bullet E}{EA}
- = \frac{A \bullet EB}{EAB}`
+multiple relationships for a given :math:`K_m^{x}`. For example,  
+:math:`K_m^{A} = \frac{A \bullet E}{EA} = \frac{A \bullet EB}{EAB}`
 
 The rate is determined by the conversion from substrate to product and using
 elementary mass action kinetics is
