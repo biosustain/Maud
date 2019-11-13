@@ -48,6 +48,7 @@ def test_create_haldane_line():
 def test_get_regulatory_string():
     """Test that the function get_regulatory_string behaves as expected."""
     inhibitor_codes = {"m1": 1, "m2": 2}
+    activator_codes = {}
     param_codes = {
         "e1_dissociation_constant_t_m1": 2,
         "e1_dissociation_constant_t_m2": 3,
@@ -55,7 +56,7 @@ def test_get_regulatory_string():
     }
     enzyme_name = "e1"
     generated = code_generation.get_regulatory_string(
-        inhibitor_codes, param_codes, enzyme_name
+        inhibitor_codes, activator_codes, param_codes, enzyme_name
     )
     expected = (
         "get_regulatory_effect("

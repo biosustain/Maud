@@ -383,10 +383,10 @@ def create_fluxes_function(kinetic_model: KineticModel, template: Template) -> s
                     mod_id: met_codes[mod_id] for mod_id in allosteric_activators.keys()
                 }
                 regulatory_string = get_regulatory_string(
-                    allosteric_inhibitor_codes, 
+                    allosteric_inhibitor_codes,
                     allosteric_activator_codes,
-                    kp_codes_in_theta, 
-                    enz.id
+                    kp_codes_in_theta,
+                    enz.id,
                 )
                 enzyme_flux_string = catalytic_string + "*" + regulatory_string
             else:
@@ -405,8 +405,8 @@ def create_fluxes_function(kinetic_model: KineticModel, template: Template) -> s
 def get_regulatory_string(
     inhibitor_codes: Dict[str, int],
     activator_codes: Dict[str, int],
-    param_codes: Dict[str, int], 
-    enzyme_name: str
+    param_codes: Dict[str, int],
+    enzyme_name: str,
 ) -> str:
     """Create a call to the Stan function get_regulatory_effect.
 
