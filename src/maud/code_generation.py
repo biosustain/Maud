@@ -357,7 +357,8 @@ def create_fluxes_function(kinetic_model: KineticModel, template: Template) -> s
                 }
 
             catalytic_string = MECHANISM_TEMPLATES[enz.mechanism].render(mechanism_args)
-            if any(enz.modifiers):
+            is_allosteric = [1 for mod in enz.modifiers.values() if mod.allosteric]
+            if any(is_allosteric):
                 # make free enzyme ratio line
                 free_enzyme_ratio_line = Template(
                     "real free_enzyme_ratio_{{enzyme}} = "
@@ -370,11 +371,22 @@ def create_fluxes_function(kinetic_model: KineticModel, template: Template) -> s
                     for mod_id, mod in enz.modifiers.items()
                     if mod.modifier_type == "allosteric_inhibitor"
                 }
+                allosteric_activators = {
+                    mod_id: mod
+                    for mod_id, mod in enz.modifiers.items()
+                    if mod.modifier_type == "allosteric_activator"
+                }
                 allosteric_inhibitor_codes = {
                     mod_id: met_codes[mod_id] for mod_id in allosteric_inhibitors.keys()
                 }
+                allosteric_activator_codes = {
+                    mod_id: met_codes[mod_id] for mod_id in allosteric_activators.keys()
+                }
                 regulatory_string = get_regulatory_string(
-                    allosteric_inhibitor_codes, kp_codes_in_theta, enz.id
+                    allosteric_inhibitor_codes, 
+                    allosteric_activator_codes,
+                    kp_codes_in_theta, 
+                    enz.id
                 )
                 enzyme_flux_string = catalytic_string + "*" + regulatory_string
             else:
@@ -391,7 +403,10 @@ def create_fluxes_function(kinetic_model: KineticModel, template: Template) -> s
 
 
 def get_regulatory_string(
-    inhibitor_codes: Dict[str, int], param_codes: Dict[str, int], enzyme_name: str
+    inhibitor_codes: Dict[str, int],
+    activator_codes: Dict[str, int],
+    param_codes: Dict[str, int], 
+    enzyme_name: str
 ) -> str:
     """Create a call to the Stan function get_regulatory_effect.
 
@@ -403,10 +418,10 @@ def get_regulatory_string(
 
     regulatory_template = Template(
         """get_regulatory_effect(
-        empty_array,
+        {{activator_str}},
         {{inhibitor_str}},
         free_enzyme_ratio_{{enzyme_name}},
-        empty_array,
+        {{diss_r_str}},
         {{diss_t_str}},
         p[{{transfer_constant_code}}]
     )""".replace(
@@ -415,20 +430,39 @@ def get_regulatory_string(
             "\n", ""
         )
     )
-    inhibitor_template = Template("{ {{-inhibitor_strs|join(',')-}} }")
-    diss_t_template = Template("{ {{-diss_t_strs|join(',')-}} }")
+    regulator_template = Template("{ {{-regulator_strs|join(',')-}} }")
+    diss_const_template = Template("{ {{-diss_const_strs|join(',')-}} }")
     diss_t_param_codes = [
         param_codes[enzyme_name + "_dissociation_constant_t_" + inhibitor_name]
         for inhibitor_name in inhibitor_codes.keys()
     ]
+    diss_r_param_codes = [
+        param_codes[enzyme_name + "_dissociation_constant_r_" + activator_name]
+        for activator_name in activator_codes.keys()
+    ]
     transfer_constant_code = param_codes[enzyme_name + "_transfer_constant"]
     inhibitor_strs = [f"m[{c}]" for c in inhibitor_codes.values()]
+    activator_strs = [f"m[{c}]" for c in activator_codes.values()]
     diss_t_strs = [f"p[{c}]" for c in diss_t_param_codes]
-    diss_t_str = diss_t_template.render(diss_t_strs=diss_t_strs)
-    inhibitor_str = inhibitor_template.render(inhibitor_strs=inhibitor_strs)
+    diss_r_strs = [f"p[{c}]" for c in diss_r_param_codes]
+    diss_t_str = diss_const_template.render(diss_const_strs=diss_t_strs)
+    diss_r_str = diss_const_template.render(diss_const_strs=diss_r_strs)
+    inhibitor_str = regulator_template.render(regulator_strs=inhibitor_strs)
+    activator_str = regulator_template.render(regulator_strs=activator_strs)
+
+    if not activator_codes:
+        activator_str = "empty_array"
+        diss_r_str = "empty_array"
+
+    if not inhibitor_codes:
+        inhibitor_str = "empty_array"
+        diss_t_str = "empty_array"
+
     return regulatory_template.render(
+        activator_str=activator_str,
         inhibitor_str=inhibitor_str,
         enzyme_name=enzyme_name,
+        diss_r_str=diss_r_str,
         diss_t_str=diss_t_str,
         transfer_constant_code=transfer_constant_code,
     )
