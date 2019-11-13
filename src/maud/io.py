@@ -88,6 +88,8 @@ def load_maud_input_from_toml(filepath: str, id: str = "mi") -> MaudInput:
                 params = {
                     param_id["target_id"]: Parameter(param_id["target_id"], e["id"])
                     for param_id in parsed_toml["priors"]["kinetic_parameters"][e["id"]]
+                    if param_id["target_id"]
+                    not in ["dissociation_constant_t", "transfer_constant"]
                 }
             else:
                 params = {
@@ -96,10 +98,19 @@ def load_maud_input_from_toml(filepath: str, id: str = "mi") -> MaudInput:
                 }
             params["delta_g"] = Parameter("delta_g", e["id"], is_thermodynamic=True)
             allosteric_inhibitors = defaultdict()
-            if "allosteric_inhibitors" in e.keys():
+            allosteric_activators = defaultdict()
+            competitive_inhibitors = defaultdict()
+            allosteric_params = defaultdict()
+            if any(
+                [
+                    x in ["allosteric_inhibitors", "allosteric_activators"]
+                    for x in e.keys()
+                ]
+            ):
                 allosteric_params = {
                     "transfer_constant": Parameter("transfer_constant", e["id"])
                 }
+            if "allosteric_inhibitors" in e.keys():
                 for inhibitor_id in e["allosteric_inhibitors"]:
                     allosteric_inhibitors.update(
                         {inhibitor_id: Modifier(inhibitor_id, "allosteric_inhibitor")}
@@ -113,6 +124,35 @@ def load_maud_input_from_toml(filepath: str, id: str = "mi") -> MaudInput:
                         }
                     )
                 params.update(allosteric_params)
+            if "allosteric_activators" in e.keys():
+                for activator_id in e["allosteric_activators"]:
+                    allosteric_activators.update(
+                        {activator_id: Modifier(activator_id, "allosteric_activator")}
+                    )
+                    diss_r_const_id = f"dissociation_constant_r_{activator_id}"
+                    allosteric_params.update(
+                        {
+                            diss_r_const_id: Parameter(
+                                diss_r_const_id, e["id"], activator_id
+                            )
+                        }
+                    )
+                params.update(allosteric_params)
+
+            if "competitive_inhibitors" in e.keys():
+                for inhibitor_id in e["competitive_inhibitors"]:
+                    competitive_inhibitors.update(
+                        {inhibitor_id: Modifier(inhibitor_id, "competitive_inhibitor")}
+                    )
+                    inhibition_constant_id = f"inhibition_constant_{inhibitor_id}"
+                    allosteric_params.update(
+                        {
+                            inhibition_constant_id: Parameter(
+                                inhibition_constant_id, e["id"], inhibitor_id
+                            )
+                        }
+                    )
+
             enz = Enzyme(
                 id=e["id"],
                 name=e["name"],

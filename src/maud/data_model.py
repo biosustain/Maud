@@ -62,13 +62,16 @@ class Modifier:
 
     :param met: the metabolite that is the modifier
     :param allosteric: whether or not the modifier is allosteric
-    :param modifier_type: what is the modifier type: 'activator', 'inhibitor',
-    'competitive inhibitor', 'uncompetitive inhibitor', or 'noncompetitive inhibitor'
+    :param modifier_type: what is the modifier type:
+    'allosteric_activator', 'allosteric_inhibitor', 'competitive inhibitor'
     """
 
     def __init__(self, metabolite: Metabolite, modifier_type: str = None):
         self.metabolite = metabolite
-        self.allosteric = modifier_type in ["inhibitor"]
+        self.allosteric = modifier_type in [
+            "allosteric_inhibitor",
+            "allosteric_activator",
+        ]
         self.modifier_type = modifier_type
 
 
