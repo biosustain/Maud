@@ -104,4 +104,5 @@ pass
 def sample(data_path, **kwargs):
     """Sample from the model defined by the data at data_path."""
     stanfit = sampling.sample(data_path, **kwargs)
+    stanfit.diagnose()
     print(stanfit.summary())
