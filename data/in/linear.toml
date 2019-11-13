@@ -36,6 +36,7 @@ stoichiometry = { M1_ex = -1, M1 = 1}
 id = 'r1'
 name = 'the enzyme that catalyses reaction r1'
 mechanism = 'uniuni'
+allosteric_activators = ['M2']
 
 [[reactions]]
 id = 'r2'
@@ -85,6 +86,8 @@ r1 = [
   { target_id = 'Kcat1', location = 1, scale = 0.6},
   { target_id = 'Kcat2', location = 1, scale = 0.6},
   { target_id = 'Ka', location = 1, scale = 0.6},
+  { target_id = 'dissociation_constant_r', metabolite = 'M2', location= 1, scale = 0.6},
+  { target_id = 'transfer_constant', location= 1, scale = 0.6},
 ]
 r2 = [
   { target_id = 'Kcat1', location = 1, scale = 0.6},
