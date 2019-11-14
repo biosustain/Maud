@@ -369,8 +369,7 @@ def create_fluxes_function(kinetic_model: KineticModel, template: Template) -> s
                 }
 
             catalytic_string = MECHANISM_TEMPLATES[enz.mechanism].render(mechanism_args)
-            is_allosteric = [1 for mod in enz.modifiers.values() if mod.allosteric]
-            if any(is_allosteric):
+            if any([mod.allosteric for mod in enz.modifiers.values()]):
                 # make free enzyme ratio line
                 free_enzyme_ratio_line = Template(
                     "real free_enzyme_ratio_{{enzyme}} = "
@@ -378,16 +377,14 @@ def create_fluxes_function(kinetic_model: KineticModel, template: Template) -> s
                 ).render(enzyme=enz_id, catalytic_string=catalytic_string)
                 free_enzyme_ratio_lines.append(free_enzyme_ratio_line)
                 # make regulatory effect string
-                allosteric_inhibitors = {
-                    mod.metabolite: mod
-                    for mod in enz.modifiers.values()
-                    if mod.modifier_type == "allosteric_inhibitor"
-                }
-                allosteric_activators = {
-                    mod.metabolite: mod
-                    for mod in enz.modifiers.values()
-                    if mod.modifier_type == "allosteric_activator"
-                }
+                allosteric_inhibitors, allosteric_activators = (
+                    {
+                        mod.metabolite: mod
+                        for mod in enz.modifiers.values()
+                        if mod.modifier_type == modifier_type
+                    }
+                    for modifier_type in ["allosteric_inhibitor", "allosteric_activator"]
+                )
                 allosteric_inhibitor_codes = {
                     mod_id: met_codes[mod_id] for mod_id in allosteric_inhibitors.keys()
                 }
