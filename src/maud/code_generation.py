@@ -318,7 +318,7 @@ def create_fluxes_function(kinetic_model: KineticModel, template: Template) -> s
             # make modular rate law if necessary
             if enz.mechanism == "modular_rate_law":
                 enz_code = enz_codes_in_theta[enz.id]
-                competitor_ids = [mod.id for mod in enz.modifiers.values() if "competitive_inhibitor" in mod.modifier_type]
+                competitor_ids = [mod.metabolite for mod in enz.modifiers.values() if "competitive_inhibitor" in mod.modifier_type]
                 substrate_block, product_block, competitor_block = get_modular_rate_codes(
                     enz_id,
                     competitor_ids,
@@ -370,8 +370,8 @@ def create_fluxes_function(kinetic_model: KineticModel, template: Template) -> s
                 free_enzyme_ratio_lines.append(free_enzyme_ratio_line)
                 # make regulatory effect string
                 allosteric_inhibitors = {
-                    mod_id: mod
-                    for mod_id, mod in enz.modifiers.items()
+                    mod.metabolite: mod
+                    for mod in enz.modifiers.values()
                     if mod.modifier_type == "allosteric_inhibitor"
                 }
                 allosteric_inhibitor_codes = {
