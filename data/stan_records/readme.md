@@ -1,1 +1,0 @@
-Store data for stan model here
