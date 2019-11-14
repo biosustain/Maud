@@ -96,6 +96,9 @@ pass
     default=SAMPLING_DEFAULTS["time_step"],
     help="How far ahead the ode solver simulates",
 )
+@click.option(
+    "--output_dir", default="./", help="Where to save Maud's output",
+)
 @click.argument(
     "data_path",
     type=click.Path(exists=True, dir_okay=False),
