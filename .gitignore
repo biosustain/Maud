@@ -1,6 +1,9 @@
 *__pycache__*
 data/cached_stan_models/*.pkl
 */.ipynb_checkpoints/*
+*.csv
+*.txt
+*.json
 
 data/stan_records/*
 data/in/*
@@ -11,9 +14,6 @@ data/in/*
 !data/in/yeast_measurements.csv
 !data/in/inits_yeast.Rdump
 !data/in/model_input_yeast.Rdump
-
-data/out/*
-!data/out/readme.md
 
 src/maud/stan_code/autogen/*
 !src/maud/stan_code/autogen/readme.md
