@@ -138,6 +138,9 @@ def load_maud_input_from_toml(filepath: str, id: str = "mi") -> MaudInput:
                         }
                     )
             if "competitive_inhibitors" in e.keys():
+                if e["mechanism"] != "modular_rate_law":
+                    raise ValueError("competitive inhibitors are currently only supported for the mechanism 'modular_rate_law'")
+
                 for inhibitor_id in e["competitive_inhibitors"]:
                     modifiers.update(
                         {f"{inhibitor_id}_competitive_inhibitors": Modifier(inhibitor_id, "competitive_inhibitor")}
