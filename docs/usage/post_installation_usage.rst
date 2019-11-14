@@ -10,6 +10,7 @@ following command:
 
 
 .. code:: console
+
           maud sample path/to/data --n_chains=3 --n_warmup=200 --n_samples=100
 
 
