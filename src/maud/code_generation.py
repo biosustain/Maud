@@ -383,7 +383,10 @@ def create_fluxes_function(kinetic_model: KineticModel, template: Template) -> s
                         for mod in enz.modifiers.values()
                         if mod.modifier_type == modifier_type
                     }
-                    for modifier_type in ["allosteric_inhibitor", "allosteric_activator"]
+                    for modifier_type in [
+                        "allosteric_inhibitor",
+                        "allosteric_activator",
+                    ]
                 )
                 allosteric_inhibitor_codes = {
                     mod_id: met_codes[mod_id] for mod_id in allosteric_inhibitors.keys()
