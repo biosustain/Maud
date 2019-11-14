@@ -97,8 +97,8 @@ real ordered_terbi(real A, real B, real C, real P, real Q,
     + Ka*V2*B*C*P*Q/(Kip*Kiq);
   return num/denom;
 }
-real modular_rate_law(real Tr, real Dr){
-  return(Tr/(Dr));
+real modular_rate_law(real Tr, real Dr, real Dr_reg){
+  return(Tr/(Dr + Dr_reg));
 }
 real irr_mass_action(real A, real V1){
   return(A*V1);

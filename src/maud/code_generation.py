@@ -76,7 +76,7 @@ MECHANISM_TEMPLATES = {
         "p[{{Kia}}],p[{{Kib}}],p[{{Kic}}],{{enz_id}}_Kip,p[{{Kiq}}],"
         "p[{{Keq}}])"
     ),
-    "modular_rate_law": Template("modular_rate_law({{Tr}},{{Dr}})"),
+    "modular_rate_law": Template("modular_rate_law({{Tr}},{{Dr}}, {{Dr_reg}})"),
 }
 
 HALDANE_PARAMS = {
@@ -318,8 +318,10 @@ def create_fluxes_function(kinetic_model: KineticModel, template: Template) -> s
             # make modular rate law if necessary
             if enz.mechanism == "modular_rate_law":
                 enz_code = enz_codes_in_theta[enz.id]
-                substrate_block, product_block = get_modular_rate_codes(
+                competitor_ids = [mod.metabolite for mod in enz.modifiers.values() if "competitive_inhibitor" in mod.modifier_type]
+                substrate_block, product_block, competitor_block = get_modular_rate_codes(
                     enz_id,
+                    competitor_ids,
                     substrate_stoichiometries,
                     product_stoichiometries,
                     kp_codes_in_theta,
@@ -332,6 +334,7 @@ def create_fluxes_function(kinetic_model: KineticModel, template: Template) -> s
                     Keq=thermo_codes_in_theta[enz_id + "_delta_g"],
                     substrate_list=substrate_block,
                     product_list=product_block,
+                    competitive_inhibitor_list=competitor_block,
                 )
                 modular_lines.append(modular_line)
             # make catalytic effect string
@@ -343,8 +346,9 @@ def create_fluxes_function(kinetic_model: KineticModel, template: Template) -> s
             enz_code = enz_codes[enz.id]
             if enz.mechanism == "modular_rate_law":
                 mechanism_args = {
-                    "Tr": ("Tr_{}").format(enz_id),
-                    "Dr": ("Dr_{}").format(enz_id),
+                    "Tr": f"Tr_{enz_id}",
+                    "Dr": f"Dr_{enz_id}",
+                    "Dr_reg": f"Dr_reg_{enz_id}",
                 }
             else:
                 mechanism_args = {
@@ -367,8 +371,8 @@ def create_fluxes_function(kinetic_model: KineticModel, template: Template) -> s
                 free_enzyme_ratio_lines.append(free_enzyme_ratio_line)
                 # make regulatory effect string
                 allosteric_inhibitors = {
-                    mod_id: mod
-                    for mod_id, mod in enz.modifiers.items()
+                    mod.metabolite: mod
+                    for mod in enz.modifiers.values()
                     if mod.modifier_type == "allosteric_inhibitor"
                 }
                 allosteric_activators = {
@@ -469,7 +473,8 @@ def get_regulatory_string(
 
 
 def get_modular_rate_codes(
-    rxn_id: str,
+    enz_id: str,
+    competitor_ids: List[List],
     substrate_info: List[List],
     product_info: List[List],
     par_codes: Dict[str, int],
@@ -494,15 +499,22 @@ def get_modular_rate_codes(
     product_keys = ["p", "q", "r", "s"]
     substrate_input = []
     product_input = []
+    competitor_input = []
     for info, keys in zip(
         [substrate_info, product_info], [substrate_keys, product_keys]
     ):
         for i, (met_id, stoic) in enumerate(info):
-            param_id = rxn_id + "_K" + keys[i]
+            param_id = enz_id + "_K" + keys[i]
             param_code = par_codes[param_id]
             met_code = met_codes[met_id]
             if stoic < 0:
                 substrate_input.append([met_code, param_code, stoic])
             elif stoic > 0:
                 product_input.append([met_code, param_code, stoic])
-    return [substrate_input, product_input]
+    for comp in competitor_ids:
+        competitor_code = met_codes[comp]
+        param_id = enz_id + "_inhibition_constant_" + comp
+        competitor_parameter = par_codes[param_id]
+        competitor_input.append([competitor_code, competitor_parameter])
+
+    return [substrate_input, product_input, competitor_input]
