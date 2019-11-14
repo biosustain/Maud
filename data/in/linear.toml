@@ -35,7 +35,7 @@ stoichiometry = { M1_ex = -1, M1 = 1}
 [[reactions.enzymes]]
 id = 'r1'
 name = 'the enzyme that catalyses reaction r1'
-mechanism = 'uniuni'
+mechanism = 'modular_rate_law'
 allosteric_activators = ['M2']
 
 [[reactions]]
@@ -45,8 +45,9 @@ stoichiometry = { M1 = -1, M2 = 1 }
 [[reactions.enzymes]]
 id = 'r2'
 name = 'the enzyme that catalyses reaction r2'
-mechanism = 'uniuni'
+mechanism = 'modular_rate_law'
 allosteric_inhibitors = ['M1']
+competitive_inhibitors = ['M2']
 
 [[reactions]]
 id = 'r3'
@@ -55,7 +56,7 @@ stoichiometry = { M2 = -1, M2_ex = 1}
 [[reactions.enzymes]]
 id = 'r3'
 name = 'the enzyme that catalyses reaction r3'
-mechanism = 'uniuni'
+mechanism = 'modular_rate_law'
 
 ###### Experimental data ######
 [[experiments]]
@@ -84,21 +85,22 @@ reaction_measurements = [
 [priors.kinetic_parameters]
 r1 = [
   { target_id = 'Kcat1', location = 1, scale = 0.6},
-  { target_id = 'Kcat2', location = 1, scale = 0.6},
+  { target_id = 'Kp', location = 1, scale = 0.6},
   { target_id = 'Ka', location = 1, scale = 0.6},
   { target_id = 'dissociation_constant_r', metabolite = 'M2', location= 1, scale = 0.6},
   { target_id = 'transfer_constant', location= 1, scale = 0.6},
 ]
 r2 = [
   { target_id = 'Kcat1', location = 1, scale = 0.6},
-  { target_id = 'Kcat2', location = 1, scale = 0.6},
+  { target_id = 'Kp', location = 1, scale = 0.6},
   { target_id = 'Ka', location = 1, scale = 0.6},
   { target_id = 'dissociation_constant_t', metabolite = 'M1', location= 1, scale = 0.6},
   { target_id = 'transfer_constant', location= 1, scale = 0.6},
+  { target_id = 'inhibition_constant', metabolite = 'M2', location= 1, scale = 0.6},
 ]
 r3 = [
   { target_id = 'Kcat1', location = 1, scale = 0.6},
-  { target_id = 'Kcat2', location = 1, scale = 0.6},
+  { target_id = 'Kp', location = 1, scale = 0.6},
   { target_id = 'Ka', location = 1, scale = 0.6},
 ]
 
