@@ -89,10 +89,12 @@ def load_maud_input_from_toml(filepath: str, id: str = "mi") -> MaudInput:
                     param_id["target_id"]: Parameter(param_id["target_id"], e["id"])
                     for param_id in parsed_toml["priors"]["kinetic_parameters"][e["id"]]
                     if param_id["target_id"]
-                    not in ["dissociation_constant_t",
-                            "dissociation_constant_r",
-                            "inhibition_constant",
-                            "transfer_constant"]
+                    not in [
+                        "dissociation_constant_t",
+                        "dissociation_constant_r",
+                        "inhibition_constant",
+                        "transfer_constant",
+                    ]
                 }
             else:
                 params = {
@@ -114,7 +116,11 @@ def load_maud_input_from_toml(filepath: str, id: str = "mi") -> MaudInput:
             if "allosteric_inhibitors" in e.keys():
                 for inhibitor_id in e["allosteric_inhibitors"]:
                     modifiers.update(
-                        {f"{inhibitor_id}_allosteric_inhibitor": Modifier(inhibitor_id, "allosteric_inhibitor")}
+                        {
+                            f"{inhibitor_id}_allosteric_inhibitor": Modifier(
+                                inhibitor_id, "allosteric_inhibitor"
+                            )
+                        }
                     )
                     diss_t_const_id = f"dissociation_constant_t_{inhibitor_id}"
                     modifier_params.update(
@@ -127,7 +133,11 @@ def load_maud_input_from_toml(filepath: str, id: str = "mi") -> MaudInput:
             if "allosteric_activators" in e.keys():
                 for activator_id in e["allosteric_activators"]:
                     modifiers.update(
-                        {f"{activator_id}_allosteric_allosteric_activator": Modifier(activator_id, "allosteric_activator")}
+                        {
+                            f"{activator_id}_allosteric_allosteric_activator": Modifier(
+                                activator_id, "allosteric_activator"
+                            )
+                        }
                     )
                     diss_r_const_id = f"dissociation_constant_r_{activator_id}"
                     modifier_params.update(
@@ -139,11 +149,18 @@ def load_maud_input_from_toml(filepath: str, id: str = "mi") -> MaudInput:
                     )
             if "competitive_inhibitors" in e.keys():
                 if e["mechanism"] != "modular_rate_law":
-                    raise ValueError("competitive inhibitors are currently only supported for the mechanism 'modular_rate_law'")
+                    raise ValueError(
+                        """competitive inhibitors are currently
+                        only supported for the mechanism 'modular_rate_law'"""
+                    )
 
                 for inhibitor_id in e["competitive_inhibitors"]:
                     modifiers.update(
-                        {f"{inhibitor_id}_competitive_inhibitors": Modifier(inhibitor_id, "competitive_inhibitor")}
+                        {
+                            f"{inhibitor_id}_competitive_inhibitors": Modifier(
+                                inhibitor_id, "competitive_inhibitor"
+                            )
+                        }
                     )
                     inhibition_constant_id = f"inhibition_constant_{inhibitor_id}"
                     modifier_params.update(

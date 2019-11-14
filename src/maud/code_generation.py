@@ -318,8 +318,16 @@ def create_fluxes_function(kinetic_model: KineticModel, template: Template) -> s
             # make modular rate law if necessary
             if enz.mechanism == "modular_rate_law":
                 enz_code = enz_codes_in_theta[enz.id]
-                competitor_ids = [mod.metabolite for mod in enz.modifiers.values() if "competitive_inhibitor" in mod.modifier_type]
-                substrate_block, product_block, competitor_block = get_modular_rate_codes(
+                competitor_ids = [
+                    mod.metabolite
+                    for mod in enz.modifiers.values()
+                    if "competitive_inhibitor" in mod.modifier_type
+                ]
+                (
+                    substrate_block,
+                    product_block,
+                    competitor_block,
+                ) = get_modular_rate_codes(
                     enz_id,
                     competitor_ids,
                     substrate_stoichiometries,
