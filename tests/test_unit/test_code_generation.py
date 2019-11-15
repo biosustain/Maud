@@ -48,6 +48,7 @@ def test_create_haldane_line():
 def test_get_regulatory_string():
     """Test that the function get_regulatory_string behaves as expected."""
     inhibitor_codes = {"m1": 1, "m2": 2}
+    activator_codes = {}
     param_codes = {
         "e1_dissociation_constant_t_m1": 2,
         "e1_dissociation_constant_t_m2": 3,
@@ -55,7 +56,7 @@ def test_get_regulatory_string():
     }
     enzyme_name = "e1"
     generated = code_generation.get_regulatory_string(
-        inhibitor_codes, param_codes, enzyme_name
+        inhibitor_codes, activator_codes, param_codes, enzyme_name
     )
     expected = (
         "get_regulatory_effect("
@@ -88,6 +89,7 @@ def test_mechanism_templates():
         "Kiq": 13,
         "Tr": 1,
         "Dr": 2,
+        "Dr_reg": 0,
     }
     enzyme_id = "e1"
     expected_calls = {
@@ -100,7 +102,7 @@ def test_mechanism_templates():
         "p[8],p[9],p[10],p[11],e1_Kip,p[13],p[2])",
         "ordered_terbi": "ordered_terbi(m[1],m[2],m[3],m[4],m[5],p[1]*p[3],"
         "p[1]*p[4],p[5],p[6],p[7],e1_Kp,p[9],p[10],p[11],p[12],e1_Kip,p[13],p[2])",
-        "modular_rate_law": "modular_rate_law(1,2)",
+        "modular_rate_law": "modular_rate_law(1,2, 0)",
     }
     generated_calls = {
         mechanism: template.render({**codes, **{"enz_id": enzyme_id}})
@@ -114,15 +116,16 @@ def test_mechanism_templates():
 
 def test_get_modular_rate_codes():
     """Check that the function get_modular_rate_codes works as expected."""
-    rxn_id = "r"
+    enz_id = "r"
+    competitor_info = []
     substrate_info = [["m1", -1], ["m2", -1]]
     product_info = [["m3", 1], ["m4", 1]]
     par_codes = {"r_keq": 0.1, "r_Ka": 0.1, "r_Kb": 0.3, "r_Kp": 0.2, "r_Kq": 0.2}
     met_codes = {"m1": 1, "m2": 2, "m3": 3, "m4": 4}
-    expected_output = [[[1, 0.1, -1], [2, 0.3, -1]], [[3, 0.2, 1], [4, 0.2, 1]]]
+    expected_output = [[[1, 0.1, -1], [2, 0.3, -1]], [[3, 0.2, 1], [4, 0.2, 1]], []]
     assert (
         code_generation.get_modular_rate_codes(
-            rxn_id, substrate_info, product_info, par_codes, met_codes
+            enz_id, competitor_info, substrate_info, product_info, par_codes, met_codes
         )
         == expected_output
     )

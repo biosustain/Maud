@@ -14,3 +14,11 @@ real Dr_{{enz_id}} = {%- for su in substrate_list %} (1 + m[{{su[0]}}]/p[{{su[1]
                 + {%- for pr in product_list %} (1 + m[{{pr[0]}}]/p[{{pr[1]}}])^{{pr[2]}} {{"*" if not loop.last}}
                 {%- endfor %}
                 - 1;
+
+{% if competitive_inhibitor_list %}
+real Dr_reg_{{enz_id}} = {%- for ci in competitive_inhibitor_list %} (m[{{ci[0]}}]/p[{{ci[1]}}]) {{"*" if not loop.last}}
+    {%- endfor %};
+
+{% else %}
+real Dr_reg_{{enz_id}} = 0;
+    {%- endif %}

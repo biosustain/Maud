@@ -76,7 +76,7 @@ MECHANISM_TEMPLATES = {
         "p[{{Kia}}],p[{{Kib}}],p[{{Kic}}],{{enz_id}}_Kip,p[{{Kiq}}],"
         "p[{{Keq}}])"
     ),
-    "modular_rate_law": Template("modular_rate_law({{Tr}},{{Dr}})"),
+    "modular_rate_law": Template("modular_rate_law({{Tr}},{{Dr}}, {{Dr_reg}})"),
 }
 
 HALDANE_PARAMS = {
@@ -318,8 +318,18 @@ def create_fluxes_function(kinetic_model: KineticModel, template: Template) -> s
             # make modular rate law if necessary
             if enz.mechanism == "modular_rate_law":
                 enz_code = enz_codes_in_theta[enz.id]
-                substrate_block, product_block = get_modular_rate_codes(
+                competitor_ids = [
+                    mod.metabolite
+                    for mod in enz.modifiers.values()
+                    if "competitive_inhibitor" in mod.modifier_type
+                ]
+                (
+                    substrate_block,
+                    product_block,
+                    competitor_block,
+                ) = get_modular_rate_codes(
                     enz_id,
+                    competitor_ids,
                     substrate_stoichiometries,
                     product_stoichiometries,
                     kp_codes_in_theta,
@@ -332,6 +342,7 @@ def create_fluxes_function(kinetic_model: KineticModel, template: Template) -> s
                     Keq=thermo_codes_in_theta[enz_id + "_delta_g"],
                     substrate_list=substrate_block,
                     product_list=product_block,
+                    competitive_inhibitor_list=competitor_block,
                 )
                 modular_lines.append(modular_line)
             # make catalytic effect string
@@ -343,8 +354,9 @@ def create_fluxes_function(kinetic_model: KineticModel, template: Template) -> s
             enz_code = enz_codes[enz.id]
             if enz.mechanism == "modular_rate_law":
                 mechanism_args = {
-                    "Tr": ("Tr_{}").format(enz_id),
-                    "Dr": ("Dr_{}").format(enz_id),
+                    "Tr": f"Tr_{enz_id}",
+                    "Dr": f"Dr_{enz_id}",
+                    "Dr_reg": f"Dr_reg_{enz_id}",
                 }
             else:
                 mechanism_args = {
@@ -357,7 +369,7 @@ def create_fluxes_function(kinetic_model: KineticModel, template: Template) -> s
                 }
 
             catalytic_string = MECHANISM_TEMPLATES[enz.mechanism].render(mechanism_args)
-            if any(enz.modifiers):
+            if any([mod.allosteric for mod in enz.modifiers.values()]):
                 # make free enzyme ratio line
                 free_enzyme_ratio_line = Template(
                     "real free_enzyme_ratio_{{enzyme}} = "
@@ -365,16 +377,28 @@ def create_fluxes_function(kinetic_model: KineticModel, template: Template) -> s
                 ).render(enzyme=enz_id, catalytic_string=catalytic_string)
                 free_enzyme_ratio_lines.append(free_enzyme_ratio_line)
                 # make regulatory effect string
-                allosteric_inhibitors = {
-                    mod_id: mod
-                    for mod_id, mod in enz.modifiers.items()
-                    if mod.modifier_type == "allosteric_inhibitor"
-                }
+                allosteric_inhibitors, allosteric_activators = (
+                    {
+                        mod.metabolite: mod
+                        for mod in enz.modifiers.values()
+                        if mod.modifier_type == modifier_type
+                    }
+                    for modifier_type in [
+                        "allosteric_inhibitor",
+                        "allosteric_activator",
+                    ]
+                )
                 allosteric_inhibitor_codes = {
                     mod_id: met_codes[mod_id] for mod_id in allosteric_inhibitors.keys()
                 }
+                allosteric_activator_codes = {
+                    mod_id: met_codes[mod_id] for mod_id in allosteric_activators.keys()
+                }
                 regulatory_string = get_regulatory_string(
-                    allosteric_inhibitor_codes, kp_codes_in_theta, enz.id
+                    allosteric_inhibitor_codes,
+                    allosteric_activator_codes,
+                    kp_codes_in_theta,
+                    enz.id,
                 )
                 enzyme_flux_string = catalytic_string + "*" + regulatory_string
             else:
@@ -391,7 +415,10 @@ def create_fluxes_function(kinetic_model: KineticModel, template: Template) -> s
 
 
 def get_regulatory_string(
-    inhibitor_codes: Dict[str, int], param_codes: Dict[str, int], enzyme_name: str
+    inhibitor_codes: Dict[str, int],
+    activator_codes: Dict[str, int],
+    param_codes: Dict[str, int],
+    enzyme_name: str,
 ) -> str:
     """Create a call to the Stan function get_regulatory_effect.
 
@@ -403,10 +430,10 @@ def get_regulatory_string(
 
     regulatory_template = Template(
         """get_regulatory_effect(
-        empty_array,
+        {{activator_str}},
         {{inhibitor_str}},
         free_enzyme_ratio_{{enzyme_name}},
-        empty_array,
+        {{diss_r_str}},
         {{diss_t_str}},
         p[{{transfer_constant_code}}]
     )""".replace(
@@ -415,27 +442,47 @@ def get_regulatory_string(
             "\n", ""
         )
     )
-    inhibitor_template = Template("{ {{-inhibitor_strs|join(',')-}} }")
-    diss_t_template = Template("{ {{-diss_t_strs|join(',')-}} }")
+    regulator_template = Template("{ {{-regulator_strs|join(',')-}} }")
+    diss_const_template = Template("{ {{-diss_const_strs|join(',')-}} }")
     diss_t_param_codes = [
         param_codes[enzyme_name + "_dissociation_constant_t_" + inhibitor_name]
         for inhibitor_name in inhibitor_codes.keys()
     ]
+    diss_r_param_codes = [
+        param_codes[enzyme_name + "_dissociation_constant_r_" + activator_name]
+        for activator_name in activator_codes.keys()
+    ]
     transfer_constant_code = param_codes[enzyme_name + "_transfer_constant"]
     inhibitor_strs = [f"m[{c}]" for c in inhibitor_codes.values()]
+    activator_strs = [f"m[{c}]" for c in activator_codes.values()]
     diss_t_strs = [f"p[{c}]" for c in diss_t_param_codes]
-    diss_t_str = diss_t_template.render(diss_t_strs=diss_t_strs)
-    inhibitor_str = inhibitor_template.render(inhibitor_strs=inhibitor_strs)
+    diss_r_strs = [f"p[{c}]" for c in diss_r_param_codes]
+    diss_t_str = diss_const_template.render(diss_const_strs=diss_t_strs)
+    diss_r_str = diss_const_template.render(diss_const_strs=diss_r_strs)
+    inhibitor_str = regulator_template.render(regulator_strs=inhibitor_strs)
+    activator_str = regulator_template.render(regulator_strs=activator_strs)
+
+    if not activator_codes:
+        activator_str = "empty_array"
+        diss_r_str = "empty_array"
+
+    if not inhibitor_codes:
+        inhibitor_str = "empty_array"
+        diss_t_str = "empty_array"
+
     return regulatory_template.render(
+        activator_str=activator_str,
         inhibitor_str=inhibitor_str,
         enzyme_name=enzyme_name,
+        diss_r_str=diss_r_str,
         diss_t_str=diss_t_str,
         transfer_constant_code=transfer_constant_code,
     )
 
 
 def get_modular_rate_codes(
-    rxn_id: str,
+    enz_id: str,
+    competitor_ids: List[List],
     substrate_info: List[List],
     product_info: List[List],
     par_codes: Dict[str, int],
@@ -460,15 +507,22 @@ def get_modular_rate_codes(
     product_keys = ["p", "q", "r", "s"]
     substrate_input = []
     product_input = []
+    competitor_input = []
     for info, keys in zip(
         [substrate_info, product_info], [substrate_keys, product_keys]
     ):
         for i, (met_id, stoic) in enumerate(info):
-            param_id = rxn_id + "_K" + keys[i]
+            param_id = enz_id + "_K" + keys[i]
             param_code = par_codes[param_id]
             met_code = met_codes[met_id]
             if stoic < 0:
                 substrate_input.append([met_code, param_code, stoic])
             elif stoic > 0:
                 product_input.append([met_code, param_code, stoic])
-    return [substrate_input, product_input]
+    for comp in competitor_ids:
+        competitor_code = met_codes[comp]
+        param_id = enz_id + "_inhibition_constant_" + comp
+        competitor_parameter = par_codes[param_id]
+        competitor_input.append([competitor_code, competitor_parameter])
+
+    return [substrate_input, product_input, competitor_input]
