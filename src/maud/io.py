@@ -81,6 +81,8 @@ def load_maud_input_from_toml(filepath: str, id: str = "mi") -> MaudInput:
             compartment=m["compartment"],
         )
         kinetic_model.metabolites.update({met.id: met})
+
+        params["formation_energy"] = Parameter("formation_energy", e["id"], is_thermodynamic=True)
     for r in parsed_toml["reactions"]:
         rxn_enzymes = {}
         for e in r["enzymes"]:
@@ -101,7 +103,6 @@ def load_maud_input_from_toml(filepath: str, id: str = "mi") -> MaudInput:
                     param_id: Parameter(param_id, e["id"])
                     for param_id in MECHANISM_TO_PARAM_IDS[e["mechanism"]]
                 }
-            params["delta_g"] = Parameter("delta_g", e["id"], is_thermodynamic=True)
             modifiers = defaultdict()
             modifier_params = defaultdict()
             if any(
@@ -206,15 +207,13 @@ def load_maud_input_from_toml(filepath: str, id: str = "mi") -> MaudInput:
             experiment.measurements.update({target_type: type_measurements})
         experiments.update({experiment.id: experiment})
     priors = {}
-    for marginal_dg in parsed_toml["priors"]["thermodynamic_parameters"][
-        "marginal_dgs"
-    ]:
-        prior_id = f"{marginal_dg['target_id']}_delta_g"
+    for formation_energy_prior in parsed_toml["priors"]["thermodynamic_parameters"]["formation_energies"]:
+        prior_id = f"{formation_energy_prior['target_id']}_formation_energy"
         priors[prior_id] = Prior(
             id=prior_id,
-            target_id=marginal_dg["target_id"],
-            location=marginal_dg["location"],
-            scale=marginal_dg["scale"],
+            target_id=formation_energy_prior["target_id"],
+            location=formation_energy_prior["location"],
+            scale=formation_energy_prior["scale"],
             target_type="thermodynamic_parameter",
         )
     for exp_id, umps in parsed_toml["priors"]["unbalanced_metabolites"].items():

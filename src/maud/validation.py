@@ -24,6 +24,7 @@ def validate_maud_input(mi: data_model.MaudInput):
     km = mi.kinetic_model
     km_unb_mets = [met.id for met in km.metabolites.values() if not met.balanced]
     km_balanced_mets = [met.id for met in km.metabolites.values() if met.balanced]
+    km_mets = km_unb_mets + km_balanced_mets
     km_rxns = [rxn.id for rxn in km.reactions.values()]
     km_enzs = [enz.id for rxn in km.reactions.values() for enz in rxn.enzymes.values()]
     km_pars = [
@@ -32,7 +33,6 @@ def validate_maud_input(mi: data_model.MaudInput):
         for enz in rxn.enzymes.values()
         for p in enz.parameters.values()
     ]
-    km_tps = [p.enzyme_id + "_" + p.id for p in km_pars if p.is_thermodynamic]
     km_kps = [p.enzyme_id + "_" + p.id for p in km_pars if not p.is_thermodynamic]
     prior_kps, prior_tps = (
         [pid for pid, p in mi.priors.items() if p.target_type == t]
@@ -57,16 +57,16 @@ def validate_maud_input(mi: data_model.MaudInput):
                 f"kinetic parameter {kp} is in the kinetic model but has no prior."
             )
     for tp in prior_tps:
-        if tp not in km_tps:
+        tp_met = tp.replace('_formation_energy', '')
+        if tp_met not in km_mets:
             raise ValueError(
-                f"thermodynamic parameter {tp} has a prior but is not in the kinetic"
+                f"Metabolite {tp_met} has a formation energy prior but is not in the kinetic"
                 " model."
             )
-    for tp in km_tps:
-        if tp not in prior_tps:
+    for km_met in km_mets:
+        if km_met + "_formation_energy" not in prior_tps:
             raise ValueError(
-                f"thermodynamic parameter {tp} is in the kinetic model but has no"
-                " prior."
+                f"Metabolite {km_met} is in the kinetic model but has no formation energy prior."
             )
     for exp_id, met_id in prior_unb_mets:
         if met_id not in km_unb_mets:

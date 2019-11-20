@@ -155,10 +155,14 @@ def get_input_data(
     enzymes = {k: v for r in reactions.values() for k, v in r.enzymes.items()}
     balanced_metabolites = {k: v for k, v in metabolites.items() if v.balanced}
     unbalanced_metabolites = {k: v for k, v in metabolites.items() if not v.balanced}
-    kinetic_parameter_priors, dg_priors = (
+    full_stoic = get_full_stoichiometry(
+        mi.kinetic_model, enzyme_codes, metabolite_codes
+    )
+    kinetic_parameter_priors, formation_energy_priors = (
         prior_df.loc[lambda df: df["target_type"] == target_type]
         for target_type in ["kinetic_parameter", "thermodynamic_parameter"]
     )
+    formation_energy_priors = formation_energy_priors.set_index('target_id').reindex(full_stoic.columns)
     prior_loc_unb, prior_loc_enzyme, prior_scale_unb, prior_scale_enzyme = (
         prior_df.loc[lambda df: df["target_type"] == target_type]
         .set_index(["target_id", "experiment_id"])[col]
@@ -182,18 +186,6 @@ def get_input_data(
         )
         for measurement_type in ["metabolite", "reaction"]
     )
-    full_stoic = get_full_stoichiometry(
-        mi.kinetic_model, enzyme_codes, metabolite_codes
-    )
-    flux_nullspace = null_space(np.transpose(np.matrix(full_stoic)))
-
-    if flux_nullspace.any():
-        wegscheider_mat = null_space(np.transpose(flux_nullspace))
-        stoichiometry_rank = np.shape(wegscheider_mat)[1]
-    else:
-        wegscheider_mat = np.identity(len(enzyme_codes))
-        stoichiometry_rank = len(enzyme_codes)
-
     return [
         {
             "N_balanced": len(balanced_metabolites),
@@ -204,7 +196,7 @@ def get_input_data(
             "N_experiment": len(mi.experiments),
             "N_flux_measurement": len(reaction_measurements),
             "N_conc_measurement": len(metabolite_measurements),
-            "stoichiometric_rank": stoichiometry_rank,
+            "stoichiometric_matrix": full_stoic.values,
             "experiment_yconc": (
                 metabolite_measurements["experiment_id"].map(experiment_codes).values
             ),
@@ -221,8 +213,8 @@ def get_input_data(
             ),
             "yflux": reaction_measurements["value"].values,
             "sigma_flux": reaction_measurements["uncertainty"].values,
-            "prior_loc_delta_g": dg_priors["location"].values,
-            "prior_scale_delta_g": dg_priors["scale"].values,
+            "prior_loc_formation_energy": formation_energy_priors["location"].values,
+            "prior_scale_formation_energy": formation_energy_priors["scale"].values,
             "prior_loc_kinetic_parameters": kinetic_parameter_priors["location"].values,
             "prior_scale_kinetic_parameters": kinetic_parameter_priors["scale"].values,
             "prior_loc_unbalanced": prior_loc_unb.values,
@@ -230,7 +222,6 @@ def get_input_data(
             "prior_loc_enzyme": prior_loc_enzyme.values,
             "prior_scale_enzyme": prior_scale_enzyme.values,
             "as_guess": [0.01 for m in range(len(balanced_metabolites))],
-            "delta_g_kernel": wegscheider_mat,
             "rtol": rel_tol,
             "ftol": f_tol,
             "steps": max_steps,
