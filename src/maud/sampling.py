@@ -221,7 +221,7 @@ def get_input_data(
             "prior_scale_unbalanced": prior_scale_unb.values,
             "prior_loc_enzyme": prior_loc_enzyme.values,
             "prior_scale_enzyme": prior_scale_enzyme.values,
-            "as_guess": [0.01 for m in range(len(balanced_metabolites))],
+            "as_guess": [0.1 for m in range(len(balanced_metabolites))],
             "rtol": rel_tol,
             "ftol": f_tol,
             "steps": max_steps,
