@@ -196,7 +196,7 @@ def get_input_data(
             "N_experiment": len(mi.experiments),
             "N_flux_measurement": len(reaction_measurements),
             "N_conc_measurement": len(metabolite_measurements),
-            "stoichiometric_matrix": full_stoic.values,
+            "stoichiometric_matrix": full_stoic.T.values,
             "experiment_yconc": (
                 metabolite_measurements["experiment_id"].map(experiment_codes).values
             ),
@@ -231,5 +231,6 @@ def get_input_data(
             "kinetic_parameters": kinetic_parameter_priors["location"].values,
             "unbalanced": np.transpose(prior_loc_unb.values),
             "enzyme_concentration": np.transpose(prior_loc_enzyme.values),
+            "formation_energy": np.transpose(formation_energy_priors['location'].values),
         },
     ]

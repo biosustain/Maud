@@ -81,8 +81,6 @@ def load_maud_input_from_toml(filepath: str, id: str = "mi") -> MaudInput:
             compartment=m["compartment"],
         )
         kinetic_model.metabolites.update({met.id: met})
-
-        params["formation_energy"] = Parameter("formation_energy", e["id"], is_thermodynamic=True)
     for r in parsed_toml["reactions"]:
         rxn_enzymes = {}
         for e in r["enzymes"]:
