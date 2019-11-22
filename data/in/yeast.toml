@@ -82,6 +82,12 @@ balanced = true
 compartment = 'cytosol'
 
 [[metabolites]]
+id = 'pi_c'
+name = 'orthophosphate'
+balanced = false
+compartment = 'cytosol'
+
+[[metabolites]]
 id = 'dhap_c'
 name = 'dihydroxyacetone phosphate'
 balanced = false
@@ -145,7 +151,7 @@ mechanism = "modular_rate_law"
 [[reactions]]
 id = 'GAPD'
 name = 'GAPD'
-stoichiometry = { g3p_c = -1, nad_c = -1, nadh_c = 1, 13dpg_c = 1 }
+stoichiometry = { g3p_c = -1, nad_c = -1, pi_c = -1, nadh_c = 1, 13dpg_c = 1 }
 [[reactions.enzymes]]
 id = 'GAPD'
 name = 'GAPD'
@@ -217,6 +223,7 @@ GAPD = [
   { target_id = 'Kcat1', location = 19, scale = 0.1},
   { target_id = 'Ka', location = 0.423, scale = 0.1},
   { target_id = 'Kb', location = 0.09, scale = 0.1},
+  { target_id = 'Kc', location = 0.001, scale = 0.1},
   { target_id = 'Kp', location = 0.06, scale = 0.1},
   { target_id = 'Kq', location = 0.909, scale = 0.1},
 ]
@@ -230,8 +237,8 @@ PGK = [
 
 [priors.thermodynamic_parameters]
 formation_energies = [
-  { target_id = 'glc__D_e', location = -446.8, scale = 1.3 },
-  { target_id = 'atp_c', location = -2313.0, scale = 3.0 },
+  { target_id = 'glc__D_e', location = -429.7, scale = 1.3 },
+  { target_id = 'atp_c', location = -2295.8, scale = 3.0 },
   { target_id = 'adp_c', location = -1423.6, scale = 2.4 },
   { target_id = 'nad_c', location = -1205.8, scale = 12.4 },
   { target_id = 'nadh_c', location = -1141.6, scale = 12.4 },
@@ -243,6 +250,7 @@ formation_energies = [
   { target_id = 'f16p_c', location = -2203.8, scale = 2.1 },
   { target_id = 'g3p_c', location = -1089.3, scale = 1.3 },
   { target_id = '13dpg_c', location = -2201.9, scale = 2.1 },
+  { target_id = 'pi_c', location = -1056.2, scale = 1.5 },
 ]
 
 [priors.unbalanced_metabolites]
@@ -254,6 +262,7 @@ condition_1 = [
   { target_id = 'nadh_c', location = 0.178, scale = 0.05 },
   { target_id = 'dhap_c', location = 1.58, scale = 0.05},
   { target_id = '3pg_c', location = 0.52, scale = 0.05 },
+  { target_id = 'pi_c', location = 2, scale = 0.05 },
 ]
 [priors.enzymes]
 condition_1 = [
