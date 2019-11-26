@@ -31,8 +31,6 @@ from maud.data_model import KineticModel, MaudInput
 RELATIVE_PATHS = {
     "stan_includes": "stan_code",
     "autogen": "stan_code/autogen",
-    "stan_records": "../../data/stan_records",
-    "data_out": "../../data/out",
 }
 
 
@@ -67,6 +65,7 @@ def sample(
     n_chains: int,
     n_cores: int,
     time_step: float,
+    output_dir: str,
 ) -> cmdstanpy.CmdStanMCMC:
     """Sample from a posterior distribution.
 
@@ -82,34 +81,40 @@ def sample(
     :param n_cores: Number of cores to try and use
     :param time_step: Amount of time for the ode solver to simulate in order to compare
     initial state with evolved state
+    :param: output_dir: Directory to save output
     """
-
     model_name = os.path.splitext(os.path.basename(data_path))[0]
+    output_filepath = os.path.join(output_dir, f"output_{model_name}.csv")
+    input_filepath = os.path.join(output_dir, f"input_data_{model_name}.json")
+
     here = os.path.dirname(os.path.abspath(__file__))
     paths = {k: os.path.join(here, v) for k, v in RELATIVE_PATHS.items()}
 
     mi = io.load_maud_input_from_toml(data_path)
 
     input_data, init_cond = get_input_data(mi, f_tol, rel_tol, max_steps, likelihood)
-    input_file = os.path.join(paths["stan_records"], f"input_data_{model_name}.json")
-    cmdstanpy.utils.jsondump(input_file, input_data)
+    cmdstanpy.utils.jsondump(input_filepath, input_data)
 
-    stan_file = os.path.join(paths["autogen"], f"inference_model_{model_name}.stan")
+    stan_program_filepath = os.path.join(
+        paths["autogen"], f"inference_model_{model_name}.stan"
+    )
     stan_code = code_generation.create_stan_program(mi, "inference", time_step)
-    no_exe_file = not os.path.exists(stan_file[:-5])
-    change_in_stan_code = not utils.match_string_to_file(stan_code, stan_file)
+    no_exe_file = not os.path.exists(stan_program_filepath[:-5])
+    change_in_stan_code = not utils.match_string_to_file(
+        stan_code, stan_program_filepath
+    )
     need_to_overwrite = no_exe_file or change_in_stan_code
     if need_to_overwrite:
-        with open(stan_file, "w") as f:
+        with open(stan_program_filepath, "w") as f:
             f.write(stan_code)
-    model = cmdstanpy.CmdStanModel(stan_file=stan_file)
+    model = cmdstanpy.CmdStanModel(stan_file=stan_program_filepath)
     model.compile(include_paths=[paths["stan_includes"]])
 
     return model.sample(
-        data=input_file,
+        data=input_filepath,
         cores=4,
         chains=n_chains,
-        csv_basename=os.path.join(paths["data_out"], f"output_{model_name}.csv"),
+        csv_basename=output_filepath,
         sampling_iters=n_samples,
         warmup_iters=n_warmup,
         max_treedepth=15,
