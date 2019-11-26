@@ -57,16 +57,17 @@ def validate_maud_input(mi: data_model.MaudInput):
                 f"kinetic parameter {kp} is in the kinetic model but has no prior."
             )
     for tp in prior_tps:
-        tp_met = tp.replace('_formation_energy', '')
+        tp_met = tp.replace("_formation_energy", "")
         if tp_met not in km_mets:
             raise ValueError(
-                f"Metabolite {tp_met} has a formation energy prior but is not in the kinetic"
-                " model."
+                f"Metabolite {tp_met} has a formation energy prior but is not in the "
+                "kinetic model."
             )
     for km_met in km_mets:
         if km_met + "_formation_energy" not in prior_tps:
             raise ValueError(
-                f"Metabolite {km_met} is in the kinetic model but has no formation energy prior."
+                f"Metabolite {km_met} is in the kinetic model but has no formation"
+                " energy prior."
             )
     for exp_id, met_id in prior_unb_mets:
         if met_id not in km_unb_mets:

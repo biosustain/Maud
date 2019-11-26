@@ -205,7 +205,9 @@ def load_maud_input_from_toml(filepath: str, id: str = "mi") -> MaudInput:
             experiment.measurements.update({target_type: type_measurements})
         experiments.update({experiment.id: experiment})
     priors = {}
-    for formation_energy_prior in parsed_toml["priors"]["thermodynamic_parameters"]["formation_energies"]:
+    for formation_energy_prior in parsed_toml["priors"]["thermodynamic_parameters"][
+        "formation_energies"
+    ]:
         prior_id = f"{formation_energy_prior['target_id']}_formation_energy"
         priors[prior_id] = Prior(
             id=prior_id,

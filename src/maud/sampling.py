@@ -22,7 +22,6 @@ from typing import Dict
 import cmdstanpy
 import numpy as np
 import pandas as pd
-from scipy.linalg import null_space as null_space
 
 from maud import code_generation, io, utils
 from maud.data_model import KineticModel, MaudInput
@@ -167,7 +166,9 @@ def get_input_data(
         prior_df.loc[lambda df: df["target_type"] == target_type]
         for target_type in ["kinetic_parameter", "thermodynamic_parameter"]
     )
-    formation_energy_priors = formation_energy_priors.set_index('target_id').reindex(full_stoic.columns)
+    formation_energy_priors = formation_energy_priors.set_index("target_id").reindex(
+        full_stoic.columns
+    )
     prior_loc_unb, prior_loc_enzyme, prior_scale_unb, prior_scale_enzyme = (
         prior_df.loc[lambda df: df["target_type"] == target_type]
         .set_index(["target_id", "experiment_id"])[col]
@@ -236,6 +237,8 @@ def get_input_data(
             "kinetic_parameters": kinetic_parameter_priors["location"].values,
             "unbalanced": np.transpose(prior_loc_unb.values),
             "enzyme_concentration": np.transpose(prior_loc_enzyme.values),
-            "formation_energy": np.transpose(formation_energy_priors['location'].values),
+            "formation_energy": np.transpose(
+                formation_energy_priors["location"].values
+            ),
         },
     ]
