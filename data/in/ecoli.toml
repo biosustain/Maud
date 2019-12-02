@@ -403,7 +403,6 @@ id = "s7p_c"
 name = "Sedoheptulose 7-phosphate"
 balanced = true
 compartment = "cytosol"
-
 [[experiments]]
 id = "Evo04Evo01EP_m-1_e-B1"
 [[experiments.metabolite_measurements]]
@@ -3956,7 +3955,6 @@ value = 0.7052349720222223
 uncertainty = 0.007959828820540497
 
 
-[[priors]]
 ###### Priors ######
 [priors.kinetic_parameters]
 
@@ -4122,7 +4120,28 @@ EDA = [
   { target_id = 'Kq', location = 8, scale = 1.5}, # pyr Imputed from the data (ecmdb.ca)
 ]
 
-
+[priors.thermodynamic_parameters]
+# Obtained from eQuilibrator
+marginal_dgs = [
+    { target_id = "PGI", location = 2.5, scale = 0.8},
+    { target_id = "FBP", location = -11.4, scale = 1.4},
+    { target_id = "FBA", location = 19.8, scale = 1.0},
+    { target_id = "TPI", location = -5.5, scale = 1.1},
+    { target_id = "GAPD", location = 7.8, scale = 0.8},
+    { target_id = "PGK", location = 18.5, scale = 0.9},
+    { target_id = "PGM", location = -4.2, scale = 0.7},
+    { target_id = "ENO", location = -4.1, scale = 0.6},
+    { target_id = "G6PDH2r", location = -2.3, scale = 2.6},
+    { target_id = "PGL", location = -20.9, scale = 3.3},
+    { target_id = "GND", location = 11.2, scale = 6.3},
+    { target_id = "RPI", location = 1.9, scale = 1.5},
+    { target_id = "RPE", location = -3.4, scale = 2.3},
+    { target_id = "TKT1", location = -3.8, scale = 3.8}, # Reversed to equilibrator
+    { target_id = "TKT2", location = -10.0, scale = 3.8}, # Reversed to equilibrator
+    { target_id = "TALA", location = -0.7, scale = 2.8},
+    { target_id = "EDD", location = -43.1, scale = 5.1},
+    { target_id = "EDA", location = 15.4, scale = 4.4},
+]
 [priors.unbalanced_metabolites]
 [[priors.unbalanced_metabolites.Evo04Evo01EP_m-1_e-B1]]
 target_id = "adp_c"
@@ -4843,7 +4862,6 @@ scale = 0.1
 target_id = "r5p_c"
 location = 0.5192687850155024
 scale = 0.1
-
 
 [priors.enzymes]
 [[priors.enzymes.Evo04Evo01EP_m-1_e-B1]]
