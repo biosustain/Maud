@@ -468,7 +468,7 @@ uncertainty = 0.001238858815390419
 [[experiments.reaction_measurements]]
 target_id = "PGM"
 value = -6.808704164444444
-uncertainty = -0.00605790544694784
+uncertainty = 0.00605790544694784
 
 [[experiments.reaction_measurements]]
 target_id = "PGI"
@@ -498,7 +498,7 @@ uncertainty = 0.01591776961498097
 [[experiments.reaction_measurements]]
 target_id = "TKT1"
 value = -0.07564788201111111
-uncertainty = -0.008204041543099788
+uncertainty = 0.008204041543099788
 
 [[experiments.reaction_measurements]]
 target_id = "EDD"
@@ -508,7 +508,7 @@ uncertainty = 9.245064452814788
 [[experiments.reaction_measurements]]
 target_id = "TKT2"
 value = -0.1936501518888889
-uncertainty = -0.003146871502554239
+uncertainty = 0.003146871502554239
 
 [[experiments.reaction_measurements]]
 target_id = "FBP"
@@ -518,7 +518,7 @@ uncertainty = 0.05893666486876288
 [[experiments.reaction_measurements]]
 target_id = "RPE"
 value = -0.2692649755111111
-uncertainty = -0.009125494756821159
+uncertainty = 0.009125494756821159
 
 [[experiments.reaction_measurements]]
 target_id = "EDA"
@@ -528,17 +528,17 @@ uncertainty = 9.245064452814788
 [[experiments.reaction_measurements]]
 target_id = "TALA"
 value = -1.344643262933333
-uncertainty = -0.0630672407188857
+uncertainty = 0.0630672407188857
 
 [[experiments.reaction_measurements]]
 target_id = "PGK"
 value = -7.382573442000001
-uncertainty = -0.001238858815390419
+uncertainty = 0.001238858815390419
 
 [[experiments.reaction_measurements]]
 target_id = "RPI"
 value = -0.4324854905555556
-uncertainty = -0.005214528410839443
+uncertainty = 0.005214528410839443
 
 [[experiments.reaction_measurements]]
 target_id = "G6PDH2r"
@@ -616,7 +616,7 @@ uncertainty = 0.001238858815390419
 [[experiments.reaction_measurements]]
 target_id = "PGM"
 value = -6.808704164444444
-uncertainty = -0.00605790544694784
+uncertainty = 0.00605790544694784
 
 [[experiments.reaction_measurements]]
 target_id = "PGI"
@@ -646,7 +646,7 @@ uncertainty = 0.01591776961498097
 [[experiments.reaction_measurements]]
 target_id = "TKT1"
 value = -0.07564788201111111
-uncertainty = -0.008204041543099788
+uncertainty = 0.008204041543099788
 
 [[experiments.reaction_measurements]]
 target_id = "EDD"
@@ -656,7 +656,7 @@ uncertainty = 9.245064452814788
 [[experiments.reaction_measurements]]
 target_id = "TKT2"
 value = -0.1936501518888889
-uncertainty = -0.003146871502554239
+uncertainty = 0.003146871502554239
 
 [[experiments.reaction_measurements]]
 target_id = "FBP"
@@ -666,7 +666,7 @@ uncertainty = 0.05893666486876288
 [[experiments.reaction_measurements]]
 target_id = "RPE"
 value = -0.2692649755111111
-uncertainty = -0.009125494756821159
+uncertainty = 0.009125494756821159
 
 [[experiments.reaction_measurements]]
 target_id = "EDA"
@@ -676,17 +676,17 @@ uncertainty = 9.245064452814788
 [[experiments.reaction_measurements]]
 target_id = "TALA"
 value = -1.344643262933333
-uncertainty = -0.0630672407188857
+uncertainty = 0.0630672407188857
 
 [[experiments.reaction_measurements]]
 target_id = "PGK"
 value = -7.382573442000001
-uncertainty = -0.001238858815390419
+uncertainty = 0.001238858815390419
 
 [[experiments.reaction_measurements]]
 target_id = "RPI"
 value = -0.4324854905555556
-uncertainty = -0.005214528410839443
+uncertainty = 0.005214528410839443
 
 [[experiments.reaction_measurements]]
 target_id = "G6PDH2r"
@@ -764,7 +764,7 @@ uncertainty = 0.001238858815390419
 [[experiments.reaction_measurements]]
 target_id = "PGM"
 value = -6.808704164444444
-uncertainty = -0.00605790544694784
+uncertainty = 0.00605790544694784
 
 [[experiments.reaction_measurements]]
 target_id = "PGI"
@@ -794,7 +794,7 @@ uncertainty = 0.01591776961498097
 [[experiments.reaction_measurements]]
 target_id = "TKT1"
 value = -0.07564788201111111
-uncertainty = -0.008204041543099788
+uncertainty = 0.008204041543099788
 
 [[experiments.reaction_measurements]]
 target_id = "EDD"
@@ -804,7 +804,7 @@ uncertainty = 9.245064452814788
 [[experiments.reaction_measurements]]
 target_id = "TKT2"
 value = -0.1936501518888889
-uncertainty = -0.003146871502554239
+uncertainty = 0.003146871502554239
 
 [[experiments.reaction_measurements]]
 target_id = "FBP"
@@ -814,7 +814,7 @@ uncertainty = 0.05893666486876288
 [[experiments.reaction_measurements]]
 target_id = "RPE"
 value = -0.2692649755111111
-uncertainty = -0.009125494756821159
+uncertainty = 0.009125494756821159
 
 [[experiments.reaction_measurements]]
 target_id = "EDA"
@@ -824,17 +824,17 @@ uncertainty = 9.245064452814788
 [[experiments.reaction_measurements]]
 target_id = "TALA"
 value = -1.344643262933333
-uncertainty = -0.0630672407188857
+uncertainty = 0.0630672407188857
 
 [[experiments.reaction_measurements]]
 target_id = "PGK"
 value = -7.382573442000001
-uncertainty = -0.001238858815390419
+uncertainty = 0.001238858815390419
 
 [[experiments.reaction_measurements]]
 target_id = "RPI"
 value = -0.4324854905555556
-uncertainty = -0.005214528410839443
+uncertainty = 0.005214528410839443
 
 [[experiments.reaction_measurements]]
 target_id = "G6PDH2r"
@@ -912,7 +912,7 @@ uncertainty = 0.001238858815390419
 [[experiments.reaction_measurements]]
 target_id = "PGM"
 value = -6.808704164444444
-uncertainty = -0.00605790544694784
+uncertainty = 0.00605790544694784
 
 [[experiments.reaction_measurements]]
 target_id = "PGI"
@@ -942,7 +942,7 @@ uncertainty = 0.01591776961498097
 [[experiments.reaction_measurements]]
 target_id = "TKT1"
 value = -0.07564788201111111
-uncertainty = -0.008204041543099788
+uncertainty = 0.008204041543099788
 
 [[experiments.reaction_measurements]]
 target_id = "EDD"
@@ -952,7 +952,7 @@ uncertainty = 9.245064452814788
 [[experiments.reaction_measurements]]
 target_id = "TKT2"
 value = -0.1936501518888889
-uncertainty = -0.003146871502554239
+uncertainty = 0.003146871502554239
 
 [[experiments.reaction_measurements]]
 target_id = "FBP"
@@ -962,7 +962,7 @@ uncertainty = 0.05893666486876288
 [[experiments.reaction_measurements]]
 target_id = "RPE"
 value = -0.2692649755111111
-uncertainty = -0.009125494756821159
+uncertainty = 0.009125494756821159
 
 [[experiments.reaction_measurements]]
 target_id = "EDA"
@@ -972,17 +972,17 @@ uncertainty = 9.245064452814788
 [[experiments.reaction_measurements]]
 target_id = "TALA"
 value = -1.344643262933333
-uncertainty = -0.0630672407188857
+uncertainty = 0.0630672407188857
 
 [[experiments.reaction_measurements]]
 target_id = "PGK"
 value = -7.382573442000001
-uncertainty = -0.001238858815390419
+uncertainty = 0.001238858815390419
 
 [[experiments.reaction_measurements]]
 target_id = "RPI"
 value = -0.4324854905555556
-uncertainty = -0.005214528410839443
+uncertainty = 0.005214528410839443
 
 [[experiments.reaction_measurements]]
 target_id = "G6PDH2r"
@@ -1060,7 +1060,7 @@ uncertainty = 0.001238858815390419
 [[experiments.reaction_measurements]]
 target_id = "PGM"
 value = -6.808704164444444
-uncertainty = -0.00605790544694784
+uncertainty = 0.00605790544694784
 
 [[experiments.reaction_measurements]]
 target_id = "PGI"
@@ -1090,7 +1090,7 @@ uncertainty = 0.01591776961498097
 [[experiments.reaction_measurements]]
 target_id = "TKT1"
 value = -0.07564788201111111
-uncertainty = -0.008204041543099788
+uncertainty = 0.008204041543099788
 
 [[experiments.reaction_measurements]]
 target_id = "EDD"
@@ -1100,7 +1100,7 @@ uncertainty = 9.245064452814788
 [[experiments.reaction_measurements]]
 target_id = "TKT2"
 value = -0.1936501518888889
-uncertainty = -0.003146871502554239
+uncertainty = 0.003146871502554239
 
 [[experiments.reaction_measurements]]
 target_id = "FBP"
@@ -1110,7 +1110,7 @@ uncertainty = 0.05893666486876288
 [[experiments.reaction_measurements]]
 target_id = "RPE"
 value = -0.2692649755111111
-uncertainty = -0.009125494756821159
+uncertainty = 0.009125494756821159
 
 [[experiments.reaction_measurements]]
 target_id = "EDA"
@@ -1120,17 +1120,17 @@ uncertainty = 9.245064452814788
 [[experiments.reaction_measurements]]
 target_id = "TALA"
 value = -1.344643262933333
-uncertainty = -0.0630672407188857
+uncertainty = 0.0630672407188857
 
 [[experiments.reaction_measurements]]
 target_id = "PGK"
 value = -7.382573442000001
-uncertainty = -0.001238858815390419
+uncertainty = 0.001238858815390419
 
 [[experiments.reaction_measurements]]
 target_id = "RPI"
 value = -0.4324854905555556
-uncertainty = -0.005214528410839443
+uncertainty = 0.005214528410839443
 
 [[experiments.reaction_measurements]]
 target_id = "G6PDH2r"
@@ -1208,7 +1208,7 @@ uncertainty = 0.001238858815390419
 [[experiments.reaction_measurements]]
 target_id = "PGM"
 value = -6.808704164444444
-uncertainty = -0.00605790544694784
+uncertainty = 0.00605790544694784
 
 [[experiments.reaction_measurements]]
 target_id = "PGI"
@@ -1238,7 +1238,7 @@ uncertainty = 0.01591776961498097
 [[experiments.reaction_measurements]]
 target_id = "TKT1"
 value = -0.07564788201111111
-uncertainty = -0.008204041543099788
+uncertainty = 0.008204041543099788
 
 [[experiments.reaction_measurements]]
 target_id = "EDD"
@@ -1248,7 +1248,7 @@ uncertainty = 9.245064452814788
 [[experiments.reaction_measurements]]
 target_id = "TKT2"
 value = -0.1936501518888889
-uncertainty = -0.003146871502554239
+uncertainty = 0.003146871502554239
 
 [[experiments.reaction_measurements]]
 target_id = "FBP"
@@ -1258,7 +1258,7 @@ uncertainty = 0.05893666486876288
 [[experiments.reaction_measurements]]
 target_id = "RPE"
 value = -0.2692649755111111
-uncertainty = -0.009125494756821159
+uncertainty = 0.009125494756821159
 
 [[experiments.reaction_measurements]]
 target_id = "EDA"
@@ -1268,17 +1268,17 @@ uncertainty = 9.245064452814788
 [[experiments.reaction_measurements]]
 target_id = "TALA"
 value = -1.344643262933333
-uncertainty = -0.0630672407188857
+uncertainty = 0.0630672407188857
 
 [[experiments.reaction_measurements]]
 target_id = "PGK"
 value = -7.382573442000001
-uncertainty = -0.001238858815390419
+uncertainty = 0.001238858815390419
 
 [[experiments.reaction_measurements]]
 target_id = "RPI"
 value = -0.4324854905555556
-uncertainty = -0.005214528410839443
+uncertainty = 0.005214528410839443
 
 [[experiments.reaction_measurements]]
 target_id = "G6PDH2r"
@@ -1356,7 +1356,7 @@ uncertainty = 0.001238858815390419
 [[experiments.reaction_measurements]]
 target_id = "PGM"
 value = -6.808704164444444
-uncertainty = -0.00605790544694784
+uncertainty = 0.00605790544694784
 
 [[experiments.reaction_measurements]]
 target_id = "PGI"
@@ -1386,7 +1386,7 @@ uncertainty = 0.01591776961498097
 [[experiments.reaction_measurements]]
 target_id = "TKT1"
 value = -0.07564788201111111
-uncertainty = -0.008204041543099788
+uncertainty = 0.008204041543099788
 
 [[experiments.reaction_measurements]]
 target_id = "EDD"
@@ -1396,7 +1396,7 @@ uncertainty = 9.245064452814788
 [[experiments.reaction_measurements]]
 target_id = "TKT2"
 value = -0.1936501518888889
-uncertainty = -0.003146871502554239
+uncertainty = 0.003146871502554239
 
 [[experiments.reaction_measurements]]
 target_id = "FBP"
@@ -1406,7 +1406,7 @@ uncertainty = 0.05893666486876288
 [[experiments.reaction_measurements]]
 target_id = "RPE"
 value = -0.2692649755111111
-uncertainty = -0.009125494756821159
+uncertainty = 0.009125494756821159
 
 [[experiments.reaction_measurements]]
 target_id = "EDA"
@@ -1416,17 +1416,17 @@ uncertainty = 9.245064452814788
 [[experiments.reaction_measurements]]
 target_id = "TALA"
 value = -1.344643262933333
-uncertainty = -0.0630672407188857
+uncertainty = 0.0630672407188857
 
 [[experiments.reaction_measurements]]
 target_id = "PGK"
 value = -7.382573442000001
-uncertainty = -0.001238858815390419
+uncertainty = 0.001238858815390419
 
 [[experiments.reaction_measurements]]
 target_id = "RPI"
 value = -0.4324854905555556
-uncertainty = -0.005214528410839443
+uncertainty = 0.005214528410839443
 
 [[experiments.reaction_measurements]]
 target_id = "G6PDH2r"
@@ -1504,7 +1504,7 @@ uncertainty = 0.001238858815390419
 [[experiments.reaction_measurements]]
 target_id = "PGM"
 value = -6.808704164444444
-uncertainty = -0.00605790544694784
+uncertainty = 0.00605790544694784
 
 [[experiments.reaction_measurements]]
 target_id = "PGI"
@@ -1534,7 +1534,7 @@ uncertainty = 0.01591776961498097
 [[experiments.reaction_measurements]]
 target_id = "TKT1"
 value = -0.07564788201111111
-uncertainty = -0.008204041543099788
+uncertainty = 0.008204041543099788
 
 [[experiments.reaction_measurements]]
 target_id = "EDD"
@@ -1544,7 +1544,7 @@ uncertainty = 9.245064452814788
 [[experiments.reaction_measurements]]
 target_id = "TKT2"
 value = -0.1936501518888889
-uncertainty = -0.003146871502554239
+uncertainty = 0.003146871502554239
 
 [[experiments.reaction_measurements]]
 target_id = "FBP"
@@ -1554,7 +1554,7 @@ uncertainty = 0.05893666486876288
 [[experiments.reaction_measurements]]
 target_id = "RPE"
 value = -0.2692649755111111
-uncertainty = -0.009125494756821159
+uncertainty = 0.009125494756821159
 
 [[experiments.reaction_measurements]]
 target_id = "EDA"
@@ -1564,17 +1564,17 @@ uncertainty = 9.245064452814788
 [[experiments.reaction_measurements]]
 target_id = "TALA"
 value = -1.344643262933333
-uncertainty = -0.0630672407188857
+uncertainty = 0.0630672407188857
 
 [[experiments.reaction_measurements]]
 target_id = "PGK"
 value = -7.382573442000001
-uncertainty = -0.001238858815390419
+uncertainty = 0.001238858815390419
 
 [[experiments.reaction_measurements]]
 target_id = "RPI"
 value = -0.4324854905555556
-uncertainty = -0.005214528410839443
+uncertainty = 0.005214528410839443
 
 [[experiments.reaction_measurements]]
 target_id = "G6PDH2r"
@@ -1652,7 +1652,7 @@ uncertainty = 0.001238858815390419
 [[experiments.reaction_measurements]]
 target_id = "PGM"
 value = -6.808704164444444
-uncertainty = -0.00605790544694784
+uncertainty = 0.00605790544694784
 
 [[experiments.reaction_measurements]]
 target_id = "PGI"
@@ -1682,7 +1682,7 @@ uncertainty = 0.01591776961498097
 [[experiments.reaction_measurements]]
 target_id = "TKT1"
 value = -0.07564788201111111
-uncertainty = -0.008204041543099788
+uncertainty = 0.008204041543099788
 
 [[experiments.reaction_measurements]]
 target_id = "EDD"
@@ -1692,7 +1692,7 @@ uncertainty = 9.245064452814788
 [[experiments.reaction_measurements]]
 target_id = "TKT2"
 value = -0.1936501518888889
-uncertainty = -0.003146871502554239
+uncertainty = 0.003146871502554239
 
 [[experiments.reaction_measurements]]
 target_id = "FBP"
@@ -1702,7 +1702,7 @@ uncertainty = 0.05893666486876288
 [[experiments.reaction_measurements]]
 target_id = "RPE"
 value = -0.2692649755111111
-uncertainty = -0.009125494756821159
+uncertainty = 0.009125494756821159
 
 [[experiments.reaction_measurements]]
 target_id = "EDA"
@@ -1712,17 +1712,17 @@ uncertainty = 9.245064452814788
 [[experiments.reaction_measurements]]
 target_id = "TALA"
 value = -1.344643262933333
-uncertainty = -0.0630672407188857
+uncertainty = 0.0630672407188857
 
 [[experiments.reaction_measurements]]
 target_id = "PGK"
 value = -7.382573442000001
-uncertainty = -0.001238858815390419
+uncertainty = 0.001238858815390419
 
 [[experiments.reaction_measurements]]
 target_id = "RPI"
 value = -0.4324854905555556
-uncertainty = -0.005214528410839443
+uncertainty = 0.005214528410839443
 
 [[experiments.reaction_measurements]]
 target_id = "G6PDH2r"
@@ -1800,7 +1800,7 @@ uncertainty = 0.001238858815390419
 [[experiments.reaction_measurements]]
 target_id = "PGM"
 value = -6.808704164444444
-uncertainty = -0.00605790544694784
+uncertainty = 0.00605790544694784
 
 [[experiments.reaction_measurements]]
 target_id = "PGI"
@@ -1830,7 +1830,7 @@ uncertainty = 0.01591776961498097
 [[experiments.reaction_measurements]]
 target_id = "TKT1"
 value = -0.07564788201111111
-uncertainty = -0.008204041543099788
+uncertainty = 0.008204041543099788
 
 [[experiments.reaction_measurements]]
 target_id = "EDD"
@@ -1840,7 +1840,7 @@ uncertainty = 9.245064452814788
 [[experiments.reaction_measurements]]
 target_id = "TKT2"
 value = -0.1936501518888889
-uncertainty = -0.003146871502554239
+uncertainty = 0.003146871502554239
 
 [[experiments.reaction_measurements]]
 target_id = "FBP"
@@ -1850,7 +1850,7 @@ uncertainty = 0.05893666486876288
 [[experiments.reaction_measurements]]
 target_id = "RPE"
 value = -0.2692649755111111
-uncertainty = -0.009125494756821159
+uncertainty = 0.009125494756821159
 
 [[experiments.reaction_measurements]]
 target_id = "EDA"
@@ -1860,17 +1860,17 @@ uncertainty = 9.245064452814788
 [[experiments.reaction_measurements]]
 target_id = "TALA"
 value = -1.344643262933333
-uncertainty = -0.0630672407188857
+uncertainty = 0.0630672407188857
 
 [[experiments.reaction_measurements]]
 target_id = "PGK"
 value = -7.382573442000001
-uncertainty = -0.001238858815390419
+uncertainty = 0.001238858815390419
 
 [[experiments.reaction_measurements]]
 target_id = "RPI"
 value = -0.4324854905555556
-uncertainty = -0.005214528410839443
+uncertainty = 0.005214528410839443
 
 [[experiments.reaction_measurements]]
 target_id = "G6PDH2r"
@@ -1948,7 +1948,7 @@ uncertainty = 0.001238858815390419
 [[experiments.reaction_measurements]]
 target_id = "PGM"
 value = -6.808704164444444
-uncertainty = -0.00605790544694784
+uncertainty = 0.00605790544694784
 
 [[experiments.reaction_measurements]]
 target_id = "PGI"
@@ -1978,7 +1978,7 @@ uncertainty = 0.01591776961498097
 [[experiments.reaction_measurements]]
 target_id = "TKT1"
 value = -0.07564788201111111
-uncertainty = -0.008204041543099788
+uncertainty = 0.008204041543099788
 
 [[experiments.reaction_measurements]]
 target_id = "EDD"
@@ -1988,7 +1988,7 @@ uncertainty = 9.245064452814788
 [[experiments.reaction_measurements]]
 target_id = "TKT2"
 value = -0.1936501518888889
-uncertainty = -0.003146871502554239
+uncertainty = 0.003146871502554239
 
 [[experiments.reaction_measurements]]
 target_id = "FBP"
@@ -1998,7 +1998,7 @@ uncertainty = 0.05893666486876288
 [[experiments.reaction_measurements]]
 target_id = "RPE"
 value = -0.2692649755111111
-uncertainty = -0.009125494756821159
+uncertainty = 0.009125494756821159
 
 [[experiments.reaction_measurements]]
 target_id = "EDA"
@@ -2008,17 +2008,17 @@ uncertainty = 9.245064452814788
 [[experiments.reaction_measurements]]
 target_id = "TALA"
 value = -1.344643262933333
-uncertainty = -0.0630672407188857
+uncertainty = 0.0630672407188857
 
 [[experiments.reaction_measurements]]
 target_id = "PGK"
 value = -7.382573442000001
-uncertainty = -0.001238858815390419
+uncertainty = 0.001238858815390419
 
 [[experiments.reaction_measurements]]
 target_id = "RPI"
 value = -0.4324854905555556
-uncertainty = -0.005214528410839443
+uncertainty = 0.005214528410839443
 
 [[experiments.reaction_measurements]]
 target_id = "G6PDH2r"
@@ -2096,7 +2096,7 @@ uncertainty = 0.001238858815390419
 [[experiments.reaction_measurements]]
 target_id = "PGM"
 value = -6.808704164444444
-uncertainty = -0.00605790544694784
+uncertainty = 0.00605790544694784
 
 [[experiments.reaction_measurements]]
 target_id = "PGI"
@@ -2126,7 +2126,7 @@ uncertainty = 0.01591776961498097
 [[experiments.reaction_measurements]]
 target_id = "TKT1"
 value = -0.07564788201111111
-uncertainty = -0.008204041543099788
+uncertainty = 0.008204041543099788
 
 [[experiments.reaction_measurements]]
 target_id = "EDD"
@@ -2136,7 +2136,7 @@ uncertainty = 9.245064452814788
 [[experiments.reaction_measurements]]
 target_id = "TKT2"
 value = -0.1936501518888889
-uncertainty = -0.003146871502554239
+uncertainty = 0.003146871502554239
 
 [[experiments.reaction_measurements]]
 target_id = "FBP"
@@ -2146,7 +2146,7 @@ uncertainty = 0.05893666486876288
 [[experiments.reaction_measurements]]
 target_id = "RPE"
 value = -0.2692649755111111
-uncertainty = -0.009125494756821159
+uncertainty = 0.009125494756821159
 
 [[experiments.reaction_measurements]]
 target_id = "EDA"
@@ -2156,17 +2156,17 @@ uncertainty = 9.245064452814788
 [[experiments.reaction_measurements]]
 target_id = "TALA"
 value = -1.344643262933333
-uncertainty = -0.0630672407188857
+uncertainty = 0.0630672407188857
 
 [[experiments.reaction_measurements]]
 target_id = "PGK"
 value = -7.382573442000001
-uncertainty = -0.001238858815390419
+uncertainty = 0.001238858815390419
 
 [[experiments.reaction_measurements]]
 target_id = "RPI"
 value = -0.4324854905555556
-uncertainty = -0.005214528410839443
+uncertainty = 0.005214528410839443
 
 [[experiments.reaction_measurements]]
 target_id = "G6PDH2r"
@@ -2244,7 +2244,7 @@ uncertainty = 0.01235199116780911
 [[experiments.reaction_measurements]]
 target_id = "PGM"
 value = -7.056713121444445
-uncertainty = -0.02322413998975971
+uncertainty = 0.02322413998975971
 
 [[experiments.reaction_measurements]]
 target_id = "PGI"
@@ -2289,7 +2289,7 @@ uncertainty = 0.009757143860844451
 [[experiments.reaction_measurements]]
 target_id = "FBP"
 value = -0.1582598797666667
-uncertainty = -3.584471107359328
+uncertainty = 3.584471107359328
 
 [[experiments.reaction_measurements]]
 target_id = "RPE"
@@ -2309,12 +2309,12 @@ uncertainty = 0.1362530945189736
 [[experiments.reaction_measurements]]
 target_id = "PGK"
 value = -7.587970859111111
-uncertainty = -0.01235199116780911
+uncertainty = 0.01235199116780911
 
 [[experiments.reaction_measurements]]
 target_id = "RPI"
 value = -0.5258907299000001
-uncertainty = -0.007486660480197303
+uncertainty = 0.007486660480197303
 
 [[experiments.reaction_measurements]]
 target_id = "G6PDH2r"
@@ -2392,7 +2392,7 @@ uncertainty = 0.01235199116780911
 [[experiments.reaction_measurements]]
 target_id = "PGM"
 value = -7.056713121444445
-uncertainty = -0.02322413998975971
+uncertainty = 0.02322413998975971
 
 [[experiments.reaction_measurements]]
 target_id = "PGI"
@@ -2437,7 +2437,7 @@ uncertainty = 0.009757143860844451
 [[experiments.reaction_measurements]]
 target_id = "FBP"
 value = -0.1582598797666667
-uncertainty = -3.584471107359328
+uncertainty = 3.584471107359328
 
 [[experiments.reaction_measurements]]
 target_id = "RPE"
@@ -2457,12 +2457,12 @@ uncertainty = 0.1362530945189736
 [[experiments.reaction_measurements]]
 target_id = "PGK"
 value = -7.587970859111111
-uncertainty = -0.01235199116780911
+uncertainty = 0.01235199116780911
 
 [[experiments.reaction_measurements]]
 target_id = "RPI"
 value = -0.5258907299000001
-uncertainty = -0.007486660480197303
+uncertainty = 0.007486660480197303
 
 [[experiments.reaction_measurements]]
 target_id = "G6PDH2r"
@@ -2540,7 +2540,7 @@ uncertainty = 0.01235199116780911
 [[experiments.reaction_measurements]]
 target_id = "PGM"
 value = -7.056713121444445
-uncertainty = -0.02322413998975971
+uncertainty = 0.02322413998975971
 
 [[experiments.reaction_measurements]]
 target_id = "PGI"
@@ -2585,7 +2585,7 @@ uncertainty = 0.009757143860844451
 [[experiments.reaction_measurements]]
 target_id = "FBP"
 value = -0.1582598797666667
-uncertainty = -3.584471107359328
+uncertainty = 3.584471107359328
 
 [[experiments.reaction_measurements]]
 target_id = "RPE"
@@ -2605,12 +2605,12 @@ uncertainty = 0.1362530945189736
 [[experiments.reaction_measurements]]
 target_id = "PGK"
 value = -7.587970859111111
-uncertainty = -0.01235199116780911
+uncertainty = 0.01235199116780911
 
 [[experiments.reaction_measurements]]
 target_id = "RPI"
 value = -0.5258907299000001
-uncertainty = -0.007486660480197303
+uncertainty = 0.007486660480197303
 
 [[experiments.reaction_measurements]]
 target_id = "G6PDH2r"
@@ -2688,7 +2688,7 @@ uncertainty = 0.01235199116780911
 [[experiments.reaction_measurements]]
 target_id = "PGM"
 value = -7.056713121444445
-uncertainty = -0.02322413998975971
+uncertainty = 0.02322413998975971
 
 [[experiments.reaction_measurements]]
 target_id = "PGI"
@@ -2733,7 +2733,7 @@ uncertainty = 0.009757143860844451
 [[experiments.reaction_measurements]]
 target_id = "FBP"
 value = -0.1582598797666667
-uncertainty = -3.584471107359328
+uncertainty = 3.584471107359328
 
 [[experiments.reaction_measurements]]
 target_id = "RPE"
@@ -2753,12 +2753,12 @@ uncertainty = 0.1362530945189736
 [[experiments.reaction_measurements]]
 target_id = "PGK"
 value = -7.587970859111111
-uncertainty = -0.01235199116780911
+uncertainty = 0.01235199116780911
 
 [[experiments.reaction_measurements]]
 target_id = "RPI"
 value = -0.5258907299000001
-uncertainty = -0.007486660480197303
+uncertainty = 0.007486660480197303
 
 [[experiments.reaction_measurements]]
 target_id = "G6PDH2r"
@@ -2836,7 +2836,7 @@ uncertainty = 0.01235199116780911
 [[experiments.reaction_measurements]]
 target_id = "PGM"
 value = -7.056713121444445
-uncertainty = -0.02322413998975971
+uncertainty = 0.02322413998975971
 
 [[experiments.reaction_measurements]]
 target_id = "PGI"
@@ -2881,7 +2881,7 @@ uncertainty = 0.009757143860844451
 [[experiments.reaction_measurements]]
 target_id = "FBP"
 value = -0.1582598797666667
-uncertainty = -3.584471107359328
+uncertainty = 3.584471107359328
 
 [[experiments.reaction_measurements]]
 target_id = "RPE"
@@ -2901,12 +2901,12 @@ uncertainty = 0.1362530945189736
 [[experiments.reaction_measurements]]
 target_id = "PGK"
 value = -7.587970859111111
-uncertainty = -0.01235199116780911
+uncertainty = 0.01235199116780911
 
 [[experiments.reaction_measurements]]
 target_id = "RPI"
 value = -0.5258907299000001
-uncertainty = -0.007486660480197303
+uncertainty = 0.007486660480197303
 
 [[experiments.reaction_measurements]]
 target_id = "G6PDH2r"
@@ -2984,7 +2984,7 @@ uncertainty = 0.01235199116780911
 [[experiments.reaction_measurements]]
 target_id = "PGM"
 value = -7.056713121444445
-uncertainty = -0.02322413998975971
+uncertainty = 0.02322413998975971
 
 [[experiments.reaction_measurements]]
 target_id = "PGI"
@@ -3029,7 +3029,7 @@ uncertainty = 0.009757143860844451
 [[experiments.reaction_measurements]]
 target_id = "FBP"
 value = -0.1582598797666667
-uncertainty = -3.584471107359328
+uncertainty = 3.584471107359328
 
 [[experiments.reaction_measurements]]
 target_id = "RPE"
@@ -3049,12 +3049,12 @@ uncertainty = 0.1362530945189736
 [[experiments.reaction_measurements]]
 target_id = "PGK"
 value = -7.587970859111111
-uncertainty = -0.01235199116780911
+uncertainty = 0.01235199116780911
 
 [[experiments.reaction_measurements]]
 target_id = "RPI"
 value = -0.5258907299000001
-uncertainty = -0.007486660480197303
+uncertainty = 0.007486660480197303
 
 [[experiments.reaction_measurements]]
 target_id = "G6PDH2r"
@@ -3132,7 +3132,7 @@ uncertainty = 0.01235199116780911
 [[experiments.reaction_measurements]]
 target_id = "PGM"
 value = -7.056713121444445
-uncertainty = -0.02322413998975971
+uncertainty = 0.02322413998975971
 
 [[experiments.reaction_measurements]]
 target_id = "PGI"
@@ -3177,7 +3177,7 @@ uncertainty = 0.009757143860844451
 [[experiments.reaction_measurements]]
 target_id = "FBP"
 value = -0.1582598797666667
-uncertainty = -3.584471107359328
+uncertainty = 3.584471107359328
 
 [[experiments.reaction_measurements]]
 target_id = "RPE"
@@ -3197,12 +3197,12 @@ uncertainty = 0.1362530945189736
 [[experiments.reaction_measurements]]
 target_id = "PGK"
 value = -7.587970859111111
-uncertainty = -0.01235199116780911
+uncertainty = 0.01235199116780911
 
 [[experiments.reaction_measurements]]
 target_id = "RPI"
 value = -0.5258907299000001
-uncertainty = -0.007486660480197303
+uncertainty = 0.007486660480197303
 
 [[experiments.reaction_measurements]]
 target_id = "G6PDH2r"
@@ -3280,7 +3280,7 @@ uncertainty = 0.01235199116780911
 [[experiments.reaction_measurements]]
 target_id = "PGM"
 value = -7.056713121444445
-uncertainty = -0.02322413998975971
+uncertainty = 0.02322413998975971
 
 [[experiments.reaction_measurements]]
 target_id = "PGI"
@@ -3325,7 +3325,7 @@ uncertainty = 0.009757143860844451
 [[experiments.reaction_measurements]]
 target_id = "FBP"
 value = -0.1582598797666667
-uncertainty = -3.584471107359328
+uncertainty = 3.584471107359328
 
 [[experiments.reaction_measurements]]
 target_id = "RPE"
@@ -3345,12 +3345,12 @@ uncertainty = 0.1362530945189736
 [[experiments.reaction_measurements]]
 target_id = "PGK"
 value = -7.587970859111111
-uncertainty = -0.01235199116780911
+uncertainty = 0.01235199116780911
 
 [[experiments.reaction_measurements]]
 target_id = "RPI"
 value = -0.5258907299000001
-uncertainty = -0.007486660480197303
+uncertainty = 0.007486660480197303
 
 [[experiments.reaction_measurements]]
 target_id = "G6PDH2r"
@@ -3428,7 +3428,7 @@ uncertainty = 0.01235199116780911
 [[experiments.reaction_measurements]]
 target_id = "PGM"
 value = -7.056713121444445
-uncertainty = -0.02322413998975971
+uncertainty = 0.02322413998975971
 
 [[experiments.reaction_measurements]]
 target_id = "PGI"
@@ -3473,7 +3473,7 @@ uncertainty = 0.009757143860844451
 [[experiments.reaction_measurements]]
 target_id = "FBP"
 value = -0.1582598797666667
-uncertainty = -3.584471107359328
+uncertainty = 3.584471107359328
 
 [[experiments.reaction_measurements]]
 target_id = "RPE"
@@ -3493,12 +3493,12 @@ uncertainty = 0.1362530945189736
 [[experiments.reaction_measurements]]
 target_id = "PGK"
 value = -7.587970859111111
-uncertainty = -0.01235199116780911
+uncertainty = 0.01235199116780911
 
 [[experiments.reaction_measurements]]
 target_id = "RPI"
 value = -0.5258907299000001
-uncertainty = -0.007486660480197303
+uncertainty = 0.007486660480197303
 
 [[experiments.reaction_measurements]]
 target_id = "G6PDH2r"
@@ -3576,7 +3576,7 @@ uncertainty = 0.01235199116780911
 [[experiments.reaction_measurements]]
 target_id = "PGM"
 value = -7.056713121444445
-uncertainty = -0.02322413998975971
+uncertainty = 0.02322413998975971
 
 [[experiments.reaction_measurements]]
 target_id = "PGI"
@@ -3621,7 +3621,7 @@ uncertainty = 0.009757143860844451
 [[experiments.reaction_measurements]]
 target_id = "FBP"
 value = -0.1582598797666667
-uncertainty = -3.584471107359328
+uncertainty = 3.584471107359328
 
 [[experiments.reaction_measurements]]
 target_id = "RPE"
@@ -3641,12 +3641,12 @@ uncertainty = 0.1362530945189736
 [[experiments.reaction_measurements]]
 target_id = "PGK"
 value = -7.587970859111111
-uncertainty = -0.01235199116780911
+uncertainty = 0.01235199116780911
 
 [[experiments.reaction_measurements]]
 target_id = "RPI"
 value = -0.5258907299000001
-uncertainty = -0.007486660480197303
+uncertainty = 0.007486660480197303
 
 [[experiments.reaction_measurements]]
 target_id = "G6PDH2r"
@@ -3724,7 +3724,7 @@ uncertainty = 0.01235199116780911
 [[experiments.reaction_measurements]]
 target_id = "PGM"
 value = -7.056713121444445
-uncertainty = -0.02322413998975971
+uncertainty = 0.02322413998975971
 
 [[experiments.reaction_measurements]]
 target_id = "PGI"
@@ -3769,7 +3769,7 @@ uncertainty = 0.009757143860844451
 [[experiments.reaction_measurements]]
 target_id = "FBP"
 value = -0.1582598797666667
-uncertainty = -3.584471107359328
+uncertainty = 3.584471107359328
 
 [[experiments.reaction_measurements]]
 target_id = "RPE"
@@ -3789,12 +3789,12 @@ uncertainty = 0.1362530945189736
 [[experiments.reaction_measurements]]
 target_id = "PGK"
 value = -7.587970859111111
-uncertainty = -0.01235199116780911
+uncertainty = 0.01235199116780911
 
 [[experiments.reaction_measurements]]
 target_id = "RPI"
 value = -0.5258907299000001
-uncertainty = -0.007486660480197303
+uncertainty = 0.007486660480197303
 
 [[experiments.reaction_measurements]]
 target_id = "G6PDH2r"
@@ -3872,7 +3872,7 @@ uncertainty = 0.01235199116780911
 [[experiments.reaction_measurements]]
 target_id = "PGM"
 value = -7.056713121444445
-uncertainty = -0.02322413998975971
+uncertainty = 0.02322413998975971
 
 [[experiments.reaction_measurements]]
 target_id = "PGI"
@@ -3917,7 +3917,7 @@ uncertainty = 0.009757143860844451
 [[experiments.reaction_measurements]]
 target_id = "FBP"
 value = -0.1582598797666667
-uncertainty = -3.584471107359328
+uncertainty = 3.584471107359328
 
 [[experiments.reaction_measurements]]
 target_id = "RPE"
@@ -3937,12 +3937,12 @@ uncertainty = 0.1362530945189736
 [[experiments.reaction_measurements]]
 target_id = "PGK"
 value = -7.587970859111111
-uncertainty = -0.01235199116780911
+uncertainty = 0.01235199116780911
 
 [[experiments.reaction_measurements]]
 target_id = "RPI"
 value = -0.5258907299000001
-uncertainty = -0.007486660480197303
+uncertainty = 0.007486660480197303
 
 [[experiments.reaction_measurements]]
 target_id = "G6PDH2r"
@@ -4173,6 +4173,16 @@ target_id = "r5p_c"
 location = 0.5768236819801289
 scale = 0.1
 
+[[priors.unbalanced_metabolites.Evo04Evo01EP_m-1_e-B1]]
+target_id = "pyr_c"
+location = 0.5
+scale = 2.0
+
+[[priors.unbalanced_metabolites.Evo04Evo01EP_m-1_e-B1]]
+target_id = "e4p_c"
+location = 0.5
+scale = 2.0
+
 [[priors.unbalanced_metabolites.Evo04Evo01EP_m-1_e-B2]]
 target_id = "adp_c"
 location = 0.5803851075700897
@@ -4203,6 +4213,16 @@ target_id = "r5p_c"
 location = 0.5768236819801289
 scale = 0.1
 
+[[priors.unbalanced_metabolites.Evo04Evo01EP_m-1_e-B2]]
+target_id = "pyr_c"
+location = 0.5
+scale = 2.0
+
+[[priors.unbalanced_metabolites.Evo04Evo01EP_m-1_e-B2]]
+target_id = "e4p_c"
+location = 0.5
+scale = 2.0
+
 [[priors.unbalanced_metabolites.Evo04Evo01EP_m-2_e-B1]]
 target_id = "adp_c"
 location = 0.6228420470776317
@@ -4233,6 +4253,16 @@ target_id = "r5p_c"
 location = 0.2684788653026555
 scale = 0.1
 
+[[priors.unbalanced_metabolites.Evo04Evo01EP_m-2_e-B1]]
+target_id = "pyr_c"
+location = 0.5
+scale = 2.0
+
+[[priors.unbalanced_metabolites.Evo04Evo01EP_m-2_e-B1]]
+target_id = "e4p_c"
+location = 0.5
+scale = 2.0
+
 [[priors.unbalanced_metabolites.Evo04Evo01EP_m-2_e-B2]]
 target_id = "adp_c"
 location = 0.6228420470776317
@@ -4262,6 +4292,16 @@ scale = 0.1
 target_id = "r5p_c"
 location = 0.2684788653026555
 scale = 0.1
+
+[[priors.unbalanced_metabolites.Evo04Evo01EP_m-2_e-B2]]
+target_id = "pyr_c"
+location = 0.5
+scale = 2.0
+
+[[priors.unbalanced_metabolites.Evo04Evo01EP_m-2_e-B2]]
+target_id = "e4p_c"
+location = 0.5
+scale = 2.0
 
 [[priors.unbalanced_metabolites.Evo04Evo01EP_m-3_e-B1]]
 target_id = "adp_c"
@@ -4293,6 +4333,16 @@ target_id = "r5p_c"
 location = 0.2844676694850122
 scale = 0.1
 
+[[priors.unbalanced_metabolites.Evo04Evo01EP_m-3_e-B1]]
+target_id = "pyr_c"
+location = 0.5
+scale = 2.0
+
+[[priors.unbalanced_metabolites.Evo04Evo01EP_m-3_e-B1]]
+target_id = "e4p_c"
+location = 0.5
+scale = 2.0
+
 [[priors.unbalanced_metabolites.Evo04Evo01EP_m-3_e-B2]]
 target_id = "adp_c"
 location = 0.6440014990736905
@@ -4323,6 +4373,16 @@ target_id = "r5p_c"
 location = 0.2844676694850122
 scale = 0.1
 
+[[priors.unbalanced_metabolites.Evo04Evo01EP_m-3_e-B2]]
+target_id = "pyr_c"
+location = 0.5
+scale = 2.0
+
+[[priors.unbalanced_metabolites.Evo04Evo01EP_m-3_e-B2]]
+target_id = "e4p_c"
+location = 0.5
+scale = 2.0
+
 [[priors.unbalanced_metabolites.Evo04Evo01EP_m-4_e-B1]]
 target_id = "adp_c"
 location = 0.6202682515759846
@@ -4353,6 +4413,16 @@ target_id = "r5p_c"
 location = 0.3243809431899649
 scale = 0.1
 
+[[priors.unbalanced_metabolites.Evo04Evo01EP_m-4_e-B1]]
+target_id = "pyr_c"
+location = 0.5
+scale = 2.0
+
+[[priors.unbalanced_metabolites.Evo04Evo01EP_m-4_e-B1]]
+target_id = "e4p_c"
+location = 0.5
+scale = 2.0
+
 [[priors.unbalanced_metabolites.Evo04Evo01EP_m-4_e-B2]]
 target_id = "adp_c"
 location = 0.6202682515759846
@@ -4382,6 +4452,16 @@ scale = 0.1
 target_id = "r5p_c"
 location = 0.3243809431899649
 scale = 0.1
+
+[[priors.unbalanced_metabolites.Evo04Evo01EP_m-4_e-B2]]
+target_id = "pyr_c"
+location = 0.5
+scale = 2.0
+
+[[priors.unbalanced_metabolites.Evo04Evo01EP_m-4_e-B2]]
+target_id = "e4p_c"
+location = 0.5
+scale = 2.0
 
 [[priors.unbalanced_metabolites.Evo04Evo01EP_m-5_e-B1]]
 target_id = "adp_c"
@@ -4413,6 +4493,16 @@ target_id = "r5p_c"
 location = 0.5676277484231236
 scale = 0.1
 
+[[priors.unbalanced_metabolites.Evo04Evo01EP_m-5_e-B1]]
+target_id = "pyr_c"
+location = 0.5
+scale = 2.0
+
+[[priors.unbalanced_metabolites.Evo04Evo01EP_m-5_e-B1]]
+target_id = "e4p_c"
+location = 0.5
+scale = 2.0
+
 [[priors.unbalanced_metabolites.Evo04Evo01EP_m-5_e-B2]]
 target_id = "adp_c"
 location = 0.5873789583773814
@@ -4443,6 +4533,16 @@ target_id = "r5p_c"
 location = 0.5676277484231236
 scale = 0.1
 
+[[priors.unbalanced_metabolites.Evo04Evo01EP_m-5_e-B2]]
+target_id = "pyr_c"
+location = 0.5
+scale = 2.0
+
+[[priors.unbalanced_metabolites.Evo04Evo01EP_m-5_e-B2]]
+target_id = "e4p_c"
+location = 0.5
+scale = 2.0
+
 [[priors.unbalanced_metabolites.Evo04Evo01EP_m-6_e-B1]]
 target_id = "adp_c"
 location = 0.6133139867049705
@@ -4473,6 +4573,16 @@ target_id = "r5p_c"
 location = 0.5549688020321867
 scale = 0.1
 
+[[priors.unbalanced_metabolites.Evo04Evo01EP_m-6_e-B1]]
+target_id = "pyr_c"
+location = 0.5
+scale = 2.0
+
+[[priors.unbalanced_metabolites.Evo04Evo01EP_m-6_e-B1]]
+target_id = "e4p_c"
+location = 0.5
+scale = 2.0
+
 [[priors.unbalanced_metabolites.Evo04Evo01EP_m-6_e-B2]]
 target_id = "adp_c"
 location = 0.6133139867049705
@@ -4502,6 +4612,16 @@ scale = 0.1
 target_id = "r5p_c"
 location = 0.5549688020321867
 scale = 0.1
+
+[[priors.unbalanced_metabolites.Evo04Evo01EP_m-6_e-B2]]
+target_id = "pyr_c"
+location = 0.5
+scale = 2.0
+
+[[priors.unbalanced_metabolites.Evo04Evo01EP_m-6_e-B2]]
+target_id = "e4p_c"
+location = 0.5
+scale = 2.0
 
 [[priors.unbalanced_metabolites.Evo04Evo02EP_m-1_e-B1]]
 target_id = "adp_c"
@@ -4533,6 +4653,16 @@ target_id = "r5p_c"
 location = 0.3779625773944491
 scale = 0.1
 
+[[priors.unbalanced_metabolites.Evo04Evo02EP_m-1_e-B1]]
+target_id = "pyr_c"
+location = 0.5
+scale = 2.0
+
+[[priors.unbalanced_metabolites.Evo04Evo02EP_m-1_e-B1]]
+target_id = "e4p_c"
+location = 0.5
+scale = 2.0
+
 [[priors.unbalanced_metabolites.Evo04Evo02EP_m-1_e-B2]]
 target_id = "adp_c"
 location = 0.5315871572171632
@@ -4563,6 +4693,16 @@ target_id = "r5p_c"
 location = 0.3779625773944491
 scale = 0.1
 
+[[priors.unbalanced_metabolites.Evo04Evo02EP_m-1_e-B2]]
+target_id = "pyr_c"
+location = 0.5
+scale = 2.0
+
+[[priors.unbalanced_metabolites.Evo04Evo02EP_m-1_e-B2]]
+target_id = "e4p_c"
+location = 0.5
+scale = 2.0
+
 [[priors.unbalanced_metabolites.Evo04Evo02EP_m-2_e-B1]]
 target_id = "adp_c"
 location = 0.7344100928387242
@@ -4593,6 +4733,16 @@ target_id = "r5p_c"
 location = 0.3523705261638891
 scale = 0.1
 
+[[priors.unbalanced_metabolites.Evo04Evo02EP_m-2_e-B1]]
+target_id = "pyr_c"
+location = 0.5
+scale = 2.0
+
+[[priors.unbalanced_metabolites.Evo04Evo02EP_m-2_e-B1]]
+target_id = "e4p_c"
+location = 0.5
+scale = 2.0
+
 [[priors.unbalanced_metabolites.Evo04Evo02EP_m-2_e-B2]]
 target_id = "adp_c"
 location = 0.7344100928387242
@@ -4622,6 +4772,16 @@ scale = 0.1
 target_id = "r5p_c"
 location = 0.3523705261638891
 scale = 0.1
+
+[[priors.unbalanced_metabolites.Evo04Evo02EP_m-2_e-B2]]
+target_id = "pyr_c"
+location = 0.5
+scale = 2.0
+
+[[priors.unbalanced_metabolites.Evo04Evo02EP_m-2_e-B2]]
+target_id = "e4p_c"
+location = 0.5
+scale = 2.0
 
 [[priors.unbalanced_metabolites.Evo04Evo02EP_m-3_e-B1]]
 target_id = "adp_c"
@@ -4653,6 +4813,16 @@ target_id = "r5p_c"
 location = 0.5681783876844768
 scale = 0.1
 
+[[priors.unbalanced_metabolites.Evo04Evo02EP_m-3_e-B1]]
+target_id = "pyr_c"
+location = 0.5
+scale = 2.0
+
+[[priors.unbalanced_metabolites.Evo04Evo02EP_m-3_e-B1]]
+target_id = "e4p_c"
+location = 0.5
+scale = 2.0
+
 [[priors.unbalanced_metabolites.Evo04Evo02EP_m-3_e-B2]]
 target_id = "adp_c"
 location = 0.5524932143710505
@@ -4683,6 +4853,16 @@ target_id = "r5p_c"
 location = 0.5681783876844768
 scale = 0.1
 
+[[priors.unbalanced_metabolites.Evo04Evo02EP_m-3_e-B2]]
+target_id = "pyr_c"
+location = 0.5
+scale = 2.0
+
+[[priors.unbalanced_metabolites.Evo04Evo02EP_m-3_e-B2]]
+target_id = "e4p_c"
+location = 0.5
+scale = 2.0
+
 [[priors.unbalanced_metabolites.Evo04Evo02EP_m-4_e-B1]]
 target_id = "adp_c"
 location = 0.5395281345011821
@@ -4713,6 +4893,16 @@ target_id = "r5p_c"
 location = 0.3476598690687084
 scale = 0.1
 
+[[priors.unbalanced_metabolites.Evo04Evo02EP_m-4_e-B1]]
+target_id = "pyr_c"
+location = 0.5
+scale = 2.0
+
+[[priors.unbalanced_metabolites.Evo04Evo02EP_m-4_e-B1]]
+target_id = "e4p_c"
+location = 0.5
+scale = 2.0
+
 [[priors.unbalanced_metabolites.Evo04Evo02EP_m-4_e-B2]]
 target_id = "adp_c"
 location = 0.5395281345011821
@@ -4742,6 +4932,16 @@ scale = 0.1
 target_id = "r5p_c"
 location = 0.3476598690687084
 scale = 0.1
+
+[[priors.unbalanced_metabolites.Evo04Evo02EP_m-4_e-B2]]
+target_id = "pyr_c"
+location = 0.5
+scale = 2.0
+
+[[priors.unbalanced_metabolites.Evo04Evo02EP_m-4_e-B2]]
+target_id = "e4p_c"
+location = 0.5
+scale = 2.0
 
 [[priors.unbalanced_metabolites.Evo04Evo02EP_m-5_e-B1]]
 target_id = "adp_c"
@@ -4773,6 +4973,16 @@ target_id = "r5p_c"
 location = 0.3740984525011242
 scale = 0.1
 
+[[priors.unbalanced_metabolites.Evo04Evo02EP_m-5_e-B1]]
+target_id = "pyr_c"
+location = 0.5
+scale = 2.0
+
+[[priors.unbalanced_metabolites.Evo04Evo02EP_m-5_e-B1]]
+target_id = "e4p_c"
+location = 0.5
+scale = 2.0
+
 [[priors.unbalanced_metabolites.Evo04Evo02EP_m-5_e-B2]]
 target_id = "adp_c"
 location = 0.7241334495690136
@@ -4803,6 +5013,16 @@ target_id = "r5p_c"
 location = 0.3740984525011242
 scale = 0.1
 
+[[priors.unbalanced_metabolites.Evo04Evo02EP_m-5_e-B2]]
+target_id = "pyr_c"
+location = 0.5
+scale = 2.0
+
+[[priors.unbalanced_metabolites.Evo04Evo02EP_m-5_e-B2]]
+target_id = "e4p_c"
+location = 0.5
+scale = 2.0
+
 [[priors.unbalanced_metabolites.Evo04Evo02EP_m-6_e-B1]]
 target_id = "adp_c"
 location = 0.480989673847055
@@ -4833,6 +5053,16 @@ target_id = "r5p_c"
 location = 0.5192687850155024
 scale = 0.1
 
+[[priors.unbalanced_metabolites.Evo04Evo02EP_m-6_e-B1]]
+target_id = "pyr_c"
+location = 0.5
+scale = 2.0
+
+[[priors.unbalanced_metabolites.Evo04Evo02EP_m-6_e-B1]]
+target_id = "e4p_c"
+location = 0.5
+scale = 2.0
+
 [[priors.unbalanced_metabolites.Evo04Evo02EP_m-6_e-B2]]
 target_id = "adp_c"
 location = 0.480989673847055
@@ -4862,6 +5092,16 @@ scale = 0.1
 target_id = "r5p_c"
 location = 0.5192687850155024
 scale = 0.1
+
+[[priors.unbalanced_metabolites.Evo04Evo02EP_m-6_e-B2]]
+target_id = "pyr_c"
+location = 0.5
+scale = 2.0
+
+[[priors.unbalanced_metabolites.Evo04Evo02EP_m-6_e-B2]]
+target_id = "e4p_c"
+location = 0.5
+scale = 2.0
 
 [priors.enzymes]
 [[priors.enzymes.Evo04Evo01EP_m-1_e-B1]]
@@ -4949,6 +5189,11 @@ target_id = "G6PDH2r"
 location = 0.01050550030116524
 scale = 0.04685481731416075
 
+[[priors.enzymes.Evo04Evo01EP_m-1_e-B1]]
+target_id = "TKT1"
+location = 0.02886215073377685
+scale = 0.07164760211238939
+
 [[priors.enzymes.Evo04Evo01EP_m-1_e-B2]]
 target_id = "EDA"
 location = 0.01682227330413945
@@ -5033,6 +5278,11 @@ scale = 0.1445872044139148
 target_id = "G6PDH2r"
 location = 0.01120855655096314
 scale = 0.10417371637146
+
+[[priors.enzymes.Evo04Evo01EP_m-1_e-B2]]
+target_id = "TKT1"
+location = 0.02755022802731761
+scale = 0.02729475251120398
 
 [[priors.enzymes.Evo04Evo01EP_m-2_e-B1]]
 target_id = "EDA"
@@ -5119,6 +5369,11 @@ target_id = "G6PDH2r"
 location = 0.01050550030116524
 scale = 0.04685481731416075
 
+[[priors.enzymes.Evo04Evo01EP_m-2_e-B1]]
+target_id = "TKT1"
+location = 0.02886215073377685
+scale = 0.07164760211238939
+
 [[priors.enzymes.Evo04Evo01EP_m-2_e-B2]]
 target_id = "EDA"
 location = 0.01682227330413945
@@ -5203,6 +5458,11 @@ scale = 0.1445872044139148
 target_id = "G6PDH2r"
 location = 0.01120855655096314
 scale = 0.10417371637146
+
+[[priors.enzymes.Evo04Evo01EP_m-2_e-B2]]
+target_id = "TKT1"
+location = 0.02755022802731761
+scale = 0.02729475251120398
 
 [[priors.enzymes.Evo04Evo01EP_m-3_e-B1]]
 target_id = "EDA"
@@ -5289,6 +5549,11 @@ target_id = "G6PDH2r"
 location = 0.01050550030116524
 scale = 0.04685481731416075
 
+[[priors.enzymes.Evo04Evo01EP_m-3_e-B1]]
+target_id = "TKT1"
+location = 0.02886215073377685
+scale = 0.07164760211238939
+
 [[priors.enzymes.Evo04Evo01EP_m-3_e-B2]]
 target_id = "EDA"
 location = 0.01682227330413945
@@ -5373,6 +5638,11 @@ scale = 0.1445872044139148
 target_id = "G6PDH2r"
 location = 0.01120855655096314
 scale = 0.10417371637146
+
+[[priors.enzymes.Evo04Evo01EP_m-3_e-B2]]
+target_id = "TKT1"
+location = 0.02755022802731761
+scale = 0.02729475251120398
 
 [[priors.enzymes.Evo04Evo01EP_m-4_e-B1]]
 target_id = "EDA"
@@ -5459,6 +5729,11 @@ target_id = "G6PDH2r"
 location = 0.01050550030116524
 scale = 0.04685481731416075
 
+[[priors.enzymes.Evo04Evo01EP_m-4_e-B1]]
+target_id = "TKT1"
+location = 0.02886215073377685
+scale = 0.07164760211238939
+
 [[priors.enzymes.Evo04Evo01EP_m-4_e-B2]]
 target_id = "EDA"
 location = 0.01682227330413945
@@ -5543,6 +5818,11 @@ scale = 0.1445872044139148
 target_id = "G6PDH2r"
 location = 0.01120855655096314
 scale = 0.10417371637146
+
+[[priors.enzymes.Evo04Evo01EP_m-4_e-B2]]
+target_id = "TKT1"
+location = 0.02755022802731761
+scale = 0.02729475251120398
 
 [[priors.enzymes.Evo04Evo01EP_m-5_e-B1]]
 target_id = "EDA"
@@ -5629,6 +5909,11 @@ target_id = "G6PDH2r"
 location = 0.01050550030116524
 scale = 0.04685481731416075
 
+[[priors.enzymes.Evo04Evo01EP_m-5_e-B1]]
+target_id = "TKT1"
+location = 0.02886215073377685
+scale = 0.07164760211238939
+
 [[priors.enzymes.Evo04Evo01EP_m-5_e-B2]]
 target_id = "EDA"
 location = 0.01682227330413945
@@ -5713,6 +5998,11 @@ scale = 0.1445872044139148
 target_id = "G6PDH2r"
 location = 0.01120855655096314
 scale = 0.10417371637146
+
+[[priors.enzymes.Evo04Evo01EP_m-5_e-B2]]
+target_id = "TKT1"
+location = 0.02755022802731761
+scale = 0.02729475251120398
 
 [[priors.enzymes.Evo04Evo01EP_m-6_e-B1]]
 target_id = "EDA"
@@ -5799,6 +6089,11 @@ target_id = "G6PDH2r"
 location = 0.01050550030116524
 scale = 0.04685481731416075
 
+[[priors.enzymes.Evo04Evo01EP_m-6_e-B1]]
+target_id = "TKT1"
+location = 0.02886215073377685
+scale = 0.07164760211238939
+
 [[priors.enzymes.Evo04Evo01EP_m-6_e-B2]]
 target_id = "EDA"
 location = 0.01682227330413945
@@ -5884,6 +6179,11 @@ target_id = "G6PDH2r"
 location = 0.01120855655096314
 scale = 0.10417371637146
 
+[[priors.enzymes.Evo04Evo01EP_m-6_e-B2]]
+target_id = "TKT1"
+location = 0.02755022802731761
+scale = 0.02729475251120398
+
 [[priors.enzymes.Evo04Evo02EP_m-1_e-B1]]
 target_id = "EDA"
 location = 0.01519228278410257
@@ -5968,6 +6268,11 @@ scale = 0.09407234137731914
 target_id = "G6PDH2r"
 location = 0.009980033276238105
 scale = 0.02445262161324497
+
+[[priors.enzymes.Evo04Evo02EP_m-1_e-B1]]
+target_id = "TKT1"
+location = 0.02989708212591632
+scale = 0.04415018298610121
 
 [[priors.enzymes.Evo04Evo02EP_m-1_e-B2]]
 target_id = "EDA"
@@ -6054,6 +6359,11 @@ target_id = "G6PDH2r"
 location = 0.01220023103747011
 scale = 0.0732836093513099
 
+[[priors.enzymes.Evo04Evo02EP_m-1_e-B2]]
+target_id = "TKT1"
+location = 0.03109983877438677
+scale = 0.1999954757093361
+
 [[priors.enzymes.Evo04Evo02EP_m-2_e-B1]]
 target_id = "EDA"
 location = 0.01519228278410257
@@ -6138,6 +6448,11 @@ scale = 0.09407234137731914
 target_id = "G6PDH2r"
 location = 0.009980033276238105
 scale = 0.02445262161324497
+
+[[priors.enzymes.Evo04Evo02EP_m-2_e-B1]]
+target_id = "TKT1"
+location = 0.02989708212591632
+scale = 0.04415018298610121
 
 [[priors.enzymes.Evo04Evo02EP_m-2_e-B2]]
 target_id = "EDA"
@@ -6224,6 +6539,11 @@ target_id = "G6PDH2r"
 location = 0.01220023103747011
 scale = 0.0732836093513099
 
+[[priors.enzymes.Evo04Evo02EP_m-2_e-B2]]
+target_id = "TKT1"
+location = 0.03109983877438677
+scale = 0.1999954757093361
+
 [[priors.enzymes.Evo04Evo02EP_m-3_e-B1]]
 target_id = "EDA"
 location = 0.01519228278410257
@@ -6308,6 +6628,11 @@ scale = 0.09407234137731914
 target_id = "G6PDH2r"
 location = 0.009980033276238105
 scale = 0.02445262161324497
+
+[[priors.enzymes.Evo04Evo02EP_m-3_e-B1]]
+target_id = "TKT1"
+location = 0.02989708212591632
+scale = 0.04415018298610121
 
 [[priors.enzymes.Evo04Evo02EP_m-3_e-B2]]
 target_id = "EDA"
@@ -6394,6 +6719,11 @@ target_id = "G6PDH2r"
 location = 0.01220023103747011
 scale = 0.0732836093513099
 
+[[priors.enzymes.Evo04Evo02EP_m-3_e-B2]]
+target_id = "TKT1"
+location = 0.03109983877438677
+scale = 0.1999954757093361
+
 [[priors.enzymes.Evo04Evo02EP_m-4_e-B1]]
 target_id = "EDA"
 location = 0.01519228278410257
@@ -6478,6 +6808,11 @@ scale = 0.09407234137731914
 target_id = "G6PDH2r"
 location = 0.009980033276238105
 scale = 0.02445262161324497
+
+[[priors.enzymes.Evo04Evo02EP_m-4_e-B1]]
+target_id = "TKT1"
+location = 0.02989708212591632
+scale = 0.04415018298610121
 
 [[priors.enzymes.Evo04Evo02EP_m-4_e-B2]]
 target_id = "EDA"
@@ -6564,6 +6899,11 @@ target_id = "G6PDH2r"
 location = 0.01220023103747011
 scale = 0.0732836093513099
 
+[[priors.enzymes.Evo04Evo02EP_m-4_e-B2]]
+target_id = "TKT1"
+location = 0.03109983877438677
+scale = 0.1999954757093361
+
 [[priors.enzymes.Evo04Evo02EP_m-5_e-B1]]
 target_id = "EDA"
 location = 0.01519228278410257
@@ -6648,6 +6988,11 @@ scale = 0.09407234137731914
 target_id = "G6PDH2r"
 location = 0.009980033276238105
 scale = 0.02445262161324497
+
+[[priors.enzymes.Evo04Evo02EP_m-5_e-B1]]
+target_id = "TKT1"
+location = 0.02989708212591632
+scale = 0.04415018298610121
 
 [[priors.enzymes.Evo04Evo02EP_m-5_e-B2]]
 target_id = "EDA"
@@ -6734,6 +7079,11 @@ target_id = "G6PDH2r"
 location = 0.01220023103747011
 scale = 0.0732836093513099
 
+[[priors.enzymes.Evo04Evo02EP_m-5_e-B2]]
+target_id = "TKT1"
+location = 0.03109983877438677
+scale = 0.1999954757093361
+
 [[priors.enzymes.Evo04Evo02EP_m-6_e-B1]]
 target_id = "EDA"
 location = 0.01519228278410257
@@ -6819,6 +7169,11 @@ target_id = "G6PDH2r"
 location = 0.009980033276238105
 scale = 0.02445262161324497
 
+[[priors.enzymes.Evo04Evo02EP_m-6_e-B1]]
+target_id = "TKT1"
+location = 0.02989708212591632
+scale = 0.04415018298610121
+
 [[priors.enzymes.Evo04Evo02EP_m-6_e-B2]]
 target_id = "EDA"
 location = 0.01091633776037329
@@ -6903,4 +7258,9 @@ scale = 0.09092085512362755
 target_id = "G6PDH2r"
 location = 0.01220023103747011
 scale = 0.0732836093513099
+
+[[priors.enzymes.Evo04Evo02EP_m-6_e-B2]]
+target_id = "TKT1"
+location = 0.03109983877438677
+scale = 0.1999954757093361
 
