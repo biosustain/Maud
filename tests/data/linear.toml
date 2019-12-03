@@ -100,10 +100,11 @@ r3 = [
 ]
 
 [priors.thermodynamic_parameters]
-marginal_dgs = [
-  { target_id = 'r1', location = 0, scale = 0.05},
-  { target_id = 'r2', location = 1, scale = 0.5},
-  { target_id = 'r3', location = 0, scale = 0.05},
+formation_energies = [
+  { target_id = 'M1_ex', location = -1, scale = 0.05},
+  { target_id = 'M1', location = -1, scale = 0.05},
+  { target_id = 'M2', location = -2, scale = 0.05},
+  { target_id = 'M2_ex', location = -2, scale = 0.05},
 ]
 
 [priors.unbalanced_metabolites]
