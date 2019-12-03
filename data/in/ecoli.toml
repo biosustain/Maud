@@ -1,0 +1,7266 @@
+[[compartments]]
+id = "c"
+name = "cytosol"
+volume = 1
+
+[[reactions]]
+id = "PGI"
+name = "Glucose-6-phosphate isomerase"
+[[reactions.enzymes]]
+id = "PGI"
+name = "Glucose-6-phosphate isomerase"
+mechanism = "modular_rate_law"
+gene = "pgi"
+
+
+[reactions.stoichiometry]
+f6p_c = 1
+g6p_c = -1
+[[reactions]]
+id = "FBP"
+name = "Fructose-bisphosphatase"
+[[reactions.enzymes]]
+id = "FBP"
+name = "Fructose-bisphosphatase"
+mechanism = "modular_rate_law"
+gene = "fbp"
+
+
+[reactions.stoichiometry]
+f6p_c = 1
+fdp_c = -1
+[[reactions]]
+id = "FBA"
+name = "Fructose-bisphosphate aldolase"
+[[reactions.enzymes]]
+id = "FBA"
+name = "Fructose-bisphosphate aldolase"
+mechanism = "modular_rate_law"
+gene = "fbaA"
+
+
+[reactions.stoichiometry]
+dhap_c = 1
+fdp_c = -1
+g3p_c = 1
+[[reactions]]
+id = "TPI"
+name = "Triose-phosphate isomerase"
+[[reactions.enzymes]]
+id = "TPI"
+name = "Triose-phosphate isomerase"
+mechanism = "modular_rate_law"
+gene = "tpiA"
+
+
+[reactions.stoichiometry]
+dhap_c = -1
+g3p_c = 1
+[[reactions]]
+id = "GAPD"
+name = "Glyceraldehyde-3-phosphate dehydrogenase"
+[[reactions.enzymes]]
+id = "GAPD"
+name = "Glyceraldehyde-3-phosphate dehydrogenase"
+mechanism = "modular_rate_law"
+gene = "gapA"
+
+
+[reactions.stoichiometry]
+13dpg_c = 1
+g3p_c = -1
+nad_c = -1
+nadh_c = 1
+[[reactions]]
+id = "PGK"
+name = "Phosphoglycerate kinase"
+[[reactions.enzymes]]
+id = "PGK"
+name = "Phosphoglycerate kinase"
+mechanism = "modular_rate_law"
+gene = "pgk"
+
+
+[reactions.stoichiometry]
+13dpg_c = 1
+3pg_c = -1
+adp_c = 1
+atp_c = -1
+[[reactions]]
+id = "PGM"
+name = "Phosphoglycerate mutase"
+[[reactions.enzymes]]
+id = "PGM"
+name = "Phosphoglycerate mutase"
+mechanism = "modular_rate_law"
+gene = "gpmA"
+
+
+[reactions.stoichiometry]
+2pg_c = -1
+3pg_c = 1
+[[reactions]]
+id = "ENO"
+name = "Enolase"
+[[reactions.enzymes]]
+id = "ENO"
+name = "Enolase"
+mechanism = "modular_rate_law"
+gene = "eno"
+
+
+[reactions.stoichiometry]
+2pg_c = -1
+pep_c = 1
+[[reactions]]
+id = "G6PDH2r"
+name = "Glucose 6-phosphate dehydrogenase"
+[[reactions.enzymes]]
+id = "G6PDH2r"
+name = "Glucose 6-phosphate dehydrogenase"
+mechanism = "modular_rate_law"
+gene = "zwf"
+
+
+[reactions.stoichiometry]
+6pgl_c = 1
+g6p_c = -1
+nadp_c = -1
+nadph_c = 1
+[[reactions]]
+id = "PGL"
+name = "6-phosphogluconolactonase"
+[[reactions.enzymes]]
+id = "PGL"
+name = "6-phosphogluconolactonase"
+mechanism = "modular_rate_law"
+gene = "pgl"
+
+
+[reactions.stoichiometry]
+6pgc_c = 1
+6pgl_c = -1
+[[reactions]]
+id = "GND"
+name = "Phosphogluconate dehydrogenase"
+[[reactions.enzymes]]
+id = "GND"
+name = "Phosphogluconate dehydrogenase"
+mechanism = "modular_rate_law"
+gene = "gnd"
+
+
+[reactions.stoichiometry]
+6pgc_c = -1
+co2_c = 1
+nadp_c = -1
+nadph_c = 1
+ru5p__D_c = 1
+[[reactions]]
+id = "RPI"
+name = "Ribose-5-phosphate isomerase"
+[[reactions.enzymes]]
+id = "RPI"
+name = "Ribose-5-phosphate isomerase"
+mechanism = "modular_rate_law"
+gene = "rpiA"
+
+
+[reactions.stoichiometry]
+r5p_c = -1
+ru5p__D_c = 1
+[[reactions]]
+id = "RPE"
+name = "Ribulose 5-phosphate 3-epimerase"
+[[reactions.enzymes]]
+id = "RPE"
+name = "Ribulose 5-phosphate 3-epimerase"
+mechanism = "modular_rate_law"
+gene = "rpe"
+
+
+[reactions.stoichiometry]
+ru5p__D_c = -1
+xu5p__D_c = 1
+[[reactions]]
+id = "TKT1"
+name = "Transketolase"
+[[reactions.enzymes]]
+id = "TKT1"
+name = "Transketolase"
+mechanism = "modular_rate_law"
+gene = "tktA"
+
+
+[reactions.stoichiometry]
+g3p_c = 1
+r5p_c = -1
+s7p_c = 1
+xu5p__D_c = -1
+[[reactions]]
+id = "TKT2"
+name = "Transketolase"
+[[reactions.enzymes]]
+id = "TKT2"
+name = "Transketolase"
+mechanism = "modular_rate_law"
+gene = "tktA"
+
+
+[reactions.stoichiometry]
+e4p_c = -1
+f6p_c = 1
+g3p_c = 1
+xu5p__D_c = -1
+[[reactions]]
+id = "TALA"
+name = "Transaldolase"
+[[reactions.enzymes]]
+id = "TALA"
+name = "Transaldolase"
+mechanism = "modular_rate_law"
+gene = "talB"
+
+
+[reactions.stoichiometry]
+e4p_c = 1
+f6p_c = 1
+g3p_c = -1
+s7p_c = -1
+[[reactions]]
+id = "EDD"
+name = "6-phosphogluconate dehydratase"
+[[reactions.enzymes]]
+id = "EDD"
+name = "6-phosphogluconate dehydratase"
+mechanism = "modular_rate_law"
+gene = "edd"
+
+
+[reactions.stoichiometry]
+2ddg6p_c = 1
+6pgc_c = -1
+[[reactions]]
+id = "EDA"
+name = "2-dehydro-3-deoxy-phosphogluconate aldolase"
+[[reactions.enzymes]]
+id = "EDA"
+name = "2-dehydro-3-deoxy-phosphogluconate aldolase"
+mechanism = "modular_rate_law"
+gene = "eda"
+
+
+[reactions.stoichiometry]
+2ddg6p_c = -1
+g3p_c = 1
+pyr_c = 1
+[[metabolites]]
+id = "xu5p__D_c"
+name = "D-Xylulose 5-phosphate"
+balanced = true
+compartment = "cytosol"
+
+[[metabolites]]
+id = "g3p_c"
+name = "Glyceraldehyde 3-phosphate"
+balanced = true
+compartment = "cytosol"
+
+[[metabolites]]
+id = "2ddg6p_c"
+name = "2-Dehydro-3-deoxy-D-gluconate 6-phosphate"
+balanced = true
+compartment = "cytosol"
+
+[[metabolites]]
+id = "co2_c"
+name = "CO2 CO2"
+balanced = true
+compartment = "cytosol"
+
+[[metabolites]]
+id = "3pg_c"
+name = "3-Phospho-D-glycerate"
+balanced = true
+compartment = "cytosol"
+
+[[metabolites]]
+id = "6pgl_c"
+name = "6-phospho-D-glucono-1,5-lactone"
+balanced = true
+compartment = "cytosol"
+
+[[metabolites]]
+id = "pyr_c"
+name = "Pyruvate"
+balanced = false
+compartment = "cytosol"
+
+[[metabolites]]
+id = "6pgc_c"
+name = "6-Phospho-D-gluconate"
+balanced = true
+compartment = "cytosol"
+
+[[metabolites]]
+id = "adp_c"
+name = "ADP C10H12N5O10P2"
+balanced = false
+compartment = "cytosol"
+
+[[metabolites]]
+id = "e4p_c"
+name = "D-Erythrose 4-phosphate"
+balanced = false
+compartment = "cytosol"
+
+[[metabolites]]
+id = "13dpg_c"
+name = "3-Phospho-D-glyceroyl phosphate"
+balanced = true
+compartment = "cytosol"
+
+[[metabolites]]
+id = "nad_c"
+name = "Nicotinamide adenine dinucleotide"
+balanced = true
+compartment = "cytosol"
+
+[[metabolites]]
+id = "atp_c"
+name = "ATP C10H12N5O13P3"
+balanced = true
+compartment = "cytosol"
+
+[[metabolites]]
+id = "nadp_c"
+name = "Nicotinamide adenine dinucleotide phosphate"
+balanced = true
+compartment = "cytosol"
+
+[[metabolites]]
+id = "g6p_c"
+name = "D-Glucose 6-phosphate"
+balanced = false
+compartment = "cytosol"
+
+[[metabolites]]
+id = "dhap_c"
+name = "Dihydroxyacetone phosphate"
+balanced = true
+compartment = "cytosol"
+
+[[metabolites]]
+id = "f6p_c"
+name = "D-Fructose 6-phosphate"
+balanced = true
+compartment = "cytosol"
+
+[[metabolites]]
+id = "ru5p__D_c"
+name = "D-Ribulose 5-phosphate"
+balanced = true
+compartment = "cytosol"
+
+[[metabolites]]
+id = "2pg_c"
+name = "D-Glycerate 2-phosphate"
+balanced = true
+compartment = "cytosol"
+
+[[metabolites]]
+id = "pep_c"
+name = "Phosphoenolpyruvate"
+balanced = false
+compartment = "cytosol"
+
+[[metabolites]]
+id = "nadh_c"
+name = "Nicotinamide adenine dinucleotide - reduced"
+balanced = false
+compartment = "cytosol"
+
+[[metabolites]]
+id = "nadph_c"
+name = "Nicotinamide adenine dinucleotide phosphate - reduced"
+balanced = false
+compartment = "cytosol"
+
+[[metabolites]]
+id = "fdp_c"
+name = "D-Fructose 1,6-bisphosphate"
+balanced = true
+compartment = "cytosol"
+
+[[metabolites]]
+id = "r5p_c"
+name = "Alpha-D-Ribose 5-phosphate"
+balanced = false
+compartment = "cytosol"
+
+[[metabolites]]
+id = "s7p_c"
+name = "Sedoheptulose 7-phosphate"
+balanced = true
+compartment = "cytosol"
+[[experiments]]
+id = "Evo04Evo01EP_m-1_e-B1"
+[[experiments.metabolite_measurements]]
+target_id = "6pgc_c"
+value = 0.5143960269791895
+uncertainty = 0.1
+
+[[experiments.metabolite_measurements]]
+target_id = "atp_c"
+value = 5.391721191506514
+uncertainty = 0.1
+
+[[experiments.metabolite_measurements]]
+target_id = "dhap_c"
+value = 1.811820073714394
+uncertainty = 0.1
+
+[[experiments.metabolite_measurements]]
+target_id = "f6p_c"
+value = 0.7234538796778107
+uncertainty = 0.1
+
+[[experiments.metabolite_measurements]]
+target_id = "fdp_c"
+value = 3.835980038011033
+uncertainty = 0.1
+
+[[experiments.metabolite_measurements]]
+target_id = "nad_c"
+value = 2.393950781811858
+uncertainty = 0.1
+
+[[experiments.metabolite_measurements]]
+target_id = "nadp_c"
+value = 0.8641724263327427
+uncertainty = 0.1
+
+[[experiments.metabolite_measurements]]
+target_id = "ru5p__D_c"
+value = 0.05234065846111169
+uncertainty = 0.1
+
+[[experiments.metabolite_measurements]]
+target_id = "s7p_c"
+value = 0.2652515081141275
+uncertainty = 0.1
+
+[[experiments.metabolite_measurements]]
+target_id = "2pg_c"
+value = 1.862842073039436
+uncertainty = 0.1
+
+[[experiments.metabolite_measurements]]
+target_id = "3pg_c"
+value = 1.862842073039436
+uncertainty = 0.1
+
+[[experiments.reaction_measurements]]
+target_id = "GAPD"
+value = 7.382573442000001
+uncertainty = 0.001238858815390419
+
+[[experiments.reaction_measurements]]
+target_id = "PGM"
+value = -6.808704164444444
+uncertainty = 0.00605790544694784
+
+[[experiments.reaction_measurements]]
+target_id = "PGI"
+value = 4.087673533555556
+uncertainty = 0.0009325263874528855
+
+[[experiments.reaction_measurements]]
+target_id = "TPI"
+value = 3.748161843222222
+uncertainty = 0.0008540444150450473
+
+[[experiments.reaction_measurements]]
+target_id = "ENO"
+value = 6.808704164444444
+uncertainty = 0.00605790544694784
+
+[[experiments.reaction_measurements]]
+target_id = "FBA"
+value = 2.536603419888889
+uncertainty = 0.03347573814687445
+
+[[experiments.reaction_measurements]]
+target_id = "PGL"
+value = 0.1880508454222223
+uncertainty = 0.01591776961498097
+
+[[experiments.reaction_measurements]]
+target_id = "TKT1"
+value = -0.07564788201111111
+uncertainty = 0.008204041543099788
+
+[[experiments.reaction_measurements]]
+target_id = "EDD"
+value = 0.0002779389
+uncertainty = 9.245064452814788
+
+[[experiments.reaction_measurements]]
+target_id = "TKT2"
+value = -0.1936501518888889
+uncertainty = 0.003146871502554239
+
+[[experiments.reaction_measurements]]
+target_id = "FBP"
+value = 0.008771676077777778
+uncertainty = 0.05893666486876288
+
+[[experiments.reaction_measurements]]
+target_id = "RPE"
+value = -0.2692649755111111
+uncertainty = 0.009125494756821159
+
+[[experiments.reaction_measurements]]
+target_id = "EDA"
+value = 0.0002779389
+uncertainty = 9.245064452814788
+
+[[experiments.reaction_measurements]]
+target_id = "TALA"
+value = -1.344643262933333
+uncertainty = 0.0630672407188857
+
+[[experiments.reaction_measurements]]
+target_id = "PGK"
+value = -7.382573442000001
+uncertainty = 0.001238858815390419
+
+[[experiments.reaction_measurements]]
+target_id = "RPI"
+value = -0.4324854905555556
+uncertainty = 0.005214528410839443
+
+[[experiments.reaction_measurements]]
+target_id = "G6PDH2r"
+value = 0.1880508454222223
+uncertainty = 0.01591776961498097
+
+[[experiments.reaction_measurements]]
+target_id = "GND"
+value = 0.1763980644555556
+uncertainty = 0.02328777246829656
+
+
+[[experiments]]
+id = "Evo04Evo01EP_m-1_e-B2"
+[[experiments.metabolite_measurements]]
+target_id = "6pgc_c"
+value = 0.5143960269791895
+uncertainty = 0.1
+
+[[experiments.metabolite_measurements]]
+target_id = "atp_c"
+value = 5.391721191506514
+uncertainty = 0.1
+
+[[experiments.metabolite_measurements]]
+target_id = "dhap_c"
+value = 1.811820073714394
+uncertainty = 0.1
+
+[[experiments.metabolite_measurements]]
+target_id = "f6p_c"
+value = 0.7234538796778107
+uncertainty = 0.1
+
+[[experiments.metabolite_measurements]]
+target_id = "fdp_c"
+value = 3.835980038011033
+uncertainty = 0.1
+
+[[experiments.metabolite_measurements]]
+target_id = "nad_c"
+value = 2.393950781811858
+uncertainty = 0.1
+
+[[experiments.metabolite_measurements]]
+target_id = "nadp_c"
+value = 0.8641724263327427
+uncertainty = 0.1
+
+[[experiments.metabolite_measurements]]
+target_id = "ru5p__D_c"
+value = 0.05234065846111169
+uncertainty = 0.1
+
+[[experiments.metabolite_measurements]]
+target_id = "s7p_c"
+value = 0.2652515081141275
+uncertainty = 0.1
+
+[[experiments.metabolite_measurements]]
+target_id = "2pg_c"
+value = 1.862842073039436
+uncertainty = 0.1
+
+[[experiments.metabolite_measurements]]
+target_id = "3pg_c"
+value = 1.862842073039436
+uncertainty = 0.1
+
+[[experiments.reaction_measurements]]
+target_id = "GAPD"
+value = 7.382573442000001
+uncertainty = 0.001238858815390419
+
+[[experiments.reaction_measurements]]
+target_id = "PGM"
+value = -6.808704164444444
+uncertainty = 0.00605790544694784
+
+[[experiments.reaction_measurements]]
+target_id = "PGI"
+value = 4.087673533555556
+uncertainty = 0.0009325263874528855
+
+[[experiments.reaction_measurements]]
+target_id = "TPI"
+value = 3.748161843222222
+uncertainty = 0.0008540444150450473
+
+[[experiments.reaction_measurements]]
+target_id = "ENO"
+value = 6.808704164444444
+uncertainty = 0.00605790544694784
+
+[[experiments.reaction_measurements]]
+target_id = "FBA"
+value = 2.536603419888889
+uncertainty = 0.03347573814687445
+
+[[experiments.reaction_measurements]]
+target_id = "PGL"
+value = 0.1880508454222223
+uncertainty = 0.01591776961498097
+
+[[experiments.reaction_measurements]]
+target_id = "TKT1"
+value = -0.07564788201111111
+uncertainty = 0.008204041543099788
+
+[[experiments.reaction_measurements]]
+target_id = "EDD"
+value = 0.0002779389
+uncertainty = 9.245064452814788
+
+[[experiments.reaction_measurements]]
+target_id = "TKT2"
+value = -0.1936501518888889
+uncertainty = 0.003146871502554239
+
+[[experiments.reaction_measurements]]
+target_id = "FBP"
+value = 0.008771676077777778
+uncertainty = 0.05893666486876288
+
+[[experiments.reaction_measurements]]
+target_id = "RPE"
+value = -0.2692649755111111
+uncertainty = 0.009125494756821159
+
+[[experiments.reaction_measurements]]
+target_id = "EDA"
+value = 0.0002779389
+uncertainty = 9.245064452814788
+
+[[experiments.reaction_measurements]]
+target_id = "TALA"
+value = -1.344643262933333
+uncertainty = 0.0630672407188857
+
+[[experiments.reaction_measurements]]
+target_id = "PGK"
+value = -7.382573442000001
+uncertainty = 0.001238858815390419
+
+[[experiments.reaction_measurements]]
+target_id = "RPI"
+value = -0.4324854905555556
+uncertainty = 0.005214528410839443
+
+[[experiments.reaction_measurements]]
+target_id = "G6PDH2r"
+value = 0.1880508454222223
+uncertainty = 0.01591776961498097
+
+[[experiments.reaction_measurements]]
+target_id = "GND"
+value = 0.1763980644555556
+uncertainty = 0.02328777246829656
+
+
+[[experiments]]
+id = "Evo04Evo01EP_m-2_e-B1"
+[[experiments.metabolite_measurements]]
+target_id = "6pgc_c"
+value = 0.8837831632411053
+uncertainty = 0.1
+
+[[experiments.metabolite_measurements]]
+target_id = "atp_c"
+value = 4.388380169658292
+uncertainty = 0.1
+
+[[experiments.metabolite_measurements]]
+target_id = "dhap_c"
+value = 1.771649341726447
+uncertainty = 0.1
+
+[[experiments.metabolite_measurements]]
+target_id = "f6p_c"
+value = 0.5873536411780145
+uncertainty = 0.1
+
+[[experiments.metabolite_measurements]]
+target_id = "fdp_c"
+value = 3.485985196333746
+uncertainty = 0.1
+
+[[experiments.metabolite_measurements]]
+target_id = "nad_c"
+value = 2.228957769795646
+uncertainty = 0.1
+
+[[experiments.metabolite_measurements]]
+target_id = "nadp_c"
+value = 0.6265407556930067
+uncertainty = 0.1
+
+[[experiments.metabolite_measurements]]
+target_id = "ru5p__D_c"
+value = 0.04990168905894168
+uncertainty = 0.1
+
+[[experiments.metabolite_measurements]]
+target_id = "s7p_c"
+value = 0.4280933865907172
+uncertainty = 0.1
+
+[[experiments.metabolite_measurements]]
+target_id = "2pg_c"
+value = 1.733293811791947
+uncertainty = 0.1
+
+[[experiments.metabolite_measurements]]
+target_id = "3pg_c"
+value = 1.733293811791947
+uncertainty = 0.1
+
+[[experiments.reaction_measurements]]
+target_id = "GAPD"
+value = 7.382573442000001
+uncertainty = 0.001238858815390419
+
+[[experiments.reaction_measurements]]
+target_id = "PGM"
+value = -6.808704164444444
+uncertainty = 0.00605790544694784
+
+[[experiments.reaction_measurements]]
+target_id = "PGI"
+value = 4.087673533555556
+uncertainty = 0.0009325263874528855
+
+[[experiments.reaction_measurements]]
+target_id = "TPI"
+value = 3.748161843222222
+uncertainty = 0.0008540444150450473
+
+[[experiments.reaction_measurements]]
+target_id = "ENO"
+value = 6.808704164444444
+uncertainty = 0.00605790544694784
+
+[[experiments.reaction_measurements]]
+target_id = "FBA"
+value = 2.536603419888889
+uncertainty = 0.03347573814687445
+
+[[experiments.reaction_measurements]]
+target_id = "PGL"
+value = 0.1880508454222223
+uncertainty = 0.01591776961498097
+
+[[experiments.reaction_measurements]]
+target_id = "TKT1"
+value = -0.07564788201111111
+uncertainty = 0.008204041543099788
+
+[[experiments.reaction_measurements]]
+target_id = "EDD"
+value = 0.0002779389
+uncertainty = 9.245064452814788
+
+[[experiments.reaction_measurements]]
+target_id = "TKT2"
+value = -0.1936501518888889
+uncertainty = 0.003146871502554239
+
+[[experiments.reaction_measurements]]
+target_id = "FBP"
+value = 0.008771676077777778
+uncertainty = 0.05893666486876288
+
+[[experiments.reaction_measurements]]
+target_id = "RPE"
+value = -0.2692649755111111
+uncertainty = 0.009125494756821159
+
+[[experiments.reaction_measurements]]
+target_id = "EDA"
+value = 0.0002779389
+uncertainty = 9.245064452814788
+
+[[experiments.reaction_measurements]]
+target_id = "TALA"
+value = -1.344643262933333
+uncertainty = 0.0630672407188857
+
+[[experiments.reaction_measurements]]
+target_id = "PGK"
+value = -7.382573442000001
+uncertainty = 0.001238858815390419
+
+[[experiments.reaction_measurements]]
+target_id = "RPI"
+value = -0.4324854905555556
+uncertainty = 0.005214528410839443
+
+[[experiments.reaction_measurements]]
+target_id = "G6PDH2r"
+value = 0.1880508454222223
+uncertainty = 0.01591776961498097
+
+[[experiments.reaction_measurements]]
+target_id = "GND"
+value = 0.1763980644555556
+uncertainty = 0.02328777246829656
+
+
+[[experiments]]
+id = "Evo04Evo01EP_m-2_e-B2"
+[[experiments.metabolite_measurements]]
+target_id = "6pgc_c"
+value = 0.8837831632411053
+uncertainty = 0.1
+
+[[experiments.metabolite_measurements]]
+target_id = "atp_c"
+value = 4.388380169658292
+uncertainty = 0.1
+
+[[experiments.metabolite_measurements]]
+target_id = "dhap_c"
+value = 1.771649341726447
+uncertainty = 0.1
+
+[[experiments.metabolite_measurements]]
+target_id = "f6p_c"
+value = 0.5873536411780145
+uncertainty = 0.1
+
+[[experiments.metabolite_measurements]]
+target_id = "fdp_c"
+value = 3.485985196333746
+uncertainty = 0.1
+
+[[experiments.metabolite_measurements]]
+target_id = "nad_c"
+value = 2.228957769795646
+uncertainty = 0.1
+
+[[experiments.metabolite_measurements]]
+target_id = "nadp_c"
+value = 0.6265407556930067
+uncertainty = 0.1
+
+[[experiments.metabolite_measurements]]
+target_id = "ru5p__D_c"
+value = 0.04990168905894168
+uncertainty = 0.1
+
+[[experiments.metabolite_measurements]]
+target_id = "s7p_c"
+value = 0.4280933865907172
+uncertainty = 0.1
+
+[[experiments.metabolite_measurements]]
+target_id = "2pg_c"
+value = 1.733293811791947
+uncertainty = 0.1
+
+[[experiments.metabolite_measurements]]
+target_id = "3pg_c"
+value = 1.733293811791947
+uncertainty = 0.1
+
+[[experiments.reaction_measurements]]
+target_id = "GAPD"
+value = 7.382573442000001
+uncertainty = 0.001238858815390419
+
+[[experiments.reaction_measurements]]
+target_id = "PGM"
+value = -6.808704164444444
+uncertainty = 0.00605790544694784
+
+[[experiments.reaction_measurements]]
+target_id = "PGI"
+value = 4.087673533555556
+uncertainty = 0.0009325263874528855
+
+[[experiments.reaction_measurements]]
+target_id = "TPI"
+value = 3.748161843222222
+uncertainty = 0.0008540444150450473
+
+[[experiments.reaction_measurements]]
+target_id = "ENO"
+value = 6.808704164444444
+uncertainty = 0.00605790544694784
+
+[[experiments.reaction_measurements]]
+target_id = "FBA"
+value = 2.536603419888889
+uncertainty = 0.03347573814687445
+
+[[experiments.reaction_measurements]]
+target_id = "PGL"
+value = 0.1880508454222223
+uncertainty = 0.01591776961498097
+
+[[experiments.reaction_measurements]]
+target_id = "TKT1"
+value = -0.07564788201111111
+uncertainty = 0.008204041543099788
+
+[[experiments.reaction_measurements]]
+target_id = "EDD"
+value = 0.0002779389
+uncertainty = 9.245064452814788
+
+[[experiments.reaction_measurements]]
+target_id = "TKT2"
+value = -0.1936501518888889
+uncertainty = 0.003146871502554239
+
+[[experiments.reaction_measurements]]
+target_id = "FBP"
+value = 0.008771676077777778
+uncertainty = 0.05893666486876288
+
+[[experiments.reaction_measurements]]
+target_id = "RPE"
+value = -0.2692649755111111
+uncertainty = 0.009125494756821159
+
+[[experiments.reaction_measurements]]
+target_id = "EDA"
+value = 0.0002779389
+uncertainty = 9.245064452814788
+
+[[experiments.reaction_measurements]]
+target_id = "TALA"
+value = -1.344643262933333
+uncertainty = 0.0630672407188857
+
+[[experiments.reaction_measurements]]
+target_id = "PGK"
+value = -7.382573442000001
+uncertainty = 0.001238858815390419
+
+[[experiments.reaction_measurements]]
+target_id = "RPI"
+value = -0.4324854905555556
+uncertainty = 0.005214528410839443
+
+[[experiments.reaction_measurements]]
+target_id = "G6PDH2r"
+value = 0.1880508454222223
+uncertainty = 0.01591776961498097
+
+[[experiments.reaction_measurements]]
+target_id = "GND"
+value = 0.1763980644555556
+uncertainty = 0.02328777246829656
+
+
+[[experiments]]
+id = "Evo04Evo01EP_m-3_e-B1"
+[[experiments.metabolite_measurements]]
+target_id = "6pgc_c"
+value = 0.5908886086861402
+uncertainty = 0.1
+
+[[experiments.metabolite_measurements]]
+target_id = "atp_c"
+value = 6.445544600029232
+uncertainty = 0.1
+
+[[experiments.metabolite_measurements]]
+target_id = "dhap_c"
+value = 2.18863158655607
+uncertainty = 0.1
+
+[[experiments.metabolite_measurements]]
+target_id = "f6p_c"
+value = 0.6621859946669975
+uncertainty = 0.1
+
+[[experiments.metabolite_measurements]]
+target_id = "fdp_c"
+value = 5.911970408617151
+uncertainty = 0.1
+
+[[experiments.metabolite_measurements]]
+target_id = "nad_c"
+value = 2.620089150631831
+uncertainty = 0.1
+
+[[experiments.metabolite_measurements]]
+target_id = "nadp_c"
+value = 1.015567110954206
+uncertainty = 0.1
+
+[[experiments.metabolite_measurements]]
+target_id = "ru5p__D_c"
+value = 0.06619735652053138
+uncertainty = 0.1
+
+[[experiments.metabolite_measurements]]
+target_id = "s7p_c"
+value = 0.302456550470792
+uncertainty = 0.1
+
+[[experiments.metabolite_measurements]]
+target_id = "2pg_c"
+value = 1.873299595548648
+uncertainty = 0.1
+
+[[experiments.metabolite_measurements]]
+target_id = "3pg_c"
+value = 1.873299595548648
+uncertainty = 0.1
+
+[[experiments.reaction_measurements]]
+target_id = "GAPD"
+value = 7.382573442000001
+uncertainty = 0.001238858815390419
+
+[[experiments.reaction_measurements]]
+target_id = "PGM"
+value = -6.808704164444444
+uncertainty = 0.00605790544694784
+
+[[experiments.reaction_measurements]]
+target_id = "PGI"
+value = 4.087673533555556
+uncertainty = 0.0009325263874528855
+
+[[experiments.reaction_measurements]]
+target_id = "TPI"
+value = 3.748161843222222
+uncertainty = 0.0008540444150450473
+
+[[experiments.reaction_measurements]]
+target_id = "ENO"
+value = 6.808704164444444
+uncertainty = 0.00605790544694784
+
+[[experiments.reaction_measurements]]
+target_id = "FBA"
+value = 2.536603419888889
+uncertainty = 0.03347573814687445
+
+[[experiments.reaction_measurements]]
+target_id = "PGL"
+value = 0.1880508454222223
+uncertainty = 0.01591776961498097
+
+[[experiments.reaction_measurements]]
+target_id = "TKT1"
+value = -0.07564788201111111
+uncertainty = 0.008204041543099788
+
+[[experiments.reaction_measurements]]
+target_id = "EDD"
+value = 0.0002779389
+uncertainty = 9.245064452814788
+
+[[experiments.reaction_measurements]]
+target_id = "TKT2"
+value = -0.1936501518888889
+uncertainty = 0.003146871502554239
+
+[[experiments.reaction_measurements]]
+target_id = "FBP"
+value = 0.008771676077777778
+uncertainty = 0.05893666486876288
+
+[[experiments.reaction_measurements]]
+target_id = "RPE"
+value = -0.2692649755111111
+uncertainty = 0.009125494756821159
+
+[[experiments.reaction_measurements]]
+target_id = "EDA"
+value = 0.0002779389
+uncertainty = 9.245064452814788
+
+[[experiments.reaction_measurements]]
+target_id = "TALA"
+value = -1.344643262933333
+uncertainty = 0.0630672407188857
+
+[[experiments.reaction_measurements]]
+target_id = "PGK"
+value = -7.382573442000001
+uncertainty = 0.001238858815390419
+
+[[experiments.reaction_measurements]]
+target_id = "RPI"
+value = -0.4324854905555556
+uncertainty = 0.005214528410839443
+
+[[experiments.reaction_measurements]]
+target_id = "G6PDH2r"
+value = 0.1880508454222223
+uncertainty = 0.01591776961498097
+
+[[experiments.reaction_measurements]]
+target_id = "GND"
+value = 0.1763980644555556
+uncertainty = 0.02328777246829656
+
+
+[[experiments]]
+id = "Evo04Evo01EP_m-3_e-B2"
+[[experiments.metabolite_measurements]]
+target_id = "6pgc_c"
+value = 0.5908886086861402
+uncertainty = 0.1
+
+[[experiments.metabolite_measurements]]
+target_id = "atp_c"
+value = 6.445544600029232
+uncertainty = 0.1
+
+[[experiments.metabolite_measurements]]
+target_id = "dhap_c"
+value = 2.18863158655607
+uncertainty = 0.1
+
+[[experiments.metabolite_measurements]]
+target_id = "f6p_c"
+value = 0.6621859946669975
+uncertainty = 0.1
+
+[[experiments.metabolite_measurements]]
+target_id = "fdp_c"
+value = 5.911970408617151
+uncertainty = 0.1
+
+[[experiments.metabolite_measurements]]
+target_id = "nad_c"
+value = 2.620089150631831
+uncertainty = 0.1
+
+[[experiments.metabolite_measurements]]
+target_id = "nadp_c"
+value = 1.015567110954206
+uncertainty = 0.1
+
+[[experiments.metabolite_measurements]]
+target_id = "ru5p__D_c"
+value = 0.06619735652053138
+uncertainty = 0.1
+
+[[experiments.metabolite_measurements]]
+target_id = "s7p_c"
+value = 0.302456550470792
+uncertainty = 0.1
+
+[[experiments.metabolite_measurements]]
+target_id = "2pg_c"
+value = 1.873299595548648
+uncertainty = 0.1
+
+[[experiments.metabolite_measurements]]
+target_id = "3pg_c"
+value = 1.873299595548648
+uncertainty = 0.1
+
+[[experiments.reaction_measurements]]
+target_id = "GAPD"
+value = 7.382573442000001
+uncertainty = 0.001238858815390419
+
+[[experiments.reaction_measurements]]
+target_id = "PGM"
+value = -6.808704164444444
+uncertainty = 0.00605790544694784
+
+[[experiments.reaction_measurements]]
+target_id = "PGI"
+value = 4.087673533555556
+uncertainty = 0.0009325263874528855
+
+[[experiments.reaction_measurements]]
+target_id = "TPI"
+value = 3.748161843222222
+uncertainty = 0.0008540444150450473
+
+[[experiments.reaction_measurements]]
+target_id = "ENO"
+value = 6.808704164444444
+uncertainty = 0.00605790544694784
+
+[[experiments.reaction_measurements]]
+target_id = "FBA"
+value = 2.536603419888889
+uncertainty = 0.03347573814687445
+
+[[experiments.reaction_measurements]]
+target_id = "PGL"
+value = 0.1880508454222223
+uncertainty = 0.01591776961498097
+
+[[experiments.reaction_measurements]]
+target_id = "TKT1"
+value = -0.07564788201111111
+uncertainty = 0.008204041543099788
+
+[[experiments.reaction_measurements]]
+target_id = "EDD"
+value = 0.0002779389
+uncertainty = 9.245064452814788
+
+[[experiments.reaction_measurements]]
+target_id = "TKT2"
+value = -0.1936501518888889
+uncertainty = 0.003146871502554239
+
+[[experiments.reaction_measurements]]
+target_id = "FBP"
+value = 0.008771676077777778
+uncertainty = 0.05893666486876288
+
+[[experiments.reaction_measurements]]
+target_id = "RPE"
+value = -0.2692649755111111
+uncertainty = 0.009125494756821159
+
+[[experiments.reaction_measurements]]
+target_id = "EDA"
+value = 0.0002779389
+uncertainty = 9.245064452814788
+
+[[experiments.reaction_measurements]]
+target_id = "TALA"
+value = -1.344643262933333
+uncertainty = 0.0630672407188857
+
+[[experiments.reaction_measurements]]
+target_id = "PGK"
+value = -7.382573442000001
+uncertainty = 0.001238858815390419
+
+[[experiments.reaction_measurements]]
+target_id = "RPI"
+value = -0.4324854905555556
+uncertainty = 0.005214528410839443
+
+[[experiments.reaction_measurements]]
+target_id = "G6PDH2r"
+value = 0.1880508454222223
+uncertainty = 0.01591776961498097
+
+[[experiments.reaction_measurements]]
+target_id = "GND"
+value = 0.1763980644555556
+uncertainty = 0.02328777246829656
+
+
+[[experiments]]
+id = "Evo04Evo01EP_m-4_e-B1"
+[[experiments.metabolite_measurements]]
+target_id = "6pgc_c"
+value = 0.473132360043196
+uncertainty = 0.1
+
+[[experiments.metabolite_measurements]]
+target_id = "atp_c"
+value = 5.871165565552658
+uncertainty = 0.1
+
+[[experiments.metabolite_measurements]]
+target_id = "dhap_c"
+value = 1.859529803346389
+uncertainty = 0.1
+
+[[experiments.metabolite_measurements]]
+target_id = "f6p_c"
+value = 0.6394497125197321
+uncertainty = 0.1
+
+[[experiments.metabolite_measurements]]
+target_id = "fdp_c"
+value = 4.306326713379016
+uncertainty = 0.1
+
+[[experiments.metabolite_measurements]]
+target_id = "nad_c"
+value = 2.13376405943195
+uncertainty = 0.1
+
+[[experiments.metabolite_measurements]]
+target_id = "nadp_c"
+value = 0.8596082298999894
+uncertainty = 0.1
+
+[[experiments.metabolite_measurements]]
+target_id = "ru5p__D_c"
+value = 0.06577853147161099
+uncertainty = 0.1
+
+[[experiments.metabolite_measurements]]
+target_id = "s7p_c"
+value = 0.3171625967433271
+uncertainty = 0.1
+
+[[experiments.metabolite_measurements]]
+target_id = "2pg_c"
+value = 1.8506563129054
+uncertainty = 0.1
+
+[[experiments.metabolite_measurements]]
+target_id = "3pg_c"
+value = 1.8506563129054
+uncertainty = 0.1
+
+[[experiments.reaction_measurements]]
+target_id = "GAPD"
+value = 7.382573442000001
+uncertainty = 0.001238858815390419
+
+[[experiments.reaction_measurements]]
+target_id = "PGM"
+value = -6.808704164444444
+uncertainty = 0.00605790544694784
+
+[[experiments.reaction_measurements]]
+target_id = "PGI"
+value = 4.087673533555556
+uncertainty = 0.0009325263874528855
+
+[[experiments.reaction_measurements]]
+target_id = "TPI"
+value = 3.748161843222222
+uncertainty = 0.0008540444150450473
+
+[[experiments.reaction_measurements]]
+target_id = "ENO"
+value = 6.808704164444444
+uncertainty = 0.00605790544694784
+
+[[experiments.reaction_measurements]]
+target_id = "FBA"
+value = 2.536603419888889
+uncertainty = 0.03347573814687445
+
+[[experiments.reaction_measurements]]
+target_id = "PGL"
+value = 0.1880508454222223
+uncertainty = 0.01591776961498097
+
+[[experiments.reaction_measurements]]
+target_id = "TKT1"
+value = -0.07564788201111111
+uncertainty = 0.008204041543099788
+
+[[experiments.reaction_measurements]]
+target_id = "EDD"
+value = 0.0002779389
+uncertainty = 9.245064452814788
+
+[[experiments.reaction_measurements]]
+target_id = "TKT2"
+value = -0.1936501518888889
+uncertainty = 0.003146871502554239
+
+[[experiments.reaction_measurements]]
+target_id = "FBP"
+value = 0.008771676077777778
+uncertainty = 0.05893666486876288
+
+[[experiments.reaction_measurements]]
+target_id = "RPE"
+value = -0.2692649755111111
+uncertainty = 0.009125494756821159
+
+[[experiments.reaction_measurements]]
+target_id = "EDA"
+value = 0.0002779389
+uncertainty = 9.245064452814788
+
+[[experiments.reaction_measurements]]
+target_id = "TALA"
+value = -1.344643262933333
+uncertainty = 0.0630672407188857
+
+[[experiments.reaction_measurements]]
+target_id = "PGK"
+value = -7.382573442000001
+uncertainty = 0.001238858815390419
+
+[[experiments.reaction_measurements]]
+target_id = "RPI"
+value = -0.4324854905555556
+uncertainty = 0.005214528410839443
+
+[[experiments.reaction_measurements]]
+target_id = "G6PDH2r"
+value = 0.1880508454222223
+uncertainty = 0.01591776961498097
+
+[[experiments.reaction_measurements]]
+target_id = "GND"
+value = 0.1763980644555556
+uncertainty = 0.02328777246829656
+
+
+[[experiments]]
+id = "Evo04Evo01EP_m-4_e-B2"
+[[experiments.metabolite_measurements]]
+target_id = "6pgc_c"
+value = 0.473132360043196
+uncertainty = 0.1
+
+[[experiments.metabolite_measurements]]
+target_id = "atp_c"
+value = 5.871165565552658
+uncertainty = 0.1
+
+[[experiments.metabolite_measurements]]
+target_id = "dhap_c"
+value = 1.859529803346389
+uncertainty = 0.1
+
+[[experiments.metabolite_measurements]]
+target_id = "f6p_c"
+value = 0.6394497125197321
+uncertainty = 0.1
+
+[[experiments.metabolite_measurements]]
+target_id = "fdp_c"
+value = 4.306326713379016
+uncertainty = 0.1
+
+[[experiments.metabolite_measurements]]
+target_id = "nad_c"
+value = 2.13376405943195
+uncertainty = 0.1
+
+[[experiments.metabolite_measurements]]
+target_id = "nadp_c"
+value = 0.8596082298999894
+uncertainty = 0.1
+
+[[experiments.metabolite_measurements]]
+target_id = "ru5p__D_c"
+value = 0.06577853147161099
+uncertainty = 0.1
+
+[[experiments.metabolite_measurements]]
+target_id = "s7p_c"
+value = 0.3171625967433271
+uncertainty = 0.1
+
+[[experiments.metabolite_measurements]]
+target_id = "2pg_c"
+value = 1.8506563129054
+uncertainty = 0.1
+
+[[experiments.metabolite_measurements]]
+target_id = "3pg_c"
+value = 1.8506563129054
+uncertainty = 0.1
+
+[[experiments.reaction_measurements]]
+target_id = "GAPD"
+value = 7.382573442000001
+uncertainty = 0.001238858815390419
+
+[[experiments.reaction_measurements]]
+target_id = "PGM"
+value = -6.808704164444444
+uncertainty = 0.00605790544694784
+
+[[experiments.reaction_measurements]]
+target_id = "PGI"
+value = 4.087673533555556
+uncertainty = 0.0009325263874528855
+
+[[experiments.reaction_measurements]]
+target_id = "TPI"
+value = 3.748161843222222
+uncertainty = 0.0008540444150450473
+
+[[experiments.reaction_measurements]]
+target_id = "ENO"
+value = 6.808704164444444
+uncertainty = 0.00605790544694784
+
+[[experiments.reaction_measurements]]
+target_id = "FBA"
+value = 2.536603419888889
+uncertainty = 0.03347573814687445
+
+[[experiments.reaction_measurements]]
+target_id = "PGL"
+value = 0.1880508454222223
+uncertainty = 0.01591776961498097
+
+[[experiments.reaction_measurements]]
+target_id = "TKT1"
+value = -0.07564788201111111
+uncertainty = 0.008204041543099788
+
+[[experiments.reaction_measurements]]
+target_id = "EDD"
+value = 0.0002779389
+uncertainty = 9.245064452814788
+
+[[experiments.reaction_measurements]]
+target_id = "TKT2"
+value = -0.1936501518888889
+uncertainty = 0.003146871502554239
+
+[[experiments.reaction_measurements]]
+target_id = "FBP"
+value = 0.008771676077777778
+uncertainty = 0.05893666486876288
+
+[[experiments.reaction_measurements]]
+target_id = "RPE"
+value = -0.2692649755111111
+uncertainty = 0.009125494756821159
+
+[[experiments.reaction_measurements]]
+target_id = "EDA"
+value = 0.0002779389
+uncertainty = 9.245064452814788
+
+[[experiments.reaction_measurements]]
+target_id = "TALA"
+value = -1.344643262933333
+uncertainty = 0.0630672407188857
+
+[[experiments.reaction_measurements]]
+target_id = "PGK"
+value = -7.382573442000001
+uncertainty = 0.001238858815390419
+
+[[experiments.reaction_measurements]]
+target_id = "RPI"
+value = -0.4324854905555556
+uncertainty = 0.005214528410839443
+
+[[experiments.reaction_measurements]]
+target_id = "G6PDH2r"
+value = 0.1880508454222223
+uncertainty = 0.01591776961498097
+
+[[experiments.reaction_measurements]]
+target_id = "GND"
+value = 0.1763980644555556
+uncertainty = 0.02328777246829656
+
+
+[[experiments]]
+id = "Evo04Evo01EP_m-5_e-B1"
+[[experiments.metabolite_measurements]]
+target_id = "6pgc_c"
+value = 1.04145157632858
+uncertainty = 0.1
+
+[[experiments.metabolite_measurements]]
+target_id = "atp_c"
+value = 4.01962388595587
+uncertainty = 0.1
+
+[[experiments.metabolite_measurements]]
+target_id = "dhap_c"
+value = 1.862495911199715
+uncertainty = 0.1
+
+[[experiments.metabolite_measurements]]
+target_id = "f6p_c"
+value = 0.4891574064419946
+uncertainty = 0.1
+
+[[experiments.metabolite_measurements]]
+target_id = "fdp_c"
+value = 3.843729796459247
+uncertainty = 0.1
+
+[[experiments.metabolite_measurements]]
+target_id = "nad_c"
+value = 2.302087456160268
+uncertainty = 0.1
+
+[[experiments.metabolite_measurements]]
+target_id = "nadp_c"
+value = 0.6646789389046276
+uncertainty = 0.1
+
+[[experiments.metabolite_measurements]]
+target_id = "ru5p__D_c"
+value = 0.06130643860126129
+uncertainty = 0.1
+
+[[experiments.metabolite_measurements]]
+target_id = "s7p_c"
+value = 0.286554654108743
+uncertainty = 0.1
+
+[[experiments.metabolite_measurements]]
+target_id = "2pg_c"
+value = 1.907278868315665
+uncertainty = 0.1
+
+[[experiments.metabolite_measurements]]
+target_id = "3pg_c"
+value = 1.907278868315665
+uncertainty = 0.1
+
+[[experiments.reaction_measurements]]
+target_id = "GAPD"
+value = 7.382573442000001
+uncertainty = 0.001238858815390419
+
+[[experiments.reaction_measurements]]
+target_id = "PGM"
+value = -6.808704164444444
+uncertainty = 0.00605790544694784
+
+[[experiments.reaction_measurements]]
+target_id = "PGI"
+value = 4.087673533555556
+uncertainty = 0.0009325263874528855
+
+[[experiments.reaction_measurements]]
+target_id = "TPI"
+value = 3.748161843222222
+uncertainty = 0.0008540444150450473
+
+[[experiments.reaction_measurements]]
+target_id = "ENO"
+value = 6.808704164444444
+uncertainty = 0.00605790544694784
+
+[[experiments.reaction_measurements]]
+target_id = "FBA"
+value = 2.536603419888889
+uncertainty = 0.03347573814687445
+
+[[experiments.reaction_measurements]]
+target_id = "PGL"
+value = 0.1880508454222223
+uncertainty = 0.01591776961498097
+
+[[experiments.reaction_measurements]]
+target_id = "TKT1"
+value = -0.07564788201111111
+uncertainty = 0.008204041543099788
+
+[[experiments.reaction_measurements]]
+target_id = "EDD"
+value = 0.0002779389
+uncertainty = 9.245064452814788
+
+[[experiments.reaction_measurements]]
+target_id = "TKT2"
+value = -0.1936501518888889
+uncertainty = 0.003146871502554239
+
+[[experiments.reaction_measurements]]
+target_id = "FBP"
+value = 0.008771676077777778
+uncertainty = 0.05893666486876288
+
+[[experiments.reaction_measurements]]
+target_id = "RPE"
+value = -0.2692649755111111
+uncertainty = 0.009125494756821159
+
+[[experiments.reaction_measurements]]
+target_id = "EDA"
+value = 0.0002779389
+uncertainty = 9.245064452814788
+
+[[experiments.reaction_measurements]]
+target_id = "TALA"
+value = -1.344643262933333
+uncertainty = 0.0630672407188857
+
+[[experiments.reaction_measurements]]
+target_id = "PGK"
+value = -7.382573442000001
+uncertainty = 0.001238858815390419
+
+[[experiments.reaction_measurements]]
+target_id = "RPI"
+value = -0.4324854905555556
+uncertainty = 0.005214528410839443
+
+[[experiments.reaction_measurements]]
+target_id = "G6PDH2r"
+value = 0.1880508454222223
+uncertainty = 0.01591776961498097
+
+[[experiments.reaction_measurements]]
+target_id = "GND"
+value = 0.1763980644555556
+uncertainty = 0.02328777246829656
+
+
+[[experiments]]
+id = "Evo04Evo01EP_m-5_e-B2"
+[[experiments.metabolite_measurements]]
+target_id = "6pgc_c"
+value = 1.04145157632858
+uncertainty = 0.1
+
+[[experiments.metabolite_measurements]]
+target_id = "atp_c"
+value = 4.01962388595587
+uncertainty = 0.1
+
+[[experiments.metabolite_measurements]]
+target_id = "dhap_c"
+value = 1.862495911199715
+uncertainty = 0.1
+
+[[experiments.metabolite_measurements]]
+target_id = "f6p_c"
+value = 0.4891574064419946
+uncertainty = 0.1
+
+[[experiments.metabolite_measurements]]
+target_id = "fdp_c"
+value = 3.843729796459247
+uncertainty = 0.1
+
+[[experiments.metabolite_measurements]]
+target_id = "nad_c"
+value = 2.302087456160268
+uncertainty = 0.1
+
+[[experiments.metabolite_measurements]]
+target_id = "nadp_c"
+value = 0.6646789389046276
+uncertainty = 0.1
+
+[[experiments.metabolite_measurements]]
+target_id = "ru5p__D_c"
+value = 0.06130643860126129
+uncertainty = 0.1
+
+[[experiments.metabolite_measurements]]
+target_id = "s7p_c"
+value = 0.286554654108743
+uncertainty = 0.1
+
+[[experiments.metabolite_measurements]]
+target_id = "2pg_c"
+value = 1.907278868315665
+uncertainty = 0.1
+
+[[experiments.metabolite_measurements]]
+target_id = "3pg_c"
+value = 1.907278868315665
+uncertainty = 0.1
+
+[[experiments.reaction_measurements]]
+target_id = "GAPD"
+value = 7.382573442000001
+uncertainty = 0.001238858815390419
+
+[[experiments.reaction_measurements]]
+target_id = "PGM"
+value = -6.808704164444444
+uncertainty = 0.00605790544694784
+
+[[experiments.reaction_measurements]]
+target_id = "PGI"
+value = 4.087673533555556
+uncertainty = 0.0009325263874528855
+
+[[experiments.reaction_measurements]]
+target_id = "TPI"
+value = 3.748161843222222
+uncertainty = 0.0008540444150450473
+
+[[experiments.reaction_measurements]]
+target_id = "ENO"
+value = 6.808704164444444
+uncertainty = 0.00605790544694784
+
+[[experiments.reaction_measurements]]
+target_id = "FBA"
+value = 2.536603419888889
+uncertainty = 0.03347573814687445
+
+[[experiments.reaction_measurements]]
+target_id = "PGL"
+value = 0.1880508454222223
+uncertainty = 0.01591776961498097
+
+[[experiments.reaction_measurements]]
+target_id = "TKT1"
+value = -0.07564788201111111
+uncertainty = 0.008204041543099788
+
+[[experiments.reaction_measurements]]
+target_id = "EDD"
+value = 0.0002779389
+uncertainty = 9.245064452814788
+
+[[experiments.reaction_measurements]]
+target_id = "TKT2"
+value = -0.1936501518888889
+uncertainty = 0.003146871502554239
+
+[[experiments.reaction_measurements]]
+target_id = "FBP"
+value = 0.008771676077777778
+uncertainty = 0.05893666486876288
+
+[[experiments.reaction_measurements]]
+target_id = "RPE"
+value = -0.2692649755111111
+uncertainty = 0.009125494756821159
+
+[[experiments.reaction_measurements]]
+target_id = "EDA"
+value = 0.0002779389
+uncertainty = 9.245064452814788
+
+[[experiments.reaction_measurements]]
+target_id = "TALA"
+value = -1.344643262933333
+uncertainty = 0.0630672407188857
+
+[[experiments.reaction_measurements]]
+target_id = "PGK"
+value = -7.382573442000001
+uncertainty = 0.001238858815390419
+
+[[experiments.reaction_measurements]]
+target_id = "RPI"
+value = -0.4324854905555556
+uncertainty = 0.005214528410839443
+
+[[experiments.reaction_measurements]]
+target_id = "G6PDH2r"
+value = 0.1880508454222223
+uncertainty = 0.01591776961498097
+
+[[experiments.reaction_measurements]]
+target_id = "GND"
+value = 0.1763980644555556
+uncertainty = 0.02328777246829656
+
+
+[[experiments]]
+id = "Evo04Evo01EP_m-6_e-B1"
+[[experiments.metabolite_measurements]]
+target_id = "6pgc_c"
+value = 0.4847034090821288
+uncertainty = 0.1
+
+[[experiments.metabolite_measurements]]
+target_id = "atp_c"
+value = 6.331583706094398
+uncertainty = 0.1
+
+[[experiments.metabolite_measurements]]
+target_id = "dhap_c"
+value = 1.875981313405807
+uncertainty = 0.1
+
+[[experiments.metabolite_measurements]]
+target_id = "f6p_c"
+value = 0.7444168805337434
+uncertainty = 0.1
+
+[[experiments.metabolite_measurements]]
+target_id = "fdp_c"
+value = 5.873168642406673
+uncertainty = 0.1
+
+[[experiments.metabolite_measurements]]
+target_id = "nad_c"
+value = 2.5773065152095
+uncertainty = 0.1
+
+[[experiments.metabolite_measurements]]
+target_id = "nadp_c"
+value = 1.004303644813853
+uncertainty = 0.1
+
+[[experiments.metabolite_measurements]]
+target_id = "ru5p__D_c"
+value = 0.05029939182414457
+uncertainty = 0.1
+
+[[experiments.metabolite_measurements]]
+target_id = "s7p_c"
+value = 0.300377975899462
+uncertainty = 0.1
+
+[[experiments.metabolite_measurements]]
+target_id = "2pg_c"
+value = 2.2118481539797
+uncertainty = 0.1
+
+[[experiments.metabolite_measurements]]
+target_id = "3pg_c"
+value = 2.2118481539797
+uncertainty = 0.1
+
+[[experiments.reaction_measurements]]
+target_id = "GAPD"
+value = 7.382573442000001
+uncertainty = 0.001238858815390419
+
+[[experiments.reaction_measurements]]
+target_id = "PGM"
+value = -6.808704164444444
+uncertainty = 0.00605790544694784
+
+[[experiments.reaction_measurements]]
+target_id = "PGI"
+value = 4.087673533555556
+uncertainty = 0.0009325263874528855
+
+[[experiments.reaction_measurements]]
+target_id = "TPI"
+value = 3.748161843222222
+uncertainty = 0.0008540444150450473
+
+[[experiments.reaction_measurements]]
+target_id = "ENO"
+value = 6.808704164444444
+uncertainty = 0.00605790544694784
+
+[[experiments.reaction_measurements]]
+target_id = "FBA"
+value = 2.536603419888889
+uncertainty = 0.03347573814687445
+
+[[experiments.reaction_measurements]]
+target_id = "PGL"
+value = 0.1880508454222223
+uncertainty = 0.01591776961498097
+
+[[experiments.reaction_measurements]]
+target_id = "TKT1"
+value = -0.07564788201111111
+uncertainty = 0.008204041543099788
+
+[[experiments.reaction_measurements]]
+target_id = "EDD"
+value = 0.0002779389
+uncertainty = 9.245064452814788
+
+[[experiments.reaction_measurements]]
+target_id = "TKT2"
+value = -0.1936501518888889
+uncertainty = 0.003146871502554239
+
+[[experiments.reaction_measurements]]
+target_id = "FBP"
+value = 0.008771676077777778
+uncertainty = 0.05893666486876288
+
+[[experiments.reaction_measurements]]
+target_id = "RPE"
+value = -0.2692649755111111
+uncertainty = 0.009125494756821159
+
+[[experiments.reaction_measurements]]
+target_id = "EDA"
+value = 0.0002779389
+uncertainty = 9.245064452814788
+
+[[experiments.reaction_measurements]]
+target_id = "TALA"
+value = -1.344643262933333
+uncertainty = 0.0630672407188857
+
+[[experiments.reaction_measurements]]
+target_id = "PGK"
+value = -7.382573442000001
+uncertainty = 0.001238858815390419
+
+[[experiments.reaction_measurements]]
+target_id = "RPI"
+value = -0.4324854905555556
+uncertainty = 0.005214528410839443
+
+[[experiments.reaction_measurements]]
+target_id = "G6PDH2r"
+value = 0.1880508454222223
+uncertainty = 0.01591776961498097
+
+[[experiments.reaction_measurements]]
+target_id = "GND"
+value = 0.1763980644555556
+uncertainty = 0.02328777246829656
+
+
+[[experiments]]
+id = "Evo04Evo01EP_m-6_e-B2"
+[[experiments.metabolite_measurements]]
+target_id = "6pgc_c"
+value = 0.4847034090821288
+uncertainty = 0.1
+
+[[experiments.metabolite_measurements]]
+target_id = "atp_c"
+value = 6.331583706094398
+uncertainty = 0.1
+
+[[experiments.metabolite_measurements]]
+target_id = "dhap_c"
+value = 1.875981313405807
+uncertainty = 0.1
+
+[[experiments.metabolite_measurements]]
+target_id = "f6p_c"
+value = 0.7444168805337434
+uncertainty = 0.1
+
+[[experiments.metabolite_measurements]]
+target_id = "fdp_c"
+value = 5.873168642406673
+uncertainty = 0.1
+
+[[experiments.metabolite_measurements]]
+target_id = "nad_c"
+value = 2.5773065152095
+uncertainty = 0.1
+
+[[experiments.metabolite_measurements]]
+target_id = "nadp_c"
+value = 1.004303644813853
+uncertainty = 0.1
+
+[[experiments.metabolite_measurements]]
+target_id = "ru5p__D_c"
+value = 0.05029939182414457
+uncertainty = 0.1
+
+[[experiments.metabolite_measurements]]
+target_id = "s7p_c"
+value = 0.300377975899462
+uncertainty = 0.1
+
+[[experiments.metabolite_measurements]]
+target_id = "2pg_c"
+value = 2.2118481539797
+uncertainty = 0.1
+
+[[experiments.metabolite_measurements]]
+target_id = "3pg_c"
+value = 2.2118481539797
+uncertainty = 0.1
+
+[[experiments.reaction_measurements]]
+target_id = "GAPD"
+value = 7.382573442000001
+uncertainty = 0.001238858815390419
+
+[[experiments.reaction_measurements]]
+target_id = "PGM"
+value = -6.808704164444444
+uncertainty = 0.00605790544694784
+
+[[experiments.reaction_measurements]]
+target_id = "PGI"
+value = 4.087673533555556
+uncertainty = 0.0009325263874528855
+
+[[experiments.reaction_measurements]]
+target_id = "TPI"
+value = 3.748161843222222
+uncertainty = 0.0008540444150450473
+
+[[experiments.reaction_measurements]]
+target_id = "ENO"
+value = 6.808704164444444
+uncertainty = 0.00605790544694784
+
+[[experiments.reaction_measurements]]
+target_id = "FBA"
+value = 2.536603419888889
+uncertainty = 0.03347573814687445
+
+[[experiments.reaction_measurements]]
+target_id = "PGL"
+value = 0.1880508454222223
+uncertainty = 0.01591776961498097
+
+[[experiments.reaction_measurements]]
+target_id = "TKT1"
+value = -0.07564788201111111
+uncertainty = 0.008204041543099788
+
+[[experiments.reaction_measurements]]
+target_id = "EDD"
+value = 0.0002779389
+uncertainty = 9.245064452814788
+
+[[experiments.reaction_measurements]]
+target_id = "TKT2"
+value = -0.1936501518888889
+uncertainty = 0.003146871502554239
+
+[[experiments.reaction_measurements]]
+target_id = "FBP"
+value = 0.008771676077777778
+uncertainty = 0.05893666486876288
+
+[[experiments.reaction_measurements]]
+target_id = "RPE"
+value = -0.2692649755111111
+uncertainty = 0.009125494756821159
+
+[[experiments.reaction_measurements]]
+target_id = "EDA"
+value = 0.0002779389
+uncertainty = 9.245064452814788
+
+[[experiments.reaction_measurements]]
+target_id = "TALA"
+value = -1.344643262933333
+uncertainty = 0.0630672407188857
+
+[[experiments.reaction_measurements]]
+target_id = "PGK"
+value = -7.382573442000001
+uncertainty = 0.001238858815390419
+
+[[experiments.reaction_measurements]]
+target_id = "RPI"
+value = -0.4324854905555556
+uncertainty = 0.005214528410839443
+
+[[experiments.reaction_measurements]]
+target_id = "G6PDH2r"
+value = 0.1880508454222223
+uncertainty = 0.01591776961498097
+
+[[experiments.reaction_measurements]]
+target_id = "GND"
+value = 0.1763980644555556
+uncertainty = 0.02328777246829656
+
+
+[[experiments]]
+id = "Evo04Evo02EP_m-1_e-B1"
+[[experiments.metabolite_measurements]]
+target_id = "6pgc_c"
+value = 0.5322000207353865
+uncertainty = 0.1
+
+[[experiments.metabolite_measurements]]
+target_id = "atp_c"
+value = 5.101707960239695
+uncertainty = 0.1
+
+[[experiments.metabolite_measurements]]
+target_id = "dhap_c"
+value = 2.65660705446209
+uncertainty = 0.1
+
+[[experiments.metabolite_measurements]]
+target_id = "f6p_c"
+value = 0.7716029719589209
+uncertainty = 0.1
+
+[[experiments.metabolite_measurements]]
+target_id = "fdp_c"
+value = 4.452664395959385
+uncertainty = 0.1
+
+[[experiments.metabolite_measurements]]
+target_id = "nad_c"
+value = 2.674982377158512
+uncertainty = 0.1
+
+[[experiments.metabolite_measurements]]
+target_id = "nadp_c"
+value = 0.911396590825146
+uncertainty = 0.1
+
+[[experiments.metabolite_measurements]]
+target_id = "ru5p__D_c"
+value = 0.07997394209891835
+uncertainty = 0.1
+
+[[experiments.metabolite_measurements]]
+target_id = "s7p_c"
+value = 0.3318951029290181
+uncertainty = 0.1
+
+[[experiments.metabolite_measurements]]
+target_id = "2pg_c"
+value = 2.224699061493002
+uncertainty = 0.1
+
+[[experiments.metabolite_measurements]]
+target_id = "3pg_c"
+value = 2.224699061493002
+uncertainty = 0.1
+
+[[experiments.reaction_measurements]]
+target_id = "GAPD"
+value = 7.587970859111111
+uncertainty = 0.01235199116780911
+
+[[experiments.reaction_measurements]]
+target_id = "PGM"
+value = -7.056713121444445
+uncertainty = 0.02322413998975971
+
+[[experiments.reaction_measurements]]
+target_id = "PGI"
+value = 3.664376702666667
+uncertainty = 0.001849771760504786
+
+[[experiments.reaction_measurements]]
+target_id = "TPI"
+value = 3.699872699444445
+uncertainty = 0.02287637269593332
+
+[[experiments.reaction_measurements]]
+target_id = "ENO"
+value = 7.056713121444445
+uncertainty = 0.02322413998975971
+
+[[experiments.reaction_measurements]]
+target_id = "FBA"
+value = 3.718390733222223
+uncertainty = 0.00363767065540048
+
+[[experiments.reaction_measurements]]
+target_id = "PGL"
+value = 0.7475179116222223
+uncertainty = 0.01067358058264015
+
+[[experiments.reaction_measurements]]
+target_id = "TKT1"
+value = 0.1495896885444445
+uncertainty = 0.001685573177670948
+
+[[experiments.reaction_measurements]]
+target_id = "EDD"
+value = 0.0453121433
+uncertainty = 0.08608505810602185
+
+[[experiments.reaction_measurements]]
+target_id = "TKT2"
+value = 0.02498560862222222
+uncertainty = 0.009757143860844451
+
+[[experiments.reaction_measurements]]
+target_id = "FBP"
+value = -0.1582598797666667
+uncertainty = 3.584471107359328
+
+[[experiments.reaction_measurements]]
+target_id = "RPE"
+value = 0.1744761123333333
+uncertainty = 0.00564970565079157
+
+[[experiments.reaction_measurements]]
+target_id = "EDA"
+value = 0.0453121433
+uncertainty = 0.08608505810602185
+
+[[experiments.reaction_measurements]]
+target_id = "TALA"
+value = 0.05266809415555556
+uncertainty = 0.1362530945189736
+
+[[experiments.reaction_measurements]]
+target_id = "PGK"
+value = -7.587970859111111
+uncertainty = 0.01235199116780911
+
+[[experiments.reaction_measurements]]
+target_id = "RPI"
+value = -0.5258907299000001
+uncertainty = 0.007486660480197303
+
+[[experiments.reaction_measurements]]
+target_id = "G6PDH2r"
+value = 0.7475179116222223
+uncertainty = 0.01067358058264015
+
+[[experiments.reaction_measurements]]
+target_id = "GND"
+value = 0.7052349720222223
+uncertainty = 0.007959828820540497
+
+
+[[experiments]]
+id = "Evo04Evo02EP_m-1_e-B2"
+[[experiments.metabolite_measurements]]
+target_id = "6pgc_c"
+value = 0.5322000207353865
+uncertainty = 0.1
+
+[[experiments.metabolite_measurements]]
+target_id = "atp_c"
+value = 5.101707960239695
+uncertainty = 0.1
+
+[[experiments.metabolite_measurements]]
+target_id = "dhap_c"
+value = 2.65660705446209
+uncertainty = 0.1
+
+[[experiments.metabolite_measurements]]
+target_id = "f6p_c"
+value = 0.7716029719589209
+uncertainty = 0.1
+
+[[experiments.metabolite_measurements]]
+target_id = "fdp_c"
+value = 4.452664395959385
+uncertainty = 0.1
+
+[[experiments.metabolite_measurements]]
+target_id = "nad_c"
+value = 2.674982377158512
+uncertainty = 0.1
+
+[[experiments.metabolite_measurements]]
+target_id = "nadp_c"
+value = 0.911396590825146
+uncertainty = 0.1
+
+[[experiments.metabolite_measurements]]
+target_id = "ru5p__D_c"
+value = 0.07997394209891835
+uncertainty = 0.1
+
+[[experiments.metabolite_measurements]]
+target_id = "s7p_c"
+value = 0.3318951029290181
+uncertainty = 0.1
+
+[[experiments.metabolite_measurements]]
+target_id = "2pg_c"
+value = 2.224699061493002
+uncertainty = 0.1
+
+[[experiments.metabolite_measurements]]
+target_id = "3pg_c"
+value = 2.224699061493002
+uncertainty = 0.1
+
+[[experiments.reaction_measurements]]
+target_id = "GAPD"
+value = 7.587970859111111
+uncertainty = 0.01235199116780911
+
+[[experiments.reaction_measurements]]
+target_id = "PGM"
+value = -7.056713121444445
+uncertainty = 0.02322413998975971
+
+[[experiments.reaction_measurements]]
+target_id = "PGI"
+value = 3.664376702666667
+uncertainty = 0.001849771760504786
+
+[[experiments.reaction_measurements]]
+target_id = "TPI"
+value = 3.699872699444445
+uncertainty = 0.02287637269593332
+
+[[experiments.reaction_measurements]]
+target_id = "ENO"
+value = 7.056713121444445
+uncertainty = 0.02322413998975971
+
+[[experiments.reaction_measurements]]
+target_id = "FBA"
+value = 3.718390733222223
+uncertainty = 0.00363767065540048
+
+[[experiments.reaction_measurements]]
+target_id = "PGL"
+value = 0.7475179116222223
+uncertainty = 0.01067358058264015
+
+[[experiments.reaction_measurements]]
+target_id = "TKT1"
+value = 0.1495896885444445
+uncertainty = 0.001685573177670948
+
+[[experiments.reaction_measurements]]
+target_id = "EDD"
+value = 0.0453121433
+uncertainty = 0.08608505810602185
+
+[[experiments.reaction_measurements]]
+target_id = "TKT2"
+value = 0.02498560862222222
+uncertainty = 0.009757143860844451
+
+[[experiments.reaction_measurements]]
+target_id = "FBP"
+value = -0.1582598797666667
+uncertainty = 3.584471107359328
+
+[[experiments.reaction_measurements]]
+target_id = "RPE"
+value = 0.1744761123333333
+uncertainty = 0.00564970565079157
+
+[[experiments.reaction_measurements]]
+target_id = "EDA"
+value = 0.0453121433
+uncertainty = 0.08608505810602185
+
+[[experiments.reaction_measurements]]
+target_id = "TALA"
+value = 0.05266809415555556
+uncertainty = 0.1362530945189736
+
+[[experiments.reaction_measurements]]
+target_id = "PGK"
+value = -7.587970859111111
+uncertainty = 0.01235199116780911
+
+[[experiments.reaction_measurements]]
+target_id = "RPI"
+value = -0.5258907299000001
+uncertainty = 0.007486660480197303
+
+[[experiments.reaction_measurements]]
+target_id = "G6PDH2r"
+value = 0.7475179116222223
+uncertainty = 0.01067358058264015
+
+[[experiments.reaction_measurements]]
+target_id = "GND"
+value = 0.7052349720222223
+uncertainty = 0.007959828820540497
+
+
+[[experiments]]
+id = "Evo04Evo02EP_m-2_e-B1"
+[[experiments.metabolite_measurements]]
+target_id = "6pgc_c"
+value = 0.567252742551845
+uncertainty = 0.1
+
+[[experiments.metabolite_measurements]]
+target_id = "atp_c"
+value = 4.005808846019889
+uncertainty = 0.1
+
+[[experiments.metabolite_measurements]]
+target_id = "dhap_c"
+value = 2.44498357190437
+uncertainty = 0.1
+
+[[experiments.metabolite_measurements]]
+target_id = "f6p_c"
+value = 0.8122182432152585
+uncertainty = 0.1
+
+[[experiments.metabolite_measurements]]
+target_id = "fdp_c"
+value = 6.993383530824431
+uncertainty = 0.1
+
+[[experiments.metabolite_measurements]]
+target_id = "nad_c"
+value = 3.079484583395672
+uncertainty = 0.1
+
+[[experiments.metabolite_measurements]]
+target_id = "nadp_c"
+value = 1.073003357705812
+uncertainty = 0.1
+
+[[experiments.metabolite_measurements]]
+target_id = "ru5p__D_c"
+value = 0.07487985463914508
+uncertainty = 0.1
+
+[[experiments.metabolite_measurements]]
+target_id = "s7p_c"
+value = 0.4167373419010046
+uncertainty = 0.1
+
+[[experiments.metabolite_measurements]]
+target_id = "2pg_c"
+value = 2.454324785422256
+uncertainty = 0.1
+
+[[experiments.metabolite_measurements]]
+target_id = "3pg_c"
+value = 2.454324785422256
+uncertainty = 0.1
+
+[[experiments.reaction_measurements]]
+target_id = "GAPD"
+value = 7.587970859111111
+uncertainty = 0.01235199116780911
+
+[[experiments.reaction_measurements]]
+target_id = "PGM"
+value = -7.056713121444445
+uncertainty = 0.02322413998975971
+
+[[experiments.reaction_measurements]]
+target_id = "PGI"
+value = 3.664376702666667
+uncertainty = 0.001849771760504786
+
+[[experiments.reaction_measurements]]
+target_id = "TPI"
+value = 3.699872699444445
+uncertainty = 0.02287637269593332
+
+[[experiments.reaction_measurements]]
+target_id = "ENO"
+value = 7.056713121444445
+uncertainty = 0.02322413998975971
+
+[[experiments.reaction_measurements]]
+target_id = "FBA"
+value = 3.718390733222223
+uncertainty = 0.00363767065540048
+
+[[experiments.reaction_measurements]]
+target_id = "PGL"
+value = 0.7475179116222223
+uncertainty = 0.01067358058264015
+
+[[experiments.reaction_measurements]]
+target_id = "TKT1"
+value = 0.1495896885444445
+uncertainty = 0.001685573177670948
+
+[[experiments.reaction_measurements]]
+target_id = "EDD"
+value = 0.0453121433
+uncertainty = 0.08608505810602185
+
+[[experiments.reaction_measurements]]
+target_id = "TKT2"
+value = 0.02498560862222222
+uncertainty = 0.009757143860844451
+
+[[experiments.reaction_measurements]]
+target_id = "FBP"
+value = -0.1582598797666667
+uncertainty = 3.584471107359328
+
+[[experiments.reaction_measurements]]
+target_id = "RPE"
+value = 0.1744761123333333
+uncertainty = 0.00564970565079157
+
+[[experiments.reaction_measurements]]
+target_id = "EDA"
+value = 0.0453121433
+uncertainty = 0.08608505810602185
+
+[[experiments.reaction_measurements]]
+target_id = "TALA"
+value = 0.05266809415555556
+uncertainty = 0.1362530945189736
+
+[[experiments.reaction_measurements]]
+target_id = "PGK"
+value = -7.587970859111111
+uncertainty = 0.01235199116780911
+
+[[experiments.reaction_measurements]]
+target_id = "RPI"
+value = -0.5258907299000001
+uncertainty = 0.007486660480197303
+
+[[experiments.reaction_measurements]]
+target_id = "G6PDH2r"
+value = 0.7475179116222223
+uncertainty = 0.01067358058264015
+
+[[experiments.reaction_measurements]]
+target_id = "GND"
+value = 0.7052349720222223
+uncertainty = 0.007959828820540497
+
+
+[[experiments]]
+id = "Evo04Evo02EP_m-2_e-B2"
+[[experiments.metabolite_measurements]]
+target_id = "6pgc_c"
+value = 0.567252742551845
+uncertainty = 0.1
+
+[[experiments.metabolite_measurements]]
+target_id = "atp_c"
+value = 4.005808846019889
+uncertainty = 0.1
+
+[[experiments.metabolite_measurements]]
+target_id = "dhap_c"
+value = 2.44498357190437
+uncertainty = 0.1
+
+[[experiments.metabolite_measurements]]
+target_id = "f6p_c"
+value = 0.8122182432152585
+uncertainty = 0.1
+
+[[experiments.metabolite_measurements]]
+target_id = "fdp_c"
+value = 6.993383530824431
+uncertainty = 0.1
+
+[[experiments.metabolite_measurements]]
+target_id = "nad_c"
+value = 3.079484583395672
+uncertainty = 0.1
+
+[[experiments.metabolite_measurements]]
+target_id = "nadp_c"
+value = 1.073003357705812
+uncertainty = 0.1
+
+[[experiments.metabolite_measurements]]
+target_id = "ru5p__D_c"
+value = 0.07487985463914508
+uncertainty = 0.1
+
+[[experiments.metabolite_measurements]]
+target_id = "s7p_c"
+value = 0.4167373419010046
+uncertainty = 0.1
+
+[[experiments.metabolite_measurements]]
+target_id = "2pg_c"
+value = 2.454324785422256
+uncertainty = 0.1
+
+[[experiments.metabolite_measurements]]
+target_id = "3pg_c"
+value = 2.454324785422256
+uncertainty = 0.1
+
+[[experiments.reaction_measurements]]
+target_id = "GAPD"
+value = 7.587970859111111
+uncertainty = 0.01235199116780911
+
+[[experiments.reaction_measurements]]
+target_id = "PGM"
+value = -7.056713121444445
+uncertainty = 0.02322413998975971
+
+[[experiments.reaction_measurements]]
+target_id = "PGI"
+value = 3.664376702666667
+uncertainty = 0.001849771760504786
+
+[[experiments.reaction_measurements]]
+target_id = "TPI"
+value = 3.699872699444445
+uncertainty = 0.02287637269593332
+
+[[experiments.reaction_measurements]]
+target_id = "ENO"
+value = 7.056713121444445
+uncertainty = 0.02322413998975971
+
+[[experiments.reaction_measurements]]
+target_id = "FBA"
+value = 3.718390733222223
+uncertainty = 0.00363767065540048
+
+[[experiments.reaction_measurements]]
+target_id = "PGL"
+value = 0.7475179116222223
+uncertainty = 0.01067358058264015
+
+[[experiments.reaction_measurements]]
+target_id = "TKT1"
+value = 0.1495896885444445
+uncertainty = 0.001685573177670948
+
+[[experiments.reaction_measurements]]
+target_id = "EDD"
+value = 0.0453121433
+uncertainty = 0.08608505810602185
+
+[[experiments.reaction_measurements]]
+target_id = "TKT2"
+value = 0.02498560862222222
+uncertainty = 0.009757143860844451
+
+[[experiments.reaction_measurements]]
+target_id = "FBP"
+value = -0.1582598797666667
+uncertainty = 3.584471107359328
+
+[[experiments.reaction_measurements]]
+target_id = "RPE"
+value = 0.1744761123333333
+uncertainty = 0.00564970565079157
+
+[[experiments.reaction_measurements]]
+target_id = "EDA"
+value = 0.0453121433
+uncertainty = 0.08608505810602185
+
+[[experiments.reaction_measurements]]
+target_id = "TALA"
+value = 0.05266809415555556
+uncertainty = 0.1362530945189736
+
+[[experiments.reaction_measurements]]
+target_id = "PGK"
+value = -7.587970859111111
+uncertainty = 0.01235199116780911
+
+[[experiments.reaction_measurements]]
+target_id = "RPI"
+value = -0.5258907299000001
+uncertainty = 0.007486660480197303
+
+[[experiments.reaction_measurements]]
+target_id = "G6PDH2r"
+value = 0.7475179116222223
+uncertainty = 0.01067358058264015
+
+[[experiments.reaction_measurements]]
+target_id = "GND"
+value = 0.7052349720222223
+uncertainty = 0.007959828820540497
+
+
+[[experiments]]
+id = "Evo04Evo02EP_m-3_e-B1"
+[[experiments.metabolite_measurements]]
+target_id = "6pgc_c"
+value = 0.6735897144293421
+uncertainty = 0.1
+
+[[experiments.metabolite_measurements]]
+target_id = "atp_c"
+value = 6.422906834739628
+uncertainty = 0.1
+
+[[experiments.metabolite_measurements]]
+target_id = "dhap_c"
+value = 2.686856896196996
+uncertainty = 0.1
+
+[[experiments.metabolite_measurements]]
+target_id = "f6p_c"
+value = 0.7755653032093188
+uncertainty = 0.1
+
+[[experiments.metabolite_measurements]]
+target_id = "fdp_c"
+value = 5.325673569612372
+uncertainty = 0.1
+
+[[experiments.metabolite_measurements]]
+target_id = "nad_c"
+value = 2.52424810453699
+uncertainty = 0.1
+
+[[experiments.metabolite_measurements]]
+target_id = "nadp_c"
+value = 0.8467373177387234
+uncertainty = 0.1
+
+[[experiments.metabolite_measurements]]
+target_id = "ru5p__D_c"
+value = 0.04346799624513748
+uncertainty = 0.1
+
+[[experiments.metabolite_measurements]]
+target_id = "s7p_c"
+value = 0.3806230605102041
+uncertainty = 0.1
+
+[[experiments.metabolite_measurements]]
+target_id = "2pg_c"
+value = 1.83185282841371
+uncertainty = 0.1
+
+[[experiments.metabolite_measurements]]
+target_id = "3pg_c"
+value = 1.83185282841371
+uncertainty = 0.1
+
+[[experiments.reaction_measurements]]
+target_id = "GAPD"
+value = 7.587970859111111
+uncertainty = 0.01235199116780911
+
+[[experiments.reaction_measurements]]
+target_id = "PGM"
+value = -7.056713121444445
+uncertainty = 0.02322413998975971
+
+[[experiments.reaction_measurements]]
+target_id = "PGI"
+value = 3.664376702666667
+uncertainty = 0.001849771760504786
+
+[[experiments.reaction_measurements]]
+target_id = "TPI"
+value = 3.699872699444445
+uncertainty = 0.02287637269593332
+
+[[experiments.reaction_measurements]]
+target_id = "ENO"
+value = 7.056713121444445
+uncertainty = 0.02322413998975971
+
+[[experiments.reaction_measurements]]
+target_id = "FBA"
+value = 3.718390733222223
+uncertainty = 0.00363767065540048
+
+[[experiments.reaction_measurements]]
+target_id = "PGL"
+value = 0.7475179116222223
+uncertainty = 0.01067358058264015
+
+[[experiments.reaction_measurements]]
+target_id = "TKT1"
+value = 0.1495896885444445
+uncertainty = 0.001685573177670948
+
+[[experiments.reaction_measurements]]
+target_id = "EDD"
+value = 0.0453121433
+uncertainty = 0.08608505810602185
+
+[[experiments.reaction_measurements]]
+target_id = "TKT2"
+value = 0.02498560862222222
+uncertainty = 0.009757143860844451
+
+[[experiments.reaction_measurements]]
+target_id = "FBP"
+value = -0.1582598797666667
+uncertainty = 3.584471107359328
+
+[[experiments.reaction_measurements]]
+target_id = "RPE"
+value = 0.1744761123333333
+uncertainty = 0.00564970565079157
+
+[[experiments.reaction_measurements]]
+target_id = "EDA"
+value = 0.0453121433
+uncertainty = 0.08608505810602185
+
+[[experiments.reaction_measurements]]
+target_id = "TALA"
+value = 0.05266809415555556
+uncertainty = 0.1362530945189736
+
+[[experiments.reaction_measurements]]
+target_id = "PGK"
+value = -7.587970859111111
+uncertainty = 0.01235199116780911
+
+[[experiments.reaction_measurements]]
+target_id = "RPI"
+value = -0.5258907299000001
+uncertainty = 0.007486660480197303
+
+[[experiments.reaction_measurements]]
+target_id = "G6PDH2r"
+value = 0.7475179116222223
+uncertainty = 0.01067358058264015
+
+[[experiments.reaction_measurements]]
+target_id = "GND"
+value = 0.7052349720222223
+uncertainty = 0.007959828820540497
+
+
+[[experiments]]
+id = "Evo04Evo02EP_m-3_e-B2"
+[[experiments.metabolite_measurements]]
+target_id = "6pgc_c"
+value = 0.6735897144293421
+uncertainty = 0.1
+
+[[experiments.metabolite_measurements]]
+target_id = "atp_c"
+value = 6.422906834739628
+uncertainty = 0.1
+
+[[experiments.metabolite_measurements]]
+target_id = "dhap_c"
+value = 2.686856896196996
+uncertainty = 0.1
+
+[[experiments.metabolite_measurements]]
+target_id = "f6p_c"
+value = 0.7755653032093188
+uncertainty = 0.1
+
+[[experiments.metabolite_measurements]]
+target_id = "fdp_c"
+value = 5.325673569612372
+uncertainty = 0.1
+
+[[experiments.metabolite_measurements]]
+target_id = "nad_c"
+value = 2.52424810453699
+uncertainty = 0.1
+
+[[experiments.metabolite_measurements]]
+target_id = "nadp_c"
+value = 0.8467373177387234
+uncertainty = 0.1
+
+[[experiments.metabolite_measurements]]
+target_id = "ru5p__D_c"
+value = 0.04346799624513748
+uncertainty = 0.1
+
+[[experiments.metabolite_measurements]]
+target_id = "s7p_c"
+value = 0.3806230605102041
+uncertainty = 0.1
+
+[[experiments.metabolite_measurements]]
+target_id = "2pg_c"
+value = 1.83185282841371
+uncertainty = 0.1
+
+[[experiments.metabolite_measurements]]
+target_id = "3pg_c"
+value = 1.83185282841371
+uncertainty = 0.1
+
+[[experiments.reaction_measurements]]
+target_id = "GAPD"
+value = 7.587970859111111
+uncertainty = 0.01235199116780911
+
+[[experiments.reaction_measurements]]
+target_id = "PGM"
+value = -7.056713121444445
+uncertainty = 0.02322413998975971
+
+[[experiments.reaction_measurements]]
+target_id = "PGI"
+value = 3.664376702666667
+uncertainty = 0.001849771760504786
+
+[[experiments.reaction_measurements]]
+target_id = "TPI"
+value = 3.699872699444445
+uncertainty = 0.02287637269593332
+
+[[experiments.reaction_measurements]]
+target_id = "ENO"
+value = 7.056713121444445
+uncertainty = 0.02322413998975971
+
+[[experiments.reaction_measurements]]
+target_id = "FBA"
+value = 3.718390733222223
+uncertainty = 0.00363767065540048
+
+[[experiments.reaction_measurements]]
+target_id = "PGL"
+value = 0.7475179116222223
+uncertainty = 0.01067358058264015
+
+[[experiments.reaction_measurements]]
+target_id = "TKT1"
+value = 0.1495896885444445
+uncertainty = 0.001685573177670948
+
+[[experiments.reaction_measurements]]
+target_id = "EDD"
+value = 0.0453121433
+uncertainty = 0.08608505810602185
+
+[[experiments.reaction_measurements]]
+target_id = "TKT2"
+value = 0.02498560862222222
+uncertainty = 0.009757143860844451
+
+[[experiments.reaction_measurements]]
+target_id = "FBP"
+value = -0.1582598797666667
+uncertainty = 3.584471107359328
+
+[[experiments.reaction_measurements]]
+target_id = "RPE"
+value = 0.1744761123333333
+uncertainty = 0.00564970565079157
+
+[[experiments.reaction_measurements]]
+target_id = "EDA"
+value = 0.0453121433
+uncertainty = 0.08608505810602185
+
+[[experiments.reaction_measurements]]
+target_id = "TALA"
+value = 0.05266809415555556
+uncertainty = 0.1362530945189736
+
+[[experiments.reaction_measurements]]
+target_id = "PGK"
+value = -7.587970859111111
+uncertainty = 0.01235199116780911
+
+[[experiments.reaction_measurements]]
+target_id = "RPI"
+value = -0.5258907299000001
+uncertainty = 0.007486660480197303
+
+[[experiments.reaction_measurements]]
+target_id = "G6PDH2r"
+value = 0.7475179116222223
+uncertainty = 0.01067358058264015
+
+[[experiments.reaction_measurements]]
+target_id = "GND"
+value = 0.7052349720222223
+uncertainty = 0.007959828820540497
+
+
+[[experiments]]
+id = "Evo04Evo02EP_m-4_e-B1"
+[[experiments.metabolite_measurements]]
+target_id = "6pgc_c"
+value = 0.333422994088822
+uncertainty = 0.1
+
+[[experiments.metabolite_measurements]]
+target_id = "atp_c"
+value = 5.396066135711753
+uncertainty = 0.1
+
+[[experiments.metabolite_measurements]]
+target_id = "dhap_c"
+value = 2.343115298432503
+uncertainty = 0.1
+
+[[experiments.metabolite_measurements]]
+target_id = "f6p_c"
+value = 0.5128172649110024
+uncertainty = 0.1
+
+[[experiments.metabolite_measurements]]
+target_id = "fdp_c"
+value = 6.342885924844061
+uncertainty = 0.1
+
+[[experiments.metabolite_measurements]]
+target_id = "nad_c"
+value = 2.338219264301141
+uncertainty = 0.1
+
+[[experiments.metabolite_measurements]]
+target_id = "nadp_c"
+value = 0.7170997728825551
+uncertainty = 0.1
+
+[[experiments.metabolite_measurements]]
+target_id = "ru5p__D_c"
+value = 0.09312687305314944
+uncertainty = 0.1
+
+[[experiments.metabolite_measurements]]
+target_id = "s7p_c"
+value = 0.2397579084572314
+uncertainty = 0.1
+
+[[experiments.metabolite_measurements]]
+target_id = "2pg_c"
+value = 1.935695210679111
+uncertainty = 0.1
+
+[[experiments.metabolite_measurements]]
+target_id = "3pg_c"
+value = 1.935695210679111
+uncertainty = 0.1
+
+[[experiments.reaction_measurements]]
+target_id = "GAPD"
+value = 7.587970859111111
+uncertainty = 0.01235199116780911
+
+[[experiments.reaction_measurements]]
+target_id = "PGM"
+value = -7.056713121444445
+uncertainty = 0.02322413998975971
+
+[[experiments.reaction_measurements]]
+target_id = "PGI"
+value = 3.664376702666667
+uncertainty = 0.001849771760504786
+
+[[experiments.reaction_measurements]]
+target_id = "TPI"
+value = 3.699872699444445
+uncertainty = 0.02287637269593332
+
+[[experiments.reaction_measurements]]
+target_id = "ENO"
+value = 7.056713121444445
+uncertainty = 0.02322413998975971
+
+[[experiments.reaction_measurements]]
+target_id = "FBA"
+value = 3.718390733222223
+uncertainty = 0.00363767065540048
+
+[[experiments.reaction_measurements]]
+target_id = "PGL"
+value = 0.7475179116222223
+uncertainty = 0.01067358058264015
+
+[[experiments.reaction_measurements]]
+target_id = "TKT1"
+value = 0.1495896885444445
+uncertainty = 0.001685573177670948
+
+[[experiments.reaction_measurements]]
+target_id = "EDD"
+value = 0.0453121433
+uncertainty = 0.08608505810602185
+
+[[experiments.reaction_measurements]]
+target_id = "TKT2"
+value = 0.02498560862222222
+uncertainty = 0.009757143860844451
+
+[[experiments.reaction_measurements]]
+target_id = "FBP"
+value = -0.1582598797666667
+uncertainty = 3.584471107359328
+
+[[experiments.reaction_measurements]]
+target_id = "RPE"
+value = 0.1744761123333333
+uncertainty = 0.00564970565079157
+
+[[experiments.reaction_measurements]]
+target_id = "EDA"
+value = 0.0453121433
+uncertainty = 0.08608505810602185
+
+[[experiments.reaction_measurements]]
+target_id = "TALA"
+value = 0.05266809415555556
+uncertainty = 0.1362530945189736
+
+[[experiments.reaction_measurements]]
+target_id = "PGK"
+value = -7.587970859111111
+uncertainty = 0.01235199116780911
+
+[[experiments.reaction_measurements]]
+target_id = "RPI"
+value = -0.5258907299000001
+uncertainty = 0.007486660480197303
+
+[[experiments.reaction_measurements]]
+target_id = "G6PDH2r"
+value = 0.7475179116222223
+uncertainty = 0.01067358058264015
+
+[[experiments.reaction_measurements]]
+target_id = "GND"
+value = 0.7052349720222223
+uncertainty = 0.007959828820540497
+
+
+[[experiments]]
+id = "Evo04Evo02EP_m-4_e-B2"
+[[experiments.metabolite_measurements]]
+target_id = "6pgc_c"
+value = 0.333422994088822
+uncertainty = 0.1
+
+[[experiments.metabolite_measurements]]
+target_id = "atp_c"
+value = 5.396066135711753
+uncertainty = 0.1
+
+[[experiments.metabolite_measurements]]
+target_id = "dhap_c"
+value = 2.343115298432503
+uncertainty = 0.1
+
+[[experiments.metabolite_measurements]]
+target_id = "f6p_c"
+value = 0.5128172649110024
+uncertainty = 0.1
+
+[[experiments.metabolite_measurements]]
+target_id = "fdp_c"
+value = 6.342885924844061
+uncertainty = 0.1
+
+[[experiments.metabolite_measurements]]
+target_id = "nad_c"
+value = 2.338219264301141
+uncertainty = 0.1
+
+[[experiments.metabolite_measurements]]
+target_id = "nadp_c"
+value = 0.7170997728825551
+uncertainty = 0.1
+
+[[experiments.metabolite_measurements]]
+target_id = "ru5p__D_c"
+value = 0.09312687305314944
+uncertainty = 0.1
+
+[[experiments.metabolite_measurements]]
+target_id = "s7p_c"
+value = 0.2397579084572314
+uncertainty = 0.1
+
+[[experiments.metabolite_measurements]]
+target_id = "2pg_c"
+value = 1.935695210679111
+uncertainty = 0.1
+
+[[experiments.metabolite_measurements]]
+target_id = "3pg_c"
+value = 1.935695210679111
+uncertainty = 0.1
+
+[[experiments.reaction_measurements]]
+target_id = "GAPD"
+value = 7.587970859111111
+uncertainty = 0.01235199116780911
+
+[[experiments.reaction_measurements]]
+target_id = "PGM"
+value = -7.056713121444445
+uncertainty = 0.02322413998975971
+
+[[experiments.reaction_measurements]]
+target_id = "PGI"
+value = 3.664376702666667
+uncertainty = 0.001849771760504786
+
+[[experiments.reaction_measurements]]
+target_id = "TPI"
+value = 3.699872699444445
+uncertainty = 0.02287637269593332
+
+[[experiments.reaction_measurements]]
+target_id = "ENO"
+value = 7.056713121444445
+uncertainty = 0.02322413998975971
+
+[[experiments.reaction_measurements]]
+target_id = "FBA"
+value = 3.718390733222223
+uncertainty = 0.00363767065540048
+
+[[experiments.reaction_measurements]]
+target_id = "PGL"
+value = 0.7475179116222223
+uncertainty = 0.01067358058264015
+
+[[experiments.reaction_measurements]]
+target_id = "TKT1"
+value = 0.1495896885444445
+uncertainty = 0.001685573177670948
+
+[[experiments.reaction_measurements]]
+target_id = "EDD"
+value = 0.0453121433
+uncertainty = 0.08608505810602185
+
+[[experiments.reaction_measurements]]
+target_id = "TKT2"
+value = 0.02498560862222222
+uncertainty = 0.009757143860844451
+
+[[experiments.reaction_measurements]]
+target_id = "FBP"
+value = -0.1582598797666667
+uncertainty = 3.584471107359328
+
+[[experiments.reaction_measurements]]
+target_id = "RPE"
+value = 0.1744761123333333
+uncertainty = 0.00564970565079157
+
+[[experiments.reaction_measurements]]
+target_id = "EDA"
+value = 0.0453121433
+uncertainty = 0.08608505810602185
+
+[[experiments.reaction_measurements]]
+target_id = "TALA"
+value = 0.05266809415555556
+uncertainty = 0.1362530945189736
+
+[[experiments.reaction_measurements]]
+target_id = "PGK"
+value = -7.587970859111111
+uncertainty = 0.01235199116780911
+
+[[experiments.reaction_measurements]]
+target_id = "RPI"
+value = -0.5258907299000001
+uncertainty = 0.007486660480197303
+
+[[experiments.reaction_measurements]]
+target_id = "G6PDH2r"
+value = 0.7475179116222223
+uncertainty = 0.01067358058264015
+
+[[experiments.reaction_measurements]]
+target_id = "GND"
+value = 0.7052349720222223
+uncertainty = 0.007959828820540497
+
+
+[[experiments]]
+id = "Evo04Evo02EP_m-5_e-B1"
+[[experiments.metabolite_measurements]]
+target_id = "6pgc_c"
+value = 0.7330024998432855
+uncertainty = 0.1
+
+[[experiments.metabolite_measurements]]
+target_id = "atp_c"
+value = 3.80257945797493
+uncertainty = 0.1
+
+[[experiments.metabolite_measurements]]
+target_id = "dhap_c"
+value = 2.387398611561255
+uncertainty = 0.1
+
+[[experiments.metabolite_measurements]]
+target_id = "f6p_c"
+value = 0.8368095778007452
+uncertainty = 0.1
+
+[[experiments.metabolite_measurements]]
+target_id = "fdp_c"
+value = 5.921225100506427
+uncertainty = 0.1
+
+[[experiments.metabolite_measurements]]
+target_id = "nad_c"
+value = 2.836653239018082
+uncertainty = 0.1
+
+[[experiments.metabolite_measurements]]
+target_id = "nadp_c"
+value = 0.9895879944815472
+uncertainty = 0.1
+
+[[experiments.metabolite_measurements]]
+target_id = "ru5p__D_c"
+value = 0.1003318411869076
+uncertainty = 0.1
+
+[[experiments.metabolite_measurements]]
+target_id = "s7p_c"
+value = 0.3187850551830144
+uncertainty = 0.1
+
+[[experiments.metabolite_measurements]]
+target_id = "2pg_c"
+value = 2.628743652807807
+uncertainty = 0.1
+
+[[experiments.metabolite_measurements]]
+target_id = "3pg_c"
+value = 2.628743652807807
+uncertainty = 0.1
+
+[[experiments.reaction_measurements]]
+target_id = "GAPD"
+value = 7.587970859111111
+uncertainty = 0.01235199116780911
+
+[[experiments.reaction_measurements]]
+target_id = "PGM"
+value = -7.056713121444445
+uncertainty = 0.02322413998975971
+
+[[experiments.reaction_measurements]]
+target_id = "PGI"
+value = 3.664376702666667
+uncertainty = 0.001849771760504786
+
+[[experiments.reaction_measurements]]
+target_id = "TPI"
+value = 3.699872699444445
+uncertainty = 0.02287637269593332
+
+[[experiments.reaction_measurements]]
+target_id = "ENO"
+value = 7.056713121444445
+uncertainty = 0.02322413998975971
+
+[[experiments.reaction_measurements]]
+target_id = "FBA"
+value = 3.718390733222223
+uncertainty = 0.00363767065540048
+
+[[experiments.reaction_measurements]]
+target_id = "PGL"
+value = 0.7475179116222223
+uncertainty = 0.01067358058264015
+
+[[experiments.reaction_measurements]]
+target_id = "TKT1"
+value = 0.1495896885444445
+uncertainty = 0.001685573177670948
+
+[[experiments.reaction_measurements]]
+target_id = "EDD"
+value = 0.0453121433
+uncertainty = 0.08608505810602185
+
+[[experiments.reaction_measurements]]
+target_id = "TKT2"
+value = 0.02498560862222222
+uncertainty = 0.009757143860844451
+
+[[experiments.reaction_measurements]]
+target_id = "FBP"
+value = -0.1582598797666667
+uncertainty = 3.584471107359328
+
+[[experiments.reaction_measurements]]
+target_id = "RPE"
+value = 0.1744761123333333
+uncertainty = 0.00564970565079157
+
+[[experiments.reaction_measurements]]
+target_id = "EDA"
+value = 0.0453121433
+uncertainty = 0.08608505810602185
+
+[[experiments.reaction_measurements]]
+target_id = "TALA"
+value = 0.05266809415555556
+uncertainty = 0.1362530945189736
+
+[[experiments.reaction_measurements]]
+target_id = "PGK"
+value = -7.587970859111111
+uncertainty = 0.01235199116780911
+
+[[experiments.reaction_measurements]]
+target_id = "RPI"
+value = -0.5258907299000001
+uncertainty = 0.007486660480197303
+
+[[experiments.reaction_measurements]]
+target_id = "G6PDH2r"
+value = 0.7475179116222223
+uncertainty = 0.01067358058264015
+
+[[experiments.reaction_measurements]]
+target_id = "GND"
+value = 0.7052349720222223
+uncertainty = 0.007959828820540497
+
+
+[[experiments]]
+id = "Evo04Evo02EP_m-5_e-B2"
+[[experiments.metabolite_measurements]]
+target_id = "6pgc_c"
+value = 0.7330024998432855
+uncertainty = 0.1
+
+[[experiments.metabolite_measurements]]
+target_id = "atp_c"
+value = 3.80257945797493
+uncertainty = 0.1
+
+[[experiments.metabolite_measurements]]
+target_id = "dhap_c"
+value = 2.387398611561255
+uncertainty = 0.1
+
+[[experiments.metabolite_measurements]]
+target_id = "f6p_c"
+value = 0.8368095778007452
+uncertainty = 0.1
+
+[[experiments.metabolite_measurements]]
+target_id = "fdp_c"
+value = 5.921225100506427
+uncertainty = 0.1
+
+[[experiments.metabolite_measurements]]
+target_id = "nad_c"
+value = 2.836653239018082
+uncertainty = 0.1
+
+[[experiments.metabolite_measurements]]
+target_id = "nadp_c"
+value = 0.9895879944815472
+uncertainty = 0.1
+
+[[experiments.metabolite_measurements]]
+target_id = "ru5p__D_c"
+value = 0.1003318411869076
+uncertainty = 0.1
+
+[[experiments.metabolite_measurements]]
+target_id = "s7p_c"
+value = 0.3187850551830144
+uncertainty = 0.1
+
+[[experiments.metabolite_measurements]]
+target_id = "2pg_c"
+value = 2.628743652807807
+uncertainty = 0.1
+
+[[experiments.metabolite_measurements]]
+target_id = "3pg_c"
+value = 2.628743652807807
+uncertainty = 0.1
+
+[[experiments.reaction_measurements]]
+target_id = "GAPD"
+value = 7.587970859111111
+uncertainty = 0.01235199116780911
+
+[[experiments.reaction_measurements]]
+target_id = "PGM"
+value = -7.056713121444445
+uncertainty = 0.02322413998975971
+
+[[experiments.reaction_measurements]]
+target_id = "PGI"
+value = 3.664376702666667
+uncertainty = 0.001849771760504786
+
+[[experiments.reaction_measurements]]
+target_id = "TPI"
+value = 3.699872699444445
+uncertainty = 0.02287637269593332
+
+[[experiments.reaction_measurements]]
+target_id = "ENO"
+value = 7.056713121444445
+uncertainty = 0.02322413998975971
+
+[[experiments.reaction_measurements]]
+target_id = "FBA"
+value = 3.718390733222223
+uncertainty = 0.00363767065540048
+
+[[experiments.reaction_measurements]]
+target_id = "PGL"
+value = 0.7475179116222223
+uncertainty = 0.01067358058264015
+
+[[experiments.reaction_measurements]]
+target_id = "TKT1"
+value = 0.1495896885444445
+uncertainty = 0.001685573177670948
+
+[[experiments.reaction_measurements]]
+target_id = "EDD"
+value = 0.0453121433
+uncertainty = 0.08608505810602185
+
+[[experiments.reaction_measurements]]
+target_id = "TKT2"
+value = 0.02498560862222222
+uncertainty = 0.009757143860844451
+
+[[experiments.reaction_measurements]]
+target_id = "FBP"
+value = -0.1582598797666667
+uncertainty = 3.584471107359328
+
+[[experiments.reaction_measurements]]
+target_id = "RPE"
+value = 0.1744761123333333
+uncertainty = 0.00564970565079157
+
+[[experiments.reaction_measurements]]
+target_id = "EDA"
+value = 0.0453121433
+uncertainty = 0.08608505810602185
+
+[[experiments.reaction_measurements]]
+target_id = "TALA"
+value = 0.05266809415555556
+uncertainty = 0.1362530945189736
+
+[[experiments.reaction_measurements]]
+target_id = "PGK"
+value = -7.587970859111111
+uncertainty = 0.01235199116780911
+
+[[experiments.reaction_measurements]]
+target_id = "RPI"
+value = -0.5258907299000001
+uncertainty = 0.007486660480197303
+
+[[experiments.reaction_measurements]]
+target_id = "G6PDH2r"
+value = 0.7475179116222223
+uncertainty = 0.01067358058264015
+
+[[experiments.reaction_measurements]]
+target_id = "GND"
+value = 0.7052349720222223
+uncertainty = 0.007959828820540497
+
+
+[[experiments]]
+id = "Evo04Evo02EP_m-6_e-B1"
+[[experiments.metabolite_measurements]]
+target_id = "6pgc_c"
+value = 0.6029923732444682
+uncertainty = 0.1
+
+[[experiments.metabolite_measurements]]
+target_id = "atp_c"
+value = 7.299513725208143
+uncertainty = 0.1
+
+[[experiments.metabolite_measurements]]
+target_id = "dhap_c"
+value = 2.12561635670476
+uncertainty = 0.1
+
+[[experiments.metabolite_measurements]]
+target_id = "f6p_c"
+value = 0.7481135997617576
+uncertainty = 0.1
+
+[[experiments.metabolite_measurements]]
+target_id = "fdp_c"
+value = 7.803135167298644
+uncertainty = 0.1
+
+[[experiments.metabolite_measurements]]
+target_id = "nad_c"
+value = 2.460071992304698
+uncertainty = 0.1
+
+[[experiments.metabolite_measurements]]
+target_id = "nadp_c"
+value = 0.9305184624354308
+uncertainty = 0.1
+
+[[experiments.metabolite_measurements]]
+target_id = "ru5p__D_c"
+value = 0.09767510486199707
+uncertainty = 0.1
+
+[[experiments.metabolite_measurements]]
+target_id = "s7p_c"
+value = 0.4244713618670217
+uncertainty = 0.1
+
+[[experiments.metabolite_measurements]]
+target_id = "2pg_c"
+value = 1.81884241406352
+uncertainty = 0.1
+
+[[experiments.metabolite_measurements]]
+target_id = "3pg_c"
+value = 1.81884241406352
+uncertainty = 0.1
+
+[[experiments.reaction_measurements]]
+target_id = "GAPD"
+value = 7.587970859111111
+uncertainty = 0.01235199116780911
+
+[[experiments.reaction_measurements]]
+target_id = "PGM"
+value = -7.056713121444445
+uncertainty = 0.02322413998975971
+
+[[experiments.reaction_measurements]]
+target_id = "PGI"
+value = 3.664376702666667
+uncertainty = 0.001849771760504786
+
+[[experiments.reaction_measurements]]
+target_id = "TPI"
+value = 3.699872699444445
+uncertainty = 0.02287637269593332
+
+[[experiments.reaction_measurements]]
+target_id = "ENO"
+value = 7.056713121444445
+uncertainty = 0.02322413998975971
+
+[[experiments.reaction_measurements]]
+target_id = "FBA"
+value = 3.718390733222223
+uncertainty = 0.00363767065540048
+
+[[experiments.reaction_measurements]]
+target_id = "PGL"
+value = 0.7475179116222223
+uncertainty = 0.01067358058264015
+
+[[experiments.reaction_measurements]]
+target_id = "TKT1"
+value = 0.1495896885444445
+uncertainty = 0.001685573177670948
+
+[[experiments.reaction_measurements]]
+target_id = "EDD"
+value = 0.0453121433
+uncertainty = 0.08608505810602185
+
+[[experiments.reaction_measurements]]
+target_id = "TKT2"
+value = 0.02498560862222222
+uncertainty = 0.009757143860844451
+
+[[experiments.reaction_measurements]]
+target_id = "FBP"
+value = -0.1582598797666667
+uncertainty = 3.584471107359328
+
+[[experiments.reaction_measurements]]
+target_id = "RPE"
+value = 0.1744761123333333
+uncertainty = 0.00564970565079157
+
+[[experiments.reaction_measurements]]
+target_id = "EDA"
+value = 0.0453121433
+uncertainty = 0.08608505810602185
+
+[[experiments.reaction_measurements]]
+target_id = "TALA"
+value = 0.05266809415555556
+uncertainty = 0.1362530945189736
+
+[[experiments.reaction_measurements]]
+target_id = "PGK"
+value = -7.587970859111111
+uncertainty = 0.01235199116780911
+
+[[experiments.reaction_measurements]]
+target_id = "RPI"
+value = -0.5258907299000001
+uncertainty = 0.007486660480197303
+
+[[experiments.reaction_measurements]]
+target_id = "G6PDH2r"
+value = 0.7475179116222223
+uncertainty = 0.01067358058264015
+
+[[experiments.reaction_measurements]]
+target_id = "GND"
+value = 0.7052349720222223
+uncertainty = 0.007959828820540497
+
+
+[[experiments]]
+id = "Evo04Evo02EP_m-6_e-B2"
+[[experiments.metabolite_measurements]]
+target_id = "6pgc_c"
+value = 0.6029923732444682
+uncertainty = 0.1
+
+[[experiments.metabolite_measurements]]
+target_id = "atp_c"
+value = 7.299513725208143
+uncertainty = 0.1
+
+[[experiments.metabolite_measurements]]
+target_id = "dhap_c"
+value = 2.12561635670476
+uncertainty = 0.1
+
+[[experiments.metabolite_measurements]]
+target_id = "f6p_c"
+value = 0.7481135997617576
+uncertainty = 0.1
+
+[[experiments.metabolite_measurements]]
+target_id = "fdp_c"
+value = 7.803135167298644
+uncertainty = 0.1
+
+[[experiments.metabolite_measurements]]
+target_id = "nad_c"
+value = 2.460071992304698
+uncertainty = 0.1
+
+[[experiments.metabolite_measurements]]
+target_id = "nadp_c"
+value = 0.9305184624354308
+uncertainty = 0.1
+
+[[experiments.metabolite_measurements]]
+target_id = "ru5p__D_c"
+value = 0.09767510486199707
+uncertainty = 0.1
+
+[[experiments.metabolite_measurements]]
+target_id = "s7p_c"
+value = 0.4244713618670217
+uncertainty = 0.1
+
+[[experiments.metabolite_measurements]]
+target_id = "2pg_c"
+value = 1.81884241406352
+uncertainty = 0.1
+
+[[experiments.metabolite_measurements]]
+target_id = "3pg_c"
+value = 1.81884241406352
+uncertainty = 0.1
+
+[[experiments.reaction_measurements]]
+target_id = "GAPD"
+value = 7.587970859111111
+uncertainty = 0.01235199116780911
+
+[[experiments.reaction_measurements]]
+target_id = "PGM"
+value = -7.056713121444445
+uncertainty = 0.02322413998975971
+
+[[experiments.reaction_measurements]]
+target_id = "PGI"
+value = 3.664376702666667
+uncertainty = 0.001849771760504786
+
+[[experiments.reaction_measurements]]
+target_id = "TPI"
+value = 3.699872699444445
+uncertainty = 0.02287637269593332
+
+[[experiments.reaction_measurements]]
+target_id = "ENO"
+value = 7.056713121444445
+uncertainty = 0.02322413998975971
+
+[[experiments.reaction_measurements]]
+target_id = "FBA"
+value = 3.718390733222223
+uncertainty = 0.00363767065540048
+
+[[experiments.reaction_measurements]]
+target_id = "PGL"
+value = 0.7475179116222223
+uncertainty = 0.01067358058264015
+
+[[experiments.reaction_measurements]]
+target_id = "TKT1"
+value = 0.1495896885444445
+uncertainty = 0.001685573177670948
+
+[[experiments.reaction_measurements]]
+target_id = "EDD"
+value = 0.0453121433
+uncertainty = 0.08608505810602185
+
+[[experiments.reaction_measurements]]
+target_id = "TKT2"
+value = 0.02498560862222222
+uncertainty = 0.009757143860844451
+
+[[experiments.reaction_measurements]]
+target_id = "FBP"
+value = -0.1582598797666667
+uncertainty = 3.584471107359328
+
+[[experiments.reaction_measurements]]
+target_id = "RPE"
+value = 0.1744761123333333
+uncertainty = 0.00564970565079157
+
+[[experiments.reaction_measurements]]
+target_id = "EDA"
+value = 0.0453121433
+uncertainty = 0.08608505810602185
+
+[[experiments.reaction_measurements]]
+target_id = "TALA"
+value = 0.05266809415555556
+uncertainty = 0.1362530945189736
+
+[[experiments.reaction_measurements]]
+target_id = "PGK"
+value = -7.587970859111111
+uncertainty = 0.01235199116780911
+
+[[experiments.reaction_measurements]]
+target_id = "RPI"
+value = -0.5258907299000001
+uncertainty = 0.007486660480197303
+
+[[experiments.reaction_measurements]]
+target_id = "G6PDH2r"
+value = 0.7475179116222223
+uncertainty = 0.01067358058264015
+
+[[experiments.reaction_measurements]]
+target_id = "GND"
+value = 0.7052349720222223
+uncertainty = 0.007959828820540497
+
+
+###### Priors ######
+[priors.kinetic_parameters]
+
+# abcd for substrates, pqrs for products
+# location = best guess on non-log scale
+# scale = error on ln-scale
+# To plot distribution use LogNormal(ln(location),scale)
+# Plot[PDF[LogNormal[ln(location), scale], x], {x, 0, 100}]
+#
+# Template for A -> B
+# = [
+#  { target_id = 'Kcat1', location = FIX, scale = FIX},
+#  { target_id = 'Ka', location = FIX, scale = FIX},
+#  { target_id = 'Kp', location = FIX, scale = FIX},
+#]
+
+# Template for A -> B + C
+# = [
+#  { target_id = 'Kcat1', location = FIX, scale = FIX},
+#  { target_id = 'Ka', location = FIX, scale = FIX},
+#  { target_id = 'Kp', location = FIX, scale = FIX},
+#  { target_id = 'Kq', location = FIX, scale = FIX},
+#]
+
+# Template for A + B -> C + D
+# = [
+#  { target_id = 'Kcat1', location = FIX, scale = FIX},
+#  { target_id = 'Ka', location = FIX, scale = FIX},
+#  { target_id = 'Kb', location = FIX, scale = FIX},
+#  { target_id = 'Kp', location = FIX, scale = FIX},
+#  { target_id = 'Kq', location = FIX, scale = FIX},-
+#]
+
+
+# Default decisions for kcats and Kms:
+# If the value is known location is defined and scale can be 0.2 or estimated from BRENDA data
+# If the value is unknown:
+# kcat - location = 10.0, scale = 3.0 (from Davidi) 10th percentile is 0.21, 90th percentile is 467
+# Kms  - location = concentration of metabolite in WT, scale = 1.5 For example if concentration is 10mM then 10th percentile is 1.46 and 90th percentile is 68.36
+
+PGI = [
+  { target_id = 'Kcat1', location = 126.0, scale = 0.2}, # Davidi
+  { target_id = 'Ka', location = 3.0, scale = 0.2}, # SABIO Glucose 6-P mM
+  { target_id = 'Kp', location = 0.16, scale = 0.2}, # SABIO Fructose 6-P mM
+]
+
+FBP = [
+  { target_id = 'Kcat1', location = 24.0, scale = 0.2}, # SABIO
+  { target_id = 'Ka', location = 16.0, scale = 0.2}, # SABIO Fructose 1,6-bP
+  { target_id = 'Kp', location = 0.69, scale = 1.5}, # SABIO Fructose 6-P Imputed from the data
+]
+
+FBA = [
+  { target_id = 'Kcat1', location = 7.0, scale = 0.2}, # SABIO
+  { target_id = 'Ka', location = 0.02, scale = 0.2}, # SABIO f16bp 
+  { target_id = 'Kp', location = 0.03, scale = 0.2}, # SABIO Ki g3p
+  { target_id = 'Kq', location = 0.13, scale = 0.2}, # SABIO Ki dhap 
+]
+
+TPI = [
+  { target_id = 'Kcat1', location = 9000.0, scale = 0.2}, # BRENDA
+  { target_id = 'Ka', location = 2.16, scale = 1.5}, # dhap Imputed from the data
+  { target_id = 'Kp', location = 200.0, scale = 0.2}, # g3p
+]
+
+GAPD = [
+  { target_id = 'Kcat1', location = 268.0, scale = 0.2}, # Davidi
+  { target_id = 'Ka', location = 0.89, scale = 0.2}, # Martas collection g3p 
+  { target_id = 'Kb', location = 0.045, scale = 0.2}, # Martas collection nad
+  { target_id = 'Kp', location = 2.02, scale = 1.5}, # 13dpg Imputed from the data (for 3pg_c)
+  { target_id = 'Kq', location = 0.003, scale = 1.5}, # nadh Imputed from the data
+]
+
+PGK = [
+  { target_id = 'Kcat1', location = 329.0, scale = 0.2}, # Davidi
+  { target_id = 'Ka', location = 2.02, scale = 1.5}, # 3pg Imputed from the data
+  { target_id = 'Kb', location = 5.37, scale = 1.5}, # atp Imputed from the data
+  { target_id = 'Kp', location = 2.02, scale = 1.5}, # 13dpg Imputed from the data
+  { target_id = 'Kq', location = 0.6, scale = 1.5}, # adp Imputed from the data
+]
+
+PGM = [
+  { target_id = 'Kcat1', location = 330.0, scale = 0.2}, # SABIO
+  { target_id = 'Ka', location = 2.02, scale = 1.5}, # 2pg_c Imputed from the data
+  { target_id = 'Kp', location = 2.02, scale = 1.5}, # 3pg_c Imputed from the data
+]
+
+ENO = [
+  { target_id = 'Kcat1', location = 396, scale = 0.2}, # Davidi
+  { target_id = 'Ka', location = 0.1, scale = 0.2}, # BRENDA 2pg_c
+  { target_id = 'Kp', location = 0.25, scale = 1.5}, # pep Imputed from the data
+]
+
+G6PDH2r = [
+  { target_id = 'Kcat1', location = 174.0, scale = 0.2}, # Davidi
+  { target_id = 'Ka', location = 0.145, scale = 0.2}, # g6p
+  { target_id = 'Kb', location = 0.0075, scale = 0.2}, # nadp
+  { target_id = 'Kp', location = 0.61, scale = 1.5}, # 6pgl Imputed from the data (for 6pgc)
+  { target_id = 'Kq', location = 0.037, scale = 1.5}, # nadph Imputed from the data
+]
+
+PGL = [
+  { target_id = 'Kcat1', location = 472.0, scale = 0.2}, # Davidi
+  { target_id = 'Ka', location = 0.61, scale = 1.5},  # 6pgl
+  { target_id = 'Kp', location = 0.61, scale = 1.5}, # 6pgc
+]
+
+GND = [
+  { target_id = 'Kcat1', location = 55.0, scale = 0.2}, # Davidi
+  { target_id = 'Ka', location = 0.093, scale = 0.2}, # EcoCyc 6pgc
+  { target_id = 'Kb', location = 0.049, scale = 0.2}, # EcoCyc nadp
+  { target_id = 'Kp', location = 0.42, scale = 1.5}, # ru5p
+  { target_id = 'Kq', location = 0.037, scale = 1.5}, # nadph Imputed from the data
+  { target_id = 'Kr', location = 10.0, scale = 1.5}, # co2 Assumed
+]
+
+RPI = [
+  { target_id = 'Kcat1', location = 2100.0, scale = 0.2}, # EcoCyc
+  { target_id = 'Ka', location = 3.1, scale = 0.2}, # EcoCyc ribose 
+  { target_id = 'Kp', location = 0.06, scale = 1.5}, # ribulose Imputed from the data 
+]
+
+RPE = [
+  { target_id = 'Kcat1', location = 10, scale = 3.0}, # Assumed
+  { target_id = 'Ka', location = 0.06, scale = 0.2}, # EcoCyc ribulose Imputed from the data 
+  { target_id = 'Kp', location = 0.06, scale = 1.5}, # xylulose Imputed from the data (from ribulose)
+]
+
+TKT1 = [
+  { target_id = 'Kcat1', location = 10, scale = 3.0}, # Assumed
+  { target_id = 'Ka', location = 1.4, scale = 0.2}, # EcoCyc ribose-5-P
+  { target_id = 'Kb', location = 0.16, scale = 0.2}, # EcoCyc xylulose-5-P
+  { target_id = 'Kp', location = 2.1, scale = 0.2}, # EcoCyc g3p
+  { target_id = 'Kq', location = 4.0, scale = 0.2}, # EcoCyc sedoheptulose 7-P
+] 
+
+TKT2 = [
+  { target_id = 'Kcat1', location = 10, scale = 3.0}, # Assumed
+  { target_id = 'Ka', location = 0.09, scale = 0.2}, # EcoCyc e4p
+  { target_id = 'Kb', location = 0.16, scale = 0.2}, # EcoCyc xylolse-5-P
+  { target_id = 'Kp', location = 1.1, scale = 0.2}, # EcoCyc fructose-6-P
+  { target_id = 'Kq', location = 2.1, scale = 0.2}, # EcoCyc g3p
+]
+
+TALA = [
+  { target_id = 'Kcat1', location = 72, scale = 0.2}, # Martas collection
+  { target_id = 'Ka', location = 1.9, scale = 0.2}, # BRENDA g3p
+  { target_id = 'Kb', location = 0.285, scale = 0.2}, # BRENDA s7p
+  { target_id = 'Kp', location = 0.250, scale = 0.2}, # BRENDA e4p  0.078-0.55
+  { target_id = 'Kq', location = 1.0, scale = 0.2}, # BRENDA f6p 0.6-22
+]
+
+EDD = [
+  { target_id = 'Kcat1', location = 10, scale = 3.0}, # Assumed
+  { target_id = 'Ka', location = 0.04, scale = 0.2}, # BRENDA 6pgc for all organisms
+  { target_id = 'Kp', location = 0.62, scale = 1.5}, # 2dd-gluconate-6-P Imputed from the data (from 6pgc)
+]
+
+EDA = [
+  { target_id = 'Kcat1', location = 283.8, scale = 0.2}, # EcoCyc
+  { target_id = 'Ka', location = 0.35, scale = 0.2}, # 2dd-gluconate-6-P
+  { target_id = 'Kp', location = 1.5, scale = 1.5}, # g3p Imputed from the data (ecmdb.ca)
+  { target_id = 'Kq', location = 8, scale = 1.5}, # pyr Imputed from the data (ecmdb.ca)
+]
+
+[priors.thermodynamic_parameters]
+# Obtained from eQuilibrator
+marginal_dgs = [
+    { target_id = "PGI", location = 2.5, scale = 0.8},
+    { target_id = "FBP", location = -11.4, scale = 1.4},
+    { target_id = "FBA", location = 19.8, scale = 1.0},
+    { target_id = "TPI", location = -5.5, scale = 1.1},
+    { target_id = "GAPD", location = 7.8, scale = 0.8},
+    { target_id = "PGK", location = 18.5, scale = 0.9},
+    { target_id = "PGM", location = -4.2, scale = 0.7},
+    { target_id = "ENO", location = -4.1, scale = 0.6},
+    { target_id = "G6PDH2r", location = -2.3, scale = 2.6},
+    { target_id = "PGL", location = -20.9, scale = 3.3},
+    { target_id = "GND", location = 11.2, scale = 6.3},
+    { target_id = "RPI", location = 1.9, scale = 1.5},
+    { target_id = "RPE", location = -3.4, scale = 2.3},
+    { target_id = "TKT1", location = -3.8, scale = 3.8}, # Reversed to equilibrator
+    { target_id = "TKT2", location = -10.0, scale = 3.8}, # Reversed to equilibrator
+    { target_id = "TALA", location = -0.7, scale = 2.8},
+    { target_id = "EDD", location = -43.1, scale = 5.1},
+    { target_id = "EDA", location = 15.4, scale = 4.4},
+]
+[priors.unbalanced_metabolites]
+[[priors.unbalanced_metabolites.Evo04Evo01EP_m-1_e-B1]]
+target_id = "adp_c"
+location = 0.5803851075700897
+scale = 0.1
+
+[[priors.unbalanced_metabolites.Evo04Evo01EP_m-1_e-B1]]
+target_id = "g6p_c"
+location = 2.251078005182113
+scale = 0.1
+
+[[priors.unbalanced_metabolites.Evo04Evo01EP_m-1_e-B1]]
+target_id = "nadh_c"
+location = 0.003263808337875014
+scale = 0.1
+
+[[priors.unbalanced_metabolites.Evo04Evo01EP_m-1_e-B1]]
+target_id = "nadph_c"
+location = 0.03594953086901059
+scale = 0.1
+
+[[priors.unbalanced_metabolites.Evo04Evo01EP_m-1_e-B1]]
+target_id = "pep_c"
+location = 0.2661780731484014
+scale = 0.1
+
+[[priors.unbalanced_metabolites.Evo04Evo01EP_m-1_e-B1]]
+target_id = "r5p_c"
+location = 0.5768236819801289
+scale = 0.1
+
+[[priors.unbalanced_metabolites.Evo04Evo01EP_m-1_e-B1]]
+target_id = "pyr_c"
+location = 0.5
+scale = 2.0
+
+[[priors.unbalanced_metabolites.Evo04Evo01EP_m-1_e-B1]]
+target_id = "e4p_c"
+location = 0.5
+scale = 2.0
+
+[[priors.unbalanced_metabolites.Evo04Evo01EP_m-1_e-B2]]
+target_id = "adp_c"
+location = 0.5803851075700897
+scale = 0.1
+
+[[priors.unbalanced_metabolites.Evo04Evo01EP_m-1_e-B2]]
+target_id = "g6p_c"
+location = 2.251078005182113
+scale = 0.1
+
+[[priors.unbalanced_metabolites.Evo04Evo01EP_m-1_e-B2]]
+target_id = "nadh_c"
+location = 0.003263808337875014
+scale = 0.1
+
+[[priors.unbalanced_metabolites.Evo04Evo01EP_m-1_e-B2]]
+target_id = "nadph_c"
+location = 0.03594953086901059
+scale = 0.1
+
+[[priors.unbalanced_metabolites.Evo04Evo01EP_m-1_e-B2]]
+target_id = "pep_c"
+location = 0.2661780731484014
+scale = 0.1
+
+[[priors.unbalanced_metabolites.Evo04Evo01EP_m-1_e-B2]]
+target_id = "r5p_c"
+location = 0.5768236819801289
+scale = 0.1
+
+[[priors.unbalanced_metabolites.Evo04Evo01EP_m-1_e-B2]]
+target_id = "pyr_c"
+location = 0.5
+scale = 2.0
+
+[[priors.unbalanced_metabolites.Evo04Evo01EP_m-1_e-B2]]
+target_id = "e4p_c"
+location = 0.5
+scale = 2.0
+
+[[priors.unbalanced_metabolites.Evo04Evo01EP_m-2_e-B1]]
+target_id = "adp_c"
+location = 0.6228420470776317
+scale = 0.1
+
+[[priors.unbalanced_metabolites.Evo04Evo01EP_m-2_e-B1]]
+target_id = "g6p_c"
+location = 1.599276185047095
+scale = 0.1
+
+[[priors.unbalanced_metabolites.Evo04Evo01EP_m-2_e-B1]]
+target_id = "nadh_c"
+location = 0.002499781278955216
+scale = 0.1
+
+[[priors.unbalanced_metabolites.Evo04Evo01EP_m-2_e-B1]]
+target_id = "nadph_c"
+location = 0.02491271512125786
+scale = 0.1
+
+[[priors.unbalanced_metabolites.Evo04Evo01EP_m-2_e-B1]]
+target_id = "pep_c"
+location = 0.226147919426002
+scale = 0.1
+
+[[priors.unbalanced_metabolites.Evo04Evo01EP_m-2_e-B1]]
+target_id = "r5p_c"
+location = 0.2684788653026555
+scale = 0.1
+
+[[priors.unbalanced_metabolites.Evo04Evo01EP_m-2_e-B1]]
+target_id = "pyr_c"
+location = 0.5
+scale = 2.0
+
+[[priors.unbalanced_metabolites.Evo04Evo01EP_m-2_e-B1]]
+target_id = "e4p_c"
+location = 0.5
+scale = 2.0
+
+[[priors.unbalanced_metabolites.Evo04Evo01EP_m-2_e-B2]]
+target_id = "adp_c"
+location = 0.6228420470776317
+scale = 0.1
+
+[[priors.unbalanced_metabolites.Evo04Evo01EP_m-2_e-B2]]
+target_id = "g6p_c"
+location = 1.599276185047095
+scale = 0.1
+
+[[priors.unbalanced_metabolites.Evo04Evo01EP_m-2_e-B2]]
+target_id = "nadh_c"
+location = 0.002499781278955216
+scale = 0.1
+
+[[priors.unbalanced_metabolites.Evo04Evo01EP_m-2_e-B2]]
+target_id = "nadph_c"
+location = 0.02491271512125786
+scale = 0.1
+
+[[priors.unbalanced_metabolites.Evo04Evo01EP_m-2_e-B2]]
+target_id = "pep_c"
+location = 0.226147919426002
+scale = 0.1
+
+[[priors.unbalanced_metabolites.Evo04Evo01EP_m-2_e-B2]]
+target_id = "r5p_c"
+location = 0.2684788653026555
+scale = 0.1
+
+[[priors.unbalanced_metabolites.Evo04Evo01EP_m-2_e-B2]]
+target_id = "pyr_c"
+location = 0.5
+scale = 2.0
+
+[[priors.unbalanced_metabolites.Evo04Evo01EP_m-2_e-B2]]
+target_id = "e4p_c"
+location = 0.5
+scale = 2.0
+
+[[priors.unbalanced_metabolites.Evo04Evo01EP_m-3_e-B1]]
+target_id = "adp_c"
+location = 0.6440014990736905
+scale = 0.1
+
+[[priors.unbalanced_metabolites.Evo04Evo01EP_m-3_e-B1]]
+target_id = "g6p_c"
+location = 2.313370643839973
+scale = 0.1
+
+[[priors.unbalanced_metabolites.Evo04Evo01EP_m-3_e-B1]]
+target_id = "nadh_c"
+location = 0.003529277316493469
+scale = 0.1
+
+[[priors.unbalanced_metabolites.Evo04Evo01EP_m-3_e-B1]]
+target_id = "nadph_c"
+location = 0.0346199661067299
+scale = 0.1
+
+[[priors.unbalanced_metabolites.Evo04Evo01EP_m-3_e-B1]]
+target_id = "pep_c"
+location = 0.2417774081117996
+scale = 0.1
+
+[[priors.unbalanced_metabolites.Evo04Evo01EP_m-3_e-B1]]
+target_id = "r5p_c"
+location = 0.2844676694850122
+scale = 0.1
+
+[[priors.unbalanced_metabolites.Evo04Evo01EP_m-3_e-B1]]
+target_id = "pyr_c"
+location = 0.5
+scale = 2.0
+
+[[priors.unbalanced_metabolites.Evo04Evo01EP_m-3_e-B1]]
+target_id = "e4p_c"
+location = 0.5
+scale = 2.0
+
+[[priors.unbalanced_metabolites.Evo04Evo01EP_m-3_e-B2]]
+target_id = "adp_c"
+location = 0.6440014990736905
+scale = 0.1
+
+[[priors.unbalanced_metabolites.Evo04Evo01EP_m-3_e-B2]]
+target_id = "g6p_c"
+location = 2.313370643839973
+scale = 0.1
+
+[[priors.unbalanced_metabolites.Evo04Evo01EP_m-3_e-B2]]
+target_id = "nadh_c"
+location = 0.003529277316493469
+scale = 0.1
+
+[[priors.unbalanced_metabolites.Evo04Evo01EP_m-3_e-B2]]
+target_id = "nadph_c"
+location = 0.0346199661067299
+scale = 0.1
+
+[[priors.unbalanced_metabolites.Evo04Evo01EP_m-3_e-B2]]
+target_id = "pep_c"
+location = 0.2417774081117996
+scale = 0.1
+
+[[priors.unbalanced_metabolites.Evo04Evo01EP_m-3_e-B2]]
+target_id = "r5p_c"
+location = 0.2844676694850122
+scale = 0.1
+
+[[priors.unbalanced_metabolites.Evo04Evo01EP_m-3_e-B2]]
+target_id = "pyr_c"
+location = 0.5
+scale = 2.0
+
+[[priors.unbalanced_metabolites.Evo04Evo01EP_m-3_e-B2]]
+target_id = "e4p_c"
+location = 0.5
+scale = 2.0
+
+[[priors.unbalanced_metabolites.Evo04Evo01EP_m-4_e-B1]]
+target_id = "adp_c"
+location = 0.6202682515759846
+scale = 0.1
+
+[[priors.unbalanced_metabolites.Evo04Evo01EP_m-4_e-B1]]
+target_id = "g6p_c"
+location = 1.558658129194417
+scale = 0.1
+
+[[priors.unbalanced_metabolites.Evo04Evo01EP_m-4_e-B1]]
+target_id = "nadh_c"
+location = 0.002553086650031948
+scale = 0.1
+
+[[priors.unbalanced_metabolites.Evo04Evo01EP_m-4_e-B1]]
+target_id = "nadph_c"
+location = 0.03540834597207852
+scale = 0.1
+
+[[priors.unbalanced_metabolites.Evo04Evo01EP_m-4_e-B1]]
+target_id = "pep_c"
+location = 0.2492327891804404
+scale = 0.1
+
+[[priors.unbalanced_metabolites.Evo04Evo01EP_m-4_e-B1]]
+target_id = "r5p_c"
+location = 0.3243809431899649
+scale = 0.1
+
+[[priors.unbalanced_metabolites.Evo04Evo01EP_m-4_e-B1]]
+target_id = "pyr_c"
+location = 0.5
+scale = 2.0
+
+[[priors.unbalanced_metabolites.Evo04Evo01EP_m-4_e-B1]]
+target_id = "e4p_c"
+location = 0.5
+scale = 2.0
+
+[[priors.unbalanced_metabolites.Evo04Evo01EP_m-4_e-B2]]
+target_id = "adp_c"
+location = 0.6202682515759846
+scale = 0.1
+
+[[priors.unbalanced_metabolites.Evo04Evo01EP_m-4_e-B2]]
+target_id = "g6p_c"
+location = 1.558658129194417
+scale = 0.1
+
+[[priors.unbalanced_metabolites.Evo04Evo01EP_m-4_e-B2]]
+target_id = "nadh_c"
+location = 0.002553086650031948
+scale = 0.1
+
+[[priors.unbalanced_metabolites.Evo04Evo01EP_m-4_e-B2]]
+target_id = "nadph_c"
+location = 0.03540834597207852
+scale = 0.1
+
+[[priors.unbalanced_metabolites.Evo04Evo01EP_m-4_e-B2]]
+target_id = "pep_c"
+location = 0.2492327891804404
+scale = 0.1
+
+[[priors.unbalanced_metabolites.Evo04Evo01EP_m-4_e-B2]]
+target_id = "r5p_c"
+location = 0.3243809431899649
+scale = 0.1
+
+[[priors.unbalanced_metabolites.Evo04Evo01EP_m-4_e-B2]]
+target_id = "pyr_c"
+location = 0.5
+scale = 2.0
+
+[[priors.unbalanced_metabolites.Evo04Evo01EP_m-4_e-B2]]
+target_id = "e4p_c"
+location = 0.5
+scale = 2.0
+
+[[priors.unbalanced_metabolites.Evo04Evo01EP_m-5_e-B1]]
+target_id = "adp_c"
+location = 0.5873789583773814
+scale = 0.1
+
+[[priors.unbalanced_metabolites.Evo04Evo01EP_m-5_e-B1]]
+target_id = "g6p_c"
+location = 2.338209978750147
+scale = 0.1
+
+[[priors.unbalanced_metabolites.Evo04Evo01EP_m-5_e-B1]]
+target_id = "nadh_c"
+location = 0.003419064040481122
+scale = 0.1
+
+[[priors.unbalanced_metabolites.Evo04Evo01EP_m-5_e-B1]]
+target_id = "nadph_c"
+location = 0.02249134077743391
+scale = 0.1
+
+[[priors.unbalanced_metabolites.Evo04Evo01EP_m-5_e-B1]]
+target_id = "pep_c"
+location = 0.2229889783443519
+scale = 0.1
+
+[[priors.unbalanced_metabolites.Evo04Evo01EP_m-5_e-B1]]
+target_id = "r5p_c"
+location = 0.5676277484231236
+scale = 0.1
+
+[[priors.unbalanced_metabolites.Evo04Evo01EP_m-5_e-B1]]
+target_id = "pyr_c"
+location = 0.5
+scale = 2.0
+
+[[priors.unbalanced_metabolites.Evo04Evo01EP_m-5_e-B1]]
+target_id = "e4p_c"
+location = 0.5
+scale = 2.0
+
+[[priors.unbalanced_metabolites.Evo04Evo01EP_m-5_e-B2]]
+target_id = "adp_c"
+location = 0.5873789583773814
+scale = 0.1
+
+[[priors.unbalanced_metabolites.Evo04Evo01EP_m-5_e-B2]]
+target_id = "g6p_c"
+location = 2.338209978750147
+scale = 0.1
+
+[[priors.unbalanced_metabolites.Evo04Evo01EP_m-5_e-B2]]
+target_id = "nadh_c"
+location = 0.003419064040481122
+scale = 0.1
+
+[[priors.unbalanced_metabolites.Evo04Evo01EP_m-5_e-B2]]
+target_id = "nadph_c"
+location = 0.02249134077743391
+scale = 0.1
+
+[[priors.unbalanced_metabolites.Evo04Evo01EP_m-5_e-B2]]
+target_id = "pep_c"
+location = 0.2229889783443519
+scale = 0.1
+
+[[priors.unbalanced_metabolites.Evo04Evo01EP_m-5_e-B2]]
+target_id = "r5p_c"
+location = 0.5676277484231236
+scale = 0.1
+
+[[priors.unbalanced_metabolites.Evo04Evo01EP_m-5_e-B2]]
+target_id = "pyr_c"
+location = 0.5
+scale = 2.0
+
+[[priors.unbalanced_metabolites.Evo04Evo01EP_m-5_e-B2]]
+target_id = "e4p_c"
+location = 0.5
+scale = 2.0
+
+[[priors.unbalanced_metabolites.Evo04Evo01EP_m-6_e-B1]]
+target_id = "adp_c"
+location = 0.6133139867049705
+scale = 0.1
+
+[[priors.unbalanced_metabolites.Evo04Evo01EP_m-6_e-B1]]
+target_id = "g6p_c"
+location = 2.421872371655819
+scale = 0.1
+
+[[priors.unbalanced_metabolites.Evo04Evo01EP_m-6_e-B1]]
+target_id = "nadh_c"
+location = 0.002762079749728664
+scale = 0.1
+
+[[priors.unbalanced_metabolites.Evo04Evo01EP_m-6_e-B1]]
+target_id = "nadph_c"
+location = 0.03910393743885063
+scale = 0.1
+
+[[priors.unbalanced_metabolites.Evo04Evo01EP_m-6_e-B1]]
+target_id = "pep_c"
+location = 0.2449432921338227
+scale = 0.1
+
+[[priors.unbalanced_metabolites.Evo04Evo01EP_m-6_e-B1]]
+target_id = "r5p_c"
+location = 0.5549688020321867
+scale = 0.1
+
+[[priors.unbalanced_metabolites.Evo04Evo01EP_m-6_e-B1]]
+target_id = "pyr_c"
+location = 0.5
+scale = 2.0
+
+[[priors.unbalanced_metabolites.Evo04Evo01EP_m-6_e-B1]]
+target_id = "e4p_c"
+location = 0.5
+scale = 2.0
+
+[[priors.unbalanced_metabolites.Evo04Evo01EP_m-6_e-B2]]
+target_id = "adp_c"
+location = 0.6133139867049705
+scale = 0.1
+
+[[priors.unbalanced_metabolites.Evo04Evo01EP_m-6_e-B2]]
+target_id = "g6p_c"
+location = 2.421872371655819
+scale = 0.1
+
+[[priors.unbalanced_metabolites.Evo04Evo01EP_m-6_e-B2]]
+target_id = "nadh_c"
+location = 0.002762079749728664
+scale = 0.1
+
+[[priors.unbalanced_metabolites.Evo04Evo01EP_m-6_e-B2]]
+target_id = "nadph_c"
+location = 0.03910393743885063
+scale = 0.1
+
+[[priors.unbalanced_metabolites.Evo04Evo01EP_m-6_e-B2]]
+target_id = "pep_c"
+location = 0.2449432921338227
+scale = 0.1
+
+[[priors.unbalanced_metabolites.Evo04Evo01EP_m-6_e-B2]]
+target_id = "r5p_c"
+location = 0.5549688020321867
+scale = 0.1
+
+[[priors.unbalanced_metabolites.Evo04Evo01EP_m-6_e-B2]]
+target_id = "pyr_c"
+location = 0.5
+scale = 2.0
+
+[[priors.unbalanced_metabolites.Evo04Evo01EP_m-6_e-B2]]
+target_id = "e4p_c"
+location = 0.5
+scale = 2.0
+
+[[priors.unbalanced_metabolites.Evo04Evo02EP_m-1_e-B1]]
+target_id = "adp_c"
+location = 0.5315871572171632
+scale = 0.1
+
+[[priors.unbalanced_metabolites.Evo04Evo02EP_m-1_e-B1]]
+target_id = "g6p_c"
+location = 4.169143118259728
+scale = 0.1
+
+[[priors.unbalanced_metabolites.Evo04Evo02EP_m-1_e-B1]]
+target_id = "nadh_c"
+location = 0.003545596104471979
+scale = 0.1
+
+[[priors.unbalanced_metabolites.Evo04Evo02EP_m-1_e-B1]]
+target_id = "nadph_c"
+location = 0.03810216113164088
+scale = 0.1
+
+[[priors.unbalanced_metabolites.Evo04Evo02EP_m-1_e-B1]]
+target_id = "pep_c"
+location = 0.2821239071287793
+scale = 0.1
+
+[[priors.unbalanced_metabolites.Evo04Evo02EP_m-1_e-B1]]
+target_id = "r5p_c"
+location = 0.3779625773944491
+scale = 0.1
+
+[[priors.unbalanced_metabolites.Evo04Evo02EP_m-1_e-B1]]
+target_id = "pyr_c"
+location = 0.5
+scale = 2.0
+
+[[priors.unbalanced_metabolites.Evo04Evo02EP_m-1_e-B1]]
+target_id = "e4p_c"
+location = 0.5
+scale = 2.0
+
+[[priors.unbalanced_metabolites.Evo04Evo02EP_m-1_e-B2]]
+target_id = "adp_c"
+location = 0.5315871572171632
+scale = 0.1
+
+[[priors.unbalanced_metabolites.Evo04Evo02EP_m-1_e-B2]]
+target_id = "g6p_c"
+location = 4.169143118259728
+scale = 0.1
+
+[[priors.unbalanced_metabolites.Evo04Evo02EP_m-1_e-B2]]
+target_id = "nadh_c"
+location = 0.003545596104471979
+scale = 0.1
+
+[[priors.unbalanced_metabolites.Evo04Evo02EP_m-1_e-B2]]
+target_id = "nadph_c"
+location = 0.03810216113164088
+scale = 0.1
+
+[[priors.unbalanced_metabolites.Evo04Evo02EP_m-1_e-B2]]
+target_id = "pep_c"
+location = 0.2821239071287793
+scale = 0.1
+
+[[priors.unbalanced_metabolites.Evo04Evo02EP_m-1_e-B2]]
+target_id = "r5p_c"
+location = 0.3779625773944491
+scale = 0.1
+
+[[priors.unbalanced_metabolites.Evo04Evo02EP_m-1_e-B2]]
+target_id = "pyr_c"
+location = 0.5
+scale = 2.0
+
+[[priors.unbalanced_metabolites.Evo04Evo02EP_m-1_e-B2]]
+target_id = "e4p_c"
+location = 0.5
+scale = 2.0
+
+[[priors.unbalanced_metabolites.Evo04Evo02EP_m-2_e-B1]]
+target_id = "adp_c"
+location = 0.7344100928387242
+scale = 0.1
+
+[[priors.unbalanced_metabolites.Evo04Evo02EP_m-2_e-B1]]
+target_id = "g6p_c"
+location = 2.45556737517058
+scale = 0.1
+
+[[priors.unbalanced_metabolites.Evo04Evo02EP_m-2_e-B1]]
+target_id = "nadh_c"
+location = 0.003020276767950541
+scale = 0.1
+
+[[priors.unbalanced_metabolites.Evo04Evo02EP_m-2_e-B1]]
+target_id = "nadph_c"
+location = 0.03758799667385722
+scale = 0.1
+
+[[priors.unbalanced_metabolites.Evo04Evo02EP_m-2_e-B1]]
+target_id = "pep_c"
+location = 0.2716107580702289
+scale = 0.1
+
+[[priors.unbalanced_metabolites.Evo04Evo02EP_m-2_e-B1]]
+target_id = "r5p_c"
+location = 0.3523705261638891
+scale = 0.1
+
+[[priors.unbalanced_metabolites.Evo04Evo02EP_m-2_e-B1]]
+target_id = "pyr_c"
+location = 0.5
+scale = 2.0
+
+[[priors.unbalanced_metabolites.Evo04Evo02EP_m-2_e-B1]]
+target_id = "e4p_c"
+location = 0.5
+scale = 2.0
+
+[[priors.unbalanced_metabolites.Evo04Evo02EP_m-2_e-B2]]
+target_id = "adp_c"
+location = 0.7344100928387242
+scale = 0.1
+
+[[priors.unbalanced_metabolites.Evo04Evo02EP_m-2_e-B2]]
+target_id = "g6p_c"
+location = 2.45556737517058
+scale = 0.1
+
+[[priors.unbalanced_metabolites.Evo04Evo02EP_m-2_e-B2]]
+target_id = "nadh_c"
+location = 0.003020276767950541
+scale = 0.1
+
+[[priors.unbalanced_metabolites.Evo04Evo02EP_m-2_e-B2]]
+target_id = "nadph_c"
+location = 0.03758799667385722
+scale = 0.1
+
+[[priors.unbalanced_metabolites.Evo04Evo02EP_m-2_e-B2]]
+target_id = "pep_c"
+location = 0.2716107580702289
+scale = 0.1
+
+[[priors.unbalanced_metabolites.Evo04Evo02EP_m-2_e-B2]]
+target_id = "r5p_c"
+location = 0.3523705261638891
+scale = 0.1
+
+[[priors.unbalanced_metabolites.Evo04Evo02EP_m-2_e-B2]]
+target_id = "pyr_c"
+location = 0.5
+scale = 2.0
+
+[[priors.unbalanced_metabolites.Evo04Evo02EP_m-2_e-B2]]
+target_id = "e4p_c"
+location = 0.5
+scale = 2.0
+
+[[priors.unbalanced_metabolites.Evo04Evo02EP_m-3_e-B1]]
+target_id = "adp_c"
+location = 0.5524932143710505
+scale = 0.1
+
+[[priors.unbalanced_metabolites.Evo04Evo02EP_m-3_e-B1]]
+target_id = "g6p_c"
+location = 2.125437689314747
+scale = 0.1
+
+[[priors.unbalanced_metabolites.Evo04Evo02EP_m-3_e-B1]]
+target_id = "nadh_c"
+location = 0.003385391184069195
+scale = 0.1
+
+[[priors.unbalanced_metabolites.Evo04Evo02EP_m-3_e-B1]]
+target_id = "nadph_c"
+location = 0.05854704682924673
+scale = 0.1
+
+[[priors.unbalanced_metabolites.Evo04Evo02EP_m-3_e-B1]]
+target_id = "pep_c"
+location = 0.2147297997564056
+scale = 0.1
+
+[[priors.unbalanced_metabolites.Evo04Evo02EP_m-3_e-B1]]
+target_id = "r5p_c"
+location = 0.5681783876844768
+scale = 0.1
+
+[[priors.unbalanced_metabolites.Evo04Evo02EP_m-3_e-B1]]
+target_id = "pyr_c"
+location = 0.5
+scale = 2.0
+
+[[priors.unbalanced_metabolites.Evo04Evo02EP_m-3_e-B1]]
+target_id = "e4p_c"
+location = 0.5
+scale = 2.0
+
+[[priors.unbalanced_metabolites.Evo04Evo02EP_m-3_e-B2]]
+target_id = "adp_c"
+location = 0.5524932143710505
+scale = 0.1
+
+[[priors.unbalanced_metabolites.Evo04Evo02EP_m-3_e-B2]]
+target_id = "g6p_c"
+location = 2.125437689314747
+scale = 0.1
+
+[[priors.unbalanced_metabolites.Evo04Evo02EP_m-3_e-B2]]
+target_id = "nadh_c"
+location = 0.003385391184069195
+scale = 0.1
+
+[[priors.unbalanced_metabolites.Evo04Evo02EP_m-3_e-B2]]
+target_id = "nadph_c"
+location = 0.05854704682924673
+scale = 0.1
+
+[[priors.unbalanced_metabolites.Evo04Evo02EP_m-3_e-B2]]
+target_id = "pep_c"
+location = 0.2147297997564056
+scale = 0.1
+
+[[priors.unbalanced_metabolites.Evo04Evo02EP_m-3_e-B2]]
+target_id = "r5p_c"
+location = 0.5681783876844768
+scale = 0.1
+
+[[priors.unbalanced_metabolites.Evo04Evo02EP_m-3_e-B2]]
+target_id = "pyr_c"
+location = 0.5
+scale = 2.0
+
+[[priors.unbalanced_metabolites.Evo04Evo02EP_m-3_e-B2]]
+target_id = "e4p_c"
+location = 0.5
+scale = 2.0
+
+[[priors.unbalanced_metabolites.Evo04Evo02EP_m-4_e-B1]]
+target_id = "adp_c"
+location = 0.5395281345011821
+scale = 0.1
+
+[[priors.unbalanced_metabolites.Evo04Evo02EP_m-4_e-B1]]
+target_id = "g6p_c"
+location = 2.049415715737728
+scale = 0.1
+
+[[priors.unbalanced_metabolites.Evo04Evo02EP_m-4_e-B1]]
+target_id = "nadh_c"
+location = 0.003662444747019865
+scale = 0.1
+
+[[priors.unbalanced_metabolites.Evo04Evo02EP_m-4_e-B1]]
+target_id = "nadph_c"
+location = 0.03749422820081005
+scale = 0.1
+
+[[priors.unbalanced_metabolites.Evo04Evo02EP_m-4_e-B1]]
+target_id = "pep_c"
+location = 0.2848908227683602
+scale = 0.1
+
+[[priors.unbalanced_metabolites.Evo04Evo02EP_m-4_e-B1]]
+target_id = "r5p_c"
+location = 0.3476598690687084
+scale = 0.1
+
+[[priors.unbalanced_metabolites.Evo04Evo02EP_m-4_e-B1]]
+target_id = "pyr_c"
+location = 0.5
+scale = 2.0
+
+[[priors.unbalanced_metabolites.Evo04Evo02EP_m-4_e-B1]]
+target_id = "e4p_c"
+location = 0.5
+scale = 2.0
+
+[[priors.unbalanced_metabolites.Evo04Evo02EP_m-4_e-B2]]
+target_id = "adp_c"
+location = 0.5395281345011821
+scale = 0.1
+
+[[priors.unbalanced_metabolites.Evo04Evo02EP_m-4_e-B2]]
+target_id = "g6p_c"
+location = 2.049415715737728
+scale = 0.1
+
+[[priors.unbalanced_metabolites.Evo04Evo02EP_m-4_e-B2]]
+target_id = "nadh_c"
+location = 0.003662444747019865
+scale = 0.1
+
+[[priors.unbalanced_metabolites.Evo04Evo02EP_m-4_e-B2]]
+target_id = "nadph_c"
+location = 0.03749422820081005
+scale = 0.1
+
+[[priors.unbalanced_metabolites.Evo04Evo02EP_m-4_e-B2]]
+target_id = "pep_c"
+location = 0.2848908227683602
+scale = 0.1
+
+[[priors.unbalanced_metabolites.Evo04Evo02EP_m-4_e-B2]]
+target_id = "r5p_c"
+location = 0.3476598690687084
+scale = 0.1
+
+[[priors.unbalanced_metabolites.Evo04Evo02EP_m-4_e-B2]]
+target_id = "pyr_c"
+location = 0.5
+scale = 2.0
+
+[[priors.unbalanced_metabolites.Evo04Evo02EP_m-4_e-B2]]
+target_id = "e4p_c"
+location = 0.5
+scale = 2.0
+
+[[priors.unbalanced_metabolites.Evo04Evo02EP_m-5_e-B1]]
+target_id = "adp_c"
+location = 0.7241334495690136
+scale = 0.1
+
+[[priors.unbalanced_metabolites.Evo04Evo02EP_m-5_e-B1]]
+target_id = "g6p_c"
+location = 4.409419946681371
+scale = 0.1
+
+[[priors.unbalanced_metabolites.Evo04Evo02EP_m-5_e-B1]]
+target_id = "nadh_c"
+location = 0.002667695872609713
+scale = 0.1
+
+[[priors.unbalanced_metabolites.Evo04Evo02EP_m-5_e-B1]]
+target_id = "nadph_c"
+location = 0.03863488160477443
+scale = 0.1
+
+[[priors.unbalanced_metabolites.Evo04Evo02EP_m-5_e-B1]]
+target_id = "pep_c"
+location = 0.2937410761647741
+scale = 0.1
+
+[[priors.unbalanced_metabolites.Evo04Evo02EP_m-5_e-B1]]
+target_id = "r5p_c"
+location = 0.3740984525011242
+scale = 0.1
+
+[[priors.unbalanced_metabolites.Evo04Evo02EP_m-5_e-B1]]
+target_id = "pyr_c"
+location = 0.5
+scale = 2.0
+
+[[priors.unbalanced_metabolites.Evo04Evo02EP_m-5_e-B1]]
+target_id = "e4p_c"
+location = 0.5
+scale = 2.0
+
+[[priors.unbalanced_metabolites.Evo04Evo02EP_m-5_e-B2]]
+target_id = "adp_c"
+location = 0.7241334495690136
+scale = 0.1
+
+[[priors.unbalanced_metabolites.Evo04Evo02EP_m-5_e-B2]]
+target_id = "g6p_c"
+location = 4.409419946681371
+scale = 0.1
+
+[[priors.unbalanced_metabolites.Evo04Evo02EP_m-5_e-B2]]
+target_id = "nadh_c"
+location = 0.002667695872609713
+scale = 0.1
+
+[[priors.unbalanced_metabolites.Evo04Evo02EP_m-5_e-B2]]
+target_id = "nadph_c"
+location = 0.03863488160477443
+scale = 0.1
+
+[[priors.unbalanced_metabolites.Evo04Evo02EP_m-5_e-B2]]
+target_id = "pep_c"
+location = 0.2937410761647741
+scale = 0.1
+
+[[priors.unbalanced_metabolites.Evo04Evo02EP_m-5_e-B2]]
+target_id = "r5p_c"
+location = 0.3740984525011242
+scale = 0.1
+
+[[priors.unbalanced_metabolites.Evo04Evo02EP_m-5_e-B2]]
+target_id = "pyr_c"
+location = 0.5
+scale = 2.0
+
+[[priors.unbalanced_metabolites.Evo04Evo02EP_m-5_e-B2]]
+target_id = "e4p_c"
+location = 0.5
+scale = 2.0
+
+[[priors.unbalanced_metabolites.Evo04Evo02EP_m-6_e-B1]]
+target_id = "adp_c"
+location = 0.480989673847055
+scale = 0.1
+
+[[priors.unbalanced_metabolites.Evo04Evo02EP_m-6_e-B1]]
+target_id = "g6p_c"
+location = 1.393615031767899
+scale = 0.1
+
+[[priors.unbalanced_metabolites.Evo04Evo02EP_m-6_e-B1]]
+target_id = "nadh_c"
+location = 0.004200658907543604
+scale = 0.1
+
+[[priors.unbalanced_metabolites.Evo04Evo02EP_m-6_e-B1]]
+target_id = "nadph_c"
+location = 0.04482441977979321
+scale = 0.1
+
+[[priors.unbalanced_metabolites.Evo04Evo02EP_m-6_e-B1]]
+target_id = "pep_c"
+location = 0.213937794966655
+scale = 0.1
+
+[[priors.unbalanced_metabolites.Evo04Evo02EP_m-6_e-B1]]
+target_id = "r5p_c"
+location = 0.5192687850155024
+scale = 0.1
+
+[[priors.unbalanced_metabolites.Evo04Evo02EP_m-6_e-B1]]
+target_id = "pyr_c"
+location = 0.5
+scale = 2.0
+
+[[priors.unbalanced_metabolites.Evo04Evo02EP_m-6_e-B1]]
+target_id = "e4p_c"
+location = 0.5
+scale = 2.0
+
+[[priors.unbalanced_metabolites.Evo04Evo02EP_m-6_e-B2]]
+target_id = "adp_c"
+location = 0.480989673847055
+scale = 0.1
+
+[[priors.unbalanced_metabolites.Evo04Evo02EP_m-6_e-B2]]
+target_id = "g6p_c"
+location = 1.393615031767899
+scale = 0.1
+
+[[priors.unbalanced_metabolites.Evo04Evo02EP_m-6_e-B2]]
+target_id = "nadh_c"
+location = 0.004200658907543604
+scale = 0.1
+
+[[priors.unbalanced_metabolites.Evo04Evo02EP_m-6_e-B2]]
+target_id = "nadph_c"
+location = 0.04482441977979321
+scale = 0.1
+
+[[priors.unbalanced_metabolites.Evo04Evo02EP_m-6_e-B2]]
+target_id = "pep_c"
+location = 0.213937794966655
+scale = 0.1
+
+[[priors.unbalanced_metabolites.Evo04Evo02EP_m-6_e-B2]]
+target_id = "r5p_c"
+location = 0.5192687850155024
+scale = 0.1
+
+[[priors.unbalanced_metabolites.Evo04Evo02EP_m-6_e-B2]]
+target_id = "pyr_c"
+location = 0.5
+scale = 2.0
+
+[[priors.unbalanced_metabolites.Evo04Evo02EP_m-6_e-B2]]
+target_id = "e4p_c"
+location = 0.5
+scale = 2.0
+
+[priors.enzymes]
+[[priors.enzymes.Evo04Evo01EP_m-1_e-B1]]
+target_id = "EDA"
+location = 0.01374963325953919
+scale = 0.1348093232134792
+
+[[priors.enzymes.Evo04Evo01EP_m-1_e-B1]]
+target_id = "EDD"
+location = 0.0007561214584135793
+scale = 0.5293044399552189
+
+[[priors.enzymes.Evo04Evo01EP_m-1_e-B1]]
+target_id = "ENO"
+location = 0.1905955270818375
+scale = 0.1383209170471876
+
+[[priors.enzymes.Evo04Evo01EP_m-1_e-B1]]
+target_id = "FBA"
+location = 0.07029224889720237
+scale = 0.1987634156333991
+
+[[priors.enzymes.Evo04Evo01EP_m-1_e-B1]]
+target_id = "FBP"
+location = 0.005502783015794894
+scale = 0.1487977277455778
+
+[[priors.enzymes.Evo04Evo01EP_m-1_e-B1]]
+target_id = "GAPD"
+location = 0.3016869537735476
+scale = 0.1878339945072058
+
+[[priors.enzymes.Evo04Evo01EP_m-1_e-B1]]
+target_id = "GND"
+location = 0.03223991753275838
+scale = 0.1482110113562903
+
+[[priors.enzymes.Evo04Evo01EP_m-1_e-B1]]
+target_id = "PGM"
+location = 0.04883552229249727
+scale = 0.1689310773461527
+
+[[priors.enzymes.Evo04Evo01EP_m-1_e-B1]]
+target_id = "PGI"
+location = 0.03387591231225262
+scale = 0.05962461512914246
+
+[[priors.enzymes.Evo04Evo01EP_m-1_e-B1]]
+target_id = "PGK"
+location = 0.1157176108741097
+scale = 0.1858510832762845
+
+[[priors.enzymes.Evo04Evo01EP_m-1_e-B1]]
+target_id = "PGL"
+location = 0.004099277146351874
+scale = 0.09421383029157467
+
+[[priors.enzymes.Evo04Evo01EP_m-1_e-B1]]
+target_id = "RPE"
+location = 0.004167802346239561
+scale = 0.0959233068193372
+
+[[priors.enzymes.Evo04Evo01EP_m-1_e-B1]]
+target_id = "RPI"
+location = 0.01057603505261598
+scale = 0.0383336758987155
+
+[[priors.enzymes.Evo04Evo01EP_m-1_e-B1]]
+target_id = "TALA"
+location = 0.05333916109250514
+scale = 0.1941272434499395
+
+[[priors.enzymes.Evo04Evo01EP_m-1_e-B1]]
+target_id = "TKT2"
+location = 0.02886215073377685
+scale = 0.07164760211238939
+
+[[priors.enzymes.Evo04Evo01EP_m-1_e-B1]]
+target_id = "TPI"
+location = 0.01668582959518094
+scale = 0.07638364268359348
+
+[[priors.enzymes.Evo04Evo01EP_m-1_e-B1]]
+target_id = "G6PDH2r"
+location = 0.01050550030116524
+scale = 0.04685481731416075
+
+[[priors.enzymes.Evo04Evo01EP_m-1_e-B1]]
+target_id = "TKT1"
+location = 0.02886215073377685
+scale = 0.07164760211238939
+
+[[priors.enzymes.Evo04Evo01EP_m-1_e-B2]]
+target_id = "EDA"
+location = 0.01682227330413945
+scale = 0.09407277596219259
+
+[[priors.enzymes.Evo04Evo01EP_m-1_e-B2]]
+target_id = "EDD"
+location = 0.001157204758563865
+scale = 0.3361843821516446
+
+[[priors.enzymes.Evo04Evo01EP_m-1_e-B2]]
+target_id = "ENO"
+location = 0.177011883859132
+scale = 0.213536665511748
+
+[[priors.enzymes.Evo04Evo01EP_m-1_e-B2]]
+target_id = "FBA"
+location = 0.07062628615123984
+scale = 0.06208004632330405
+
+[[priors.enzymes.Evo04Evo01EP_m-1_e-B2]]
+target_id = "FBP"
+location = 0.005922909500492
+scale = 0.04698117495381678
+
+[[priors.enzymes.Evo04Evo01EP_m-1_e-B2]]
+target_id = "GAPD"
+location = 0.267441535802706
+scale = 0.140024827461143
+
+[[priors.enzymes.Evo04Evo01EP_m-1_e-B2]]
+target_id = "GND"
+location = 0.03745924004214481
+scale = 0.1988444818086466
+
+[[priors.enzymes.Evo04Evo01EP_m-1_e-B2]]
+target_id = "PGM"
+location = 0.05440418809674039
+scale = 0.1823481554820609
+
+[[priors.enzymes.Evo04Evo01EP_m-1_e-B2]]
+target_id = "PGI"
+location = 0.03289905944292722
+scale = 0.02139218000798766
+
+[[priors.enzymes.Evo04Evo01EP_m-1_e-B2]]
+target_id = "PGK"
+location = 0.08730599984602698
+scale = 0.1418240288896284
+
+[[priors.enzymes.Evo04Evo01EP_m-1_e-B2]]
+target_id = "PGL"
+location = 0.004958323100883351
+scale = 0.06884955568086991
+
+[[priors.enzymes.Evo04Evo01EP_m-1_e-B2]]
+target_id = "RPE"
+location = 0.004073221843828366
+scale = 0.08950526319884641
+
+[[priors.enzymes.Evo04Evo01EP_m-1_e-B2]]
+target_id = "RPI"
+location = 0.01094305936607868
+scale = 0.05668089737003713
+
+[[priors.enzymes.Evo04Evo01EP_m-1_e-B2]]
+target_id = "TALA"
+location = 0.05162830503792652
+scale = 0.1301183081195095
+
+[[priors.enzymes.Evo04Evo01EP_m-1_e-B2]]
+target_id = "TKT2"
+location = 0.02755022802731761
+scale = 0.02729475251120398
+
+[[priors.enzymes.Evo04Evo01EP_m-1_e-B2]]
+target_id = "TPI"
+location = 0.02294372284336806
+scale = 0.1445872044139148
+
+[[priors.enzymes.Evo04Evo01EP_m-1_e-B2]]
+target_id = "G6PDH2r"
+location = 0.01120855655096314
+scale = 0.10417371637146
+
+[[priors.enzymes.Evo04Evo01EP_m-1_e-B2]]
+target_id = "TKT1"
+location = 0.02755022802731761
+scale = 0.02729475251120398
+
+[[priors.enzymes.Evo04Evo01EP_m-2_e-B1]]
+target_id = "EDA"
+location = 0.01374963325953919
+scale = 0.1348093232134792
+
+[[priors.enzymes.Evo04Evo01EP_m-2_e-B1]]
+target_id = "EDD"
+location = 0.0007561214584135793
+scale = 0.5293044399552189
+
+[[priors.enzymes.Evo04Evo01EP_m-2_e-B1]]
+target_id = "ENO"
+location = 0.1905955270818375
+scale = 0.1383209170471876
+
+[[priors.enzymes.Evo04Evo01EP_m-2_e-B1]]
+target_id = "FBA"
+location = 0.07029224889720237
+scale = 0.1987634156333991
+
+[[priors.enzymes.Evo04Evo01EP_m-2_e-B1]]
+target_id = "FBP"
+location = 0.005502783015794894
+scale = 0.1487977277455778
+
+[[priors.enzymes.Evo04Evo01EP_m-2_e-B1]]
+target_id = "GAPD"
+location = 0.3016869537735476
+scale = 0.1878339945072058
+
+[[priors.enzymes.Evo04Evo01EP_m-2_e-B1]]
+target_id = "GND"
+location = 0.03223991753275838
+scale = 0.1482110113562903
+
+[[priors.enzymes.Evo04Evo01EP_m-2_e-B1]]
+target_id = "PGM"
+location = 0.04883552229249727
+scale = 0.1689310773461527
+
+[[priors.enzymes.Evo04Evo01EP_m-2_e-B1]]
+target_id = "PGI"
+location = 0.03387591231225262
+scale = 0.05962461512914246
+
+[[priors.enzymes.Evo04Evo01EP_m-2_e-B1]]
+target_id = "PGK"
+location = 0.1157176108741097
+scale = 0.1858510832762845
+
+[[priors.enzymes.Evo04Evo01EP_m-2_e-B1]]
+target_id = "PGL"
+location = 0.004099277146351874
+scale = 0.09421383029157467
+
+[[priors.enzymes.Evo04Evo01EP_m-2_e-B1]]
+target_id = "RPE"
+location = 0.004167802346239561
+scale = 0.0959233068193372
+
+[[priors.enzymes.Evo04Evo01EP_m-2_e-B1]]
+target_id = "RPI"
+location = 0.01057603505261598
+scale = 0.0383336758987155
+
+[[priors.enzymes.Evo04Evo01EP_m-2_e-B1]]
+target_id = "TALA"
+location = 0.05333916109250514
+scale = 0.1941272434499395
+
+[[priors.enzymes.Evo04Evo01EP_m-2_e-B1]]
+target_id = "TKT2"
+location = 0.02886215073377685
+scale = 0.07164760211238939
+
+[[priors.enzymes.Evo04Evo01EP_m-2_e-B1]]
+target_id = "TPI"
+location = 0.01668582959518094
+scale = 0.07638364268359348
+
+[[priors.enzymes.Evo04Evo01EP_m-2_e-B1]]
+target_id = "G6PDH2r"
+location = 0.01050550030116524
+scale = 0.04685481731416075
+
+[[priors.enzymes.Evo04Evo01EP_m-2_e-B1]]
+target_id = "TKT1"
+location = 0.02886215073377685
+scale = 0.07164760211238939
+
+[[priors.enzymes.Evo04Evo01EP_m-2_e-B2]]
+target_id = "EDA"
+location = 0.01682227330413945
+scale = 0.09407277596219259
+
+[[priors.enzymes.Evo04Evo01EP_m-2_e-B2]]
+target_id = "EDD"
+location = 0.001157204758563865
+scale = 0.3361843821516446
+
+[[priors.enzymes.Evo04Evo01EP_m-2_e-B2]]
+target_id = "ENO"
+location = 0.177011883859132
+scale = 0.213536665511748
+
+[[priors.enzymes.Evo04Evo01EP_m-2_e-B2]]
+target_id = "FBA"
+location = 0.07062628615123984
+scale = 0.06208004632330405
+
+[[priors.enzymes.Evo04Evo01EP_m-2_e-B2]]
+target_id = "FBP"
+location = 0.005922909500492
+scale = 0.04698117495381678
+
+[[priors.enzymes.Evo04Evo01EP_m-2_e-B2]]
+target_id = "GAPD"
+location = 0.267441535802706
+scale = 0.140024827461143
+
+[[priors.enzymes.Evo04Evo01EP_m-2_e-B2]]
+target_id = "GND"
+location = 0.03745924004214481
+scale = 0.1988444818086466
+
+[[priors.enzymes.Evo04Evo01EP_m-2_e-B2]]
+target_id = "PGM"
+location = 0.05440418809674039
+scale = 0.1823481554820609
+
+[[priors.enzymes.Evo04Evo01EP_m-2_e-B2]]
+target_id = "PGI"
+location = 0.03289905944292722
+scale = 0.02139218000798766
+
+[[priors.enzymes.Evo04Evo01EP_m-2_e-B2]]
+target_id = "PGK"
+location = 0.08730599984602698
+scale = 0.1418240288896284
+
+[[priors.enzymes.Evo04Evo01EP_m-2_e-B2]]
+target_id = "PGL"
+location = 0.004958323100883351
+scale = 0.06884955568086991
+
+[[priors.enzymes.Evo04Evo01EP_m-2_e-B2]]
+target_id = "RPE"
+location = 0.004073221843828366
+scale = 0.08950526319884641
+
+[[priors.enzymes.Evo04Evo01EP_m-2_e-B2]]
+target_id = "RPI"
+location = 0.01094305936607868
+scale = 0.05668089737003713
+
+[[priors.enzymes.Evo04Evo01EP_m-2_e-B2]]
+target_id = "TALA"
+location = 0.05162830503792652
+scale = 0.1301183081195095
+
+[[priors.enzymes.Evo04Evo01EP_m-2_e-B2]]
+target_id = "TKT2"
+location = 0.02755022802731761
+scale = 0.02729475251120398
+
+[[priors.enzymes.Evo04Evo01EP_m-2_e-B2]]
+target_id = "TPI"
+location = 0.02294372284336806
+scale = 0.1445872044139148
+
+[[priors.enzymes.Evo04Evo01EP_m-2_e-B2]]
+target_id = "G6PDH2r"
+location = 0.01120855655096314
+scale = 0.10417371637146
+
+[[priors.enzymes.Evo04Evo01EP_m-2_e-B2]]
+target_id = "TKT1"
+location = 0.02755022802731761
+scale = 0.02729475251120398
+
+[[priors.enzymes.Evo04Evo01EP_m-3_e-B1]]
+target_id = "EDA"
+location = 0.01374963325953919
+scale = 0.1348093232134792
+
+[[priors.enzymes.Evo04Evo01EP_m-3_e-B1]]
+target_id = "EDD"
+location = 0.0007561214584135793
+scale = 0.5293044399552189
+
+[[priors.enzymes.Evo04Evo01EP_m-3_e-B1]]
+target_id = "ENO"
+location = 0.1905955270818375
+scale = 0.1383209170471876
+
+[[priors.enzymes.Evo04Evo01EP_m-3_e-B1]]
+target_id = "FBA"
+location = 0.07029224889720237
+scale = 0.1987634156333991
+
+[[priors.enzymes.Evo04Evo01EP_m-3_e-B1]]
+target_id = "FBP"
+location = 0.005502783015794894
+scale = 0.1487977277455778
+
+[[priors.enzymes.Evo04Evo01EP_m-3_e-B1]]
+target_id = "GAPD"
+location = 0.3016869537735476
+scale = 0.1878339945072058
+
+[[priors.enzymes.Evo04Evo01EP_m-3_e-B1]]
+target_id = "GND"
+location = 0.03223991753275838
+scale = 0.1482110113562903
+
+[[priors.enzymes.Evo04Evo01EP_m-3_e-B1]]
+target_id = "PGM"
+location = 0.04883552229249727
+scale = 0.1689310773461527
+
+[[priors.enzymes.Evo04Evo01EP_m-3_e-B1]]
+target_id = "PGI"
+location = 0.03387591231225262
+scale = 0.05962461512914246
+
+[[priors.enzymes.Evo04Evo01EP_m-3_e-B1]]
+target_id = "PGK"
+location = 0.1157176108741097
+scale = 0.1858510832762845
+
+[[priors.enzymes.Evo04Evo01EP_m-3_e-B1]]
+target_id = "PGL"
+location = 0.004099277146351874
+scale = 0.09421383029157467
+
+[[priors.enzymes.Evo04Evo01EP_m-3_e-B1]]
+target_id = "RPE"
+location = 0.004167802346239561
+scale = 0.0959233068193372
+
+[[priors.enzymes.Evo04Evo01EP_m-3_e-B1]]
+target_id = "RPI"
+location = 0.01057603505261598
+scale = 0.0383336758987155
+
+[[priors.enzymes.Evo04Evo01EP_m-3_e-B1]]
+target_id = "TALA"
+location = 0.05333916109250514
+scale = 0.1941272434499395
+
+[[priors.enzymes.Evo04Evo01EP_m-3_e-B1]]
+target_id = "TKT2"
+location = 0.02886215073377685
+scale = 0.07164760211238939
+
+[[priors.enzymes.Evo04Evo01EP_m-3_e-B1]]
+target_id = "TPI"
+location = 0.01668582959518094
+scale = 0.07638364268359348
+
+[[priors.enzymes.Evo04Evo01EP_m-3_e-B1]]
+target_id = "G6PDH2r"
+location = 0.01050550030116524
+scale = 0.04685481731416075
+
+[[priors.enzymes.Evo04Evo01EP_m-3_e-B1]]
+target_id = "TKT1"
+location = 0.02886215073377685
+scale = 0.07164760211238939
+
+[[priors.enzymes.Evo04Evo01EP_m-3_e-B2]]
+target_id = "EDA"
+location = 0.01682227330413945
+scale = 0.09407277596219259
+
+[[priors.enzymes.Evo04Evo01EP_m-3_e-B2]]
+target_id = "EDD"
+location = 0.001157204758563865
+scale = 0.3361843821516446
+
+[[priors.enzymes.Evo04Evo01EP_m-3_e-B2]]
+target_id = "ENO"
+location = 0.177011883859132
+scale = 0.213536665511748
+
+[[priors.enzymes.Evo04Evo01EP_m-3_e-B2]]
+target_id = "FBA"
+location = 0.07062628615123984
+scale = 0.06208004632330405
+
+[[priors.enzymes.Evo04Evo01EP_m-3_e-B2]]
+target_id = "FBP"
+location = 0.005922909500492
+scale = 0.04698117495381678
+
+[[priors.enzymes.Evo04Evo01EP_m-3_e-B2]]
+target_id = "GAPD"
+location = 0.267441535802706
+scale = 0.140024827461143
+
+[[priors.enzymes.Evo04Evo01EP_m-3_e-B2]]
+target_id = "GND"
+location = 0.03745924004214481
+scale = 0.1988444818086466
+
+[[priors.enzymes.Evo04Evo01EP_m-3_e-B2]]
+target_id = "PGM"
+location = 0.05440418809674039
+scale = 0.1823481554820609
+
+[[priors.enzymes.Evo04Evo01EP_m-3_e-B2]]
+target_id = "PGI"
+location = 0.03289905944292722
+scale = 0.02139218000798766
+
+[[priors.enzymes.Evo04Evo01EP_m-3_e-B2]]
+target_id = "PGK"
+location = 0.08730599984602698
+scale = 0.1418240288896284
+
+[[priors.enzymes.Evo04Evo01EP_m-3_e-B2]]
+target_id = "PGL"
+location = 0.004958323100883351
+scale = 0.06884955568086991
+
+[[priors.enzymes.Evo04Evo01EP_m-3_e-B2]]
+target_id = "RPE"
+location = 0.004073221843828366
+scale = 0.08950526319884641
+
+[[priors.enzymes.Evo04Evo01EP_m-3_e-B2]]
+target_id = "RPI"
+location = 0.01094305936607868
+scale = 0.05668089737003713
+
+[[priors.enzymes.Evo04Evo01EP_m-3_e-B2]]
+target_id = "TALA"
+location = 0.05162830503792652
+scale = 0.1301183081195095
+
+[[priors.enzymes.Evo04Evo01EP_m-3_e-B2]]
+target_id = "TKT2"
+location = 0.02755022802731761
+scale = 0.02729475251120398
+
+[[priors.enzymes.Evo04Evo01EP_m-3_e-B2]]
+target_id = "TPI"
+location = 0.02294372284336806
+scale = 0.1445872044139148
+
+[[priors.enzymes.Evo04Evo01EP_m-3_e-B2]]
+target_id = "G6PDH2r"
+location = 0.01120855655096314
+scale = 0.10417371637146
+
+[[priors.enzymes.Evo04Evo01EP_m-3_e-B2]]
+target_id = "TKT1"
+location = 0.02755022802731761
+scale = 0.02729475251120398
+
+[[priors.enzymes.Evo04Evo01EP_m-4_e-B1]]
+target_id = "EDA"
+location = 0.01374963325953919
+scale = 0.1348093232134792
+
+[[priors.enzymes.Evo04Evo01EP_m-4_e-B1]]
+target_id = "EDD"
+location = 0.0007561214584135793
+scale = 0.5293044399552189
+
+[[priors.enzymes.Evo04Evo01EP_m-4_e-B1]]
+target_id = "ENO"
+location = 0.1905955270818375
+scale = 0.1383209170471876
+
+[[priors.enzymes.Evo04Evo01EP_m-4_e-B1]]
+target_id = "FBA"
+location = 0.07029224889720237
+scale = 0.1987634156333991
+
+[[priors.enzymes.Evo04Evo01EP_m-4_e-B1]]
+target_id = "FBP"
+location = 0.005502783015794894
+scale = 0.1487977277455778
+
+[[priors.enzymes.Evo04Evo01EP_m-4_e-B1]]
+target_id = "GAPD"
+location = 0.3016869537735476
+scale = 0.1878339945072058
+
+[[priors.enzymes.Evo04Evo01EP_m-4_e-B1]]
+target_id = "GND"
+location = 0.03223991753275838
+scale = 0.1482110113562903
+
+[[priors.enzymes.Evo04Evo01EP_m-4_e-B1]]
+target_id = "PGM"
+location = 0.04883552229249727
+scale = 0.1689310773461527
+
+[[priors.enzymes.Evo04Evo01EP_m-4_e-B1]]
+target_id = "PGI"
+location = 0.03387591231225262
+scale = 0.05962461512914246
+
+[[priors.enzymes.Evo04Evo01EP_m-4_e-B1]]
+target_id = "PGK"
+location = 0.1157176108741097
+scale = 0.1858510832762845
+
+[[priors.enzymes.Evo04Evo01EP_m-4_e-B1]]
+target_id = "PGL"
+location = 0.004099277146351874
+scale = 0.09421383029157467
+
+[[priors.enzymes.Evo04Evo01EP_m-4_e-B1]]
+target_id = "RPE"
+location = 0.004167802346239561
+scale = 0.0959233068193372
+
+[[priors.enzymes.Evo04Evo01EP_m-4_e-B1]]
+target_id = "RPI"
+location = 0.01057603505261598
+scale = 0.0383336758987155
+
+[[priors.enzymes.Evo04Evo01EP_m-4_e-B1]]
+target_id = "TALA"
+location = 0.05333916109250514
+scale = 0.1941272434499395
+
+[[priors.enzymes.Evo04Evo01EP_m-4_e-B1]]
+target_id = "TKT2"
+location = 0.02886215073377685
+scale = 0.07164760211238939
+
+[[priors.enzymes.Evo04Evo01EP_m-4_e-B1]]
+target_id = "TPI"
+location = 0.01668582959518094
+scale = 0.07638364268359348
+
+[[priors.enzymes.Evo04Evo01EP_m-4_e-B1]]
+target_id = "G6PDH2r"
+location = 0.01050550030116524
+scale = 0.04685481731416075
+
+[[priors.enzymes.Evo04Evo01EP_m-4_e-B1]]
+target_id = "TKT1"
+location = 0.02886215073377685
+scale = 0.07164760211238939
+
+[[priors.enzymes.Evo04Evo01EP_m-4_e-B2]]
+target_id = "EDA"
+location = 0.01682227330413945
+scale = 0.09407277596219259
+
+[[priors.enzymes.Evo04Evo01EP_m-4_e-B2]]
+target_id = "EDD"
+location = 0.001157204758563865
+scale = 0.3361843821516446
+
+[[priors.enzymes.Evo04Evo01EP_m-4_e-B2]]
+target_id = "ENO"
+location = 0.177011883859132
+scale = 0.213536665511748
+
+[[priors.enzymes.Evo04Evo01EP_m-4_e-B2]]
+target_id = "FBA"
+location = 0.07062628615123984
+scale = 0.06208004632330405
+
+[[priors.enzymes.Evo04Evo01EP_m-4_e-B2]]
+target_id = "FBP"
+location = 0.005922909500492
+scale = 0.04698117495381678
+
+[[priors.enzymes.Evo04Evo01EP_m-4_e-B2]]
+target_id = "GAPD"
+location = 0.267441535802706
+scale = 0.140024827461143
+
+[[priors.enzymes.Evo04Evo01EP_m-4_e-B2]]
+target_id = "GND"
+location = 0.03745924004214481
+scale = 0.1988444818086466
+
+[[priors.enzymes.Evo04Evo01EP_m-4_e-B2]]
+target_id = "PGM"
+location = 0.05440418809674039
+scale = 0.1823481554820609
+
+[[priors.enzymes.Evo04Evo01EP_m-4_e-B2]]
+target_id = "PGI"
+location = 0.03289905944292722
+scale = 0.02139218000798766
+
+[[priors.enzymes.Evo04Evo01EP_m-4_e-B2]]
+target_id = "PGK"
+location = 0.08730599984602698
+scale = 0.1418240288896284
+
+[[priors.enzymes.Evo04Evo01EP_m-4_e-B2]]
+target_id = "PGL"
+location = 0.004958323100883351
+scale = 0.06884955568086991
+
+[[priors.enzymes.Evo04Evo01EP_m-4_e-B2]]
+target_id = "RPE"
+location = 0.004073221843828366
+scale = 0.08950526319884641
+
+[[priors.enzymes.Evo04Evo01EP_m-4_e-B2]]
+target_id = "RPI"
+location = 0.01094305936607868
+scale = 0.05668089737003713
+
+[[priors.enzymes.Evo04Evo01EP_m-4_e-B2]]
+target_id = "TALA"
+location = 0.05162830503792652
+scale = 0.1301183081195095
+
+[[priors.enzymes.Evo04Evo01EP_m-4_e-B2]]
+target_id = "TKT2"
+location = 0.02755022802731761
+scale = 0.02729475251120398
+
+[[priors.enzymes.Evo04Evo01EP_m-4_e-B2]]
+target_id = "TPI"
+location = 0.02294372284336806
+scale = 0.1445872044139148
+
+[[priors.enzymes.Evo04Evo01EP_m-4_e-B2]]
+target_id = "G6PDH2r"
+location = 0.01120855655096314
+scale = 0.10417371637146
+
+[[priors.enzymes.Evo04Evo01EP_m-4_e-B2]]
+target_id = "TKT1"
+location = 0.02755022802731761
+scale = 0.02729475251120398
+
+[[priors.enzymes.Evo04Evo01EP_m-5_e-B1]]
+target_id = "EDA"
+location = 0.01374963325953919
+scale = 0.1348093232134792
+
+[[priors.enzymes.Evo04Evo01EP_m-5_e-B1]]
+target_id = "EDD"
+location = 0.0007561214584135793
+scale = 0.5293044399552189
+
+[[priors.enzymes.Evo04Evo01EP_m-5_e-B1]]
+target_id = "ENO"
+location = 0.1905955270818375
+scale = 0.1383209170471876
+
+[[priors.enzymes.Evo04Evo01EP_m-5_e-B1]]
+target_id = "FBA"
+location = 0.07029224889720237
+scale = 0.1987634156333991
+
+[[priors.enzymes.Evo04Evo01EP_m-5_e-B1]]
+target_id = "FBP"
+location = 0.005502783015794894
+scale = 0.1487977277455778
+
+[[priors.enzymes.Evo04Evo01EP_m-5_e-B1]]
+target_id = "GAPD"
+location = 0.3016869537735476
+scale = 0.1878339945072058
+
+[[priors.enzymes.Evo04Evo01EP_m-5_e-B1]]
+target_id = "GND"
+location = 0.03223991753275838
+scale = 0.1482110113562903
+
+[[priors.enzymes.Evo04Evo01EP_m-5_e-B1]]
+target_id = "PGM"
+location = 0.04883552229249727
+scale = 0.1689310773461527
+
+[[priors.enzymes.Evo04Evo01EP_m-5_e-B1]]
+target_id = "PGI"
+location = 0.03387591231225262
+scale = 0.05962461512914246
+
+[[priors.enzymes.Evo04Evo01EP_m-5_e-B1]]
+target_id = "PGK"
+location = 0.1157176108741097
+scale = 0.1858510832762845
+
+[[priors.enzymes.Evo04Evo01EP_m-5_e-B1]]
+target_id = "PGL"
+location = 0.004099277146351874
+scale = 0.09421383029157467
+
+[[priors.enzymes.Evo04Evo01EP_m-5_e-B1]]
+target_id = "RPE"
+location = 0.004167802346239561
+scale = 0.0959233068193372
+
+[[priors.enzymes.Evo04Evo01EP_m-5_e-B1]]
+target_id = "RPI"
+location = 0.01057603505261598
+scale = 0.0383336758987155
+
+[[priors.enzymes.Evo04Evo01EP_m-5_e-B1]]
+target_id = "TALA"
+location = 0.05333916109250514
+scale = 0.1941272434499395
+
+[[priors.enzymes.Evo04Evo01EP_m-5_e-B1]]
+target_id = "TKT2"
+location = 0.02886215073377685
+scale = 0.07164760211238939
+
+[[priors.enzymes.Evo04Evo01EP_m-5_e-B1]]
+target_id = "TPI"
+location = 0.01668582959518094
+scale = 0.07638364268359348
+
+[[priors.enzymes.Evo04Evo01EP_m-5_e-B1]]
+target_id = "G6PDH2r"
+location = 0.01050550030116524
+scale = 0.04685481731416075
+
+[[priors.enzymes.Evo04Evo01EP_m-5_e-B1]]
+target_id = "TKT1"
+location = 0.02886215073377685
+scale = 0.07164760211238939
+
+[[priors.enzymes.Evo04Evo01EP_m-5_e-B2]]
+target_id = "EDA"
+location = 0.01682227330413945
+scale = 0.09407277596219259
+
+[[priors.enzymes.Evo04Evo01EP_m-5_e-B2]]
+target_id = "EDD"
+location = 0.001157204758563865
+scale = 0.3361843821516446
+
+[[priors.enzymes.Evo04Evo01EP_m-5_e-B2]]
+target_id = "ENO"
+location = 0.177011883859132
+scale = 0.213536665511748
+
+[[priors.enzymes.Evo04Evo01EP_m-5_e-B2]]
+target_id = "FBA"
+location = 0.07062628615123984
+scale = 0.06208004632330405
+
+[[priors.enzymes.Evo04Evo01EP_m-5_e-B2]]
+target_id = "FBP"
+location = 0.005922909500492
+scale = 0.04698117495381678
+
+[[priors.enzymes.Evo04Evo01EP_m-5_e-B2]]
+target_id = "GAPD"
+location = 0.267441535802706
+scale = 0.140024827461143
+
+[[priors.enzymes.Evo04Evo01EP_m-5_e-B2]]
+target_id = "GND"
+location = 0.03745924004214481
+scale = 0.1988444818086466
+
+[[priors.enzymes.Evo04Evo01EP_m-5_e-B2]]
+target_id = "PGM"
+location = 0.05440418809674039
+scale = 0.1823481554820609
+
+[[priors.enzymes.Evo04Evo01EP_m-5_e-B2]]
+target_id = "PGI"
+location = 0.03289905944292722
+scale = 0.02139218000798766
+
+[[priors.enzymes.Evo04Evo01EP_m-5_e-B2]]
+target_id = "PGK"
+location = 0.08730599984602698
+scale = 0.1418240288896284
+
+[[priors.enzymes.Evo04Evo01EP_m-5_e-B2]]
+target_id = "PGL"
+location = 0.004958323100883351
+scale = 0.06884955568086991
+
+[[priors.enzymes.Evo04Evo01EP_m-5_e-B2]]
+target_id = "RPE"
+location = 0.004073221843828366
+scale = 0.08950526319884641
+
+[[priors.enzymes.Evo04Evo01EP_m-5_e-B2]]
+target_id = "RPI"
+location = 0.01094305936607868
+scale = 0.05668089737003713
+
+[[priors.enzymes.Evo04Evo01EP_m-5_e-B2]]
+target_id = "TALA"
+location = 0.05162830503792652
+scale = 0.1301183081195095
+
+[[priors.enzymes.Evo04Evo01EP_m-5_e-B2]]
+target_id = "TKT2"
+location = 0.02755022802731761
+scale = 0.02729475251120398
+
+[[priors.enzymes.Evo04Evo01EP_m-5_e-B2]]
+target_id = "TPI"
+location = 0.02294372284336806
+scale = 0.1445872044139148
+
+[[priors.enzymes.Evo04Evo01EP_m-5_e-B2]]
+target_id = "G6PDH2r"
+location = 0.01120855655096314
+scale = 0.10417371637146
+
+[[priors.enzymes.Evo04Evo01EP_m-5_e-B2]]
+target_id = "TKT1"
+location = 0.02755022802731761
+scale = 0.02729475251120398
+
+[[priors.enzymes.Evo04Evo01EP_m-6_e-B1]]
+target_id = "EDA"
+location = 0.01374963325953919
+scale = 0.1348093232134792
+
+[[priors.enzymes.Evo04Evo01EP_m-6_e-B1]]
+target_id = "EDD"
+location = 0.0007561214584135793
+scale = 0.5293044399552189
+
+[[priors.enzymes.Evo04Evo01EP_m-6_e-B1]]
+target_id = "ENO"
+location = 0.1905955270818375
+scale = 0.1383209170471876
+
+[[priors.enzymes.Evo04Evo01EP_m-6_e-B1]]
+target_id = "FBA"
+location = 0.07029224889720237
+scale = 0.1987634156333991
+
+[[priors.enzymes.Evo04Evo01EP_m-6_e-B1]]
+target_id = "FBP"
+location = 0.005502783015794894
+scale = 0.1487977277455778
+
+[[priors.enzymes.Evo04Evo01EP_m-6_e-B1]]
+target_id = "GAPD"
+location = 0.3016869537735476
+scale = 0.1878339945072058
+
+[[priors.enzymes.Evo04Evo01EP_m-6_e-B1]]
+target_id = "GND"
+location = 0.03223991753275838
+scale = 0.1482110113562903
+
+[[priors.enzymes.Evo04Evo01EP_m-6_e-B1]]
+target_id = "PGM"
+location = 0.04883552229249727
+scale = 0.1689310773461527
+
+[[priors.enzymes.Evo04Evo01EP_m-6_e-B1]]
+target_id = "PGI"
+location = 0.03387591231225262
+scale = 0.05962461512914246
+
+[[priors.enzymes.Evo04Evo01EP_m-6_e-B1]]
+target_id = "PGK"
+location = 0.1157176108741097
+scale = 0.1858510832762845
+
+[[priors.enzymes.Evo04Evo01EP_m-6_e-B1]]
+target_id = "PGL"
+location = 0.004099277146351874
+scale = 0.09421383029157467
+
+[[priors.enzymes.Evo04Evo01EP_m-6_e-B1]]
+target_id = "RPE"
+location = 0.004167802346239561
+scale = 0.0959233068193372
+
+[[priors.enzymes.Evo04Evo01EP_m-6_e-B1]]
+target_id = "RPI"
+location = 0.01057603505261598
+scale = 0.0383336758987155
+
+[[priors.enzymes.Evo04Evo01EP_m-6_e-B1]]
+target_id = "TALA"
+location = 0.05333916109250514
+scale = 0.1941272434499395
+
+[[priors.enzymes.Evo04Evo01EP_m-6_e-B1]]
+target_id = "TKT2"
+location = 0.02886215073377685
+scale = 0.07164760211238939
+
+[[priors.enzymes.Evo04Evo01EP_m-6_e-B1]]
+target_id = "TPI"
+location = 0.01668582959518094
+scale = 0.07638364268359348
+
+[[priors.enzymes.Evo04Evo01EP_m-6_e-B1]]
+target_id = "G6PDH2r"
+location = 0.01050550030116524
+scale = 0.04685481731416075
+
+[[priors.enzymes.Evo04Evo01EP_m-6_e-B1]]
+target_id = "TKT1"
+location = 0.02886215073377685
+scale = 0.07164760211238939
+
+[[priors.enzymes.Evo04Evo01EP_m-6_e-B2]]
+target_id = "EDA"
+location = 0.01682227330413945
+scale = 0.09407277596219259
+
+[[priors.enzymes.Evo04Evo01EP_m-6_e-B2]]
+target_id = "EDD"
+location = 0.001157204758563865
+scale = 0.3361843821516446
+
+[[priors.enzymes.Evo04Evo01EP_m-6_e-B2]]
+target_id = "ENO"
+location = 0.177011883859132
+scale = 0.213536665511748
+
+[[priors.enzymes.Evo04Evo01EP_m-6_e-B2]]
+target_id = "FBA"
+location = 0.07062628615123984
+scale = 0.06208004632330405
+
+[[priors.enzymes.Evo04Evo01EP_m-6_e-B2]]
+target_id = "FBP"
+location = 0.005922909500492
+scale = 0.04698117495381678
+
+[[priors.enzymes.Evo04Evo01EP_m-6_e-B2]]
+target_id = "GAPD"
+location = 0.267441535802706
+scale = 0.140024827461143
+
+[[priors.enzymes.Evo04Evo01EP_m-6_e-B2]]
+target_id = "GND"
+location = 0.03745924004214481
+scale = 0.1988444818086466
+
+[[priors.enzymes.Evo04Evo01EP_m-6_e-B2]]
+target_id = "PGM"
+location = 0.05440418809674039
+scale = 0.1823481554820609
+
+[[priors.enzymes.Evo04Evo01EP_m-6_e-B2]]
+target_id = "PGI"
+location = 0.03289905944292722
+scale = 0.02139218000798766
+
+[[priors.enzymes.Evo04Evo01EP_m-6_e-B2]]
+target_id = "PGK"
+location = 0.08730599984602698
+scale = 0.1418240288896284
+
+[[priors.enzymes.Evo04Evo01EP_m-6_e-B2]]
+target_id = "PGL"
+location = 0.004958323100883351
+scale = 0.06884955568086991
+
+[[priors.enzymes.Evo04Evo01EP_m-6_e-B2]]
+target_id = "RPE"
+location = 0.004073221843828366
+scale = 0.08950526319884641
+
+[[priors.enzymes.Evo04Evo01EP_m-6_e-B2]]
+target_id = "RPI"
+location = 0.01094305936607868
+scale = 0.05668089737003713
+
+[[priors.enzymes.Evo04Evo01EP_m-6_e-B2]]
+target_id = "TALA"
+location = 0.05162830503792652
+scale = 0.1301183081195095
+
+[[priors.enzymes.Evo04Evo01EP_m-6_e-B2]]
+target_id = "TKT2"
+location = 0.02755022802731761
+scale = 0.02729475251120398
+
+[[priors.enzymes.Evo04Evo01EP_m-6_e-B2]]
+target_id = "TPI"
+location = 0.02294372284336806
+scale = 0.1445872044139148
+
+[[priors.enzymes.Evo04Evo01EP_m-6_e-B2]]
+target_id = "G6PDH2r"
+location = 0.01120855655096314
+scale = 0.10417371637146
+
+[[priors.enzymes.Evo04Evo01EP_m-6_e-B2]]
+target_id = "TKT1"
+location = 0.02755022802731761
+scale = 0.02729475251120398
+
+[[priors.enzymes.Evo04Evo02EP_m-1_e-B1]]
+target_id = "EDA"
+location = 0.01519228278410257
+scale = 0.1205174855284811
+
+[[priors.enzymes.Evo04Evo02EP_m-1_e-B1]]
+target_id = "EDD"
+location = 0.000463806726888499
+scale = 0.6117946293860677
+
+[[priors.enzymes.Evo04Evo02EP_m-1_e-B1]]
+target_id = "ENO"
+location = 0.1804223711720037
+scale = 0.1084471426999666
+
+[[priors.enzymes.Evo04Evo02EP_m-1_e-B1]]
+target_id = "FBA"
+location = 0.05713137070939144
+scale = 0.1912764884560326
+
+[[priors.enzymes.Evo04Evo02EP_m-1_e-B1]]
+target_id = "FBP"
+location = 0.00498715760963118
+scale = 0.1299362517921545
+
+[[priors.enzymes.Evo04Evo02EP_m-1_e-B1]]
+target_id = "GAPD"
+location = 0.2392237713782442
+scale = 0.1600813998525576
+
+[[priors.enzymes.Evo04Evo02EP_m-1_e-B1]]
+target_id = "GND"
+location = 0.04068991651266067
+scale = 0.01973913543463182
+
+[[priors.enzymes.Evo04Evo02EP_m-1_e-B1]]
+target_id = "PGM"
+location = 0.04498372572498716
+scale = 0.02159574889645683
+
+[[priors.enzymes.Evo04Evo02EP_m-1_e-B1]]
+target_id = "PGI"
+location = 0.04069951082615522
+scale = 0.05831937059110903
+
+[[priors.enzymes.Evo04Evo02EP_m-1_e-B1]]
+target_id = "PGK"
+location = 0.0985193498161802
+scale = 0.1962159000847288
+
+[[priors.enzymes.Evo04Evo02EP_m-1_e-B1]]
+target_id = "PGL"
+location = 0.00508224011627053
+scale = 0.2433794752859315
+
+[[priors.enzymes.Evo04Evo02EP_m-1_e-B1]]
+target_id = "RPE"
+location = 0.003987529038417541
+scale = 0.01353304793363888
+
+[[priors.enzymes.Evo04Evo02EP_m-1_e-B1]]
+target_id = "RPI"
+location = 0.01238571397145494
+scale = 0.1969301095454049
+
+[[priors.enzymes.Evo04Evo02EP_m-1_e-B1]]
+target_id = "TALA"
+location = 0.04984191132609872
+scale = 0.05414018555395715
+
+[[priors.enzymes.Evo04Evo02EP_m-1_e-B1]]
+target_id = "TKT2"
+location = 0.02989708212591632
+scale = 0.04415018298610121
+
+[[priors.enzymes.Evo04Evo02EP_m-1_e-B1]]
+target_id = "TPI"
+location = 0.02412020178875426
+scale = 0.09407234137731914
+
+[[priors.enzymes.Evo04Evo02EP_m-1_e-B1]]
+target_id = "G6PDH2r"
+location = 0.009980033276238105
+scale = 0.02445262161324497
+
+[[priors.enzymes.Evo04Evo02EP_m-1_e-B1]]
+target_id = "TKT1"
+location = 0.02989708212591632
+scale = 0.04415018298610121
+
+[[priors.enzymes.Evo04Evo02EP_m-1_e-B2]]
+target_id = "EDA"
+location = 0.01091633776037329
+scale = 0.2683173434124703
+
+[[priors.enzymes.Evo04Evo02EP_m-1_e-B2]]
+target_id = "EDD"
+location = 0.0008318305462055982
+scale = 0.05685769613656688
+
+[[priors.enzymes.Evo04Evo02EP_m-1_e-B2]]
+target_id = "ENO"
+location = 0.1704236729782516
+scale = 0.1986789628374664
+
+[[priors.enzymes.Evo04Evo02EP_m-1_e-B2]]
+target_id = "FBA"
+location = 0.05822009346553075
+scale = 0.2956982848383968
+
+[[priors.enzymes.Evo04Evo02EP_m-1_e-B2]]
+target_id = "FBP"
+location = 0.006969945401903855
+scale = 0.05920102563244166
+
+[[priors.enzymes.Evo04Evo02EP_m-1_e-B2]]
+target_id = "GAPD"
+location = 0.2460479468337232
+scale = 0.1442345319848526
+
+[[priors.enzymes.Evo04Evo02EP_m-1_e-B2]]
+target_id = "GND"
+location = 0.03481425863577216
+scale = 0.07023901034931285
+
+[[priors.enzymes.Evo04Evo02EP_m-1_e-B2]]
+target_id = "PGM"
+location = 0.05119429313884696
+scale = 0.04945947615944991
+
+[[priors.enzymes.Evo04Evo02EP_m-1_e-B2]]
+target_id = "PGI"
+location = 0.04185836029438587
+scale = 0.08015589640290227
+
+[[priors.enzymes.Evo04Evo02EP_m-1_e-B2]]
+target_id = "PGK"
+location = 0.09469170061783601
+scale = 0.2284521255912965
+
+[[priors.enzymes.Evo04Evo02EP_m-1_e-B2]]
+target_id = "PGL"
+location = 0.007006582509201296
+scale = 0.08489965123498849
+
+[[priors.enzymes.Evo04Evo02EP_m-1_e-B2]]
+target_id = "RPE"
+location = 0.004497104567331758
+scale = 0.3414305393856398
+
+[[priors.enzymes.Evo04Evo02EP_m-1_e-B2]]
+target_id = "RPI"
+location = 0.009749117538384464
+scale = 0.1141930598895173
+
+[[priors.enzymes.Evo04Evo02EP_m-1_e-B2]]
+target_id = "TALA"
+location = 0.05265111774017275
+scale = 0.159866352839154
+
+[[priors.enzymes.Evo04Evo02EP_m-1_e-B2]]
+target_id = "TKT2"
+location = 0.03109983877438677
+scale = 0.1999954757093361
+
+[[priors.enzymes.Evo04Evo02EP_m-1_e-B2]]
+target_id = "TPI"
+location = 0.03310785541635645
+scale = 0.09092085512362755
+
+[[priors.enzymes.Evo04Evo02EP_m-1_e-B2]]
+target_id = "G6PDH2r"
+location = 0.01220023103747011
+scale = 0.0732836093513099
+
+[[priors.enzymes.Evo04Evo02EP_m-1_e-B2]]
+target_id = "TKT1"
+location = 0.03109983877438677
+scale = 0.1999954757093361
+
+[[priors.enzymes.Evo04Evo02EP_m-2_e-B1]]
+target_id = "EDA"
+location = 0.01519228278410257
+scale = 0.1205174855284811
+
+[[priors.enzymes.Evo04Evo02EP_m-2_e-B1]]
+target_id = "EDD"
+location = 0.000463806726888499
+scale = 0.6117946293860677
+
+[[priors.enzymes.Evo04Evo02EP_m-2_e-B1]]
+target_id = "ENO"
+location = 0.1804223711720037
+scale = 0.1084471426999666
+
+[[priors.enzymes.Evo04Evo02EP_m-2_e-B1]]
+target_id = "FBA"
+location = 0.05713137070939144
+scale = 0.1912764884560326
+
+[[priors.enzymes.Evo04Evo02EP_m-2_e-B1]]
+target_id = "FBP"
+location = 0.00498715760963118
+scale = 0.1299362517921545
+
+[[priors.enzymes.Evo04Evo02EP_m-2_e-B1]]
+target_id = "GAPD"
+location = 0.2392237713782442
+scale = 0.1600813998525576
+
+[[priors.enzymes.Evo04Evo02EP_m-2_e-B1]]
+target_id = "GND"
+location = 0.04068991651266067
+scale = 0.01973913543463182
+
+[[priors.enzymes.Evo04Evo02EP_m-2_e-B1]]
+target_id = "PGM"
+location = 0.04498372572498716
+scale = 0.02159574889645683
+
+[[priors.enzymes.Evo04Evo02EP_m-2_e-B1]]
+target_id = "PGI"
+location = 0.04069951082615522
+scale = 0.05831937059110903
+
+[[priors.enzymes.Evo04Evo02EP_m-2_e-B1]]
+target_id = "PGK"
+location = 0.0985193498161802
+scale = 0.1962159000847288
+
+[[priors.enzymes.Evo04Evo02EP_m-2_e-B1]]
+target_id = "PGL"
+location = 0.00508224011627053
+scale = 0.2433794752859315
+
+[[priors.enzymes.Evo04Evo02EP_m-2_e-B1]]
+target_id = "RPE"
+location = 0.003987529038417541
+scale = 0.01353304793363888
+
+[[priors.enzymes.Evo04Evo02EP_m-2_e-B1]]
+target_id = "RPI"
+location = 0.01238571397145494
+scale = 0.1969301095454049
+
+[[priors.enzymes.Evo04Evo02EP_m-2_e-B1]]
+target_id = "TALA"
+location = 0.04984191132609872
+scale = 0.05414018555395715
+
+[[priors.enzymes.Evo04Evo02EP_m-2_e-B1]]
+target_id = "TKT2"
+location = 0.02989708212591632
+scale = 0.04415018298610121
+
+[[priors.enzymes.Evo04Evo02EP_m-2_e-B1]]
+target_id = "TPI"
+location = 0.02412020178875426
+scale = 0.09407234137731914
+
+[[priors.enzymes.Evo04Evo02EP_m-2_e-B1]]
+target_id = "G6PDH2r"
+location = 0.009980033276238105
+scale = 0.02445262161324497
+
+[[priors.enzymes.Evo04Evo02EP_m-2_e-B1]]
+target_id = "TKT1"
+location = 0.02989708212591632
+scale = 0.04415018298610121
+
+[[priors.enzymes.Evo04Evo02EP_m-2_e-B2]]
+target_id = "EDA"
+location = 0.01091633776037329
+scale = 0.2683173434124703
+
+[[priors.enzymes.Evo04Evo02EP_m-2_e-B2]]
+target_id = "EDD"
+location = 0.0008318305462055982
+scale = 0.05685769613656688
+
+[[priors.enzymes.Evo04Evo02EP_m-2_e-B2]]
+target_id = "ENO"
+location = 0.1704236729782516
+scale = 0.1986789628374664
+
+[[priors.enzymes.Evo04Evo02EP_m-2_e-B2]]
+target_id = "FBA"
+location = 0.05822009346553075
+scale = 0.2956982848383968
+
+[[priors.enzymes.Evo04Evo02EP_m-2_e-B2]]
+target_id = "FBP"
+location = 0.006969945401903855
+scale = 0.05920102563244166
+
+[[priors.enzymes.Evo04Evo02EP_m-2_e-B2]]
+target_id = "GAPD"
+location = 0.2460479468337232
+scale = 0.1442345319848526
+
+[[priors.enzymes.Evo04Evo02EP_m-2_e-B2]]
+target_id = "GND"
+location = 0.03481425863577216
+scale = 0.07023901034931285
+
+[[priors.enzymes.Evo04Evo02EP_m-2_e-B2]]
+target_id = "PGM"
+location = 0.05119429313884696
+scale = 0.04945947615944991
+
+[[priors.enzymes.Evo04Evo02EP_m-2_e-B2]]
+target_id = "PGI"
+location = 0.04185836029438587
+scale = 0.08015589640290227
+
+[[priors.enzymes.Evo04Evo02EP_m-2_e-B2]]
+target_id = "PGK"
+location = 0.09469170061783601
+scale = 0.2284521255912965
+
+[[priors.enzymes.Evo04Evo02EP_m-2_e-B2]]
+target_id = "PGL"
+location = 0.007006582509201296
+scale = 0.08489965123498849
+
+[[priors.enzymes.Evo04Evo02EP_m-2_e-B2]]
+target_id = "RPE"
+location = 0.004497104567331758
+scale = 0.3414305393856398
+
+[[priors.enzymes.Evo04Evo02EP_m-2_e-B2]]
+target_id = "RPI"
+location = 0.009749117538384464
+scale = 0.1141930598895173
+
+[[priors.enzymes.Evo04Evo02EP_m-2_e-B2]]
+target_id = "TALA"
+location = 0.05265111774017275
+scale = 0.159866352839154
+
+[[priors.enzymes.Evo04Evo02EP_m-2_e-B2]]
+target_id = "TKT2"
+location = 0.03109983877438677
+scale = 0.1999954757093361
+
+[[priors.enzymes.Evo04Evo02EP_m-2_e-B2]]
+target_id = "TPI"
+location = 0.03310785541635645
+scale = 0.09092085512362755
+
+[[priors.enzymes.Evo04Evo02EP_m-2_e-B2]]
+target_id = "G6PDH2r"
+location = 0.01220023103747011
+scale = 0.0732836093513099
+
+[[priors.enzymes.Evo04Evo02EP_m-2_e-B2]]
+target_id = "TKT1"
+location = 0.03109983877438677
+scale = 0.1999954757093361
+
+[[priors.enzymes.Evo04Evo02EP_m-3_e-B1]]
+target_id = "EDA"
+location = 0.01519228278410257
+scale = 0.1205174855284811
+
+[[priors.enzymes.Evo04Evo02EP_m-3_e-B1]]
+target_id = "EDD"
+location = 0.000463806726888499
+scale = 0.6117946293860677
+
+[[priors.enzymes.Evo04Evo02EP_m-3_e-B1]]
+target_id = "ENO"
+location = 0.1804223711720037
+scale = 0.1084471426999666
+
+[[priors.enzymes.Evo04Evo02EP_m-3_e-B1]]
+target_id = "FBA"
+location = 0.05713137070939144
+scale = 0.1912764884560326
+
+[[priors.enzymes.Evo04Evo02EP_m-3_e-B1]]
+target_id = "FBP"
+location = 0.00498715760963118
+scale = 0.1299362517921545
+
+[[priors.enzymes.Evo04Evo02EP_m-3_e-B1]]
+target_id = "GAPD"
+location = 0.2392237713782442
+scale = 0.1600813998525576
+
+[[priors.enzymes.Evo04Evo02EP_m-3_e-B1]]
+target_id = "GND"
+location = 0.04068991651266067
+scale = 0.01973913543463182
+
+[[priors.enzymes.Evo04Evo02EP_m-3_e-B1]]
+target_id = "PGM"
+location = 0.04498372572498716
+scale = 0.02159574889645683
+
+[[priors.enzymes.Evo04Evo02EP_m-3_e-B1]]
+target_id = "PGI"
+location = 0.04069951082615522
+scale = 0.05831937059110903
+
+[[priors.enzymes.Evo04Evo02EP_m-3_e-B1]]
+target_id = "PGK"
+location = 0.0985193498161802
+scale = 0.1962159000847288
+
+[[priors.enzymes.Evo04Evo02EP_m-3_e-B1]]
+target_id = "PGL"
+location = 0.00508224011627053
+scale = 0.2433794752859315
+
+[[priors.enzymes.Evo04Evo02EP_m-3_e-B1]]
+target_id = "RPE"
+location = 0.003987529038417541
+scale = 0.01353304793363888
+
+[[priors.enzymes.Evo04Evo02EP_m-3_e-B1]]
+target_id = "RPI"
+location = 0.01238571397145494
+scale = 0.1969301095454049
+
+[[priors.enzymes.Evo04Evo02EP_m-3_e-B1]]
+target_id = "TALA"
+location = 0.04984191132609872
+scale = 0.05414018555395715
+
+[[priors.enzymes.Evo04Evo02EP_m-3_e-B1]]
+target_id = "TKT2"
+location = 0.02989708212591632
+scale = 0.04415018298610121
+
+[[priors.enzymes.Evo04Evo02EP_m-3_e-B1]]
+target_id = "TPI"
+location = 0.02412020178875426
+scale = 0.09407234137731914
+
+[[priors.enzymes.Evo04Evo02EP_m-3_e-B1]]
+target_id = "G6PDH2r"
+location = 0.009980033276238105
+scale = 0.02445262161324497
+
+[[priors.enzymes.Evo04Evo02EP_m-3_e-B1]]
+target_id = "TKT1"
+location = 0.02989708212591632
+scale = 0.04415018298610121
+
+[[priors.enzymes.Evo04Evo02EP_m-3_e-B2]]
+target_id = "EDA"
+location = 0.01091633776037329
+scale = 0.2683173434124703
+
+[[priors.enzymes.Evo04Evo02EP_m-3_e-B2]]
+target_id = "EDD"
+location = 0.0008318305462055982
+scale = 0.05685769613656688
+
+[[priors.enzymes.Evo04Evo02EP_m-3_e-B2]]
+target_id = "ENO"
+location = 0.1704236729782516
+scale = 0.1986789628374664
+
+[[priors.enzymes.Evo04Evo02EP_m-3_e-B2]]
+target_id = "FBA"
+location = 0.05822009346553075
+scale = 0.2956982848383968
+
+[[priors.enzymes.Evo04Evo02EP_m-3_e-B2]]
+target_id = "FBP"
+location = 0.006969945401903855
+scale = 0.05920102563244166
+
+[[priors.enzymes.Evo04Evo02EP_m-3_e-B2]]
+target_id = "GAPD"
+location = 0.2460479468337232
+scale = 0.1442345319848526
+
+[[priors.enzymes.Evo04Evo02EP_m-3_e-B2]]
+target_id = "GND"
+location = 0.03481425863577216
+scale = 0.07023901034931285
+
+[[priors.enzymes.Evo04Evo02EP_m-3_e-B2]]
+target_id = "PGM"
+location = 0.05119429313884696
+scale = 0.04945947615944991
+
+[[priors.enzymes.Evo04Evo02EP_m-3_e-B2]]
+target_id = "PGI"
+location = 0.04185836029438587
+scale = 0.08015589640290227
+
+[[priors.enzymes.Evo04Evo02EP_m-3_e-B2]]
+target_id = "PGK"
+location = 0.09469170061783601
+scale = 0.2284521255912965
+
+[[priors.enzymes.Evo04Evo02EP_m-3_e-B2]]
+target_id = "PGL"
+location = 0.007006582509201296
+scale = 0.08489965123498849
+
+[[priors.enzymes.Evo04Evo02EP_m-3_e-B2]]
+target_id = "RPE"
+location = 0.004497104567331758
+scale = 0.3414305393856398
+
+[[priors.enzymes.Evo04Evo02EP_m-3_e-B2]]
+target_id = "RPI"
+location = 0.009749117538384464
+scale = 0.1141930598895173
+
+[[priors.enzymes.Evo04Evo02EP_m-3_e-B2]]
+target_id = "TALA"
+location = 0.05265111774017275
+scale = 0.159866352839154
+
+[[priors.enzymes.Evo04Evo02EP_m-3_e-B2]]
+target_id = "TKT2"
+location = 0.03109983877438677
+scale = 0.1999954757093361
+
+[[priors.enzymes.Evo04Evo02EP_m-3_e-B2]]
+target_id = "TPI"
+location = 0.03310785541635645
+scale = 0.09092085512362755
+
+[[priors.enzymes.Evo04Evo02EP_m-3_e-B2]]
+target_id = "G6PDH2r"
+location = 0.01220023103747011
+scale = 0.0732836093513099
+
+[[priors.enzymes.Evo04Evo02EP_m-3_e-B2]]
+target_id = "TKT1"
+location = 0.03109983877438677
+scale = 0.1999954757093361
+
+[[priors.enzymes.Evo04Evo02EP_m-4_e-B1]]
+target_id = "EDA"
+location = 0.01519228278410257
+scale = 0.1205174855284811
+
+[[priors.enzymes.Evo04Evo02EP_m-4_e-B1]]
+target_id = "EDD"
+location = 0.000463806726888499
+scale = 0.6117946293860677
+
+[[priors.enzymes.Evo04Evo02EP_m-4_e-B1]]
+target_id = "ENO"
+location = 0.1804223711720037
+scale = 0.1084471426999666
+
+[[priors.enzymes.Evo04Evo02EP_m-4_e-B1]]
+target_id = "FBA"
+location = 0.05713137070939144
+scale = 0.1912764884560326
+
+[[priors.enzymes.Evo04Evo02EP_m-4_e-B1]]
+target_id = "FBP"
+location = 0.00498715760963118
+scale = 0.1299362517921545
+
+[[priors.enzymes.Evo04Evo02EP_m-4_e-B1]]
+target_id = "GAPD"
+location = 0.2392237713782442
+scale = 0.1600813998525576
+
+[[priors.enzymes.Evo04Evo02EP_m-4_e-B1]]
+target_id = "GND"
+location = 0.04068991651266067
+scale = 0.01973913543463182
+
+[[priors.enzymes.Evo04Evo02EP_m-4_e-B1]]
+target_id = "PGM"
+location = 0.04498372572498716
+scale = 0.02159574889645683
+
+[[priors.enzymes.Evo04Evo02EP_m-4_e-B1]]
+target_id = "PGI"
+location = 0.04069951082615522
+scale = 0.05831937059110903
+
+[[priors.enzymes.Evo04Evo02EP_m-4_e-B1]]
+target_id = "PGK"
+location = 0.0985193498161802
+scale = 0.1962159000847288
+
+[[priors.enzymes.Evo04Evo02EP_m-4_e-B1]]
+target_id = "PGL"
+location = 0.00508224011627053
+scale = 0.2433794752859315
+
+[[priors.enzymes.Evo04Evo02EP_m-4_e-B1]]
+target_id = "RPE"
+location = 0.003987529038417541
+scale = 0.01353304793363888
+
+[[priors.enzymes.Evo04Evo02EP_m-4_e-B1]]
+target_id = "RPI"
+location = 0.01238571397145494
+scale = 0.1969301095454049
+
+[[priors.enzymes.Evo04Evo02EP_m-4_e-B1]]
+target_id = "TALA"
+location = 0.04984191132609872
+scale = 0.05414018555395715
+
+[[priors.enzymes.Evo04Evo02EP_m-4_e-B1]]
+target_id = "TKT2"
+location = 0.02989708212591632
+scale = 0.04415018298610121
+
+[[priors.enzymes.Evo04Evo02EP_m-4_e-B1]]
+target_id = "TPI"
+location = 0.02412020178875426
+scale = 0.09407234137731914
+
+[[priors.enzymes.Evo04Evo02EP_m-4_e-B1]]
+target_id = "G6PDH2r"
+location = 0.009980033276238105
+scale = 0.02445262161324497
+
+[[priors.enzymes.Evo04Evo02EP_m-4_e-B1]]
+target_id = "TKT1"
+location = 0.02989708212591632
+scale = 0.04415018298610121
+
+[[priors.enzymes.Evo04Evo02EP_m-4_e-B2]]
+target_id = "EDA"
+location = 0.01091633776037329
+scale = 0.2683173434124703
+
+[[priors.enzymes.Evo04Evo02EP_m-4_e-B2]]
+target_id = "EDD"
+location = 0.0008318305462055982
+scale = 0.05685769613656688
+
+[[priors.enzymes.Evo04Evo02EP_m-4_e-B2]]
+target_id = "ENO"
+location = 0.1704236729782516
+scale = 0.1986789628374664
+
+[[priors.enzymes.Evo04Evo02EP_m-4_e-B2]]
+target_id = "FBA"
+location = 0.05822009346553075
+scale = 0.2956982848383968
+
+[[priors.enzymes.Evo04Evo02EP_m-4_e-B2]]
+target_id = "FBP"
+location = 0.006969945401903855
+scale = 0.05920102563244166
+
+[[priors.enzymes.Evo04Evo02EP_m-4_e-B2]]
+target_id = "GAPD"
+location = 0.2460479468337232
+scale = 0.1442345319848526
+
+[[priors.enzymes.Evo04Evo02EP_m-4_e-B2]]
+target_id = "GND"
+location = 0.03481425863577216
+scale = 0.07023901034931285
+
+[[priors.enzymes.Evo04Evo02EP_m-4_e-B2]]
+target_id = "PGM"
+location = 0.05119429313884696
+scale = 0.04945947615944991
+
+[[priors.enzymes.Evo04Evo02EP_m-4_e-B2]]
+target_id = "PGI"
+location = 0.04185836029438587
+scale = 0.08015589640290227
+
+[[priors.enzymes.Evo04Evo02EP_m-4_e-B2]]
+target_id = "PGK"
+location = 0.09469170061783601
+scale = 0.2284521255912965
+
+[[priors.enzymes.Evo04Evo02EP_m-4_e-B2]]
+target_id = "PGL"
+location = 0.007006582509201296
+scale = 0.08489965123498849
+
+[[priors.enzymes.Evo04Evo02EP_m-4_e-B2]]
+target_id = "RPE"
+location = 0.004497104567331758
+scale = 0.3414305393856398
+
+[[priors.enzymes.Evo04Evo02EP_m-4_e-B2]]
+target_id = "RPI"
+location = 0.009749117538384464
+scale = 0.1141930598895173
+
+[[priors.enzymes.Evo04Evo02EP_m-4_e-B2]]
+target_id = "TALA"
+location = 0.05265111774017275
+scale = 0.159866352839154
+
+[[priors.enzymes.Evo04Evo02EP_m-4_e-B2]]
+target_id = "TKT2"
+location = 0.03109983877438677
+scale = 0.1999954757093361
+
+[[priors.enzymes.Evo04Evo02EP_m-4_e-B2]]
+target_id = "TPI"
+location = 0.03310785541635645
+scale = 0.09092085512362755
+
+[[priors.enzymes.Evo04Evo02EP_m-4_e-B2]]
+target_id = "G6PDH2r"
+location = 0.01220023103747011
+scale = 0.0732836093513099
+
+[[priors.enzymes.Evo04Evo02EP_m-4_e-B2]]
+target_id = "TKT1"
+location = 0.03109983877438677
+scale = 0.1999954757093361
+
+[[priors.enzymes.Evo04Evo02EP_m-5_e-B1]]
+target_id = "EDA"
+location = 0.01519228278410257
+scale = 0.1205174855284811
+
+[[priors.enzymes.Evo04Evo02EP_m-5_e-B1]]
+target_id = "EDD"
+location = 0.000463806726888499
+scale = 0.6117946293860677
+
+[[priors.enzymes.Evo04Evo02EP_m-5_e-B1]]
+target_id = "ENO"
+location = 0.1804223711720037
+scale = 0.1084471426999666
+
+[[priors.enzymes.Evo04Evo02EP_m-5_e-B1]]
+target_id = "FBA"
+location = 0.05713137070939144
+scale = 0.1912764884560326
+
+[[priors.enzymes.Evo04Evo02EP_m-5_e-B1]]
+target_id = "FBP"
+location = 0.00498715760963118
+scale = 0.1299362517921545
+
+[[priors.enzymes.Evo04Evo02EP_m-5_e-B1]]
+target_id = "GAPD"
+location = 0.2392237713782442
+scale = 0.1600813998525576
+
+[[priors.enzymes.Evo04Evo02EP_m-5_e-B1]]
+target_id = "GND"
+location = 0.04068991651266067
+scale = 0.01973913543463182
+
+[[priors.enzymes.Evo04Evo02EP_m-5_e-B1]]
+target_id = "PGM"
+location = 0.04498372572498716
+scale = 0.02159574889645683
+
+[[priors.enzymes.Evo04Evo02EP_m-5_e-B1]]
+target_id = "PGI"
+location = 0.04069951082615522
+scale = 0.05831937059110903
+
+[[priors.enzymes.Evo04Evo02EP_m-5_e-B1]]
+target_id = "PGK"
+location = 0.0985193498161802
+scale = 0.1962159000847288
+
+[[priors.enzymes.Evo04Evo02EP_m-5_e-B1]]
+target_id = "PGL"
+location = 0.00508224011627053
+scale = 0.2433794752859315
+
+[[priors.enzymes.Evo04Evo02EP_m-5_e-B1]]
+target_id = "RPE"
+location = 0.003987529038417541
+scale = 0.01353304793363888
+
+[[priors.enzymes.Evo04Evo02EP_m-5_e-B1]]
+target_id = "RPI"
+location = 0.01238571397145494
+scale = 0.1969301095454049
+
+[[priors.enzymes.Evo04Evo02EP_m-5_e-B1]]
+target_id = "TALA"
+location = 0.04984191132609872
+scale = 0.05414018555395715
+
+[[priors.enzymes.Evo04Evo02EP_m-5_e-B1]]
+target_id = "TKT2"
+location = 0.02989708212591632
+scale = 0.04415018298610121
+
+[[priors.enzymes.Evo04Evo02EP_m-5_e-B1]]
+target_id = "TPI"
+location = 0.02412020178875426
+scale = 0.09407234137731914
+
+[[priors.enzymes.Evo04Evo02EP_m-5_e-B1]]
+target_id = "G6PDH2r"
+location = 0.009980033276238105
+scale = 0.02445262161324497
+
+[[priors.enzymes.Evo04Evo02EP_m-5_e-B1]]
+target_id = "TKT1"
+location = 0.02989708212591632
+scale = 0.04415018298610121
+
+[[priors.enzymes.Evo04Evo02EP_m-5_e-B2]]
+target_id = "EDA"
+location = 0.01091633776037329
+scale = 0.2683173434124703
+
+[[priors.enzymes.Evo04Evo02EP_m-5_e-B2]]
+target_id = "EDD"
+location = 0.0008318305462055982
+scale = 0.05685769613656688
+
+[[priors.enzymes.Evo04Evo02EP_m-5_e-B2]]
+target_id = "ENO"
+location = 0.1704236729782516
+scale = 0.1986789628374664
+
+[[priors.enzymes.Evo04Evo02EP_m-5_e-B2]]
+target_id = "FBA"
+location = 0.05822009346553075
+scale = 0.2956982848383968
+
+[[priors.enzymes.Evo04Evo02EP_m-5_e-B2]]
+target_id = "FBP"
+location = 0.006969945401903855
+scale = 0.05920102563244166
+
+[[priors.enzymes.Evo04Evo02EP_m-5_e-B2]]
+target_id = "GAPD"
+location = 0.2460479468337232
+scale = 0.1442345319848526
+
+[[priors.enzymes.Evo04Evo02EP_m-5_e-B2]]
+target_id = "GND"
+location = 0.03481425863577216
+scale = 0.07023901034931285
+
+[[priors.enzymes.Evo04Evo02EP_m-5_e-B2]]
+target_id = "PGM"
+location = 0.05119429313884696
+scale = 0.04945947615944991
+
+[[priors.enzymes.Evo04Evo02EP_m-5_e-B2]]
+target_id = "PGI"
+location = 0.04185836029438587
+scale = 0.08015589640290227
+
+[[priors.enzymes.Evo04Evo02EP_m-5_e-B2]]
+target_id = "PGK"
+location = 0.09469170061783601
+scale = 0.2284521255912965
+
+[[priors.enzymes.Evo04Evo02EP_m-5_e-B2]]
+target_id = "PGL"
+location = 0.007006582509201296
+scale = 0.08489965123498849
+
+[[priors.enzymes.Evo04Evo02EP_m-5_e-B2]]
+target_id = "RPE"
+location = 0.004497104567331758
+scale = 0.3414305393856398
+
+[[priors.enzymes.Evo04Evo02EP_m-5_e-B2]]
+target_id = "RPI"
+location = 0.009749117538384464
+scale = 0.1141930598895173
+
+[[priors.enzymes.Evo04Evo02EP_m-5_e-B2]]
+target_id = "TALA"
+location = 0.05265111774017275
+scale = 0.159866352839154
+
+[[priors.enzymes.Evo04Evo02EP_m-5_e-B2]]
+target_id = "TKT2"
+location = 0.03109983877438677
+scale = 0.1999954757093361
+
+[[priors.enzymes.Evo04Evo02EP_m-5_e-B2]]
+target_id = "TPI"
+location = 0.03310785541635645
+scale = 0.09092085512362755
+
+[[priors.enzymes.Evo04Evo02EP_m-5_e-B2]]
+target_id = "G6PDH2r"
+location = 0.01220023103747011
+scale = 0.0732836093513099
+
+[[priors.enzymes.Evo04Evo02EP_m-5_e-B2]]
+target_id = "TKT1"
+location = 0.03109983877438677
+scale = 0.1999954757093361
+
+[[priors.enzymes.Evo04Evo02EP_m-6_e-B1]]
+target_id = "EDA"
+location = 0.01519228278410257
+scale = 0.1205174855284811
+
+[[priors.enzymes.Evo04Evo02EP_m-6_e-B1]]
+target_id = "EDD"
+location = 0.000463806726888499
+scale = 0.6117946293860677
+
+[[priors.enzymes.Evo04Evo02EP_m-6_e-B1]]
+target_id = "ENO"
+location = 0.1804223711720037
+scale = 0.1084471426999666
+
+[[priors.enzymes.Evo04Evo02EP_m-6_e-B1]]
+target_id = "FBA"
+location = 0.05713137070939144
+scale = 0.1912764884560326
+
+[[priors.enzymes.Evo04Evo02EP_m-6_e-B1]]
+target_id = "FBP"
+location = 0.00498715760963118
+scale = 0.1299362517921545
+
+[[priors.enzymes.Evo04Evo02EP_m-6_e-B1]]
+target_id = "GAPD"
+location = 0.2392237713782442
+scale = 0.1600813998525576
+
+[[priors.enzymes.Evo04Evo02EP_m-6_e-B1]]
+target_id = "GND"
+location = 0.04068991651266067
+scale = 0.01973913543463182
+
+[[priors.enzymes.Evo04Evo02EP_m-6_e-B1]]
+target_id = "PGM"
+location = 0.04498372572498716
+scale = 0.02159574889645683
+
+[[priors.enzymes.Evo04Evo02EP_m-6_e-B1]]
+target_id = "PGI"
+location = 0.04069951082615522
+scale = 0.05831937059110903
+
+[[priors.enzymes.Evo04Evo02EP_m-6_e-B1]]
+target_id = "PGK"
+location = 0.0985193498161802
+scale = 0.1962159000847288
+
+[[priors.enzymes.Evo04Evo02EP_m-6_e-B1]]
+target_id = "PGL"
+location = 0.00508224011627053
+scale = 0.2433794752859315
+
+[[priors.enzymes.Evo04Evo02EP_m-6_e-B1]]
+target_id = "RPE"
+location = 0.003987529038417541
+scale = 0.01353304793363888
+
+[[priors.enzymes.Evo04Evo02EP_m-6_e-B1]]
+target_id = "RPI"
+location = 0.01238571397145494
+scale = 0.1969301095454049
+
+[[priors.enzymes.Evo04Evo02EP_m-6_e-B1]]
+target_id = "TALA"
+location = 0.04984191132609872
+scale = 0.05414018555395715
+
+[[priors.enzymes.Evo04Evo02EP_m-6_e-B1]]
+target_id = "TKT2"
+location = 0.02989708212591632
+scale = 0.04415018298610121
+
+[[priors.enzymes.Evo04Evo02EP_m-6_e-B1]]
+target_id = "TPI"
+location = 0.02412020178875426
+scale = 0.09407234137731914
+
+[[priors.enzymes.Evo04Evo02EP_m-6_e-B1]]
+target_id = "G6PDH2r"
+location = 0.009980033276238105
+scale = 0.02445262161324497
+
+[[priors.enzymes.Evo04Evo02EP_m-6_e-B1]]
+target_id = "TKT1"
+location = 0.02989708212591632
+scale = 0.04415018298610121
+
+[[priors.enzymes.Evo04Evo02EP_m-6_e-B2]]
+target_id = "EDA"
+location = 0.01091633776037329
+scale = 0.2683173434124703
+
+[[priors.enzymes.Evo04Evo02EP_m-6_e-B2]]
+target_id = "EDD"
+location = 0.0008318305462055982
+scale = 0.05685769613656688
+
+[[priors.enzymes.Evo04Evo02EP_m-6_e-B2]]
+target_id = "ENO"
+location = 0.1704236729782516
+scale = 0.1986789628374664
+
+[[priors.enzymes.Evo04Evo02EP_m-6_e-B2]]
+target_id = "FBA"
+location = 0.05822009346553075
+scale = 0.2956982848383968
+
+[[priors.enzymes.Evo04Evo02EP_m-6_e-B2]]
+target_id = "FBP"
+location = 0.006969945401903855
+scale = 0.05920102563244166
+
+[[priors.enzymes.Evo04Evo02EP_m-6_e-B2]]
+target_id = "GAPD"
+location = 0.2460479468337232
+scale = 0.1442345319848526
+
+[[priors.enzymes.Evo04Evo02EP_m-6_e-B2]]
+target_id = "GND"
+location = 0.03481425863577216
+scale = 0.07023901034931285
+
+[[priors.enzymes.Evo04Evo02EP_m-6_e-B2]]
+target_id = "PGM"
+location = 0.05119429313884696
+scale = 0.04945947615944991
+
+[[priors.enzymes.Evo04Evo02EP_m-6_e-B2]]
+target_id = "PGI"
+location = 0.04185836029438587
+scale = 0.08015589640290227
+
+[[priors.enzymes.Evo04Evo02EP_m-6_e-B2]]
+target_id = "PGK"
+location = 0.09469170061783601
+scale = 0.2284521255912965
+
+[[priors.enzymes.Evo04Evo02EP_m-6_e-B2]]
+target_id = "PGL"
+location = 0.007006582509201296
+scale = 0.08489965123498849
+
+[[priors.enzymes.Evo04Evo02EP_m-6_e-B2]]
+target_id = "RPE"
+location = 0.004497104567331758
+scale = 0.3414305393856398
+
+[[priors.enzymes.Evo04Evo02EP_m-6_e-B2]]
+target_id = "RPI"
+location = 0.009749117538384464
+scale = 0.1141930598895173
+
+[[priors.enzymes.Evo04Evo02EP_m-6_e-B2]]
+target_id = "TALA"
+location = 0.05265111774017275
+scale = 0.159866352839154
+
+[[priors.enzymes.Evo04Evo02EP_m-6_e-B2]]
+target_id = "TKT2"
+location = 0.03109983877438677
+scale = 0.1999954757093361
+
+[[priors.enzymes.Evo04Evo02EP_m-6_e-B2]]
+target_id = "TPI"
+location = 0.03310785541635645
+scale = 0.09092085512362755
+
+[[priors.enzymes.Evo04Evo02EP_m-6_e-B2]]
+target_id = "G6PDH2r"
+location = 0.01220023103747011
+scale = 0.0732836093513099
+
+[[priors.enzymes.Evo04Evo02EP_m-6_e-B2]]
+target_id = "TKT1"
+location = 0.03109983877438677
+scale = 0.1999954757093361
+
