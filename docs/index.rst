@@ -6,8 +6,16 @@
 Welcome to Maud's documentation!
 ================================
 
+Maud is a command-line application that fits Bayesian statistical models of
+metabolic networks using Python and Stan.
+
+Maud aims to take into account allosteric effects, ensure that the laws of
+thermodynamics are obeyed and to synthesise information from both steady state
+experiments and the existing literature.
+
+
 .. toctree::
-   :maxdepth: 2
+   :maxdepth: 1
    :caption: How to use Maud:
 
    usage/installation
@@ -16,7 +24,7 @@ Welcome to Maud's documentation!
    usage/post_installation_usage
 
 .. toctree::
-   :maxdepth: 2
+   :maxdepth: 1
    :caption: Theoretical background:
 
    theory/computation
@@ -25,7 +33,7 @@ Welcome to Maud's documentation!
    theory/thermodynamics
 
 .. toctree::
-   :maxdepth: 2
+   :maxdepth: 1
    :caption: Implementation details:
 
    implementation/data_model
