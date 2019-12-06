@@ -20,7 +20,8 @@
 
 """
 
-from collections import defaultdict
+from string import ascii_lowercase
+from typing import Dict, List, Tuple
 
 import toml
 
@@ -38,8 +39,7 @@ from maud.data_model import (
     Prior,
     Reaction,
 )
-from string import ascii_lowercase
-from typing import Dict
+
 
 MECHANISM_TO_PARAM_IDS = {
     "uniuni": ["Kcat1", "Kcat2", "Ka"],
@@ -61,13 +61,23 @@ MECHANISM_TO_PARAM_IDS = {
 }
 
 
-def load_kinetic_model_from_toml(parsed_toml: dict, model_id: str = 'mi') -> KineticModel:
+def load_kinetic_model_from_toml(
+    parsed_toml: dict, model_id: str = "mi"
+) -> KineticModel:
+    """Turn the output of toml.load into a KineticModel object.
+
+    :param parsed_toml: Result of running toml.load on a suitable toml file
+    :param model_id: String identifying the model.
+
+    """
     compartments = {
         c["id"]: Compartment(id=c["id"], name=c["name"], volume=c["volume"])
         for c in parsed_toml["compartments"]
     }
     metabolites = {
-        m["id"] + "_" + m["compartment"]: Metabolite(
+        m["id"]
+        + "_"
+        + m["compartment"]: Metabolite(
             id=m["id"],
             name=m["name"],
             balanced=m["balanced"],
@@ -75,19 +85,28 @@ def load_kinetic_model_from_toml(parsed_toml: dict, model_id: str = 'mi') -> Kin
         )
         for m in parsed_toml["metabolites"]
     }
-    reactions = {
-        r["id"]: load_reaction_from_toml(r) for r in parsed_toml["reactions"]
-    }
+    reactions = {r["id"]: load_reaction_from_toml(r) for r in parsed_toml["reactions"]}
     return KineticModel(
         model_id=model_id,
         metabolites=metabolites,
         compartments=compartments,
-        reactions=reactions
+        reactions=reactions,
     )
 
 
-def get_toml_enzyme_params(toml_enzyme: dict, stoichiometry: dict) -> Dict[str, Parameter]:
-    if toml_enzyme["mechanism"] == "modular_rate_law":
+def get_non_modifier_params(
+    enzyme_id: str, enzyme_mechanism: str, stoichiometry: dict
+) -> Dict[str, Parameter]:
+    """Get the non-modifer parameters for an enzyme.
+
+    :param enzyme_id: String identifying the enzyme
+    :param enzyme_mechanism: String identifying the enzyme's mechanism,
+    e.g. 'ordered_bibi'
+    :param stoichiometry: Dictionary representing the reaction's stoichiometry. The
+    keys are metabolite ids and the values are stoichiometries.
+
+    """
+    if enzyme_mechanism == "modular_rate_law":
         substrates = [k for k, v in stoichiometry.items() if v < 0]
         products = [k for k, v in stoichiometry.items() if v > 0]
         substrate_param_ids = [
@@ -96,52 +115,79 @@ def get_toml_enzyme_params(toml_enzyme: dict, stoichiometry: dict) -> Dict[str, 
         product_param_ids = [
             "K" + letter for product, letter in zip(products, ascii_lowercase[15:])
         ]
-        param_ids = substrate_param_ids + product_param_ids + ['Kcat1']
-        return {
-            param_id: Parameter(param_id, toml_enzyme["id"])
-            for param_id in param_ids
-        }
+        param_ids = substrate_param_ids + product_param_ids + ["Kcat1"]
+        return {param_id: Parameter(param_id, enzyme_id) for param_id in param_ids}
     else:
         return {
-            param_id: Parameter(param_id, toml_enzyme["id"])
-            for param_id in MECHANISM_TO_PARAM_IDS[e["mechanism"]]
+            param_id: Parameter(param_id, enzyme_id)
+            for param_id in MECHANISM_TO_PARAM_IDS[enzyme_mechanism]
         }
 
 
-def parse_modifiers(toml_enzyme: dict) -> tuple:
-    modifier_types =  "competitive_inhibitors"
+def parse_modifiers(
+    modifier_type: str, modifiers: List[str], enzyme_id: str, param_prefix: str
+) -> Tuple:
+    """Turn unformatted modifier info into dictionaries of Modifier and Parameter objects.
+
+    :param modifier_type: String identifying the type of modifier. One of
+    'allosteric_inhibitor', 'allosteric_activator', 'competitive_inhibitor'
+
+    :param modifier: List of strings identifying modifying metabolites.
+
+    :param enzyme id: String identifying the enzyme that is modified.
+
+    :param_prefix: String that goes before the metabolite id in order to
+    identify the metabolite-specific parameters.
+
+    """
     modifiers = {}
     modifier_params = {}
-    for modifier_type in ['allosteric_inhibitor', 'allosteric_activator']:
-        if modifier_type + 's' in toml_enzyme.keys():
-            modifier_params["transfer_constant"] = Parameter("transfer_constant", e["id"])
-            for mod in toml_enzyme[modifier_type]:
-                diss_const_type = "t" if modifier_type == 'allosteric_inhibitor' else "r"
-                diss_const_id = "dissociation_constant_" + diss_const_type + "_" + mod
-                modifiers[f"{mod}_{modifier_type}"] = Modifier(mod, modifier_type)
-                modifier_params[diss_const_id] = Parameter(diss_const_id, toml_enzyme["id"], mod)
-    if 'competitive_inhibitors' in toml_enzyme.keys():
-        if e["mechanism"] != "modular_rate_law":
-                raise ValueError(
-                    """competitive inhibitors are currently
-                    only supported for the mechanism 'modular_rate_law'"""
-                )
-        for mod in toml_enzyme["competitive_inhibitors"]:
-            modifiers[f"{mod}_competitive_inhibitors"] = Modifier(mod, "competitive_inhibitor")
-            inhibition_constant_id = f"inhibition_constant_{mod}"
-            modifier_params[inhibition_constant_id] = Parameter(inhibition_constant_id, toml_enzyme["id"], mod)
+    for modifier in modifiers:
+        modifiers[f"{modifier}_{modifier_type}"] = Modifier(modifier, modifier_type)
+        param_id = f"{param_prefix}_{modifier}"
+        modifier_params[param_id] = Parameter(param_id, enzyme_id, modifier)
+    if modifier_type in ["allosteric_inhibitor", "allosteric_activator"]:
+        modifier_params["transfer_constant"] = Parameter("transfer_constant", enzyme_id)
     return modifiers, modifier_params
 
 
 def load_reaction_from_toml(toml_reaction: dict) -> Reaction:
+    """Turn a dictionary representing a reaction into a Reaction object.
+
+    :param toml_reaction: Dictionary representing a reaction, typically one of
+    the values of the 'reactions' field in the output of toml.load.
+
+    """
     enzymes = {}
-    reversible = toml_reaction["reversible"] if "reversible" in toml_reaction.keys() else None
-    is_exchange = toml_reaction["is_exchange"] if "is_exchange" in toml_reaction.keys() else None
+    reversible = (
+        toml_reaction["reversible"] if "reversible" in toml_reaction.keys() else None
+    )
+    is_exchange = (
+        toml_reaction["is_exchange"] if "is_exchange" in toml_reaction.keys() else None
+    )
     for e in toml_reaction["enzymes"]:
-        non_modifier_params = get_toml_enzyme_params(e, toml_reaction['stoichiometry'])
-        modifiers, modifier_params = parse_modifiers(e)
+        non_modifier_params = get_non_modifier_params(
+            e["id"], e["mechanism"], toml_reaction["stoichiometry"]
+        )
+        modifiers = {}
+        modifier_params = {}
+        if "competitive_inhibitors" in e.keys() & e["mechanism"] != "modular_rate_law":
+            raise ValueError(
+                """competitive inhibitors are currently
+                only supported for the mechanism 'modular_rate_law'"""
+            )
+        for modifier_type, param_prefix in [
+            ("allosteric_activator", "dissociation_constant_r"),
+            ("allosteric_inhibitor", "dissociation_constant_t"),
+            ("competitive_inhibitor", "inhibition_constant"),
+        ]:
+            if modifier_type + "s" in e.keys():
+                modifiers_of_this_type, modifier_params_of_this_type = parse_modifiers(
+                    modifier_type, e[modifier_type + "s"], e["id"], param_prefix
+                )
+                modifiers[modifier_type + "s"] = modifiers_of_this_type
+                modifier_params.update(modifier_params_of_this_type)
         params = {**non_modifier_params, **modifier_params}
-        modifier_params = defaultdict()
         enzymes[e["id"]] = Enzyme(
             id=e["id"],
             name=e["name"],
@@ -158,7 +204,6 @@ def load_reaction_from_toml(toml_reaction: dict) -> Reaction:
         stoichiometry=toml_reaction["stoichiometry"],
         enzymes=enzymes,
     )
-
 
 
 def load_maud_input_from_toml(filepath: str, id: str = "mi") -> MaudInput:

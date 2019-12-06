@@ -22,10 +22,7 @@ def test_get_input_data():
         "N_experiment": 2,
         "N_flux_measurement": 2,
         "N_conc_measurement": 4,
-        "stoichiometric_matrix": [
-            [-1,  0,  0], [ 0,  0,  1],
-            [ 1, -1,  0], [ 0,  1, -1]
-        ],
+        "stoichiometric_matrix": [[-1, 0, 0], [0, 0, 1], [1, -1, 0], [0, 1, -1]],
         "experiment_yconc": [1, 1, 2, 2],
         "metabolite_yconc": [3, 4, 3, 4],
         "yconc": [0.8, 1.5, 0.7, 1.4],

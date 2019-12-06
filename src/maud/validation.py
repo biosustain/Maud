@@ -22,16 +22,16 @@ from maud import data_model
 def validate_maud_input(mi: data_model.MaudInput):
     """Check that priors, experiments and kinetic model are consistent."""
     km = mi.kinetic_model
-    km_compartment_ids = km.compartments.keys()
     km_unb_mets = [
-        met.id + '_' + met.compartment
-        for met in km.metabolites.values() if not met.balanced
+        met.id + "_" + met.compartment
+        for met in km.metabolites.values()
+        if not met.balanced
     ]
     km_balanced_mets = [
-        met.id + '_' + met.compartment
-        for met in km.metabolites.values() if met.balanced
+        met.id + "_" + met.compartment
+        for met in km.metabolites.values()
+        if met.balanced
     ]
-    km_mets = km_unb_mets + km_balanced_mets
     km_mets_no_compartments = list(set([met.id for met in km.metabolites.values()]))
     km_rxns = [rxn.id for rxn in km.reactions.values()]
     km_enzs = [enz.id for rxn in km.reactions.values() for enz in rxn.enzymes.values()]
