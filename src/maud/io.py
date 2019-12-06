@@ -140,15 +140,15 @@ def parse_modifiers(
     identify the metabolite-specific parameters.
 
     """
-    modifiers = {}
+    modifier_dict = {}
     modifier_params = {}
     for modifier in modifiers:
-        modifiers[f"{modifier}_{modifier_type}"] = Modifier(modifier, modifier_type)
+        modifier_dict[f"{modifier}_{modifier_type}"] = Modifier(modifier, modifier_type)
         param_id = f"{param_prefix}_{modifier}"
         modifier_params[param_id] = Parameter(param_id, enzyme_id, modifier)
     if modifier_type in ["allosteric_inhibitor", "allosteric_activator"]:
         modifier_params["transfer_constant"] = Parameter("transfer_constant", enzyme_id)
-    return modifiers, modifier_params
+    return modifier_dict, modifier_params
 
 
 def load_reaction_from_toml(toml_reaction: dict) -> Reaction:
@@ -185,7 +185,7 @@ def load_reaction_from_toml(toml_reaction: dict) -> Reaction:
                 modifiers_of_this_type, modifier_params_of_this_type = parse_modifiers(
                     modifier_type, e[modifier_type + "s"], e["id"], param_prefix
                 )
-                modifiers[modifier_type + "s"] = modifiers_of_this_type
+                modifiers.update(modifiers_of_this_type)
                 modifier_params.update(modifier_params_of_this_type)
         params = {**non_modifier_params, **modifier_params}
         enzymes[e["id"]] = Enzyme(
