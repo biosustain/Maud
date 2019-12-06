@@ -4,11 +4,53 @@ functions{
 #include allostery.stan
   vector get_fluxes(real[] m, real[] p){
   real empty_array[0];
-  real free_enzyme_ratio_r2 = get_free_enzyme_ratio_uniuni(m[3],m[4],p[2]*p[12],p[2]*p[13],p[14],p[7]);
+  real Tr_r1 = p[3]*p[11]
+                * (m[1]/p[9])^(-1*-1) 
+                - p[3]*p[11]/p[6]
+                * (p[9])^-1 
+                * (p[10])^1 
+                * (m[3]/p[10])^1 ;
+
+real Dr_r1 = (1 + m[1]/p[9])^(-1*-1) 
+                + (1 + m[3]/p[10])^1 
+                - 1;
+
+
+real Dr_reg_r1 = 0;
+  real Tr_r2 = p[4]*p[16]
+                * (m[3]/p[14])^(-1*-1) 
+                - p[4]*p[16]/p[7]
+                * (p[14])^-1 
+                * (p[15])^1 
+                * (m[4]/p[15])^1 ;
+
+real Dr_r2 = (1 + m[3]/p[14])^(-1*-1) 
+                + (1 + m[4]/p[15])^1 
+                - 1;
+
+
+real Dr_reg_r2 = (m[4]/p[19]) ;
+
+
+  real Tr_r3 = p[5]*p[22]
+                * (m[4]/p[20])^(-1*-1) 
+                - p[5]*p[22]/p[8]
+                * (p[20])^-1 
+                * (p[21])^1 
+                * (m[2]/p[21])^1 ;
+
+real Dr_r3 = (1 + m[4]/p[20])^(-1*-1) 
+                + (1 + m[2]/p[21])^1 
+                - 1;
+
+
+real Dr_reg_r3 = 0;
+  real free_enzyme_ratio_r1 = get_free_enzyme_ratio_modular_rate_law(Tr_r1,Dr_r1, Dr_reg_r1);
+  real free_enzyme_ratio_r2 = get_free_enzyme_ratio_modular_rate_law(Tr_r2,Dr_r2, Dr_reg_r2);
   return [
-    uniuni(m[1],m[3],p[1]*p[9],p[1]*p[10],p[11],p[6]),
-    uniuni(m[3],m[4],p[2]*p[12],p[2]*p[13],p[14],p[7])*get_regulatory_effect(empty_array,{m[3]},free_enzyme_ratio_r2,empty_array,{p[16]},p[15]),
-    uniuni(m[4],m[2],p[3]*p[17],p[3]*p[18],p[19],p[8])
+    modular_rate_law(Tr_r1,Dr_r1, Dr_reg_r1)*get_regulatory_effect({m[4]},empty_array,free_enzyme_ratio_r1,{p[12]},empty_array,p[13]),
+    modular_rate_law(Tr_r2,Dr_r2, Dr_reg_r2)*get_regulatory_effect(empty_array,{m[3]},free_enzyme_ratio_r2,empty_array,{p[17]},p[18]),
+    modular_rate_law(Tr_r3,Dr_r3, Dr_reg_r3)
   ]';
 }
   real[] ode_func(real t, real[] m, real[] p, real[] xr, int[] xi){
@@ -52,6 +94,7 @@ data {
   int<lower=1> N_experiment;
   int<lower=1> N_flux_measurement;
   int<lower=1> N_conc_measurement;
+  int<lower=1> N_metabolite;  // NB metabolites in multiple compartments only count once here
   // measurements
   int<lower=1,upper=N_experiment> experiment_yconc[N_conc_measurement];
   int<lower=1,upper=N_balanced+N_unbalanced> metabolite_yconc[N_conc_measurement];
@@ -62,8 +105,8 @@ data {
   vector[N_flux_measurement] yflux;
   vector<lower=0>[N_flux_measurement] sigma_flux;
   // hardcoded priors
-  vector[N_balanced+N_unbalanced] prior_loc_formation_energy;
-  vector<lower=0>[N_balanced+N_unbalanced] prior_scale_formation_energy;
+  vector[N_metabolite] prior_loc_formation_energy;
+  vector<lower=0>[N_metabolite] prior_scale_formation_energy;
   vector[N_kinetic_parameters] prior_loc_kinetic_parameters;
   vector<lower=0>[N_kinetic_parameters] prior_scale_kinetic_parameters;
   real prior_loc_unbalanced[N_unbalanced, N_experiment];
@@ -72,6 +115,7 @@ data {
   real<lower=0> prior_scale_enzyme[N_enzyme, N_experiment];
   // network properties
   matrix[N_balanced+N_unbalanced, N_enzyme] stoichiometric_matrix;
+  int<lower=1,upper=N_metabolite> compartment_metabolite_index[N_balanced+N_unbalanced];
   // configuration
   vector<lower=0>[N_balanced] as_guess;
   real rtol;
@@ -85,7 +129,7 @@ transformed data {
   real minus_RT = - 0.008314 * 298.15;
 }
 parameters {
-  vector[N_balanced+N_unbalanced] formation_energy;
+  vector[N_metabolite] formation_energy;
   vector<lower=0>[N_kinetic_parameters] kinetic_parameters;
   vector<lower=0>[N_unbalanced] unbalanced[N_experiment];
   vector<lower=0>[N_enzyme] enzyme_concentration[N_experiment];
@@ -93,7 +137,7 @@ parameters {
 transformed parameters {
   vector<lower=0>[N_balanced+N_unbalanced] conc[N_experiment];
   vector[N_reaction] flux[N_experiment];
-  vector[N_enzyme] delta_g = stoichiometric_matrix' * formation_energy;
+  vector[N_enzyme] delta_g = stoichiometric_matrix' * formation_energy[compartment_metabolite_index];
   for (e in 1:N_experiment){
     vector[N_enzyme] keq = exp(delta_g / minus_RT);
     vector[N_unbalanced+N_enzyme+N_enzyme+N_kinetic_parameters] theta;
