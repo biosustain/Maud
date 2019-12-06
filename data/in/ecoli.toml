@@ -275,7 +275,7 @@ compartment = "cytosol"
 [[metabolites]]
 id = "co2_c"
 name = "CO2 CO2"
-balanced = true
+balanced = false
 compartment = "cytosol"
 
 [[metabolites]]
@@ -4174,6 +4174,11 @@ location = 0.5768236819801289
 scale = 0.1
 
 [[priors.unbalanced_metabolites.Evo04Evo01EP_m-1_e-B1]]
+target_id = "co2_c"
+location = 0.5
+scale = 2.0
+
+[[priors.unbalanced_metabolites.Evo04Evo01EP_m-1_e-B1]]
 target_id = "pyr_c"
 location = 0.5
 scale = 2.0
@@ -4214,6 +4219,11 @@ location = 0.5768236819801289
 scale = 0.1
 
 [[priors.unbalanced_metabolites.Evo04Evo01EP_m-1_e-B2]]
+target_id = "co2_c"
+location = 0.5
+scale = 2.0
+
+[[priors.unbalanced_metabolites.Evo04Evo01EP_m-1_e-B2]]
 target_id = "pyr_c"
 location = 0.5
 scale = 2.0
@@ -4254,6 +4264,11 @@ location = 0.2684788653026555
 scale = 0.1
 
 [[priors.unbalanced_metabolites.Evo04Evo01EP_m-2_e-B1]]
+target_id = "co2_c"
+location = 0.5
+scale = 2.0
+
+[[priors.unbalanced_metabolites.Evo04Evo01EP_m-2_e-B1]]
 target_id = "pyr_c"
 location = 0.5
 scale = 2.0
@@ -4294,6 +4309,11 @@ location = 0.2684788653026555
 scale = 0.1
 
 [[priors.unbalanced_metabolites.Evo04Evo01EP_m-2_e-B2]]
+target_id = "co2_c"
+location = 0.5
+scale = 2.0
+
+[[priors.unbalanced_metabolites.Evo04Evo01EP_m-2_e-B2]]
 target_id = "pyr_c"
 location = 0.5
 scale = 2.0
@@ -4334,6 +4354,11 @@ location = 0.2844676694850122
 scale = 0.1
 
 [[priors.unbalanced_metabolites.Evo04Evo01EP_m-3_e-B1]]
+target_id = "co2_c"
+location = 0.5
+scale = 2.0
+
+[[priors.unbalanced_metabolites.Evo04Evo01EP_m-3_e-B1]]
 target_id = "pyr_c"
 location = 0.5
 scale = 2.0
@@ -4374,6 +4399,11 @@ location = 0.2844676694850122
 scale = 0.1
 
 [[priors.unbalanced_metabolites.Evo04Evo01EP_m-3_e-B2]]
+target_id = "co2_c"
+location = 0.5
+scale = 2.0
+
+[[priors.unbalanced_metabolites.Evo04Evo01EP_m-3_e-B2]]
 target_id = "pyr_c"
 location = 0.5
 scale = 2.0
@@ -4414,6 +4444,11 @@ location = 0.3243809431899649
 scale = 0.1
 
 [[priors.unbalanced_metabolites.Evo04Evo01EP_m-4_e-B1]]
+target_id = "co2_c"
+location = 0.5
+scale = 2.0
+
+[[priors.unbalanced_metabolites.Evo04Evo01EP_m-4_e-B1]]
 target_id = "pyr_c"
 location = 0.5
 scale = 2.0
@@ -4454,6 +4489,11 @@ location = 0.3243809431899649
 scale = 0.1
 
 [[priors.unbalanced_metabolites.Evo04Evo01EP_m-4_e-B2]]
+target_id = "co2_c"
+location = 0.5
+scale = 2.0
+
+[[priors.unbalanced_metabolites.Evo04Evo01EP_m-4_e-B2]]
 target_id = "pyr_c"
 location = 0.5
 scale = 2.0
@@ -4494,6 +4534,11 @@ location = 0.5676277484231236
 scale = 0.1
 
 [[priors.unbalanced_metabolites.Evo04Evo01EP_m-5_e-B1]]
+target_id = "co2_c"
+location = 0.5
+scale = 2.0
+
+[[priors.unbalanced_metabolites.Evo04Evo01EP_m-5_e-B1]]
 target_id = "pyr_c"
 location = 0.5
 scale = 2.0
@@ -4534,6 +4579,11 @@ location = 0.5676277484231236
 scale = 0.1
 
 [[priors.unbalanced_metabolites.Evo04Evo01EP_m-5_e-B2]]
+target_id = "co2_c"
+location = 0.5
+scale = 2.0
+
+[[priors.unbalanced_metabolites.Evo04Evo01EP_m-5_e-B2]]
 target_id = "pyr_c"
 location = 0.5
 scale = 2.0
@@ -4574,6 +4624,11 @@ location = 0.5549688020321867
 scale = 0.1
 
 [[priors.unbalanced_metabolites.Evo04Evo01EP_m-6_e-B1]]
+target_id = "co2_c"
+location = 0.5
+scale = 2.0
+
+[[priors.unbalanced_metabolites.Evo04Evo01EP_m-6_e-B1]]
 target_id = "pyr_c"
 location = 0.5
 scale = 2.0
@@ -4614,6 +4669,11 @@ location = 0.5549688020321867
 scale = 0.1
 
 [[priors.unbalanced_metabolites.Evo04Evo01EP_m-6_e-B2]]
+target_id = "co2_c"
+location = 0.5
+scale = 2.0
+
+[[priors.unbalanced_metabolites.Evo04Evo01EP_m-6_e-B2]]
 target_id = "pyr_c"
 location = 0.5
 scale = 2.0
@@ -4654,6 +4714,11 @@ location = 0.3779625773944491
 scale = 0.1
 
 [[priors.unbalanced_metabolites.Evo04Evo02EP_m-1_e-B1]]
+target_id = "co2_c"
+location = 0.5
+scale = 2.0
+
+[[priors.unbalanced_metabolites.Evo04Evo02EP_m-1_e-B1]]
 target_id = "pyr_c"
 location = 0.5
 scale = 2.0
@@ -4694,6 +4759,11 @@ location = 0.3779625773944491
 scale = 0.1
 
 [[priors.unbalanced_metabolites.Evo04Evo02EP_m-1_e-B2]]
+target_id = "co2_c"
+location = 0.5
+scale = 2.0
+
+[[priors.unbalanced_metabolites.Evo04Evo02EP_m-1_e-B2]]
 target_id = "pyr_c"
 location = 0.5
 scale = 2.0
@@ -4734,6 +4804,11 @@ location = 0.3523705261638891
 scale = 0.1
 
 [[priors.unbalanced_metabolites.Evo04Evo02EP_m-2_e-B1]]
+target_id = "co2_c"
+location = 0.5
+scale = 2.0
+
+[[priors.unbalanced_metabolites.Evo04Evo02EP_m-2_e-B1]]
 target_id = "pyr_c"
 location = 0.5
 scale = 2.0
@@ -4774,6 +4849,11 @@ location = 0.3523705261638891
 scale = 0.1
 
 [[priors.unbalanced_metabolites.Evo04Evo02EP_m-2_e-B2]]
+target_id = "co2_c"
+location = 0.5
+scale = 2.0
+
+[[priors.unbalanced_metabolites.Evo04Evo02EP_m-2_e-B2]]
 target_id = "pyr_c"
 location = 0.5
 scale = 2.0
@@ -4814,6 +4894,11 @@ location = 0.5681783876844768
 scale = 0.1
 
 [[priors.unbalanced_metabolites.Evo04Evo02EP_m-3_e-B1]]
+target_id = "co2_c"
+location = 0.5
+scale = 2.0
+
+[[priors.unbalanced_metabolites.Evo04Evo02EP_m-3_e-B1]]
 target_id = "pyr_c"
 location = 0.5
 scale = 2.0
@@ -4854,6 +4939,11 @@ location = 0.5681783876844768
 scale = 0.1
 
 [[priors.unbalanced_metabolites.Evo04Evo02EP_m-3_e-B2]]
+target_id = "co2_c"
+location = 0.5
+scale = 2.0
+
+[[priors.unbalanced_metabolites.Evo04Evo02EP_m-3_e-B2]]
 target_id = "pyr_c"
 location = 0.5
 scale = 2.0
@@ -4894,6 +4984,11 @@ location = 0.3476598690687084
 scale = 0.1
 
 [[priors.unbalanced_metabolites.Evo04Evo02EP_m-4_e-B1]]
+target_id = "co2_c"
+location = 0.5
+scale = 2.0
+
+[[priors.unbalanced_metabolites.Evo04Evo02EP_m-4_e-B1]]
 target_id = "pyr_c"
 location = 0.5
 scale = 2.0
@@ -4934,6 +5029,11 @@ location = 0.3476598690687084
 scale = 0.1
 
 [[priors.unbalanced_metabolites.Evo04Evo02EP_m-4_e-B2]]
+target_id = "co2_c"
+location = 0.5
+scale = 2.0
+
+[[priors.unbalanced_metabolites.Evo04Evo02EP_m-4_e-B2]]
 target_id = "pyr_c"
 location = 0.5
 scale = 2.0
@@ -4974,6 +5074,11 @@ location = 0.3740984525011242
 scale = 0.1
 
 [[priors.unbalanced_metabolites.Evo04Evo02EP_m-5_e-B1]]
+target_id = "co2_c"
+location = 0.5
+scale = 2.0
+
+[[priors.unbalanced_metabolites.Evo04Evo02EP_m-5_e-B1]]
 target_id = "pyr_c"
 location = 0.5
 scale = 2.0
@@ -5014,6 +5119,11 @@ location = 0.3740984525011242
 scale = 0.1
 
 [[priors.unbalanced_metabolites.Evo04Evo02EP_m-5_e-B2]]
+target_id = "co2_c"
+location = 0.5
+scale = 2.0
+
+[[priors.unbalanced_metabolites.Evo04Evo02EP_m-5_e-B2]]
 target_id = "pyr_c"
 location = 0.5
 scale = 2.0
@@ -5054,6 +5164,11 @@ location = 0.5192687850155024
 scale = 0.1
 
 [[priors.unbalanced_metabolites.Evo04Evo02EP_m-6_e-B1]]
+target_id = "co2_c"
+location = 0.5
+scale = 2.0
+
+[[priors.unbalanced_metabolites.Evo04Evo02EP_m-6_e-B1]]
 target_id = "pyr_c"
 location = 0.5
 scale = 2.0
@@ -5092,6 +5207,11 @@ scale = 0.1
 target_id = "r5p_c"
 location = 0.5192687850155024
 scale = 0.1
+
+[[priors.unbalanced_metabolites.Evo04Evo02EP_m-6_e-B2]]
+target_id = "co2_c"
+location = 0.5
+scale = 2.0
 
 [[priors.unbalanced_metabolites.Evo04Evo02EP_m-6_e-B2]]
 target_id = "pyr_c"
