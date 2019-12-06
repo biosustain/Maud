@@ -153,6 +153,13 @@ def get_input_data(
     enzyme_codes = code_generation.get_enzyme_codes(mi.kinetic_model)
     experiment_codes = utils.codify(mi.experiments.keys())
     metabolite_codes = code_generation.get_metabolite_codes(mi.kinetic_model)
+    metabolite_ids_no_compartments = list(set([
+        m.id for m in mi.kinetic_model.metabolites.values()
+    ]))
+    metabolite_codes_no_compartments = utils.codify(metabolite_ids_no_compartments)
+    compartment_metabolite_index = [
+        metabolite_codes_no_compartments[m.id] for m in metabolites.values()
+    ]
     unb_metabolite_codes = {
         k: v for k, v in metabolite_codes.items() if not metabolites[k].balanced
     }
@@ -167,7 +174,7 @@ def get_input_data(
         for target_type in ["kinetic_parameter", "thermodynamic_parameter"]
     )
     formation_energy_priors = formation_energy_priors.set_index("target_id").reindex(
-        full_stoic.columns
+        metabolite_codes_no_compartments
     )
     prior_loc_unb, prior_loc_enzyme, prior_scale_unb, prior_scale_enzyme = (
         prior_df.loc[lambda df: df["target_type"] == target_type]
@@ -202,7 +209,9 @@ def get_input_data(
             "N_experiment": len(mi.experiments),
             "N_flux_measurement": len(reaction_measurements),
             "N_conc_measurement": len(metabolite_measurements),
+            "N_metabolite": len(formation_energy_priors),
             "stoichiometric_matrix": full_stoic.T.values,
+            "compartment_metabolite_index": compartment_metabolite_index,
             "experiment_yconc": (
                 metabolite_measurements["experiment_id"].map(experiment_codes).values
             ),
@@ -227,7 +236,7 @@ def get_input_data(
             "prior_scale_unbalanced": prior_scale_unb.values,
             "prior_loc_enzyme": prior_loc_enzyme.values,
             "prior_scale_enzyme": prior_scale_enzyme.values,
-            "as_guess": [0.1 for m in range(len(balanced_metabolites))],
+            "as_guess": [0.01 for m in range(len(balanced_metabolites))],
             "rtol": rel_tol,
             "ftol": f_tol,
             "steps": max_steps,
