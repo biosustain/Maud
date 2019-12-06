@@ -22,9 +22,17 @@ from maud import data_model
 def validate_maud_input(mi: data_model.MaudInput):
     """Check that priors, experiments and kinetic model are consistent."""
     km = mi.kinetic_model
-    km_unb_mets = [met.id for met in km.metabolites.values() if not met.balanced]
-    km_balanced_mets = [met.id for met in km.metabolites.values() if met.balanced]
+    km_compartment_ids = km.compartments.keys()
+    km_unb_mets = [
+        met.id + '_' + met.compartment
+        for met in km.metabolites.values() if not met.balanced
+    ]
+    km_balanced_mets = [
+        met.id + '_' + met.compartment
+        for met in km.metabolites.values() if met.balanced
+    ]
     km_mets = km_unb_mets + km_balanced_mets
+    km_mets_no_compartments = list(set([met.id for met in km.metabolites.values()]))
     km_rxns = [rxn.id for rxn in km.reactions.values()]
     km_enzs = [enz.id for rxn in km.reactions.values() for enz in rxn.enzymes.values()]
     km_pars = [
@@ -58,12 +66,12 @@ def validate_maud_input(mi: data_model.MaudInput):
             )
     for tp in prior_tps:
         tp_met = tp.replace("_formation_energy", "")
-        if tp_met not in km_mets:
+        if tp_met not in km_mets_no_compartments:
             raise ValueError(
                 f"Metabolite {tp_met} has a formation energy prior but is not in the "
                 "kinetic model."
             )
-    for km_met in km_mets:
+    for km_met in km_mets_no_compartments:
         if km_met + "_formation_energy" not in prior_tps:
             raise ValueError(
                 f"Metabolite {km_met} is in the kinetic model but has no formation"
