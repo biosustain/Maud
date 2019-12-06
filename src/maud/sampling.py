@@ -153,8 +153,8 @@ def get_input_data(
     enzyme_codes = code_generation.get_enzyme_codes(mi.kinetic_model)
     experiment_codes = utils.codify(mi.experiments.keys())
     metabolite_codes = code_generation.get_metabolite_codes(mi.kinetic_model)
-    metabolite_ids_no_compartments = list(
-        set([m.id for m in mi.kinetic_model.metabolites.values()])
+    metabolite_ids_no_compartments = np.unique(
+        [m.id for m in mi.kinetic_model.metabolites.values()]
     )
     metabolite_codes_no_compartments = utils.codify(metabolite_ids_no_compartments)
     compartment_metabolite_index = [
