@@ -161,18 +161,23 @@ class Reaction:
 class KineticModel:
     """Constructor for representation of a system of metabolic reactions.
 
-    All attributes apart from model_id are initialized as empty defaultdicts.
-
-    Each of the dictionaries will be of the form {'entity_id': entity_object},
-    where entity stands for metabolite, reaction, compartment, or condition, at
-    the moment.
+    :param model_id: id of the kinetic model
+    :param metabolites: dictionary mapping strings to metabolite objects
+    :param reactions: dictionary mapping strings to reaction objects
+    :param compartments: dictionary mapping strings to compartment objects
     """
 
-    def __init__(self, model_id: str):
+    def __init__(
+        self,
+        model_id: str,
+        metabolites: Dict[str, Metabolite],
+        reactions: Dict[str, Reaction],
+        compartments: Dict[str, Compartment],
+    ):
         self.model_id = model_id
-        self.metabolites = defaultdict()
-        self.reactions = defaultdict()
-        self.compartments = defaultdict()
+        self.metabolites = metabolites
+        self.reactions = reactions
+        self.compartments = compartments
 
 
 class Measurement:

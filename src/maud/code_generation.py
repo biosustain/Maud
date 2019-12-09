@@ -31,7 +31,6 @@ from maud.utils import (
     get_enzyme_codes,
     get_kinetic_parameter_codes,
     get_metabolite_codes,
-    get_thermo_codes,
 )
 
 
@@ -265,19 +264,18 @@ def create_fluxes_function(kinetic_model: KineticModel, template: Template) -> s
     modular_template = get_templates()["modular_rate_law"]
     unbalanced = [m for m in kinetic_model.metabolites.values() if not m.balanced]
     kp_codes = get_kinetic_parameter_codes(kinetic_model)
-    thermo_codes = get_thermo_codes(kinetic_model)
     met_codes = get_metabolite_codes(kinetic_model)
-    enz_codes = get_enzyme_codes(kinetic_model)
+    enz_codes = keq_codes = get_enzyme_codes(kinetic_model)
 
     # Add increments to codes so they can be referred to in context of stacked
     # theta vector in the Stan model. This is necessary because only one vector
     # of random variables can be passed into the algebra solver.
-    enz_codes_in_theta, thermo_codes_in_theta, kp_codes_in_theta = (
+    enz_codes_in_theta, keq_codes_in_theta, kp_codes_in_theta = (
         {k: v + increment for k, v in original_codes.items()}
         for increment, original_codes in [
             (len(unbalanced), enz_codes),
-            (len(unbalanced) + len(enz_codes), thermo_codes),
-            (len(unbalanced) + len(enz_codes) + len(thermo_codes), kp_codes),
+            (len(unbalanced) + len(enz_codes), keq_codes),
+            (len(unbalanced) + len(enz_codes) + len(keq_codes), kp_codes),
         ]
     )
     haldane_lines = []
@@ -300,7 +298,7 @@ def create_fluxes_function(kinetic_model: KineticModel, template: Template) -> s
                 derived_params = HALDANE_PARAMS[enz.mechanism].keys()
                 for derived_param in derived_params:
                     haldane_line = create_haldane_line(
-                        {**kp_codes_in_theta, **thermo_codes_in_theta},
+                        {**kp_codes_in_theta, **keq_codes_in_theta},
                         derived_param,
                         enz.mechanism,
                         enz.id,
@@ -339,7 +337,7 @@ def create_fluxes_function(kinetic_model: KineticModel, template: Template) -> s
                     enz_id=enz_id,
                     enz=enz_code,
                     Kcat1=kp_codes_in_theta[enz_id + "_" + "Kcat1"],
-                    Keq=thermo_codes_in_theta[enz_id + "_delta_g"],
+                    Keq=keq_codes_in_theta[enz_id],
                     substrate_list=substrate_block,
                     product_list=product_block,
                     competitive_inhibitor_list=competitor_block,
@@ -365,7 +363,7 @@ def create_fluxes_function(kinetic_model: KineticModel, template: Template) -> s
                     **{"enz": enz_code},
                     **enz_param_codes,
                     "enz_id": enz_id,
-                    "Keq": thermo_codes_in_theta[enz_id + "_delta_g"],
+                    "Keq": keq_codes_in_theta[enz_id],
                 }
 
             catalytic_string = MECHANISM_TEMPLATES[enz.mechanism].render(mechanism_args)
