@@ -77,32 +77,32 @@ def validate_maud_input(mi: data_model.MaudInput):
                 f"Metabolite {km_met} is in the kinetic model but has no formation"
                 " energy prior."
             )
-    for exp_id, met_id in prior_unb_mets:
-        if met_id not in km_unb_mets:
-            raise ValueError(
-                f"unbalanced metabolite {met_id} has a prior in experiment {exp_id} but"
-                " is not in the kinetic model."
-            )
-    for met_id in km_unb_mets:
-        for exp_id in mi.experiments.keys():
-            if (exp_id, met_id) not in prior_unb_mets:
-                raise ValueError(
-                    f"unbalanced metabolite {met_id} is in the kinetic model but has no"
-                    " prior in experiment {exp_id}."
-                )
-    for exp_id, enz_id in prior_enzs:
-        if enz_id not in km_enzs:
-            raise ValueError(
-                f"enzyme {enz_id} in experiment {exp_id} has a prior but is not in the"
-                " kinetic model."
-            )
-    for enz_id in km_enzs:
-        for exp_id in mi.experiments.keys():
-            if exp_id + "_" + enz_id not in map("_".join, prior_enzs):
-                raise ValueError(
-                    f"enzyme {enz_id} is in the kinetic model but has no prior in"
-                    " experiment {exp_id}."
-                )
+    # for exp_id, met_id in prior_unb_mets:
+        # if met_id not in km_unb_mets:
+            # raise ValueError(
+                # f"unbalanced metabolite {met_id} has a prior in experiment {exp_id} but"
+                # " is not in the kinetic model."
+            # )
+    # for met_id in km_unb_mets:
+        # for exp_id in mi.experiments.keys():
+            # if (exp_id, met_id) not in prior_unb_mets:
+                # raise ValueError(
+                    # f"unbalanced metabolite {met_id} is in the kinetic model but has no"
+                    # " prior in experiment {exp_id}."
+                # )
+    # for exp_id, enz_id in prior_enzs:
+        # if enz_id not in km_enzs:
+            # raise ValueError(
+                # f"enzyme {enz_id} in experiment {exp_id} has a prior but is not in the"
+                # " kinetic model."
+            # )
+    # for enz_id in km_enzs:
+        # for exp_id in mi.experiments.keys():
+            # if exp_id + "_" + enz_id not in map("_".join, prior_enzs):
+                # raise ValueError(
+                    # f"enzyme {enz_id} is in the kinetic model but has no prior in"
+                    # " experiment {exp_id}."
+                # )
     for exp in mi.experiments.values():
         for meas in exp.measurements["metabolite"].values():
             if meas.target_id not in km_unb_mets + km_balanced_mets:

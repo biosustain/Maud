@@ -219,7 +219,7 @@ def load_maud_input_from_toml(filepath: str, id: str = "mi") -> MaudInput:
     experiments = {}
     for e in parsed_toml["experiments"]:
         experiment = Experiment(id=e["id"])
-        for target_type in ["metabolite", "reaction"]:
+        for target_type in ["metabolite", "reaction", "enzyme"]:
             type_measurements = {}
             for m in e[target_type + "_measurements"]:
                 measurement = Measurement(
@@ -244,17 +244,17 @@ def load_maud_input_from_toml(filepath: str, id: str = "mi") -> MaudInput:
             scale=formation_energy_prior["scale"],
             target_type="thermodynamic_parameter",
         )
-    for exp_id, umps in parsed_toml["priors"]["unbalanced_metabolites"].items():
-        for ump in umps:
-            prior_id = f"{exp_id}_{ump['target_id']}"
-            priors[prior_id] = Prior(
-                id=prior_id,
-                target_id=ump["target_id"],
-                location=ump["location"],
-                scale=ump["scale"],
-                target_type="unbalanced_metabolite",
-                experiment_id=exp_id,
-            )
+    # for exp_id, umps in parsed_toml["priors"]["unbalanced_metabolites"].items():
+        # for ump in umps:
+            # prior_id = f"{exp_id}_{ump['target_id']}"
+            # priors[prior_id] = Prior(
+                # id=prior_id,
+                # target_id=ump["target_id"],
+                # location=ump["location"],
+                # scale=ump["scale"],
+                # target_type="unbalanced_metabolite",
+                # experiment_id=exp_id,
+            # )
     for enz_id, kpps in parsed_toml["priors"]["kinetic_parameters"].items():
         for kpp in kpps:
             prior_id = f"{enz_id}_{kpp['target_id']}"
@@ -267,17 +267,17 @@ def load_maud_input_from_toml(filepath: str, id: str = "mi") -> MaudInput:
                 scale=kpp["scale"],
                 target_type="kinetic_parameter",
             )
-    for exp_id, eps in parsed_toml["priors"]["enzymes"].items():
-        for ep in eps:
-            prior_id = f"{exp_id}_{ep['target_id']}"
-            priors[prior_id] = Prior(
-                id=prior_id,
-                target_id=ep["target_id"],
-                location=ep["location"],
-                scale=ep["scale"],
-                target_type="enzyme",
-                experiment_id=exp_id,
-            )
+    # for exp_id, eps in parsed_toml["priors"]["enzymes"].items():
+        # for ep in eps:
+            # prior_id = f"{exp_id}_{ep['target_id']}"
+            # priors[prior_id] = Prior(
+                # id=prior_id,
+                # target_id=ep["target_id"],
+                # location=ep["location"],
+                # scale=ep["scale"],
+                # target_type="enzyme",
+                # experiment_id=exp_id,
+            # )
 
     mi = MaudInput(kinetic_model=kinetic_model, priors=priors, experiments=experiments)
     validation.validate_maud_input(mi)
