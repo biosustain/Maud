@@ -225,11 +225,9 @@ def get_input_data(
         "yflux": reaction_measurements["value"].values,
         "sigma_flux": reaction_measurements["uncertainty"].values,
         "experiment_yenz": (
-            enzyme_measurements['experiment_id'].map(experiment_codes).values
+            enzyme_measurements["experiment_id"].map(experiment_codes).values
         ),
-        "enzyme_yenz": (
-            enzyme_measurements['target_id'].map(enzyme_codes).values
-        ),
+        "enzyme_yenz": (enzyme_measurements["target_id"].map(enzyme_codes).values),
         "yenz": enzyme_measurements["value"].values,
         "sigma_enz": enzyme_measurements["uncertainty"].values,
         "prior_loc_formation_energy": formation_energy_priors["location"].values,
@@ -249,18 +247,20 @@ def get_input_data(
 
 
 def get_initial_conditions(input_data):
-    enz_shape = input_data["N_experiment"], input_data["N_enzyme"],
+    enz_shape = (
+        input_data["N_experiment"],
+        input_data["N_enzyme"],
+    )
     unb_shape = input_data["N_experiment"], input_data["N_unbalanced"]
     enz_init = np.full(enz_shape, 0.1)
     unb_init = np.full(unb_shape, 0.01)
-    for i, (enz_ix, exp_ix) in enumerate(zip(
-            input_data["enzyme_yenz"] - 1,
-            input_data["experiment_yenz"] - 1
-    )):
+    for i, (enz_ix, exp_ix) in enumerate(
+        zip(input_data["enzyme_yenz"] - 1, input_data["experiment_yenz"] - 1)
+    ):
         enz_init[exp_ix, enz_ix] = input_data["yenz"][i]
     return {
         "kinetic_parameters": input_data["prior_loc_kinetic_parameters"],
         "unbalanced": unb_init,
         "enzyme_concentration": enz_init,
-        "formation_energy": input_data["prior_loc_formation_energy"]
+        "formation_energy": input_data["prior_loc_formation_energy"],
     }
