@@ -176,10 +176,28 @@ metabolite_measurements = [
   { target_id = 'f16p_c', value = 2.78, uncertainty = 0.05},
   { target_id = 'g3p_c', value = 0.067, uncertainty = 0.05},
   { target_id = '13dpg_c', value = 0.0016, uncertainty = 0.05},
+  { target_id = 'glc__D_e', value = 74, uncertainty = 0.05 },
+  { target_id = 'atp_c', value = 3.95, uncertainty = 0.05 },
+  { target_id = 'adp_c', value = 1.73, uncertainty = 0.05 },
+  { target_id = 'nad_c', value = 1.41, uncertainty = 0.05 },
+  { target_id = 'nadh_c', value = 0.178, uncertainty = 0.05 },
+  { target_id = 'dhap_c', value = 1.58, uncertainty = 0.05},
+  { target_id = '3pg_c', value = 0.52, uncertainty = 0.05 },
+  { target_id = 'pi_c', value = 2, uncertainty = 0.05 },
 ]
 reaction_measurements = [
   { target_id = 'GLCt1', value = 1.88, uncertainty = 0.05},
   { target_id = 'TPI', value = 1.83, uncertainty = 0.05},
+]
+enzyme_measurements = [
+  {target_id='GLCt1', value=1, uncertainty=0.05},
+  {target_id='HEX1', value=0.062, uncertainty=0.1},
+  {target_id='PGI', value=0.138, uncertainty=0.05},
+  {target_id='PFK', value=0.085, uncertainty=0.05},
+  {target_id='FBA', value=1.34, uncertainty=0.05},
+  {target_id='TPI', value=0.295, uncertainty=0.05},
+  {target_id='GAPD', value=4.2, uncertainty=0.05},
+  {target_id='PGK', value=0.258, uncertainty=0.05},
 ]
 
 ###### Priors ######
@@ -255,24 +273,8 @@ formation_energies = [
 
 [priors.unbalanced_metabolites]
 condition_1 = [
-  { target_id = 'glc__D_e', location = 74, scale = 0.05 },
-  { target_id = 'atp_c', location = 3.95, scale = 0.05 },
-  { target_id = 'adp_c', location = 1.73, scale = 0.05 },
-  { target_id = 'nad_c', location = 1.41, scale = 0.05 },
-  { target_id = 'nadh_c', location = 0.178, scale = 0.05 },
-  { target_id = 'dhap_c', location = 1.58, scale = 0.05},
-  { target_id = '3pg_c', location = 0.52, scale = 0.05 },
-  { target_id = 'pi_c', location = 2, scale = 0.05 },
 ]
 [priors.enzymes]
 condition_1 = [
   # Glycolysis
-  {target_id='GLCt1', location=1, scale=0.05},
-  {target_id='HEX1', location=0.062, scale=0.1},
-  {target_id='PGI', location=0.138, scale=0.05},
-  {target_id='PFK', location=0.085, scale=0.05},
-  {target_id='FBA', location=1.34, scale=0.05},
-  {target_id='TPI', location=0.295, scale=0.05},
-  {target_id='GAPD', location=4.2, scale=0.05},
-  {target_id='PGK', location=0.258, scale=0.05},
 ]

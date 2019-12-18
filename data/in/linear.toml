@@ -70,9 +70,16 @@ metadata = "A bat got in the bioreactor."
 metabolite_measurements = [
   {target_id='M1_c', value=0.8, uncertainty=0.1},
   {target_id='M2_c', value=1.5, uncertainty=0.1},
+  {target_id='M1_e', value=2, uncertainty=0.05},
+  {target_id='M2_e', value=1, uncertainty=0.05},
 ]
 reaction_measurements = [
   {target_id='r3', value=0.29, uncertainty=0.1}
+]
+enzyme_measurements = [
+  {target_id='r1', value=1, uncertainty=0.05},
+  {target_id='r2', value=1, uncertainty=0.05},
+  {target_id='r3', value=1, uncertainty=0.05},
 ]
 
 [[experiments]]
@@ -81,9 +88,16 @@ metadata = "I may have mixed up some/all of the numbers."
 metabolite_measurements = [
   {target_id='M1_c', value=0.7, uncertainty=0.1},
   {target_id='M2_c', value=1.4, uncertainty=0.1},
+  {target_id='M1_e', value=2, uncertainty=0.05},
+  {target_id='M2_e', value=1, uncertainty=0.05},
 ]
 reaction_measurements = [
   {target_id='r3', value=0.21, uncertainty=0.1}
+]
+enzyme_measurements = [
+  {target_id='r1', value=1.5, uncertainty=0.05},
+  {target_id='r2', value=1.5, uncertainty=0.05},
+  {target_id='r3', value=1.5, uncertainty=0.05},
 ]
 
 ###### Priors ######
@@ -113,26 +127,4 @@ r3 = [
 formation_energies = [
   { target_id = 'M1', location = -1, scale = 0.05},
   { target_id = 'M2', location = -2, scale = 0.05},
-]
-
-[priors.unbalanced_metabolites]
-condition_1 = [
-  {target_id='M1_e', location=2, scale=0.05},
-  {target_id='M2_e', location=1, scale=0.05},
-]
-condition_2 = [
-  {target_id='M1_e', location=2, scale=0.05},
-  {target_id='M2_e', location=1, scale=0.05},
-]
-
-[priors.enzymes]
-condition_1 = [
-  {target_id='r1', location=1, scale=0.05},
-  {target_id='r2', location=1, scale=0.05},
-  {target_id='r3', location=1, scale=0.05},
-]
-condition_2 = [
-  {target_id='r1', location=1.5, scale=0.05},
-  {target_id='r2', location=1.5, scale=0.05},
-  {target_id='r3', location=1.5, scale=0.05},
 ]
