@@ -34,7 +34,6 @@ def validate_maud_input(mi: data_model.MaudInput):
     ]
     km_mets_no_compartments = list(set([met.id for met in km.metabolites.values()]))
     km_rxns = [rxn.id for rxn in km.reactions.values()]
-    km_enzs = [enz.id for rxn in km.reactions.values() for enz in rxn.enzymes.values()]
     km_pars = [
         p
         for rxn in km.reactions.values()

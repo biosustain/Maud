@@ -162,9 +162,6 @@ def get_input_data(
     compartment_metabolite_index = [
         metabolite_codes_no_compartments[m.id] for m in metabolites.values()
     ]
-    unb_metabolite_codes = {
-        k: v for k, v in metabolite_codes.items() if not metabolites[k].balanced
-    }
     enzymes = {k: v for r in reactions.values() for k, v in r.enzymes.items()}
     balanced_metabolites = {k: v for k, v in metabolites.items() if v.balanced}
     unbalanced_metabolites = {k: v for k, v in metabolites.items() if not v.balanced}
@@ -247,6 +244,7 @@ def get_input_data(
 
 
 def get_initial_conditions(input_data):
+    """Specify parameters' initial conditions."""
     enz_shape = (
         input_data["N_experiment"],
         input_data["N_enzyme"],
