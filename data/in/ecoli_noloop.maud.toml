@@ -67,7 +67,7 @@ name = "Ribose-5-phosphate isomerase"
 id = "RPI"
 name = "Ribose-5-phosphate isomerase"
 mechanism = "modular_rate_law"
-gene = "FIX"
+gene = "rpiA"
 
 
 [reactions.stoichiometry]
@@ -93,7 +93,7 @@ name = "Transketolase"
 id = "TKT1"
 name = "Transketolase"
 mechanism = "modular_rate_law"
-gene = "FIX"
+gene = "tktA"
 
 
 [reactions.stoichiometry]
@@ -102,116 +102,116 @@ r5p_c = -1
 s7p_c = 1
 xu5p__D_c = -1
 [[metabolites]]
-id = "6pgl_c"
-name = "6-phospho-D-glucono-1,5-lactone"
-balanced = true
-compartment = "cytosol"
-
-[[metabolites]]
-id = "xu5p__D_c"
-name = "D-Xylulose 5-phosphate"
-balanced = false
-compartment = "cytosol"
-
-[[metabolites]]
-id = "g3p_c"
-name = "Glyceraldehyde 3-phosphate"
-balanced = false
-compartment = "cytosol"
-
-[[metabolites]]
-id = "s7p_c"
+id = "s7p"
 name = "Sedoheptulose 7-phosphate"
+compartment = "c"
 balanced = false
-compartment = "cytosol"
 
 [[metabolites]]
-id = "nadp_c"
-name = "Nicotinamide adenine dinucleotide phosphate"
-balanced = false
-compartment = "cytosol"
-
-[[metabolites]]
-id = "nadph_c"
-name = "Nicotinamide adenine dinucleotide phosphate - reduced"
-balanced = false
-compartment = "cytosol"
-
-[[metabolites]]
-id = "6pgc_c"
-name = "6-Phospho-D-gluconate"
-balanced = true
-compartment = "cytosol"
-
-[[metabolites]]
-id = "g6p_c"
-name = "D-Glucose 6-phosphate"
-balanced = false
-compartment = "cytosol"
-
-[[metabolites]]
-id = "f6p_c"
-name = "D-Fructose 6-phosphate"
-balanced = false
-compartment = "cytosol"
-
-[[metabolites]]
-id = "r5p_c"
-name = "Alpha-D-Ribose 5-phosphate"
-balanced = false
-compartment = "cytosol"
-
-[[metabolites]]
-id = "co2_c"
+id = "co2"
 name = "CO2 CO2"
+compartment = "c"
 balanced = false
-compartment = "cytosol"
 
 [[metabolites]]
-id = "ru5p__D_c"
+id = "g6p"
+name = "D-Glucose 6-phosphate"
+compartment = "c"
+balanced = false
+
+[[metabolites]]
+id = "ru5p__D"
 name = "D-Ribulose 5-phosphate"
+compartment = "c"
 balanced = true
-compartment = "cytosol"
+
+[[metabolites]]
+id = "6pgc"
+name = "6-Phospho-D-gluconate"
+compartment = "c"
+balanced = true
+
+[[metabolites]]
+id = "r5p"
+name = "Alpha-D-Ribose 5-phosphate"
+compartment = "c"
+balanced = false
+
+[[metabolites]]
+id = "nadph"
+name = "Nicotinamide adenine dinucleotide phosphate - reduced"
+compartment = "c"
+balanced = false
+
+[[metabolites]]
+id = "f6p"
+name = "D-Fructose 6-phosphate"
+compartment = "c"
+balanced = false
+
+[[metabolites]]
+id = "6pgl"
+name = "6-phospho-D-glucono-1,5-lactone"
+compartment = "c"
+balanced = true
+
+[[metabolites]]
+id = "g3p"
+name = "Glyceraldehyde 3-phosphate"
+compartment = "c"
+balanced = false
+
+[[metabolites]]
+id = "nadp"
+name = "Nicotinamide adenine dinucleotide phosphate"
+compartment = "c"
+balanced = false
+
+[[metabolites]]
+id = "xu5p__D"
+name = "D-Xylulose 5-phosphate"
+compartment = "c"
+balanced = false
 
 [[experiments]]
 id = "Evo04Evo01EP_m-1_e-B1"
 [[experiments.metabolite_measurements]]
-target_id = "6pgc_c"
+target_id = [ "Evo04Evo01EP", 1, "6pgc_c",]
 value = 0.5143960269791895
 uncertainty = 0.1
 
 [[experiments.metabolite_measurements]]
-target_id = "f6p_c"
+target_id = [ "Evo04Evo01EP", 1, "f6p_c",]
 value = 0.7234538796778107
 uncertainty = 0.1
 
 [[experiments.metabolite_measurements]]
-target_id = "g6p_c"
+target_id = [ "Evo04Evo01EP", 1, "g6p_c",]
 value = 2.251078005182113
 uncertainty = 0.1
 
 [[experiments.metabolite_measurements]]
-target_id = "nadp_c"
+target_id = [ "Evo04Evo01EP", 1, "nadp_c",]
 value = 0.8641724263327427
 uncertainty = 0.1
 
 [[experiments.metabolite_measurements]]
-target_id = "nadph_c"
+target_id = [ "Evo04Evo01EP", 1, "nadph_c",]
 value = 0.03594953086901059
 uncertainty = 0.1
 
 [[experiments.metabolite_measurements]]
-target_id = "r5p_c"
+target_id = [ "Evo04Evo01EP", 1, "r5p_c",]
 value = 0.5768236819801289
 uncertainty = 0.1
 
 [[experiments.metabolite_measurements]]
-target_id = "ru5p__D_c"
+target_id = [ "Evo04Evo01EP", 1, "ru5p__D_c",]
 value = 0.05234065846111169
 uncertainty = 0.1
 
 [[experiments.metabolite_measurements]]
-target_id = "s7p_c"
+target_id = [ "Evo04Evo01EP", 1, "s7p_c",]
 value = 0.2652515081141275
 uncertainty = 0.1
 
@@ -254,42 +254,42 @@ uncertainty = 0.02328777246829656
 [[experiments]]
 id = "Evo04Evo01EP_m-1_e-B2"
 [[experiments.metabolite_measurements]]
-target_id = "6pgc_c"
+target_id = [ "Evo04Evo01EP", 1, "6pgc_c",]
 value = 0.5143960269791895
 uncertainty = 0.1
 
 [[experiments.metabolite_measurements]]
-target_id = "f6p_c"
+target_id = [ "Evo04Evo01EP", 1, "f6p_c",]
 value = 0.7234538796778107
 uncertainty = 0.1
 
 [[experiments.metabolite_measurements]]
-target_id = "g6p_c"
+target_id = [ "Evo04Evo01EP", 1, "g6p_c",]
 value = 2.251078005182113
 uncertainty = 0.1
 
 [[experiments.metabolite_measurements]]
-target_id = "nadp_c"
+target_id = [ "Evo04Evo01EP", 1, "nadp_c",]
 value = 0.8641724263327427
 uncertainty = 0.1
 
 [[experiments.metabolite_measurements]]
-target_id = "nadph_c"
+target_id = [ "Evo04Evo01EP", 1, "nadph_c",]
 value = 0.03594953086901059
 uncertainty = 0.1
 
 [[experiments.metabolite_measurements]]
-target_id = "r5p_c"
+target_id = [ "Evo04Evo01EP", 1, "r5p_c",]
 value = 0.5768236819801289
 uncertainty = 0.1
 
 [[experiments.metabolite_measurements]]
-target_id = "ru5p__D_c"
+target_id = [ "Evo04Evo01EP", 1, "ru5p__D_c",]
 value = 0.05234065846111169
 uncertainty = 0.1
 
 [[experiments.metabolite_measurements]]
-target_id = "s7p_c"
+target_id = [ "Evo04Evo01EP", 1, "s7p_c",]
 value = 0.2652515081141275
 uncertainty = 0.1
 
@@ -332,42 +332,42 @@ uncertainty = 0.02328777246829656
 [[experiments]]
 id = "Evo04Evo01EP_m-2_e-B1"
 [[experiments.metabolite_measurements]]
-target_id = "6pgc_c"
+target_id = [ "Evo04Evo01EP", 2, "6pgc_c",]
 value = 0.8837831632411053
 uncertainty = 0.1
 
 [[experiments.metabolite_measurements]]
-target_id = "f6p_c"
+target_id = [ "Evo04Evo01EP", 2, "f6p_c",]
 value = 0.5873536411780145
 uncertainty = 0.1
 
 [[experiments.metabolite_measurements]]
-target_id = "g6p_c"
+target_id = [ "Evo04Evo01EP", 2, "g6p_c",]
 value = 1.599276185047095
 uncertainty = 0.1
 
 [[experiments.metabolite_measurements]]
-target_id = "nadp_c"
+target_id = [ "Evo04Evo01EP", 2, "nadp_c",]
 value = 0.6265407556930067
 uncertainty = 0.1
 
 [[experiments.metabolite_measurements]]
-target_id = "nadph_c"
+target_id = [ "Evo04Evo01EP", 2, "nadph_c",]
 value = 0.02491271512125786
 uncertainty = 0.1
 
 [[experiments.metabolite_measurements]]
-target_id = "r5p_c"
+target_id = [ "Evo04Evo01EP", 2, "r5p_c",]
 value = 0.2684788653026555
 uncertainty = 0.1
 
 [[experiments.metabolite_measurements]]
-target_id = "ru5p__D_c"
+target_id = [ "Evo04Evo01EP", 2, "ru5p__D_c",]
 value = 0.04990168905894168
 uncertainty = 0.1
 
 [[experiments.metabolite_measurements]]
-target_id = "s7p_c"
+target_id = [ "Evo04Evo01EP", 2, "s7p_c",]
 value = 0.4280933865907172
 uncertainty = 0.1
 
@@ -410,42 +410,42 @@ uncertainty = 0.02328777246829656
 [[experiments]]
 id = "Evo04Evo01EP_m-2_e-B2"
 [[experiments.metabolite_measurements]]
-target_id = "6pgc_c"
+target_id = [ "Evo04Evo01EP", 2, "6pgc_c",]
 value = 0.8837831632411053
 uncertainty = 0.1
 
 [[experiments.metabolite_measurements]]
-target_id = "f6p_c"
+target_id = [ "Evo04Evo01EP", 2, "f6p_c",]
 value = 0.5873536411780145
 uncertainty = 0.1
 
 [[experiments.metabolite_measurements]]
-target_id = "g6p_c"
+target_id = [ "Evo04Evo01EP", 2, "g6p_c",]
 value = 1.599276185047095
 uncertainty = 0.1
 
 [[experiments.metabolite_measurements]]
-target_id = "nadp_c"
+target_id = [ "Evo04Evo01EP", 2, "nadp_c",]
 value = 0.6265407556930067
 uncertainty = 0.1
 
 [[experiments.metabolite_measurements]]
-target_id = "nadph_c"
+target_id = [ "Evo04Evo01EP", 2, "nadph_c",]
 value = 0.02491271512125786
 uncertainty = 0.1
 
 [[experiments.metabolite_measurements]]
-target_id = "r5p_c"
+target_id = [ "Evo04Evo01EP", 2, "r5p_c",]
 value = 0.2684788653026555
 uncertainty = 0.1
 
 [[experiments.metabolite_measurements]]
-target_id = "ru5p__D_c"
+target_id = [ "Evo04Evo01EP", 2, "ru5p__D_c",]
 value = 0.04990168905894168
 uncertainty = 0.1
 
 [[experiments.metabolite_measurements]]
-target_id = "s7p_c"
+target_id = [ "Evo04Evo01EP", 2, "s7p_c",]
 value = 0.4280933865907172
 uncertainty = 0.1
 
@@ -488,42 +488,42 @@ uncertainty = 0.02328777246829656
 [[experiments]]
 id = "Evo04Evo01EP_m-3_e-B1"
 [[experiments.metabolite_measurements]]
-target_id = "6pgc_c"
+target_id = [ "Evo04Evo01EP", 3, "6pgc_c",]
 value = 0.5908886086861402
 uncertainty = 0.1
 
 [[experiments.metabolite_measurements]]
-target_id = "f6p_c"
+target_id = [ "Evo04Evo01EP", 3, "f6p_c",]
 value = 0.6621859946669975
 uncertainty = 0.1
 
 [[experiments.metabolite_measurements]]
-target_id = "g6p_c"
+target_id = [ "Evo04Evo01EP", 3, "g6p_c",]
 value = 2.313370643839973
 uncertainty = 0.1
 
 [[experiments.metabolite_measurements]]
-target_id = "nadp_c"
+target_id = [ "Evo04Evo01EP", 3, "nadp_c",]
 value = 1.015567110954206
 uncertainty = 0.1
 
 [[experiments.metabolite_measurements]]
-target_id = "nadph_c"
+target_id = [ "Evo04Evo01EP", 3, "nadph_c",]
 value = 0.0346199661067299
 uncertainty = 0.1
 
 [[experiments.metabolite_measurements]]
-target_id = "r5p_c"
+target_id = [ "Evo04Evo01EP", 3, "r5p_c",]
 value = 0.2844676694850122
 uncertainty = 0.1
 
 [[experiments.metabolite_measurements]]
-target_id = "ru5p__D_c"
+target_id = [ "Evo04Evo01EP", 3, "ru5p__D_c",]
 value = 0.06619735652053138
 uncertainty = 0.1
 
 [[experiments.metabolite_measurements]]
-target_id = "s7p_c"
+target_id = [ "Evo04Evo01EP", 3, "s7p_c",]
 value = 0.302456550470792
 uncertainty = 0.1
 
@@ -566,42 +566,42 @@ uncertainty = 0.02328777246829656
 [[experiments]]
 id = "Evo04Evo01EP_m-3_e-B2"
 [[experiments.metabolite_measurements]]
-target_id = "6pgc_c"
+target_id = [ "Evo04Evo01EP", 3, "6pgc_c",]
 value = 0.5908886086861402
 uncertainty = 0.1
 
 [[experiments.metabolite_measurements]]
-target_id = "f6p_c"
+target_id = [ "Evo04Evo01EP", 3, "f6p_c",]
 value = 0.6621859946669975
 uncertainty = 0.1
 
 [[experiments.metabolite_measurements]]
-target_id = "g6p_c"
+target_id = [ "Evo04Evo01EP", 3, "g6p_c",]
 value = 2.313370643839973
 uncertainty = 0.1
 
 [[experiments.metabolite_measurements]]
-target_id = "nadp_c"
+target_id = [ "Evo04Evo01EP", 3, "nadp_c",]
 value = 1.015567110954206
 uncertainty = 0.1
 
 [[experiments.metabolite_measurements]]
-target_id = "nadph_c"
+target_id = [ "Evo04Evo01EP", 3, "nadph_c",]
 value = 0.0346199661067299
 uncertainty = 0.1
 
 [[experiments.metabolite_measurements]]
-target_id = "r5p_c"
+target_id = [ "Evo04Evo01EP", 3, "r5p_c",]
 value = 0.2844676694850122
 uncertainty = 0.1
 
 [[experiments.metabolite_measurements]]
-target_id = "ru5p__D_c"
+target_id = [ "Evo04Evo01EP", 3, "ru5p__D_c",]
 value = 0.06619735652053138
 uncertainty = 0.1
 
 [[experiments.metabolite_measurements]]
-target_id = "s7p_c"
+target_id = [ "Evo04Evo01EP", 3, "s7p_c",]
 value = 0.302456550470792
 uncertainty = 0.1
 
@@ -644,42 +644,42 @@ uncertainty = 0.02328777246829656
 [[experiments]]
 id = "Evo04Evo01EP_m-4_e-B1"
 [[experiments.metabolite_measurements]]
-target_id = "6pgc_c"
+target_id = [ "Evo04Evo01EP", 4, "6pgc_c",]
 value = 0.473132360043196
 uncertainty = 0.1
 
 [[experiments.metabolite_measurements]]
-target_id = "f6p_c"
+target_id = [ "Evo04Evo01EP", 4, "f6p_c",]
 value = 0.6394497125197321
 uncertainty = 0.1
 
 [[experiments.metabolite_measurements]]
-target_id = "g6p_c"
+target_id = [ "Evo04Evo01EP", 4, "g6p_c",]
 value = 1.558658129194417
 uncertainty = 0.1
 
 [[experiments.metabolite_measurements]]
-target_id = "nadp_c"
+target_id = [ "Evo04Evo01EP", 4, "nadp_c",]
 value = 0.8596082298999894
 uncertainty = 0.1
 
 [[experiments.metabolite_measurements]]
-target_id = "nadph_c"
+target_id = [ "Evo04Evo01EP", 4, "nadph_c",]
 value = 0.03540834597207852
 uncertainty = 0.1
 
 [[experiments.metabolite_measurements]]
-target_id = "r5p_c"
+target_id = [ "Evo04Evo01EP", 4, "r5p_c",]
 value = 0.3243809431899649
 uncertainty = 0.1
 
 [[experiments.metabolite_measurements]]
-target_id = "ru5p__D_c"
+target_id = [ "Evo04Evo01EP", 4, "ru5p__D_c",]
 value = 0.06577853147161099
 uncertainty = 0.1
 
 [[experiments.metabolite_measurements]]
-target_id = "s7p_c"
+target_id = [ "Evo04Evo01EP", 4, "s7p_c",]
 value = 0.3171625967433271
 uncertainty = 0.1
 
@@ -722,42 +722,42 @@ uncertainty = 0.02328777246829656
 [[experiments]]
 id = "Evo04Evo01EP_m-4_e-B2"
 [[experiments.metabolite_measurements]]
-target_id = "6pgc_c"
+target_id = [ "Evo04Evo01EP", 4, "6pgc_c",]
 value = 0.473132360043196
 uncertainty = 0.1
 
 [[experiments.metabolite_measurements]]
-target_id = "f6p_c"
+target_id = [ "Evo04Evo01EP", 4, "f6p_c",]
 value = 0.6394497125197321
 uncertainty = 0.1
 
 [[experiments.metabolite_measurements]]
-target_id = "g6p_c"
+target_id = [ "Evo04Evo01EP", 4, "g6p_c",]
 value = 1.558658129194417
 uncertainty = 0.1
 
 [[experiments.metabolite_measurements]]
-target_id = "nadp_c"
+target_id = [ "Evo04Evo01EP", 4, "nadp_c",]
 value = 0.8596082298999894
 uncertainty = 0.1
 
 [[experiments.metabolite_measurements]]
-target_id = "nadph_c"
+target_id = [ "Evo04Evo01EP", 4, "nadph_c",]
 value = 0.03540834597207852
 uncertainty = 0.1
 
 [[experiments.metabolite_measurements]]
-target_id = "r5p_c"
+target_id = [ "Evo04Evo01EP", 4, "r5p_c",]
 value = 0.3243809431899649
 uncertainty = 0.1
 
 [[experiments.metabolite_measurements]]
-target_id = "ru5p__D_c"
+target_id = [ "Evo04Evo01EP", 4, "ru5p__D_c",]
 value = 0.06577853147161099
 uncertainty = 0.1
 
 [[experiments.metabolite_measurements]]
-target_id = "s7p_c"
+target_id = [ "Evo04Evo01EP", 4, "s7p_c",]
 value = 0.3171625967433271
 uncertainty = 0.1
 
@@ -800,42 +800,42 @@ uncertainty = 0.02328777246829656
 [[experiments]]
 id = "Evo04Evo01EP_m-5_e-B1"
 [[experiments.metabolite_measurements]]
-target_id = "6pgc_c"
+target_id = [ "Evo04Evo01EP", 5, "6pgc_c",]
 value = 1.04145157632858
 uncertainty = 0.1
 
 [[experiments.metabolite_measurements]]
-target_id = "f6p_c"
+target_id = [ "Evo04Evo01EP", 5, "f6p_c",]
 value = 0.4891574064419946
 uncertainty = 0.1
 
 [[experiments.metabolite_measurements]]
-target_id = "g6p_c"
+target_id = [ "Evo04Evo01EP", 5, "g6p_c",]
 value = 2.338209978750147
 uncertainty = 0.1
 
 [[experiments.metabolite_measurements]]
-target_id = "nadp_c"
+target_id = [ "Evo04Evo01EP", 5, "nadp_c",]
 value = 0.6646789389046276
 uncertainty = 0.1
 
 [[experiments.metabolite_measurements]]
-target_id = "nadph_c"
+target_id = [ "Evo04Evo01EP", 5, "nadph_c",]
 value = 0.02249134077743391
 uncertainty = 0.1
 
 [[experiments.metabolite_measurements]]
-target_id = "r5p_c"
+target_id = [ "Evo04Evo01EP", 5, "r5p_c",]
 value = 0.5676277484231236
 uncertainty = 0.1
 
 [[experiments.metabolite_measurements]]
-target_id = "ru5p__D_c"
+target_id = [ "Evo04Evo01EP", 5, "ru5p__D_c",]
 value = 0.06130643860126129
 uncertainty = 0.1
 
 [[experiments.metabolite_measurements]]
-target_id = "s7p_c"
+target_id = [ "Evo04Evo01EP", 5, "s7p_c",]
 value = 0.286554654108743
 uncertainty = 0.1
 
@@ -878,42 +878,42 @@ uncertainty = 0.02328777246829656
 [[experiments]]
 id = "Evo04Evo01EP_m-5_e-B2"
 [[experiments.metabolite_measurements]]
-target_id = "6pgc_c"
+target_id = [ "Evo04Evo01EP", 5, "6pgc_c",]
 value = 1.04145157632858
 uncertainty = 0.1
 
 [[experiments.metabolite_measurements]]
-target_id = "f6p_c"
+target_id = [ "Evo04Evo01EP", 5, "f6p_c",]
 value = 0.4891574064419946
 uncertainty = 0.1
 
 [[experiments.metabolite_measurements]]
-target_id = "g6p_c"
+target_id = [ "Evo04Evo01EP", 5, "g6p_c",]
 value = 2.338209978750147
 uncertainty = 0.1
 
 [[experiments.metabolite_measurements]]
-target_id = "nadp_c"
+target_id = [ "Evo04Evo01EP", 5, "nadp_c",]
 value = 0.6646789389046276
 uncertainty = 0.1
 
 [[experiments.metabolite_measurements]]
-target_id = "nadph_c"
+target_id = [ "Evo04Evo01EP", 5, "nadph_c",]
 value = 0.02249134077743391
 uncertainty = 0.1
 
 [[experiments.metabolite_measurements]]
-target_id = "r5p_c"
+target_id = [ "Evo04Evo01EP", 5, "r5p_c",]
 value = 0.5676277484231236
 uncertainty = 0.1
 
 [[experiments.metabolite_measurements]]
-target_id = "ru5p__D_c"
+target_id = [ "Evo04Evo01EP", 5, "ru5p__D_c",]
 value = 0.06130643860126129
 uncertainty = 0.1
 
 [[experiments.metabolite_measurements]]
-target_id = "s7p_c"
+target_id = [ "Evo04Evo01EP", 5, "s7p_c",]
 value = 0.286554654108743
 uncertainty = 0.1
 
@@ -956,42 +956,42 @@ uncertainty = 0.02328777246829656
 [[experiments]]
 id = "Evo04Evo01EP_m-6_e-B1"
 [[experiments.metabolite_measurements]]
-target_id = "6pgc_c"
+target_id = [ "Evo04Evo01EP", 6, "6pgc_c",]
 value = 0.4847034090821288
 uncertainty = 0.1
 
 [[experiments.metabolite_measurements]]
-target_id = "f6p_c"
+target_id = [ "Evo04Evo01EP", 6, "f6p_c",]
 value = 0.7444168805337434
 uncertainty = 0.1
 
 [[experiments.metabolite_measurements]]
-target_id = "g6p_c"
+target_id = [ "Evo04Evo01EP", 6, "g6p_c",]
 value = 2.421872371655819
 uncertainty = 0.1
 
 [[experiments.metabolite_measurements]]
-target_id = "nadp_c"
+target_id = [ "Evo04Evo01EP", 6, "nadp_c",]
 value = 1.004303644813853
 uncertainty = 0.1
 
 [[experiments.metabolite_measurements]]
-target_id = "nadph_c"
+target_id = [ "Evo04Evo01EP", 6, "nadph_c",]
 value = 0.03910393743885063
 uncertainty = 0.1
 
 [[experiments.metabolite_measurements]]
-target_id = "r5p_c"
+target_id = [ "Evo04Evo01EP", 6, "r5p_c",]
 value = 0.5549688020321867
 uncertainty = 0.1
 
 [[experiments.metabolite_measurements]]
-target_id = "ru5p__D_c"
+target_id = [ "Evo04Evo01EP", 6, "ru5p__D_c",]
 value = 0.05029939182414457
 uncertainty = 0.1
 
 [[experiments.metabolite_measurements]]
-target_id = "s7p_c"
+target_id = [ "Evo04Evo01EP", 6, "s7p_c",]
 value = 0.300377975899462
 uncertainty = 0.1
 
@@ -1034,42 +1034,42 @@ uncertainty = 0.02328777246829656
 [[experiments]]
 id = "Evo04Evo01EP_m-6_e-B2"
 [[experiments.metabolite_measurements]]
-target_id = "6pgc_c"
+target_id = [ "Evo04Evo01EP", 6, "6pgc_c",]
 value = 0.4847034090821288
 uncertainty = 0.1
 
 [[experiments.metabolite_measurements]]
-target_id = "f6p_c"
+target_id = [ "Evo04Evo01EP", 6, "f6p_c",]
 value = 0.7444168805337434
 uncertainty = 0.1
 
 [[experiments.metabolite_measurements]]
-target_id = "g6p_c"
+target_id = [ "Evo04Evo01EP", 6, "g6p_c",]
 value = 2.421872371655819
 uncertainty = 0.1
 
 [[experiments.metabolite_measurements]]
-target_id = "nadp_c"
+target_id = [ "Evo04Evo01EP", 6, "nadp_c",]
 value = 1.004303644813853
 uncertainty = 0.1
 
 [[experiments.metabolite_measurements]]
-target_id = "nadph_c"
+target_id = [ "Evo04Evo01EP", 6, "nadph_c",]
 value = 0.03910393743885063
 uncertainty = 0.1
 
 [[experiments.metabolite_measurements]]
-target_id = "r5p_c"
+target_id = [ "Evo04Evo01EP", 6, "r5p_c",]
 value = 0.5549688020321867
 uncertainty = 0.1
 
 [[experiments.metabolite_measurements]]
-target_id = "ru5p__D_c"
+target_id = [ "Evo04Evo01EP", 6, "ru5p__D_c",]
 value = 0.05029939182414457
 uncertainty = 0.1
 
 [[experiments.metabolite_measurements]]
-target_id = "s7p_c"
+target_id = [ "Evo04Evo01EP", 6, "s7p_c",]
 value = 0.300377975899462
 uncertainty = 0.1
 
@@ -1112,42 +1112,42 @@ uncertainty = 0.02328777246829656
 [[experiments]]
 id = "Evo04Evo02EP_m-1_e-B1"
 [[experiments.metabolite_measurements]]
-target_id = "6pgc_c"
+target_id = [ "Evo04Evo02EP", 1, "6pgc_c",]
 value = 0.5322000207353865
 uncertainty = 0.1
 
 [[experiments.metabolite_measurements]]
-target_id = "f6p_c"
+target_id = [ "Evo04Evo02EP", 1, "f6p_c",]
 value = 0.7716029719589209
 uncertainty = 0.1
 
 [[experiments.metabolite_measurements]]
-target_id = "g6p_c"
+target_id = [ "Evo04Evo02EP", 1, "g6p_c",]
 value = 4.169143118259728
 uncertainty = 0.1
 
 [[experiments.metabolite_measurements]]
-target_id = "nadp_c"
+target_id = [ "Evo04Evo02EP", 1, "nadp_c",]
 value = 0.911396590825146
 uncertainty = 0.1
 
 [[experiments.metabolite_measurements]]
-target_id = "nadph_c"
+target_id = [ "Evo04Evo02EP", 1, "nadph_c",]
 value = 0.03810216113164088
 uncertainty = 0.1
 
 [[experiments.metabolite_measurements]]
-target_id = "r5p_c"
+target_id = [ "Evo04Evo02EP", 1, "r5p_c",]
 value = 0.3779625773944491
 uncertainty = 0.1
 
 [[experiments.metabolite_measurements]]
-target_id = "ru5p__D_c"
+target_id = [ "Evo04Evo02EP", 1, "ru5p__D_c",]
 value = 0.07997394209891835
 uncertainty = 0.1
 
 [[experiments.metabolite_measurements]]
-target_id = "s7p_c"
+target_id = [ "Evo04Evo02EP", 1, "s7p_c",]
 value = 0.3318951029290181
 uncertainty = 0.1
 
@@ -1190,42 +1190,42 @@ uncertainty = 0.007959828820540497
 [[experiments]]
 id = "Evo04Evo02EP_m-1_e-B2"
 [[experiments.metabolite_measurements]]
-target_id = "6pgc_c"
+target_id = [ "Evo04Evo02EP", 1, "6pgc_c",]
 value = 0.5322000207353865
 uncertainty = 0.1
 
 [[experiments.metabolite_measurements]]
-target_id = "f6p_c"
+target_id = [ "Evo04Evo02EP", 1, "f6p_c",]
 value = 0.7716029719589209
 uncertainty = 0.1
 
 [[experiments.metabolite_measurements]]
-target_id = "g6p_c"
+target_id = [ "Evo04Evo02EP", 1, "g6p_c",]
 value = 4.169143118259728
 uncertainty = 0.1
 
 [[experiments.metabolite_measurements]]
-target_id = "nadp_c"
+target_id = [ "Evo04Evo02EP", 1, "nadp_c",]
 value = 0.911396590825146
 uncertainty = 0.1
 
 [[experiments.metabolite_measurements]]
-target_id = "nadph_c"
+target_id = [ "Evo04Evo02EP", 1, "nadph_c",]
 value = 0.03810216113164088
 uncertainty = 0.1
 
 [[experiments.metabolite_measurements]]
-target_id = "r5p_c"
+target_id = [ "Evo04Evo02EP", 1, "r5p_c",]
 value = 0.3779625773944491
 uncertainty = 0.1
 
 [[experiments.metabolite_measurements]]
-target_id = "ru5p__D_c"
+target_id = [ "Evo04Evo02EP", 1, "ru5p__D_c",]
 value = 0.07997394209891835
 uncertainty = 0.1
 
 [[experiments.metabolite_measurements]]
-target_id = "s7p_c"
+target_id = [ "Evo04Evo02EP", 1, "s7p_c",]
 value = 0.3318951029290181
 uncertainty = 0.1
 
@@ -1268,42 +1268,42 @@ uncertainty = 0.007959828820540497
 [[experiments]]
 id = "Evo04Evo02EP_m-2_e-B1"
 [[experiments.metabolite_measurements]]
-target_id = "6pgc_c"
+target_id = [ "Evo04Evo02EP", 2, "6pgc_c",]
 value = 0.567252742551845
 uncertainty = 0.1
 
 [[experiments.metabolite_measurements]]
-target_id = "f6p_c"
+target_id = [ "Evo04Evo02EP", 2, "f6p_c",]
 value = 0.8122182432152585
 uncertainty = 0.1
 
 [[experiments.metabolite_measurements]]
-target_id = "g6p_c"
+target_id = [ "Evo04Evo02EP", 2, "g6p_c",]
 value = 2.45556737517058
 uncertainty = 0.1
 
 [[experiments.metabolite_measurements]]
-target_id = "nadp_c"
+target_id = [ "Evo04Evo02EP", 2, "nadp_c",]
 value = 1.073003357705812
 uncertainty = 0.1
 
 [[experiments.metabolite_measurements]]
-target_id = "nadph_c"
+target_id = [ "Evo04Evo02EP", 2, "nadph_c",]
 value = 0.03758799667385722
 uncertainty = 0.1
 
 [[experiments.metabolite_measurements]]
-target_id = "r5p_c"
+target_id = [ "Evo04Evo02EP", 2, "r5p_c",]
 value = 0.3523705261638891
 uncertainty = 0.1
 
 [[experiments.metabolite_measurements]]
-target_id = "ru5p__D_c"
+target_id = [ "Evo04Evo02EP", 2, "ru5p__D_c",]
 value = 0.07487985463914508
 uncertainty = 0.1
 
 [[experiments.metabolite_measurements]]
-target_id = "s7p_c"
+target_id = [ "Evo04Evo02EP", 2, "s7p_c",]
 value = 0.4167373419010046
 uncertainty = 0.1
 
@@ -1346,42 +1346,42 @@ uncertainty = 0.007959828820540497
 [[experiments]]
 id = "Evo04Evo02EP_m-2_e-B2"
 [[experiments.metabolite_measurements]]
-target_id = "6pgc_c"
+target_id = [ "Evo04Evo02EP", 2, "6pgc_c",]
 value = 0.567252742551845
 uncertainty = 0.1
 
 [[experiments.metabolite_measurements]]
-target_id = "f6p_c"
+target_id = [ "Evo04Evo02EP", 2, "f6p_c",]
 value = 0.8122182432152585
 uncertainty = 0.1
 
 [[experiments.metabolite_measurements]]
-target_id = "g6p_c"
+target_id = [ "Evo04Evo02EP", 2, "g6p_c",]
 value = 2.45556737517058
 uncertainty = 0.1
 
 [[experiments.metabolite_measurements]]
-target_id = "nadp_c"
+target_id = [ "Evo04Evo02EP", 2, "nadp_c",]
 value = 1.073003357705812
 uncertainty = 0.1
 
 [[experiments.metabolite_measurements]]
-target_id = "nadph_c"
+target_id = [ "Evo04Evo02EP", 2, "nadph_c",]
 value = 0.03758799667385722
 uncertainty = 0.1
 
 [[experiments.metabolite_measurements]]
-target_id = "r5p_c"
+target_id = [ "Evo04Evo02EP", 2, "r5p_c",]
 value = 0.3523705261638891
 uncertainty = 0.1
 
 [[experiments.metabolite_measurements]]
-target_id = "ru5p__D_c"
+target_id = [ "Evo04Evo02EP", 2, "ru5p__D_c",]
 value = 0.07487985463914508
 uncertainty = 0.1
 
 [[experiments.metabolite_measurements]]
-target_id = "s7p_c"
+target_id = [ "Evo04Evo02EP", 2, "s7p_c",]
 value = 0.4167373419010046
 uncertainty = 0.1
 
@@ -1424,42 +1424,42 @@ uncertainty = 0.007959828820540497
 [[experiments]]
 id = "Evo04Evo02EP_m-3_e-B1"
 [[experiments.metabolite_measurements]]
-target_id = "6pgc_c"
+target_id = [ "Evo04Evo02EP", 3, "6pgc_c",]
 value = 0.6735897144293421
 uncertainty = 0.1
 
 [[experiments.metabolite_measurements]]
-target_id = "f6p_c"
+target_id = [ "Evo04Evo02EP", 3, "f6p_c",]
 value = 0.7755653032093188
 uncertainty = 0.1
 
 [[experiments.metabolite_measurements]]
-target_id = "g6p_c"
+target_id = [ "Evo04Evo02EP", 3, "g6p_c",]
 value = 2.125437689314747
 uncertainty = 0.1
 
 [[experiments.metabolite_measurements]]
-target_id = "nadp_c"
+target_id = [ "Evo04Evo02EP", 3, "nadp_c",]
 value = 0.8467373177387234
 uncertainty = 0.1
 
 [[experiments.metabolite_measurements]]
-target_id = "nadph_c"
+target_id = [ "Evo04Evo02EP", 3, "nadph_c",]
 value = 0.05854704682924673
 uncertainty = 0.1
 
 [[experiments.metabolite_measurements]]
-target_id = "r5p_c"
+target_id = [ "Evo04Evo02EP", 3, "r5p_c",]
 value = 0.5681783876844768
 uncertainty = 0.1
 
 [[experiments.metabolite_measurements]]
-target_id = "ru5p__D_c"
+target_id = [ "Evo04Evo02EP", 3, "ru5p__D_c",]
 value = 0.04346799624513748
 uncertainty = 0.1
 
 [[experiments.metabolite_measurements]]
-target_id = "s7p_c"
+target_id = [ "Evo04Evo02EP", 3, "s7p_c",]
 value = 0.3806230605102041
 uncertainty = 0.1
 
@@ -1502,42 +1502,42 @@ uncertainty = 0.007959828820540497
 [[experiments]]
 id = "Evo04Evo02EP_m-3_e-B2"
 [[experiments.metabolite_measurements]]
-target_id = "6pgc_c"
+target_id = [ "Evo04Evo02EP", 3, "6pgc_c",]
 value = 0.6735897144293421
 uncertainty = 0.1
 
 [[experiments.metabolite_measurements]]
-target_id = "f6p_c"
+target_id = [ "Evo04Evo02EP", 3, "f6p_c",]
 value = 0.7755653032093188
 uncertainty = 0.1
 
 [[experiments.metabolite_measurements]]
-target_id = "g6p_c"
+target_id = [ "Evo04Evo02EP", 3, "g6p_c",]
 value = 2.125437689314747
 uncertainty = 0.1
 
 [[experiments.metabolite_measurements]]
-target_id = "nadp_c"
+target_id = [ "Evo04Evo02EP", 3, "nadp_c",]
 value = 0.8467373177387234
 uncertainty = 0.1
 
 [[experiments.metabolite_measurements]]
-target_id = "nadph_c"
+target_id = [ "Evo04Evo02EP", 3, "nadph_c",]
 value = 0.05854704682924673
 uncertainty = 0.1
 
 [[experiments.metabolite_measurements]]
-target_id = "r5p_c"
+target_id = [ "Evo04Evo02EP", 3, "r5p_c",]
 value = 0.5681783876844768
 uncertainty = 0.1
 
 [[experiments.metabolite_measurements]]
-target_id = "ru5p__D_c"
+target_id = [ "Evo04Evo02EP", 3, "ru5p__D_c",]
 value = 0.04346799624513748
 uncertainty = 0.1
 
 [[experiments.metabolite_measurements]]
-target_id = "s7p_c"
+target_id = [ "Evo04Evo02EP", 3, "s7p_c",]
 value = 0.3806230605102041
 uncertainty = 0.1
 
@@ -1580,42 +1580,42 @@ uncertainty = 0.007959828820540497
 [[experiments]]
 id = "Evo04Evo02EP_m-4_e-B1"
 [[experiments.metabolite_measurements]]
-target_id = "6pgc_c"
+target_id = [ "Evo04Evo02EP", 4, "6pgc_c",]
 value = 0.333422994088822
 uncertainty = 0.1
 
 [[experiments.metabolite_measurements]]
-target_id = "f6p_c"
+target_id = [ "Evo04Evo02EP", 4, "f6p_c",]
 value = 0.5128172649110024
 uncertainty = 0.1
 
 [[experiments.metabolite_measurements]]
-target_id = "g6p_c"
+target_id = [ "Evo04Evo02EP", 4, "g6p_c",]
 value = 2.049415715737728
 uncertainty = 0.1
 
 [[experiments.metabolite_measurements]]
-target_id = "nadp_c"
+target_id = [ "Evo04Evo02EP", 4, "nadp_c",]
 value = 0.7170997728825551
 uncertainty = 0.1
 
 [[experiments.metabolite_measurements]]
-target_id = "nadph_c"
+target_id = [ "Evo04Evo02EP", 4, "nadph_c",]
 value = 0.03749422820081005
 uncertainty = 0.1
 
 [[experiments.metabolite_measurements]]
-target_id = "r5p_c"
+target_id = [ "Evo04Evo02EP", 4, "r5p_c",]
 value = 0.3476598690687084
 uncertainty = 0.1
 
 [[experiments.metabolite_measurements]]
-target_id = "ru5p__D_c"
+target_id = [ "Evo04Evo02EP", 4, "ru5p__D_c",]
 value = 0.09312687305314944
 uncertainty = 0.1
 
 [[experiments.metabolite_measurements]]
-target_id = "s7p_c"
+target_id = [ "Evo04Evo02EP", 4, "s7p_c",]
 value = 0.2397579084572314
 uncertainty = 0.1
 
@@ -1658,42 +1658,42 @@ uncertainty = 0.007959828820540497
 [[experiments]]
 id = "Evo04Evo02EP_m-4_e-B2"
 [[experiments.metabolite_measurements]]
-target_id = "6pgc_c"
+target_id = [ "Evo04Evo02EP", 4, "6pgc_c",]
 value = 0.333422994088822
 uncertainty = 0.1
 
 [[experiments.metabolite_measurements]]
-target_id = "f6p_c"
+target_id = [ "Evo04Evo02EP", 4, "f6p_c",]
 value = 0.5128172649110024
 uncertainty = 0.1
 
 [[experiments.metabolite_measurements]]
-target_id = "g6p_c"
+target_id = [ "Evo04Evo02EP", 4, "g6p_c",]
 value = 2.049415715737728
 uncertainty = 0.1
 
 [[experiments.metabolite_measurements]]
-target_id = "nadp_c"
+target_id = [ "Evo04Evo02EP", 4, "nadp_c",]
 value = 0.7170997728825551
 uncertainty = 0.1
 
 [[experiments.metabolite_measurements]]
-target_id = "nadph_c"
+target_id = [ "Evo04Evo02EP", 4, "nadph_c",]
 value = 0.03749422820081005
 uncertainty = 0.1
 
 [[experiments.metabolite_measurements]]
-target_id = "r5p_c"
+target_id = [ "Evo04Evo02EP", 4, "r5p_c",]
 value = 0.3476598690687084
 uncertainty = 0.1
 
 [[experiments.metabolite_measurements]]
-target_id = "ru5p__D_c"
+target_id = [ "Evo04Evo02EP", 4, "ru5p__D_c",]
 value = 0.09312687305314944
 uncertainty = 0.1
 
 [[experiments.metabolite_measurements]]
-target_id = "s7p_c"
+target_id = [ "Evo04Evo02EP", 4, "s7p_c",]
 value = 0.2397579084572314
 uncertainty = 0.1
 
@@ -1736,42 +1736,42 @@ uncertainty = 0.007959828820540497
 [[experiments]]
 id = "Evo04Evo02EP_m-5_e-B1"
 [[experiments.metabolite_measurements]]
-target_id = "6pgc_c"
+target_id = [ "Evo04Evo02EP", 5, "6pgc_c",]
 value = 0.7330024998432855
 uncertainty = 0.1
 
 [[experiments.metabolite_measurements]]
-target_id = "f6p_c"
+target_id = [ "Evo04Evo02EP", 5, "f6p_c",]
 value = 0.8368095778007452
 uncertainty = 0.1
 
 [[experiments.metabolite_measurements]]
-target_id = "g6p_c"
+target_id = [ "Evo04Evo02EP", 5, "g6p_c",]
 value = 4.409419946681371
 uncertainty = 0.1
 
 [[experiments.metabolite_measurements]]
-target_id = "nadp_c"
+target_id = [ "Evo04Evo02EP", 5, "nadp_c",]
 value = 0.9895879944815472
 uncertainty = 0.1
 
 [[experiments.metabolite_measurements]]
-target_id = "nadph_c"
+target_id = [ "Evo04Evo02EP", 5, "nadph_c",]
 value = 0.03863488160477443
 uncertainty = 0.1
 
 [[experiments.metabolite_measurements]]
-target_id = "r5p_c"
+target_id = [ "Evo04Evo02EP", 5, "r5p_c",]
 value = 0.3740984525011242
 uncertainty = 0.1
 
 [[experiments.metabolite_measurements]]
-target_id = "ru5p__D_c"
+target_id = [ "Evo04Evo02EP", 5, "ru5p__D_c",]
 value = 0.1003318411869076
 uncertainty = 0.1
 
 [[experiments.metabolite_measurements]]
-target_id = "s7p_c"
+target_id = [ "Evo04Evo02EP", 5, "s7p_c",]
 value = 0.3187850551830144
 uncertainty = 0.1
 
@@ -1814,42 +1814,42 @@ uncertainty = 0.007959828820540497
 [[experiments]]
 id = "Evo04Evo02EP_m-5_e-B2"
 [[experiments.metabolite_measurements]]
-target_id = "6pgc_c"
+target_id = [ "Evo04Evo02EP", 5, "6pgc_c",]
 value = 0.7330024998432855
 uncertainty = 0.1
 
 [[experiments.metabolite_measurements]]
-target_id = "f6p_c"
+target_id = [ "Evo04Evo02EP", 5, "f6p_c",]
 value = 0.8368095778007452
 uncertainty = 0.1
 
 [[experiments.metabolite_measurements]]
-target_id = "g6p_c"
+target_id = [ "Evo04Evo02EP", 5, "g6p_c",]
 value = 4.409419946681371
 uncertainty = 0.1
 
 [[experiments.metabolite_measurements]]
-target_id = "nadp_c"
+target_id = [ "Evo04Evo02EP", 5, "nadp_c",]
 value = 0.9895879944815472
 uncertainty = 0.1
 
 [[experiments.metabolite_measurements]]
-target_id = "nadph_c"
+target_id = [ "Evo04Evo02EP", 5, "nadph_c",]
 value = 0.03863488160477443
 uncertainty = 0.1
 
 [[experiments.metabolite_measurements]]
-target_id = "r5p_c"
+target_id = [ "Evo04Evo02EP", 5, "r5p_c",]
 value = 0.3740984525011242
 uncertainty = 0.1
 
 [[experiments.metabolite_measurements]]
-target_id = "ru5p__D_c"
+target_id = [ "Evo04Evo02EP", 5, "ru5p__D_c",]
 value = 0.1003318411869076
 uncertainty = 0.1
 
 [[experiments.metabolite_measurements]]
-target_id = "s7p_c"
+target_id = [ "Evo04Evo02EP", 5, "s7p_c",]
 value = 0.3187850551830144
 uncertainty = 0.1
 
@@ -1892,42 +1892,42 @@ uncertainty = 0.007959828820540497
 [[experiments]]
 id = "Evo04Evo02EP_m-6_e-B1"
 [[experiments.metabolite_measurements]]
-target_id = "6pgc_c"
+target_id = [ "Evo04Evo02EP", 6, "6pgc_c",]
 value = 0.6029923732444682
 uncertainty = 0.1
 
 [[experiments.metabolite_measurements]]
-target_id = "f6p_c"
+target_id = [ "Evo04Evo02EP", 6, "f6p_c",]
 value = 0.7481135997617576
 uncertainty = 0.1
 
 [[experiments.metabolite_measurements]]
-target_id = "g6p_c"
+target_id = [ "Evo04Evo02EP", 6, "g6p_c",]
 value = 1.393615031767899
 uncertainty = 0.1
 
 [[experiments.metabolite_measurements]]
-target_id = "nadp_c"
+target_id = [ "Evo04Evo02EP", 6, "nadp_c",]
 value = 0.9305184624354308
 uncertainty = 0.1
 
 [[experiments.metabolite_measurements]]
-target_id = "nadph_c"
+target_id = [ "Evo04Evo02EP", 6, "nadph_c",]
 value = 0.04482441977979321
 uncertainty = 0.1
 
 [[experiments.metabolite_measurements]]
-target_id = "r5p_c"
+target_id = [ "Evo04Evo02EP", 6, "r5p_c",]
 value = 0.5192687850155024
 uncertainty = 0.1
 
 [[experiments.metabolite_measurements]]
-target_id = "ru5p__D_c"
+target_id = [ "Evo04Evo02EP", 6, "ru5p__D_c",]
 value = 0.09767510486199707
 uncertainty = 0.1
 
 [[experiments.metabolite_measurements]]
-target_id = "s7p_c"
+target_id = [ "Evo04Evo02EP", 6, "s7p_c",]
 value = 0.4244713618670217
 uncertainty = 0.1
 
@@ -1970,42 +1970,42 @@ uncertainty = 0.007959828820540497
 [[experiments]]
 id = "Evo04Evo02EP_m-6_e-B2"
 [[experiments.metabolite_measurements]]
-target_id = "6pgc_c"
+target_id = [ "Evo04Evo02EP", 6, "6pgc_c",]
 value = 0.6029923732444682
 uncertainty = 0.1
 
 [[experiments.metabolite_measurements]]
-target_id = "f6p_c"
+target_id = [ "Evo04Evo02EP", 6, "f6p_c",]
 value = 0.7481135997617576
 uncertainty = 0.1
 
 [[experiments.metabolite_measurements]]
-target_id = "g6p_c"
+target_id = [ "Evo04Evo02EP", 6, "g6p_c",]
 value = 1.393615031767899
 uncertainty = 0.1
 
 [[experiments.metabolite_measurements]]
-target_id = "nadp_c"
+target_id = [ "Evo04Evo02EP", 6, "nadp_c",]
 value = 0.9305184624354308
 uncertainty = 0.1
 
 [[experiments.metabolite_measurements]]
-target_id = "nadph_c"
+target_id = [ "Evo04Evo02EP", 6, "nadph_c",]
 value = 0.04482441977979321
 uncertainty = 0.1
 
 [[experiments.metabolite_measurements]]
-target_id = "r5p_c"
+target_id = [ "Evo04Evo02EP", 6, "r5p_c",]
 value = 0.5192687850155024
 uncertainty = 0.1
 
 [[experiments.metabolite_measurements]]
-target_id = "ru5p__D_c"
+target_id = [ "Evo04Evo02EP", 6, "ru5p__D_c",]
 value = 0.09767510486199707
 uncertainty = 0.1
 
 [[experiments.metabolite_measurements]]
-target_id = "s7p_c"
+target_id = [ "Evo04Evo02EP", 6, "s7p_c",]
 value = 0.4244713618670217
 uncertainty = 0.1
 
@@ -2084,6 +2084,9 @@ uncertainty = 0.007959828820540497
 # If the value is unknown:
 # kcat - location = 10.0, scale = 3.0 (from Davidi) 10th percentile is 0.21, 90th percentile is 467
 # Kms  - location = concentration of metabolite in WT, scale = 1.5 For example if concentration is 10mM then 10th percentile is 1.46 and 90th percentile is 68.36
+# This article is very useful https://pubs.acs.org/doi/10.1021/acs.chemrev.8b00039
+# According to this article location of kcat should be 10 and scale should cover 10^-4 up to 10^6 
+# Kms should be around 0.1 (100uM) and span range around 1e-6 up to 1e4 mM
 
 PGI = [
   { target_id = 'Kcat1', location = 126.0, scale = 0.2}, # Davidi
@@ -2212,6 +2215,34 @@ EDA = [
 
 [priors.thermodynamic_parameters]
 # Obtained from eQuilibrator
+formation_energies = [
+  { target_id = "xu5p__D", location = -1253.6, scale = 2.4 },
+  { target_id = 'g3p', location = -1106.4, scale = 1.3 },
+  { target_id = "2ddg6p", location = -1467.7, scale = 4.7 },
+  { target_id = "co2", location = -403.1, scale = 5.8 },
+  { target_id = '3pg', location = -1365.2, scale = 1.5 },
+  { target_id = "6pgl", location = -1403.8, scale = 2.9 },
+  { target_id = "pyr", location = -362.9, scale = 1.5 },
+  { target_id = "6pgc", location = -1582.3, scale 2.5 },
+  { target_id = 'adp', location = -1440.8, scale = 2.4 },
+  { target_id = "e4p", location = -1176.6, scale = 3.4 },
+  { target_id = '13dpg', location = -2219.0, scale = 2.1 },
+  { target_id = 'nad', location = -1222.9, scale = 12.4 },
+  { target_id = 'atp', location = -2313.0, scale = 3.0 },
+  { target_id = "nadp", location = -2106.9, scale = 12.7 }
+  { target_id = 'g6p', location = -1336.3, scale = 1.3 },
+  { target_id = 'dhap', location = -1111.9, scale = 1.1 },
+  { target_id = 'f6p', location = -1333.8, scale = 1.3 },
+  { target_id = "ru5p__D", location = -1250.3, scale = 1.9 },
+  { target_id = "2pg", location = -1361.0, scale = 1.6 },
+  { target_id = "pep", location = -1207.5, scale = 1.6 },
+  { target_id = 'nadh', location = -1158.7, scale = 12.4 },
+  { target_id = "nadph", location = -2041.8, scale = 12.7 },
+  { target_id = "fdp", location = -2220.9, scale = 2.1 },
+  { target_id = "r5p", location = -1252.2, scale = 2.0 },
+  { target_id = "s7p", location = -1403.2, scale = 3.7 },
+]
+
 marginal_dgs = [
     { target_id = "PGI", location = 2.5, scale = 0.8},
     { target_id = "FBP", location = -11.4, scale = 1.4},
@@ -2234,7 +2265,7 @@ marginal_dgs = [
 ]
 [priors.unbalanced_metabolites]
 [[priors.unbalanced_metabolites.Evo04Evo01EP_m-1_e-B1]]
-target_id = "xu5p__D_c"
+target_id = "co2_c"
 location = 0.5
 scale = 2.0
 
@@ -2244,7 +2275,17 @@ location = 0.5
 scale = 2.0
 
 [[priors.unbalanced_metabolites.Evo04Evo01EP_m-1_e-B1]]
+target_id = "xu5p__D_c"
+location = 0.5
+scale = 2.0
+
+[[priors.unbalanced_metabolites.Evo04Evo01EP_m-1_e-B2]]
 target_id = "co2_c"
+location = 0.5
+scale = 2.0
+
+[[priors.unbalanced_metabolites.Evo04Evo01EP_m-1_e-B2]]
+target_id = "g3p_c"
 location = 0.5
 scale = 2.0
 
@@ -2253,18 +2294,8 @@ target_id = "xu5p__D_c"
 location = 0.5
 scale = 2.0
 
-[[priors.unbalanced_metabolites.Evo04Evo01EP_m-1_e-B2]]
-target_id = "g3p_c"
-location = 0.5
-scale = 2.0
-
-[[priors.unbalanced_metabolites.Evo04Evo01EP_m-1_e-B2]]
-target_id = "co2_c"
-location = 0.5
-scale = 2.0
-
 [[priors.unbalanced_metabolites.Evo04Evo01EP_m-2_e-B1]]
-target_id = "xu5p__D_c"
+target_id = "co2_c"
 location = 0.5
 scale = 2.0
 
@@ -2274,7 +2305,17 @@ location = 0.5
 scale = 2.0
 
 [[priors.unbalanced_metabolites.Evo04Evo01EP_m-2_e-B1]]
+target_id = "xu5p__D_c"
+location = 0.5
+scale = 2.0
+
+[[priors.unbalanced_metabolites.Evo04Evo01EP_m-2_e-B2]]
 target_id = "co2_c"
+location = 0.5
+scale = 2.0
+
+[[priors.unbalanced_metabolites.Evo04Evo01EP_m-2_e-B2]]
+target_id = "g3p_c"
 location = 0.5
 scale = 2.0
 
@@ -2283,18 +2324,8 @@ target_id = "xu5p__D_c"
 location = 0.5
 scale = 2.0
 
-[[priors.unbalanced_metabolites.Evo04Evo01EP_m-2_e-B2]]
-target_id = "g3p_c"
-location = 0.5
-scale = 2.0
-
-[[priors.unbalanced_metabolites.Evo04Evo01EP_m-2_e-B2]]
-target_id = "co2_c"
-location = 0.5
-scale = 2.0
-
 [[priors.unbalanced_metabolites.Evo04Evo01EP_m-3_e-B1]]
-target_id = "xu5p__D_c"
+target_id = "co2_c"
 location = 0.5
 scale = 2.0
 
@@ -2304,7 +2335,17 @@ location = 0.5
 scale = 2.0
 
 [[priors.unbalanced_metabolites.Evo04Evo01EP_m-3_e-B1]]
+target_id = "xu5p__D_c"
+location = 0.5
+scale = 2.0
+
+[[priors.unbalanced_metabolites.Evo04Evo01EP_m-3_e-B2]]
 target_id = "co2_c"
+location = 0.5
+scale = 2.0
+
+[[priors.unbalanced_metabolites.Evo04Evo01EP_m-3_e-B2]]
+target_id = "g3p_c"
 location = 0.5
 scale = 2.0
 
@@ -2313,18 +2354,8 @@ target_id = "xu5p__D_c"
 location = 0.5
 scale = 2.0
 
-[[priors.unbalanced_metabolites.Evo04Evo01EP_m-3_e-B2]]
-target_id = "g3p_c"
-location = 0.5
-scale = 2.0
-
-[[priors.unbalanced_metabolites.Evo04Evo01EP_m-3_e-B2]]
-target_id = "co2_c"
-location = 0.5
-scale = 2.0
-
 [[priors.unbalanced_metabolites.Evo04Evo01EP_m-4_e-B1]]
-target_id = "xu5p__D_c"
+target_id = "co2_c"
 location = 0.5
 scale = 2.0
 
@@ -2334,7 +2365,17 @@ location = 0.5
 scale = 2.0
 
 [[priors.unbalanced_metabolites.Evo04Evo01EP_m-4_e-B1]]
+target_id = "xu5p__D_c"
+location = 0.5
+scale = 2.0
+
+[[priors.unbalanced_metabolites.Evo04Evo01EP_m-4_e-B2]]
 target_id = "co2_c"
+location = 0.5
+scale = 2.0
+
+[[priors.unbalanced_metabolites.Evo04Evo01EP_m-4_e-B2]]
+target_id = "g3p_c"
 location = 0.5
 scale = 2.0
 
@@ -2343,18 +2384,8 @@ target_id = "xu5p__D_c"
 location = 0.5
 scale = 2.0
 
-[[priors.unbalanced_metabolites.Evo04Evo01EP_m-4_e-B2]]
-target_id = "g3p_c"
-location = 0.5
-scale = 2.0
-
-[[priors.unbalanced_metabolites.Evo04Evo01EP_m-4_e-B2]]
-target_id = "co2_c"
-location = 0.5
-scale = 2.0
-
 [[priors.unbalanced_metabolites.Evo04Evo01EP_m-5_e-B1]]
-target_id = "xu5p__D_c"
+target_id = "co2_c"
 location = 0.5
 scale = 2.0
 
@@ -2364,7 +2395,17 @@ location = 0.5
 scale = 2.0
 
 [[priors.unbalanced_metabolites.Evo04Evo01EP_m-5_e-B1]]
+target_id = "xu5p__D_c"
+location = 0.5
+scale = 2.0
+
+[[priors.unbalanced_metabolites.Evo04Evo01EP_m-5_e-B2]]
 target_id = "co2_c"
+location = 0.5
+scale = 2.0
+
+[[priors.unbalanced_metabolites.Evo04Evo01EP_m-5_e-B2]]
+target_id = "g3p_c"
 location = 0.5
 scale = 2.0
 
@@ -2373,18 +2414,8 @@ target_id = "xu5p__D_c"
 location = 0.5
 scale = 2.0
 
-[[priors.unbalanced_metabolites.Evo04Evo01EP_m-5_e-B2]]
-target_id = "g3p_c"
-location = 0.5
-scale = 2.0
-
-[[priors.unbalanced_metabolites.Evo04Evo01EP_m-5_e-B2]]
-target_id = "co2_c"
-location = 0.5
-scale = 2.0
-
 [[priors.unbalanced_metabolites.Evo04Evo01EP_m-6_e-B1]]
-target_id = "xu5p__D_c"
+target_id = "co2_c"
 location = 0.5
 scale = 2.0
 
@@ -2394,7 +2425,17 @@ location = 0.5
 scale = 2.0
 
 [[priors.unbalanced_metabolites.Evo04Evo01EP_m-6_e-B1]]
+target_id = "xu5p__D_c"
+location = 0.5
+scale = 2.0
+
+[[priors.unbalanced_metabolites.Evo04Evo01EP_m-6_e-B2]]
 target_id = "co2_c"
+location = 0.5
+scale = 2.0
+
+[[priors.unbalanced_metabolites.Evo04Evo01EP_m-6_e-B2]]
+target_id = "g3p_c"
 location = 0.5
 scale = 2.0
 
@@ -2403,18 +2444,8 @@ target_id = "xu5p__D_c"
 location = 0.5
 scale = 2.0
 
-[[priors.unbalanced_metabolites.Evo04Evo01EP_m-6_e-B2]]
-target_id = "g3p_c"
-location = 0.5
-scale = 2.0
-
-[[priors.unbalanced_metabolites.Evo04Evo01EP_m-6_e-B2]]
-target_id = "co2_c"
-location = 0.5
-scale = 2.0
-
 [[priors.unbalanced_metabolites.Evo04Evo02EP_m-1_e-B1]]
-target_id = "xu5p__D_c"
+target_id = "co2_c"
 location = 0.5
 scale = 2.0
 
@@ -2424,7 +2455,17 @@ location = 0.5
 scale = 2.0
 
 [[priors.unbalanced_metabolites.Evo04Evo02EP_m-1_e-B1]]
+target_id = "xu5p__D_c"
+location = 0.5
+scale = 2.0
+
+[[priors.unbalanced_metabolites.Evo04Evo02EP_m-1_e-B2]]
 target_id = "co2_c"
+location = 0.5
+scale = 2.0
+
+[[priors.unbalanced_metabolites.Evo04Evo02EP_m-1_e-B2]]
+target_id = "g3p_c"
 location = 0.5
 scale = 2.0
 
@@ -2433,18 +2474,8 @@ target_id = "xu5p__D_c"
 location = 0.5
 scale = 2.0
 
-[[priors.unbalanced_metabolites.Evo04Evo02EP_m-1_e-B2]]
-target_id = "g3p_c"
-location = 0.5
-scale = 2.0
-
-[[priors.unbalanced_metabolites.Evo04Evo02EP_m-1_e-B2]]
-target_id = "co2_c"
-location = 0.5
-scale = 2.0
-
 [[priors.unbalanced_metabolites.Evo04Evo02EP_m-2_e-B1]]
-target_id = "xu5p__D_c"
+target_id = "co2_c"
 location = 0.5
 scale = 2.0
 
@@ -2454,7 +2485,17 @@ location = 0.5
 scale = 2.0
 
 [[priors.unbalanced_metabolites.Evo04Evo02EP_m-2_e-B1]]
+target_id = "xu5p__D_c"
+location = 0.5
+scale = 2.0
+
+[[priors.unbalanced_metabolites.Evo04Evo02EP_m-2_e-B2]]
 target_id = "co2_c"
+location = 0.5
+scale = 2.0
+
+[[priors.unbalanced_metabolites.Evo04Evo02EP_m-2_e-B2]]
+target_id = "g3p_c"
 location = 0.5
 scale = 2.0
 
@@ -2463,18 +2504,8 @@ target_id = "xu5p__D_c"
 location = 0.5
 scale = 2.0
 
-[[priors.unbalanced_metabolites.Evo04Evo02EP_m-2_e-B2]]
-target_id = "g3p_c"
-location = 0.5
-scale = 2.0
-
-[[priors.unbalanced_metabolites.Evo04Evo02EP_m-2_e-B2]]
-target_id = "co2_c"
-location = 0.5
-scale = 2.0
-
 [[priors.unbalanced_metabolites.Evo04Evo02EP_m-3_e-B1]]
-target_id = "xu5p__D_c"
+target_id = "co2_c"
 location = 0.5
 scale = 2.0
 
@@ -2484,7 +2515,17 @@ location = 0.5
 scale = 2.0
 
 [[priors.unbalanced_metabolites.Evo04Evo02EP_m-3_e-B1]]
+target_id = "xu5p__D_c"
+location = 0.5
+scale = 2.0
+
+[[priors.unbalanced_metabolites.Evo04Evo02EP_m-3_e-B2]]
 target_id = "co2_c"
+location = 0.5
+scale = 2.0
+
+[[priors.unbalanced_metabolites.Evo04Evo02EP_m-3_e-B2]]
+target_id = "g3p_c"
 location = 0.5
 scale = 2.0
 
@@ -2493,18 +2534,8 @@ target_id = "xu5p__D_c"
 location = 0.5
 scale = 2.0
 
-[[priors.unbalanced_metabolites.Evo04Evo02EP_m-3_e-B2]]
-target_id = "g3p_c"
-location = 0.5
-scale = 2.0
-
-[[priors.unbalanced_metabolites.Evo04Evo02EP_m-3_e-B2]]
-target_id = "co2_c"
-location = 0.5
-scale = 2.0
-
 [[priors.unbalanced_metabolites.Evo04Evo02EP_m-4_e-B1]]
-target_id = "xu5p__D_c"
+target_id = "co2_c"
 location = 0.5
 scale = 2.0
 
@@ -2514,7 +2545,17 @@ location = 0.5
 scale = 2.0
 
 [[priors.unbalanced_metabolites.Evo04Evo02EP_m-4_e-B1]]
+target_id = "xu5p__D_c"
+location = 0.5
+scale = 2.0
+
+[[priors.unbalanced_metabolites.Evo04Evo02EP_m-4_e-B2]]
 target_id = "co2_c"
+location = 0.5
+scale = 2.0
+
+[[priors.unbalanced_metabolites.Evo04Evo02EP_m-4_e-B2]]
+target_id = "g3p_c"
 location = 0.5
 scale = 2.0
 
@@ -2523,18 +2564,8 @@ target_id = "xu5p__D_c"
 location = 0.5
 scale = 2.0
 
-[[priors.unbalanced_metabolites.Evo04Evo02EP_m-4_e-B2]]
-target_id = "g3p_c"
-location = 0.5
-scale = 2.0
-
-[[priors.unbalanced_metabolites.Evo04Evo02EP_m-4_e-B2]]
-target_id = "co2_c"
-location = 0.5
-scale = 2.0
-
 [[priors.unbalanced_metabolites.Evo04Evo02EP_m-5_e-B1]]
-target_id = "xu5p__D_c"
+target_id = "co2_c"
 location = 0.5
 scale = 2.0
 
@@ -2544,12 +2575,12 @@ location = 0.5
 scale = 2.0
 
 [[priors.unbalanced_metabolites.Evo04Evo02EP_m-5_e-B1]]
-target_id = "co2_c"
+target_id = "xu5p__D_c"
 location = 0.5
 scale = 2.0
 
 [[priors.unbalanced_metabolites.Evo04Evo02EP_m-5_e-B2]]
-target_id = "xu5p__D_c"
+target_id = "co2_c"
 location = 0.5
 scale = 2.0
 
@@ -2559,12 +2590,12 @@ location = 0.5
 scale = 2.0
 
 [[priors.unbalanced_metabolites.Evo04Evo02EP_m-5_e-B2]]
-target_id = "co2_c"
+target_id = "xu5p__D_c"
 location = 0.5
 scale = 2.0
 
 [[priors.unbalanced_metabolites.Evo04Evo02EP_m-6_e-B1]]
-target_id = "xu5p__D_c"
+target_id = "co2_c"
 location = 0.5
 scale = 2.0
 
@@ -2574,12 +2605,12 @@ location = 0.5
 scale = 2.0
 
 [[priors.unbalanced_metabolites.Evo04Evo02EP_m-6_e-B1]]
-target_id = "co2_c"
+target_id = "xu5p__D_c"
 location = 0.5
 scale = 2.0
 
 [[priors.unbalanced_metabolites.Evo04Evo02EP_m-6_e-B2]]
-target_id = "xu5p__D_c"
+target_id = "co2_c"
 location = 0.5
 scale = 2.0
 
@@ -2589,7 +2620,7 @@ location = 0.5
 scale = 2.0
 
 [[priors.unbalanced_metabolites.Evo04Evo02EP_m-6_e-B2]]
-target_id = "co2_c"
+target_id = "xu5p__D_c"
 location = 0.5
 scale = 2.0
 
@@ -2615,6 +2646,16 @@ location = 0.004167802346239561
 scale = 0.0959233068193372
 
 [[priors.enzymes.Evo04Evo01EP_m-1_e-B1]]
+target_id = "RPI"
+location = 0.01057603505261598
+scale = 0.0383336758987155
+
+[[priors.enzymes.Evo04Evo01EP_m-1_e-B1]]
+target_id = "TKT1"
+location = 0.02886215073377685
+scale = 0.07164760211238939
+
+[[priors.enzymes.Evo04Evo01EP_m-1_e-B1]]
 target_id = "G6PDH2r"
 location = 0.01050550030116524
 scale = 0.04685481731416075
@@ -2638,6 +2679,16 @@ scale = 0.06884955568086991
 target_id = "RPE"
 location = 0.004073221843828366
 scale = 0.08950526319884641
+
+[[priors.enzymes.Evo04Evo01EP_m-1_e-B2]]
+target_id = "RPI"
+location = 0.01094305936607868
+scale = 0.05668089737003713
+
+[[priors.enzymes.Evo04Evo01EP_m-1_e-B2]]
+target_id = "TKT1"
+location = 0.02755022802731761
+scale = 0.02729475251120398
 
 [[priors.enzymes.Evo04Evo01EP_m-1_e-B2]]
 target_id = "G6PDH2r"
@@ -2665,6 +2716,16 @@ location = 0.004167802346239561
 scale = 0.0959233068193372
 
 [[priors.enzymes.Evo04Evo01EP_m-2_e-B1]]
+target_id = "RPI"
+location = 0.01057603505261598
+scale = 0.0383336758987155
+
+[[priors.enzymes.Evo04Evo01EP_m-2_e-B1]]
+target_id = "TKT1"
+location = 0.02886215073377685
+scale = 0.07164760211238939
+
+[[priors.enzymes.Evo04Evo01EP_m-2_e-B1]]
 target_id = "G6PDH2r"
 location = 0.01050550030116524
 scale = 0.04685481731416075
@@ -2688,6 +2749,16 @@ scale = 0.06884955568086991
 target_id = "RPE"
 location = 0.004073221843828366
 scale = 0.08950526319884641
+
+[[priors.enzymes.Evo04Evo01EP_m-2_e-B2]]
+target_id = "RPI"
+location = 0.01094305936607868
+scale = 0.05668089737003713
+
+[[priors.enzymes.Evo04Evo01EP_m-2_e-B2]]
+target_id = "TKT1"
+location = 0.02755022802731761
+scale = 0.02729475251120398
 
 [[priors.enzymes.Evo04Evo01EP_m-2_e-B2]]
 target_id = "G6PDH2r"
@@ -2715,6 +2786,16 @@ location = 0.004167802346239561
 scale = 0.0959233068193372
 
 [[priors.enzymes.Evo04Evo01EP_m-3_e-B1]]
+target_id = "RPI"
+location = 0.01057603505261598
+scale = 0.0383336758987155
+
+[[priors.enzymes.Evo04Evo01EP_m-3_e-B1]]
+target_id = "TKT1"
+location = 0.02886215073377685
+scale = 0.07164760211238939
+
+[[priors.enzymes.Evo04Evo01EP_m-3_e-B1]]
 target_id = "G6PDH2r"
 location = 0.01050550030116524
 scale = 0.04685481731416075
@@ -2738,6 +2819,16 @@ scale = 0.06884955568086991
 target_id = "RPE"
 location = 0.004073221843828366
 scale = 0.08950526319884641
+
+[[priors.enzymes.Evo04Evo01EP_m-3_e-B2]]
+target_id = "RPI"
+location = 0.01094305936607868
+scale = 0.05668089737003713
+
+[[priors.enzymes.Evo04Evo01EP_m-3_e-B2]]
+target_id = "TKT1"
+location = 0.02755022802731761
+scale = 0.02729475251120398
 
 [[priors.enzymes.Evo04Evo01EP_m-3_e-B2]]
 target_id = "G6PDH2r"
@@ -2765,6 +2856,16 @@ location = 0.004167802346239561
 scale = 0.0959233068193372
 
 [[priors.enzymes.Evo04Evo01EP_m-4_e-B1]]
+target_id = "RPI"
+location = 0.01057603505261598
+scale = 0.0383336758987155
+
+[[priors.enzymes.Evo04Evo01EP_m-4_e-B1]]
+target_id = "TKT1"
+location = 0.02886215073377685
+scale = 0.07164760211238939
+
+[[priors.enzymes.Evo04Evo01EP_m-4_e-B1]]
 target_id = "G6PDH2r"
 location = 0.01050550030116524
 scale = 0.04685481731416075
@@ -2788,6 +2889,16 @@ scale = 0.06884955568086991
 target_id = "RPE"
 location = 0.004073221843828366
 scale = 0.08950526319884641
+
+[[priors.enzymes.Evo04Evo01EP_m-4_e-B2]]
+target_id = "RPI"
+location = 0.01094305936607868
+scale = 0.05668089737003713
+
+[[priors.enzymes.Evo04Evo01EP_m-4_e-B2]]
+target_id = "TKT1"
+location = 0.02755022802731761
+scale = 0.02729475251120398
 
 [[priors.enzymes.Evo04Evo01EP_m-4_e-B2]]
 target_id = "G6PDH2r"
@@ -2815,6 +2926,16 @@ location = 0.004167802346239561
 scale = 0.0959233068193372
 
 [[priors.enzymes.Evo04Evo01EP_m-5_e-B1]]
+target_id = "RPI"
+location = 0.01057603505261598
+scale = 0.0383336758987155
+
+[[priors.enzymes.Evo04Evo01EP_m-5_e-B1]]
+target_id = "TKT1"
+location = 0.02886215073377685
+scale = 0.07164760211238939
+
+[[priors.enzymes.Evo04Evo01EP_m-5_e-B1]]
 target_id = "G6PDH2r"
 location = 0.01050550030116524
 scale = 0.04685481731416075
@@ -2838,6 +2959,16 @@ scale = 0.06884955568086991
 target_id = "RPE"
 location = 0.004073221843828366
 scale = 0.08950526319884641
+
+[[priors.enzymes.Evo04Evo01EP_m-5_e-B2]]
+target_id = "RPI"
+location = 0.01094305936607868
+scale = 0.05668089737003713
+
+[[priors.enzymes.Evo04Evo01EP_m-5_e-B2]]
+target_id = "TKT1"
+location = 0.02755022802731761
+scale = 0.02729475251120398
 
 [[priors.enzymes.Evo04Evo01EP_m-5_e-B2]]
 target_id = "G6PDH2r"
@@ -2863,6 +2994,16 @@ scale = 0.09421383029157467
 target_id = "RPE"
 location = 0.004167802346239561
 scale = 0.0959233068193372
+
+[[priors.enzymes.Evo04Evo01EP_m-6_e-B1]]
+target_id = "RPI"
+location = 0.01057603505261598
+scale = 0.0383336758987155
+
+[[priors.enzymes.Evo04Evo01EP_m-6_e-B1]]
+target_id = "TKT1"
+location = 0.02886215073377685
+scale = 0.07164760211238939
 
 [[priors.enzymes.Evo04Evo01EP_m-6_e-B1]]
 target_id = "G6PDH2r"
@@ -2888,6 +3029,16 @@ scale = 0.06884955568086991
 target_id = "RPE"
 location = 0.004073221843828366
 scale = 0.08950526319884641
+
+[[priors.enzymes.Evo04Evo01EP_m-6_e-B2]]
+target_id = "RPI"
+location = 0.01094305936607868
+scale = 0.05668089737003713
+
+[[priors.enzymes.Evo04Evo01EP_m-6_e-B2]]
+target_id = "TKT1"
+location = 0.02755022802731761
+scale = 0.02729475251120398
 
 [[priors.enzymes.Evo04Evo01EP_m-6_e-B2]]
 target_id = "G6PDH2r"
@@ -2915,6 +3066,16 @@ location = 0.003987529038417541
 scale = 0.01353304793363888
 
 [[priors.enzymes.Evo04Evo02EP_m-1_e-B1]]
+target_id = "RPI"
+location = 0.01238571397145494
+scale = 0.1969301095454049
+
+[[priors.enzymes.Evo04Evo02EP_m-1_e-B1]]
+target_id = "TKT1"
+location = 0.02989708212591632
+scale = 0.04415018298610121
+
+[[priors.enzymes.Evo04Evo02EP_m-1_e-B1]]
 target_id = "G6PDH2r"
 location = 0.009980033276238105
 scale = 0.02445262161324497
@@ -2938,6 +3099,16 @@ scale = 0.08489965123498849
 target_id = "RPE"
 location = 0.004497104567331758
 scale = 0.3414305393856398
+
+[[priors.enzymes.Evo04Evo02EP_m-1_e-B2]]
+target_id = "RPI"
+location = 0.009749117538384464
+scale = 0.1141930598895173
+
+[[priors.enzymes.Evo04Evo02EP_m-1_e-B2]]
+target_id = "TKT1"
+location = 0.03109983877438677
+scale = 0.1999954757093361
 
 [[priors.enzymes.Evo04Evo02EP_m-1_e-B2]]
 target_id = "G6PDH2r"
@@ -2965,6 +3136,16 @@ location = 0.003987529038417541
 scale = 0.01353304793363888
 
 [[priors.enzymes.Evo04Evo02EP_m-2_e-B1]]
+target_id = "RPI"
+location = 0.01238571397145494
+scale = 0.1969301095454049
+
+[[priors.enzymes.Evo04Evo02EP_m-2_e-B1]]
+target_id = "TKT1"
+location = 0.02989708212591632
+scale = 0.04415018298610121
+
+[[priors.enzymes.Evo04Evo02EP_m-2_e-B1]]
 target_id = "G6PDH2r"
 location = 0.009980033276238105
 scale = 0.02445262161324497
@@ -2988,6 +3169,16 @@ scale = 0.08489965123498849
 target_id = "RPE"
 location = 0.004497104567331758
 scale = 0.3414305393856398
+
+[[priors.enzymes.Evo04Evo02EP_m-2_e-B2]]
+target_id = "RPI"
+location = 0.009749117538384464
+scale = 0.1141930598895173
+
+[[priors.enzymes.Evo04Evo02EP_m-2_e-B2]]
+target_id = "TKT1"
+location = 0.03109983877438677
+scale = 0.1999954757093361
 
 [[priors.enzymes.Evo04Evo02EP_m-2_e-B2]]
 target_id = "G6PDH2r"
@@ -3015,6 +3206,16 @@ location = 0.003987529038417541
 scale = 0.01353304793363888
 
 [[priors.enzymes.Evo04Evo02EP_m-3_e-B1]]
+target_id = "RPI"
+location = 0.01238571397145494
+scale = 0.1969301095454049
+
+[[priors.enzymes.Evo04Evo02EP_m-3_e-B1]]
+target_id = "TKT1"
+location = 0.02989708212591632
+scale = 0.04415018298610121
+
+[[priors.enzymes.Evo04Evo02EP_m-3_e-B1]]
 target_id = "G6PDH2r"
 location = 0.009980033276238105
 scale = 0.02445262161324497
@@ -3038,6 +3239,16 @@ scale = 0.08489965123498849
 target_id = "RPE"
 location = 0.004497104567331758
 scale = 0.3414305393856398
+
+[[priors.enzymes.Evo04Evo02EP_m-3_e-B2]]
+target_id = "RPI"
+location = 0.009749117538384464
+scale = 0.1141930598895173
+
+[[priors.enzymes.Evo04Evo02EP_m-3_e-B2]]
+target_id = "TKT1"
+location = 0.03109983877438677
+scale = 0.1999954757093361
 
 [[priors.enzymes.Evo04Evo02EP_m-3_e-B2]]
 target_id = "G6PDH2r"
@@ -3065,6 +3276,16 @@ location = 0.003987529038417541
 scale = 0.01353304793363888
 
 [[priors.enzymes.Evo04Evo02EP_m-4_e-B1]]
+target_id = "RPI"
+location = 0.01238571397145494
+scale = 0.1969301095454049
+
+[[priors.enzymes.Evo04Evo02EP_m-4_e-B1]]
+target_id = "TKT1"
+location = 0.02989708212591632
+scale = 0.04415018298610121
+
+[[priors.enzymes.Evo04Evo02EP_m-4_e-B1]]
 target_id = "G6PDH2r"
 location = 0.009980033276238105
 scale = 0.02445262161324497
@@ -3088,6 +3309,16 @@ scale = 0.08489965123498849
 target_id = "RPE"
 location = 0.004497104567331758
 scale = 0.3414305393856398
+
+[[priors.enzymes.Evo04Evo02EP_m-4_e-B2]]
+target_id = "RPI"
+location = 0.009749117538384464
+scale = 0.1141930598895173
+
+[[priors.enzymes.Evo04Evo02EP_m-4_e-B2]]
+target_id = "TKT1"
+location = 0.03109983877438677
+scale = 0.1999954757093361
 
 [[priors.enzymes.Evo04Evo02EP_m-4_e-B2]]
 target_id = "G6PDH2r"
@@ -3115,6 +3346,16 @@ location = 0.003987529038417541
 scale = 0.01353304793363888
 
 [[priors.enzymes.Evo04Evo02EP_m-5_e-B1]]
+target_id = "RPI"
+location = 0.01238571397145494
+scale = 0.1969301095454049
+
+[[priors.enzymes.Evo04Evo02EP_m-5_e-B1]]
+target_id = "TKT1"
+location = 0.02989708212591632
+scale = 0.04415018298610121
+
+[[priors.enzymes.Evo04Evo02EP_m-5_e-B1]]
 target_id = "G6PDH2r"
 location = 0.009980033276238105
 scale = 0.02445262161324497
@@ -3138,6 +3379,16 @@ scale = 0.08489965123498849
 target_id = "RPE"
 location = 0.004497104567331758
 scale = 0.3414305393856398
+
+[[priors.enzymes.Evo04Evo02EP_m-5_e-B2]]
+target_id = "RPI"
+location = 0.009749117538384464
+scale = 0.1141930598895173
+
+[[priors.enzymes.Evo04Evo02EP_m-5_e-B2]]
+target_id = "TKT1"
+location = 0.03109983877438677
+scale = 0.1999954757093361
 
 [[priors.enzymes.Evo04Evo02EP_m-5_e-B2]]
 target_id = "G6PDH2r"
@@ -3163,6 +3414,16 @@ scale = 0.2433794752859315
 target_id = "RPE"
 location = 0.003987529038417541
 scale = 0.01353304793363888
+
+[[priors.enzymes.Evo04Evo02EP_m-6_e-B1]]
+target_id = "RPI"
+location = 0.01238571397145494
+scale = 0.1969301095454049
+
+[[priors.enzymes.Evo04Evo02EP_m-6_e-B1]]
+target_id = "TKT1"
+location = 0.02989708212591632
+scale = 0.04415018298610121
 
 [[priors.enzymes.Evo04Evo02EP_m-6_e-B1]]
 target_id = "G6PDH2r"
@@ -3188,6 +3449,16 @@ scale = 0.08489965123498849
 target_id = "RPE"
 location = 0.004497104567331758
 scale = 0.3414305393856398
+
+[[priors.enzymes.Evo04Evo02EP_m-6_e-B2]]
+target_id = "RPI"
+location = 0.009749117538384464
+scale = 0.1141930598895173
+
+[[priors.enzymes.Evo04Evo02EP_m-6_e-B2]]
+target_id = "TKT1"
+location = 0.03109983877438677
+scale = 0.1999954757093361
 
 [[priors.enzymes.Evo04Evo02EP_m-6_e-B2]]
 target_id = "G6PDH2r"
