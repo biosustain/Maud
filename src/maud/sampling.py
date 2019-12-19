@@ -22,7 +22,6 @@ from typing import Dict
 import cmdstanpy
 import numpy as np
 import pandas as pd
-from scipy.linalg import null_space as null_space
 
 from maud import code_generation, io, utils
 from maud.data_model import KineticModel, MaudInput
@@ -154,15 +153,28 @@ def get_input_data(
     enzyme_codes = code_generation.get_enzyme_codes(mi.kinetic_model)
     experiment_codes = utils.codify(mi.experiments.keys())
     metabolite_codes = code_generation.get_metabolite_codes(mi.kinetic_model)
+    metabolite_ids_no_compartments = np.unique(
+        [m.id for m in mi.kinetic_model.metabolites.values()]
+    )
+    metabolite_codes_no_compartments = utils.codify(metabolite_ids_no_compartments)
+    compartment_metabolite_index = [
+        metabolite_codes_no_compartments[m.id] for m in metabolites.values()
+    ]
     unb_metabolite_codes = {
         k: v for k, v in metabolite_codes.items() if not metabolites[k].balanced
     }
     enzymes = {k: v for r in reactions.values() for k, v in r.enzymes.items()}
     balanced_metabolites = {k: v for k, v in metabolites.items() if v.balanced}
     unbalanced_metabolites = {k: v for k, v in metabolites.items() if not v.balanced}
-    kinetic_parameter_priors, dg_priors = (
+    full_stoic = get_full_stoichiometry(
+        mi.kinetic_model, enzyme_codes, metabolite_codes
+    )
+    kinetic_parameter_priors, formation_energy_priors = (
         prior_df.loc[lambda df: df["target_type"] == target_type]
         for target_type in ["kinetic_parameter", "thermodynamic_parameter"]
+    )
+    formation_energy_priors = formation_energy_priors.set_index("target_id").reindex(
+        metabolite_codes_no_compartments
     )
     prior_loc_unb, prior_loc_enzyme, prior_scale_unb, prior_scale_enzyme = (
         prior_df.loc[lambda df: df["target_type"] == target_type]
@@ -187,18 +199,6 @@ def get_input_data(
         )
         for measurement_type in ["metabolite", "reaction"]
     )
-    full_stoic = get_full_stoichiometry(
-        mi.kinetic_model, enzyme_codes, metabolite_codes
-    )
-    flux_nullspace = null_space(np.transpose(np.matrix(full_stoic)))
-
-    if flux_nullspace.any():
-        wegscheider_mat = null_space(np.transpose(flux_nullspace))
-        stoichiometry_rank = np.shape(wegscheider_mat)[1]
-    else:
-        wegscheider_mat = np.identity(len(enzyme_codes))
-        stoichiometry_rank = len(enzyme_codes)
-
     return [
         {
             "N_balanced": len(balanced_metabolites),
@@ -209,7 +209,9 @@ def get_input_data(
             "N_experiment": len(mi.experiments),
             "N_flux_measurement": len(reaction_measurements),
             "N_conc_measurement": len(metabolite_measurements),
-            "stoichiometric_rank": stoichiometry_rank,
+            "N_metabolite": len(formation_energy_priors),
+            "stoichiometric_matrix": full_stoic.T.values,
+            "compartment_metabolite_index": compartment_metabolite_index,
             "experiment_yconc": (
                 metabolite_measurements["experiment_id"].map(experiment_codes).values
             ),
@@ -226,8 +228,8 @@ def get_input_data(
             ),
             "yflux": reaction_measurements["value"].values,
             "sigma_flux": reaction_measurements["uncertainty"].values,
-            "prior_loc_delta_g": dg_priors["location"].values,
-            "prior_scale_delta_g": dg_priors["scale"].values,
+            "prior_loc_formation_energy": formation_energy_priors["location"].values,
+            "prior_scale_formation_energy": formation_energy_priors["scale"].values,
             "prior_loc_kinetic_parameters": kinetic_parameter_priors["location"].values,
             "prior_scale_kinetic_parameters": kinetic_parameter_priors["scale"].values,
             "prior_loc_unbalanced": prior_loc_unb.values,
@@ -235,7 +237,6 @@ def get_input_data(
             "prior_loc_enzyme": prior_loc_enzyme.values,
             "prior_scale_enzyme": prior_scale_enzyme.values,
             "as_guess": [0.01 for m in range(len(balanced_metabolites))],
-            "delta_g_kernel": wegscheider_mat,
             "rtol": rel_tol,
             "ftol": f_tol,
             "steps": max_steps,
@@ -245,5 +246,8 @@ def get_input_data(
             "kinetic_parameters": kinetic_parameter_priors["location"].values,
             "unbalanced": np.transpose(prior_loc_unb.values),
             "enzyme_concentration": np.transpose(prior_loc_enzyme.values),
+            "formation_energy": np.transpose(
+                formation_energy_priors["location"].values
+            ),
         },
     ]

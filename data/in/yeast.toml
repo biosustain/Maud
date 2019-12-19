@@ -10,82 +10,88 @@ name = 'external'
 volume = 1
 
 [[metabolites]]
-id = 'glc__D_e'
+id = 'glc__D'
 name = 'glucose external'
 balanced = false
-compartment = 'external'
+compartment = 'e'
 
 [[metabolites]]
-id = 'glc__D_c'
+id = 'glc__D'
 name = 'glucose cytosolic'
 balanced = true
-compartment = 'cytosol'
+compartment = 'c'
 
 [[metabolites]]
-id = 'atp_c'
+id = 'atp'
 name = 'atp'
 balanced = false
-compartment = 'cytosol'
+compartment = 'c'
 
 [[metabolites]]
-id = 'adp_c'
+id = 'adp'
 name = 'adp'
 balanced = false
-compartment = 'cytosol'
+compartment = 'c'
 
 [[metabolites]]
-id = 'nad_c'
+id = 'nad'
 name = 'oxidised nicotinamide adenine dinucleotide'
 balanced = false
-compartment = 'cytosol'
+compartment = 'c'
 
 [[metabolites]]
-id = 'nadh_c'
+id = 'nadh'
 name = 'reduced nicotinamide adenine dinucleotide'
 balanced = false
-compartment = 'cytosol'
+compartment = 'c'
 
 [[metabolites]]
-id = '3pg_c'
+id = '3pg'
 name = '3-phosphoglycerate'
 balanced = false
-compartment = 'cytosol'
+compartment = 'c'
 
 [[metabolites]]
-id = 'g6p_c'
+id = 'g6p'
 name = 'glucose-6-phosphate'
 balanced = true
-compartment = 'cytosol'
+compartment = 'c'
 
 [[metabolites]]
-id = 'f6p_c'
+id = 'f6p'
 name = 'fructose-6-phosphate'
 balanced = true
-compartment = 'cytosol'
+compartment = 'c'
 
 [[metabolites]]
-id = 'f16p_c'
+id = 'f16p'
 name = 'fructose-1,6-bisphosphate'
 balanced = true
-compartment = 'cytosol'
+compartment = 'c'
 
 [[metabolites]]
-id = 'g3p_c'
+id = 'g3p'
 name = 'glyceraldyhyde-3-phosphate'
 balanced = true
-compartment = 'cytosol'
+compartment = 'c'
 
 [[metabolites]]
-id = '13dpg_c'
+id = '13dpg'
 name = '1,3-diphosphoglycerate'
 balanced = true
-compartment = 'cytosol'
+compartment = 'c'
 
 [[metabolites]]
-id = 'dhap_c'
+id = 'pi'
+name = 'orthophosphate'
+balanced = false
+compartment = 'c'
+
+[[metabolites]]
+id = 'dhap'
 name = 'dihydroxyacetone phosphate'
 balanced = false
-compartment = 'cytosol'
+compartment = 'c'
 
 # Glycolysis
 [[reactions]]
@@ -145,7 +151,7 @@ mechanism = "modular_rate_law"
 [[reactions]]
 id = 'GAPD'
 name = 'GAPD'
-stoichiometry = { g3p_c = -1, nad_c = -1, nadh_c = 1, 13dpg_c = 1 }
+stoichiometry = { g3p_c = -1, nad_c = -1, pi_c = -1, nadh_c = 1, 13dpg_c = 1 }
 [[reactions.enzymes]]
 id = 'GAPD'
 name = 'GAPD'
@@ -217,6 +223,7 @@ GAPD = [
   { target_id = 'Kcat1', location = 19, scale = 0.1},
   { target_id = 'Ka', location = 0.423, scale = 0.1},
   { target_id = 'Kb', location = 0.09, scale = 0.1},
+  { target_id = 'Kc', location = 0.001, scale = 0.1},
   { target_id = 'Kp', location = 0.06, scale = 0.1},
   { target_id = 'Kq', location = 0.909, scale = 0.1},
 ]
@@ -229,15 +236,21 @@ PGK = [
 ]
 
 [priors.thermodynamic_parameters]
-marginal_dgs = [
-  { target_id = 'GLCt1', location = 0, scale = 0.05},
-  { target_id = 'HEX1', location = -18.8, scale = 0.9},
-  { target_id = 'PGI', location = -3.1, scale = 0.8},
-  { target_id = 'PFK', location = -16.6, scale = 1.3},
-  { target_id = 'FBA', location = -6.6, scale = 1.0},
-  { target_id = 'TPI', location = -7.7, scale = 1.1},
-  { target_id = 'GAPD', location = 13.0, scale = 0.8},
-  { target_id = 'PGK', location = -20.0, scale = 0.9},
+formation_energies = [
+  { target_id = 'glc__D', location = -446.8, scale = 1.3 },
+  { target_id = 'atp', location = -2313.0, scale = 3.0 },
+  { target_id = 'adp', location = -1440.8, scale = 2.4 },
+  { target_id = 'nad', location = -1222.9, scale = 12.4 },
+  { target_id = 'nadh', location = -1158.7, scale = 12.4 },
+  { target_id = 'dhap', location = -1111.9, scale = 1.1 },
+  { target_id = '3pg', location = -1365.2, scale = 1.5 },
+  { target_id = 'glc__D', location = -446.8, scale = 1.3 },
+  { target_id = 'g6p', location = -1336.3, scale = 1.3 },
+  { target_id = 'f6p', location = -1333.8, scale = 1.3 },
+  { target_id = 'f16p', location = -2220.9, scale = 2.1 },
+  { target_id = 'g3p', location = -1106.4, scale = 1.3 },
+  { target_id = '13dpg', location = -2219.0, scale = 2.1 },
+  { target_id = 'pi', location = -1073.3, scale = 1.5 },
 ]
 
 [priors.unbalanced_metabolites]
@@ -249,6 +262,7 @@ condition_1 = [
   { target_id = 'nadh_c', location = 0.178, scale = 0.05 },
   { target_id = 'dhap_c', location = 1.58, scale = 0.05},
   { target_id = '3pg_c', location = 0.52, scale = 0.05 },
+  { target_id = 'pi_c', location = 2, scale = 0.05 },
 ]
 [priors.enzymes]
 condition_1 = [

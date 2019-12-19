@@ -255,154 +255,154 @@ gene = "eda"
 g3p_c = 1
 pyr_c = 1
 [[metabolites]]
-id = "xu5p__D_c"
+id = "xu5p__D"
 name = "D-Xylulose 5-phosphate"
 balanced = true
-compartment = "cytosol"
+compartment = "c"
 
 [[metabolites]]
-id = "g3p_c"
+id = "g3p"
 name = "Glyceraldehyde 3-phosphate"
 balanced = true
-compartment = "cytosol"
+compartment = "c"
 
 [[metabolites]]
-id = "2ddg6p_c"
+id = "2ddg6p"
 name = "2-Dehydro-3-deoxy-D-gluconate 6-phosphate"
 balanced = true
-compartment = "cytosol"
+compartment = "c"
 
 [[metabolites]]
-id = "co2_c"
+id = "co2"
 name = "CO2 CO2"
 balanced = false
-compartment = "cytosol"
+compartment = "c"
 
 [[metabolites]]
-id = "3pg_c"
+id = "3pg"
 name = "3-Phospho-D-glycerate"
 balanced = true
-compartment = "cytosol"
+compartment = "c"
 
 [[metabolites]]
-id = "6pgl_c"
+id = "6pgl"
 name = "6-phospho-D-glucono-1,5-lactone"
 balanced = true
-compartment = "cytosol"
+compartment = "c"
 
 [[metabolites]]
-id = "pyr_c"
+id = "pyr"
 name = "Pyruvate"
 balanced = false
-compartment = "cytosol"
+compartment = "c"
 
 [[metabolites]]
-id = "6pgc_c"
+id = "6pgc"
 name = "6-Phospho-D-gluconate"
 balanced = true
-compartment = "cytosol"
+compartment = "c"
 
 [[metabolites]]
-id = "adp_c"
+id = "adp"
 name = "ADP C10H12N5O10P2"
 balanced = false
-compartment = "cytosol"
+compartment = "c"
 
 [[metabolites]]
-id = "e4p_c"
+id = "e4p"
 name = "D-Erythrose 4-phosphate"
 balanced = false
-compartment = "cytosol"
+compartment = "c"
 
 [[metabolites]]
-id = "13dpg_c"
+id = "13dpg"
 name = "3-Phospho-D-glyceroyl phosphate"
 balanced = true
-compartment = "cytosol"
+compartment = "c"
 
 [[metabolites]]
-id = "nad_c"
+id = "nad"
 name = "Nicotinamide adenine dinucleotide"
 balanced = true
-compartment = "cytosol"
+compartment = "c"
 
 [[metabolites]]
-id = "atp_c"
+id = "atp"
 name = "ATP C10H12N5O13P3"
 balanced = true
-compartment = "cytosol"
+compartment = "c"
 
 [[metabolites]]
-id = "nadp_c"
+id = "nadp"
 name = "Nicotinamide adenine dinucleotide phosphate"
 balanced = true
-compartment = "cytosol"
+compartment = "c"
 
 [[metabolites]]
-id = "g6p_c"
+id = "g6p"
 name = "D-Glucose 6-phosphate"
 balanced = false
-compartment = "cytosol"
+compartment = "c"
 
 [[metabolites]]
-id = "dhap_c"
+id = "dhap"
 name = "Dihydroxyacetone phosphate"
 balanced = true
-compartment = "cytosol"
+compartment = "c"
 
 [[metabolites]]
-id = "f6p_c"
+id = "f6p"
 name = "D-Fructose 6-phosphate"
 balanced = true
-compartment = "cytosol"
+compartment = "c"
 
 [[metabolites]]
-id = "ru5p__D_c"
+id = "ru5p__D"
 name = "D-Ribulose 5-phosphate"
 balanced = true
-compartment = "cytosol"
+compartment = "c"
 
 [[metabolites]]
-id = "2pg_c"
+id = "2pg"
 name = "D-Glycerate 2-phosphate"
 balanced = true
-compartment = "cytosol"
+compartment = "c"
 
 [[metabolites]]
-id = "pep_c"
+id = "pep"
 name = "Phosphoenolpyruvate"
 balanced = false
-compartment = "cytosol"
+compartment = "c"
 
 [[metabolites]]
-id = "nadh_c"
+id = "nadh"
 name = "Nicotinamide adenine dinucleotide - reduced"
 balanced = false
-compartment = "cytosol"
+compartment = "c"
 
 [[metabolites]]
-id = "nadph_c"
+id = "nadph"
 name = "Nicotinamide adenine dinucleotide phosphate - reduced"
 balanced = false
-compartment = "cytosol"
+compartment = "c"
 
 [[metabolites]]
-id = "fdp_c"
+id = "fdp"
 name = "D-Fructose 1,6-bisphosphate"
 balanced = true
-compartment = "cytosol"
+compartment = "c"
 
 [[metabolites]]
-id = "r5p_c"
+id = "r5p"
 name = "Alpha-D-Ribose 5-phosphate"
 balanced = false
-compartment = "cytosol"
+compartment = "c"
 
 [[metabolites]]
-id = "s7p_c"
+id = "s7p"
 name = "Sedoheptulose 7-phosphate"
 balanced = true
-compartment = "cytosol"
+compartment = "c"
 [[experiments]]
 id = "Evo04Evo01EP_m-1_e-B1"
 [[experiments.metabolite_measurements]]
@@ -4122,6 +4122,33 @@ EDA = [
 
 [priors.thermodynamic_parameters]
 # Obtained from eQuilibrator
+formation_energies = [
+  { target_id = "xu5p__D", location = -1253.6, scale = 2.4 },
+  { target_id = 'g3p', location = -1106.4, scale = 1.3 },
+  { target_id = "2ddg6p", location = -1467.7, scale = 4.7 },
+  { target_id = "co2", location = -403.1, scale = 5.8 },
+  { target_id = '3pg', location = -1365.2, scale = 1.5 },
+  { target_id = "6pgl", location = -1403.8, scale = 2.9 },
+  { target_id = "pyr", location = -362.9, scale = 1.5 },
+  { target_id = "6pgc", location = -1582.3, scale 2.5 },
+  { target_id = 'adp', location = -1440.8, scale = 2.4 },
+  { target_id = "e4p", location = -1176.6, scale = 3.4 },
+  { target_id = '13dpg', location = -2219.0, scale = 2.1 },
+  { target_id = 'nad', location = -1222.9, scale = 12.4 },
+  { target_id = 'atp', location = -2313.0, scale = 3.0 },
+  { target_id = "nadp", location = -2106.9, scale = 12.7 }
+  { target_id = 'g6p', location = -1336.3, scale = 1.3 },
+  { target_id = 'dhap', location = -1111.9, scale = 1.1 },
+  { target_id = 'f6p', location = -1333.8, scale = 1.3 },
+  { target_id = "ru5p__D", location = -1250.3, scale = 1.9 },
+  { target_id = "2pg", location = -1361.0, scale = 1.6 },
+  { target_id = "pep", location = -1207.5, scale = 1.6 },
+  { target_id = 'nadh', location = -1158.7, scale = 12.4 },
+  { target_id = "nadph", location = -2041.8, scale = 12.7 },
+  { target_id = "fdp", location = -2220.9, scale = 2.1 },
+  { target_id = "r5p", location = -1252.2, scale = 2.0 },
+  { target_id = "s7p", location = -1403.2, scale = 3.7 },
+]
 marginal_dgs = [
     { target_id = "PGI", location = 2.5, scale = 0.8},
     { target_id = "FBP", location = -11.4, scale = 1.4},

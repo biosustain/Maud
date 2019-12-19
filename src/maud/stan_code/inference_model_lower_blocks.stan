@@ -8,7 +8,7 @@ data {
   int<lower=1> N_experiment;
   int<lower=1> N_flux_measurement;
   int<lower=1> N_conc_measurement;
-  int<lower=1> stoichiometric_rank;
+  int<lower=1> N_metabolite;  // NB metabolites in multiple compartments only count once here
   // measurements
   int<lower=1,upper=N_experiment> experiment_yconc[N_conc_measurement];
   int<lower=1,upper=N_balanced+N_unbalanced> metabolite_yconc[N_conc_measurement];
@@ -19,8 +19,8 @@ data {
   vector[N_flux_measurement] yflux;
   vector<lower=0>[N_flux_measurement] sigma_flux;
   // hardcoded priors
-  vector[N_enzyme] prior_loc_delta_g;
-  vector<lower=0>[N_enzyme] prior_scale_delta_g;
+  vector[N_metabolite] prior_loc_formation_energy;
+  vector<lower=0>[N_metabolite] prior_scale_formation_energy;
   vector[N_kinetic_parameters] prior_loc_kinetic_parameters;
   vector<lower=0>[N_kinetic_parameters] prior_scale_kinetic_parameters;
   real prior_loc_unbalanced[N_unbalanced, N_experiment];
@@ -28,7 +28,8 @@ data {
   real prior_loc_enzyme[N_enzyme, N_experiment];
   real<lower=0> prior_scale_enzyme[N_enzyme, N_experiment];
   // network properties
-  matrix[N_enzyme, stoichiometric_rank] delta_g_kernel;
+  matrix[N_balanced+N_unbalanced, N_enzyme] stoichiometric_matrix;
+  int<lower=1,upper=N_metabolite> compartment_metabolite_index[N_balanced+N_unbalanced];
   // configuration
   vector<lower=0>[N_balanced] as_guess;
   real rtol;
@@ -42,7 +43,7 @@ transformed data {
   real minus_RT = - 0.008314 * 298.15;
 }
 parameters {
-  vector[stoichiometric_rank] delta_g_basis_contribution;
+  vector[N_metabolite] formation_energy;
   vector<lower=0>[N_kinetic_parameters] kinetic_parameters;
   vector<lower=0>[N_unbalanced] unbalanced[N_experiment];
   vector<lower=0>[N_enzyme] enzyme_concentration[N_experiment];
@@ -50,7 +51,7 @@ parameters {
 transformed parameters {
   vector<lower=0>[N_balanced+N_unbalanced] conc[N_experiment];
   vector[N_reaction] flux[N_experiment];
-  vector[N_enzyme] delta_g = delta_g_kernel * delta_g_basis_contribution;  // linear transformation so no need for Jacobian adjustment
+  vector[N_enzyme] delta_g = stoichiometric_matrix' * formation_energy[compartment_metabolite_index];
   for (e in 1:N_experiment){
     vector[N_enzyme] keq = exp(delta_g / minus_RT);
     vector[N_unbalanced+N_enzyme+N_enzyme+N_kinetic_parameters] theta;
@@ -65,7 +66,7 @@ transformed parameters {
 }
 model {
   kinetic_parameters ~ lognormal(log(prior_loc_kinetic_parameters), prior_scale_kinetic_parameters);
-  delta_g ~ normal(prior_loc_delta_g, prior_scale_delta_g);
+  formation_energy ~ normal(prior_loc_formation_energy, prior_scale_formation_energy);
   for (e in 1:N_experiment){
     unbalanced[e] ~ lognormal(log(prior_loc_unbalanced[,e]), prior_scale_unbalanced[,e]);
     enzyme_concentration[e] ~ lognormal(log(prior_loc_enzyme[,e]), prior_scale_enzyme[,e]);
