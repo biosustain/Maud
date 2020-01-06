@@ -91,7 +91,9 @@ def sample(
 
     mi = io.load_maud_input_from_toml(data_path)
 
-    input_data, init_cond = get_input_data(mi, f_tol, rel_tol, max_steps, likelihood)
+    input_data = get_input_data(mi, f_tol, rel_tol, max_steps, likelihood)
+    init_cond = get_initial_conditions(input_data)
+
     cmdstanpy.utils.jsondump(input_filepath, input_data)
 
     stan_program_filepath = os.path.join(
@@ -160,9 +162,6 @@ def get_input_data(
     compartment_metabolite_index = [
         metabolite_codes_no_compartments[m.id] for m in metabolites.values()
     ]
-    unb_metabolite_codes = {
-        k: v for k, v in metabolite_codes.items() if not metabolites[k].balanced
-    }
     enzymes = {k: v for r in reactions.values() for k, v in r.enzymes.items()}
     balanced_metabolites = {k: v for k, v in metabolites.items() if v.balanced}
     unbalanced_metabolites = {k: v for k, v in metabolites.items() if not v.balanced}
@@ -176,19 +175,13 @@ def get_input_data(
     formation_energy_priors = formation_energy_priors.set_index("target_id").reindex(
         metabolite_codes_no_compartments
     )
-    prior_loc_unb, prior_loc_enzyme, prior_scale_unb, prior_scale_enzyme = (
-        prior_df.loc[lambda df: df["target_type"] == target_type]
-        .set_index(["target_id", "experiment_id"])[col]
-        .unstack()
-        .loc[list(codes.keys()), list(experiment_codes.keys())]
-        for col in ["location", "scale"]
-        for target_type, codes in [
-            ("unbalanced_metabolite", unb_metabolite_codes),
-            ("enzyme", enzyme_codes),
-        ]
-    )
-
-    metabolite_measurements, reaction_measurements = (
+    unbalanced_param_shape = len(unbalanced_metabolites), len(mi.experiments)
+    enzyme_param_shape = len(enzymes), len(mi.experiments)
+    prior_loc_unbalanced = np.full(unbalanced_param_shape, 0.1)
+    prior_scale_unbalanced = np.full(unbalanced_param_shape, 1)
+    prior_loc_enzyme = np.full(enzyme_param_shape, 0.1)
+    prior_scale_enzyme = np.full(enzyme_param_shape, 1)
+    metabolite_measurements, reaction_measurements, enzyme_measurements = (
         pd.DataFrame(
             [
                 [exp.id, meas.target_id, meas.value, meas.uncertainty]
@@ -197,57 +190,75 @@ def get_input_data(
             ],
             columns=["experiment_id", "target_id", "value", "uncertainty"],
         )
-        for measurement_type in ["metabolite", "reaction"]
+        for measurement_type in ["metabolite", "reaction", "enzyme"]
     )
-    return [
-        {
-            "N_balanced": len(balanced_metabolites),
-            "N_unbalanced": len(unbalanced_metabolites),
-            "N_kinetic_parameters": len(kinetic_parameter_priors),
-            "N_reaction": len(reactions),
-            "N_enzyme": len(enzymes),
-            "N_experiment": len(mi.experiments),
-            "N_flux_measurement": len(reaction_measurements),
-            "N_conc_measurement": len(metabolite_measurements),
-            "N_metabolite": len(formation_energy_priors),
-            "stoichiometric_matrix": full_stoic.T.values,
-            "compartment_metabolite_index": compartment_metabolite_index,
-            "experiment_yconc": (
-                metabolite_measurements["experiment_id"].map(experiment_codes).values
-            ),
-            "metabolite_yconc": (
-                metabolite_measurements["target_id"].map(metabolite_codes).values
-            ),
-            "yconc": metabolite_measurements["value"].values,
-            "sigma_conc": metabolite_measurements["uncertainty"].values,
-            "experiment_yflux": (
-                reaction_measurements["experiment_id"].map(experiment_codes).values
-            ),
-            "reaction_yflux": (
-                reaction_measurements["target_id"].map(reaction_codes).values
-            ),
-            "yflux": reaction_measurements["value"].values,
-            "sigma_flux": reaction_measurements["uncertainty"].values,
-            "prior_loc_formation_energy": formation_energy_priors["location"].values,
-            "prior_scale_formation_energy": formation_energy_priors["scale"].values,
-            "prior_loc_kinetic_parameters": kinetic_parameter_priors["location"].values,
-            "prior_scale_kinetic_parameters": kinetic_parameter_priors["scale"].values,
-            "prior_loc_unbalanced": prior_loc_unb.values,
-            "prior_scale_unbalanced": prior_scale_unb.values,
-            "prior_loc_enzyme": prior_loc_enzyme.values,
-            "prior_scale_enzyme": prior_scale_enzyme.values,
-            "as_guess": [0.01 for m in range(len(balanced_metabolites))],
-            "rtol": rel_tol,
-            "ftol": f_tol,
-            "steps": max_steps,
-            "LIKELIHOOD": likelihood,
-        },
-        {
-            "kinetic_parameters": kinetic_parameter_priors["location"].values,
-            "unbalanced": np.transpose(prior_loc_unb.values),
-            "enzyme_concentration": np.transpose(prior_loc_enzyme.values),
-            "formation_energy": np.transpose(
-                formation_energy_priors["location"].values
-            ),
-        },
-    ]
+    return {
+        "N_balanced": len(balanced_metabolites),
+        "N_unbalanced": len(unbalanced_metabolites),
+        "N_kinetic_parameters": len(kinetic_parameter_priors),
+        "N_reaction": len(reactions),
+        "N_enzyme": len(enzymes),
+        "N_experiment": len(mi.experiments),
+        "N_flux_measurement": len(reaction_measurements),
+        "N_enzyme_measurement": len(enzyme_measurements),
+        "N_conc_measurement": len(metabolite_measurements),
+        "N_metabolite": len(formation_energy_priors),
+        "stoichiometric_matrix": full_stoic.T.values,
+        "compartment_metabolite_index": compartment_metabolite_index,
+        "experiment_yconc": (
+            metabolite_measurements["experiment_id"].map(experiment_codes).values
+        ),
+        "metabolite_yconc": (
+            metabolite_measurements["target_id"].map(metabolite_codes).values
+        ),
+        "yconc": metabolite_measurements["value"].values,
+        "sigma_conc": metabolite_measurements["uncertainty"].values,
+        "experiment_yflux": (
+            reaction_measurements["experiment_id"].map(experiment_codes).values
+        ),
+        "reaction_yflux": (
+            reaction_measurements["target_id"].map(reaction_codes).values
+        ),
+        "yflux": reaction_measurements["value"].values,
+        "sigma_flux": reaction_measurements["uncertainty"].values,
+        "experiment_yenz": (
+            enzyme_measurements["experiment_id"].map(experiment_codes).values
+        ),
+        "enzyme_yenz": (enzyme_measurements["target_id"].map(enzyme_codes).values),
+        "yenz": enzyme_measurements["value"].values,
+        "sigma_enz": enzyme_measurements["uncertainty"].values,
+        "prior_loc_formation_energy": formation_energy_priors["location"].values,
+        "prior_scale_formation_energy": formation_energy_priors["scale"].values,
+        "prior_loc_kinetic_parameters": kinetic_parameter_priors["location"].values,
+        "prior_scale_kinetic_parameters": kinetic_parameter_priors["scale"].values,
+        "prior_loc_unbalanced": prior_loc_unbalanced,
+        "prior_scale_unbalanced": prior_scale_unbalanced,
+        "prior_loc_enzyme": prior_loc_enzyme,
+        "prior_scale_enzyme": prior_scale_enzyme,
+        "as_guess": [0.01 for m in range(len(balanced_metabolites))],
+        "rtol": rel_tol,
+        "ftol": f_tol,
+        "steps": max_steps,
+        "LIKELIHOOD": likelihood,
+    }
+
+
+def get_initial_conditions(input_data):
+    """Specify parameters' initial conditions."""
+    enz_shape = (
+        input_data["N_experiment"],
+        input_data["N_enzyme"],
+    )
+    unb_shape = input_data["N_experiment"], input_data["N_unbalanced"]
+    enz_init = np.full(enz_shape, 0.1)
+    unb_init = np.full(unb_shape, 0.01)
+    for i, (enz_ix, exp_ix) in enumerate(
+        zip(input_data["enzyme_yenz"] - 1, input_data["experiment_yenz"] - 1)
+    ):
+        enz_init[exp_ix, enz_ix] = input_data["yenz"][i]
+    return {
+        "kinetic_parameters": input_data["prior_loc_kinetic_parameters"],
+        "unbalanced": unb_init,
+        "enzyme_concentration": enz_init,
+        "formation_energy": input_data["prior_loc_formation_energy"],
+    }
