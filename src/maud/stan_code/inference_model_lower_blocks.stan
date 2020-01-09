@@ -7,6 +7,7 @@ data {
   int<lower=1> N_enzyme;
   int<lower=1> N_experiment;
   int<lower=1> N_flux_measurement;
+  int<lower=1> N_enzyme_measurement;
   int<lower=1> N_conc_measurement;
   int<lower=1> N_metabolite;  // NB metabolites in multiple compartments only count once here
   // measurements
@@ -18,6 +19,10 @@ data {
   int<lower=1,upper=N_reaction> reaction_yflux[N_flux_measurement];
   vector[N_flux_measurement] yflux;
   vector<lower=0>[N_flux_measurement] sigma_flux;
+  int<lower=1,upper=N_experiment> experiment_yenz[N_enzyme_measurement];
+  int<lower=1,upper=N_enzyme> enzyme_yenz[N_enzyme_measurement];
+  vector[N_enzyme_measurement] yenz;
+  vector<lower=0>[N_enzyme_measurement] sigma_enz;
   // hardcoded priors
   vector[N_metabolite] prior_loc_formation_energy;
   vector<lower=0>[N_metabolite] prior_scale_formation_energy;
@@ -75,6 +80,9 @@ model {
     for (c in 1:N_conc_measurement){
       target += lognormal_lpdf(yconc[c] | log(conc[experiment_yconc[c], metabolite_yconc[c]]), sigma_conc[c]);
     }
+    for (ec in 1:N_enzyme_measurement){
+      target += lognormal_lpdf(yenz[ec] | log(enzyme_concentration[experiment_yenz[ec], enzyme_yenz[ec]]), sigma_enz[ec]);
+    }
     for (f in 1:N_flux_measurement){
       target += normal_lpdf(yflux[f] | flux[experiment_yflux[f], reaction_yflux[f]], sigma_flux[f]);
     }
@@ -82,9 +90,13 @@ model {
 }
 generated quantities {
   vector[N_conc_measurement] yconc_sim;
+  vector[N_enzyme_measurement] yenz_sim;
   vector[N_flux_measurement] yflux_sim;
   for (c in 1:N_conc_measurement){
     yconc_sim[c] = lognormal_rng(log(conc[experiment_yconc[c], metabolite_yconc[c]]), sigma_conc[c]);
+  }
+  for (ec in 1:N_enzyme_measurement){
+    yenz_sim[ec] = lognormal_rng(log(enzyme_concentration[experiment_yenz[ec], enzyme_yenz[ec]]), sigma_enz[ec]);
   }
   for (f in 1:N_flux_measurement){
     yflux_sim[f] = normal_rng(flux[experiment_yflux[f], reaction_yflux[f]], sigma_flux[f]);

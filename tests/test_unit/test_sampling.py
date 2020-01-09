@@ -21,18 +21,23 @@ def test_get_input_data():
         "N_enzyme": 3,
         "N_experiment": 2,
         "N_flux_measurement": 2,
-        "N_conc_measurement": 4,
+        "N_enzyme_measurement": 6,
+        "N_conc_measurement": 8,
         "N_metabolite": 2,
         "stoichiometric_matrix": [[-1, 0, 0], [0, 0, 1], [1, -1, 0], [0, 1, -1]],
         "compartment_metabolite_index": [1, 2, 1, 2],
-        "experiment_yconc": [1, 1, 2, 2],
-        "metabolite_yconc": [3, 4, 3, 4],
-        "yconc": [0.8, 1.5, 0.7, 1.4],
-        "sigma_conc": [0.1, 0.1, 0.1, 0.1],
+        "experiment_yconc": [1, 1, 1, 1, 2, 2, 2, 2],
+        "metabolite_yconc": [3, 4, 1, 2, 3, 4, 1, 2],
+        "yconc": [0.8, 1.5, 2.0, 1.0, 0.7, 1.4, 2.0, 1.0],
+        "sigma_conc": [0.1, 0.1, 0.05, 0.05, 0.1, 0.1, 0.05, 0.05],
         "experiment_yflux": [1, 2],
         "reaction_yflux": [3, 3],
         "yflux": [0.29, 0.21],
         "sigma_flux": [0.1, 0.1],
+        "experiment_yenz": [1, 1, 1, 2, 2, 2],
+        "enzyme_yenz": [1, 2, 3, 1, 2, 3],
+        "yenz": [1.0, 1.0, 1.0, 1.5, 1.5, 1.5],
+        "sigma_enz": [0.05, 0.05, 0.05, 0.05, 0.05, 0.05],
         "prior_loc_formation_energy": [-1.0, -2.0],
         "prior_scale_formation_energy": [0.05, 0.05],
         "prior_loc_kinetic_parameters": [
@@ -67,10 +72,10 @@ def test_get_input_data():
             0.6,
             0.6,
         ],
-        "prior_loc_unbalanced": [[2.0, 2.0], [1.0, 1.0]],
-        "prior_scale_unbalanced": [[0.05, 0.05], [0.05, 0.05]],
-        "prior_loc_enzyme": [[1.0, 1.5], [1.0, 1.5], [1.0, 1.5]],
-        "prior_scale_enzyme": [[0.05, 0.05], [0.05, 0.05], [0.05, 0.05]],
+        "prior_loc_unbalanced": [[0.1, 0.1], [0.1, 0.1]],
+        "prior_scale_unbalanced": [[1, 1], [1, 1]],
+        "prior_loc_enzyme": [[0.1, 0.1], [0.1, 0.1], [0.1, 0.1]],
+        "prior_scale_enzyme": [[1.0, 1.0], [1.0, 1.0], [1.0, 1.0]],
         "as_guess": [0.01, 0.01],
         "rtol": 1e-09,
         "ftol": 1e-06,
@@ -79,7 +84,7 @@ def test_get_input_data():
     }
     toml_input_path = os.path.join(data_path, "linear.toml")
     mi = io.load_maud_input_from_toml(toml_input_path)
-    actual, _ = sampling.get_input_data(mi, 1e-06, 1e-09, int(1e9), 1)
+    actual = sampling.get_input_data(mi, 1e-06, 1e-09, int(1e9), 1)
     assert actual.keys() == expected.keys()
     for k in actual.keys():
         assert_equal(actual[k], expected[k])
