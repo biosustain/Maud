@@ -39,22 +39,38 @@ class Metabolite:
 
     :param id: metabolite id, use a BiGG id if possible.
     :param name: metabolite name.
-    :param balanced: Doe this metabolite have an unchanging concentration at
-    steady state?
-    :param compartment: compartment for the metabolite.
     """
 
     def __init__(
         self,
         id: str,
         name: str = None,
-        balanced: bool = None,
-        compartment: Compartment = None,
     ):
         self.id = id
         self.name = name if name is not None else id
+
+
+class MetaboliteInCompartment:
+    """A metabolite, in a compartment, or mic for short.
+
+    :param id: this mic's id, usually <metabolite_id>_<compartment_id>.
+    :param metabolite_id: id of this mic's metabolite
+    :param compartment_id: id of this mic's compartment
+    :param balanced: Does this mic have stable concentration at steady state?
+
+    """
+
+    def __init__(
+        self,
+        id: str,
+        metabolite_id: str = None,
+        compartment_id: str = None,
+        balanced: bool = None,
+    ):
+        self.id = id
+        self.metabolite_id = metabolite_id
+        self.compartment_id = compartment_id
         self.balanced = balanced
-        self.compartment = compartment
 
 
 class Modifier:
@@ -165,6 +181,7 @@ class KineticModel:
     :param metabolites: dictionary mapping strings to metabolite objects
     :param reactions: dictionary mapping strings to reaction objects
     :param compartments: dictionary mapping strings to compartment objects
+    :param mic: dictionary mapping strings to MetaboliteInCompartment objects
     """
 
     def __init__(
@@ -173,11 +190,13 @@ class KineticModel:
         metabolites: Dict[str, Metabolite],
         reactions: Dict[str, Reaction],
         compartments: Dict[str, Compartment],
+        mics: Dict[str, MetaboliteInCompartment],
     ):
         self.model_id = model_id
         self.metabolites = metabolites
         self.reactions = reactions
         self.compartments = compartments
+        self.mics = mics
 
 
 class Measurement:
