@@ -97,7 +97,7 @@ pass
     help="How far ahead the ode solver simulates",
 )
 @click.option(
-    "--output_dir", default="./", help="Where to save Maud's output",
+    "--output_dir", default=".", help="Where to save Maud's output",
 )
 @click.argument(
     "data_path",
