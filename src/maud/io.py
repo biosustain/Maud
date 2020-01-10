@@ -34,6 +34,7 @@ from maud.data_model import (
     MaudInput,
     Measurement,
     Metabolite,
+    MetaboliteInCompartment,
     Modifier,
     Parameter,
     Prior,
@@ -75,13 +76,15 @@ def load_kinetic_model_from_toml(
         for c in parsed_toml["compartments"]
     }
     metabolites = {
-        m["id"]
-        + "_"
-        + m["compartment"]: Metabolite(
-            id=m["id"],
-            name=m["name"],
+        m["id"]: Metabolite(id=m["id"], name=m["name"])
+        for m in parsed_toml["metabolites"]
+    }
+    mics = {
+        f"{m['id']}_{m['compartment']}": MetaboliteInCompartment(
+            id=f"{m['id']}_{m['compartment']}",
+            metabolite_id=m["id"],
+            compartment_id=m["compartment"],
             balanced=m["balanced"],
-            compartment=m["compartment"],
         )
         for m in parsed_toml["metabolites"]
     }
@@ -90,6 +93,7 @@ def load_kinetic_model_from_toml(
         model_id=model_id,
         metabolites=metabolites,
         compartments=compartments,
+        mics=mics,
         reactions=reactions,
     )
 

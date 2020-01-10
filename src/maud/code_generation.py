@@ -26,12 +26,7 @@ from typing import Dict, List
 from jinja2 import Environment, PackageLoader, Template
 
 from maud.data_model import KineticModel, MaudInput
-from maud.utils import (
-    codify,
-    get_enzyme_codes,
-    get_kinetic_parameter_codes,
-    get_metabolite_codes,
-)
+from maud.utils import codify, get_enzyme_codes, get_kinetic_parameter_codes
 
 
 TEMPLATE_FILES = [
@@ -106,17 +101,15 @@ def create_stan_program(mi: MaudInput, model_type: str, time_step=0.05) -> str:
     """
     templates = get_templates()
     kinetic_model = mi.kinetic_model
-    met_codes = get_metabolite_codes(kinetic_model)
+    mic_codes = codify(kinetic_model.mics.keys())
     par_codes = get_kinetic_parameter_codes(kinetic_model)
     balanced_codes = [
-        met_codes[met_id]
-        for met_id, met in kinetic_model.metabolites.items()
-        if met.balanced
+        mic_codes[mic_id] for mic_id, mic in kinetic_model.mics.items() if mic.balanced
     ]
     unbalanced_codes = [
-        met_codes[met_id]
-        for met_id, met in kinetic_model.metabolites.items()
-        if not met.balanced
+        mic_codes[mic_id]
+        for mic_id, mic in kinetic_model.mics.items()
+        if not mic.balanced
     ]
     keq_position = [par_codes[par_id] for par_id in par_codes.keys() if "Keq" in par_id]
     fluxes_function = create_fluxes_function(
@@ -166,14 +159,14 @@ def create_ode_function(kinetic_model: KineticModel, template: Template) -> str:
     rxns = kinetic_model.reactions
     rxn_id_to_stan = codify(rxns.keys())
     metabolite_lines = []
-    for met_id, met in kinetic_model.metabolites.items():
-        if not met.balanced:
+    for mic_id, mic in kinetic_model.mics.items():
+        if not mic.balanced:
             line = "0"
         else:
             line = ""
             for rxn_id, rxn in rxns.items():
-                if met_id in rxn.stoichiometry.keys():
-                    stoich = rxn.stoichiometry[met_id]
+                if mic_id in rxn.stoichiometry.keys():
+                    stoich = rxn.stoichiometry[mic_id]
                     prefix = "+" if stoich > 0 and line != "" else ""
                     rxn_stan = rxn_id_to_stan[rxn_id]
                     line += prefix + str(stoich) + "*fluxes[{}]".format(rxn_stan)
@@ -196,11 +189,11 @@ def create_steady_state_function(
     compare with the initial state
     """
 
-    mets = kinetic_model.metabolites
-    met_codes = dict(zip(mets.keys(), range(1, len(mets) + 1)))
-    balanced_codes = [met_codes[met_id] for met_id, met in mets.items() if met.balanced]
+    mics = kinetic_model.mics
+    mic_codes = codify(mics.keys())
+    balanced_codes = [mic_codes[mic_id] for mic_id, mic in mics.items() if mic.balanced]
     unbalanced_codes = [
-        met_codes[met_id] for met_id, met in mets.items() if not met.balanced
+        mic_codes[mic_id] for mic_id, mic in mics.items() if not mic.balanced
     ]
     return template.render(
         N_balanced=len(balanced_codes),
@@ -262,9 +255,9 @@ def create_fluxes_function(kinetic_model: KineticModel, template: Template) -> s
     :param template: A jinja template
     """
     modular_template = get_templates()["modular_rate_law"]
-    unbalanced = [m for m in kinetic_model.metabolites.values() if not m.balanced]
+    unbalanced = [m for m in kinetic_model.mics.values() if not m.balanced]
     kp_codes = get_kinetic_parameter_codes(kinetic_model)
-    met_codes = get_metabolite_codes(kinetic_model)
+    mic_codes = codify(kinetic_model.mics.keys())
     enz_codes = keq_codes = get_enzyme_codes(kinetic_model)
 
     # Add increments to codes so they can be referred to in context of stacked
@@ -283,13 +276,13 @@ def create_fluxes_function(kinetic_model: KineticModel, template: Template) -> s
     free_enzyme_ratio_lines = []
     flux_lines = []
     for _, rxn in kinetic_model.reactions.items():
-        substrate_ids = [met_id for met_id, s in rxn.stoichiometry.items() if s < 0]
+        substrate_ids = [mic_id for mic_id, s in rxn.stoichiometry.items() if s < 0]
         substrate_codes = {
-            "S" + str(i): met_codes[met_id] for i, met_id in enumerate(substrate_ids)
+            "S" + str(i): mic_codes[mic_id] for i, mic_id in enumerate(substrate_ids)
         }
-        product_ids = [met_id for met_id, s in rxn.stoichiometry.items() if s > 0]
+        product_ids = [mic_id for mic_id, s in rxn.stoichiometry.items() if s > 0]
         product_codes = {
-            "P" + str(i): met_codes[met_id] for i, met_id in enumerate(product_ids)
+            "P" + str(i): mic_codes[mic_id] for i, mic_id in enumerate(product_ids)
         }
         enzyme_flux_strings = []
         for enz_id, enz in rxn.enzymes.items():
@@ -317,7 +310,7 @@ def create_fluxes_function(kinetic_model: KineticModel, template: Template) -> s
             if enz.mechanism == "modular_rate_law":
                 enz_code = enz_codes_in_theta[enz.id]
                 competitor_ids = [
-                    mod.metabolite
+                    mod.mic
                     for mod in enz.modifiers.values()
                     if "competitive_inhibitor" in mod.modifier_type
                 ]
@@ -331,7 +324,7 @@ def create_fluxes_function(kinetic_model: KineticModel, template: Template) -> s
                     substrate_stoichiometries,
                     product_stoichiometries,
                     kp_codes_in_theta,
-                    met_codes,
+                    mic_codes,
                 )
                 modular_line = modular_template.render(
                     enz_id=enz_id,
@@ -377,7 +370,7 @@ def create_fluxes_function(kinetic_model: KineticModel, template: Template) -> s
                 # make regulatory effect string
                 allosteric_inhibitors, allosteric_activators = (
                     {
-                        mod.metabolite: mod
+                        mod.mic: mod
                         for mod in enz.modifiers.values()
                         if mod.modifier_type == modifier_type
                     }
@@ -387,10 +380,10 @@ def create_fluxes_function(kinetic_model: KineticModel, template: Template) -> s
                     ]
                 )
                 allosteric_inhibitor_codes = {
-                    mod_id: met_codes[mod_id] for mod_id in allosteric_inhibitors.keys()
+                    mod_id: mic_codes[mod_id] for mod_id in allosteric_inhibitors.keys()
                 }
                 allosteric_activator_codes = {
-                    mod_id: met_codes[mod_id] for mod_id in allosteric_activators.keys()
+                    mod_id: mic_codes[mod_id] for mod_id in allosteric_activators.keys()
                 }
                 regulatory_string = get_regulatory_string(
                     allosteric_inhibitor_codes,
@@ -484,21 +477,21 @@ def get_modular_rate_codes(
     substrate_info: List[List],
     product_info: List[List],
     par_codes: Dict[str, int],
-    met_codes: Dict[str, int],
+    mic_codes: Dict[str, int],
 ) -> List[List[int]]:
     """Get codes that can be put into the modular rate law jinja template.
 
     The function returns a list containing lists substrate_input and
     product_input. Each of these is a list containing lists with the form
-    [met_code, param_code, stoic] for each substrate and product.
+    [mic_code, param_code, stoic] for each substrate and product.
 
     :param rxn_id: id of the reaction
-    :param substrate_info: list containing lists with the form [met_id, stoic]
-    where met_id is a string and stoic is a float
-    :param product_info: list containing lists with the form [met_id, stoic]
-    where met_id is a string and stoic is a float
+    :param substrate_info: list containing lists with the form [mic_id, stoic]
+    where mic_id is a string and stoic is a float
+    :param product_info: list containing lists with the form [mic_id, stoic]
+    where mic_id is a string and stoic is a float
     :param par_codes: dictionary mapping parameter ids to integers
-    :param met_codes: dictionary mapping metabolite ids to integers
+    :param mic_codes: dictionary mapping metabolite-in-compartment ids to integers
     """
 
     substrate_keys = ["a", "b", "c", "d"]
@@ -509,16 +502,16 @@ def get_modular_rate_codes(
     for info, keys in zip(
         [substrate_info, product_info], [substrate_keys, product_keys]
     ):
-        for i, (met_id, stoic) in enumerate(info):
+        for i, (mic_id, stoic) in enumerate(info):
             param_id = enz_id + "_K" + keys[i]
             param_code = par_codes[param_id]
-            met_code = met_codes[met_id]
+            mic_code = mic_codes[mic_id]
             if stoic < 0:
-                substrate_input.append([met_code, param_code, stoic])
+                substrate_input.append([mic_code, param_code, stoic])
             elif stoic > 0:
-                product_input.append([met_code, param_code, stoic])
+                product_input.append([mic_code, param_code, stoic])
     for comp in competitor_ids:
-        competitor_code = met_codes[comp]
+        competitor_code = mic_codes[comp]
         param_id = enz_id + "_inhibition_constant_" + comp
         competitor_parameter = par_codes[param_id]
         competitor_input.append([competitor_code, competitor_parameter])
