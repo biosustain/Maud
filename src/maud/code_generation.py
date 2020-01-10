@@ -109,9 +109,7 @@ def create_stan_program(mi: MaudInput, model_type: str, time_step=0.05) -> str:
     mic_codes = codify(kinetic_model.mics.keys())
     par_codes = get_kinetic_parameter_codes(kinetic_model)
     balanced_codes = [
-        mic_codes[mic_id]
-        for mic_id, mic in kinetic_model.mics.items()
-        if mic.balanced
+        mic_codes[mic_id] for mic_id, mic in kinetic_model.mics.items() if mic.balanced
     ]
     unbalanced_codes = [
         mic_codes[mic_id]

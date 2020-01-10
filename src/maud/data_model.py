@@ -42,9 +42,7 @@ class Metabolite:
     """
 
     def __init__(
-        self,
-        id: str,
-        name: str = None,
+        self, id: str, name: str = None,
     ):
         self.id = id
         self.name = name if name is not None else id

@@ -163,17 +163,15 @@ def get_input_data(
     enzymes = {k: v for r in reactions.values() for k, v in r.enzymes.items()}
     balanced_mics = {k: v for k, v in mics.items() if v.balanced}
     unbalanced_mics = {k: v for k, v in mics.items() if not v.balanced}
-    full_stoic = get_full_stoichiometry(
-        mi.kinetic_model, enzyme_codes, mic_codes
-    )
+    full_stoic = get_full_stoichiometry(mi.kinetic_model, enzyme_codes, mic_codes)
     kinetic_parameter_priors, formation_energy_priors = (
         prior_df.loc[lambda df: df["target_type"] == target_type].copy()
         for target_type in ["kinetic_parameter", "thermodynamic_parameter"]
     )
-    formation_energy_priors['metabolite_code'] = (
-        formation_energy_priors['target_id'].map(metabolite_codes)
-    )
-    formation_energy_priors = formation_energy_priors.sort_values('metabolite_code')
+    formation_energy_priors["metabolite_code"] = formation_energy_priors[
+        "target_id"
+    ].map(metabolite_codes)
+    formation_energy_priors = formation_energy_priors.sort_values("metabolite_code")
     unbalanced_param_shape = len(unbalanced_mics), len(mi.experiments)
     enzyme_param_shape = len(enzymes), len(mi.experiments)
     prior_loc_unbalanced = np.full(unbalanced_param_shape, 0.1)
