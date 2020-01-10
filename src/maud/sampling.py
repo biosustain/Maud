@@ -108,10 +108,12 @@ def sample(
     if need_to_overwrite:
         with open(stan_program_filepath, "w") as f:
             f.write(stan_code)
-        for p in [exe_file_path, exe_file_path + '.o', exe_file_path + '.hpp']:
+        for p in [exe_file_path, exe_file_path + ".o", exe_file_path + ".hpp"]:
             if os.path.exists(p):
                 os.remove(p)
-    model = cmdstanpy.CmdStanModel(stan_file=stan_program_filepath, include_paths=[paths["stan_includes"]])
+    model = cmdstanpy.CmdStanModel(
+        stan_file=stan_program_filepath, include_paths=[paths["stan_includes"]]
+    )
     return model.sample(
         data=input_filepath,
         chains=n_chains,
