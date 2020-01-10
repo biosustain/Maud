@@ -83,7 +83,6 @@ def sample(
     :param: output_dir: Directory to save output
     """
     model_name = os.path.splitext(os.path.basename(data_path))[0]
-    output_filepath = os.path.join(output_dir, f"output_{model_name}.csv")
     input_filepath = os.path.join(output_dir, f"input_data_{model_name}.json")
 
     here = os.path.dirname(os.path.abspath(__file__))
@@ -99,24 +98,26 @@ def sample(
     stan_program_filepath = os.path.join(
         paths["autogen"], f"inference_model_{model_name}.stan"
     )
+    exe_file_path = stan_program_filepath[:-5]
     stan_code = code_generation.create_stan_program(mi, "inference", time_step)
-    no_exe_file = not os.path.exists(stan_program_filepath[:-5])
+    exe_file_exists = os.path.exists(exe_file_path)
     change_in_stan_code = not utils.match_string_to_file(
         stan_code, stan_program_filepath
     )
-    need_to_overwrite = no_exe_file or change_in_stan_code
+    need_to_overwrite = (not exe_file_exists) or change_in_stan_code
     if need_to_overwrite:
         with open(stan_program_filepath, "w") as f:
             f.write(stan_code)
-    model = cmdstanpy.CmdStanModel(stan_file=stan_program_filepath)
-    model.compile(include_paths=[paths["stan_includes"]])
-
+        for p in [exe_file_path, exe_file_path + '.o', exe_file_path + '.hpp']:
+            if os.path.exists(p):
+                os.remove(p)
+    model = cmdstanpy.CmdStanModel(stan_file=stan_program_filepath, include_paths=[paths["stan_includes"]])
     return model.sample(
         data=input_filepath,
-        cores=4,
         chains=n_chains,
-        csv_basename=output_filepath,
+        cores=4,
         sampling_iters=n_samples,
+        output_dir=output_dir,
         warmup_iters=n_warmup,
         max_treedepth=15,
         save_warmup=True,
