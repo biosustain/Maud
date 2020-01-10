@@ -76,14 +76,14 @@ class MetaboliteInCompartment:
 class Modifier:
     """Constructor for modifier objects.
 
-    :param met: the metabolite that is the modifier
+    :param mic: the metabolite-in-compartment that is the modifier
     :param allosteric: whether or not the modifier is allosteric
     :param modifier_type: what is the modifier type:
     'allosteric_activator', 'allosteric_inhibitor', 'competitive inhibitor'
     """
 
-    def __init__(self, metabolite: Metabolite, modifier_type: str = None):
-        self.metabolite = metabolite
+    def __init__(self, mic: MetaboliteInCompartment, modifier_type: str = None):
+        self.mic = mic
         self.allosteric = modifier_type in [
             "allosteric_inhibitor",
             "allosteric_activator",
