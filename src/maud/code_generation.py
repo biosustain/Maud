@@ -26,12 +26,7 @@ from typing import Dict, List
 from jinja2 import Environment, PackageLoader, Template
 
 from maud.data_model import KineticModel, MaudInput
-from maud.utils import (
-    codify,
-    get_enzyme_codes,
-    get_kinetic_parameter_codes,
-    get_metabolite_codes,
-)
+from maud.utils import codify, get_enzyme_codes, get_kinetic_parameter_codes
 
 
 TEMPLATE_FILES = [
