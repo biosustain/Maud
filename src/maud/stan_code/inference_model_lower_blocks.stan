@@ -1,6 +1,6 @@
 data {
   // dimensions
-  int<lower=1> N_balanced;    // 'Balanced' metabolites must have constant concentration at steady state
+  int<lower=1> N_mic;         // Total number of metabolites in compartments
   int<lower=1> N_unbalanced;  // 'Unbalanced' metabolites can have changing concentration at steady state
   int<lower=1> N_kinetic_parameters;
   int<lower=1> N_reaction;
@@ -12,7 +12,7 @@ data {
   int<lower=1> N_metabolite;  // NB metabolites in multiple compartments only count once here
   // measurements
   int<lower=1,upper=N_experiment> experiment_yconc[N_conc_measurement];
-  int<lower=1,upper=N_balanced+N_unbalanced> metabolite_yconc[N_conc_measurement];
+  int<lower=1,upper=N_mic> mic_ix_yconc[N_conc_measurement];
   vector[N_conc_measurement] yconc;
   vector<lower=0>[N_conc_measurement] sigma_conc;
   int<lower=1,upper=N_experiment> experiment_yflux[N_flux_measurement];
@@ -28,15 +28,15 @@ data {
   vector<lower=0>[N_metabolite] prior_scale_formation_energy;
   vector[N_kinetic_parameters] prior_loc_kinetic_parameters;
   vector<lower=0>[N_kinetic_parameters] prior_scale_kinetic_parameters;
-  real prior_loc_unbalanced[N_unbalanced, N_experiment];
-  real<lower=0> prior_scale_unbalanced[N_unbalanced, N_experiment];
+  real prior_loc_conc[N_mic, N_experiment];
+  real<lower=0> prior_scale_conc[N_mic, N_experiment];
   real prior_loc_enzyme[N_enzyme, N_experiment];
   real<lower=0> prior_scale_enzyme[N_enzyme, N_experiment];
   // network properties
-  matrix[N_balanced+N_unbalanced, N_enzyme] stoichiometric_matrix;
-  int<lower=1,upper=N_metabolite> compartment_metabolite_index[N_balanced+N_unbalanced];
+  matrix[N_mic, N_enzyme] stoichiometric_matrix;
+  int<lower=1,upper=N_metabolite> metabolite_ix_stoichiometric_matrix[N_mic];
   // configuration
-  vector<lower=0>[N_balanced] as_guess;
+  vector<lower=0>[N_mic-N_unbalanced] as_guess;
   real rtol;
   real ftol;
   int steps;
@@ -50,22 +50,20 @@ transformed data {
 parameters {
   vector[N_metabolite] formation_energy;
   vector<lower=0>[N_kinetic_parameters] kinetic_parameters;
-  vector<lower=0>[N_unbalanced] unbalanced[N_experiment];
   vector<lower=0>[N_enzyme] enzyme_concentration[N_experiment];
 }
 transformed parameters {
-  vector<lower=0>[N_balanced+N_unbalanced] conc[N_experiment];
+  vector<lower=0>[N_mic] conc[N_experiment];
   vector[N_reaction] flux[N_experiment];
-  vector[N_enzyme] delta_g = stoichiometric_matrix' * formation_energy[compartment_metabolite_index];
+  vector[N_enzyme] delta_g = stoichiometric_matrix' * formation_energy[metabolite_ix_stoiciometric_matrix];
   for (e in 1:N_experiment){
     vector[N_enzyme] keq = exp(delta_g / minus_RT);
     vector[N_unbalanced+N_enzyme+N_enzyme+N_kinetic_parameters] theta;
-    theta[1:N_unbalanced] = unbalanced[e];
+    theta[1:N_unbalanced] = conc[e, { {{-unbalanced_codes|join(',')-}} }];
     theta[N_unbalanced+1:N_unbalanced+N_enzyme] = enzyme_concentration[e];
     theta[N_unbalanced+N_enzyme+1:N_unbalanced+N_enzyme+N_enzyme] = keq;
     theta[N_unbalanced+N_enzyme+N_enzyme+1:] = kinetic_parameters;
     conc[e, { {{-balanced_codes|join(',')-}} }] = algebra_solver(steady_state_function, as_guess, theta, xr, xi, rtol, ftol, steps);
-    conc[e, { {{-unbalanced_codes|join(',')-}} }] = unbalanced[e];
     flux[e] = get_fluxes(to_array_1d(conc[e]), to_array_1d(theta));
   }
 }
@@ -73,11 +71,12 @@ model {
   kinetic_parameters ~ lognormal(log(prior_loc_kinetic_parameters), prior_scale_kinetic_parameters);
   formation_energy ~ normal(prior_loc_formation_energy, prior_scale_formation_energy);
   for (e in 1:N_experiment){
-    unbalanced[e] ~ lognormal(log(prior_loc_unbalanced[,e]), prior_scale_unbalanced[,e]);
+    conc[e] ~ lognormal(log(prior_loc_conc[,e]), prior_scale_conc[,e]);
     enzyme_concentration[e] ~ lognormal(log(prior_loc_enzyme[,e]), prior_scale_enzyme[,e]);
   }
   if (LIKELIHOOD == 1){
     for (c in 1:N_conc_measurement){
+      print(yconc[c], conc[experiment_yconc[c], metabolite_yconc[c]]);
       target += lognormal_lpdf(yconc[c] | log(conc[experiment_yconc[c], metabolite_yconc[c]]), sigma_conc[c]);
     }
     for (ec in 1:N_enzyme_measurement){
