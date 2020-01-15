@@ -285,8 +285,8 @@ class MaudInput:
     :param kinetic_system: a KineticSystem object
     :param priors: a dictionary mapping prior ids to Prior objects
     :param stan codes: a dictionary with keys 'metabolite', 'reaction', 'mic',
-    'experiment' and 'kinetic_parameter', whose values are dictionaries mapping ids
-    of the relevant objects to integer codes
+    'experiment', 'balanced_mic', 'unbalanced_mic' and 'kinetic_parameter', whose
+    values are dictionaries mapping ids of the relevant objects to integer codes
     :param experiments: a dictionary mapping experiment ids to Experiment objects
     """
 
