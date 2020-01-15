@@ -77,7 +77,6 @@ model {
   }
   if (LIKELIHOOD == 1){
     for (c in 1:N_conc_measurement){
-      print(yconc[c], conc[experiment_yconc[c], mic_ix_yconc[c]]);
       target += lognormal_lpdf(yconc[c] | log(conc[experiment_yconc[c], mic_ix_yconc[c]]), sigma_conc[c]);
     }
     for (ec in 1:N_enzyme_measurement){
