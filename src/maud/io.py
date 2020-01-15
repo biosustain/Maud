@@ -40,6 +40,7 @@ from maud.data_model import (
     Prior,
     Reaction,
 )
+from maud.utils import codify
 
 
 MECHANISM_TO_PARAM_IDS = {
@@ -96,6 +97,41 @@ def load_kinetic_model_from_toml(
         mics=mics,
         reactions=reactions,
     )
+
+
+def get_stan_codes(km: KineticModel, experiments) -> Dict[str, Dict[str, int]]:
+    """Get the stan codes for a Maud input.
+
+    :param km: KineticModel object
+    :param experiments: dictionary mapping experiment ids to Experiment objects
+    """
+    rxns = km.reactions.values()
+    enzyme_ids = [eid for rxn in rxns for eid in rxn.enzymes.keys()]
+    kinetic_parameter_ids = [
+        f"{enzyme_id}_{parameter_id}"
+        for reaction in km.reactions.values()
+        for enzyme_id, enzyme in reaction.enzymes.items()
+        for parameter_id in enzyme.parameters.keys()
+    ]
+    mic_codes = codify(km.mics.keys())
+    balanced_mic_codes = {
+        mic_id: code for mic_id, code in mic_codes.items() if km.mics[mic_id].balanced
+    }
+    unbalanced_mic_codes = {
+        mic_id: code
+        for mic_id, code in mic_codes.items()
+        if not km.mics[mic_id].balanced
+    }
+    return {
+        "metabolite": codify(km.metabolites.keys()),
+        "metabolite_in_compartment": mic_codes,
+        "balanced_mic": balanced_mic_codes,
+        "unbalanced_mic": unbalanced_mic_codes,
+        "kinetic_parameter": codify(kinetic_parameter_ids),
+        "reaction": codify(km.reactions.keys()),
+        "experiment": codify(experiments.keys()),
+        "enzyme": codify(enzyme_ids),
+    }
 
 
 def get_non_modifier_params(
@@ -260,7 +296,12 @@ def load_maud_input_from_toml(filepath: str, id: str = "mi") -> MaudInput:
                 scale=kpp["scale"],
                 target_type="kinetic_parameter",
             )
-
-    mi = MaudInput(kinetic_model=kinetic_model, priors=priors, experiments=experiments)
+    stan_codes = get_stan_codes(kinetic_model, experiments)
+    mi = MaudInput(
+        kinetic_model=kinetic_model,
+        priors=priors,
+        stan_codes=stan_codes,
+        experiments=experiments,
+    )
     validation.validate_maud_input(mi)
     return mi

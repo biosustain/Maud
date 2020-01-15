@@ -26,7 +26,6 @@ from typing import Dict, List
 from jinja2 import Environment, PackageLoader, Template
 
 from maud.data_model import KineticModel, MaudInput
-from maud.utils import codify, get_enzyme_codes, get_kinetic_parameter_codes
 
 
 TEMPLATE_FILES = [
@@ -101,8 +100,8 @@ def create_stan_program(mi: MaudInput, model_type: str, time_step=0.05) -> str:
     """
     templates = get_templates()
     kinetic_model = mi.kinetic_model
-    mic_codes = codify(kinetic_model.mics.keys())
-    par_codes = get_kinetic_parameter_codes(kinetic_model)
+    mic_codes = mi.stan_codes["metabolite_in_compartment"]
+    par_codes = mi.stan_codes["kinetic_parameter"]
     balanced_codes = [
         mic_codes[mic_id] for mic_id, mic in kinetic_model.mics.items() if mic.balanced
     ]
@@ -112,12 +111,10 @@ def create_stan_program(mi: MaudInput, model_type: str, time_step=0.05) -> str:
         if not mic.balanced
     ]
     keq_position = [par_codes[par_id] for par_id in par_codes.keys() if "Keq" in par_id]
-    fluxes_function = create_fluxes_function(
-        kinetic_model, templates["fluxes_function"]
-    )
-    ode_function = create_ode_function(kinetic_model, templates["ode_function"])
+    fluxes_function = create_fluxes_function(mi, templates["fluxes_function"])
+    ode_function = create_ode_function(mi, templates["ode_function"])
     steady_state_function = create_steady_state_function(
-        kinetic_model, templates["steady_state_function"], time_step
+        kinetic_model, mic_codes, templates["steady_state_function"], time_step
     )
     functions_block = templates["functions_block"].render(
         fluxes_function=fluxes_function,
@@ -149,15 +146,16 @@ def get_templates(template_files: List[str] = TEMPLATE_FILES) -> Dict[str, Templ
     return out
 
 
-def create_ode_function(kinetic_model: KineticModel, template: Template) -> str:
+def create_ode_function(mi: MaudInput, template: Template) -> str:
     """Get a Stan function specifying metabolite rates of change.
 
-    :param kinetic_model: a KineticModel object
+    :param mi: a MaudInput object
     :param template: a jinja template
     """
 
+    kinetic_model = mi.kinetic_model
+    rxn_codes = mi.stan_codes["reaction"]
     rxns = kinetic_model.reactions
-    rxn_id_to_stan = codify(rxns.keys())
     metabolite_lines = []
     for mic_id, mic in kinetic_model.mics.items():
         if not mic.balanced:
@@ -168,14 +166,17 @@ def create_ode_function(kinetic_model: KineticModel, template: Template) -> str:
                 if mic_id in rxn.stoichiometry.keys():
                     stoich = rxn.stoichiometry[mic_id]
                     prefix = "+" if stoich > 0 and line != "" else ""
-                    rxn_stan = rxn_id_to_stan[rxn_id]
+                    rxn_stan = rxn_codes[rxn_id]
                     line += prefix + str(stoich) + "*fluxes[{}]".format(rxn_stan)
         metabolite_lines.append(line)
     return template.render(ode_stoic=metabolite_lines, N_flux=len(rxns))
 
 
 def create_steady_state_function(
-    kinetic_model: KineticModel, template: Template, time_step: float
+    kinetic_model: KineticModel,
+    mic_codes: Dict[str, int],
+    template: Template,
+    time_step: float,
 ) -> str:
     """Get a Stan function for finding the steady state of the system.
 
@@ -183,6 +184,7 @@ def create_steady_state_function(
     value is zero when the system is at steady state.
 
     :param kinetic_model: A KineticModel object
+    :param mic codes: A dictionary mapping metabolite-in-compartment ids to integers
     :param template: A jinja template
     :param time_step: A number specifying how far into the future the ode
     solver should simulate the system in order to find an evolved state to
@@ -190,7 +192,6 @@ def create_steady_state_function(
     """
 
     mics = kinetic_model.mics
-    mic_codes = codify(mics.keys())
     balanced_codes = [mic_codes[mic_id] for mic_id, mic in mics.items() if mic.balanced]
     unbalanced_codes = [
         mic_codes[mic_id] for mic_id, mic in mics.items() if not mic.balanced
@@ -248,17 +249,18 @@ def create_haldane_line(
     )
 
 
-def create_fluxes_function(kinetic_model: KineticModel, template: Template) -> str:
+def create_fluxes_function(mi: MaudInput, template: Template) -> str:
     """Get a Stan function that maps metabolite/parameter configurations to fluxes.
 
-    :param kinetic_model: A KineticModel object
+    :param mi: A MaudInput object
     :param template: A jinja template
     """
+    kinetic_model = mi.kinetic_model
     modular_template = get_templates()["modular_rate_law"]
     unbalanced = [m for m in kinetic_model.mics.values() if not m.balanced]
-    kp_codes = get_kinetic_parameter_codes(kinetic_model)
-    mic_codes = codify(kinetic_model.mics.keys())
-    enz_codes = keq_codes = get_enzyme_codes(kinetic_model)
+    kp_codes = mi.stan_codes["kinetic_parameter"]
+    mic_codes = mi.stan_codes["metabolite_in_compartment"]
+    enz_codes = keq_codes = mi.stan_codes["enzyme"]
 
     # Add increments to codes so they can be referred to in context of stacked
     # theta vector in the Stan model. This is necessary because only one vector
