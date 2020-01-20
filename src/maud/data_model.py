@@ -284,6 +284,9 @@ class MaudInput:
 
     :param kinetic_system: a KineticSystem object
     :param priors: a dictionary mapping prior ids to Prior objects
+    :param stan codes: a dictionary with keys 'metabolite', 'reaction', 'mic',
+    'experiment', 'balanced_mic', 'unbalanced_mic' and 'kinetic_parameter', whose
+    values are dictionaries mapping ids of the relevant objects to integer codes
     :param experiments: a dictionary mapping experiment ids to Experiment objects
     """
 
@@ -291,10 +294,12 @@ class MaudInput:
         self,
         kinetic_model: KineticModel,
         priors: Dict[str, Prior],
+        stan_codes: Dict[str, Dict[str, int]],
         experiments: Dict[str, Experiment] = None,
     ):
         if experiments is None:
             experiments = defaultdict()
         self.kinetic_model = kinetic_model
         self.priors = priors
+        self.stan_codes = stan_codes
         self.experiments = experiments
