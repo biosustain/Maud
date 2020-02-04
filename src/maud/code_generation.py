@@ -36,57 +36,6 @@ TEMPLATE_FILES = [
     "steady_state_function.stan",
     "modular_rate_law.stan",
 ]
-MECHANISM_TEMPLATES = {
-    "uniuni": Template(
-        "uniuni(m[{{S0}}],m[{{P0}}],p[{{enz}}]*p[{{Kcat1}}],"
-        "p[{{enz}}]*p[{{Kcat2}}],p[{{Ka}}],p[{{Keq}}])"
-    ),
-    "ordered_unibi": Template(
-        "ordered_unibi(m[{{S0}}],m[{{P0}}],m[{{P1}}],"
-        "p[{{enz}}]*p[{{Kcat1}}],p[{{enz}}]*p[{{Kcat2}}],"
-        "p[{{Ka}}],p[{{Kp}}],p[{{Kq}}],"
-        "p[{{Kia}}],{{enz_id}}_Kip,{{enz_id}}_Kiq,"
-        "p[{{Keq}}])"
-    ),
-    "ordered_bibi": Template(
-        "ordered_bibi(m[{{S0}}],m[{{S1}}],m[{{P0}}],m[{{P1}}],"
-        "p[{{enz}}]*p[{{Kcat1}}],p[{{enz}}]*p[{{Kcat2}}],"
-        "p[{{Ka}}],p[{{Kb}}],p[{{Kp}}],p[{{Kq}}],"
-        "{{enz_id}}_Kia,p[{{Kib}}],{{enz_id}}_Kip,p[{{Kiq}}],"
-        "p[{{Keq}}])"
-    ),
-    "pingpong": Template(
-        "pingpong(m[{{S0}}],m[{{S1}}],m[{{P0}}],m[{{P1}}],"
-        "p[{{enz}}]*p[{{Kcat1}}],p[{{enz}}]*p[{{Kcat2}}],"
-        "p[{{Ka}}],p[{{Kb}}],p[{{Kp}}],p[{{Kq}}],"
-        "p[{{Kia}}],p[{{Kib}}],{{enz_id}}_Kip,p[{{Kiq}}],"
-        "p[{{Keq}}])"
-    ),
-    "ordered_terbi": Template(
-        "ordered_terbi(m[{{S0}}],m[{{S1}}],m[{{S2}}],m[{{P0}}],m[{{P1}}],"
-        "p[{{enz}}]*p[{{Kcat1}}],p[{{enz}}]*p[{{Kcat2}}],"
-        "p[{{Ka}}],p[{{Kb}}],p[{{Kc}}],{{enz_id}}_Kp,p[{{Kq}}],"
-        "p[{{Kia}}],p[{{Kib}}],p[{{Kic}}],{{enz_id}}_Kip,p[{{Kiq}}],"
-        "p[{{Keq}}])"
-    ),
-    "modular_rate_law": Template("modular_rate_law({{Tr}},{{Dr}}, {{Dr_reg}})"),
-}
-
-HALDANE_PARAMS = {
-    "ordered_unibi": {
-        "Kip": ["delta_g", "Kia", "Kq", "Kcat1", "Kcat2"],
-        "Kiq": ["delta_g", "Ka", "Kp", "Kcat1", "Kcat2"],
-    },
-    "ordered_bibi": {
-        "Kia": ["delta_g", "Kb", "Kp", "Kiq", "Kcat1", "Kcat2"],
-        "Kip": ["delta_g", "Ka", "Kq", "Kib", "Kcat1", "Kcat2"],
-    },
-    "pingpong": {"Kp": ["delta_g", "Ka", "Kb", "Kq", "Kcat1", "Kcat2"]},
-    "ordered_terbi": {
-        "Kip": ["delta_g", "Kia", "Kib", "Kic", "Kiq"],
-        "Kp": ["delta_g", "Kc", "Kia", "Kib", "Kiq", "Kcat1", "Kcat2"],
-    },
-}
 
 
 def create_stan_program(mi: MaudInput, model_type: str, time_step=0.05) -> str:
@@ -288,18 +237,6 @@ def create_fluxes_function(mi: MaudInput, template: Template) -> str:
         }
         enzyme_flux_strings = []
         for enz_id, enz in rxn.enzymes.items():
-            # make haldane relationship lines if necessary
-            if enz.mechanism in HALDANE_PARAMS.keys():
-                derived_params = HALDANE_PARAMS[enz.mechanism].keys()
-                for derived_param in derived_params:
-                    haldane_line = create_haldane_line(
-                        {**kp_codes_in_theta, **keq_codes_in_theta},
-                        derived_param,
-                        enz.mechanism,
-                        enz.id,
-                        HALDANE_PARAMS,
-                    )
-                    haldane_lines.append(haldane_line)
             substrate_stoichiometries = [
                 [substrate_id, rxn.stoichiometry[substrate_id]]
                 for substrate_id in substrate_ids
@@ -308,36 +245,33 @@ def create_fluxes_function(mi: MaudInput, template: Template) -> str:
                 [product_id, rxn.stoichiometry[product_id]]
                 for product_id in product_ids
             ]
-            # make modular rate law if necessary
-            if enz.mechanism == "modular_rate_law":
-                enz_code = enz_codes_in_theta[enz.id]
-                competitor_ids = [
-                    mod.mic
-                    for mod in enz.modifiers.values()
-                    if "competitive_inhibitor" in mod.modifier_type
-                ]
-                (
-                    substrate_block,
-                    product_block,
-                    competitor_block,
-                ) = get_modular_rate_codes(
-                    enz_id,
-                    competitor_ids,
-                    substrate_stoichiometries,
-                    product_stoichiometries,
-                    kp_codes_in_theta,
-                    mic_codes,
-                )
-                modular_line = modular_template.render(
-                    enz_id=enz_id,
-                    enz=enz_code,
-                    Kcat1=kp_codes_in_theta[enz_id + "_" + "Kcat1"],
-                    Keq=keq_codes_in_theta[enz_id],
-                    substrate_list=substrate_block,
-                    product_list=product_block,
-                    competitive_inhibitor_list=competitor_block,
-                )
-                modular_lines.append(modular_line)
+            enz_code = enz_codes_in_theta[enz.id]
+            competitor_ids = [
+                mod.mic for mod in enz.modifiers.values()
+                if "competitive_inhibitor" in mod.modifier_type
+            ]
+            (
+                substrate_block,
+                product_block,
+                competitor_block,
+            ) = get_modular_rate_codes(
+                enz_id,
+                competitor_ids,
+                substrate_stoichiometries,
+                product_stoichiometries,
+                kp_codes_in_theta,
+                mic_codes,
+            )
+            modular_line = modular_template.render(
+                enz_id=enz_id,
+                enz=enz_code,
+                Kcat1=kp_codes_in_theta[enz_id + "_" + "Kcat1"],
+                Keq=keq_codes_in_theta[enz_id],
+                substrate_list=substrate_block,
+                product_list=product_block,
+                competitive_inhibitor_list=competitor_block,
+            )
+            modular_lines.append(modular_line)
             # make catalytic effect string
             enz_param_codes = {
                 k[len(enz_id) + 1 :]: v
@@ -345,22 +279,11 @@ def create_fluxes_function(mi: MaudInput, template: Template) -> str:
                 if enz_id in k
             }
             enz_code = enz_codes[enz.id]
-            if enz.mechanism == "modular_rate_law":
-                mechanism_args = {
-                    "Tr": f"Tr_{enz_id}",
-                    "Dr": f"Dr_{enz_id}",
-                    "Dr_reg": f"Dr_reg_{enz_id}",
-                }
-            else:
-                mechanism_args = {
-                    **substrate_codes,
-                    **product_codes,
-                    **{"enz": enz_code},
-                    **enz_param_codes,
-                    "enz_id": enz_id,
-                    "Keq": keq_codes_in_theta[enz_id],
-                }
-
+            mechanism_args = {
+                "Tr": f"Tr_{enz_id}",
+                "Dr": f"Dr_{enz_id}",
+                "Dr_reg": f"Dr_reg_{enz_id}",
+            }
             catalytic_string = MECHANISM_TEMPLATES[enz.mechanism].render(mechanism_args)
             if any([mod.allosteric for mod in enz.modifiers.values()]):
                 # make free enzyme ratio line
