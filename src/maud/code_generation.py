@@ -250,11 +250,7 @@ def create_fluxes_function(mi: MaudInput, template: Template) -> str:
                 mod.mic for mod in enz.modifiers.values()
                 if "competitive_inhibitor" in mod.modifier_type
             ]
-            (
-                substrate_block,
-                product_block,
-                competitor_block,
-            ) = get_modular_rate_codes(
+            mod_substrates, mod_products, mod_competitors = get_modular_rate_codes(
                 enz_id,
                 competitor_ids,
                 substrate_stoichiometries,
@@ -267,9 +263,9 @@ def create_fluxes_function(mi: MaudInput, template: Template) -> str:
                 enz=enz_code,
                 Kcat1=kp_codes_in_theta[enz_id + "_" + "Kcat1"],
                 Keq=keq_codes_in_theta[enz_id],
-                substrate_list=substrate_block,
-                product_list=product_block,
-                competitive_inhibitor_list=competitor_block,
+                substrate_list=mod_substrates,
+                product_list=mod_products,
+                competitive_inhibitor_list=mod_competitors,
             )
             modular_lines.append(modular_line)
             # make catalytic effect string
@@ -279,12 +275,9 @@ def create_fluxes_function(mi: MaudInput, template: Template) -> str:
                 if enz_id in k
             }
             enz_code = enz_codes[enz.id]
-            mechanism_args = {
-                "Tr": f"Tr_{enz_id}",
-                "Dr": f"Dr_{enz_id}",
-                "Dr_reg": f"Dr_reg_{enz_id}",
-            }
-            catalytic_string = MECHANISM_TEMPLATES[enz.mechanism].render(mechanism_args)
+            catalytic_string = (
+                f"modular_rate_law(Tr_{enz_id}, Dr_{enz_id}, Dr_reg_{enz_id})"
+            )
             if any([mod.allosteric for mod in enz.modifiers.values()]):
                 # make free enzyme ratio line
                 free_enzyme_ratio_line = Template(
