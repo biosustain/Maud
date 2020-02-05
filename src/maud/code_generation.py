@@ -154,50 +154,6 @@ def create_steady_state_function(
     )
 
 
-def create_haldane_line(
-    param_codes: Dict[str, int],
-    derived_param: str,
-    mechanism: str,
-    enz_id: str,
-    haldane_params: Dict[str, Dict[str, List[str]]],
-) -> str:
-    """Create a call to one of the functions in `haldane_relationships.stan`.
-
-    :param param_codes: dictionary mapping parameters (both thermodynamic and
-    kinetic) to integer indexes
-
-    :param derived_param: string identifying the derived parameter. Must be one
-    of the second-level keys in HALDANE_PARAMS.
-
-    :param mechanism: string identifying the relevant mechanism. Must be one of
-    the first-level keys in HALDANE_PARAMS.
-
-    :param enz_id: string identifying the relevant enzyme.
-
-    :param haldane_params: nested dictionary mapping mechanisms to derived
-    parameters to lists of arguments to the relevant haldane function.
-
-    """
-
-    params_in_order = haldane_params[mechanism][derived_param]
-    param_codes_in_order = [
-        param_codes[enz_id + "_" + param] for param in params_in_order
-    ]
-    template = Template(
-        "real {{enz_id}}_{{derived_param}} = "
-        "get_{{derived_param}}_{{mechanism}}("
-        "{% for code in param_codes_in_order %}"
-        "p[{{code}}]{% if not loop.last %},{% endif %}"
-        "{% endfor %});"
-    )
-    return template.render(
-        param_codes_in_order=param_codes_in_order,
-        derived_param=derived_param,
-        mechanism=mechanism,
-        enz_id=enz_id,
-    )
-
-
 def create_fluxes_function(mi: MaudInput, template: Template) -> str:
     """Get a Stan function that maps metabolite/parameter configurations to fluxes.
 
@@ -222,19 +178,12 @@ def create_fluxes_function(mi: MaudInput, template: Template) -> str:
             (len(unbalanced) + len(enz_codes) + len(keq_codes), kp_codes),
         ]
     )
-    haldane_lines = []
     modular_lines = []
     free_enzyme_ratio_lines = []
     flux_lines = []
     for _, rxn in kinetic_model.reactions.items():
         substrate_ids = [mic_id for mic_id, s in rxn.stoichiometry.items() if s < 0]
-        substrate_codes = {
-            "S" + str(i): mic_codes[mic_id] for i, mic_id in enumerate(substrate_ids)
-        }
         product_ids = [mic_id for mic_id, s in rxn.stoichiometry.items() if s > 0]
-        product_codes = {
-            "P" + str(i): mic_codes[mic_id] for i, mic_id in enumerate(product_ids)
-        }
         enzyme_flux_strings = []
         for enz_id, enz in rxn.enzymes.items():
             substrate_stoichiometries = [
@@ -247,7 +196,8 @@ def create_fluxes_function(mi: MaudInput, template: Template) -> str:
             ]
             enz_code = enz_codes_in_theta[enz.id]
             competitor_ids = [
-                mod.mic for mod in enz.modifiers.values()
+                mod.mic
+                for mod in enz.modifiers.values()
                 if "competitive_inhibitor" in mod.modifier_type
             ]
             mod_substrates, mod_products, mod_competitors = get_modular_rate_codes(
@@ -269,11 +219,6 @@ def create_fluxes_function(mi: MaudInput, template: Template) -> str:
             )
             modular_lines.append(modular_line)
             # make catalytic effect string
-            enz_param_codes = {
-                k[len(enz_id) + 1 :]: v
-                for k, v in kp_codes_in_theta.items()
-                if enz_id in k
-            }
             enz_code = enz_codes[enz.id]
             catalytic_string = (
                 f"modular_rate_law(Tr_{enz_id}, Dr_{enz_id}, Dr_reg_{enz_id})"
@@ -316,7 +261,6 @@ def create_fluxes_function(mi: MaudInput, template: Template) -> str:
         flux_line = "+".join(enzyme_flux_strings)
         flux_lines.append(flux_line)
     return template.render(
-        haldanes=haldane_lines,
         modular_coefficients=modular_lines,
         free_enzyme_ratio=free_enzyme_ratio_lines,
         fluxes=flux_lines,
