@@ -45,12 +45,12 @@ real Dr_r3 = (1 + m[4]/p[20])^(-1*-1)
 
 
 real Dr_reg_r3 = 0;
-  real free_enzyme_ratio_r1 = get_free_enzyme_ratio_modular_rate_law(Tr_r1,Dr_r1, Dr_reg_r1);
-  real free_enzyme_ratio_r2 = get_free_enzyme_ratio_modular_rate_law(Tr_r2,Dr_r2, Dr_reg_r2);
+  real free_enzyme_ratio_r1 = get_free_enzyme_ratio_modular_rate_law(Tr_r1, Dr_r1, Dr_reg_r1);
+  real free_enzyme_ratio_r2 = get_free_enzyme_ratio_modular_rate_law(Tr_r2, Dr_r2, Dr_reg_r2);
   return [
-    modular_rate_law(Tr_r1,Dr_r1, Dr_reg_r1)*get_regulatory_effect({m[4]},empty_array,free_enzyme_ratio_r1,{p[12]},empty_array,p[13]),
-    modular_rate_law(Tr_r2,Dr_r2, Dr_reg_r2)*get_regulatory_effect(empty_array,{m[3]},free_enzyme_ratio_r2,empty_array,{p[17]},p[18]),
-    modular_rate_law(Tr_r3,Dr_r3, Dr_reg_r3)
+    modular_rate_law(Tr_r1, Dr_r1, Dr_reg_r1)*get_regulatory_effect({m[4]},empty_array,free_enzyme_ratio_r1,{p[12]},empty_array,p[13]),
+    modular_rate_law(Tr_r2, Dr_r2, Dr_reg_r2)*get_regulatory_effect(empty_array,{m[3]},free_enzyme_ratio_r2,empty_array,{p[17]},p[18]),
+    modular_rate_law(Tr_r3, Dr_r3, Dr_reg_r3)
   ]';
 }
   real[] ode_func(real t, real[] m, real[] p, real[] xr, int[] xi){
