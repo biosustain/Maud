@@ -1,4 +1,4 @@
-vector steady_state_function(vector balanced, vector theta, real[] xr, int[] xi){
+vector steady_state_function(vector balanced, vector theta, data real[] xr, data int[] xi){
   int N_unbalanced = {{N_unbalanced}};
   int N_balanced = {{N_balanced}};
   real initial_time = 0;
