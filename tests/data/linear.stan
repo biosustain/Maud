@@ -62,7 +62,7 @@ real Dr_reg_r3 = 0;
     1*fluxes[2]-1*fluxes[3]
   };
 }
-  vector steady_state_function(vector balanced, vector theta, real[] xr, int[] xi){
+  vector steady_state_function(vector balanced, vector theta, data real[] xr, data int[] xi){
   int N_unbalanced = 2;
   int N_balanced = 2;
   real initial_time = 0;
