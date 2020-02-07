@@ -27,10 +27,7 @@ from maud import code_generation, io, utils
 from maud.data_model import KineticModel, MaudInput
 
 
-RELATIVE_PATHS = {
-    "stan_includes": "stan_code",
-    "autogen": "stan_code/autogen",
-}
+RELATIVE_PATHS = {"stan_includes": "stan_code", "autogen": "stan_code/autogen"}
 DEFAULT_PRIOR_LOC_UNBALANCED = 1
 DEFAULT_PRIOR_SCALE_UNBALANCED = 4
 DEFAULT_PRIOR_LOC_ENZYME = 0.1
