@@ -29,7 +29,7 @@ def test_create_stan_program():
 
 def test_get_regulatory_string():
     """Test that the function get_regulatory_string behaves as expected."""
-    inhibitor_codes = {"m1": 1, "m2": 2}
+    inhibitor_codes = {"m1": "m[1]", "m2": "m[2]"}
     activator_codes = {}
     param_codes = {
         "e1_dissociation_constant_t_m1": 2,
@@ -55,8 +55,12 @@ def test_get_modular_rate_codes():
     substrate_info = [["m1", -1], ["m2", -1]]
     product_info = [["m3", 1], ["m4", 1]]
     par_codes = {"r_keq": 0.1, "r_Ka": 0.1, "r_Kb": 0.3, "r_Kp": 0.2, "r_Kq": 0.2}
-    met_codes = {"m1": 1, "m2": 2, "m3": 3, "m4": 4}
-    expected_output = [[[1, 0.1, -1], [2, 0.3, -1]], [[3, 0.2, 1], [4, 0.2, 1]], []]
+    met_codes = {"m1": "m[1]", "m2": "m[2]", "m3": "m[3]", "m4": "m[4]"}
+    expected_output = [
+        [["m[1]", 0.1, -1], ["m[2]", 0.3, -1]],
+        [["m[3]", 0.2, 1], ["m[4]", 0.2, 1]],
+        [],
+    ]
     assert (
         code_generation.get_modular_rate_codes(
             enz_id, competitor_info, substrate_info, product_info, par_codes, met_codes
