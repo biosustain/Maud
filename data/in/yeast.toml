@@ -241,7 +241,7 @@ GAPD = [
   { target_id = 'Kcat1', location = 19, scale = 0.1},
   { target_id = 'Ka', location = 0.423, scale = 0.1},
   { target_id = 'Kb', location = 0.09, scale = 0.1},
-  { target_id = 'Kc', location = 0.001, scale = 0.1},
+  { target_id = 'Kc', location = 1.5, scale = 0.1},
   { target_id = 'Kp', location = 0.06, scale = 0.1},
   { target_id = 'Kq', location = 0.909, scale = 0.1},
 ]
