@@ -65,7 +65,7 @@ transformed parameters {
       conc_unbalanced[e], enzyme_concentration[e]), keq), kinetic_parameters);
     conc[e, balanced_mic_ix] = algebra_solver(steady_state_function, as_guess, theta, xr, xi, rtol, ftol, steps);
     conc[e, unbalanced_mic_ix] = conc_unbalanced[e];
-    flux[e] = get_fluxes(to_array_1d(conc[e]), to_array_1d(theta));
+    flux[e] = get_fluxes(to_array_1d(conc[e, balanced_mic_ix]), to_array_1d(theta));
   }
 }
 model {
