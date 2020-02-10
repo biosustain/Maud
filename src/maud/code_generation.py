@@ -163,14 +163,10 @@ def create_fluxes_function(mi: MaudInput, template: Template) -> str:
     unbalanced = [m for m in kinetic_model.mics.values() if not m.balanced]
     balanced = [m for m in kinetic_model.mics.values() if m.balanced]
     kp_codes = mi.stan_codes["kinetic_parameter"]
-    mic_codes = mi.stan_codes["metabolite_in_compartment"]
     enz_codes = keq_codes = mi.stan_codes["enzyme"]
-    unb_ode_code = dict()
-    bal_ode_code = dict()
-    for i, bal in enumerate(balanced):
-        bal_ode_code[bal.id] = f'm[{i+1}]'
-    for i, unb in enumerate(unbalanced):
-        unb_ode_code[unb.id] = f'p[{i+1}]'
+    unb_ode_code = {x.id: f"p[{i+1}]" for i, x in enumerate(unbalanced)}
+    bal_ode_code = {x.id: f"m[{i+1}]" for i, x in enumerate(balanced)}
+    mic_codes = {**unb_ode_code, **bal_ode_code}
 
     # Add increments to codes so they can be referred to in context of stacked
     # theta vector in the Stan model. This is necessary because only one vector
@@ -212,8 +208,6 @@ def create_fluxes_function(mi: MaudInput, template: Template) -> str:
                 product_stoichiometries,
                 kp_codes_in_theta,
                 mic_codes,
-                unb_ode_code,
-                bal_ode_code,
             )
             modular_line = modular_template.render(
                 enz_id=enz_id,
@@ -313,8 +307,8 @@ def get_regulatory_string(
         for activator_name in activator_codes.keys()
     ]
     transfer_constant_code = param_codes[enzyme_name + "_transfer_constant"]
-    inhibitor_strs = [f"m[{c}]" for c in inhibitor_codes.values()]
-    activator_strs = [f"m[{c}]" for c in activator_codes.values()]
+    inhibitor_strs = [c for c in inhibitor_codes.values()]
+    activator_strs = [c for c in activator_codes.values()]
     diss_t_strs = [f"p[{c}]" for c in diss_t_param_codes]
     diss_r_strs = [f"p[{c}]" for c in diss_r_param_codes]
     diss_t_str = diss_const_template.render(diss_const_strs=diss_t_strs)
@@ -345,10 +339,8 @@ def get_modular_rate_codes(
     competitor_ids: List[List],
     substrate_info: List[List],
     product_info: List[List],
-    par_codes: Dict[str, int],
-    mic_codes: Dict[str, int],
-    unb_ode_code: Dict[str, int],
-    bal_ode_code: Dict[str, int],
+    par_codes: Dict[str, str],
+    mic_codes: Dict[str, str],
 ) -> List[List[int]]:
     """Get codes that can be put into the modular rate law jinja template.
 
@@ -362,9 +354,8 @@ def get_modular_rate_codes(
     :param product_info: list containing lists with the form [mic_id, stoic]
     where mic_id is a string and stoic is a float
     :param par_codes: dictionary mapping parameter ids to integers
-    :param mic_codes: dictionary mapping metabolite-in-compartment ids to integers
-    :param unb_ode_code: dictionary mapping unbalanced metabolite-in-compartment to parameter in ode function
-    :param bal_ode_code: dictionary mapping balanced metabolite-in-compartment to parameter in ode function
+    :param mic_codes: dictionary mapping metabolite-in-compartment ids to
+    stan ode code strings
     """
 
     substrate_keys = ["a", "b", "c", "d"]
@@ -378,25 +369,13 @@ def get_modular_rate_codes(
         for i, (mic_id, stoic) in enumerate(info):
             param_id = enz_id + "_K" + keys[i]
             param_code = par_codes[param_id]
-            mic_code = mic_codes[mic_id]
-            if stoic < 0: 
-                if mic_id in unb_ode_code.keys():
-                    substrate_input.append([unb_ode_code[mic_id], param_code, stoic])
-                else:
-                    substrate_input.append([bal_ode_code[mic_id], param_code, stoic])
+            if stoic < 0:
+                substrate_input.append([mic_codes[mic_id], param_code, stoic])
             elif stoic > 0:
-                if mic_id in unb_ode_code.keys():
-                    product_input.append([unb_ode_code[mic_id], param_code, stoic])
-                else:
-                    product_input.append([bal_ode_code[mic_id], param_code, stoic])
+                product_input.append([mic_codes[mic_id], param_code, stoic])
     for comp in competitor_ids:
-        if comp in unb_ode_code.keys():
-            competitor_code = unb_ode_code[comp]
-        else:
-            competitor_code = bal_ode_code[comp]
         competitor_code = mic_codes[comp]
         param_id = enz_id + "_inhibition_constant_" + comp
         competitor_parameter = par_codes[param_id]
         competitor_input.append([competitor_code, competitor_parameter])
-
     return [substrate_input, product_input, competitor_input]

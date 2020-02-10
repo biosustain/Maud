@@ -189,17 +189,14 @@ def get_input_data(
     )
 
     balanced_guess = pd.DataFrame(
-        0.01,
-        index=experiment_codes.values(),
-        columns=balanced_mic_codes.values(),
+        0.01, index=experiment_codes.values(), columns=balanced_mic_codes.values()
     )
-    for i, row in mic_measurements.iterrows():
+    for _i, row in mic_measurements.iterrows():
         if row["target_id"] in balanced_mic_codes.keys():
             row_ix = experiment_codes[row["experiment_id"]]
             column_ix = balanced_mic_codes[row["target_id"]]
             balanced_guess.loc[row_ix, column_ix] = row["value"]
 
-    
     return {
         "N_mic": len(mics),
         "N_unbalanced": len(unbalanced_mic_codes),
