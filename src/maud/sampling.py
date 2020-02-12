@@ -264,12 +264,12 @@ def get_initial_conditions(input_data):
     init_enzyme = pd.DataFrame(
         index=range(1, input_data["N_experiment"] + 1),
         columns=input_data["enzyme_yenz"],
-        )
+    )
     for exp_id, enz_ix, measurement in zip(
-        input_data["experiment_yenz"], input_data['enzyme_yenz'], input_data["yenz"]
+        input_data["experiment_yenz"], input_data["enzyme_yenz"], input_data["yenz"]
     ):
         init_enzyme.loc[exp_id, enz_ix] = measurement
-        
+
     return {
         "kinetic_parameters": input_data["prior_loc_kinetic_parameters"],
         "conc_unbalanced": init_unbalanced.values,
