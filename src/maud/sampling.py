@@ -263,7 +263,7 @@ def get_initial_conditions(input_data):
 
     init_enzyme = pd.DataFrame(
         index=range(1, input_data["N_experiment"] + 1),
-        columns=input_data["enzyme_yenz"],
+        columns=sorted(pd.unique(input_data["enzyme_yenz"])),
     )
     for exp_id, enz_ix, measurement in zip(
         input_data["experiment_yenz"], input_data["enzyme_yenz"], input_data["yenz"]
