@@ -129,6 +129,7 @@ stoichiometry = { f6p_c = -1, atp_c = -1, fdp_c = 1, adp_c = 1 }
 id = 'PFK'
 name = 'PFK'
 mechanism = "modular_rate_law"
+allosteric_inhibitors = ['atp_c', 'fdp_c']
 
 [[reactions]]
 id = 'FBA'
@@ -138,6 +139,8 @@ stoichiometry = { fdp_c = -1, dhap_c = 1, g3p_c = 1 }
 id = 'FBA'
 name = 'FBA'
 mechanism = "modular_rate_law"
+allosteric_inhibitors = ['g3p_c']
+
 
 [[reactions]]
 id = 'TPI'
@@ -147,6 +150,7 @@ stoichiometry = { dhap_c = -1, g3p_c = 1 }
 id = 'TPI'
 name = 'TPI'
 mechanism = "modular_rate_law"
+allosteric_inhibitors = ['g3p_c']
 
 [[reactions]]
 id = 'GAPD'
@@ -165,6 +169,7 @@ stoichiometry = { adp_c = -1, 13dpg_c = -1, 3pg_c = 1, atp_c = 1}
 id = 'PGK'
 name = 'PGK'
 mechanism = "modular_rate_law"
+allosteric_activators = ['adp_c']
 
 [[experiments]]
 id = 'C0_11'
@@ -224,7 +229,7 @@ enzyme_measurements = [
   {target_id='TPI', value=0.50, uncertainty=0.05},
   {target_id='GAPD', value=0.35, uncertainty=0.05},
   {target_id='PGK', value=0.61, uncertainty=0.05},
-]
+  ]
 
 ###### Priors ######
 [priors.kinetic_parameters]
@@ -251,17 +256,24 @@ PFK = [
   { target_id = 'Kb', location = 0.71, scale = 0.1},
   { target_id = 'Kp', location = 0.111, scale = 0.1},
   { target_id = 'Kq', location = 1, scale = 0.1},
+  { target_id = 'dissociation_constant_t', metabolite = 'atp_c', location= 3, scale = 1},
+  { target_id = 'dissociation_constant_t', metabolite = 'fdp_c', location= 0.397, scale = 1},
+  { target_id = 'transfer_constant', location = 0.66, scale = 1},
 ]
 FBA = [
   { target_id = 'Kcat1', location = 4.14, scale = 0.1},
   { target_id = 'Ka', location = 0.45, scale = 0.1},
   { target_id = 'Kp', location = 2, scale = 0.1},
   { target_id = 'Kq', location = 2.4, scale = 0.1},
+  { target_id = 'dissociation_constant_t', metabolite = 'g3p_c', location = 10, scale = 1},
+  { target_id = 'transfer_constant', location = 1, scale = 1},
 ]
 TPI = [
   { target_id = 'Kcat1', location = 564, scale = 0.1},
   { target_id = 'Ka', location = 6.454, scale = 0.1},
   { target_id = 'Kp', location = 5.25, scale = 0.1},
+  { target_id = 'dissociation_constant_t', metabolite = 'g3p_c', location = 32, scale = 1},
+  { target_id = 'transfer_constant', location = 1, scale = 1},
 ]
 GAPD = [
   { target_id = 'Kcat1', location = 19, scale = 0.1},
@@ -277,6 +289,8 @@ PGK = [
   { target_id = 'Kb', location = 0.003, scale = 0.1},
   { target_id = 'Kp', location = 4.58, scale = 0.1},
   { target_id = 'Kq', location = 1.99, scale = 0.1},
+  { target_id = 'dissociation_constant_r', metabolite = 'adp_c', location = 0.2, scale = 1},
+  { target_id = 'transfer_constant', location = 1, scale = 1},
 ]
 
 [priors.thermodynamic_parameters]
