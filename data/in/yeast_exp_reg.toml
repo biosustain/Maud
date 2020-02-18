@@ -186,8 +186,8 @@ metabolite_measurements = [
   { target_id = 'atp_c', value = 0.318, uncertainty = 0.05},
 ]
 reaction_measurements = [
-  { target_id = 'PFK', value = 4.0, uncertainty = 0.1},
-  { target_id = 'TPI', value = 4.37, uncertainty = 0.1},
+  { target_id = 'PFK', value = 0.060508, uncertainty = 0.005},
+  { target_id = 'TPI', value = 0.0660, uncertainty = 0.005},
 ]
 enzyme_measurements = [
   # Glycolysis
@@ -216,8 +216,8 @@ metabolite_measurements = [
   { target_id = 'atp_c', value = 0.252, uncertainty = 0.05},
 ]
 reaction_measurements = [
-  { target_id = 'PFK', value = 6.65, uncertainty = 0.1},
-  { target_id = 'TPI', value = 7.35, uncertainty = 0.1},
+  { target_id = 'PFK', value = 0.088023, uncertainty = 0.005},
+  { target_id = 'TPI', value = 0.0972, uncertainty = 0.005},
 ]
 enzyme_measurements = [
   # Glycolysis
