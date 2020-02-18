@@ -245,6 +245,7 @@ def get_input_data(
         "ftol": f_tol,
         "steps": max_steps,
         "LIKELIHOOD": likelihood,
+        "timepoint": 500,
     }
 
 

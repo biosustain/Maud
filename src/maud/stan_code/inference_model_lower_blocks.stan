@@ -43,11 +43,13 @@ data {
   real ftol;
   int steps;
   int<lower=0,upper=1> LIKELIHOOD;  // set to 0 for priors-only mode
+  real<lower=0> timepoint;
 }
 transformed data {
   real xr[0];
   int xi[0];
   real minus_RT = - 0.008314 * 298.15;
+
 }
 parameters {
   vector[N_metabolite] formation_energy;
@@ -56,6 +58,7 @@ parameters {
   vector<lower=0>[N_unbalanced] conc_unbalanced[N_experiment];
 }
 transformed parameters {
+  real initial_time = 0;
   vector<lower=0>[N_mic] conc[N_experiment];
   vector[N_reaction] flux[N_experiment];
   vector[N_enzyme] delta_g = stoichiometric_matrix' * formation_energy[metabolite_ix_stoichiometric_matrix];
@@ -63,7 +66,16 @@ transformed parameters {
     vector[N_enzyme] keq = exp(delta_g / minus_RT);
     vector[N_unbalanced+N_enzyme+N_enzyme+N_kinetic_parameters] theta = append_row(append_row(append_row(
       conc_unbalanced[e], enzyme_concentration[e]), keq), kinetic_parameters);
-    conc[e, balanced_mic_ix] = algebra_solver(steady_state_function, as_guess[e,], theta, xr, xi, rtol, ftol, steps);
+    conc[e, balanced_mic_ix] = to_vector(integrate_ode_bdf(
+                                    ode_func,
+                                    to_array_1d(as_guess[e,]),
+                                    initial_time,
+                                    rep_array(timepoint, 1),
+                                    to_array_1d(theta),
+                                    xr,
+                                    rep_array(0, 1),
+                                    1e-8, 1e-12, 1e5
+                                  )[1, ]); 
     conc[e, unbalanced_mic_ix] = conc_unbalanced[e];
     flux[e] = get_fluxes(to_array_1d(conc[e, balanced_mic_ix]), to_array_1d(theta));
   }
