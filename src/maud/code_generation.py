@@ -25,7 +25,7 @@ from typing import Dict, List
 
 from jinja2 import Environment, PackageLoader, Template
 
-from maud.data_model import KineticModel, MaudInput
+from maud.data_model import MaudInput
 
 
 TEMPLATE_FILES = [
