@@ -195,14 +195,14 @@ def get_input_data(
         for measurement_type in ["metabolite", "reaction", "enzyme"]
     )
 
-    balanced_guess = pd.DataFrame(
+    balanced_init = pd.DataFrame(
         0.01, index=experiment_codes.values(), columns=balanced_mic_codes.values()
     )
     for _i, row in mic_measurements.iterrows():
         if row["target_id"] in balanced_mic_codes.keys():
             row_ix = experiment_codes[row["experiment_id"]]
             column_ix = balanced_mic_codes[row["target_id"]]
-            balanced_guess.loc[row_ix, column_ix] = row["value"]
+            balanced_init.loc[row_ix, column_ix] = row["value"]
 
     return {
         "N_mic": len(mics),
@@ -247,7 +247,7 @@ def get_input_data(
         "prior_scale_unbalanced": prior_scale_unb,
         "prior_loc_enzyme": prior_loc_enzyme,
         "prior_scale_enzyme": prior_scale_enzyme,
-        "as_guess": balanced_guess.values,
+        "conc_init": balanced_init.values,
         "rtol": rel_tol,
         "ftol": f_tol,
         "steps": max_steps,
