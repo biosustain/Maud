@@ -113,7 +113,8 @@ def sample(
             if os.path.exists(p):
                 os.remove(p)
     model = cmdstanpy.CmdStanModel(
-        stan_file=stan_program_filepath, include_paths=[paths["stan_includes"]]
+        stan_file=stan_program_filepath,
+        stanc_options={"include_paths": [paths["stan_includes"]]},
     )
     return model.sample(
         data=input_filepath,
