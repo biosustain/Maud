@@ -112,6 +112,7 @@ def create_ode_function(mi: MaudInput, template: Template) -> str:
             metabolite_lines.append(line)
     return template.render(ode_stoic=metabolite_lines, N_flux=len(rxns))
 
+
 def create_fluxes_function(mi: MaudInput, template: Template) -> str:
     """Get a Stan function that maps metabolite/parameter configurations to fluxes.
 
@@ -204,10 +205,12 @@ def create_fluxes_function(mi: MaudInput, template: Template) -> str:
                     ]
                 )
                 allosteric_inhibitor_codes = {
-                    mod_id: mic_ode_string[mod_id] for mod_id in allosteric_inhibitors.keys()
+                    mod_id: mic_ode_string[mod_id]
+                    for mod_id in allosteric_inhibitors.keys()
                 }
                 allosteric_activator_codes = {
-                    mod_id: mic_ode_string[mod_id] for mod_id in allosteric_activators.keys()
+                    mod_id: mic_ode_string[mod_id]
+                    for mod_id in allosteric_activators.keys()
                 }
                 regulatory_string = get_regulatory_string(
                     allosteric_inhibitor_codes,
