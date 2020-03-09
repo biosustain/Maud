@@ -4,5 +4,4 @@ functions{
 #include allostery.stan
   {{fluxes_function}}
   {{ode_function}}
-  {{steady_state_function}}
 }

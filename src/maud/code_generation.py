@@ -25,7 +25,7 @@ from typing import Dict, List
 
 from jinja2 import Environment, PackageLoader, Template
 
-from maud.data_model import KineticModel, MaudInput
+from maud.data_model import MaudInput
 
 
 TEMPLATE_FILES = [
@@ -33,7 +33,6 @@ TEMPLATE_FILES = [
     "functions_block.stan",
     "ode_function.stan",
     "fluxes_function.stan",
-    "steady_state_function.stan",
     "modular_rate_law.stan",
 ]
 
@@ -62,13 +61,8 @@ def create_stan_program(mi: MaudInput, model_type: str, time_step=0.05) -> str:
     keq_position = [par_codes[par_id] for par_id in par_codes.keys() if "Keq" in par_id]
     fluxes_function = create_fluxes_function(mi, templates["fluxes_function"])
     ode_function = create_ode_function(mi, templates["ode_function"])
-    steady_state_function = create_steady_state_function(
-        kinetic_model, mic_codes, templates["steady_state_function"], time_step
-    )
     functions_block = templates["functions_block"].render(
-        fluxes_function=fluxes_function,
-        ode_function=ode_function,
-        steady_state_function=steady_state_function,
+        fluxes_function=fluxes_function, ode_function=ode_function
     )
     if model_type == "inference":
         lower_blocks = templates["inference_model_lower_blocks"].render(
@@ -107,9 +101,7 @@ def create_ode_function(mi: MaudInput, template: Template) -> str:
     rxns = kinetic_model.reactions
     metabolite_lines = []
     for mic_id, mic in kinetic_model.mics.items():
-        if not mic.balanced:
-            line = "0"
-        else:
+        if mic.balanced:
             line = ""
             for rxn_id, rxn in rxns.items():
                 if mic_id in rxn.stoichiometry.keys():
@@ -117,41 +109,8 @@ def create_ode_function(mi: MaudInput, template: Template) -> str:
                     prefix = "+" if stoich > 0 and line != "" else ""
                     rxn_stan = rxn_codes[rxn_id]
                     line += prefix + str(stoich) + "*fluxes[{}]".format(rxn_stan)
-        metabolite_lines.append(line)
+            metabolite_lines.append(line)
     return template.render(ode_stoic=metabolite_lines, N_flux=len(rxns))
-
-
-def create_steady_state_function(
-    kinetic_model: KineticModel,
-    mic_codes: Dict[str, int],
-    template: Template,
-    time_step: float,
-) -> str:
-    """Get a Stan function for finding the steady state of the system.
-
-    This is a function that can be input to Stan's algebra solver, whose return
-    value is zero when the system is at steady state.
-
-    :param kinetic_model: A KineticModel object
-    :param mic codes: A dictionary mapping metabolite-in-compartment ids to integers
-    :param template: A jinja template
-    :param time_step: A number specifying how far into the future the ode
-    solver should simulate the system in order to find an evolved state to
-    compare with the initial state
-    """
-
-    mics = kinetic_model.mics
-    balanced_codes = [mic_codes[mic_id] for mic_id, mic in mics.items() if mic.balanced]
-    unbalanced_codes = [
-        mic_codes[mic_id] for mic_id, mic in mics.items() if not mic.balanced
-    ]
-    return template.render(
-        N_balanced=len(balanced_codes),
-        N_unbalanced=len(unbalanced_codes),
-        time_step=time_step,
-        balanced_codes=balanced_codes,
-        unbalanced_codes=unbalanced_codes,
-    )
 
 
 def create_fluxes_function(mi: MaudInput, template: Template) -> str:
@@ -163,9 +122,12 @@ def create_fluxes_function(mi: MaudInput, template: Template) -> str:
     kinetic_model = mi.kinetic_model
     modular_template = get_templates()["modular_rate_law"]
     unbalanced = [m for m in kinetic_model.mics.values() if not m.balanced]
+    balanced = [m for m in kinetic_model.mics.values() if m.balanced]
     kp_codes = mi.stan_codes["kinetic_parameter"]
-    mic_codes = mi.stan_codes["metabolite_in_compartment"]
     enz_codes = keq_codes = mi.stan_codes["enzyme"]
+    unb_ode_code = {x.id: f"p[{i+1}]" for i, x in enumerate(unbalanced)}
+    bal_ode_code = {x.id: f"m[{i+1}]" for i, x in enumerate(balanced)}
+    mic_ode_string = {**unb_ode_code, **bal_ode_code}
 
     # Add increments to codes so they can be referred to in context of stacked
     # theta vector in the Stan model. This is necessary because only one vector
@@ -206,7 +168,7 @@ def create_fluxes_function(mi: MaudInput, template: Template) -> str:
                 substrate_stoichiometries,
                 product_stoichiometries,
                 kp_codes_in_theta,
-                mic_codes,
+                mic_ode_string,
             )
             modular_line = modular_template.render(
                 enz_id=enz_id,
@@ -243,10 +205,12 @@ def create_fluxes_function(mi: MaudInput, template: Template) -> str:
                     ]
                 )
                 allosteric_inhibitor_codes = {
-                    mod_id: mic_codes[mod_id] for mod_id in allosteric_inhibitors.keys()
+                    mod_id: mic_ode_string[mod_id]
+                    for mod_id in allosteric_inhibitors.keys()
                 }
                 allosteric_activator_codes = {
-                    mod_id: mic_codes[mod_id] for mod_id in allosteric_activators.keys()
+                    mod_id: mic_ode_string[mod_id]
+                    for mod_id in allosteric_activators.keys()
                 }
                 regulatory_string = get_regulatory_string(
                     allosteric_inhibitor_codes,
@@ -306,8 +270,8 @@ def get_regulatory_string(
         for activator_name in activator_codes.keys()
     ]
     transfer_constant_code = param_codes[enzyme_name + "_transfer_constant"]
-    inhibitor_strs = [f"m[{c}]" for c in inhibitor_codes.values()]
-    activator_strs = [f"m[{c}]" for c in activator_codes.values()]
+    inhibitor_strs = [c for c in inhibitor_codes.values()]
+    activator_strs = [c for c in activator_codes.values()]
     diss_t_strs = [f"p[{c}]" for c in diss_t_param_codes]
     diss_r_strs = [f"p[{c}]" for c in diss_r_param_codes]
     diss_t_str = diss_const_template.render(diss_const_strs=diss_t_strs)
@@ -338,8 +302,8 @@ def get_modular_rate_codes(
     competitor_ids: List[List],
     substrate_info: List[List],
     product_info: List[List],
-    par_codes: Dict[str, int],
-    mic_codes: Dict[str, int],
+    par_codes: Dict[str, str],
+    mic_ode_string: Dict[str, str],
 ) -> List[List[int]]:
     """Get codes that can be put into the modular rate law jinja template.
 
@@ -353,7 +317,8 @@ def get_modular_rate_codes(
     :param product_info: list containing lists with the form [mic_id, stoic]
     where mic_id is a string and stoic is a float
     :param par_codes: dictionary mapping parameter ids to integers
-    :param mic_codes: dictionary mapping metabolite-in-compartment ids to integers
+    :param mic_ode_string: dictionary mapping metabolite-in-compartment ids to
+    stan ode code strings
     """
 
     substrate_keys = ["a", "b", "c", "d"]
@@ -367,15 +332,13 @@ def get_modular_rate_codes(
         for i, (mic_id, stoic) in enumerate(info):
             param_id = enz_id + "_K" + keys[i]
             param_code = par_codes[param_id]
-            mic_code = mic_codes[mic_id]
             if stoic < 0:
-                substrate_input.append([mic_code, param_code, stoic])
+                substrate_input.append([mic_ode_string[mic_id], param_code, stoic])
             elif stoic > 0:
-                product_input.append([mic_code, param_code, stoic])
+                product_input.append([mic_ode_string[mic_id], param_code, stoic])
     for comp in competitor_ids:
-        competitor_code = mic_codes[comp]
+        competitor_code = mic_ode_string[comp]
         param_id = enz_id + "_inhibition_constant_" + comp
         competitor_parameter = par_codes[param_id]
         competitor_input.append([competitor_code, competitor_parameter])
-
     return [substrate_input, product_input, competitor_input]
