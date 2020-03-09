@@ -38,7 +38,7 @@ data {
   matrix[N_mic, N_enzyme] stoichiometric_matrix;
   int<lower=1,upper=N_metabolite> metabolite_ix_stoichiometric_matrix[N_mic];
   // configuration
-  vector<lower=0>[N_mic-N_unbalanced] as_guess[N_experiment];
+  real<lower=0> as_guess[N_experiment, N_mic-N_unbalanced];
   real rtol;
   real ftol;
   int steps;
@@ -68,7 +68,7 @@ transformed parameters {
       conc_unbalanced[e], enzyme_concentration[e]), keq), kinetic_parameters);
     conc[e, balanced_mic_ix] = to_vector(integrate_ode_bdf(
                                     ode_func,
-                                    to_array_1d(as_guess[e,]),
+                                    as_guess[e,],
                                     initial_time,
                                     rep_array(timepoint, 1),
                                     to_array_1d(theta),
