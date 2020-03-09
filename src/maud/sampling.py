@@ -67,7 +67,7 @@ def sample(
     n_warmup: int,
     n_chains: int,
     n_cores: int,
-    time_step: float,
+    timepoint: float,
     output_dir: str,
 ) -> cmdstanpy.CmdStanMCMC:
     """Sample from a posterior distribution.
@@ -94,7 +94,7 @@ def sample(
 
     mi = io.load_maud_input_from_toml(data_path)
 
-    input_data = get_input_data(mi, f_tol, rel_tol, max_steps, likelihood)
+    input_data = get_input_data(mi, f_tol, rel_tol, max_steps, likelihood, timepoint)
     init_cond = get_initial_conditions(input_data)
 
     cmdstanpy.utils.jsondump(input_filepath, input_data)
@@ -103,7 +103,7 @@ def sample(
         paths["autogen"], f"inference_model_{model_name}.stan"
     )
     exe_file_path = stan_program_filepath[:-5]
-    stan_code = code_generation.create_stan_program(mi, "inference", time_step)
+    stan_code = code_generation.create_stan_program(mi, "inference")
     exe_file_exists = os.path.exists(exe_file_path)
     change_in_stan_code = not utils.match_string_to_file(
         stan_code, stan_program_filepath
@@ -116,7 +116,8 @@ def sample(
             if os.path.exists(p):
                 os.remove(p)
     model = cmdstanpy.CmdStanModel(
-        stan_file=stan_program_filepath, include_paths=[paths["stan_includes"]]
+        stan_file=stan_program_filepath,
+        stanc_options={"include_paths": [paths["stan_includes"]]},
     )
     return model.sample(
         data=input_filepath,
@@ -128,11 +129,17 @@ def sample(
         max_treedepth=15,
         save_warmup=True,
         inits=init_cond,
+        show_progress=True,
     )
 
 
 def get_input_data(
-    mi: MaudInput, f_tol: float, rel_tol: float, max_steps: int, likelihood: int
+    mi: MaudInput,
+    f_tol: float,
+    rel_tol: float,
+    max_steps: int,
+    likelihood: int,
+    timepoint: float,
 ) -> dict:
     """Put a MaudInput and some config numbers into a Stan-friendly dictionary.
 
@@ -190,6 +197,16 @@ def get_input_data(
         )
         for measurement_type in ["metabolite", "reaction", "enzyme"]
     )
+
+    balanced_init = pd.DataFrame(
+        0.01, index=experiment_codes.values(), columns=balanced_mic_codes.values()
+    )
+    for _i, row in mic_measurements.iterrows():
+        if row["target_id"] in balanced_mic_codes.keys():
+            row_ix = experiment_codes[row["experiment_id"]]
+            column_ix = balanced_mic_codes[row["target_id"]]
+            balanced_init.loc[row_ix, column_ix] = row["value"]
+
     return {
         "N_mic": len(mics),
         "N_unbalanced": len(unbalanced_mic_codes),
@@ -233,11 +250,12 @@ def get_input_data(
         "prior_scale_unbalanced": prior_scale_unb,
         "prior_loc_enzyme": prior_loc_enzyme,
         "prior_scale_enzyme": prior_scale_enzyme,
-        "as_guess": [0.01 for m in range(len(balanced_mic_codes))],
+        "conc_init": balanced_init.values,
         "rtol": rel_tol,
         "ftol": f_tol,
         "steps": max_steps,
         "LIKELIHOOD": likelihood,
+        "timepoint": timepoint,
     }
 
 
@@ -253,9 +271,19 @@ def get_initial_conditions(input_data):
     ):
         if mic_ix in input_data["unbalanced_mic_ix"]:
             init_unbalanced.loc[exp_ix, mic_ix] = measurement
+
+    init_enzyme = pd.DataFrame(
+        index=range(1, input_data["N_experiment"] + 1),
+        columns=sorted(pd.unique(input_data["enzyme_yenz"])),
+    )
+    for exp_id, enz_ix, measurement in zip(
+        input_data["experiment_yenz"], input_data["enzyme_yenz"], input_data["yenz"]
+    ):
+        init_enzyme.loc[exp_id, enz_ix] = measurement
+
     return {
         "kinetic_parameters": input_data["prior_loc_kinetic_parameters"],
         "conc_unbalanced": init_unbalanced.values,
-        "enzyme_concentration": input_data["prior_loc_enzyme"],
+        "enzyme_concentration": init_enzyme.values,
         "formation_energy": input_data["prior_loc_formation_energy"],
     }

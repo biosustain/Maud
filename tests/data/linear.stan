@@ -5,83 +5,60 @@ functions{
   vector get_fluxes(real[] m, real[] p){
   real empty_array[0];
   real Tr_r1 = p[3]*p[11]
-                * (m[1]/p[9])^(-1*-1) 
+                * (p[1]/p[9])^(-1*-1) 
                 - p[3]*p[11]/p[6]
                 * (p[9])^-1 
                 * (p[10])^1 
-                * (m[3]/p[10])^1 ;
+                * (m[1]/p[10])^1 ;
 
-real Dr_r1 = (1 + m[1]/p[9])^(-1*-1) 
-                + (1 + m[3]/p[10])^1 
+real Dr_r1 = (1 + p[1]/p[9])^(-1*-1) 
+                + (1 + m[1]/p[10])^1 
                 - 1;
 
 
 real Dr_reg_r1 = 0;
   real Tr_r2 = p[4]*p[16]
-                * (m[3]/p[14])^(-1*-1) 
+                * (m[1]/p[14])^(-1*-1) 
                 - p[4]*p[16]/p[7]
                 * (p[14])^-1 
                 * (p[15])^1 
-                * (m[4]/p[15])^1 ;
+                * (m[2]/p[15])^1 ;
 
-real Dr_r2 = (1 + m[3]/p[14])^(-1*-1) 
-                + (1 + m[4]/p[15])^1 
+real Dr_r2 = (1 + m[1]/p[14])^(-1*-1) 
+                + (1 + m[2]/p[15])^1 
                 - 1;
 
 
-real Dr_reg_r2 = (m[4]/p[19]) ;
+real Dr_reg_r2 = (m[2]/p[19]) ;
 
 
   real Tr_r3 = p[5]*p[22]
-                * (m[4]/p[20])^(-1*-1) 
+                * (m[2]/p[20])^(-1*-1) 
                 - p[5]*p[22]/p[8]
                 * (p[20])^-1 
                 * (p[21])^1 
-                * (m[2]/p[21])^1 ;
+                * (p[2]/p[21])^1 ;
 
-real Dr_r3 = (1 + m[4]/p[20])^(-1*-1) 
-                + (1 + m[2]/p[21])^1 
+real Dr_r3 = (1 + m[2]/p[20])^(-1*-1) 
+                + (1 + p[2]/p[21])^1 
                 - 1;
 
 
 real Dr_reg_r3 = 0;
-  real free_enzyme_ratio_r1 = get_free_enzyme_ratio_modular_rate_law(Tr_r1,Dr_r1, Dr_reg_r1);
-  real free_enzyme_ratio_r2 = get_free_enzyme_ratio_modular_rate_law(Tr_r2,Dr_r2, Dr_reg_r2);
+  real free_enzyme_ratio_r1 = get_free_enzyme_ratio_modular_rate_law(Tr_r1, Dr_r1, Dr_reg_r1);
+  real free_enzyme_ratio_r2 = get_free_enzyme_ratio_modular_rate_law(Tr_r2, Dr_r2, Dr_reg_r2);
   return [
-    modular_rate_law(Tr_r1,Dr_r1, Dr_reg_r1)*get_regulatory_effect({m[4]},empty_array,free_enzyme_ratio_r1,{p[12]},empty_array,p[13]),
-    modular_rate_law(Tr_r2,Dr_r2, Dr_reg_r2)*get_regulatory_effect(empty_array,{m[3]},free_enzyme_ratio_r2,empty_array,{p[17]},p[18]),
-    modular_rate_law(Tr_r3,Dr_r3, Dr_reg_r3)
+    modular_rate_law(Tr_r1, Dr_r1, Dr_reg_r1)*get_regulatory_effect({m[2]},empty_array,free_enzyme_ratio_r1,{p[12]},empty_array,p[13]),
+    modular_rate_law(Tr_r2, Dr_r2, Dr_reg_r2)*get_regulatory_effect(empty_array,{m[1]},free_enzyme_ratio_r2,empty_array,{p[17]},p[18]),
+    modular_rate_law(Tr_r3, Dr_r3, Dr_reg_r3)
   ]';
 }
   real[] ode_func(real t, real[] m, real[] p, real[] xr, int[] xi){
   vector[3] fluxes = get_fluxes(m, p);
   return {
-    0,
-    0,
     1*fluxes[1]-1*fluxes[2],
     1*fluxes[2]-1*fluxes[3]
   };
-}
-  vector steady_state_function(vector balanced, vector theta, real[] xr, int[] xi){
-  int N_unbalanced = 2;
-  int N_balanced = 2;
-  real initial_time = 0;
-  real time_step = 0.05;
-  real conc[4];
-  real balanced_new[2];
-  conc[{3,4}] = to_array_1d(balanced);
-  conc[{1,2}] = to_array_1d(theta[1:2]);
-  balanced_new = integrate_ode_bdf(
-    ode_func,
-    conc,
-    initial_time,
-    rep_array(time_step, 1),
-    to_array_1d(theta),
-    xr,
-    rep_array(0, 1),
-    1e-8, 1e-12, 1e5
-  )[1, {3,4}]; 
-  return to_vector(balanced_new) - balanced;
 }
 }
 data {
@@ -124,16 +101,18 @@ data {
   matrix[N_mic, N_enzyme] stoichiometric_matrix;
   int<lower=1,upper=N_metabolite> metabolite_ix_stoichiometric_matrix[N_mic];
   // configuration
-  vector<lower=0>[N_mic-N_unbalanced] as_guess;
+  real<lower=0> conc_init[N_experiment, N_mic-N_unbalanced];
   real rtol;
   real ftol;
   int steps;
   int<lower=0,upper=1> LIKELIHOOD;  // set to 0 for priors-only mode
+  real<lower=0> timepoint;
 }
 transformed data {
   real xr[0];
   int xi[0];
   real minus_RT = - 0.008314 * 298.15;
+
 }
 parameters {
   vector[N_metabolite] formation_energy;
@@ -142,6 +121,7 @@ parameters {
   vector<lower=0>[N_unbalanced] conc_unbalanced[N_experiment];
 }
 transformed parameters {
+  real initial_time = 0;
   vector<lower=0>[N_mic] conc[N_experiment];
   vector[N_reaction] flux[N_experiment];
   vector[N_enzyme] delta_g = stoichiometric_matrix' * formation_energy[metabolite_ix_stoichiometric_matrix];
@@ -149,9 +129,18 @@ transformed parameters {
     vector[N_enzyme] keq = exp(delta_g / minus_RT);
     vector[N_unbalanced+N_enzyme+N_enzyme+N_kinetic_parameters] theta = append_row(append_row(append_row(
       conc_unbalanced[e], enzyme_concentration[e]), keq), kinetic_parameters);
-    conc[e, balanced_mic_ix] = algebra_solver(steady_state_function, as_guess, theta, xr, xi, rtol, ftol, steps);
+    conc[e, balanced_mic_ix] = to_vector(integrate_ode_bdf(
+                                    ode_func,
+                                    conc_init[e,],
+                                    initial_time,
+                                    rep_array(timepoint, 1),
+                                    to_array_1d(theta),
+                                    xr,
+                                    rep_array(0, 1),
+                                    1e-8, 1e-12, 1e5
+                                  )[1, ]); 
     conc[e, unbalanced_mic_ix] = conc_unbalanced[e];
-    flux[e] = get_fluxes(to_array_1d(conc[e]), to_array_1d(theta));
+    flux[e] = get_fluxes(to_array_1d(conc[e, balanced_mic_ix]), to_array_1d(theta));
   }
 }
 model {
@@ -177,6 +166,17 @@ generated quantities {
   vector[N_conc_measurement] yconc_sim;
   vector[N_enzyme_measurement] yenz_sim;
   vector[N_flux_measurement] yflux_sim;
+  vector[N_flux_measurement+N_conc_measurement] log_like;
+
+  for (c in 1:N_conc_measurement){
+    log_like[N_flux_measurement+c] = lognormal_lpdf(yconc[c] | log(conc[experiment_yconc[c], mic_ix_yconc[c]]), sigma_conc[c]);
+  }
+
+  for (f in 1:N_flux_measurement){
+    log_like[f] = normal_lpdf(yflux[f] | flux[experiment_yflux[f], reaction_yflux[f]], sigma_flux[f]);
+  }
+
+
   for (c in 1:N_conc_measurement){
     yconc_sim[c] = lognormal_rng(log(conc[experiment_yconc[c], mic_ix_yconc[c]]), sigma_conc[c]);
   }

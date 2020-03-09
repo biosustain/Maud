@@ -33,7 +33,7 @@ SAMPLING_DEFAULTS = {
     "n_warmup": 5,
     "n_chains": 4,
     "n_cores": 4,
-    "time_step": 0.05,
+    "timepoint": 500,
 }
 RELATIVE_PATH_EXAMPLE = "../../data/in/linear.toml"
 
@@ -92,13 +92,11 @@ pass
     help="Number of chains to run in parallel",
 )
 @click.option(
-    "--time_step",
-    default=SAMPLING_DEFAULTS["time_step"],
-    help="How far ahead the ode solver simulates",
+    "--timepoint",
+    default=SAMPLING_DEFAULTS["timepoint"],
+    help="How long the ODE simulates for (Units are whatever your time units are)",
 )
-@click.option(
-    "--output_dir", default=".", help="Where to save Maud's output",
-)
+@click.option("--output_dir", default=".", help="Where to save Maud's output")
 @click.argument(
     "data_path",
     type=click.Path(exists=True, dir_okay=False),
