@@ -126,6 +126,7 @@ def sample(
         max_treedepth=15,
         save_warmup=True,
         inits=init_cond,
+        show_progress=True,
     )
 
 
