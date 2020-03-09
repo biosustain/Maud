@@ -64,7 +64,7 @@ def sample(
     n_warmup: int,
     n_chains: int,
     n_cores: int,
-    time_step: float,
+    timepoint: float,
     output_dir: str,
 ) -> cmdstanpy.CmdStanMCMC:
     """Sample from a posterior distribution.
@@ -91,7 +91,7 @@ def sample(
 
     mi = io.load_maud_input_from_toml(data_path)
 
-    input_data = get_input_data(mi, f_tol, rel_tol, max_steps, likelihood)
+    input_data = get_input_data(mi, f_tol, rel_tol, max_steps, likelihood, timepoint)
     init_cond = get_initial_conditions(input_data)
 
     cmdstanpy.utils.jsondump(input_filepath, input_data)
@@ -100,7 +100,7 @@ def sample(
         paths["autogen"], f"inference_model_{model_name}.stan"
     )
     exe_file_path = stan_program_filepath[:-5]
-    stan_code = code_generation.create_stan_program(mi, "inference", time_step)
+    stan_code = code_generation.create_stan_program(mi, "inference")
     exe_file_exists = os.path.exists(exe_file_path)
     change_in_stan_code = not utils.match_string_to_file(
         stan_code, stan_program_filepath
@@ -129,7 +129,12 @@ def sample(
 
 
 def get_input_data(
-    mi: MaudInput, f_tol: float, rel_tol: float, max_steps: int, likelihood: int
+    mi: MaudInput,
+    f_tol: float,
+    rel_tol: float,
+    max_steps: int,
+    likelihood: int,
+    timepoint: float,
 ) -> dict:
     """Put a MaudInput and some config numbers into a Stan-friendly dictionary.
 
@@ -245,7 +250,7 @@ def get_input_data(
         "ftol": f_tol,
         "steps": max_steps,
         "LIKELIHOOD": likelihood,
-        "timepoint": 500,
+        "timepoint": timepoint,
     }
 
 

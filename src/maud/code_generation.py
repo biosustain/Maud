@@ -33,7 +33,6 @@ TEMPLATE_FILES = [
     "functions_block.stan",
     "ode_function.stan",
     "fluxes_function.stan",
-    "steady_state_function.stan",
     "modular_rate_law.stan",
 ]
 
@@ -62,13 +61,8 @@ def create_stan_program(mi: MaudInput, model_type: str, time_step=0.05) -> str:
     keq_position = [par_codes[par_id] for par_id in par_codes.keys() if "Keq" in par_id]
     fluxes_function = create_fluxes_function(mi, templates["fluxes_function"])
     ode_function = create_ode_function(mi, templates["ode_function"])
-    steady_state_function = create_steady_state_function(
-        kinetic_model, mic_codes, templates["steady_state_function"], time_step
-    )
     functions_block = templates["functions_block"].render(
-        fluxes_function=fluxes_function,
-        ode_function=ode_function,
-        steady_state_function=steady_state_function,
+        fluxes_function=fluxes_function, ode_function=ode_function
     )
     if model_type == "inference":
         lower_blocks = templates["inference_model_lower_blocks"].render(
