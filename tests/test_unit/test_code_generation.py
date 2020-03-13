@@ -37,12 +37,17 @@ def test_get_regulatory_string():
         "e1_transfer_constant": 4,
     }
     enzyme_name = "e1"
+    subunits = 1
     generated = code_generation.get_regulatory_string(
-        inhibitor_codes, activator_codes, param_codes, enzyme_name
+        inhibitor_codes=inhibitor_codes,
+        activator_codes=activator_codes,
+        num_subunits=subunits,
+        param_codes=param_codes,
+        enzyme_name=enzyme_name,
     )
     expected = (
         "get_regulatory_effect("
-        "empty_array,{m[1],m[2]},free_enzyme_ratio_e1,empty_array,{p[2],p[3]},p[4]"
+        "empty_array,{m[1],m[2]},free_enzyme_ratio_e1,empty_array,{p[2],p[3]},p[4],1"
         ")"
     )
     assert generated == expected
