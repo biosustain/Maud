@@ -25,6 +25,8 @@ import pandas as pd
 
 from maud import code_generation, io, utils
 from maud.data_model import KineticModel, MaudInput
+from .util.dGf_calculation import calculate_dGf, preparecompoundmatrices, cholesky_decomposition
+from .core.compound import compound
 
 
 RELATIVE_PATHS = {
@@ -207,6 +209,36 @@ def get_input_data(
             column_ix = balanced_mic_codes[row["target_id"]]
             balanced_init.loc[row_ix, column_ix] = row["value"]
 
+
+    kegg_map = {}
+    with open('data/ecoli_kegg_map.txt','r') as f:
+        for line in f:
+            line = line.strip()
+            line = line.split("\t")
+            kegg_map[line[0]] = line[1]
+
+    mu_dGf, cov_dGf = calculate_dGf(mic_codes.keys(), kegg_map)
+    transformed_mu_dGf = []
+    pH = 7
+    ionic_strength = 0.25
+    temperature = 298
+    compounds = []
+    compounds_ms = []
+    mu_dGf_water = calculate_dGf(['h2o_c'], kegg_map)
+    h2o_at_condition_dGf = compound('h2o_c', Kegg_map=kegg_map, delG_f=mu_dGf_water, pH=pH, ionic_strength=ionic_strength, temperature=temperature)
+    h2o_transformed_dGf = float(h2o_at_condition_dGf.transform(pH=pH, ionic_strength=ionic_strength, temperature=temperature, dGf_water=0)) + mu_dGf_water[0]
+
+    for i, met in enumerate(mic_codes.keys()):
+        temp_met = compound(met, Kegg_map=kegg_map, delG_f=mu_dGf[i], pH=pH, ionic_strength=ionic_strength, temperature=temperature)
+        temp_transformed_mu_dGf = temp_met.transform(pH=pH, ionic_strength=ionic_strength, temperature=temperature, dGf_water=h2o_transformed_dGf)
+        transformed_mu_dGf.append(float(temp_transformed_mu_dGf+mu_dGf[i]))
+
+    chol_mat = cholesky_decomposition(transformed_mu_dGf, cov_dGf)
+
+    print(f'Met\t\tNorm\t\tTransoformed')
+    for i, met in enumerate(mic_codes.keys()):
+        print(f'{met}\t\t{mu_dGf[i]}\t\t{transformed_mu_dGf[i]}')
+
     return {
         "N_mic": len(mics),
         "N_unbalanced": len(unbalanced_mic_codes),
@@ -242,8 +274,8 @@ def get_input_data(
         "enzyme_yenz": (enzyme_measurements["target_id"].map(enzyme_codes).values),
         "yenz": enzyme_measurements["value"].values,
         "sigma_enz": enzyme_measurements["uncertainty"].values,
-        "prior_loc_formation_energy": prior_loc_formation_energy,
-        "prior_scale_formation_energy": prior_scale_formation_energy,
+        "prior_loc_formation_energy": transformed_mu_dGf,
+        "prior_scale_formation_energy": chol_mat,
         "prior_loc_kinetic_parameters": prior_loc_kp,
         "prior_scale_kinetic_parameters": prior_scale_kp,
         "prior_loc_unbalanced": prior_loc_unb,
