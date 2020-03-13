@@ -116,6 +116,8 @@ class Enzyme:
     :param name: human-understandable name for the enzyme
     :param mechanism: enzyme mechanism as a string
     :param modifiers: modifiers, given as {'modifier_id': modifier_object}
+    :param subunits: number of individual enzyme 'units' that combine to form
+    an active enzyme. [Allosteric case: Defined, else: None]
     :param parameters: enzyme parameters, give as {'parameter_id': parameter_object}
     """
 
@@ -126,6 +128,7 @@ class Enzyme:
         name: str,
         mechanism: str,
         parameters: Dict[str, Parameter],
+        subunits: int = None,
         modifiers: Dict[str, Modifier] = None,
     ):
         if modifiers is None:
@@ -134,6 +137,7 @@ class Enzyme:
         self.name = name
         self.mechanism = mechanism
         self.modifiers = modifiers
+        self.subunits = subunits
         self.parameters = parameters
 
 
