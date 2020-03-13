@@ -26,8 +26,8 @@ data {
   vector[N_enzyme_measurement] yenz;
   vector<lower=0>[N_enzyme_measurement] sigma_enz;
   // hardcoded priors
-  vector[N_metabolite] prior_loc_formation_energy;
-  vector<lower=0>[N_metabolite] prior_scale_formation_energy;
+  vector[N_mic] prior_loc_formation_energy;
+  matrix[N_mic, N_mic] prior_scale_formation_energy;
   vector[N_kinetic_parameters] prior_loc_kinetic_parameters;
   vector<lower=0>[N_kinetic_parameters] prior_scale_kinetic_parameters;
   real prior_loc_unbalanced[N_experiment, N_unbalanced];
@@ -52,7 +52,7 @@ transformed data {
 
 }
 parameters {
-  vector[N_metabolite] formation_energy;
+  vector[N_mic] formation_energy;
   vector<lower=0>[N_kinetic_parameters] kinetic_parameters;
   vector<lower=0>[N_enzyme] enzyme_concentration[N_experiment];
   vector<lower=0>[N_unbalanced] conc_unbalanced[N_experiment];
@@ -61,7 +61,7 @@ transformed parameters {
   real initial_time = 0;
   vector<lower=0>[N_mic] conc[N_experiment];
   vector[N_reaction] flux[N_experiment];
-  vector[N_enzyme] delta_g = stoichiometric_matrix' * formation_energy[metabolite_ix_stoichiometric_matrix];
+  vector[N_enzyme] delta_g = stoichiometric_matrix' * formation_energy;
   for (e in 1:N_experiment){
     vector[N_enzyme] keq = exp(delta_g / minus_RT);
     vector[N_unbalanced+N_enzyme+N_enzyme+N_kinetic_parameters] theta = append_row(append_row(append_row(
@@ -82,7 +82,7 @@ transformed parameters {
 }
 model {
   kinetic_parameters ~ lognormal(log(prior_loc_kinetic_parameters), prior_scale_kinetic_parameters);
-  formation_energy ~ normal(prior_loc_formation_energy, prior_scale_formation_energy);
+  formation_energy ~ multi_normal_cholesky(prior_loc_formation_energy, prior_scale_formation_energy);
   for (e in 1:N_experiment){
     conc_unbalanced[e] ~ lognormal(log(prior_loc_unbalanced[e]), prior_scale_unbalanced[e]);
     enzyme_concentration[e] ~ lognormal(log(prior_loc_enzyme[e]), prior_scale_enzyme[e]);
