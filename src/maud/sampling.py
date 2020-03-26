@@ -27,10 +27,7 @@ from maud import code_generation, io, utils
 from maud.data_model import KineticModel, MaudInput
 
 
-RELATIVE_PATHS = {
-    "stan_includes": "stan_code",
-    "autogen": os.path.join("stan_code", "autogen"),
-}
+INCLUDE_PATH = "stan_code"
 DEFAULT_PRIOR_LOC_UNBALANCED = 1
 DEFAULT_PRIOR_SCALE_UNBALANCED = 4
 DEFAULT_PRIOR_LOC_ENZYME = 0.1
@@ -90,7 +87,6 @@ def sample(
     input_filepath = os.path.join(output_dir, f"input_data_{model_name}.json")
 
     here = os.path.dirname(os.path.abspath(__file__))
-    paths = {k: os.path.join(here, v) for k, v in RELATIVE_PATHS.items()}
 
     mi = io.load_maud_input_from_toml(data_path)
 
@@ -99,9 +95,8 @@ def sample(
 
     cmdstanpy.utils.jsondump(input_filepath, input_data)
 
-    stan_program_filepath = os.path.join(
-        paths["autogen"], f"inference_model_{model_name}.stan"
-    )
+    stan_program_filename = f"inference_model_{model_name}.stan"
+    stan_program_filepath = os.path.join(output_dir, stan_program_filename)
     exe_file_path = stan_program_filepath[:-5]
     stan_code = code_generation.create_stan_program(mi, "inference")
     exe_file_exists = os.path.exists(exe_file_path)
@@ -115,9 +110,10 @@ def sample(
         for p in [exe_file_path, exe_file_path + ".o", exe_file_path + ".hpp"]:
             if os.path.exists(p):
                 os.remove(p)
+    include_path = os.path.join(here, INCLUDE_PATH)
     model = cmdstanpy.CmdStanModel(
         stan_file=stan_program_filepath,
-        stanc_options={"include_paths": [paths["stan_includes"]]},
+        stanc_options={"include_paths": [include_path]},
     )
     return model.sample(
         data=input_filepath,
