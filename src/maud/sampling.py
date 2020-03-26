@@ -26,6 +26,7 @@ import pandas as pd
 from maud import code_generation, io, utils
 from maud.data_model import KineticModel, MaudInput
 
+
 INCLUDE_PATH = "stan_code"
 DEFAULT_PRIOR_LOC_UNBALANCED = 1
 DEFAULT_PRIOR_SCALE_UNBALANCED = 4
