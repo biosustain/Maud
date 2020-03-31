@@ -112,8 +112,7 @@ def sample(
                 os.remove(p)
     include_path = os.path.join(here, INCLUDE_PATH)
     model = cmdstanpy.CmdStanModel(
-        stan_file=stan_program_filepath,
-        stanc_options={"include_paths": [include_path]},
+        stan_file=stan_program_filepath, stanc_options={"include_paths": [include_path]}
     )
     return model.sample(
         data=input_filepath,
