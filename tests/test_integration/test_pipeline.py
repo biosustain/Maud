@@ -1,5 +1,6 @@
 import os
 import tempfile
+import shutil
 
 import arviz as az
 import pandas as pd
@@ -41,9 +42,10 @@ def get_measurement_index(mi, mic_codes, enzyme_codes, experiment_codes):
 	measurement_index_new = measurement_index_new.merge(meas_index, on='measurement_id', how='left')
 
 	for exp in experiment_codes:
-	    measurement_index_new[measurement_index_new['experiment']==exp].sort_values(by='order', inplace=True)
+		meas_idx_temp = measurement_index_new[measurement_index_new['experiment']==exp].sort_values(by='order').copy(deep=True).values
+		measurement_index_new[measurement_index_new['experiment']==exp] = meas_idx_temp
 
-	return measurement_index_new.drop(['order'], axis=1, inplace=True)
+	return measurement_index_new
 
 def get_coords_dims(mi):
 
@@ -58,8 +60,6 @@ def get_coords_dims(mi):
                                               mic_codes=mic_codes,
                                               enzyme_codes=enzyme_codes,
                                               experiment_codes=experiment_codes)
-
-	print(measurement_index)
 
 	coords={
             'reactions': reaction_codes,
@@ -83,12 +83,15 @@ def get_coords_dims(mi):
 
 
 def test_linear():
+	"""tests from code generation to sampling of the linear model by computing 200
+	samples after 200 warmups and checking if the sampled median is within the
+	94% CI of a precomputed set."""
 
 	linear_input = os.path.join(data_path, "linear.toml")
 	temp_directory = tempfile.mkdtemp(dir = data_path)
-	control_directory = os.path.join(data_path, "linear_fit_control")
+	control_directory = os.path.join(data_path, "linear_control_set")
 	linear_control_files = [os.path.join(control_directory,
-										 f"inference_model_linear_test-{i}")
+										 f"inference_model_linear_test-{i}.csv")
 							for i in range(1,5)]
 
 	mi = io.load_maud_input_from_toml(linear_input)
@@ -96,10 +99,9 @@ def test_linear():
 	coords, dims = get_coords_dims(mi)
 
 	linear_input_values = {
-    "f_tol_as": 1e-6,
-    "rel_tol_as": 1e-9,
-    "abs_tol_as": 1e-12,
-    "max_steps_as": int(1e9),
+    "f_tol": 1e-6,
+    "rel_tol": 1e-9,
+    "max_steps": int(1e9),
     "likelihood": 1,
     "n_samples": 200,
     "n_warmup": 200,
@@ -110,7 +112,7 @@ def test_linear():
     "data_path": linear_input,
 	}
 
-	linear_fit_test = sampling.sample(linear_input_values)
+	linear_fit_test = sampling.sample(**linear_input_values)
 	linear_fit_test_az = az.from_cmdstanpy(linear_fit_test,
 										 coords=coords,
 										 dims=dims)
@@ -120,14 +122,14 @@ def test_linear():
 
 	interval_test = pd.DataFrame()
 
-	interval_test['sample'] = az.summary(linear_fit_test)['mean'].values
+	interval_test['sample_mean'] = az.summary(linear_fit_test)['mean'].values
 	interval_test['lower'] = az.summary(linear_fit_control)['hpd_3%'].values
 	interval_test['upper'] = az.summary(linear_fit_control)['hpd_97%'].values
 	interval_test['coord'] = az.summary(linear_fit_test).index.values
 	interval_test['within'] = float("NaN")
-	interval_test.reset_index('coord', inplace=True)
+	interval_test.set_index('coord', inplace=True)
 
-	for i in range(0, interval_test.shape()[0]):
+	for i in range(0, interval_test.shape[0]):
 		if interval_test['lower'][i] <= interval_test['sample_mean'][i] <= interval_test['upper'][i]:
 			interval_test['within'][i] = 1
 		else:
@@ -135,7 +137,7 @@ def test_linear():
 
 	out_of_bounds = interval_test[interval_test['within']==0]
 
-	os.rmdir(temp_directory)
+	shutil.rmtree(temp_directory)
 
 	assert out_of_bounds.empty, out_of_bounds
 
