@@ -14,11 +14,11 @@ following command:
           maud sample path/to/data --n_chains=3 --n_warmup=200 --n_samples=100
 
 
-This will use the data file at `path/to/myinput.toml` to create a Stan program
-at `maud/stan_code/autogen/inference_model_myinput.stan`, compile it into a C++
-Stan model, then start three independent MCMC chains, each using 200 iterations
-for adaptation and storing the contents of 100 further iterations in a
-file called `data/out/model_output_myinput-<n>.csv`.
+This will use the data file at `path/to/myinput.toml` to create a Stan program,
+compile it into a C++ Stan model, then start three independent MCMC chains,
+each using 200 iterations for adaptation and storing the contents of 100
+further iterations in a csv file. All the files will be stored in the directory
+where the command is run unless the option `output_dir` is specified.
 
 Here is the full documentation for the :code:`sample` command, listing all
 available options:
