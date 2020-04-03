@@ -4,34 +4,34 @@ functions{
 #include allostery.stan
   vector get_fluxes(real[] m, real[] p){
   real empty_array[0];
-  real Tr_r1 = p[3]*p[11]
-                * (p[1]/p[9])^(-1*-1) 
+  real Tr_r2 = p[3]*p[11]
+                * (m[1]/p[9])^(-1*-1) 
                 - p[3]*p[11]/p[6]
                 * (p[9])^-1 
                 * (p[10])^1 
-                * (m[1]/p[10])^1 ;
+                * (m[2]/p[10])^1 ;
 
-real Dr_r1 = (1 + p[1]/p[9])^(-1*-1) 
-                + (1 + m[1]/p[10])^1 
+real Dr_r2 = (1 + m[1]/p[9])^(-1*-1) 
+                + (1 + m[2]/p[10])^1 
+                - 1;
+
+
+real Dr_reg_r2 = (m[2]/p[14]) ;
+
+
+  real Tr_r1 = p[4]*p[17]
+                * (p[1]/p[15])^(-1*-1) 
+                - p[4]*p[17]/p[7]
+                * (p[15])^-1 
+                * (p[16])^1 
+                * (m[1]/p[16])^1 ;
+
+real Dr_r1 = (1 + p[1]/p[15])^(-1*-1) 
+                + (1 + m[1]/p[16])^1 
                 - 1;
 
 
 real Dr_reg_r1 = 0;
-  real Tr_r2 = p[4]*p[16]
-                * (m[1]/p[14])^(-1*-1) 
-                - p[4]*p[16]/p[7]
-                * (p[14])^-1 
-                * (p[15])^1 
-                * (m[2]/p[15])^1 ;
-
-real Dr_r2 = (1 + m[1]/p[14])^(-1*-1) 
-                + (1 + m[2]/p[15])^1 
-                - 1;
-
-
-real Dr_reg_r2 = (m[2]/p[19]) ;
-
-
   real Tr_r3 = p[5]*p[22]
                 * (m[2]/p[20])^(-1*-1) 
                 - p[5]*p[22]/p[8]
@@ -45,19 +45,19 @@ real Dr_r3 = (1 + m[2]/p[20])^(-1*-1)
 
 
 real Dr_reg_r3 = 0;
-  real free_enzyme_ratio_r1 = get_free_enzyme_ratio_modular_rate_law(Tr_r1, Dr_r1, Dr_reg_r1);
   real free_enzyme_ratio_r2 = get_free_enzyme_ratio_modular_rate_law(Tr_r2, Dr_r2, Dr_reg_r2);
+  real free_enzyme_ratio_r1 = get_free_enzyme_ratio_modular_rate_law(Tr_r1, Dr_r1, Dr_reg_r1);
   return [
-    modular_rate_law(Tr_r1, Dr_r1, Dr_reg_r1)*get_regulatory_effect({m[2]},empty_array,free_enzyme_ratio_r1,{p[12]},empty_array,p[13],1),
-    modular_rate_law(Tr_r2, Dr_r2, Dr_reg_r2)*get_regulatory_effect(empty_array,{m[1]},free_enzyme_ratio_r2,empty_array,{p[17]},p[18],1),
+    modular_rate_law(Tr_r2, Dr_r2, Dr_reg_r2)*get_regulatory_effect(empty_array,{m[1]},free_enzyme_ratio_r2,empty_array,{p[12]},p[13],1),
+    modular_rate_law(Tr_r1, Dr_r1, Dr_reg_r1)*get_regulatory_effect({m[2]},empty_array,free_enzyme_ratio_r1,{p[18]},empty_array,p[19],1),
     modular_rate_law(Tr_r3, Dr_r3, Dr_reg_r3)
   ]';
 }
   real[] ode_func(real t, real[] m, real[] p, real[] xr, int[] xi){
   vector[3] fluxes = get_fluxes(m, p);
   return {
-    1*fluxes[1]-1*fluxes[2],
-    1*fluxes[2]-1*fluxes[3]
+    -1*fluxes[1]+1*fluxes[2],
+    1*fluxes[1]-1*fluxes[3]
   };
 }
 }
