@@ -54,6 +54,7 @@ stoichiometry = { M1_e = -1, M1_c = 1}
 id = 'r1'
 name = 'the enzyme that catalyses reaction r1'
 mechanism = 'modular_rate_law'
+subunits  = 1
 allosteric_activators = ['M2_c']
 
 [[reactions]]
