@@ -255,20 +255,20 @@ PGK = [
 
 [priors.thermodynamic_parameters]
 formation_energies = [
-  { target_id = 'glc__D', location = -446.8, scale = 1.3 },
-  { target_id = 'atp', location = -2313.0, scale = 3.0 },
-  { target_id = 'adp', location = -1440.8, scale = 2.4 },
-  { target_id = 'nad', location = -1222.9, scale = 12.4 },
-  { target_id = 'nadh', location = -1158.7, scale = 12.4 },
-  { target_id = 'dhap', location = -1111.9, scale = 1.1 },
-  { target_id = '3pg', location = -1365.2, scale = 1.5 },
-  { target_id = 'glc__D', location = -446.8, scale = 1.3 },
-  { target_id = 'g6p', location = -1336.3, scale = 1.3 },
-  { target_id = 'f6p', location = -1333.8, scale = 1.3 },
-  { target_id = 'f16p', location = -2220.9, scale = 2.1 },
-  { target_id = 'g3p', location = -1106.4, scale = 1.3 },
-  { target_id = '13dpg', location = -2219.0, scale = 2.1 },
-  { target_id = 'pi', location = -1073.3, scale = 1.5 },
+  { target_id = 'glc__D_c', location = -446.8, scale = 1.3 },
+  { target_id = 'glc__D_e', location = -446.8, scale = 1.3 },
+  { target_id = 'atp_c', location = -2313.0, scale = 3.0 },
+  { target_id = 'adp_c', location = -1440.8, scale = 2.4 },
+  { target_id = 'nad_c', location = -1222.9, scale = 12.4 },
+  { target_id = 'nadh_c', location = -1158.7, scale = 12.4 },
+  { target_id = 'dhap_c', location = -1111.9, scale = 1.1 },
+  { target_id = '3pg_c', location = -1365.2, scale = 1.5 },
+  { target_id = 'g6p_c', location = -1336.3, scale = 1.3 },
+  { target_id = 'f6p_c', location = -1333.8, scale = 1.3 },
+  { target_id = 'f16p_c', location = -2220.9, scale = 2.1 },
+  { target_id = 'g3p_c', location = -1106.4, scale = 1.3 },
+  { target_id = '13dpg_c', location = -2219.0, scale = 2.1 },
+  { target_id = 'pi_c', location = -1073.3, scale = 1.5 },
 ]
 
 [priors.unbalanced_metabolites]

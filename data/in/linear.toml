@@ -125,6 +125,8 @@ r3 = [
 
 [priors.thermodynamic_parameters]
 formation_energies = [
-  { target_id = 'M1', location = -1, scale = 0.05},
-  { target_id = 'M2', location = -2, scale = 0.05},
+  { target_id = 'M1_c', location = -1, scale = 0.05},
+  { target_id = 'M2_c', location = -2, scale = 0.05},
+  { target_id = 'M1_e', location = -1, scale = 0.05},
+  { target_id = 'M2_e', location = -2, scale = 0.05},
 ]

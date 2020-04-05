@@ -17,16 +17,15 @@
 """Code for sampling from a posterior distribution."""
 
 import os
-from typing import Dict
+from typing import Dict, List
 
 import cmdstanpy
 import numpy as np
 import pandas as pd
+import numpy as np
 
 from maud import code_generation, io, utils
 from maud.data_model import KineticModel, MaudInput
-from .util.dGf_calculation import calculate_dGf, preparecompoundmatrices, cholesky_decomposition
-from .core.compound import compound
 
 
 RELATIVE_PATHS = {
@@ -47,8 +46,8 @@ def get_full_stoichiometry(
     """Get full stoichiometric matrix for each isoenzyme.
 
     :param kinetic_model: A Kinetic Model object
-    :param enzyme_codes: the codified enzyme codes
-    :param metabolite_codes: the codified metabolite codes
+    :param enzyme_codes: The codified enzyme codes
+    :param metabolite_codes: The codified metabolite codes
     """
     S = pd.DataFrame(index=enzyme_codes, columns=metabolite_codes)
     for _, rxn in kinetic_model.reactions.items():
@@ -57,6 +56,26 @@ def get_full_stoichiometry(
                 S.loc[enz_id, met] = stoic
     S.fillna(0, inplace=True)
     return S
+
+def get_thermodynamic_values(
+    mi: MaudInput,
+    mic_codes: Dict[str, int],
+    from_equilibrator: bool,
+):
+    """Return mean and covarance matrix for formation energies.
+        
+        :param kinetic_model: A Kinetic Model object
+        :param metabolite_codes: The codified metabolite_in_copmpartment codes,
+        To use equilibrator functionallity must be specified using BIGG identifiers
+        :param from_equilibrator: 1 for retrive means and covariance matrix from
+        equilibrator -> Isn't currently supported
+    """
+    if from_equilibrator == 0:
+        formation_energy_mean = [mi.priors[f'{met}_formation_energy'].location for met in mic_codes.keys()]
+        formation_energy_variance = [mi.priors[f'{met}_formation_energy'].scale for met in mic_codes.keys()]
+        formation_energy_cov_mat = np.diag(formation_energy_variance)
+
+    return formation_energy_mean, formation_energy_cov_mat
 
 
 def sample(
@@ -178,12 +197,6 @@ def get_input_data(
             ix = [experiment_codes[mic_codes[p.target_id - 1], p.experiment_id] - 1]
             prior_loc_unb[ix] = p.location
             prior_scale_unb[ix] = p.scale
-    prior_loc_formation_energy = [
-        mi.priors[k + "_formation_energy"].location for k in met_codes.keys()
-    ]
-    prior_scale_formation_energy = [
-        mi.priors[k + "_formation_energy"].scale for k in met_codes.keys()
-    ]
     enzyme_shape = len(mi.experiments), len(enzymes)
     prior_loc_enzyme = np.full(enzyme_shape, DEFAULT_PRIOR_LOC_ENZYME)
     prior_scale_enzyme = np.full(enzyme_shape, DEFAULT_PRIOR_SCALE_ENZYME)
@@ -209,35 +222,9 @@ def get_input_data(
             column_ix = balanced_mic_codes[row["target_id"]]
             balanced_init.loc[row_ix, column_ix] = row["value"]
 
-
-    kegg_map = {}
-    with open('data/ecoli_kegg_map.txt','r') as f:
-        for line in f:
-            line = line.strip()
-            line = line.split("\t")
-            kegg_map[line[0]] = line[1]
-
-    mu_dGf, cov_dGf = calculate_dGf(mic_codes.keys(), kegg_map)
-    transformed_mu_dGf = []
-    pH = 7
-    ionic_strength = 0.25
-    temperature = 298
-    compounds = []
-    compounds_ms = []
-    mu_dGf_water = calculate_dGf(['h2o_c'], kegg_map)
-    h2o_at_condition_dGf = compound('h2o_c', Kegg_map=kegg_map, delG_f=mu_dGf_water, pH=pH, ionic_strength=ionic_strength, temperature=temperature)
-    h2o_transformed_dGf = float(h2o_at_condition_dGf.transform(pH=pH, ionic_strength=ionic_strength, temperature=temperature, dGf_water=0)) + mu_dGf_water[0]
-
-    for i, met in enumerate(mic_codes.keys()):
-        temp_met = compound(met, Kegg_map=kegg_map, delG_f=mu_dGf[i], pH=pH, ionic_strength=ionic_strength, temperature=temperature)
-        temp_transformed_mu_dGf = temp_met.transform(pH=pH, ionic_strength=ionic_strength, temperature=temperature, dGf_water=h2o_transformed_dGf)
-        transformed_mu_dGf.append(float(temp_transformed_mu_dGf+mu_dGf[i]))
-
-    chol_mat = cholesky_decomposition(transformed_mu_dGf, cov_dGf)
-
-    print(f'Met\t\tNorm\t\tTransoformed')
-    for i, met in enumerate(mic_codes.keys()):
-        print(f'{met}\t\t{mu_dGf[i]}\t\t{transformed_mu_dGf[i]}')
+    prior_loc_formation_energy, prior_scale_formation_energy = get_thermodynamic_values(mi=mi,
+                                                                            mic_codes=mic_codes,
+                                                                            from_equilibrator=0)
 
     return {
         "N_mic": len(mics),
@@ -274,8 +261,8 @@ def get_input_data(
         "enzyme_yenz": (enzyme_measurements["target_id"].map(enzyme_codes).values),
         "yenz": enzyme_measurements["value"].values,
         "sigma_enz": enzyme_measurements["uncertainty"].values,
-        "prior_loc_formation_energy": transformed_mu_dGf,
-        "prior_scale_formation_energy": chol_mat,
+        "prior_loc_formation_energy": prior_loc_formation_energy,
+        "prior_scale_formation_energy": prior_scale_formation_energy,
         "prior_loc_kinetic_parameters": prior_loc_kp,
         "prior_scale_kinetic_parameters": prior_scale_kp,
         "prior_loc_unbalanced": prior_loc_unb,
