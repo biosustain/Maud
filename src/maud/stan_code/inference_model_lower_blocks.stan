@@ -82,7 +82,7 @@ transformed parameters {
 }
 model {
   kinetic_parameters ~ lognormal(log(prior_loc_kinetic_parameters), prior_scale_kinetic_parameters);
-  formation_energy ~ multi_normal(prior_loc_formation_energy, prior_scale_formation_energy);
+  formation_energy ~ multi_normal_cholesky(prior_loc_formation_energy, prior_scale_formation_energy);
   for (e in 1:N_experiment){
     conc_unbalanced[e] ~ lognormal(log(prior_loc_unbalanced[e]), prior_scale_unbalanced[e]);
     enzyme_concentration[e] ~ lognormal(log(prior_loc_enzyme[e]), prior_scale_enzyme[e]);

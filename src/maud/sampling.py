@@ -54,27 +54,6 @@ def get_full_stoichiometry(
     S.fillna(0, inplace=True)
     return S
 
-def get_thermodynamic_values(
-    mi: MaudInput,
-    mic_codes: Dict[str, int],
-    from_equilibrator: bool,
-):
-    """Return mean and covarance matrix for formation energies.
-        
-        :param kinetic_model: A Kinetic Model object
-        :param metabolite_codes: The codified metabolite_in_copmpartment codes,
-        To use equilibrator functionallity must be specified using BIGG identifiers
-        :param from_equilibrator: 1 for retrive means and covariance matrix from
-        equilibrator -> Isn't currently supported
-    """
-    if from_equilibrator == 0:
-        formation_energy_mean = [mi.priors[f'{met}_formation_energy'].location for met in mic_codes.keys()]
-        formation_energy_variance = [mi.priors[f'{met}_formation_energy'].scale for met in mic_codes.keys()]
-        formation_energy_cov_mat = np.diag(formation_energy_variance)
-
-    return formation_energy_mean, formation_energy_cov_mat
-
-
 def sample(
     data_path: str,
     f_tol: float,
@@ -217,9 +196,11 @@ def get_input_data(
             column_ix = balanced_mic_codes[row["target_id"]]
             balanced_init.loc[row_ix, column_ix] = row["value"]
 
-    prior_loc_formation_energy, prior_scale_formation_energy = get_thermodynamic_values(mi=mi,
-                                                                            mic_codes=mic_codes,
-                                                                            from_equilibrator=0)
+    prior_loc_formation_energy = prior_loc_formation_energy = [
+        mi.priors[k + "_formation_energy"].location for k in mic_codes.keys()
+    ]
+    prior_scale_formation_energy = np.array(mi.kinetic_model.covariance_matrix)
+
 
     return {
         "N_mic": len(mics),

@@ -17,8 +17,7 @@
 """Definitions of Maud-specific objects."""
 
 from collections import defaultdict
-from typing import Dict
-
+from typing import Dict, List
 
 class Compartment:
     """Constructor for compartment objects.
@@ -186,12 +185,14 @@ class KineticModel:
         metabolites: Dict[str, Metabolite],
         reactions: Dict[str, Reaction],
         compartments: Dict[str, Compartment],
+        covariance_matrix: List[List[float]],
         mics: Dict[str, MetaboliteInCompartment],
     ):
         self.model_id = model_id
         self.metabolites = metabolites
         self.reactions = reactions
         self.compartments = compartments
+        self.covariance_matrix = covariance_matrix
         self.mics = mics
 
 

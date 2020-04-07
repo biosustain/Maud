@@ -90,10 +90,12 @@ def load_kinetic_model_from_toml(
         for m in parsed_toml["metabolites"]
     }
     reactions = {r["id"]: load_reaction_from_toml(r) for r in parsed_toml["reactions"]}
+    covariance_matrix = parsed_toml["covariance_matrix"]["covariance_matrix_cholesky"]
     return KineticModel(
         model_id=model_id,
         metabolites=metabolites,
         compartments=compartments,
+        covariance_matrix=covariance_matrix,
         mics=mics,
         reactions=reactions,
     )
@@ -281,7 +283,7 @@ def load_maud_input_from_toml(filepath: str, id: str = "mi") -> MaudInput:
             id=prior_id,
             target_id=formation_energy_prior["target_id"],
             location=formation_energy_prior["location"],
-            scale=formation_energy_prior["scale"],
+            scale=None,
             target_type="thermodynamic_parameter",
         )
     for enz_id, kpps in parsed_toml["priors"]["kinetic_parameters"].items():
