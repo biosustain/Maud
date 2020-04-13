@@ -107,12 +107,13 @@ generated quantities {
   vector[N_flux_measurement] yflux_sim;
   vector[N_flux_measurement+N_conc_measurement] log_like;
 
-  for (c in 1:N_conc_measurement){
-    log_like[N_flux_measurement+c] = lognormal_lpdf(yconc[c] | log(conc[experiment_yconc[c], mic_ix_yconc[c]]), sigma_conc[c]);
-  }
 
   for (f in 1:N_flux_measurement){
     log_like[f] = normal_lpdf(yflux[f] | flux[experiment_yflux[f], reaction_yflux[f]], sigma_flux[f]);
+  }
+
+  for (c in 1:N_conc_measurement){
+    log_like[N_flux_measurement+c] = lognormal_lpdf(yconc[c] | log(conc[experiment_yconc[c], mic_ix_yconc[c]]), sigma_conc[c]);
   }
 
 
