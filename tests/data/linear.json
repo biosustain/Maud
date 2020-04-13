@@ -175,22 +175,22 @@
   ],
   "prior_loc_unbalanced": [
     [
-      1,
-      1
+      0.1,
+      0.1
     ],
     [
-      1,
-      1
+      0.1,
+      0.1
     ]
   ],
   "prior_scale_unbalanced": [
     [
-      4,
-      4
+      3,
+      3
     ],
     [
-      4,
-      4
+      3,
+      3
     ]
   ],
   "prior_loc_enzyme": [

@@ -20,4 +20,4 @@ def test_get_input_data():
     actual = sampling.get_input_data(mi, 1e-06, 1e-09, int(1e9), 1, 500)
     assert actual.keys() == expected.keys()
     for k in actual.keys():
-        assert_equal(actual[k], expected[k])
+        assert_equal(actual[k], expected[k], err_msg=f"key {k} is not equal.")
