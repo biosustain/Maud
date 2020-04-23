@@ -53,6 +53,22 @@ def get_full_stoichiometry(
     S.fillna(0, inplace=True)
     return S
 
+def get_knockout_matrix(
+    mi: MaudInput,
+    enzyme_codes: Dict[str, int],
+    experiment_codes: Dict[str, int],
+    ):
+    enzyme_knockout_matrix = pd.DataFrame(1,
+                                          index=np.arange(len(experiment_codes)),
+                                          columns=np.arange(len(enzyme_codes)))
+
+    for exp_name, exp in mi.experiments.items():
+        if exp.knockouts:
+            for enz in exp.knockouts:
+                enzyme_knockout_matrix.loc[experiment_codes[exp_name]-1, enzyme_codes[enz]-1] = 0
+
+    return enzyme_knockout_matrix
+
 
 def sample(
     data_path: str,
@@ -202,6 +218,9 @@ def get_input_data(
             column_ix = balanced_mic_codes[row["target_id"]]
             balanced_init.loc[row_ix, column_ix] = row["value"]
 
+    knockout_matrix = get_knockout_matrix(mi=mi,
+                                          experiment_codes=experiment_codes,
+                                          enzyme_codes=enzyme_codes)
     return {
         "N_mic": len(mics),
         "N_unbalanced": len(unbalanced_mic_codes),
@@ -246,6 +265,7 @@ def get_input_data(
         "prior_loc_enzyme": prior_loc_enzyme,
         "prior_scale_enzyme": prior_scale_enzyme,
         "conc_init": balanced_init.values,
+        "knockout_enzymes": knockout_matrix.values,
         "rtol": rel_tol,
         "ftol": f_tol,
         "steps": max_steps,

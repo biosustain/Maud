@@ -271,6 +271,8 @@ def load_maud_input_from_toml(filepath: str, id: str = "mi") -> MaudInput:
                 )
                 type_measurements.update({m["target_id"]: measurement})
             experiment.measurements.update({target_type: type_measurements})
+        if "knockouts" in e.keys():
+            experiment.knockouts = e["knockouts"]
         experiments.update({experiment.id: experiment})
     priors = {}
     for formation_energy_prior in parsed_toml["priors"]["thermodynamic_parameters"][
