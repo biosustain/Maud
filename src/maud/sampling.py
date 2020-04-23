@@ -188,7 +188,7 @@ def get_input_data(
             prior_loc_unb[ix] = p.location
             prior_scale_unb[ix] = p.scale
     prior_loc_formation_energy = [
-        mi.priors[k + "_formation_energy"].location + 17.1 for k in met_codes.keys()
+        mi.priors[k + "_formation_energy"].location for k in met_codes.keys()
     ]
     prior_scale_formation_energy = [
         mi.priors[k + "_formation_energy"].scale for k in met_codes.keys()
