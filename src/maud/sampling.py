@@ -107,7 +107,7 @@ def sample(
     mi = io.load_maud_input_from_toml(data_path)
 
     input_data = get_input_data(mi, f_tol, rel_tol, max_steps, likelihood, timepoint)
-    init_cond = get_initial_conditions(input_data)
+    init_cond = get_initial_conditions(input_data, mi)
 
     cmdstanpy.utils.jsondump(input_filepath, input_data)
 
@@ -273,9 +273,58 @@ def get_input_data(
         "timepoint": timepoint,
     }
 
+def validate_init_enzyme(mi):
+    enzyme_validation = pd.DataFrame(columns = [
+    'reaction',
+    'enzyme',
+    'experiment',
+    'enzyme_concentration',
+    'kcat_prior',
+    'reaction_flux',
+    'scaling_factor',
+    'init_enzyme'
+    ])
 
-def get_initial_conditions(input_data):
+    rxn_enz_dict = {
+        rxn_name: list(rxn_data.enzymes.keys())
+        for rxn_name, rxn_data in mi.kinetic_model.reactions.items()
+    }
+
+    count = 0
+
+    for exp_name, exp in mi.experiments.items():
+        for rxn, flux in exp.measurements['reaction'].items():
+            tmp_enz_kcat_array = []
+            Vmax = 0
+            for enz in rxn_enz_dict[rxn]:
+                try:
+                    tmp_enz_kcat_array.append([enz, exp.measurements['enzyme'][enz].value, mi.priors[f'{enz}_Kcat1'].location])
+                except:
+                    print(f"The enzyme: {enz} wasn't measured in experiment: {exp_name}")
+                    tmp_enz_kcat_array.append([enz, DEFAULT_PRIOR_LOC_ENZYME, mi.priors[f'{enz}_Kcat1'].location])
+                Vmax += tmp_enz_kcat_array[-1][1] * tmp_enz_kcat_array[-1][2]
+            if Vmax < np.abs(flux.value):
+                scaling_factor = 1.5 * flux.value / Vmax
+            else:
+                scaling_factor = 1
+                
+            for enz in tmp_enz_kcat_array:
+                enzyme_validation.loc[count, 'reaction'] = rxn
+                enzyme_validation.loc[count, 'enzyme'] = enz[0]
+                enzyme_validation.loc[count, 'experiment'] = exp_name
+                enzyme_validation.loc[count, 'enzyme_concentration'] = enz[1]
+                enzyme_validation.loc[count, 'kcat_prior'] = enz[2]
+                enzyme_validation.loc[count, 'reaction_flux'] = np.abs(flux.value)
+                enzyme_validation.loc[count, 'scaling_factor'] = scaling_factor
+                enzyme_validation.loc[count, 'init_enzyme'] = np.abs(scaling_factor * enz[1])
+                count += 1
+    return enzyme_validation
+
+def get_initial_conditions(input_data, mi):
     """Specify parameters' initial conditions."""
+    experiment_codes = mi.stan_codes['experiment']
+    enzyme_codes = mi.stan_codes['enzyme']
+
     init_unbalanced = pd.DataFrame(
         input_data["prior_loc_unbalanced"],
         index=range(1, input_data["N_experiment"] + 1),
@@ -287,16 +336,17 @@ def get_initial_conditions(input_data):
         if mic_ix in input_data["unbalanced_mic_ix"]:
             init_unbalanced.loc[exp_ix, mic_ix] = measurement
 
+    init_enzyme_df = validate_init_enzyme(mi)
+
     init_enzyme = pd.DataFrame(
         index=range(1, input_data["N_experiment"] + 1),
         columns=sorted(pd.unique(input_data["enzyme_yenz"])),
     )
-    for exp_id, enz_ix, measurement in zip(
-        input_data["experiment_yenz"], input_data["enzyme_yenz"], input_data["yenz"]
-    ):
-        init_enzyme.loc[exp_id, enz_ix] = measurement
 
-    init_enzyme.fillna(value = DEFAULT_PRIOR_LOC_ENZYME, inplace=True)
+    for _, row in init_enzyme_df.iterrows():
+        init_enzyme.loc[experiment_codes[row["experiment"]], enzyme_codes[row["enzyme"]]] = row["init_enzyme"]
+
+    init_enzyme.fillna(DEFAULT_PRIOR_LOC_ENZYME, inplace=True)
 
     return {
         "kinetic_parameters": input_data["prior_loc_kinetic_parameters"],
