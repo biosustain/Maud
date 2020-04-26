@@ -125,16 +125,20 @@ def prior_check(
 
     for i, row in enumerate(reaction_measurements.iterrows()):
         if row[1]['value'] < model_fit.summary().loc[f'yflux_sim[{i+1}]', '5%']:
-            print(f"""{row[1]['target_id']} in experiment {row[1]['experiment_id']}
+            print(f"""
+                {row[1]['target_id']} in experiment {row[1]['experiment_id']} 
                 had a flux specified that was smaller than the prior flux\n
-                flux = {row[1]['value']} \t\t limit = {model_fit.summary().loc[f'yflux_sim[{i+1}]', '5%']}""")
+                flux = {row[1]['value']} \
+                limit = {model_fit.summary().loc[f'yflux_sim[{i+1}]', '5%']}""")
 
         if row[1]['value'] > model_fit.summary().loc[f'yflux_sim[{i+1}]', '95%']:
-            print(f"""{row[1]['target_id']} in experiment {row[1]['experiment_id']}
+            print(f"""
+                {row[1]['target_id']} in experiment {row[1]['experiment_id']}
                 had a flux specified that was larger than the prior flux\n
-                flux = {row[1]['value']} \t\t limit = {model_fit.summary().loc[f'yflux_sim[{i+1}]', '95%']}""")
+                flux = {row[1]['value']} \
+                limit = {model_fit.summary().loc[f'yflux_sim[{i+1}]', '95%']}""")
 
-    return
+    return model_fit
 
 
 def get_input_data(
@@ -169,8 +173,8 @@ def get_input_data(
     for p in mi.priors.values():
         if p.target_type == "metabolite_concentration":
             ix = [experiment_codes[mic_codes[p.target_id - 1], p.experiment_id] - 1]
-            prior_loc_unb[ix] = p.location
-            prior_scale_unb[ix] = p.scale
+            prior_loc_conc[ix] = p.location
+            prior_scale_conc[ix] = p.scale
     prior_loc_formation_energy = [
         mi.priors[k + "_formation_energy"].location for k in met_codes.keys()
     ]

@@ -20,7 +20,7 @@ import os
 
 import click
 
-from maud import sampling, prior_check
+from maud import prior_check, sampling
 
 
 SAMPLING_DEFAULTS = {
@@ -135,3 +135,5 @@ def sample(data_path, **kwargs):
 def prior(data_path, **kwargs):
     """Sample from the model defined by the data at data_path."""
     stanfit = prior_check.prior_check(data_path, **kwargs)
+    stanfit.diagnose()
+    print(stanfit.summary())

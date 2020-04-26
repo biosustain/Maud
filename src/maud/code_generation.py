@@ -72,7 +72,7 @@ def create_stan_program(mi: MaudInput, model_type: str, time_step=0.05) -> str:
             Keq_position=keq_position,
         )
     elif model_type == "prior_check":
-            lower_blocks = templates["prior_model_lower_blocks"].render(
+        lower_blocks = templates["prior_model_lower_blocks"].render(
             balanced_codes=balanced_codes,
             unbalanced_codes=unbalanced_codes,
             Keq_position=keq_position,
