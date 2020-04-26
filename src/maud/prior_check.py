@@ -115,18 +115,18 @@ def prior_check(
     )
 
     reaction_measurements = pd.DataFrame(
-            [
-                [exp.id, meas.target_id, meas.value, meas.uncertainty]
-                for exp in mi.experiments.values()
-                for meas in exp.measurements['reaction'].values()
-            ],
+        [
+            [exp.id, meas.target_id, meas.value, meas.uncertainty]
+            for exp in mi.experiments.values()
+            for meas in exp.measurements['reaction'].values()
+        ],
             columns=["experiment_id", "target_id", "value", "uncertainty"],
-        )
+    )
 
     for i, row in enumerate(reaction_measurements.iterrows()):
         if row[1]['value'] < model_fit.summary().loc[f'yflux_sim[{i+1}]', '5%']:
             print(f"""
-                {row[1]['target_id']} in experiment {row[1]['experiment_id']} 
+                {row[1]['target_id']} in experiment {row[1]['experiment_id']}
                 had a flux specified that was smaller than the prior flux\n
                 flux = {row[1]['value']} \
                 limit = {model_fit.summary().loc[f'yflux_sim[{i+1}]', '5%']}""")
