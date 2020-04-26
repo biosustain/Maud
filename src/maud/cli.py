@@ -20,7 +20,7 @@ import os
 
 import click
 
-from maud import sampling
+from maud import sampling, prior_check
 
 
 SAMPLING_DEFAULTS = {
@@ -107,3 +107,31 @@ def sample(data_path, **kwargs):
     stanfit = sampling.sample(data_path, **kwargs)
     stanfit.diagnose()
     print(stanfit.summary())
+
+
+@cli.command()
+@click.option(
+    "--n_samples",
+    default=SAMPLING_DEFAULTS["n_samples"],
+    help="Number of post-warmup posterior samples",
+)
+@click.option(
+    "--n_warmup", default=SAMPLING_DEFAULTS["n_warmup"], help="Number of warmup samples"
+)
+@click.option(
+    "--n_chains", default=SAMPLING_DEFAULTS["n_chains"], help="Number of MCMC chains"
+)
+@click.option(
+    "--n_cores",
+    default=SAMPLING_DEFAULTS["n_cores"],
+    help="Number of chains to run in parallel",
+)
+@click.option("--output_dir", default=".", help="Where to save Maud's output")
+@click.argument(
+    "data_path",
+    type=click.Path(exists=True, dir_okay=False),
+    default=get_example_path(RELATIVE_PATH_EXAMPLE),
+)
+def prior(data_path, **kwargs):
+    """Sample from the model defined by the data at data_path."""
+    stanfit = prior_check.prior_check(data_path, **kwargs)
