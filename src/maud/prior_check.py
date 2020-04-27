@@ -146,7 +146,6 @@ def prior_check(
                 limit = {model_fit.summary().loc[f'yflux_sim[{i+1}]', '95%']}"""
             )
 
-    
     if flux_within_bounds:
         print("All fluxes appear within prior specification")
 
