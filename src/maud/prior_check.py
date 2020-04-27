@@ -123,8 +123,11 @@ def prior_check(
         columns=["experiment_id", "target_id", "value", "uncertainty"],
     )
 
+    flux_within_bounds = 1
+
     for i, row in enumerate(reaction_measurements.iterrows()):
         if row[1]["value"] < model_fit.summary().loc[f"yflux_sim[{i+1}]", "5%"]:
+            flux_within_bounds = 0
             print(
                 f"""
                 {row[1]['target_id']} in experiment {row[1]['experiment_id']}
@@ -134,6 +137,7 @@ def prior_check(
             )
 
         if row[1]["value"] > model_fit.summary().loc[f"yflux_sim[{i+1}]", "95%"]:
+            flux_within_bounds = 1
             print(
                 f"""
                 {row[1]['target_id']} in experiment {row[1]['experiment_id']}
@@ -141,6 +145,10 @@ def prior_check(
                 flux = {row[1]['value']} \
                 limit = {model_fit.summary().loc[f'yflux_sim[{i+1}]', '95%']}"""
             )
+
+    
+    if flux_within_bounds:
+        print("All fluxes appear within prior specification")
 
     return model_fit
 
