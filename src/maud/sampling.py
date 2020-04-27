@@ -276,7 +276,7 @@ def get_initial_conditions(input_data):
     ):
         init_enzyme.loc[exp_id, enz_ix] = measurement
 
-    init_enzyme.fillna(value = DEFAULT_PRIOR_LOC_ENZYME, inplace=True)
+    init_enzyme.fillna(value=DEFAULT_PRIOR_LOC_ENZYME, inplace=True)
 
     return {
         "kinetic_parameters": input_data["prior_loc_kinetic_parameters"],
