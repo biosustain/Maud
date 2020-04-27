@@ -53,19 +53,20 @@ def get_full_stoichiometry(
     S.fillna(0, inplace=True)
     return S
 
+
 def get_knockout_matrix(
-    mi: MaudInput,
-    enzyme_codes: Dict[str, int],
-    experiment_codes: Dict[str, int],
-    ):
-    enzyme_knockout_matrix = pd.DataFrame(1,
-                                          index=np.arange(len(experiment_codes)),
-                                          columns=np.arange(len(enzyme_codes)))
+    mi: MaudInput, enzyme_codes: Dict[str, int], experiment_codes: Dict[str, int]
+):
+    enzyme_knockout_matrix = pd.DataFrame(
+        1, index=np.arange(len(experiment_codes)), columns=np.arange(len(enzyme_codes))
+    )
 
     for exp_name, exp in mi.experiments.items():
         if exp.knockouts:
             for enz in exp.knockouts:
-                enzyme_knockout_matrix.loc[experiment_codes[exp_name]-1, enzyme_codes[enz]-1] = 0
+                enzyme_knockout_matrix.loc[
+                    experiment_codes[exp_name] - 1, enzyme_codes[enz] - 1
+                ] = 0
 
     return enzyme_knockout_matrix
 
@@ -218,9 +219,9 @@ def get_input_data(
             column_ix = balanced_mic_codes[row["target_id"]]
             balanced_init.loc[row_ix, column_ix] = row["value"]
 
-    knockout_matrix = get_knockout_matrix(mi=mi,
-                                          experiment_codes=experiment_codes,
-                                          enzyme_codes=enzyme_codes)
+    knockout_matrix = get_knockout_matrix(
+        mi=mi, experiment_codes=experiment_codes, enzyme_codes=enzyme_codes
+    )
     return {
         "N_mic": len(mics),
         "N_unbalanced": len(unbalanced_mic_codes),
@@ -273,17 +274,20 @@ def get_input_data(
         "timepoint": timepoint,
     }
 
+
 def validate_init_enzyme(mi):
-    enzyme_validation = pd.DataFrame(columns = [
-    'reaction',
-    'enzyme',
-    'experiment',
-    'enzyme_concentration',
-    'kcat_prior',
-    'reaction_flux',
-    'scaling_factor',
-    'init_enzyme'
-    ])
+    enzyme_validation = pd.DataFrame(
+        columns=[
+            "reaction",
+            "enzyme",
+            "experiment",
+            "enzyme_concentration",
+            "kcat_prior",
+            "reaction_flux",
+            "scaling_factor",
+            "init_enzyme",
+        ]
+    )
 
     rxn_enz_dict = {
         rxn_name: list(rxn_data.enzymes.keys())
@@ -293,37 +297,54 @@ def validate_init_enzyme(mi):
     count = 0
 
     for exp_name, exp in mi.experiments.items():
-        for rxn, flux in exp.measurements['reaction'].items():
+        for rxn, flux in exp.measurements["reaction"].items():
             tmp_enz_kcat_array = []
             Vmax = 0
             for enz in rxn_enz_dict[rxn]:
                 try:
-                    tmp_enz_kcat_array.append([enz, exp.measurements['enzyme'][enz].value, mi.priors[f'{enz}_Kcat1'].location])
+                    tmp_enz_kcat_array.append(
+                        [
+                            enz,
+                            exp.measurements["enzyme"][enz].value,
+                            mi.priors[f"{enz}_Kcat1"].location,
+                        ]
+                    )
                 except:
-                    print(f"The enzyme: {enz} wasn't measured in experiment: {exp_name}")
-                    tmp_enz_kcat_array.append([enz, DEFAULT_PRIOR_LOC_ENZYME, mi.priors[f'{enz}_Kcat1'].location])
+                    print(
+                        f"The enzyme: {enz} wasn't measured in experiment: {exp_name}"
+                    )
+                    tmp_enz_kcat_array.append(
+                        [
+                            enz,
+                            DEFAULT_PRIOR_LOC_ENZYME,
+                            mi.priors[f"{enz}_Kcat1"].location,
+                        ]
+                    )
                 Vmax += tmp_enz_kcat_array[-1][1] * tmp_enz_kcat_array[-1][2]
             if Vmax < np.abs(flux.value):
                 scaling_factor = 1.5 * flux.value / Vmax
             else:
                 scaling_factor = 1
-                
+
             for enz in tmp_enz_kcat_array:
-                enzyme_validation.loc[count, 'reaction'] = rxn
-                enzyme_validation.loc[count, 'enzyme'] = enz[0]
-                enzyme_validation.loc[count, 'experiment'] = exp_name
-                enzyme_validation.loc[count, 'enzyme_concentration'] = enz[1]
-                enzyme_validation.loc[count, 'kcat_prior'] = enz[2]
-                enzyme_validation.loc[count, 'reaction_flux'] = np.abs(flux.value)
-                enzyme_validation.loc[count, 'scaling_factor'] = scaling_factor
-                enzyme_validation.loc[count, 'init_enzyme'] = np.abs(scaling_factor * enz[1])
+                enzyme_validation.loc[count, "reaction"] = rxn
+                enzyme_validation.loc[count, "enzyme"] = enz[0]
+                enzyme_validation.loc[count, "experiment"] = exp_name
+                enzyme_validation.loc[count, "enzyme_concentration"] = enz[1]
+                enzyme_validation.loc[count, "kcat_prior"] = enz[2]
+                enzyme_validation.loc[count, "reaction_flux"] = np.abs(flux.value)
+                enzyme_validation.loc[count, "scaling_factor"] = scaling_factor
+                enzyme_validation.loc[count, "init_enzyme"] = np.abs(
+                    scaling_factor * enz[1]
+                )
                 count += 1
     return enzyme_validation
 
+
 def get_initial_conditions(input_data, mi):
     """Specify parameters' initial conditions."""
-    experiment_codes = mi.stan_codes['experiment']
-    enzyme_codes = mi.stan_codes['enzyme']
+    experiment_codes = mi.stan_codes["experiment"]
+    enzyme_codes = mi.stan_codes["enzyme"]
 
     init_unbalanced = pd.DataFrame(
         input_data["prior_loc_unbalanced"],
@@ -344,7 +365,9 @@ def get_initial_conditions(input_data, mi):
     )
 
     for _, row in init_enzyme_df.iterrows():
-        init_enzyme.loc[experiment_codes[row["experiment"]], enzyme_codes[row["enzyme"]]] = row["init_enzyme"]
+        init_enzyme.loc[
+            experiment_codes[row["experiment"]], enzyme_codes[row["enzyme"]]
+        ] = row["init_enzyme"]
 
     init_enzyme.fillna(DEFAULT_PRIOR_LOC_ENZYME, inplace=True)
 
