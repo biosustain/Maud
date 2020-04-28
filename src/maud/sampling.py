@@ -18,6 +18,7 @@
 
 import os
 from typing import Dict
+from copy import deepcopy
 
 import cmdstanpy
 import numpy as np
@@ -345,9 +346,10 @@ def get_initial_conditions(input_data, mi):
     """Specify parameters' initial conditions."""
     experiment_codes = mi.stan_codes["experiment"]
     enzyme_codes = mi.stan_codes["enzyme"]
+    init_conc_unb = deepcopy(input_data["prior_loc_unbalanced"])
 
     init_unbalanced = pd.DataFrame(
-        input_data["prior_loc_unbalanced"],
+        init_conc_unb,
         index=range(1, input_data["N_experiment"] + 1),
         columns=input_data["unbalanced_mic_ix"],
     )
