@@ -17,8 +17,8 @@
 """Code for sampling from a posterior distribution."""
 
 import os
-from typing import Dict
 from copy import deepcopy
+from typing import Dict
 
 import cmdstanpy
 import numpy as np
@@ -55,9 +55,14 @@ def get_full_stoichiometry(
     return S
 
 
-def get_knockout_matrix(
-    mi: MaudInput, enzyme_codes: Dict[str, int], experiment_codes: Dict[str, int]
-):
+def get_knockout_matrix(mi: MaudInput):
+    """Get binary experiment, enzyme matrix, 1 if enyzme present, 0 if not.
+
+    :param mi: a MaudInput object
+    """
+    experiment_codes = mi.stan_codes["experiment"]
+    enzyme_codes = mi.stan_codes["enzyme"]
+
     enzyme_knockout_matrix = pd.DataFrame(
         1, index=np.arange(len(experiment_codes)), columns=np.arange(len(enzyme_codes))
     )
@@ -220,9 +225,8 @@ def get_input_data(
             column_ix = balanced_mic_codes[row["target_id"]]
             balanced_init.loc[row_ix, column_ix] = row["value"]
 
-    knockout_matrix = get_knockout_matrix(
-        mi=mi, experiment_codes=experiment_codes, enzyme_codes=enzyme_codes
-    )
+    knockout_matrix = get_knockout_matrix(mi=mi)
+
     return {
         "N_mic": len(mics),
         "N_unbalanced": len(unbalanced_mic_codes),
@@ -277,6 +281,10 @@ def get_input_data(
 
 
 def validate_init_enzyme(mi):
+    """Initilize enyme concentrations above their measured flux.
+
+    :param mi: a MaudInput object
+    """
     enzyme_validation = pd.DataFrame(
         columns=[
             "reaction",
@@ -310,7 +318,7 @@ def validate_init_enzyme(mi):
                             mi.priors[f"{enz}_Kcat1"].location,
                         ]
                     )
-                except:
+                except KeyError:
                     print(
                         f"The enzyme: {enz} wasn't measured in experiment: {exp_name}"
                     )
