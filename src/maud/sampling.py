@@ -28,8 +28,8 @@ from maud.data_model import KineticModel, MaudInput
 
 
 INCLUDE_PATH = "stan_code"
-DEFAULT_PRIOR_LOC_UNBALANCED = 1
-DEFAULT_PRIOR_SCALE_UNBALANCED = 4
+DEFAULT_PRIOR_LOC_UNBALANCED = 0.1
+DEFAULT_PRIOR_SCALE_UNBALANCED = 3
 DEFAULT_PRIOR_LOC_ENZYME = 0.1
 DEFAULT_PRIOR_SCALE_ENZYME = 3
 
@@ -268,6 +268,7 @@ def get_initial_conditions(input_data):
             init_unbalanced.loc[exp_ix, mic_ix] = measurement
 
     init_enzyme = pd.DataFrame(
+        DEFAULT_PRIOR_LOC_ENZYME,
         index=range(1, input_data["N_experiment"] + 1),
         columns=sorted(pd.unique(input_data["enzyme_yenz"])),
     )
