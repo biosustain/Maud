@@ -268,6 +268,7 @@ def get_initial_conditions(input_data):
             init_unbalanced.loc[exp_ix, mic_ix] = measurement
 
     init_enzyme = pd.DataFrame(
+        DEFAULT_PRIOR_LOC_ENZYME,
         index=range(1, input_data["N_experiment"] + 1),
         columns=sorted(pd.unique(input_data["enzyme_yenz"])),
     )
@@ -275,8 +276,6 @@ def get_initial_conditions(input_data):
         input_data["experiment_yenz"], input_data["enzyme_yenz"], input_data["yenz"]
     ):
         init_enzyme.loc[exp_id, enz_ix] = measurement
-
-    init_enzyme.fillna(value=DEFAULT_PRIOR_LOC_ENZYME, inplace=True)
 
     return {
         "kinetic_parameters": input_data["prior_loc_kinetic_parameters"],
