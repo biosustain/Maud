@@ -18,6 +18,7 @@
 
 import os
 from copy import deepcopy
+from itertools import product
 from typing import Dict
 
 import cmdstanpy
@@ -280,82 +281,97 @@ def get_input_data(
     }
 
 
-def validate_init_enzyme(mi):
-    """Initilize enyme concentrations above their measured flux.
+def get_init_enzyme(mi):
+    """Get initial enyme concentrations.
+
+    Some internal logic is required to ensure that enzyme concentrations are
+    always initialised implied vmax is always at least as high as the measured
+    flux.
 
     :param mi: a MaudInput object
+
     """
-    enzyme_validation = pd.DataFrame(
-        columns=[
-            "reaction",
-            "enzyme",
-            "experiment",
-            "enzyme_concentration",
-            "kcat_prior",
-            "reaction_flux",
-            "scaling_factor",
-            "init_enzyme",
+
+    def get_naive_init(mi):
+        enz_codes = mi.stan_codes["enzyme"]
+        exp_codes = mi.stan_codes["experiment"]
+        exp_ids, enz_ids = zip(*product(exp_codes.keys(), enz_codes.keys()))
+        out = pd.DataFrame(
+            {
+                "experiment_id": exp_ids,
+                "enzyme_id": enz_ids,
+                "init": DEFAULT_PRIOR_LOC_ENZYME,
+            }
+        ).set_index(["experiment_id", "enzyme_id"])
+        for (exp_id, enz_id), _ in out.iterrows():
+            measurements = mi.experiments[exp_id].measurements
+            if "enzyme" in measurements.keys():
+                if enz_id in measurements["enzyme"].keys():
+                    out.loc[(exp_id, enz_id), "init"] = measurements["enzyme"][
+                        enz_id
+                    ].value
+        return out.reset_index()
+
+    def get_greatest_measured_flux(exp_id, enz_id, mi):
+        measurements = mi.experiments[exp_id].measurements["reaction"]
+        rxn_ids = [
+            rid
+            for rid, r in mi.kinetic_model.reactions.items()
+            if enz_id in r.enzymes.keys() and rid in measurements.keys()
         ]
+        return (
+            max([measurements[rid].value for rid in rxn_ids])
+            if len(rxn_ids) > 0
+            else np.nan
+        )
+
+    def get_vmax_component(enz_id, init, mi):
+        return init * mi.priors[f"{enz_id}_Kcat1"].location
+
+    def get_lowest_vmax(exp_id, enz_id, inits, mi):
+        rxns = [
+            r for r in mi.kinetic_model.reactions.values() if enz_id in r.enzymes.keys()
+        ]
+        vmaxes = []
+        for rxn in rxns:
+            vmax_components = []
+            for enz_id in rxn.enzymes.keys():
+                init = inits.set_index(["experiment_id", "enzyme_id"]).loc[
+                    (exp_id, enz_id), "init"
+                ]
+                vmax_components.append(get_vmax_component(enz_id, init, mi))
+            vmaxes.append(sum(vmax_components))
+        return min(vmaxes)
+
+    e = get_naive_init(mi)
+    e["experiment_id_stan"] = e["experiment_id"].map(mi.stan_codes["experiment"])
+    e["enzyme_id_stan"] = e["enzyme_id"].map(mi.stan_codes["enzyme"])
+    e["measured_flux"] = e.apply(
+        lambda row: get_greatest_measured_flux(
+            row["experiment_id"], row["enzyme_id"], mi
+        ),
+        axis=1,
     )
-
-    rxn_enz_dict = {
-        rxn_name: list(rxn_data.enzymes.keys())
-        for rxn_name, rxn_data in mi.kinetic_model.reactions.items()
-    }
-
-    count = 0
-
-    for exp_name, exp in mi.experiments.items():
-        for rxn, flux in exp.measurements["reaction"].items():
-            tmp_enz_kcat_array = []
-            Vmax = 0
-            for enz in rxn_enz_dict[rxn]:
-                try:
-                    tmp_enz_kcat_array.append(
-                        [
-                            enz,
-                            exp.measurements["enzyme"][enz].value,
-                            mi.priors[f"{enz}_Kcat1"].location,
-                        ]
-                    )
-                except KeyError:
-                    print(
-                        f"The enzyme: {enz} wasn't measured in experiment: {exp_name}"
-                    )
-                    tmp_enz_kcat_array.append(
-                        [
-                            enz,
-                            DEFAULT_PRIOR_LOC_ENZYME,
-                            mi.priors[f"{enz}_Kcat1"].location,
-                        ]
-                    )
-                Vmax += tmp_enz_kcat_array[-1][1] * tmp_enz_kcat_array[-1][2]
-            if Vmax < np.abs(flux.value):
-                scaling_factor = 1.5 * flux.value / Vmax
-            else:
-                scaling_factor = 1
-
-            for enz in tmp_enz_kcat_array:
-                enzyme_validation.loc[count, "reaction"] = rxn
-                enzyme_validation.loc[count, "enzyme"] = enz[0]
-                enzyme_validation.loc[count, "experiment"] = exp_name
-                enzyme_validation.loc[count, "enzyme_concentration"] = enz[1]
-                enzyme_validation.loc[count, "kcat_prior"] = enz[2]
-                enzyme_validation.loc[count, "reaction_flux"] = np.abs(flux.value)
-                enzyme_validation.loc[count, "scaling_factor"] = scaling_factor
-                enzyme_validation.loc[count, "init_enzyme"] = np.abs(
-                    scaling_factor * enz[1]
-                )
-                count += 1
-    return enzyme_validation
+    e["vmax"] = e.apply(
+        lambda row: get_lowest_vmax(row["experiment_id"], row["enzyme_id"], e, mi),
+        axis=1,
+    )
+    # replace init with init * 1.5 * flux/vmax if vmax is too low
+    e["init_out"] = np.where(
+        e["vmax"] < e["measured_flux"],
+        e["init"] * 1.5 * e["measured_flux"] / e["vmax"],
+        e["init"],
+    )
+    return (
+        e.set_index(["experiment_id_stan", "enzyme_id_stan"])["init_out"]
+        .sort_index()
+        .unstack()
+    )
 
 
 def get_initial_conditions(input_data, mi):
     """Specify parameters' initial conditions."""
-    experiment_codes = mi.stan_codes["experiment"]
-    enzyme_codes = mi.stan_codes["enzyme"]
     init_conc_unb = deepcopy(input_data["prior_loc_unbalanced"])
-
     init_unbalanced = pd.DataFrame(
         init_conc_unb,
         index=range(1, input_data["N_experiment"] + 1),
@@ -366,21 +382,7 @@ def get_initial_conditions(input_data, mi):
     ):
         if mic_ix in input_data["unbalanced_mic_ix"]:
             init_unbalanced.loc[exp_ix, mic_ix] = measurement
-
-    init_enzyme_df = validate_init_enzyme(mi)
-
-    init_enzyme = pd.DataFrame(
-        index=range(1, input_data["N_experiment"] + 1),
-        columns=sorted(pd.unique(input_data["enzyme_yenz"])),
-    )
-
-    for _, row in init_enzyme_df.iterrows():
-        init_enzyme.loc[
-            experiment_codes[row["experiment"]], enzyme_codes[row["enzyme"]]
-        ] = row["init_enzyme"]
-
-    init_enzyme.fillna(DEFAULT_PRIOR_LOC_ENZYME, inplace=True)
-
+    init_enzyme = get_init_enzyme(mi)
     return {
         "kinetic_parameters": input_data["prior_loc_kinetic_parameters"],
         "conc_unbalanced": init_unbalanced.values,
