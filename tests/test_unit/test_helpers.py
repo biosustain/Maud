@@ -32,4 +32,4 @@ def test_show_versions(capsys):
 
     assert lines[7].startswith("Package Versions")
     assert lines[8].startswith("================")
-    assert any(l.startswith("maud") for l in lines[9:])
+    assert any(ln.startswith("maud") for ln in lines[9:])

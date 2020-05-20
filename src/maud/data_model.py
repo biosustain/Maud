@@ -17,7 +17,7 @@
 """Definitions of Maud-specific objects."""
 
 from collections import defaultdict
-from typing import Dict
+from typing import Dict, List
 
 
 class Compartment:
@@ -236,12 +236,14 @@ class Experiment:
         id: str,
         measurements: Dict[str, Dict[str, Measurement]] = None,
         metadata: str = None,
+        knockouts: List[str] = None,
     ):
         if measurements is None:
             measurements = defaultdict()
         self.id = id
         self.measurements = measurements
         self.metadata = metadata
+        self.knockouts = knockouts
 
 
 class Prior:

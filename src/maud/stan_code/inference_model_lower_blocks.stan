@@ -37,6 +37,7 @@ data {
   // network properties
   matrix[N_mic, N_enzyme] stoichiometric_matrix;
   int<lower=1,upper=N_metabolite> metabolite_ix_stoichiometric_matrix[N_mic];
+  matrix<lower=0,upper=1>[N_experiment, N_enzyme] knockout_enzymes;
   // configuration
   real<lower=0> conc_init[N_experiment, N_mic-N_unbalanced];
   real rtol;
@@ -63,9 +64,10 @@ transformed parameters {
   matrix[N_experiment, N_reaction] flux;
   vector[N_enzyme] delta_g = stoichiometric_matrix' * formation_energy[metabolite_ix_stoichiometric_matrix];
   for (e in 1:N_experiment){
+    vector[N_enzyme] temp_enzyme_concentration = (enzyme_concentration[e, ] .* knockout_enzymes[e, ])';
     vector[N_enzyme] keq = exp(delta_g / minus_RT);
     vector[N_unbalanced+N_enzyme+N_enzyme+N_kinetic_parameters] theta = append_row(append_row(append_row(
-      conc_unbalanced[e, ]', enzyme_concentration[e, ]'), keq), kinetic_parameters);
+      conc_unbalanced[e, ]', temp_enzyme_concentration), keq), kinetic_parameters);
     conc[e, balanced_mic_ix] = to_vector(integrate_ode_bdf(
                                     ode_func,
                                     conc_init[e,],

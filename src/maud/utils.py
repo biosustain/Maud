@@ -39,9 +39,9 @@ def sem_pct_to_lognormal_sigma(sem_pct, mean, n=3):
     return np.sqrt(np.log(1 + (s ** 2) / (mean ** 2)))
 
 
-def codify(l: Iterable[str]) -> Dict[str, int]:
+def codify(lx: Iterable[str]) -> Dict[str, int]:
     """Turn an iterable of strings into a dictionary mapping them to integer indexes."""
-    return dict(zip(l, range(1, len(l) + 1)))
+    return dict(zip(lx, range(1, len(lx) + 1)))
 
 
 def get_metabolite_codes(kinetic_model: KineticModel) -> Dict[str, int]:
