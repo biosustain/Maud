@@ -65,10 +65,9 @@ transformed parameters {
   vector[N_enzyme] delta_g = stoichiometric_matrix' * formation_energy[metabolite_ix_stoichiometric_matrix];
   for (e in 1:N_experiment){
     vector[N_enzyme] temp_enzyme_concentration = (enzyme_concentration[e, ] .* knockout_enzymes[e, ])';
-    vector[N_enzyme] temp_unbalanced_concentration = conc_unbalanced[e, ]';
     vector[N_enzyme] keq = exp(delta_g / minus_RT);
     vector[N_unbalanced+N_enzyme+N_enzyme+N_kinetic_parameters] theta = append_row(append_row(append_row(
-      temp_unbalanced_concentration, temp_enzyme_concentration), keq), kinetic_parameters);
+      conc_unbalanced[e, ]', temp_enzyme_concentration), keq), kinetic_parameters);
     conc[e, balanced_mic_ix] = to_vector(integrate_ode_bdf(
                                     ode_func,
                                     conc_init[e,],
