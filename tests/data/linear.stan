@@ -1,5 +1,6 @@
 functions{
 #include big_k_rate_equations.stan
+#include partial_sums.stan
 #include haldane_relationships.stan
 #include allostery.stan
   vector get_fluxes(real[] m, real[] p){
@@ -78,15 +79,15 @@ data {
   int<lower=1,upper=N_mic> balanced_mic_ix[N_mic-N_unbalanced];
   int<lower=1,upper=N_experiment> experiment_yconc[N_conc_measurement];
   int<lower=1,upper=N_mic> mic_ix_yconc[N_conc_measurement];
-  vector[N_conc_measurement] yconc;
+  real yconc[N_conc_measurement];
   vector<lower=0>[N_conc_measurement] sigma_conc;
   int<lower=1,upper=N_experiment> experiment_yflux[N_flux_measurement];
   int<lower=1,upper=N_reaction> reaction_yflux[N_flux_measurement];
-  vector[N_flux_measurement] yflux;
+  real yflux[N_flux_measurement];
   vector<lower=0>[N_flux_measurement] sigma_flux;
   int<lower=1,upper=N_experiment> experiment_yenz[N_enzyme_measurement];
   int<lower=1,upper=N_enzyme> enzyme_yenz[N_enzyme_measurement];
-  vector[N_enzyme_measurement] yenz;
+  real yenz[N_enzyme_measurement];
   vector<lower=0>[N_enzyme_measurement] sigma_enz;
   // hardcoded priors
   vector[N_metabolite] prior_loc_formation_energy;
@@ -153,15 +154,12 @@ model {
     enzyme_concentration[e] ~ lognormal(log(prior_loc_enzyme[e]), prior_scale_enzyme[e]);
   }
   if (LIKELIHOOD == 1){
-    for (c in 1:N_conc_measurement){
-      target += lognormal_lpdf(yconc[c] | log(conc[experiment_yconc[c], mic_ix_yconc[c]]), sigma_conc[c]);
-    }
-    for (ec in 1:N_enzyme_measurement){
-      target += lognormal_lpdf(yenz[ec] | log(enzyme_concentration[experiment_yenz[ec], enzyme_yenz[ec]]), sigma_enz[ec]);
-    }
-    for (f in 1:N_flux_measurement){
-      target += normal_lpdf(yflux[f] | flux[experiment_yflux[f], reaction_yflux[f]], sigma_flux[f]);
-    }
+    target += reduce_sum(partial_sum_conc, yconc, 1,
+                         conc, experiment_yconc, mic_ix_yconc, sigma_conc);
+    target += reduce_sum(partial_sum_enz, yenz, 1,
+                         enzyme_concentration, experiment_yenz, enzyme_yenz, sigma_enz);
+    target += reduce_sum(partial_sum_flux, yflux, 1,
+                         flux, experiment_yflux, reaction_yflux, sigma_flux);
   }
 }
 generated quantities {
