@@ -41,6 +41,7 @@ def test_linear():
         "timepoint": 500,
         "output_dir": temp_directory,
         "data_path": linear_input,
+        "threads_per_chain": 1,
     }
     fit = sampling.sample(**linear_input_values)
     samples_test = fit.get_drawset()

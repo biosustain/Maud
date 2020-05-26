@@ -97,6 +97,7 @@ pass
     help="How long the ODE simulates for (Units are whatever your time units are)",
 )
 @click.option("--output_dir", default=".", help="Where to save Maud's output")
+@click.option("--threads_per_chain", default=1, help="How many threads per chain")
 @click.argument(
     "data_path",
     type=click.Path(exists=True, dir_okay=False),

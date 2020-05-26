@@ -90,6 +90,7 @@ def sample(
     n_cores: int,
     timepoint: float,
     output_dir: str,
+    threads_per_chain: int,
 ) -> cmdstanpy.CmdStanMCMC:
     """Sample from a posterior distribution.
 
@@ -106,7 +107,10 @@ def sample(
     :param time_step: Amount of time for the ode solver to simulate in order to compare
     initial state with evolved state
     :param: output_dir: Directory to save output
+    :param: threads_per_chain: Number of threads per chain (default is 1)
     """
+    if threads_per_chain != 1:
+        os.environ["STAN_NUM_THREADS"] = str(threads_per_chain)
     model_name = os.path.splitext(os.path.basename(data_path))[0]
     input_filepath = os.path.join(output_dir, f"input_data_{model_name}.json")
 
@@ -135,8 +139,11 @@ def sample(
             if os.path.exists(p):
                 os.remove(p)
     include_path = os.path.join(here, INCLUDE_PATH)
+    cpp_options = {"STAN_THREADS": True} if threads_per_chain != 1 else None
     model = cmdstanpy.CmdStanModel(
-        stan_file=stan_program_filepath, stanc_options={"include_paths": [include_path]}
+        stan_file=stan_program_filepath,
+        stanc_options={"include_paths": [include_path]},
+        cpp_options=cpp_options,
     )
     return model.sample(
         data=input_filepath,
