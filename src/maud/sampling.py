@@ -203,7 +203,7 @@ def get_input_data(
             prior_loc_unb[ix] = p.location
             prior_scale_unb[ix] = p.scale
     prior_loc_formation_energy = [
-        mi.priors[k + "_formation_energy"].location for k in met_codes.keys()
+        mi.priors[k + "_formation_energy"].location - 17.1 for k in met_codes.keys()
     ]
     prior_scale_formation_energy = [
         mi.priors[k + "_formation_energy"].scale for k in met_codes.keys()
@@ -234,6 +234,7 @@ def get_input_data(
             balanced_init.loc[row_ix, column_ix] = row["value"]
 
     knockout_matrix = get_knockout_matrix(mi=mi)
+    adjustment = [0, 0, 0, 0, 0, 0, 0, 0, -81.8, 0, 0, 0, 0, 0]
 
     return {
         "N_mic": len(mics),
@@ -280,6 +281,7 @@ def get_input_data(
         "prior_scale_enzyme": prior_scale_enzyme,
         "conc_init": balanced_init.values,
         "knockout_enzymes": knockout_matrix.values,
+        "adjustment": adjustment,
         "rtol": rel_tol,
         "ftol": f_tol,
         "steps": max_steps,
