@@ -144,84 +144,94 @@ def create_fluxes_function(mi: MaudInput, template: Template) -> str:
     free_enzyme_ratio_lines = []
     flux_lines = []
     for _, rxn in kinetic_model.reactions.items():
-        substrate_ids = [mic_id for mic_id, s in rxn.stoichiometry.items() if s < 0]
-        product_ids = [mic_id for mic_id, s in rxn.stoichiometry.items() if s > 0]
-        enzyme_flux_strings = []
+        fixed_exchange_rxn = 0
         for enz_id, enz in rxn.enzymes.items():
-            substrate_stoichiometries = [
-                [substrate_id, rxn.stoichiometry[substrate_id]]
-                for substrate_id in substrate_ids
-            ]
-            product_stoichiometries = [
-                [product_id, rxn.stoichiometry[product_id]]
-                for product_id in product_ids
-            ]
-            enz_code = enz_codes_in_theta[enz.id]
-            competitor_ids = [
-                mod.mic
-                for mod in enz.modifiers.values()
-                if "competitive_inhibitor" in mod.modifier_type
-            ]
-            mod_substrates, mod_products, mod_competitors = get_modular_rate_codes(
-                enz_id,
-                competitor_ids,
-                substrate_stoichiometries,
-                product_stoichiometries,
-                kp_codes_in_theta,
-                mic_ode_string,
-            )
-            modular_line = modular_template.render(
-                enz_id=enz_id,
-                enz=enz_code,
-                Kcat1=kp_codes_in_theta[enz_id + "_" + "Kcat1"],
-                Keq=keq_codes_in_theta[enz_id],
-                substrate_list=mod_substrates,
-                product_list=mod_products,
-                competitive_inhibitor_list=mod_competitors,
-            )
-            modular_lines.append(modular_line)
-            # make catalytic effect string
-            enz_code = enz_codes[enz.id]
-            catalytic_string = (
-                f"modular_rate_law(Tr_{enz_id}, Dr_{enz_id}, Dr_reg_{enz_id})"
-            )
-            if any([mod.allosteric for mod in enz.modifiers.values()]):
-                # make free enzyme ratio line
-                free_enzyme_ratio_line = Template(
-                    "real free_enzyme_ratio_{{enzyme}} = "
-                    "get_free_enzyme_ratio_{{catalytic_string}};"
-                ).render(enzyme=enz_id, catalytic_string=catalytic_string)
-                free_enzyme_ratio_lines.append(free_enzyme_ratio_line)
-                # make regulatory effect string
-                allosteric_inhibitors, allosteric_activators = (
-                    {
-                        mod.mic: mod
-                        for mod in enz.modifiers.values()
-                        if mod.modifier_type == modifier_type
-                    }
-                    for modifier_type in [
-                        "allosteric_inhibitor",
-                        "allosteric_activator",
-                    ]
-                )
-                allosteric_inhibitor_codes = {
-                    mod_id: mic_ode_string[mod_id]
-                    for mod_id in allosteric_inhibitors.keys()
-                }
-                allosteric_activator_codes = {
-                    mod_id: mic_ode_string[mod_id]
-                    for mod_id in allosteric_activators.keys()
-                }
-                regulatory_string = get_regulatory_string(
-                    allosteric_inhibitor_codes,
-                    allosteric_activator_codes,
+            if "fixed_exchange" == enz.mechanism:
+                fixed_exchange_rxn = 1
+
+        if fixed_exchange_rxn is 0:
+            substrate_ids = [mic_id for mic_id, s in rxn.stoichiometry.items() if s < 0]
+            product_ids = [mic_id for mic_id, s in rxn.stoichiometry.items() if s > 0]
+            enzyme_flux_strings = []
+            for enz_id, enz in rxn.enzymes.items():
+                substrate_stoichiometries = [
+                    [substrate_id, rxn.stoichiometry[substrate_id]]
+                    for substrate_id in substrate_ids
+                ]
+                product_stoichiometries = [
+                    [product_id, rxn.stoichiometry[product_id]]
+                    for product_id in product_ids
+                ]
+                enz_code = enz_codes_in_theta[enz.id]
+                competitor_ids = [
+                    mod.mic
+                    for mod in enz.modifiers.values()
+                    if "competitive_inhibitor" in mod.modifier_type
+                ]
+                mod_substrates, mod_products, mod_competitors = get_modular_rate_codes(
+                    enz_id,
+                    competitor_ids,
+                    substrate_stoichiometries,
+                    product_stoichiometries,
                     kp_codes_in_theta,
-                    enz.id,
+                    mic_ode_string,
                 )
-                enzyme_flux_string = catalytic_string + "*" + regulatory_string
-            else:
-                enzyme_flux_string = catalytic_string
-            enzyme_flux_strings.append(enzyme_flux_string)
+                modular_line = modular_template.render(
+                    enz_id=enz_id,
+                    enz=enz_code,
+                    Kcat1=kp_codes_in_theta[enz_id + "_" + "Kcat1"],
+                    Keq=keq_codes_in_theta[enz_id],
+                    substrate_list=mod_substrates,
+                    product_list=mod_products,
+                    competitive_inhibitor_list=mod_competitors,
+                )
+                modular_lines.append(modular_line)
+                # make catalytic effect string
+                enz_code = enz_codes[enz.id]
+                catalytic_string = (
+                    f"modular_rate_law(Tr_{enz_id}, Dr_{enz_id}, Dr_reg_{enz_id})"
+                )
+                if any([mod.allosteric for mod in enz.modifiers.values()]):
+                    # make free enzyme ratio line
+                    free_enzyme_ratio_line = Template(
+                        "real free_enzyme_ratio_{{enzyme}} = "
+                        "get_free_enzyme_ratio_{{catalytic_string}};"
+                    ).render(enzyme=enz_id, catalytic_string=catalytic_string)
+                    free_enzyme_ratio_lines.append(free_enzyme_ratio_line)
+                    # make regulatory effect string
+                    allosteric_inhibitors, allosteric_activators = (
+                        {
+                            mod.mic: mod
+                            for mod in enz.modifiers.values()
+                            if mod.modifier_type == modifier_type
+                        }
+                        for modifier_type in [
+                            "allosteric_inhibitor",
+                            "allosteric_activator",
+                        ]
+                    )
+                    allosteric_inhibitor_codes = {
+                        mod_id: mic_ode_string[mod_id]
+                        for mod_id in allosteric_inhibitors.keys()
+                    }
+                    allosteric_activator_codes = {
+                        mod_id: mic_ode_string[mod_id]
+                        for mod_id in allosteric_activators.keys()
+                    }
+                    regulatory_string = get_regulatory_string(
+                        allosteric_inhibitor_codes,
+                        allosteric_activator_codes,
+                        kp_codes_in_theta,
+                        enz.id,
+                    )
+                    enzyme_flux_string = catalytic_string + "*" + regulatory_string
+                else:
+                    enzyme_flux_string = catalytic_string
+                enzyme_flux_strings.append(enzyme_flux_string)
+        else:
+            enz_code = enz_codes_in_theta[f"{rxn.id}"]
+            cat_code = kp_codes_in_theta[f"{rxn.id}_fixed_exchange"]
+            enzyme_flux_strings = [f"p[{cat_code}]" + "*" + f"p[{enz_code}]"]
         flux_line = "+".join(enzyme_flux_strings)
         flux_lines.append(flux_line)
     return template.render(

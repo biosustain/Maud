@@ -60,6 +60,7 @@ MECHANISM_TO_PARAM_IDS = {
         "Kic",
         "Kiq",
     ],
+    "fixed_exchange": ["fixed_exchange"]
 }
 
 
