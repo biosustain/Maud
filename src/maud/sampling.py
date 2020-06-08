@@ -234,7 +234,7 @@ def get_input_data(
             balanced_init.loc[row_ix, column_ix] = row["value"]
 
     knockout_matrix = get_knockout_matrix(mi=mi)
-    adjustment = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -81.8, -81.8, 0, 0, 0, 0, 0, -81.8, 0, 0, 0]
+    adjustment = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -81.8, 0, 0, 0, 0, 0, -81.8, 0, 0, 0]
     # adjustment done on the GND and PDC reactions
 
     return {
