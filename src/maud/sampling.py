@@ -397,7 +397,7 @@ def get_initial_conditions(input_data, mi):
         if mic_ix in input_data["unbalanced_mic_ix"]:
             init_unbalanced.loc[exp_ix, mic_ix] = measurement
     init_enzyme = get_init_enzyme(mi)
-    init_enzyme.loc[0:5, 23:24] = 0.00001
+    init_enzyme.loc[0:5, 22:23] = 0.000001
     return {
         "kinetic_parameters": input_data["prior_loc_kinetic_parameters"],
         "conc_unbalanced": init_unbalanced.values,
