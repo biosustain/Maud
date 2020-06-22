@@ -234,7 +234,7 @@ def get_input_data(
             balanced_init.loc[row_ix, column_ix] = row["value"]
 
     knockout_matrix = get_knockout_matrix(mi=mi)
-    adjustment = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -81.8, 0, 0, 0, 0, 0, -81.8, 0, 0, 0]
+    adjustment = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -81.8, 0, 0, 0, 0, 0, -81.8, 0, 0, 0, 0]
     # adjustment done on the GND and PDC reactions
 
     return {
@@ -397,7 +397,7 @@ def get_initial_conditions(input_data, mi):
         if mic_ix in input_data["unbalanced_mic_ix"]:
             init_unbalanced.loc[exp_ix, mic_ix] = measurement
     init_enzyme = get_init_enzyme(mi)
-    init_enzyme.loc[0:5, 22:23] = 0.000001
+    init_enzyme.loc[0:5, 22:23:24] = 0.000000001
     return {
         "kinetic_parameters": input_data["prior_loc_kinetic_parameters"],
         "conc_unbalanced": init_unbalanced.values,

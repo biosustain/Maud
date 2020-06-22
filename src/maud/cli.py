@@ -33,7 +33,7 @@ SAMPLING_DEFAULTS = {
     "n_warmup": 5,
     "n_chains": 4,
     "n_cores": 4,
-    "timepoint": 500,
+    "timepoint": 120,
 }
 RELATIVE_PATH_EXAMPLE = "../../data/in/linear.toml"
 
