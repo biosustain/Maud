@@ -256,7 +256,7 @@ def get_input_data(
         "mic_ix_yconc": mic_measurements["target_id"].map(mic_codes).values,
         "balanced_mic_ix": list(balanced_mic_codes.values()),
         "unbalanced_mic_ix": list(unbalanced_mic_codes.values()),
-        "yconc": mic_measurements["value"].values,
+        "yconc": mic_measurements["value"].values * 8,
         "sigma_conc": mic_measurements["uncertainty"].values,
         "experiment_yflux": (
             reaction_measurements["experiment_id"].map(experiment_codes).values
@@ -270,7 +270,7 @@ def get_input_data(
             enzyme_measurements["experiment_id"].map(experiment_codes).values
         ),
         "enzyme_yenz": (enzyme_measurements["target_id"].map(enzyme_codes).values),
-        "yenz": enzyme_measurements["value"].values,
+        "yenz": enzyme_measurements["value"].values * 8,
         "sigma_enz": enzyme_measurements["uncertainty"].values,
         "prior_loc_formation_energy": prior_loc_formation_energy,
         "prior_scale_formation_energy": prior_scale_formation_energy,
@@ -280,7 +280,7 @@ def get_input_data(
         "prior_scale_unbalanced": prior_scale_unb,
         "prior_loc_enzyme": prior_loc_enzyme,
         "prior_scale_enzyme": prior_scale_enzyme,
-        "conc_init": balanced_init.values,
+        "conc_init": balanced_init.values * 8,
         "knockout_enzymes": knockout_matrix.values,
         "adjustment": adjustment,
         "rtol": rel_tol,
