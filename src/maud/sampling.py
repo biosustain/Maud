@@ -400,7 +400,7 @@ def get_initial_conditions(input_data, mi):
     init_enzyme.loc[0:5, 22:23:24] = 0.000000001
     return {
         "kinetic_parameters": input_data["prior_loc_kinetic_parameters"],
-        "conc_unbalanced": init_unbalanced.values,
-        "enzyme_concentration": init_enzyme.values,
+        "conc_unbalanced": init_unbalanced.values * 8,
+        "enzyme_concentration": init_enzyme.values * 8,
         "formation_energy": input_data["prior_loc_formation_energy"],
     }
