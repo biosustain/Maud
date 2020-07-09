@@ -272,8 +272,7 @@ def get_input_data(
         "enzyme_yenz": (enzyme_measurements["target_id"].map(enzyme_codes).values),
         "yenz": enzyme_measurements["value"].values * 8,
         "sigma_enz": enzyme_measurements["uncertainty"].values,
-        "prior_loc_formation_energy": prior_loc_formation_energy,
-        "prior_scale_formation_energy": prior_scale_formation_energy,
+        "formation_energy": prior_loc_formation_energy,
         "prior_loc_kinetic_parameters": prior_loc_kp,
         "prior_scale_kinetic_parameters": prior_scale_kp,
         "prior_loc_unbalanced": prior_loc_unb,
@@ -402,5 +401,4 @@ def get_initial_conditions(input_data, mi):
         "kinetic_parameters": input_data["prior_loc_kinetic_parameters"],
         "conc_unbalanced": init_unbalanced.values * 8,
         "enzyme_concentration": init_enzyme.values * 8,
-        "formation_energy": input_data["prior_loc_formation_energy"],
     }

@@ -26,8 +26,7 @@ data {
   real yenz[N_enzyme_measurement];
   vector<lower=0>[N_enzyme_measurement] sigma_enz;
   // hardcoded priors
-  vector[N_metabolite] prior_loc_formation_energy;
-  vector<lower=0>[N_metabolite] prior_scale_formation_energy;
+  vector[N_metabolite] formation_energy;
   vector[N_kinetic_parameters] prior_loc_kinetic_parameters;
   vector<lower=0>[N_kinetic_parameters] prior_scale_kinetic_parameters;
   real prior_loc_unbalanced[N_experiment, N_unbalanced];
@@ -54,7 +53,6 @@ transformed data {
 
 }
 parameters {
-  vector[N_metabolite] formation_energy;
   vector<lower=0>[N_kinetic_parameters] kinetic_parameters;
   matrix<lower=0>[N_experiment, N_enzyme] enzyme_concentration;
   matrix<lower=0>[N_experiment, N_unbalanced] conc_unbalanced;
@@ -85,7 +83,6 @@ transformed parameters {
 }
 model {
   kinetic_parameters ~ lognormal(log(prior_loc_kinetic_parameters), prior_scale_kinetic_parameters);
-  formation_energy ~ normal(prior_loc_formation_energy, prior_scale_formation_energy);
   for (e in 1:N_experiment){
     conc_unbalanced[e] ~ lognormal(log(prior_loc_unbalanced[e]), prior_scale_unbalanced[e]);
     enzyme_concentration[e] ~ lognormal(log(prior_loc_enzyme[e]), prior_scale_enzyme[e]);
