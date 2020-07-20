@@ -219,10 +219,11 @@ def create_fluxes_function(mi: MaudInput, template: Template) -> str:
                         for mod_id in allosteric_activators.keys()
                     }
                     regulatory_string = get_regulatory_string(
-                        allosteric_inhibitor_codes,
-                        allosteric_activator_codes,
-                        kp_codes_in_theta,
-                        enz.id,
+                        inhibitor_codes=allosteric_inhibitor_codes,
+                        activator_codes=allosteric_activator_codes,
+                        num_subunits=enz.subunits,
+                        param_codes=kp_codes_in_theta,
+                        enzyme_name=enz.id,
                     )
                     enzyme_flux_string = catalytic_string + "*" + regulatory_string
                 else:
@@ -244,6 +245,7 @@ def create_fluxes_function(mi: MaudInput, template: Template) -> str:
 def get_regulatory_string(
     inhibitor_codes: Dict[str, int],
     activator_codes: Dict[str, int],
+    num_subunits: int,
     param_codes: Dict[str, int],
     enzyme_name: str,
 ) -> str:
@@ -262,7 +264,8 @@ def get_regulatory_string(
         free_enzyme_ratio_{{enzyme_name}},
         {{diss_r_str}},
         {{diss_t_str}},
-        p[{{transfer_constant_code}}]
+        p[{{transfer_constant_code}}],
+        {{num_subunits}}
     )""".replace(
             " ", ""
         ).replace(
@@ -304,6 +307,7 @@ def get_regulatory_string(
         diss_r_str=diss_r_str,
         diss_t_str=diss_t_str,
         transfer_constant_code=transfer_constant_code,
+        num_subunits=num_subunits,
     )
 
 

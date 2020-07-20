@@ -115,6 +115,8 @@ class Enzyme:
     :param reaction_id: the id of the reaction the enzyme catalyses
     :param name: human-understandable name for the enzyme
     :param mechanism: enzyme mechanism as a string
+    :param subunits: number of individual enzyme 'units' that combine to form
+    an active enzyme. [Allosteric case: Defined, else: None]
     :param modifiers: modifiers, given as {'modifier_id': modifier_object}
     :param parameters: enzyme parameters, give as {'parameter_id': parameter_object}
     """
@@ -127,6 +129,7 @@ class Enzyme:
         mechanism: str,
         parameters: Dict[str, Parameter],
         modifiers: Dict[str, Modifier] = None,
+        subunits: int = None,
     ):
         if modifiers is None:
             modifiers = defaultdict()
@@ -135,6 +138,7 @@ class Enzyme:
         self.mechanism = mechanism
         self.modifiers = modifiers
         self.parameters = parameters
+        self.subunits = subunits
 
 
 class Reaction:

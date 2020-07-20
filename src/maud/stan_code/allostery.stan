@@ -3,12 +3,13 @@ real get_regulatory_effect(real[] activator_concentration,    // metabolite
                            real free_enzyme_ratio,            // derived from rate equation
                            real[] dissociation_constant_r,    // parameter
                            real[] dissociation_constant_t,    // parameter
-                           real transfer_constant){           // parameter
+                           real transfer_constant,            // parameter
+                           real num_subunits){                // parameter
   real Q_num = size(inhibitor_concentration) == 0 ? 1 :
     1 + sum(to_vector(inhibitor_concentration) ./ to_vector(dissociation_constant_t));
   real Q_denom = size(activator_concentration) == 0 ? 1
     : 1 + sum(to_vector(activator_concentration) ./ to_vector(dissociation_constant_r));
-  real Q = transfer_constant * free_enzyme_ratio * Q_num / Q_denom;
+  real Q = transfer_constant * pow(free_enzyme_ratio * Q_num / Q_denom, num_subunits);
   return inv(1 + Q); 
 }
 real get_free_enzyme_ratio_uniuni(real A, real P, real V1, real V2, real Ka, real Keq){

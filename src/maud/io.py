@@ -229,11 +229,16 @@ def load_reaction_from_toml(toml_reaction: dict) -> Reaction:
                 modifiers.update(modifiers_of_this_type)
                 modifier_params.update(modifier_params_of_this_type)
         params = {**non_modifier_params, **modifier_params}
+        if 'subunits' in e.keys():
+            subunits = e['subunits']
+        else:
+            subunits = None
         enzymes[e["id"]] = Enzyme(
             id=e["id"],
             name=e["name"],
             reaction_id=toml_reaction["id"],
             mechanism=e["mechanism"],
+            subunits=subunits,
             parameters=params,
             modifiers=modifiers,
         )
