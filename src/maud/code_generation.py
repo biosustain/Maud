@@ -144,12 +144,12 @@ def create_fluxes_function(mi: MaudInput, template: Template) -> str:
     free_enzyme_ratio_lines = []
     flux_lines = []
     for _, rxn in kinetic_model.reactions.items():
-        fixed_exchange_rxn = 0
+        irr_mass_action_rxn = 0
         for enz_id, enz in rxn.enzymes.items():
-            if "fixed_exchange" == enz.mechanism:
-                fixed_exchange_rxn = 1
+            if "irr_mass_action" == enz.mechanism:
+                irr_mass_action_rxn = 1
 
-        if fixed_exchange_rxn is 0:
+        if irr_mass_action_rxn is 0:
             substrate_ids = [mic_id for mic_id, s in rxn.stoichiometry.items() if s < 0]
             product_ids = [mic_id for mic_id, s in rxn.stoichiometry.items() if s > 0]
             enzyme_flux_strings = []
@@ -231,8 +231,8 @@ def create_fluxes_function(mi: MaudInput, template: Template) -> str:
                 enzyme_flux_strings.append(enzyme_flux_string)
         else:
             enz_code = enz_codes_in_theta[f"{rxn.id}"]
-            cat_code = kp_codes_in_theta[f"{rxn.id}_fixed_exchange"]
-            enzyme_flux_strings = [f"p[{cat_code}]" + "*" + f"p[{enz_code}]"]
+            cat_code = kp_codes_in_theta[f"{rxn.id}_V1"]
+            enzyme_flux_strings = [f"irr_mass_action({bal_ode_code[[*rxn.stoichiometry.keys()][0]]},p[{cat_code}])"]
         flux_line = "+".join(enzyme_flux_strings)
         flux_lines.append(flux_line)
     return template.render(

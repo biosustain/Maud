@@ -60,7 +60,7 @@ MECHANISM_TO_PARAM_IDS = {
         "Kic",
         "Kiq",
     ],
-    "fixed_exchange": ["fixed_exchange"]
+    "irr_mass_action": ["V1"]
 }
 
 
