@@ -232,7 +232,7 @@ def create_fluxes_function(mi: MaudInput, template: Template) -> str:
         else:
             enz_code = enz_codes_in_theta[f"{rxn.id}"]
             cat_code = kp_codes_in_theta[f"{rxn.id}_V1"]
-            enzyme_flux_strings = [f"irr_mass_action({bal_ode_code[[*rxn.stoichiometry.keys()][0]]},p[{cat_code}])"]
+            enzyme_flux_strings = [f"irr_mass_action({bal_ode_code[[*rxn.stoichiometry.keys()][0]]},p[{enz_code}])"]
         flux_line = "+".join(enzyme_flux_strings)
         flux_lines.append(flux_line)
     return template.render(

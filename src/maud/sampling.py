@@ -234,7 +234,7 @@ def get_input_data(
             balanced_init.loc[row_ix, column_ix] = row["value"]
 
     knockout_matrix = get_knockout_matrix(mi=mi)
-    adjustment = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -81.8, 0, 0, 0, 0, 0, -81.8, 0, 0, 0, 0]
+    adjustment = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -81.8, 0, 0, 0, 0, 0, 0, 0, 0]
     # adjustment done on the GND and PDC reactions
 
     return {
@@ -265,7 +265,7 @@ def get_input_data(
             reaction_measurements["target_id"].map(reaction_codes).values
         ),
         "yflux": reaction_measurements["value"].values,
-        "sigma_flux": np.array(reaction_measurements["value"].values)*0.1,
+        "sigma_flux": reaction_measurements["uncertainty"].values,
         "experiment_yenz": (
             enzyme_measurements["experiment_id"].map(experiment_codes).values
         ),
