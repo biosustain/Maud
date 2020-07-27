@@ -25,8 +25,8 @@ from maud import sampling
 
 SAMPLING_DEFAULTS = {
     "f_tol_as": 1e-6,
-    "rel_tol_as": 1e-9,
-    "abs_tol_as": 1e-12,
+    "rel_tol_as": 1e-6,
+    "abs_tol_as": 1e-6,
     "max_steps_as": int(1e9),
     "likelihood": 1,
     "n_samples": 5,
@@ -35,7 +35,7 @@ SAMPLING_DEFAULTS = {
     "n_cores": 4,
     "timepoint": 500,
 }
-RELATIVE_PATH_EXAMPLE = "../../data/in/linear.toml"
+RELATIVE_PATH_EXAMPLE = "../../tests/data/linear.toml"
 
 
 def get_example_path(relative_path_example):

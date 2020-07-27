@@ -107,12 +107,6 @@ def get_stan_codes(km: KineticModel, experiments) -> Dict[str, Dict[str, int]]:
     """
     rxns = km.reactions.values()
     enzyme_ids = [eid for rxn in rxns for eid in rxn.enzymes.keys()]
-    kinetic_parameter_ids = [
-        f"{enzyme_id}_{parameter_id}"
-        for reaction in km.reactions.values()
-        for enzyme_id, enzyme in reaction.enzymes.items()
-        for parameter_id in enzyme.parameters.keys()
-    ]
     mic_codes = codify(km.mics.keys())
     balanced_mic_codes = {
         mic_id: code for mic_id, code in mic_codes.items() if km.mics[mic_id].balanced
@@ -127,7 +121,6 @@ def get_stan_codes(km: KineticModel, experiments) -> Dict[str, Dict[str, int]]:
         "metabolite_in_compartment": mic_codes,
         "balanced_mic": balanced_mic_codes,
         "unbalanced_mic": unbalanced_mic_codes,
-        "kinetic_parameter": codify(kinetic_parameter_ids),
         "reaction": codify(km.reactions.keys()),
         "experiment": codify(experiments.keys()),
         "enzyme": codify(enzyme_ids),
@@ -232,8 +225,6 @@ def load_reaction_from_toml(toml_reaction: dict) -> Reaction:
             id=e["id"],
             name=e["name"],
             reaction_id=toml_reaction["id"],
-            mechanism=e["mechanism"],
-            parameters=params,
             modifiers=modifiers,
         )
     return Reaction(
@@ -274,30 +265,45 @@ def load_maud_input_from_toml(filepath: str, id: str = "mi") -> MaudInput:
         if "knockouts" in e.keys():
             experiment.knockouts = e["knockouts"]
         experiments.update({experiment.id: experiment})
-    priors = {}
-    for formation_energy_prior in parsed_toml["priors"]["thermodynamic_parameters"][
-        "formation_energies"
-    ]:
-        prior_id = f"{formation_energy_prior['target_id']}_formation_energy"
-        priors[prior_id] = Prior(
-            id=prior_id,
-            target_id=formation_energy_prior["target_id"],
-            location=formation_energy_prior["location"],
-            scale=formation_energy_prior["scale"],
-            target_type="thermodynamic_parameter",
-        )
-    for enz_id, kpps in parsed_toml["priors"]["kinetic_parameters"].items():
-        for kpp in kpps:
-            prior_id = f"{enz_id}_{kpp['target_id']}"
-            if "metabolite" in kpp.keys():
-                prior_id += "_" + kpp["metabolite"]
-            priors[prior_id] = Prior(
-                id=prior_id,
-                target_id=kpp["target_id"],
-                location=kpp["location"],
-                scale=kpp["scale"],
-                target_type="kinetic_parameter",
+    priors = {
+        "kcats": [],
+        "kms": [],
+        "enzyme_concentrations": [],
+        "formation_energies": [],
+        "unbalanced_metabolites": [],
+    }
+    for prior in parsed_toml["priors"]["formation_energies"]:
+        metabolite_id = prior["metabolite_id"]
+        priors["formation_energies"].append(
+            Prior(
+                id=f"formation_energy_{metabolite_id}",
+                location=prior["location"],
+                scale=prior["scale"],
+                metabolite_id=metabolite_id
             )
+        )
+    for prior in parsed_toml["priors"]["kms"]:
+        enzyme_id = prior["enzyme_id"]
+        mic_id = prior["mic_id"]
+        priors["kms"].append(
+            Prior(
+                id=f"km_{enzyme_id}_{mic_id}",
+                location=prior["location"],
+                scale=prior["scale"],
+                mic_id=mic_id,
+                enzyme_id=enzyme_id
+            )
+        )
+    for prior in parsed_toml["priors"]["kcats"]:
+        enzyme_id = prior["enzyme_id"]
+        priors["kcats"].append(
+            Prior(
+                id=f"kcat_{enzyme_id}",
+                location=prior["location"],
+                scale=prior["scale"],
+                enzyme_id=enzyme_id
+            )
+        )
     stan_codes = get_stan_codes(kinetic_model, experiments)
     mi = MaudInput(
         kinetic_model=kinetic_model,

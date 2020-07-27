@@ -1,24 +1,47 @@
-real Tr_{{enz_id}} = p[{{enz}}]*p[{{Kcat1}}]
-                *  {%- for su in substrate_list %} ({{su[0]}}/p[{{su[1]}}])^(-1*{{su[2]}}) {{"*" if not loop.last}}
-                {%- endfor %}
-                - p[{{enz}}]*p[{{Kcat1}}]/p[{{Keq}}]
-                *  {%- for su in substrate_list %} (p[{{su[1]}}])^{{su[2]}} {{"*" if not loop.last}}
-                {%- endfor %}
-                *  {%- for pr in product_list %} (p[{{pr[1]}}])^{{pr[2]}} {{"*" if not loop.last}}
-                {%- endfor %}
-                *  {%- for pr in product_list %} ({{pr[0]}}/p[{{pr[1]}}])^{{pr[2]}} {{"*" if not loop.last}}
-                {%- endfor %};
+real get_Tr(vector metabolite,
+            vector km,
+            vector stoichiometry,
+            real kcat,
+            real keq){
+  real plus_product = 1;
+  real minus_product = 1;
+  real k_minus = (kcat / keq);
+  for (m in 1:size(metabolite)){
+    real multiplicand = (metabolite[m] / km[m]) ^ abs(stoichiometry[m]);
+    k_minus *= km[m] ^ stoichiometry[m];
+    if (stoichiometry[m] < 0)
+      plus_product *= multiplicand;
+    else
+      minus_product *= multiplicand;
+  }
+  return kcat * plus_product - k_minus * minus_product;
+}
 
-real Dr_{{enz_id}} = {%- for su in substrate_list %} (1 + {{su[0]}}/p[{{su[1]}}])^(-1*{{su[2]}}) {{"*" if not loop.last}}
-                {%- endfor %}
-                + {%- for pr in product_list %} (1 + {{pr[0]}}/p[{{pr[1]}}])^{{pr[2]}} {{"*" if not loop.last}}
-                {%- endfor %}
-                - 1;
+real get_Dr_common_rate_law(vector metabolite, vector km, vector stoichiometry){
+  real psi_plus = 1;
+  real psi_minus = 1;
+  for (m in 1:size(metabolite)){
+    real multiplicand = (1 + metabolite[m] / km[m]) ^ abs(stoichiometry[m]);
+    if (stoichiometry[m] < 0)
+      psi_plus *= multiplicand;
+    else
+      psi_minus *= multiplicand;
+  }
+  return psi_plus + psi_minus - 1;
+}
 
-{% if competitive_inhibitor_list %}
-real Dr_reg_{{enz_id}} = {%- for ci in competitive_inhibitor_list %} ({{ci[0]}}/p[{{ci[1]}}]) {{"*" if not loop.last}}
-    {%- endfor %};
+real get_Dr_reg(){
+  return 0;
+}
 
-{% else %}
-real Dr_reg_{{enz_id}} = 0;
-    {%- endif %}
+real modular_rate_law(vector metabolite,
+                      vector km,
+                      vector stoichiometry,
+                      real kcat,
+                      real keq,
+                      real enz){
+  real Tr = get_Tr(metabolite, km, stoichiometry, kcat, keq);
+  real Dr = get_Dr_common_rate_law(metabolite, km, stoichiometry);
+  real Dr_reg = get_Dr_reg();
+  return enz * Tr / (Dr + Dr_reg);
+}

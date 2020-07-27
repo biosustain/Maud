@@ -34,6 +34,7 @@ DEFAULT_PRIOR_LOC_UNBALANCED = 0.1
 DEFAULT_PRIOR_SCALE_UNBALANCED = 3
 DEFAULT_PRIOR_LOC_ENZYME = 0.1
 DEFAULT_PRIOR_SCALE_ENZYME = 3
+STAN_PROGRAM_RELATIVE_PATH = "stan_code/inference_model.stan"
 
 
 def get_full_stoichiometry(
@@ -57,7 +58,7 @@ def get_full_stoichiometry(
 
 
 def get_knockout_matrix(mi: MaudInput):
-    """Get binary experiment, enzyme matrix, 1 if enyzme present, 0 if not.
+    """Get binary experiment, enzyme matrix, 1 if enyzme knocked out, 0 if not.
 
     :param mi: a MaudInput object
     """
@@ -65,7 +66,7 @@ def get_knockout_matrix(mi: MaudInput):
     enzyme_codes = mi.stan_codes["enzyme"]
 
     enzyme_knockout_matrix = pd.DataFrame(
-        1, index=np.arange(len(experiment_codes)), columns=np.arange(len(enzyme_codes))
+        0, index=np.arange(len(experiment_codes)), columns=np.arange(len(enzyme_codes))
     )
 
     for exp_name, exp in mi.experiments.items():
@@ -73,9 +74,19 @@ def get_knockout_matrix(mi: MaudInput):
             for enz in exp.knockouts:
                 enzyme_knockout_matrix.loc[
                     experiment_codes[exp_name] - 1, enzyme_codes[enz] - 1
-                ] = 0
+                ] = 1
 
     return enzyme_knockout_matrix
+
+
+def get_km_lookup(km_priors, mic_codes, enzyme_codes):
+    """Get a mics x enzymes matrix of km indexes. 0 means null"""
+    out = pd.DataFrame(0, index=mic_codes.values(), columns=enzyme_codes.values())
+    for i, row in km_priors.iterrows():
+        mic_code = mic_codes[row["mic_id"]]
+        enzyme_code = enzyme_codes[row["enzyme_id"]]
+        out.loc[mic_code, enzyme_code] = i + 1
+    return out
 
 
 def sample(
@@ -111,6 +122,8 @@ def sample(
     """
     if threads_per_chain != 1:
         os.environ["STAN_NUM_THREADS"] = str(threads_per_chain)
+
+    cmdstanpy.set_cmdstan_path("/Users/tedgro/.cmdstanpy/cmdstan-2.24.0-rc1")
     model_name = os.path.splitext(os.path.basename(data_path))[0]
     input_filepath = os.path.join(output_dir, f"input_data_{model_name}.json")
 
@@ -123,21 +136,7 @@ def sample(
 
     cmdstanpy.utils.jsondump(input_filepath, input_data)
 
-    stan_program_filename = f"inference_model_{model_name}.stan"
-    stan_program_filepath = os.path.join(output_dir, stan_program_filename)
-    exe_file_path = stan_program_filepath[:-5]
-    stan_code = code_generation.create_stan_program(mi, "inference")
-    exe_file_exists = os.path.exists(exe_file_path)
-    change_in_stan_code = not utils.match_string_to_file(
-        stan_code, stan_program_filepath
-    )
-    need_to_overwrite = (not exe_file_exists) or change_in_stan_code
-    if need_to_overwrite:
-        with open(stan_program_filepath, "w") as f:
-            f.write(stan_code)
-        for p in [exe_file_path, exe_file_path + ".o", exe_file_path + ".hpp"]:
-            if os.path.exists(p):
-                os.remove(p)
+    stan_program_filepath = os.path.join(here, STAN_PROGRAM_RELATIVE_PATH)
     include_path = os.path.join(here, INCLUDE_PATH)
     cpp_options = {"STAN_THREADS": True} if threads_per_chain != 1 else None
     model = cmdstanpy.CmdStanModel(
@@ -180,7 +179,6 @@ def get_input_data(
     reactions = mi.kinetic_model.reactions
     reaction_codes = mi.stan_codes["reaction"]
     enzyme_codes = mi.stan_codes["enzyme"]
-    kp_codes = mi.stan_codes["kinetic_parameter"]
     experiment_codes = mi.stan_codes["experiment"]
     met_codes = mi.stan_codes["metabolite"]
     mic_codes = mi.stan_codes["metabolite_in_compartment"]
@@ -192,22 +190,31 @@ def get_input_data(
     enzymes = {k: v for r in reactions.values() for k, v in r.enzymes.items()}
     full_stoic = get_full_stoichiometry(mi.kinetic_model, enzyme_codes, mic_codes)
     # priors
-    prior_loc_kp = [mi.priors[k].location for k in kp_codes.keys()]
-    prior_scale_kp = [mi.priors[k].scale for k in kp_codes.keys()]
+    km_priors = pd.DataFrame({
+        "location": [p.location for p in mi.priors["kms"]],
+        "scale": [p.scale for p in mi.priors["kms"]],
+        "enzyme_id": [p.enzyme_id for p in mi.priors["kms"]],
+        "mic_id": [p.mic_id for p in mi.priors["kms"]],
+    })
+    kcat_priors = pd.DataFrame({
+        "location": [p.location for p in mi.priors["kcats"]],
+        "scale": [p.scale for p in mi.priors["kcats"]],
+        "enzyme_id": [p.enzyme_id for p in mi.priors["kcats"]],
+    })
+    formation_energy_priors = pd.DataFrame({
+        "location": [p.location for p in mi.priors["formation_energies"]],
+        "scale": [p.scale for p in mi.priors["formation_energies"]],
+        "metabolite_id": [p.metabolite_id for p in mi.priors["formation_energies"]],
+
+    })
     unb_shape = len(mi.experiments), len(unbalanced_mic_codes)
     prior_loc_unb = np.full(unb_shape, DEFAULT_PRIOR_LOC_UNBALANCED)
     prior_scale_unb = np.full(unb_shape, DEFAULT_PRIOR_SCALE_UNBALANCED)
-    for p in mi.priors.values():
-        if p.target_type == "metabolite_concentration":
-            ix = [experiment_codes[mic_codes[p.target_id - 1], p.experiment_id] - 1]
+    if "mic_concentrations" in mi.priors.keys():
+        for p in mi.priors["mic_concentrations"]:
+            ix = [experiment_codes[mic_codes[p.mic_id - 1], p.experiment_id] - 1]
             prior_loc_unb[ix] = p.location
             prior_scale_unb[ix] = p.scale
-    prior_loc_formation_energy = [
-        mi.priors[k + "_formation_energy"].location for k in met_codes.keys()
-    ]
-    prior_scale_formation_energy = [
-        mi.priors[k + "_formation_energy"].scale for k in met_codes.keys()
-    ]
     enzyme_shape = len(mi.experiments), len(enzymes)
     prior_loc_enzyme = np.full(enzyme_shape, DEFAULT_PRIOR_LOC_ENZYME)
     prior_scale_enzyme = np.full(enzyme_shape, DEFAULT_PRIOR_SCALE_ENZYME)
@@ -224,36 +231,34 @@ def get_input_data(
         for measurement_type in ["metabolite", "reaction", "enzyme"]
     )
 
-    balanced_init = pd.DataFrame(
-        0.01, index=experiment_codes.values(), columns=balanced_mic_codes.values()
+    conc_init = pd.DataFrame(
+        0.01, index=experiment_codes.values(), columns=mic_codes.values()
     )
     for _i, row in mic_measurements.iterrows():
         if row["target_id"] in balanced_mic_codes.keys():
             row_ix = experiment_codes[row["experiment_id"]]
-            column_ix = balanced_mic_codes[row["target_id"]]
-            balanced_init.loc[row_ix, column_ix] = row["value"]
+            column_ix = mic_codes[row["target_id"]]
+            conc_init.loc[row_ix, column_ix] = row["value"]
 
     knockout_matrix = get_knockout_matrix(mi=mi)
-
+    km_lookup = get_km_lookup(km_priors, mic_codes, enzyme_codes)
     return {
         "N_mic": len(mics),
         "N_unbalanced": len(unbalanced_mic_codes),
-        "N_kinetic_parameters": len(kp_codes),
+        "N_metabolite": len(metabolites),
+        "N_km": len(km_priors),
         "N_reaction": len(reactions),
         "N_enzyme": len(enzymes),
         "N_experiment": len(mi.experiments),
         "N_flux_measurement": len(reaction_measurements),
         "N_enzyme_measurement": len(enzyme_measurements),
         "N_conc_measurement": len(mic_measurements),
-        "N_metabolite": len(metabolites),
-        "stoichiometric_matrix": full_stoic.T.values,
-        "metabolite_ix_stoichiometric_matrix": list(mic_to_met.values()),
+        "unbalanced_mic_ix": list(unbalanced_mic_codes.values()),
+        "balanced_mic_ix": list(balanced_mic_codes.values()),
         "experiment_yconc": (
             mic_measurements["experiment_id"].map(experiment_codes).values
         ),
         "mic_ix_yconc": mic_measurements["target_id"].map(mic_codes).values,
-        "balanced_mic_ix": list(balanced_mic_codes.values()),
-        "unbalanced_mic_ix": list(unbalanced_mic_codes.values()),
         "yconc": mic_measurements["value"].values,
         "sigma_conc": mic_measurements["uncertainty"].values,
         "experiment_yflux": (
@@ -270,19 +275,24 @@ def get_input_data(
         "enzyme_yenz": (enzyme_measurements["target_id"].map(enzyme_codes).values),
         "yenz": enzyme_measurements["value"].values,
         "sigma_enz": enzyme_measurements["uncertainty"].values,
-        "prior_loc_formation_energy": prior_loc_formation_energy,
-        "prior_scale_formation_energy": prior_scale_formation_energy,
-        "prior_loc_kinetic_parameters": prior_loc_kp,
-        "prior_scale_kinetic_parameters": prior_scale_kp,
+        "prior_loc_formation_energy": formation_energy_priors["location"].values,
+        "prior_scale_formation_energy": formation_energy_priors["scale"].values,
+        "prior_loc_km": km_priors["location"].values,
+        "prior_scale_km": km_priors["scale"].values,
+        "prior_loc_kcat": kcat_priors["location"].values,
+        "prior_scale_kcat": kcat_priors["scale"].values,
         "prior_loc_unbalanced": prior_loc_unb,
         "prior_scale_unbalanced": prior_scale_unb,
         "prior_loc_enzyme": prior_loc_enzyme,
         "prior_scale_enzyme": prior_scale_enzyme,
-        "conc_init": balanced_init.values,
-        "knockout_enzymes": knockout_matrix.values,
-        "rtol": rel_tol,
-        "ftol": f_tol,
-        "steps": max_steps,
+        "S": full_stoic.T.values,
+        "metabolite_ix_stoichiometric_matrix": list(mic_to_met.values()),
+        "conc_init": conc_init.values,
+        "is_knockout": knockout_matrix.values,
+        "km_lookup": km_lookup.values,
+        "rel_tol": rel_tol,
+        "abs_tol": f_tol,
+        "max_num_steps": max_steps,
         "LIKELIHOOD": likelihood,
         "timepoint": timepoint,
     }
@@ -332,8 +342,11 @@ def get_init_enzyme(mi):
             else np.nan
         )
 
-    def get_vmax_component(enz_id, init, mi):
-        return init * mi.priors[f"{enz_id}_Kcat1"].location
+    def get_vmax_component(enzyme_id, init, mi):
+        kcat = [
+            p.location for p in mi.priors["kcats"] if p.enzyme_id == enzyme_id
+        ][0]
+        return init * kcat
 
     def get_lowest_vmax(exp_id, enz_id, inits, mi):
         rxns = [
@@ -391,7 +404,8 @@ def get_initial_conditions(input_data, mi):
             init_unbalanced.loc[exp_ix, mic_ix] = measurement
     init_enzyme = get_init_enzyme(mi)
     return {
-        "kinetic_parameters": input_data["prior_loc_kinetic_parameters"],
+        "km": input_data["prior_loc_km"],
+        "kcat": input_data["prior_loc_kcat"],
         "conc_unbalanced": init_unbalanced.values,
         "enzyme_concentration": init_enzyme.values,
         "formation_energy": input_data["prior_loc_formation_energy"],
