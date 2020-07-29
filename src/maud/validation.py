@@ -46,14 +46,21 @@ def validate_maud_input(mi: data_model.MaudInput):
     model_formation_energies = [
         f"formation_energy_{met_id}" for met_id in model_metabolites
     ]
+    model_kis = [
+        f"ki_{enz.id}_{modifier.mic_id}"
+        for rxn in model.reactions.values()
+        for enz in rxn.enzymes.values()
+        for modifier in enz.modifiers["competitive_inhibitor"]
+    ]
     prior_kms = [p.id for p in mi.priors["kms"]]
     prior_kcats = [p.id for p in mi.priors["kcats"]]
+    prior_kis = [p.id for p in mi.priors["inhibition_constants"]]
     prior_formation_energies = [p.id for p in mi.priors["formation_energies"]]
     prior_enzyme_concentrations = [p.id for p in mi.priors["enzyme_concentrations"]]
     prior_unbalanced_metabolites = [p.id for p in mi.priors["unbalanced_metabolites"]]
     for model_pars, prior_pars in zip(
-        [model_kms, model_kcats, model_formation_energies],
-        [prior_kms, prior_kcats, prior_formation_energies]
+        [model_kms, model_kcats, model_formation_energies, model_kis],
+        [prior_kms, prior_kcats, prior_formation_energies, prior_kis]
     ):
         for prior_par in prior_pars:
             msg = f"{prior_par} is in the priors but not the kinetic model."

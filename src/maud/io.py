@@ -127,63 +127,6 @@ def get_stan_codes(km: KineticModel, experiments) -> Dict[str, Dict[str, int]]:
     }
 
 
-def get_non_modifier_params(
-    enzyme_id: str, enzyme_mechanism: str, stoichiometry: dict
-) -> Dict[str, Parameter]:
-    """Get the non-modifer parameters for an enzyme.
-
-    :param enzyme_id: String identifying the enzyme
-    :param enzyme_mechanism: String identifying the enzyme's mechanism,
-    e.g. 'ordered_bibi'
-    :param stoichiometry: Dictionary representing the reaction's stoichiometry. The
-    keys are metabolite ids and the values are stoichiometries.
-
-    """
-    if enzyme_mechanism == "modular_rate_law":
-        substrates = [k for k, v in stoichiometry.items() if v < 0]
-        products = [k for k, v in stoichiometry.items() if v > 0]
-        substrate_param_ids = [
-            "K" + letter for substrate, letter in zip(substrates, ascii_lowercase)
-        ]
-        product_param_ids = [
-            "K" + letter for product, letter in zip(products, ascii_lowercase[15:])
-        ]
-        param_ids = substrate_param_ids + product_param_ids + ["Kcat1"]
-        return {param_id: Parameter(param_id, enzyme_id) for param_id in param_ids}
-    else:
-        return {
-            param_id: Parameter(param_id, enzyme_id)
-            for param_id in MECHANISM_TO_PARAM_IDS[enzyme_mechanism]
-        }
-
-
-def parse_modifiers(
-    modifier_type: str, modifiers: List[str], enzyme_id: str, param_prefix: str
-) -> Tuple:
-    """Turn unformatted modifier info into dictionaries of Modifier and Parameter objects.
-
-    :param modifier_type: String identifying the type of modifier. One of
-    'allosteric_inhibitor', 'allosteric_activator', 'competitive_inhibitor'
-
-    :param modifier: List of strings identifying modifying metabolites.
-
-    :param enzyme id: String identifying the enzyme that is modified.
-
-    :param_prefix: String that goes before the metabolite id in order to
-    identify the metabolite-specific parameters.
-
-    """
-    modifier_dict = {}
-    modifier_params = {}
-    for modifier in modifiers:
-        modifier_dict[f"{modifier}_{modifier_type}"] = Modifier(modifier, modifier_type)
-        param_id = f"{param_prefix}_{modifier}"
-        modifier_params[param_id] = Parameter(param_id, enzyme_id, modifier)
-    if modifier_type in ["allosteric_inhibitor", "allosteric_activator"]:
-        modifier_params["transfer_constant"] = Parameter("transfer_constant", enzyme_id)
-    return modifier_dict, modifier_params
-
-
 def load_reaction_from_toml(toml_reaction: dict) -> Reaction:
     """Turn a dictionary representing a reaction into a Reaction object.
 
@@ -199,28 +142,21 @@ def load_reaction_from_toml(toml_reaction: dict) -> Reaction:
         toml_reaction["is_exchange"] if "is_exchange" in toml_reaction.keys() else None
     )
     for e in toml_reaction["enzymes"]:
-        non_modifier_params = get_non_modifier_params(
-            e["id"], e["mechanism"], toml_reaction["stoichiometry"]
-        )
-        modifiers = {}
-        modifier_params = {}
-        if "competitive_inhibitors" in e.keys() & e["mechanism"] != "modular_rate_law":
-            raise ValueError(
-                """competitive inhibitors are currently
-                only supported for the mechanism 'modular_rate_law'"""
-            )
-        for modifier_type, param_prefix in [
-            ("allosteric_activator", "dissociation_constant_r"),
-            ("allosteric_inhibitor", "dissociation_constant_t"),
-            ("competitive_inhibitor", "inhibition_constant"),
-        ]:
-            if modifier_type + "s" in e.keys():
-                modifiers_of_this_type, modifier_params_of_this_type = parse_modifiers(
-                    modifier_type, e[modifier_type + "s"], e["id"], param_prefix
+        modifiers = {
+            "competitive_inhibitor": [],
+            "allosteric_inhibitor": [],
+            "allosteric_activator": [],
+        }
+        if "modifiers" in e.keys():
+            for modifier_dict in e["modifiers"]:
+                modifier_type = modifier_dict["modifier_type"]
+                modifiers[modifier_type].append(
+                    Modifier(
+                        mic_id=modifier_dict["mic_id"],
+                        enzyme_id=e["id"],
+                        modifier_type=modifier_type
+                    )
                 )
-                modifiers.update(modifiers_of_this_type)
-                modifier_params.update(modifier_params_of_this_type)
-        params = {**non_modifier_params, **modifier_params}
         enzymes[e["id"]] = Enzyme(
             id=e["id"],
             name=e["name"],
@@ -271,6 +207,7 @@ def load_maud_input_from_toml(filepath: str, id: str = "mi") -> MaudInput:
         "enzyme_concentrations": [],
         "formation_energies": [],
         "unbalanced_metabolites": [],
+        "inhibition_constants": [],
     }
     for prior in parsed_toml["priors"]["formation_energies"]:
         metabolite_id = prior["metabolite_id"]
@@ -302,6 +239,18 @@ def load_maud_input_from_toml(filepath: str, id: str = "mi") -> MaudInput:
                 location=prior["location"],
                 scale=prior["scale"],
                 enzyme_id=enzyme_id
+            )
+        )
+    for prior in parsed_toml["priors"]["inhibition_constants"]:
+        enzyme_id = prior["enzyme_id"]
+        mic_id = prior["mic_id"]
+        priors["inhibition_constants"].append(
+            Prior(
+                id=f"ki_{enzyme_id}_{mic_id}",
+                location=prior["location"],
+                scale=prior["scale"],
+                enzyme_id=enzyme_id,
+                mic_id=mic_id,
             )
         )
     stan_codes = get_stan_codes(kinetic_model, experiments)

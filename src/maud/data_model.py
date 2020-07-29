@@ -72,19 +72,23 @@ class MetaboliteInCompartment:
 class Modifier:
     """Constructor for modifier objects.
 
-    :param mic: the metabolite-in-compartment that is the modifier
-    :param allosteric: whether or not the modifier is allosteric
-    :param modifier_type: what is the modifier type:
+    :param mic_id: the id of the modifying metabolite-in-compartment
+    :param enzyme_id: the id of the modified enzyme
+    :param modifier_type: what is the modifier type, e.g.
     'allosteric_activator', 'allosteric_inhibitor', 'competitive inhibitor'
     """
 
-    def __init__(self, mic: MetaboliteInCompartment, modifier_type: str = None):
-        self.mic = mic
-        self.allosteric = modifier_type in [
-            "allosteric_inhibitor",
-            "allosteric_activator",
-        ]
+    def __init__(
+        self,
+        mic_id: str,
+        enzyme_id: str,
+        modifier_type: str = None
+    ):
+        allosteric_types = ["allosteric_inhibitor", "allosteric_activator"]
+        self.mic_id = mic_id
+        self.enzyme_id = enzyme_id
         self.modifier_type = modifier_type
+        self.allosteric = modifier_type in allosteric_types
 
 
 class Parameter:
@@ -122,7 +126,7 @@ class Enzyme:
         id: str,
         reaction_id: str,
         name: str,
-        modifiers: Dict[str, Modifier] = None,
+        modifiers: Dict[str, List[Modifier]] = None,
     ):
         if modifiers is None:
             modifiers = defaultdict()

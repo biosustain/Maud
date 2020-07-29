@@ -24,10 +24,9 @@ from maud import sampling
 
 
 SAMPLING_DEFAULTS = {
-    "f_tol_as": 1e-6,
-    "rel_tol_as": 1e-6,
-    "abs_tol_as": 1e-6,
-    "max_steps_as": int(1e9),
+    "rel_tol": 1e-6,
+    "abs_tol": 1e-6,
+    "max_num_steps": int(1e9),
     "likelihood": 1,
     "n_samples": 5,
     "n_warmup": 5,
@@ -56,19 +55,19 @@ pass
 
 @cli.command()
 @click.option(
-    "--f_tol",
-    default=SAMPLING_DEFAULTS["f_tol_as"],
-    help="Algebra solver's functional tolerance parameter",
-)
-@click.option(
     "--rel_tol",
-    default=SAMPLING_DEFAULTS["rel_tol_as"],
-    help="Algebra solver's absolute tolerance parameter",
+    default=SAMPLING_DEFAULTS["rel_tol"],
+    help="ODE solver's relative tolerance parameter",
 )
 @click.option(
-    "--max_steps",
-    default=SAMPLING_DEFAULTS["max_steps_as"],
-    help="Algebra solver's maximum steps parameter",
+    "--abs_tol",
+    default=SAMPLING_DEFAULTS["abs_tol"],
+    help="ODE solver's absolute tolerance parameter",
+)
+@click.option(
+    "--max_num_steps",
+    default=SAMPLING_DEFAULTS["max_num_steps"],
+    help="ODE solver's maximum steps parameter",
 )
 @click.option(
     "--likelihood",
@@ -108,3 +107,36 @@ def sample(data_path, **kwargs):
     stanfit = sampling.sample(data_path, **kwargs)
     stanfit.diagnose()
     print(stanfit.summary())
+
+
+@cli.command()
+@click.option(
+    "--rel_tol",
+    default=SAMPLING_DEFAULTS["rel_tol"],
+    help="ODE solver's relative tolerance parameter",
+)
+@click.option(
+    "--abs_tol",
+    default=SAMPLING_DEFAULTS["abs_tol"],
+    help="ODE solver's absolute tolerance parameter",
+)
+@click.option(
+    "--max_num_steps",
+    default=SAMPLING_DEFAULTS["max_num_steps"],
+    help="ODE solver's maximum steps parameter",
+)
+@click.option(
+    "--timepoint",
+    default=SAMPLING_DEFAULTS["timepoint"],
+    help="How long the ODE simulates for (Units are whatever your time units are)",
+)
+@click.option("--output_dir", default=".", help="Where to save Maud's output")
+@click.argument(
+    "data_path",
+    type=click.Path(exists=True, dir_okay=False),
+    default=get_example_path(RELATIVE_PATH_EXAMPLE),
+)
+def simulate_once(data_path, **kwargs):
+    """Generate one draw using the given initial conditions for diagnostics."""
+    stanfit = sampling.simulate_once(data_path, **kwargs)
+    print(stanfit.get_drawset(params=["conc"]).T)

@@ -30,18 +30,25 @@ real get_Dr_common_rate_law(vector metabolite, vector km, vector stoichiometry){
   return psi_plus + psi_minus - 1;
 }
 
-real get_Dr_reg(){
-  return 0;
+real get_Dr_reg(vector conc_ci, vector ki){
+  if (rows(conc_ci) > 0){
+    return 0;
+  }
+  else {
+    return prod(conc_ci ./ ki);
+  }
 }
 
 real modular_rate_law(vector metabolite,
-                      vector km,
-                      vector stoichiometry,
-                      real kcat,
-                      real keq,
-                      real enz){
+		      vector km,
+		      vector stoichiometry,
+		      real kcat,
+		      real keq,
+		      real enz,
+		      vector conc_ci,
+		      vector ki){
   real Tr = get_Tr(metabolite, km, stoichiometry, kcat, keq);
   real Dr = get_Dr_common_rate_law(metabolite, km, stoichiometry);
-  real Dr_reg = get_Dr_reg();
+  real Dr_reg = get_Dr_reg(conc_ci, ki);
   return enz * Tr / (Dr + Dr_reg);
 }

@@ -41,8 +41,12 @@ stoichiometry = { M1_c = -1, M2_c = 1 }
 id = 'r2'
 name = 'the enzyme that catalyses reaction r2'
 mechanism = 'modular_rate_law'
-allosteric_inhibitors = ['M1_c']
-competitive_inhibitors = ['M2_c']
+[[reactions.enzymes.modifiers]]
+modifier_type = 'allosteric_inhibitor'
+mic_id = 'M1_c'
+[[reactions.enzymes.modifiers]]
+modifier_type = 'competitive_inhibitor'
+mic_id = 'M2_c'
 
 [[reactions]]
 id = 'r1'
@@ -52,7 +56,9 @@ stoichiometry = { M1_e = -1, M1_c = 1}
 id = 'r1'
 name = 'the enzyme that catalyses reaction r1'
 mechanism = 'modular_rate_law'
-allosteric_activators = ['M2_c']
+[[reactions.enzymes.modifiers]]
+modifier_type = 'allosteric_activator'
+mic_id = 'M2_c'
 
 [[reactions]]
 id = 'r3'
@@ -68,7 +74,7 @@ mechanism = 'modular_rate_law'
 id = 'condition_1'
 metadata = "A bat got in the bioreactor."
 metabolite_measurements = [
-  {target_id='M1_c', value=0.8, uncertainty=0.1},
+  {target_id='M1_c', value=1.8, uncertainty=0.1},
   {target_id='M2_c', value=1.5, uncertainty=0.1},
   {target_id='M1_e', value=2, uncertainty=0.05},
   {target_id='M2_e', value=1, uncertainty=0.05},
@@ -86,7 +92,7 @@ enzyme_measurements = [
 id = 'condition_2'
 metadata = "I may have mixed up some/all of the numbers."
 metabolite_measurements = [
-  {target_id='M1_c', value=0.7, uncertainty=0.1},
+  {target_id='M1_c', value=1.9, uncertainty=0.1},
   {target_id='M2_c', value=1.4, uncertainty=0.1},
   {target_id='M1_e', value=2, uncertainty=0.05},
   {target_id='M2_e', value=1, uncertainty=0.05},
@@ -154,10 +160,16 @@ scale = 0.6
 
 [[priors.formation_energies]]
 metabolite_id = "M1"
-location = -1
+location = -5
 scale = 0.05
 
 [[priors.formation_energies]]
 metabolite_id = "M2"
-location = -2
+location = -6
 scale = 0.05
+
+[[priors.inhibition_constants]]
+enzyme_id = "r2"
+mic_id = "M2_c"
+location = 1
+scale = 0.6
