@@ -19,12 +19,6 @@
 from maud import data_model
 
 
-def get_enzyme_parameters(enz, rxn):
-    out = ["keq", "kcat"]
-    for mic_id in rxn.stoichiometry.keys():
-        out.append(f"km_{enz.id}_{mic_id}")
-    return out
-
 def validate_maud_input(mi: data_model.MaudInput):
     """Check that priors, experiments and kinetic model are consistent."""
     model = mi.kinetic_model
@@ -56,11 +50,9 @@ def validate_maud_input(mi: data_model.MaudInput):
     prior_kcats = [p.id for p in mi.priors["kcats"]]
     prior_kis = [p.id for p in mi.priors["inhibition_constants"]]
     prior_formation_energies = [p.id for p in mi.priors["formation_energies"]]
-    prior_enzyme_concentrations = [p.id for p in mi.priors["enzyme_concentrations"]]
-    prior_unbalanced_metabolites = [p.id for p in mi.priors["unbalanced_metabolites"]]
     for model_pars, prior_pars in zip(
         [model_kms, model_kcats, model_formation_energies, model_kis],
-        [prior_kms, prior_kcats, prior_formation_energies, prior_kis]
+        [prior_kms, prior_kcats, prior_formation_energies, prior_kis],
     ):
         for prior_par in prior_pars:
             msg = f"{prior_par} is in the priors but not the kinetic model."

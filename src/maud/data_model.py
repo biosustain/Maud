@@ -78,12 +78,7 @@ class Modifier:
     'allosteric_activator', 'allosteric_inhibitor', 'competitive inhibitor'
     """
 
-    def __init__(
-        self,
-        mic_id: str,
-        enzyme_id: str,
-        modifier_type: str = None
-    ):
+    def __init__(self, mic_id: str, enzyme_id: str, modifier_type: str = None):
         allosteric_types = ["allosteric_inhibitor", "allosteric_activator"]
         self.mic_id = mic_id
         self.enzyme_id = enzyme_id

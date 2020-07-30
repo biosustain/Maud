@@ -29,6 +29,7 @@ from maud import io
 from maud.data_model import KineticModel, MaudInput
 
 
+HERE = os.path.dirname(os.path.abspath(__file__))
 INCLUDE_PATH = ""
 DEFAULT_PRIOR_LOC_UNBALANCED = 0.1
 DEFAULT_PRIOR_SCALE_UNBALANCED = 3
@@ -77,7 +78,7 @@ def get_knockout_matrix(mi: MaudInput):
 
 
 def get_km_lookup(km_priors, mic_codes, enzyme_codes):
-    """Get a mics x enzymes matrix of km indexes. 0 means null"""
+    """Get a mics x enzymes matrix of km indexes. 0 means null."""
     out = pd.DataFrame(0, index=mic_codes.values(), columns=enzyme_codes.values())
     for i, row in km_priors.iterrows():
         mic_code = mic_codes[row["mic_id"]]
@@ -122,7 +123,6 @@ def sample(
     model_name = os.path.splitext(os.path.basename(data_path))[0]
     input_filepath = os.path.join(output_dir, f"input_data_{model_name}.json")
     init_filepath = os.path.join(output_dir, f"initial_values_{model_name}.json")
-    here = os.path.dirname(os.path.abspath(__file__))
     mi = io.load_maud_input_from_toml(data_path)
     input_data = get_input_data(
         mi, abs_tol, rel_tol, max_num_steps, likelihood, timepoint
@@ -130,8 +130,8 @@ def sample(
     inits = get_initial_conditions(input_data, mi)
     cmdstanpy.utils.jsondump(input_filepath, input_data)
     cmdstanpy.utils.jsondump(init_filepath, inits)
-    stan_program_filepath = os.path.join(here, STAN_PROGRAM_RELATIVE_PATH)
-    include_path = os.path.join(here, INCLUDE_PATH)
+    stan_program_filepath = os.path.join(HERE, STAN_PROGRAM_RELATIVE_PATH)
+    include_path = os.path.join(HERE, INCLUDE_PATH)
     cpp_options = {"STAN_THREADS": True} if threads_per_chain != 1 else None
     model = cmdstanpy.CmdStanModel(
         stan_file=stan_program_filepath,
@@ -173,17 +173,15 @@ def simulate_once(
     model_name = os.path.splitext(os.path.basename(data_path))[0]
     input_filepath = os.path.join(output_dir, f"input_data_{model_name}.json")
     init_filepath = os.path.join(output_dir, f"initial_values_{model_name}.json")
-    here = os.path.dirname(os.path.abspath(__file__))
     mi = io.load_maud_input_from_toml(data_path)
     input_data = get_input_data(mi, abs_tol, rel_tol, max_num_steps, 1, timepoint)
     inits = get_initial_conditions(input_data, mi)
     cmdstanpy.utils.jsondump(input_filepath, input_data)
     cmdstanpy.utils.jsondump(init_filepath, inits)
-    stan_program_filepath = os.path.join(here, STAN_PROGRAM_RELATIVE_PATH)
-    include_path = os.path.join(here, INCLUDE_PATH)
+    stan_program_filepath = os.path.join(HERE, STAN_PROGRAM_RELATIVE_PATH)
+    include_path = os.path.join(HERE, INCLUDE_PATH)
     model = cmdstanpy.CmdStanModel(
-        stan_file=stan_program_filepath,
-        stanc_options={"include_paths": [include_path]}
+        stan_file=stan_program_filepath, stanc_options={"include_paths": [include_path]}
     )
     return model.sample(
         data=input_filepath,
@@ -192,7 +190,7 @@ def simulate_once(
         output_dir=output_dir,
         inits=init_filepath,
         show_progress=True,
-        fixed_param=True
+        fixed_param=True,
     )
 
 
@@ -228,34 +226,42 @@ def get_input_data(
     enzymes = {k: v for r in reactions.values() for k, v in r.enzymes.items()}
     full_stoic = get_full_stoichiometry(mi.kinetic_model, enzyme_codes, mic_codes)
     # priors
-    km_priors = pd.DataFrame({
-        "location": [p.location for p in mi.priors["kms"]],
-        "scale": [p.scale for p in mi.priors["kms"]],
-        "enzyme_id": [p.enzyme_id for p in mi.priors["kms"]],
-        "mic_id": [p.mic_id for p in mi.priors["kms"]],
-    })
-    kcat_priors = pd.DataFrame({
-        "location": [p.location for p in mi.priors["kcats"]],
-        "scale": [p.scale for p in mi.priors["kcats"]],
-        "enzyme_id": [p.enzyme_id for p in mi.priors["kcats"]],
-    })
-    formation_energy_priors = pd.DataFrame({
-        "location": [p.location for p in mi.priors["formation_energies"]],
-        "scale": [p.scale for p in mi.priors["formation_energies"]],
-        "metabolite_id": [p.metabolite_id for p in mi.priors["formation_energies"]],
-
-    })
-    ki_priors = pd.DataFrame({
-        "location": [p.location for p in mi.priors["inhibition_constants"]],
-        "scale": [p.scale for p in mi.priors["inhibition_constants"]],
-        "mic_id": [p.mic_id for p in mi.priors["inhibition_constants"]],
-        "enzyme_id": [p.enzyme_id for p in mi.priors["inhibition_constants"]],
-    })
+    km_priors = pd.DataFrame(
+        {
+            "location": [p.location for p in mi.priors["kms"]],
+            "scale": [p.scale for p in mi.priors["kms"]],
+            "enzyme_id": [p.enzyme_id for p in mi.priors["kms"]],
+            "mic_id": [p.mic_id for p in mi.priors["kms"]],
+        }
+    )
+    kcat_priors = pd.DataFrame(
+        {
+            "location": [p.location for p in mi.priors["kcats"]],
+            "scale": [p.scale for p in mi.priors["kcats"]],
+            "enzyme_id": [p.enzyme_id for p in mi.priors["kcats"]],
+        }
+    )
+    formation_energy_priors = pd.DataFrame(
+        {
+            "location": [p.location for p in mi.priors["formation_energies"]],
+            "scale": [p.scale for p in mi.priors["formation_energies"]],
+            "metabolite_id": [p.metabolite_id for p in mi.priors["formation_energies"]],
+        }
+    )
+    ki_priors = pd.DataFrame(
+        {
+            "location": [p.location for p in mi.priors["inhibition_constants"]],
+            "scale": [p.scale for p in mi.priors["inhibition_constants"]],
+            "mic_id": [p.mic_id for p in mi.priors["inhibition_constants"]],
+            "enzyme_id": [p.enzyme_id for p in mi.priors["inhibition_constants"]],
+        }
+    )
     ki_priors["mic_code"] = ki_priors["mic_id"].map(mic_codes)
     ki_priors["enzyme_code"] = ki_priors["enzyme_id"].map(enzyme_codes)
     ki_priors = ki_priors.sort_values("enzyme_code")
     n_ki_enzyme = (
-        ki_priors.groupby("enzyme_code").size()
+        ki_priors.groupby("enzyme_code")
+        .size()
         .reindex(enzyme_codes.values())
         .fillna(0)
         .astype(int)
@@ -401,9 +407,7 @@ def get_init_enzyme(mi):
         )
 
     def get_vmax_component(enzyme_id, init, mi):
-        kcat = [
-            p.location for p in mi.priors["kcats"] if p.enzyme_id == enzyme_id
-        ][0]
+        kcat = [p.location for p in mi.priors["kcats"] if p.enzyme_id == enzyme_id][0]
         return init * kcat
 
     def get_lowest_vmax(exp_id, enz_id, inits, mi):

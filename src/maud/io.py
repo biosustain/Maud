@@ -20,8 +20,7 @@
 
 """
 
-from string import ascii_lowercase
-from typing import Dict, List, Tuple
+from typing import Dict
 
 import toml
 
@@ -36,7 +35,6 @@ from maud.data_model import (
     Metabolite,
     MetaboliteInCompartment,
     Modifier,
-    Parameter,
     Prior,
     Reaction,
 )
@@ -154,7 +152,7 @@ def load_reaction_from_toml(toml_reaction: dict) -> Reaction:
                     Modifier(
                         mic_id=modifier_dict["mic_id"],
                         enzyme_id=e["id"],
-                        modifier_type=modifier_type
+                        modifier_type=modifier_type,
                     )
                 )
         enzymes[e["id"]] = Enzyme(
@@ -216,7 +214,7 @@ def load_maud_input_from_toml(filepath: str, id: str = "mi") -> MaudInput:
                 id=f"formation_energy_{metabolite_id}",
                 location=prior["location"],
                 scale=prior["scale"],
-                metabolite_id=metabolite_id
+                metabolite_id=metabolite_id,
             )
         )
     for prior in parsed_toml["priors"]["kms"]:
@@ -228,7 +226,7 @@ def load_maud_input_from_toml(filepath: str, id: str = "mi") -> MaudInput:
                 location=prior["location"],
                 scale=prior["scale"],
                 mic_id=mic_id,
-                enzyme_id=enzyme_id
+                enzyme_id=enzyme_id,
             )
         )
     for prior in parsed_toml["priors"]["kcats"]:
@@ -238,7 +236,7 @@ def load_maud_input_from_toml(filepath: str, id: str = "mi") -> MaudInput:
                 id=f"kcat_{enzyme_id}",
                 location=prior["location"],
                 scale=prior["scale"],
-                enzyme_id=enzyme_id
+                enzyme_id=enzyme_id,
             )
         )
     for prior in parsed_toml["priors"]["inhibition_constants"]:

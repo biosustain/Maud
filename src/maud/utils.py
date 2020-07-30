@@ -16,10 +16,7 @@
 
 """General purpose utility functions."""
 
-import os
 from typing import Dict, Iterable
-
-import numpy as np
 
 from maud.data_model import KineticModel
 
