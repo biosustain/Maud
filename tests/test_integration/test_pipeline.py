@@ -30,14 +30,14 @@ def test_linear():
         for i in range(1, 5)
     ]
     linear_input_values = {
-        "f_tol": 1e-6,
-        "rel_tol": 1e-9,
-        "max_steps": int(1e9),
+        "abs_tol": 1e-6,
+        "rel_tol": 1e-6,
+        "max_num_steps": int(1e9),
         "likelihood": 1,
         "n_samples": 200,
         "n_warmup": 200,
-        "n_chains": 4,
-        "n_cores": 4,
+        "n_chains": 1,
+        "n_cores": 1,
         "timepoint": 500,
         "output_dir": temp_directory,
         "data_path": linear_input,
