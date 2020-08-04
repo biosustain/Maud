@@ -39,6 +39,16 @@ real get_Dr_reg(vector conc_ci, vector ki){
   }
 }
 
+real get_free_enzyme_ratio(vector metabolite,
+                           vector km,
+                           vector stoichiometry,
+                           vector conc_ci,
+                           vector ki){
+  real Dr = get_Dr_common_rate_law(metabolite, km, stoichiometry);
+  real Dr_reg = get_Dr_reg(conc_ci, ki);
+  return 1 / (Dr + Dr_reg);
+}
+
 real modular_rate_law(vector metabolite,
 		      vector km,
 		      vector stoichiometry,
@@ -52,3 +62,4 @@ real modular_rate_law(vector metabolite,
   real Dr_reg = get_Dr_reg(conc_ci, ki);
   return enz * Tr / (Dr + Dr_reg);
 }
+

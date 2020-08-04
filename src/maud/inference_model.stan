@@ -16,6 +16,9 @@ data {
   int<lower=1> N_enzyme_measurement;
   int<lower=1> N_conc_measurement;
   int<lower=0> N_competitive_inhibitor;
+  int<lower=0> N_allosteric_inhibitor;
+  int<lower=0> N_allosteric_activator;
+  int<lower=0> N_allosteric_enzyme;
   // measurements
   int<lower=1,upper=N_mic> unbalanced_mic_ix[N_unbalanced];
   int<lower=1,upper=N_mic> balanced_mic_ix[N_mic-N_unbalanced];
@@ -40,6 +43,12 @@ data {
   vector<lower=0>[N_km] prior_scale_km;
   vector[N_competitive_inhibitor] prior_loc_ki;
   vector<lower=0>[N_competitive_inhibitor] prior_scale_ki;
+  vector[N_allosteric_inhibitor] prior_loc_diss_t;
+  vector<lower=0>[N_allosteric_inhibitor] prior_scale_diss_t;
+  vector[N_allosteric_activator] prior_loc_diss_r;
+  vector<lower=0>[N_allosteric_activator] prior_scale_diss_r;
+  vector<lower=0>[N_allosteric_enzyme] prior_loc_tc;
+  vector<lower=0>[N_allosteric_enzyme] prior_scale_tc;
   real prior_loc_unbalanced[N_experiment, N_unbalanced];
   real<lower=0> prior_scale_unbalanced[N_experiment, N_unbalanced];
   real prior_loc_enzyme[N_experiment, N_enzyme];
@@ -50,7 +59,11 @@ data {
   matrix<lower=0,upper=1>[N_experiment, N_enzyme] is_knockout;
   int<lower=0,upper=N_km> km_lookup[N_mic, N_enzyme];
   int<lower=0,upper=N_mic> n_ci[N_enzyme];
+  int<lower=0,upper=N_mic> n_ai[N_enzyme];
+  int<lower=0,upper=N_mic> n_aa[N_enzyme];
   int<lower=0,upper=N_mic> ci_ix[N_competitive_inhibitor];
+  int<lower=0,upper=N_mic> ai_ix[N_competitive_inhibitor];
+  int<lower=0,upper=N_mic> aa_ix[N_competitive_inhibitor];
   // configuration
   vector<lower=0>[N_mic] conc_init[N_experiment];
   real rel_tol;
@@ -72,6 +85,9 @@ parameters {
   matrix<lower=0>[N_experiment, N_enzyme] enzyme;
   matrix<lower=0>[N_experiment, N_unbalanced] conc_unbalanced;
   vector<lower=0>[N_competitive_inhibitor] ki;
+  vector<lower=0>[N_allosteric_inhibitor] dissociation_constant_t;
+  vector<lower=0>[N_allosteric_activator] dissociation_constant_r;
+  vector<lower=0>[N_allosteric_enzyme] transfer_constant;
 }
 transformed parameters {
   vector<lower=0>[N_mic] conc[N_experiment];
@@ -95,8 +111,15 @@ transformed parameters {
                                            kcat,
                                            keq,
                                            ci_ix,
+                                           ai_ix,
+                                           aa_ix,
                                            n_ci,
-                                           ki)[1]; 
+                                           n_ai,
+                                           n_aa,
+                                           ki,
+                                           dissociation_constant_t,
+                                           dissociation_constant_r,
+                                           transfer_constant)[1]; 
     conc[e, unbalanced_mic_ix] = conc_unbalanced[e]';
     flux[e] = get_flux(conc[e],
                        experiment_enzyme,
@@ -121,6 +144,13 @@ transformed parameters {
     target += lognormal_lpdf(kcat | log(prior_loc_kcat), prior_scale_kcat);
     target += lognormal_lpdf(km | log(prior_loc_km), prior_scale_km);
     target += lognormal_lpdf(ki | log(prior_loc_ki), prior_scale_ki);
+    target += lognormal_lpdf(ki | log(prior_loc_ki), prior_scale_ki);
+    target += lognormal_lpdf(dissociation_constant_t |
+                             log(prior_loc_diss_t), prior_scale_diss_t);
+    target += lognormal_lpdf(dissociation_constant_r |
+                             log(prior_loc_diss_r), prior_scale_diss_r);
+    target += lognormal_lpdf(transfer_constant |
+                             log(prior_loc_tc), prior_scale_tc);
     target += normal_lpdf(formation_energy |
                           prior_loc_formation_energy,
                           prior_scale_formation_energy);
