@@ -4,7 +4,7 @@ real get_allostery(vector activator_concentration,    // metabolite
                    vector dissociation_constant_r,    // parameter
                    vector dissociation_constant_t,    // parameter
                    real transfer_constant){           // parameter
-  if ((rows(activator_concentration) == 0) & (rows(inhibitor_concentration) == 0)){
+  if ((rows(activator_concentration) == 0) && (rows(inhibitor_concentration) == 0)){
     return 1;
   }
   else {

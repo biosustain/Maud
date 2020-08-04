@@ -1,4 +1,5 @@
 functions{
+#include allostery.stan
 #include modular_rate_law.stan
 #include dbalanced_dt.stan
 #include partial_sums.stan
@@ -129,8 +130,15 @@ transformed parameters {
                        kcat,
                        keq,
                        ci_ix,
+                       ai_ix,
+                       aa_ix,
                        n_ci,
-                       ki)';
+                       n_ai,
+                       n_aa,
+                       ki,
+                       dissociation_constant_t,
+                       dissociation_constant_r,
+                       transfer_constant)';
   }
   print(conc_unbalanced);
   print(conc);
