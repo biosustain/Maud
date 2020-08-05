@@ -235,11 +235,13 @@ def get_input_data(
         }
     )
     kcat_priors, transfer_constant_priors = (
-        pd.DataFrame({
-            "location": [p.location for p in mi.priors[prior_type]],
-            "scale": [p.scale for p in mi.priors[prior_type]],
-            "enzyme_id": [p.enzyme_id for p in mi.priors[prior_type]],
-        })
+        pd.DataFrame(
+            {
+                "location": [p.location for p in mi.priors[prior_type]],
+                "scale": [p.scale for p in mi.priors[prior_type]],
+                "enzyme_id": [p.enzyme_id for p in mi.priors[prior_type]],
+            }
+        )
         for prior_type in ["kcats", "transfer_constants"]
     )
     formation_energy_priors = pd.DataFrame(
@@ -250,23 +252,25 @@ def get_input_data(
         }
     )
     ki_priors, diss_t_priors, diss_r_priors = (
-        pd.DataFrame({
-            "location": [p.location for p in mi.priors[prior_type]],
-            "scale": [p.scale for p in mi.priors[prior_type]],
-            "mic_id": [p.mic_id for p in mi.priors[prior_type]],
-            "enzyme_id": [p.enzyme_id for p in mi.priors[prior_type]],
-        })
-        if prior_type in mi.priors.keys() else pd.DataFrame()
+        pd.DataFrame(
+            {
+                "location": [p.location for p in mi.priors[prior_type]],
+                "scale": [p.scale for p in mi.priors[prior_type]],
+                "mic_id": [p.mic_id for p in mi.priors[prior_type]],
+                "enzyme_id": [p.enzyme_id for p in mi.priors[prior_type]],
+            }
+        )
+        if prior_type in mi.priors.keys()
+        else pd.DataFrame()
         for prior_type in [
-                "inhibition_constants",
-                "tense_dissociation_constants",
-                "relaxed_dissociation_constants"
+            "inhibition_constants",
+            "tense_dissociation_constants",
+            "relaxed_dissociation_constants",
         ]
     )
     n_modifier = {}
     for df, param_type in zip(
-        [ki_priors, diss_t_priors, diss_r_priors],
-        ["ki", "diss_t", "diss_r"]
+        [ki_priors, diss_t_priors, diss_r_priors], ["ki", "diss_t", "diss_r"]
     ):
         df["mic_code"] = df["mic_id"].map(mic_codes)
         df["enzyme_code"] = df["enzyme_id"].map(enzyme_codes)
