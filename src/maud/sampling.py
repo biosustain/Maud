@@ -141,7 +141,7 @@ def sample(
     return model.sample(
         data=input_filepath,
         chains=n_chains,
-        cores=n_cores,
+        parallel_chains=n_cores,
         iter_sampling=n_samples,
         output_dir=output_dir,
         iter_warmup=n_warmup,
