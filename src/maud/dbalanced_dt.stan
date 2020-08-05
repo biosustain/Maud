@@ -57,9 +57,9 @@ vector get_flux(vector conc_mic,
     vector[nai_rxn] diss_t_rxn;
     vector[naa_rxn] diss_r_rxn;
     real catalysis_factor;
-    real allostery_factor;
+    real allostery_factor = 1;
     real free_enzyme_ratio;
-    int is_allosteric = (nai_rxn > 0) || (naa_rxn > 0);
+    int is_allosteric = ((nai_rxn > 0) || (naa_rxn > 0));
     if (nci_rxn != 0){
       conc_ci = conc_mic[segment(ci_ix, pos_ci, nci_rxn)];
       ki_rxn = segment(ki, pos_ci, nci_rxn);
@@ -85,12 +85,14 @@ vector get_flux(vector conc_mic,
                                         conc_enz[i_rxn],
                                         conc_ci,
                                         ki_rxn);
-    allostery_factor = get_allostery(conc_aa,
-                                     conc_ai,
-                                     free_enzyme_ratio,
-                                     diss_r_rxn,
-                                     diss_t_rxn,
-                                     transfer_constant[pos_tc]);
+    if (is_allosteric == 1){
+      allostery_factor = get_allostery(conc_aa,
+                                       conc_ai,
+                                       free_enzyme_ratio,
+                                       diss_r_rxn,
+                                       diss_t_rxn,
+                                       transfer_constant[pos_tc]);
+    }
     flux[i_rxn] = catalysis_factor * allostery_factor;
     pos_ci += n_ci[i_rxn];
     pos_ai += n_ai[i_rxn];
