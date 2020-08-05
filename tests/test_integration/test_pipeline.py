@@ -24,7 +24,7 @@ def test_linear():
 
     linear_input = os.path.join(data_path, "linear.toml")
     temp_directory = tempfile.mkdtemp(dir=data_path)
-    linear_control_file = os.path.join(data_path, f"linear_control_samples.csv")
+    linear_control_file = os.path.join(data_path, "linear_control_samples.csv")
     linear_input_values = {
         "abs_tol": 1e-6,
         "rel_tol": 1e-6,
