@@ -24,11 +24,7 @@ def test_linear():
 
     linear_input = os.path.join(data_path, "linear.toml")
     temp_directory = tempfile.mkdtemp(dir=data_path)
-    control_directory = os.path.join(data_path, "linear_control_set")
-    linear_control_files = [
-        os.path.join(control_directory, f"inference_model_linear_test-{i}.csv")
-        for i in range(1, 5)
-    ]
+    linear_control_file = os.path.join(data_path, f"linear_control_samples.csv")
     linear_input_values = {
         "abs_tol": 1e-6,
         "rel_tol": 1e-6,
@@ -45,9 +41,7 @@ def test_linear():
     }
     fit = sampling.sample(**linear_input_values)
     samples_test = fit.get_drawset()
-    samples_ctrl = pd.concat(
-        [pd.read_csv(f, comment="#").iloc[200:] for f in linear_control_files]
-    )
+    samples_ctrl = pd.read_csv(linear_control_file, comment="#").iloc[200:]
     # Check that the output and the control have the same column names.
     assert all(samples_test.columns == samples_ctrl.columns)
     # Check that each output column (other than the diagnostic ones) is
