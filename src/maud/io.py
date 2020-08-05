@@ -206,6 +206,9 @@ def load_maud_input_from_toml(filepath: str, id: str = "mi") -> MaudInput:
         "formation_energies": [],
         "unbalanced_metabolites": [],
         "inhibition_constants": [],
+        "tense_dissociation_constants": [],
+        "relaxed_dissociation_constants": [],
+        "transfer_constants": [],
     }
     for prior in parsed_toml["priors"]["formation_energies"]:
         metabolite_id = prior["metabolite_id"]
@@ -239,18 +242,35 @@ def load_maud_input_from_toml(filepath: str, id: str = "mi") -> MaudInput:
                 enzyme_id=enzyme_id,
             )
         )
-    for prior in parsed_toml["priors"]["inhibition_constants"]:
-        enzyme_id = prior["enzyme_id"]
-        mic_id = prior["mic_id"]
-        priors["inhibition_constants"].append(
-            Prior(
-                id=f"ki_{enzyme_id}_{mic_id}",
-                location=prior["location"],
-                scale=prior["scale"],
-                enzyme_id=enzyme_id,
-                mic_id=mic_id,
-            )
-        )
+    for prior_type, prefix in zip([
+            "inhibition_constants",
+            "relaxed_dissociation_constants",
+            "tense_dissociation_constants"
+    ], ["ki", "diss_r", "diss_t"]):
+        if prior_type in parsed_toml["priors"].keys():
+            for prior in parsed_toml["priors"][prior_type]:
+                enzyme_id = prior["enzyme_id"]
+                mic_id = prior["mic_id"]
+                priors[prior_type].append(
+                    Prior(
+                        id=f"{prefix}_{enzyme_id}_{mic_id}",
+                        location=prior["location"],
+                        scale=prior["scale"],
+                        enzyme_id=enzyme_id,
+                        mic_id=mic_id,
+                    )
+                )
+    if "transfer_constants" in parsed_toml["priors"].keys():
+        for prior in parsed_toml["priors"]["transfer_constants"]:
+             enzyme_id = prior["enzyme_id"]
+             priors["transfer_constants"].append(
+                 Prior(
+                    id=f"transfer_constant_{enzyme_id}",
+                    location=prior["location"],
+                    scale=prior["scale"],
+                    enzyme_id=enzyme_id,
+                )
+             )
     stan_codes = get_stan_codes(kinetic_model, experiments)
     mi = MaudInput(
         kinetic_model=kinetic_model,
