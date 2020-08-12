@@ -50,13 +50,13 @@ real get_free_enzyme_ratio(vector metabolite,
 }
 
 real modular_rate_law(vector metabolite,
-		      vector km,
-		      vector stoichiometry,
-		      real kcat,
-		      real keq,
-		      real enz,
-		      vector conc_ci,
-		      vector ki){
+                      vector km,
+                      vector stoichiometry,
+                      real kcat,
+                      real keq,
+                      real enz,
+                      vector conc_ci,
+                      vector ki){
   real free_enzyme_ratio = get_free_enzyme_ratio(metabolite,
                                                  km,
                                                  stoichiometry,

@@ -22,19 +22,19 @@ int[] get_rxn_mics(matrix S, int i_rxn){
 }
 
 vector get_flux(vector conc_mic,
-		vector conc_enz,
-		vector km,
-		int[,] km_lookup,
-		matrix S,
-		vector kcat,
-		vector keq,
-		int[] ci_ix,
-		int[] ai_ix,
-		int[] aa_ix,
-		int[] n_ci,
-		int[] n_ai,
-		int[] n_aa,
-		vector ki,
+                vector conc_enz,
+                vector km,
+                int[,] km_lookup,
+                matrix S,
+                vector kcat,
+                vector keq,
+                int[] ci_ix,
+                int[] ai_ix,
+                int[] aa_ix,
+                int[] n_ci,
+                int[] n_ai,
+                int[] n_aa,
+                vector ki,
                 vector dissociation_constant_t,
                 vector dissociation_constant_r,
                 vector transfer_constant){
@@ -103,23 +103,23 @@ vector get_flux(vector conc_mic,
 }
 
 vector dbalanced_dt(real time,
-		    vector current_balanced,
-		    vector unbalanced,
-		    int[] balanced_ix,
-		    int[] unbalanced_ix,
-		    vector enzyme_concentration,
-		    vector km,
-		    int[,] km_lookup,
-		    matrix S,
-		    vector kcat,
-		    vector keq,
-		    int[] ci_ix,  // index of competitive inhibitors (long-form ragged)
-		    int[] ai_ix,  // index of allosteric inhibitors (long-form ragged)
-		    int[] aa_ix,  // index of allosteric activators (long-form ragged)
-		    int[] n_ci,   // number of competitive inhibitors for each reaction
-		    int[] n_ai,   // number of allosteric inhibitors for each reaction
-		    int[] n_aa,   // number of allosteric activators for each reaction
-		    vector ki,    // vector of competitive inhibition constants
+                    vector current_balanced,
+                    vector unbalanced,
+                    int[] balanced_ix,
+                    int[] unbalanced_ix,
+                    vector enzyme_concentration,
+                    vector km,
+                    int[,] km_lookup,
+                    matrix S,
+                    vector kcat,
+                    vector keq,
+                    int[] ci_ix,  // index of competitive inhibitors (long-form ragged)
+                    int[] ai_ix,  // index of allosteric inhibitors (long-form ragged)
+                    int[] aa_ix,  // index of allosteric activators (long-form ragged)
+                    int[] n_ci,   // number of competitive inhibitors for each reaction
+                    int[] n_ai,   // number of allosteric inhibitors for each reaction
+                    int[] n_aa,   // number of allosteric activators for each reaction
+                    vector ki,    // vector of competitive inhibition constants
                     vector dissociation_constant_t,
                     vector dissociation_constant_r,
                     vector transfer_constant){
@@ -127,19 +127,19 @@ vector dbalanced_dt(real time,
   current_concentration[balanced_ix] = current_balanced;
   current_concentration[unbalanced_ix] = unbalanced;
   return S[balanced_ix] * get_flux(current_concentration,
-				   enzyme_concentration,
-				   km,
-				   km_lookup,
-				   S,
-				   kcat,
-				   keq,
-				   ci_ix,
-				   ai_ix,
-				   aa_ix,
-				   n_ci,
-				   n_ai,
-				   n_aa,
-				   ki,
+                                   enzyme_concentration,
+                                   km,
+                                   km_lookup,
+                                   S,
+                                   kcat,
+                                   keq,
+                                   ci_ix,
+                                   ai_ix,
+                                   aa_ix,
+                                   n_ci,
+                                   n_ai,
+                                   n_aa,
+                                   ki,
                                    dissociation_constant_t,
                                    dissociation_constant_r,
                                    transfer_constant);
