@@ -229,11 +229,11 @@ def get_input_data(
         {
             "enzyme_id": [e.id for e in enzymes.values()],
             "subunits": [e.subunits for e in enzymes.values()],
-            "index": [enzyme_codes[e.id] for e in enzymes.values()]
+            "index": [enzyme_codes[e.id] for e in enzymes.values()],
         }
     )
 
-    subunits = subunits.sort_values(by='index').reset_index(drop=True)
+    subunits = subunits.sort_values(by="index").reset_index(drop=True)
 
     # priors
     km_priors = pd.DataFrame(
