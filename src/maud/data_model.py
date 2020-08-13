@@ -114,6 +114,7 @@ class Enzyme:
     :param reaction_id: the id of the reaction the enzyme catalyses
     :param name: human-understandable name for the enzyme
     :param modifiers: modifiers, given as {'modifier_id': modifier_object}
+    :param subunits: number of subunits in enzymes
     """
 
     def __init__(
@@ -122,12 +123,14 @@ class Enzyme:
         reaction_id: str,
         name: str,
         modifiers: Dict[str, List[Modifier]] = None,
+        subunits: int = 1,
     ):
         if modifiers is None:
             modifiers = defaultdict()
         self.id = id
         self.name = name
         self.modifiers = modifiers
+        self.subunits = subunits
 
 
 class Reaction:

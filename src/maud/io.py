@@ -133,6 +133,7 @@ def load_reaction_from_toml(toml_reaction: dict) -> Reaction:
 
     """
     enzymes = {}
+    subunits = 1
     reversible = (
         toml_reaction["reversible"] if "reversible" in toml_reaction.keys() else None
     )
@@ -155,11 +156,16 @@ def load_reaction_from_toml(toml_reaction: dict) -> Reaction:
                         modifier_type=modifier_type,
                     )
                 )
+                
+        if "subunits" in e.keys():
+            subunits = e['subunits']
+
         enzymes[e["id"]] = Enzyme(
             id=e["id"],
             name=e["name"],
             reaction_id=toml_reaction["id"],
             modifiers=modifiers,
+            subunits=subunits
         )
     return Reaction(
         id=toml_reaction["id"],

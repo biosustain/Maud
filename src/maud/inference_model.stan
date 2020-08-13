@@ -65,6 +65,7 @@ data {
   int<lower=0,upper=N_mic> ci_ix[N_competitive_inhibitor];
   int<lower=0,upper=N_mic> ai_ix[N_allosteric_inhibitor];
   int<lower=0,upper=N_mic> aa_ix[N_allosteric_activator];
+  int<lower=0> subunits[N_enzyme];
   // configuration
   vector<lower=0>[N_mic] conc_init[N_experiment];
   real rel_tol;
@@ -122,7 +123,8 @@ transformed parameters {
                                                               ki,
                                                               dissociation_constant_t,
                                                               dissociation_constant_r,
-                                                              transfer_constant);
+                                                              transfer_constant,
+                                                              subunits);
     conc[e, balanced_mic_ix] = conc_balanced[1];
     conc[e, unbalanced_mic_ix] = conc_unbalanced[e]';
     flux[e] = get_flux(conc[e],
@@ -141,7 +143,8 @@ transformed parameters {
                        ki,
                        dissociation_constant_t,
                        dissociation_constant_r,
-                       transfer_constant)';
+                       transfer_constant,
+                       subunits)';
     if (squared_distance(conc_balanced[1], conc_balanced[2]) > 1){
       print("Balanced metabolite concentration at ", timepoint, " seconds is not steady.");
       print("Found ", conc_balanced[1], " at ", timepoint, " seconds and ",

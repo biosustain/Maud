@@ -37,7 +37,8 @@ vector get_flux(vector conc_mic,
                 vector ki,
                 vector dissociation_constant_t,
                 vector dissociation_constant_r,
-                vector transfer_constant){
+                vector transfer_constant,
+                int[] subunits){
   vector[cols(S)] flux;
   int pos_ci = 1;
   int pos_ai = 1;
@@ -91,7 +92,8 @@ vector get_flux(vector conc_mic,
                                        free_enzyme_ratio,
                                        diss_r_rxn,
                                        diss_t_rxn,
-                                       transfer_constant[pos_tc]);
+                                       transfer_constant[pos_tc],
+                                       subunits[i_rxn]);
     }
     flux[i_rxn] = catalysis_factor * allostery_factor;
     pos_ci += n_ci[i_rxn];
@@ -122,7 +124,8 @@ vector dbalanced_dt(real time,
                     vector ki,    // vector of competitive inhibition constants
                     vector dissociation_constant_t,
                     vector dissociation_constant_r,
-                    vector transfer_constant){
+                    vector transfer_constant,
+                    int[] subunits){
   vector[rows(current_balanced)+rows(unbalanced)] current_concentration;
   current_concentration[balanced_ix] = current_balanced;
   current_concentration[unbalanced_ix] = unbalanced;
@@ -142,5 +145,6 @@ vector dbalanced_dt(real time,
                                    ki,
                                    dissociation_constant_t,
                                    dissociation_constant_r,
-                                   transfer_constant);
+                                   transfer_constant,
+                                   subunits);
 }

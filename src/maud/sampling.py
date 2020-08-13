@@ -225,6 +225,16 @@ def get_input_data(
     }
     enzymes = {k: v for r in reactions.values() for k, v in r.enzymes.items()}
     full_stoic = get_full_stoichiometry(mi.kinetic_model, enzyme_codes, mic_codes)
+    subunits = pd.DataFrame(
+        {
+            "enzyme_id": [e.id for e in enzymes.values()],
+            "subunits": [e.subunits for e in enzymes.values()],
+            "index": [enzyme_codes[e.id] for e in enzymes.values()]
+        }
+    )
+
+    subunits = subunits.sort_values(by='index').reset_index(drop=True)
+
     # priors
     km_priors = pd.DataFrame(
         {
@@ -382,6 +392,7 @@ def get_input_data(
         "ci_ix": ki_priors["mic_code"].values,
         "ai_ix": diss_t_priors["mic_code"].values,
         "aa_ix": diss_r_priors["mic_code"].values,
+        "subunits": subunits["subunits"].values,
         "conc_init": conc_init.values,
         "rel_tol": rel_tol,
         "abs_tol": abs_tol,
