@@ -20,8 +20,7 @@
 
 """
 
-from string import ascii_lowercase
-from typing import Dict, List, Tuple
+from typing import Dict
 
 import toml
 
@@ -36,7 +35,6 @@ from maud.data_model import (
     Metabolite,
     MetaboliteInCompartment,
     Modifier,
-    Parameter,
     Prior,
     Reaction,
 )
@@ -107,12 +105,6 @@ def get_stan_codes(km: KineticModel, experiments) -> Dict[str, Dict[str, int]]:
     """
     rxns = km.reactions.values()
     enzyme_ids = [eid for rxn in rxns for eid in rxn.enzymes.keys()]
-    kinetic_parameter_ids = [
-        f"{enzyme_id}_{parameter_id}"
-        for reaction in km.reactions.values()
-        for enzyme_id, enzyme in reaction.enzymes.items()
-        for parameter_id in enzyme.parameters.keys()
-    ]
     mic_codes = codify(km.mics.keys())
     balanced_mic_codes = {
         mic_id: code for mic_id, code in mic_codes.items() if km.mics[mic_id].balanced
@@ -127,68 +119,10 @@ def get_stan_codes(km: KineticModel, experiments) -> Dict[str, Dict[str, int]]:
         "metabolite_in_compartment": mic_codes,
         "balanced_mic": balanced_mic_codes,
         "unbalanced_mic": unbalanced_mic_codes,
-        "kinetic_parameter": codify(kinetic_parameter_ids),
         "reaction": codify(km.reactions.keys()),
         "experiment": codify(experiments.keys()),
         "enzyme": codify(enzyme_ids),
     }
-
-
-def get_non_modifier_params(
-    enzyme_id: str, enzyme_mechanism: str, stoichiometry: dict
-) -> Dict[str, Parameter]:
-    """Get the non-modifer parameters for an enzyme.
-
-    :param enzyme_id: String identifying the enzyme
-    :param enzyme_mechanism: String identifying the enzyme's mechanism,
-    e.g. 'ordered_bibi'
-    :param stoichiometry: Dictionary representing the reaction's stoichiometry. The
-    keys are metabolite ids and the values are stoichiometries.
-
-    """
-    if enzyme_mechanism == "modular_rate_law":
-        substrates = [k for k, v in stoichiometry.items() if v < 0]
-        products = [k for k, v in stoichiometry.items() if v > 0]
-        substrate_param_ids = [
-            "K" + letter for substrate, letter in zip(substrates, ascii_lowercase)
-        ]
-        product_param_ids = [
-            "K" + letter for product, letter in zip(products, ascii_lowercase[15:])
-        ]
-        param_ids = substrate_param_ids + product_param_ids + ["Kcat1"]
-        return {param_id: Parameter(param_id, enzyme_id) for param_id in param_ids}
-    else:
-        return {
-            param_id: Parameter(param_id, enzyme_id)
-            for param_id in MECHANISM_TO_PARAM_IDS[enzyme_mechanism]
-        }
-
-
-def parse_modifiers(
-    modifier_type: str, modifiers: List[str], enzyme_id: str, param_prefix: str
-) -> Tuple:
-    """Turn unformatted modifier info into dictionaries of Modifier and Parameter objects.
-
-    :param modifier_type: String identifying the type of modifier. One of
-    'allosteric_inhibitor', 'allosteric_activator', 'competitive_inhibitor'
-
-    :param modifier: List of strings identifying modifying metabolites.
-
-    :param enzyme id: String identifying the enzyme that is modified.
-
-    :param_prefix: String that goes before the metabolite id in order to
-    identify the metabolite-specific parameters.
-
-    """
-    modifier_dict = {}
-    modifier_params = {}
-    for modifier in modifiers:
-        modifier_dict[f"{modifier}_{modifier_type}"] = Modifier(modifier, modifier_type)
-        param_id = f"{param_prefix}_{modifier}"
-        modifier_params[param_id] = Parameter(param_id, enzyme_id, modifier)
-    if modifier_type in ["allosteric_inhibitor", "allosteric_activator"]:
-        modifier_params["transfer_constant"] = Parameter("transfer_constant", enzyme_id)
-    return modifier_dict, modifier_params
 
 
 def load_reaction_from_toml(toml_reaction: dict) -> Reaction:
@@ -199,6 +133,7 @@ def load_reaction_from_toml(toml_reaction: dict) -> Reaction:
 
     """
     enzymes = {}
+    subunits = 1
     reversible = (
         toml_reaction["reversible"] if "reversible" in toml_reaction.keys() else None
     )
@@ -206,35 +141,31 @@ def load_reaction_from_toml(toml_reaction: dict) -> Reaction:
         toml_reaction["is_exchange"] if "is_exchange" in toml_reaction.keys() else None
     )
     for e in toml_reaction["enzymes"]:
-        non_modifier_params = get_non_modifier_params(
-            e["id"], e["mechanism"], toml_reaction["stoichiometry"]
-        )
-        modifiers = {}
-        modifier_params = {}
-        if "competitive_inhibitors" in e.keys() & e["mechanism"] != "modular_rate_law":
-            raise ValueError(
-                """competitive inhibitors are currently
-                only supported for the mechanism 'modular_rate_law'"""
-            )
-        for modifier_type, param_prefix in [
-            ("allosteric_activator", "dissociation_constant_r"),
-            ("allosteric_inhibitor", "dissociation_constant_t"),
-            ("competitive_inhibitor", "inhibition_constant"),
-        ]:
-            if modifier_type + "s" in e.keys():
-                modifiers_of_this_type, modifier_params_of_this_type = parse_modifiers(
-                    modifier_type, e[modifier_type + "s"], e["id"], param_prefix
+        modifiers = {
+            "competitive_inhibitor": [],
+            "allosteric_inhibitor": [],
+            "allosteric_activator": [],
+        }
+        if "modifiers" in e.keys():
+            for modifier_dict in e["modifiers"]:
+                modifier_type = modifier_dict["modifier_type"]
+                modifiers[modifier_type].append(
+                    Modifier(
+                        mic_id=modifier_dict["mic_id"],
+                        enzyme_id=e["id"],
+                        modifier_type=modifier_type,
+                    )
                 )
-                modifiers.update(modifiers_of_this_type)
-                modifier_params.update(modifier_params_of_this_type)
-        params = {**non_modifier_params, **modifier_params}
+
+        if "subunits" in e.keys():
+            subunits = e["subunits"]
+
         enzymes[e["id"]] = Enzyme(
             id=e["id"],
             name=e["name"],
             reaction_id=toml_reaction["id"],
-            mechanism=e["mechanism"],
-            parameters=params,
             modifiers=modifiers,
+            subunits=subunits,
         )
     return Reaction(
         id=toml_reaction["id"],
@@ -274,29 +205,80 @@ def load_maud_input_from_toml(filepath: str, id: str = "mi") -> MaudInput:
         if "knockouts" in e.keys():
             experiment.knockouts = e["knockouts"]
         experiments.update({experiment.id: experiment})
-    priors = {}
-    for formation_energy_prior in parsed_toml["priors"]["thermodynamic_parameters"][
-        "formation_energies"
-    ]:
-        prior_id = f"{formation_energy_prior['target_id']}_formation_energy"
-        priors[prior_id] = Prior(
-            id=prior_id,
-            target_id=formation_energy_prior["target_id"],
-            location=formation_energy_prior["location"],
-            scale=formation_energy_prior["scale"],
-            target_type="thermodynamic_parameter",
+    priors = {
+        "kcats": [],
+        "kms": [],
+        "enzyme_concentrations": [],
+        "formation_energies": [],
+        "unbalanced_metabolites": [],
+        "inhibition_constants": [],
+        "tense_dissociation_constants": [],
+        "relaxed_dissociation_constants": [],
+        "transfer_constants": [],
+    }
+    for prior in parsed_toml["priors"]["formation_energies"]:
+        metabolite_id = prior["metabolite_id"]
+        priors["formation_energies"].append(
+            Prior(
+                id=f"formation_energy_{metabolite_id}",
+                location=prior["location"],
+                scale=prior["scale"],
+                metabolite_id=metabolite_id,
+            )
         )
-    for enz_id, kpps in parsed_toml["priors"]["kinetic_parameters"].items():
-        for kpp in kpps:
-            prior_id = f"{enz_id}_{kpp['target_id']}"
-            if "metabolite" in kpp.keys():
-                prior_id += "_" + kpp["metabolite"]
-            priors[prior_id] = Prior(
-                id=prior_id,
-                target_id=kpp["target_id"],
-                location=kpp["location"],
-                scale=kpp["scale"],
-                target_type="kinetic_parameter",
+    for prior in parsed_toml["priors"]["kms"]:
+        enzyme_id = prior["enzyme_id"]
+        mic_id = prior["mic_id"]
+        priors["kms"].append(
+            Prior(
+                id=f"km_{enzyme_id}_{mic_id}",
+                location=prior["location"],
+                scale=prior["scale"],
+                mic_id=mic_id,
+                enzyme_id=enzyme_id,
+            )
+        )
+    for prior in parsed_toml["priors"]["kcats"]:
+        enzyme_id = prior["enzyme_id"]
+        priors["kcats"].append(
+            Prior(
+                id=f"kcat_{enzyme_id}",
+                location=prior["location"],
+                scale=prior["scale"],
+                enzyme_id=enzyme_id,
+            )
+        )
+    for prior_type, prefix in zip(
+        [
+            "inhibition_constants",
+            "relaxed_dissociation_constants",
+            "tense_dissociation_constants",
+        ],
+        ["ki", "diss_r", "diss_t"],
+    ):
+        if prior_type in parsed_toml["priors"].keys():
+            for prior in parsed_toml["priors"][prior_type]:
+                enzyme_id = prior["enzyme_id"]
+                mic_id = prior["mic_id"]
+                priors[prior_type].append(
+                    Prior(
+                        id=f"{prefix}_{enzyme_id}_{mic_id}",
+                        location=prior["location"],
+                        scale=prior["scale"],
+                        enzyme_id=enzyme_id,
+                        mic_id=mic_id,
+                    )
+                )
+    if "transfer_constants" in parsed_toml["priors"].keys():
+        for prior in parsed_toml["priors"]["transfer_constants"]:
+            enzyme_id = prior["enzyme_id"]
+            priors["transfer_constants"].append(
+                Prior(
+                    id=f"transfer_constant_{enzyme_id}",
+                    location=prior["location"],
+                    scale=prior["scale"],
+                    enzyme_id=enzyme_id,
+                )
             )
     stan_codes = get_stan_codes(kinetic_model, experiments)
     mi = MaudInput(

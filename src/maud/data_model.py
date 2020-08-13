@@ -72,19 +72,18 @@ class MetaboliteInCompartment:
 class Modifier:
     """Constructor for modifier objects.
 
-    :param mic: the metabolite-in-compartment that is the modifier
-    :param allosteric: whether or not the modifier is allosteric
-    :param modifier_type: what is the modifier type:
+    :param mic_id: the id of the modifying metabolite-in-compartment
+    :param enzyme_id: the id of the modified enzyme
+    :param modifier_type: what is the modifier type, e.g.
     'allosteric_activator', 'allosteric_inhibitor', 'competitive inhibitor'
     """
 
-    def __init__(self, mic: MetaboliteInCompartment, modifier_type: str = None):
-        self.mic = mic
-        self.allosteric = modifier_type in [
-            "allosteric_inhibitor",
-            "allosteric_activator",
-        ]
+    def __init__(self, mic_id: str, enzyme_id: str, modifier_type: str = None):
+        allosteric_types = ["allosteric_inhibitor", "allosteric_activator"]
+        self.mic_id = mic_id
+        self.enzyme_id = enzyme_id
         self.modifier_type = modifier_type
+        self.allosteric = modifier_type in allosteric_types
 
 
 class Parameter:
@@ -114,9 +113,8 @@ class Enzyme:
     :param id: a string identifying the enzyme
     :param reaction_id: the id of the reaction the enzyme catalyses
     :param name: human-understandable name for the enzyme
-    :param mechanism: enzyme mechanism as a string
     :param modifiers: modifiers, given as {'modifier_id': modifier_object}
-    :param parameters: enzyme parameters, give as {'parameter_id': parameter_object}
+    :param subunits: number of subunits in enzymes
     """
 
     def __init__(
@@ -124,17 +122,15 @@ class Enzyme:
         id: str,
         reaction_id: str,
         name: str,
-        mechanism: str,
-        parameters: Dict[str, Parameter],
-        modifiers: Dict[str, Modifier] = None,
+        modifiers: Dict[str, List[Modifier]] = None,
+        subunits: int = 1,
     ):
         if modifiers is None:
             modifiers = defaultdict()
         self.id = id
         self.name = name
-        self.mechanism = mechanism
         self.modifiers = modifiers
-        self.parameters = parameters
+        self.subunits = subunits
 
 
 class Reaction:
@@ -256,8 +252,6 @@ class Prior:
     :param target_id: a string identifying the thing that has a prior distribution
     :param location: a number specifying the location of the distribution
     :param scale: a number specifying the scale of the distribution
-    :param target_type: a string describing the target, e.g. 'kinetic_parameter',
-    'enzyme', 'thermodynamic_parameter' or 'unbalanced_metabolite'
     :param experiment_id: id of the relevant experiment (for enzymes or unbalanced
     metabolites)
     """
@@ -265,25 +259,27 @@ class Prior:
     def __init__(
         self,
         id: str,
-        target_id: str,
         location: float,
         scale: float,
-        target_type: str,
         experiment_id: str = None,
+        mic_id: str = None,
+        metabolite_id: str = None,
+        enzyme_id: str = None,
     ):
         self.id = id
-        self.target_id = target_id
         self.location = location
         self.scale = scale
-        self.target_type = target_type
         self.experiment_id = experiment_id
+        self.mic_id = mic_id
+        self.metabolite_id = metabolite_id
+        self.enzyme_id = enzyme_id
 
 
 class MaudInput:
     """Everything that is needed to run Maud.
 
     :param kinetic_system: a KineticSystem object
-    :param priors: a dictionary mapping prior ids to Prior objects
+    :param priors: a dictionary mapping prior types to lists of Prior objects
     :param stan codes: a dictionary with keys 'metabolite', 'reaction', 'mic',
     'experiment', 'balanced_mic', 'unbalanced_mic' and 'kinetic_parameter', whose
     values are dictionaries mapping ids of the relevant objects to integer codes
@@ -293,7 +289,7 @@ class MaudInput:
     def __init__(
         self,
         kinetic_model: KineticModel,
-        priors: Dict[str, Prior],
+        priors: Dict[str, List[Prior]],
         stan_codes: Dict[str, Dict[str, int]],
         experiments: Dict[str, Experiment] = None,
     ):
