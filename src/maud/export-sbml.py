@@ -21,6 +21,8 @@ Template_yaml = Template("""time:
     variable: t
 
 parameters:
+    - parameterId: Zero
+      nominalValue: 0
 {%- for par in parameters %}
     - parameterId: {{par[0]}}
       nominalValue: {{par[1]}}
@@ -102,16 +104,19 @@ S = sampling.get_full_stoichiometry(kinetic_model,
                                     mic_codes)
 system_odes = []
 
-for met_vec in S.T.values:
+for met_ix, met_vec in enumerate(S.T.values):
     tmp_met_ode = ''
     first = 0
-    for flux_ix, stoic in enumerate(met_vec):
-        if stoic != 0:
-            if first == 0:
-                first += 1
-                tmp_met_ode += f'({stoic}*{flux_vector[flux_ix]})'
-            else:
-                tmp_met_ode += f'+({stoic}*{flux_vector[flux_ix]})' 
+    if mi.kinetic_model.mics[list(mic_codes.keys())[met_ix]].balanced == 1:
+        for flux_ix, stoic in enumerate(met_vec):
+            if stoic != 0:
+                if first == 0:
+                    first += 1
+                    tmp_met_ode += f'({stoic}*{flux_vector[flux_ix]})'
+                else:
+                    tmp_met_ode += f'+({stoic}*{flux_vector[flux_ix]})' 
+    else:
+        tmp_met_ode = "Zero"
 
     system_odes.append(tmp_met_ode)
 
