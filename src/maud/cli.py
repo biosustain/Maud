@@ -98,8 +98,11 @@ pass
 )
 @click.option("--output_dir", default=".", help="Where to save Maud's output")
 @click.option("--threads_per_chain", default=1, help="How many threads per chain")
-@click.option("--save_warmup", default=SAMPLING_DEFAULTS["save_warmup"],
-              help="Whether to save warmup draws")
+@click.option(
+    "--save_warmup",
+    default=SAMPLING_DEFAULTS["save_warmup"],
+    help="Whether to save warmup draws",
+)
 @click.argument(
     "data_path",
     type=click.Path(exists=True, dir_okay=False),
