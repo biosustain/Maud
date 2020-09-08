@@ -37,6 +37,7 @@ experiments and the existing literature.
    :caption: Implementation details:
 
    implementation/data_model
+   implementation/computation
 
 
 
