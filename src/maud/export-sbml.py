@@ -78,9 +78,9 @@ for rxn in mi.kinetic_model.reactions.values():
         substrate_information = tmp_enz_entry[tmp_enz_entry['stoichiometry'] < 0]
         product_information = tmp_enz_entry[tmp_enz_entry['stoichiometry'] > 0]
 
-        substrate_entry = zip(substrate_information['mic_id'], substrate_information['parameter_id'], substrate_information['stoichiometry'])
+        substrate_entry = zip(substrate_information['mic_id'], substrate_information['parameter_id'], substrate_information['stoichiometry'].abs())
         metabolite_denomintor = zip(tmp_enz_entry['mic_id'], tmp_enz_entry['parameter_id'], tmp_enz_entry['stoichiometry'].abs())
-        product_entry = zip(product_information['mic_id'], product_information['parameter_id'], product_information['stoichiometry'])
+        product_entry = zip(product_information['mic_id'], product_information['parameter_id'], product_information['stoichiometry'].abs())
         haldane_entry = zip(tmp_enz_entry['parameter_id'], tmp_enz_entry['stoichiometry'])
         
 
@@ -95,7 +95,8 @@ for rxn in mi.kinetic_model.reactions.values():
                                  Hal=Hal)
         Dr = Template_Dr.render(met_array=metabolite_denomintor)
         flux = Template_flux.render(Tr=Tr,
-                                    Dr=Dr)
+                                    Dr=Dr,
+                                    Drreg="0")
 
         flux_vector.append(flux)
 
