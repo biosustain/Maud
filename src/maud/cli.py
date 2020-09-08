@@ -33,6 +33,7 @@ SAMPLING_DEFAULTS = {
     "n_chains": 4,
     "n_cores": 4,
     "timepoint": 500,
+    "save_warmup": True,
 }
 RELATIVE_PATH_EXAMPLE = "../../tests/data/linear.toml"
 
@@ -97,6 +98,11 @@ pass
 )
 @click.option("--output_dir", default=".", help="Where to save Maud's output")
 @click.option("--threads_per_chain", default=1, help="How many threads per chain")
+@click.option(
+    "--save_warmup",
+    default=SAMPLING_DEFAULTS["save_warmup"],
+    help="Whether to save warmup draws",
+)
 @click.argument(
     "data_path",
     type=click.Path(exists=True, dir_okay=False),
