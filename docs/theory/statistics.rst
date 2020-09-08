@@ -98,6 +98,15 @@ quantities typically have multiplicative errors. In other words, if the
 measured value is large, then the associated error is also proportionally
 large.
 
+Summary statistics
+------------------
+
+It is common for experimental results to be reported in the form of a sample
+mean and standard deviation. It is important to note that for non-negative
+quantities like metabolite and enzyme concentrations these summary statistics
+will generally not be good values use as :math:`y` and :math:`\sigma` above. If
+possible, non-summarised measurement results should be used instead.
+
 
 Relative measurements
 ---------------------
