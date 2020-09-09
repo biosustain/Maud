@@ -38,9 +38,10 @@ def test_linear():
         "output_dir": temp_directory,
         "data_path": linear_input,
         "threads_per_chain": 1,
+        "save_warmup": False,
     }
     fit = sampling.sample(**linear_input_values)
-    samples_test = fit.get_drawset()
+    samples_test = fit.draws_as_dataframe()
     samples_ctrl = pd.read_csv(linear_control_file, comment="#").iloc[200:]
     # Check that the output and the control have the same column names.
     assert all(samples_test.columns == samples_ctrl.columns)
