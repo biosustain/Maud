@@ -27,7 +27,6 @@ experiments and the existing literature.
    :maxdepth: 1
    :caption: Theoretical background:
 
-   theory/computation
    theory/enzyme_kinetics
    theory/statistics
    theory/thermodynamics
