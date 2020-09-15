@@ -31,11 +31,11 @@ real get_Dr_common_rate_law(vector metabolite, vector km, vector stoichiometry){
 }
 
 real get_Dr_reg(vector conc_ci, vector ki){
-  if (rows(conc_ci) > 0){
+  if (rows(conc_ci) < 1){
     return 0;
   }
   else {
-    return prod(conc_ci ./ ki);
+    return sum(conc_ci ./ ki);
   }
 }
 
