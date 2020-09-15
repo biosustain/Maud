@@ -261,6 +261,16 @@ def get_input_data(
             "metabolite_id": [p.metabolite_id for p in mi.priors["formation_energies"]],
         }
     )
+    met_id_df = pd.DataFrame.from_dict(met_codes, orient="index").reset_index()
+    met_id_df.columns = ["metabolite_id", "index"]
+    formation_energy_priors = (
+        formation_energy_priors.merge(
+            met_id_df, left_on=["metabolite_id"], right_on=["metabolite_id"]
+        )
+        .sort_values("index")
+        .reset_index(drop=True)
+    )
+
     ki_priors, diss_t_priors, diss_r_priors = (
         pd.DataFrame(
             {
