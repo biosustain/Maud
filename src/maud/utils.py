@@ -18,6 +18,9 @@
 
 from typing import Dict, Iterable
 
+import numpy as np
+from scipy.stats import norm
+
 from maud.data_model import KineticModel
 
 
@@ -46,3 +49,31 @@ def get_enzyme_codes(kinetic_model: KineticModel) -> Dict[str, int]:
         for enz_id, _ in rxn.enzymes.items():
             enzyme_ids.append(enz_id)
     return codify(enzyme_ids)
+
+
+def get_lognormal_parameters_from_quantiles(x1, p1, x2, p2):
+    """Find parameters for a lognormal distribution from two quantiles.
+
+    i.e. get mu and sigma such that if X ~ lognormal(mu, sigma), then pr(X <
+    x1) = p1 and pr(X < x2) = p2.
+
+    """
+    logx1 = np.log(x1)
+    logx2 = np.log(x2)
+    denom = norm.ppf(p2) - norm.ppf(p1)
+    sigma = (logx2 - logx1) / denom
+    mu = (logx1 * norm.ppf(p2) - logx2 * norm.ppf(p1)) / denom
+    return mu, sigma
+
+
+def get_normal_parameters_from_quantiles(x1, p1, x2, p2):
+    """Find parameters for a normal distribution from two quantiles.
+
+    i.e. get mu and sigma such that if X ~ normal(mu, sigma), then pr(X <
+    x1) = p1 and pr(X < x2) = p2.
+
+    """
+    denom = norm.ppf(p2) - norm.ppf(p1)
+    sigma = (x2 - x1) / denom
+    mu = (x1 * norm.ppf(p2) - x2 * norm.ppf(p1)) / denom
+    return mu, sigma

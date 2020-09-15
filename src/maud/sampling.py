@@ -100,6 +100,7 @@ def sample(
     timepoint: float,
     output_dir: str,
     threads_per_chain: int,
+    save_warmup: bool,
 ) -> cmdstanpy.CmdStanMCMC:
     """Sample from a posterior distribution.
 
@@ -117,6 +118,7 @@ def sample(
     initial state with evolved state
     :param: output_dir: Directory to save output
     :param: threads_per_chain: Number of threads per chain (default is 1)
+    :param: save_warmup: whether to save warmup draws (default is True)
     """
     if threads_per_chain != 1:
         os.environ["STAN_NUM_THREADS"] = str(threads_per_chain)
@@ -146,7 +148,7 @@ def sample(
         output_dir=output_dir,
         iter_warmup=n_warmup,
         max_treedepth=15,
-        save_warmup=True,
+        save_warmup=save_warmup,
         inits=init_filepath,
         show_progress=True,
     )
