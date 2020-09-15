@@ -23,6 +23,10 @@ Homeostasis has lots of timescales, with the fastest cellular responses being
 done by allosterism in kinetic systems. All microbial regulation is kinetic and
 a lot of mammal regulation.
 
+Failures of enzyme regulation cause many diseases. Conversely, properly
+functioning enzyme regulation causes negative feedback loops in metabolic
+pathways that might otherwise be viable targets for biosynthesis.
+
 Compared to forms of homeostatic systems with longer timescales, like gene
 expression regulation, allosteric regulation is poorly understood. Questions
 like why certain enzymes are multimeric, or why they are sub-optimally
