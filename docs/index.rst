@@ -31,8 +31,6 @@ experiments and the existing literature.
    theory/enzyme_kinetics
    theory/statistics
    theory/thermodynamics
-   theory/kinetic_model
-
 
 .. toctree::
    :maxdepth: 1
