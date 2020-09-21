@@ -263,6 +263,10 @@ def get_input_data(
             "metabolite_id": [p.metabolite_id for p in mi.priors["formation_energies"]],
         }
     )
+    formation_energy_priors["metabolite_code"] = (
+        formation_energy_priors["metabolite_id"].map(met_codes)
+    )
+    formation_energy_priors = formation_energy_priors.sort_values("metabolite_code")
     ki_priors, diss_t_priors, diss_r_priors = (
         pd.DataFrame(
             {
