@@ -428,7 +428,3 @@ enzyme_measurements = [
   {target_id='PGI', value=0.03338748587758992, uncertainty=0.06406406775305307},
   {target_id='PGK', value=0.1015118053600683, uncertainty=0.2444643294169102},
 ]
-
-haldane relationship:
-kcatfwd = kcatrev * prod(substrate_kms) / prod(product_kms)
-= 1480 * (0.6 * 2.02) / (2.02 * 5.37)
