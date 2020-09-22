@@ -17,12 +17,6 @@ compartment = "c"
 balanced = true
 
 [[metabolites]]
-id = "h20"
-name = "water"
-compartment = "c"
-balanced = false
-
-[[metabolites]]
 id = "fdp"
 name = "D-Fructose 1,6-bisphosphate"
 compartment = "c"
@@ -91,8 +85,8 @@ name = "Glucose-6-phosphate isomerase"
 mechanism = "modular_rate_law"
 gene = "pgi"
 [reactions.stoichiometry]
-f6p_c = 1
 g6p_c = -1
+f6p_c = 1
 
 [[reactions]]
 id = "PFK"
@@ -103,9 +97,9 @@ name = "Phosphofructokinase"
 mechanism = "modular_rate_law"
 gene = "pfkA"
 [reactions.stoichiometry]
-adp_c = 1
 atp_c = -1
 f6p_c = -1
+adp_c = 1
 fdp_c = 1
 
 [[reactions]]
@@ -120,7 +114,6 @@ gene = "fbp"
 f6p_c = 1
 fdp_c = -1
 pi_c = 1
-h20_c = -1
 
 [[reactions]]
 id = "FBA"
@@ -171,10 +164,10 @@ name = "Phosphoglycerate kinase"
 mechanism = "modular_rate_law"
 gene = "pgk"
 [reactions.stoichiometry]
-13dpg_c = 1
-3pg_c = -1
-adp_c = 1
-atp_c = -1
+13dpg_c = -1
+3pg_c = 1
+adp_c = -1
+atp_c = 1
 
 [[priors.formation_energies]]
 metabolite_id = "g6p"
@@ -190,11 +183,6 @@ scale = 1.3
 metabolite_id = "pi"
 location = -1073.3
 scale = 1.5
-
-[[priors.formation_energies]]
-metabolite_id = "h20"
-location = -157.6
-scale = 1.6
 
 [[priors.formation_energies]]
 metabolite_id = "fdp"
@@ -274,7 +262,7 @@ scale = 0.2
 [[priors.kcats]]
 enzyme_id = "PGK"
 location = 329.0
-scale = 0.2
+scale = 1
 
 [[priors.kms]]
 enzyme_id = "PGI"
@@ -312,18 +300,11 @@ mic_id = "adp_c"
 location = 0.55
 scale = 1.5
 
-
 [[priors.kms]]
 enzyme_id = "FBP"
 mic_id = "fdp_c"
 location = 16.0
 scale = 0.2
-
-[[priors.kms]]
-enzyme_id = "FBP"
-mic_id = "h20_c"
-location = 0.5
-scale = 1
 
 [[priors.kms]]
 enzyme_id = "FBP"
@@ -428,7 +409,6 @@ id = 'condition_1'
 metadata = "Made up numbers"
 metabolite_measurements = [
   {target_id='3pg_c', value=1.9065364, uncertainty=0.084368},
-  {target_id='h20_c', value=10.6113649, uncertainty=0.01},
   {target_id='adp_c', value=0.6113649, uncertainty=0.038811},
   {target_id='atp_c', value=5.4080032, uncertainty=0.186962},
   {target_id='dhap_c', value=1.895018, uncertainty=0.078636},
@@ -439,10 +419,7 @@ metabolite_measurements = [
   {target_id='nadh_c', value=0.00300451, uncertainty=0.15119365},
 ]
 reaction_measurements = [
-  {target_id='GAPD', value=7.382573442000001, uncertainty=0.5},
   {target_id='PGI', value=4.087673533555556, uncertainty=0.5},
-  {target_id='TPI', value=3.748161843222222, uncertainty=0.5},
-  {target_id='FBA', value=2.536603419888889, uncertainty=0.5},
 ]
 enzyme_measurements = [
   {target_id='FBA', value=0.0704592675242211, uncertainty=0.2078269607533649},
@@ -451,3 +428,7 @@ enzyme_measurements = [
   {target_id='PGI', value=0.03338748587758992, uncertainty=0.06406406775305307},
   {target_id='PGK', value=0.1015118053600683, uncertainty=0.2444643294169102},
 ]
+
+haldane relationship:
+kcatfwd = kcatrev * prod(substrate_kms) / prod(product_kms)
+= 1480 * (0.6 * 2.02) / (2.02 * 5.37)
