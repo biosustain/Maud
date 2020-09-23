@@ -105,6 +105,7 @@ fdp_c = 1
 [[reactions]]
 id = "FBP"
 name = "Fructose-bisphosphatase"
+water_stoichiometry = -1
 [[reactions.enzymes]]
 id = "FBP"
 name = "Fructose-bisphosphatase"

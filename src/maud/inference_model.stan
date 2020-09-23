@@ -3,6 +3,7 @@ functions{
 #include modular_rate_law.stan
 #include dbalanced_dt.stan
 #include partial_sums.stan
+#include thermodynamics.stan
 }
 data {
   // dimensions
@@ -56,7 +57,8 @@ data {
   real<lower=0> prior_scale_enzyme[N_experiment, N_enzyme];
   // network properties
   matrix[N_mic, N_enzyme] S;
-  int<lower=1,upper=N_metabolite> metabolite_ix_stoichiometric_matrix[N_mic];
+  int<lower=1,upper=N_metabolite> mic_to_met[N_mic];
+  vector[N_enzyme] water_stoichiometry;
   matrix<lower=0,upper=1>[N_experiment, N_enzyme] is_knockout;
   int<lower=0,upper=N_km> km_lookup[N_mic, N_enzyme];
   int<lower=0,upper=N_mic> n_ci[N_enzyme];
@@ -75,7 +77,6 @@ data {
   real<lower=0> timepoint;
 }
 transformed data {
-  real minus_RT = - 0.008314 * 298.15;
   real initial_time = 0;
   matrix[N_experiment, N_enzyme] knockout =
     rep_matrix(1, N_experiment, N_enzyme) - is_knockout;
@@ -94,10 +95,10 @@ parameters {
 transformed parameters {
   vector<lower=0>[N_mic] conc[N_experiment];
   matrix[N_experiment, N_reaction] flux;
-  vector[N_enzyme] delta_g;
-  vector[N_enzyme] keq;
-  delta_g = S' * formation_energy[metabolite_ix_stoichiometric_matrix];
-  keq = exp(delta_g / minus_RT);
+  vector[N_enzyme] keq = get_keq(S,
+                                 formation_energy,
+                                 mic_to_met,
+                                 water_stoichiometry);
   for (e in 1:N_experiment){
     vector[N_enzyme] experiment_enzyme = enzyme[e]' .* knockout[e]';
     vector[N_mic-N_unbalanced] conc_balanced[2] = ode_bdf_tol(dbalanced_dt,

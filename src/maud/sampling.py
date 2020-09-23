@@ -227,6 +227,9 @@ def get_input_data(
     }
     enzymes = {k: v for r in reactions.values() for k, v in r.enzymes.items()}
     full_stoic = get_full_stoichiometry(mi.kinetic_model, enzyme_codes, mic_codes)
+    water_stoichiometry = [
+        r.water_stoichiometry for r in reactions.values() for e in r.enzymes.items()
+    ]
     subunits = pd.DataFrame(
         {
             "enzyme_id": [e.id for e in enzymes.values()],
@@ -390,7 +393,8 @@ def get_input_data(
         "prior_loc_enzyme": prior_loc_enzyme,
         "prior_scale_enzyme": prior_scale_enzyme,
         "S": full_stoic.T.values,
-        "metabolite_ix_stoichiometric_matrix": list(mic_to_met.values()),
+        "water_stoichiometry": water_stoichiometry,
+        "mic_to_met": list(mic_to_met.values()),
         "is_knockout": knockout_matrix.values,
         "km_lookup": km_lookup.values,
         "n_ci": n_modifier["ki"],
