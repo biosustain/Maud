@@ -29,6 +29,18 @@ compartment = "c"
 balanced = false
 
 [[metabolites]]
+id = "adp"
+name = "ADP C10H12N5O10P2"
+compartment = "c"
+balanced = false
+
+[[metabolites]]
+id = "atp"
+name = "ATP C10H12N5O13P3"
+compartment = "c"
+balanced = false
+
+[[metabolites]]
 id = "dhap"
 name = "Dihydroxyacetone phosphate"
 compartment = "c"
@@ -57,18 +69,6 @@ id = "13dpg"
 name = "3-Phospho-D-glyceroyl phosphate"
 compartment = "c"
 balanced = true
-
-[[metabolites]]
-id = "adp"
-name = "ADP C10H12N5O10P2"
-compartment = "c"
-balanced = false
-
-[[metabolites]]
-id = "atp"
-name = "ATP C10H12N5O13P3"
-compartment = "c"
-balanced = false
 
 [[metabolites]]
 id = "3pg"
@@ -102,19 +102,19 @@ f6p_c = -1
 adp_c = 1
 fdp_c = 1
 
-[[reactions]]
-id = "FBP"
-name = "Fructose-bisphosphatase"
-water_stoichiometry = -1
-[[reactions.enzymes]]
-id = "FBP"
-name = "Fructose-bisphosphatase"
-mechanism = "modular_rate_law"
-gene = "fbp"
-[reactions.stoichiometry]
-f6p_c = 1
-fdp_c = -1
-pi_c = 1
+# [[reactions]]
+# id = "FBP"
+# name = "Fructose-bisphosphatase"
+# water_stoichiometry = 1
+# [[reactions.enzymes]]
+# id = "FBP"
+# name = "Fructose-bisphosphatase"
+# mechanism = "modular_rate_law"
+# gene = "fbp"
+# [reactions.stoichiometry]
+# f6p_c = -1
+# fdp_c = 1
+# pi_c = -1
 
 [[reactions]]
 id = "FBA"
@@ -186,6 +186,16 @@ location = -1073.3
 scale = 1.5
 
 [[priors.formation_energies]]
+metabolite_id = "adp"
+location = -1440.8
+scale = 2.4
+
+[[priors.formation_energies]]
+metabolite_id = "atp"
+location = -2313.0
+scale = 3.0
+
+[[priors.formation_energies]]
 metabolite_id = "fdp"
 location = -2220.9
 scale = 2.1
@@ -220,15 +230,6 @@ metabolite_id = "3pg"
 location = -1365.2
 scale = 1.5
 
-[[priors.formation_energies]]
-metabolite_id = "adp"
-location = -1440.8
-scale = 2.4
-
-[[priors.formation_energies]]
-metabolite_id = "atp"
-location = -2313.0
-scale = 3.0
 
 [[priors.kcats]]
 enzyme_id = "PGI"
@@ -240,10 +241,10 @@ enzyme_id = "PFK"
 location = 110.0
 scale = 0.2
 
-[[priors.kcats]]
-enzyme_id = "FBP"
-location = 24.0
-scale = 0.2
+# [[priors.kcats]]
+# enzyme_id = "FBP"
+# location = 24.0
+# scale = 0.2
 
 [[priors.kcats]]
 enzyme_id = "FBA"
@@ -301,23 +302,23 @@ mic_id = "adp_c"
 location = 0.55
 scale = 1.5
 
-[[priors.kms]]
-enzyme_id = "FBP"
-mic_id = "fdp_c"
-location = 16.0
-scale = 0.2
+# [[priors.kms]]
+# enzyme_id = "FBP"
+# mic_id = "fdp_c"
+# location = 16.0
+# scale = 0.2
 
-[[priors.kms]]
-enzyme_id = "FBP"
-mic_id = "f6p_c"
-location = 0.6899999999999999
-scale = 1.5
+# [[priors.kms]]
+# enzyme_id = "FBP"
+# mic_id = "f6p_c"
+# location = 0.6899999999999999
+# scale = 1.5
 
-[[priors.kms]]
-enzyme_id = "FBP"
-mic_id = "pi_c"
-location = 1.0
-scale = 1.5
+# [[priors.kms]]
+# enzyme_id = "FBP"
+# mic_id = "pi_c"
+# location = 1.0
+# scale = 1.5
 
 [[priors.kms]]
 enzyme_id = "FBA"
@@ -420,11 +421,11 @@ metabolite_measurements = [
   {target_id='nadh_c', value=0.00300451, uncertainty=0.15119365},
 ]
 reaction_measurements = [
-  {target_id='PGI', value=4.087673533555556, uncertainty=0.5},
+  {target_id='PGI', value=4.087673533555556, uncertainty=0.1},
 ]
 enzyme_measurements = [
   {target_id='FBA', value=0.0704592675242211, uncertainty=0.2078269607533649},
-  {target_id='FBP', value=0.005712846258143446, uncertainty=0.1513769774104986},
+  # {target_id='FBP', value=0.005712846258143446, uncertainty=0.1513769774104986},
   {target_id='GAPD', value=0.2845642447881268, uncertainty=0.2386915037960135},
   {target_id='PGI', value=0.03338748587758992, uncertainty=0.06406406775305307},
   {target_id='PGK', value=0.1015118053600683, uncertainty=0.2444643294169102},
