@@ -151,7 +151,8 @@ def sample(
         save_warmup=save_warmup,
         inits=init_filepath,
         show_progress=True,
-        step_size=0.025
+        step_size=0.025,
+        adapt_delta=0.9
     )
 
 
