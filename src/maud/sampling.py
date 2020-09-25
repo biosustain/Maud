@@ -32,7 +32,7 @@ from maud.data_model import KineticModel, MaudInput
 HERE = os.path.dirname(os.path.abspath(__file__))
 INCLUDE_PATH = ""
 DEFAULT_PRIOR_LOC_UNBALANCED = 0.1
-DEFAULT_PRIOR_SCALE_UNBALANCED = 3
+DEFAULT_PRIOR_SCALE_UNBALANCED = 2
 DEFAULT_PRIOR_LOC_ENZYME = 0.1
 DEFAULT_PRIOR_SCALE_ENZYME = 2
 STAN_PROGRAM_RELATIVE_PATH = "inference_model.stan"
@@ -151,6 +151,7 @@ def sample(
         save_warmup=save_warmup,
         inits=init_filepath,
         show_progress=True,
+        step_size=0.025
     )
 
 
