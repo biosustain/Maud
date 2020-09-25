@@ -142,7 +142,8 @@ def load_reaction_from_toml(toml_reaction: dict) -> Reaction:
     )
     water_stoichiometry = (
         toml_reaction["water_stoichiometry"]
-        if "water_stoichiometry" in toml_reaction.keys() else 0
+        if "water_stoichiometry" in toml_reaction.keys()
+        else 0
     )
     for e in toml_reaction["enzymes"]:
         modifiers = {

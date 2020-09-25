@@ -152,7 +152,7 @@ def sample(
         inits=init_filepath,
         show_progress=True,
         step_size=0.025,
-        adapt_delta=0.9
+        adapt_delta=0.9,
     )
 
 
