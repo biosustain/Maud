@@ -1,6 +1,6 @@
-===========
-Computation
-===========
+=============
+ Computation
+=============
 
 Fitting Bayesian statistical models of large metabolic networks poses
 distinctive computational problems. This document explains what the problems
@@ -9,10 +9,10 @@ are and how Maud attempts to address them.
 Goal
 ====
 
-Maud aims to fit Bayesian models of metabolic networks with about 100 internal
-reactions, each with its kinetics represented by the modular rate law and MWC
-formalism as described in the section on :doc:`Maud's statistical model
-<../theory/statistics>`, and around 20 experiments.
+Maud aims to fit Bayesian models of metabolic networks at a scientifically
+interesting scale, each with its kinetics represented by the modular rate law
+and MWC formalism as described in the section on :doc:`Maud's statistical model
+<../theory/statistics>`.
 
 Inputs
 ======
@@ -48,15 +48,16 @@ efficiently explore the posterior probability distribution defined by the
 Why Use Stan And Adaptive Hmc?
 ------------------------------
 
-Our Approach Using Adaptive Hmc Is Preferable To Alternatives Based On
-Rejection Sampling Because The Parameter Space That Needs To Be Explored In
-Scientifically Interesting Problems Has A Large Number Of Dimensions. Rejection
-Sampling Is Known To Be Unreliable In High-Dimensional Problems.
+Our approach using adaptive hmc is preferable to alternatives based on
+rejection sampling because the parameter space that needs to be explored in
+scientifically interesting problems has a large number of dimensions. Rejection
+sampling is known to be unreliable in high-dimensional problems.
 
-Compared To Other Markov Chain Monte Carlo Approaches, Ours Has The Following
-Notable Advantages:
+Compared to other Markov Chain Monte Carlo approaches, ours has the following
+notable advantages:
 
-- It Is Highly Efficient
+- It tends to be highly efficient compared to other generic MCMC
+  implementations in terms of the number of effective samples per second.
 - The well-tested and fast CVODES ODE solver and algebra solver are available
 - Software complexity can be kept low compared to a custom sampler
 - Effective diagnostic tools are available, so we can be relatively confident,
@@ -158,7 +159,7 @@ been kept to where possible:
   blocks in preference to the transformed parameters and model blocks
 - keeping parameters close to unit scale
 - using vectorised operations rather than loops
-- parameterising the model so that the parameters are as uncorrelated
+- parameterising the model so that the parameters are uncorrelated
 
 The final point about less correlated parameterisation is under active
 development - it is likely that the thermodynamic component of the model can be
