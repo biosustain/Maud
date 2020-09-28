@@ -27,7 +27,6 @@ experiments and the existing literature.
    :maxdepth: 1
    :caption: Theoretical background:
 
-   theory/computation
    theory/enzyme_kinetics
    theory/statistics
    theory/thermodynamics
@@ -37,6 +36,7 @@ experiments and the existing literature.
    :caption: Implementation details:
 
    implementation/data_model
+   implementation/computation
 
 
 
