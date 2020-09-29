@@ -147,12 +147,12 @@ def sample(
         iter_sampling=n_samples,
         output_dir=output_dir,
         iter_warmup=n_warmup,
-        max_treedepth=15,
+        max_treedepth=11,
         save_warmup=save_warmup,
         inits=init_filepath,
         show_progress=True,
         step_size=0.025,
-        adapt_delta=0.9,
+        adapt_delta=0.99,
     )
 
 
