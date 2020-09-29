@@ -29,8 +29,9 @@ how the system works, a prior model describing the pre-experimental information
 about the system's formation energies and kinetic parameters, and an
 experiments section describing some test data and its information content.
 
-The full toml input can be found in Maud's GitHub repository
-[LLLLLIIIINKKKK]. The following section explains how it was constructed.
+The full toml input can be found in `Maud's GitHub repository
+<https://github.com/biosustain/Maud/blob/master/tests/data/ecoli_small.toml>`_. The
+following section explains how it was constructed.
 
 
 Kinetic Model
