@@ -56,6 +56,7 @@ data {
   real<lower=0> prior_scale_enzyme[N_experiment, N_enzyme];
   // network properties
   matrix[N_mic, N_enzyme] S;
+  matrix[N_reaction, N_enzyme] S_to_flux_map;
   int<lower=1,upper=N_metabolite> metabolite_ix_stoichiometric_matrix[N_mic];
   matrix<lower=0,upper=1>[N_experiment, N_enzyme] is_knockout;
   int<lower=0,upper=N_km> km_lookup[N_mic, N_enzyme];
@@ -127,24 +128,24 @@ transformed parameters {
                                                               subunits);
     conc[e, balanced_mic_ix] = conc_balanced[1];
     conc[e, unbalanced_mic_ix] = conc_unbalanced[e]';
-    flux[e] = get_flux(conc[e],
-                       experiment_enzyme,
-                       km,
-                       km_lookup,
-                       S,
-                       kcat,
-                       keq,
-                       ci_ix,
-                       ai_ix,
-                       aa_ix,
-                       n_ci,
-                       n_ai,
-                       n_aa,
-                       ki,
-                       dissociation_constant_t,
-                       dissociation_constant_r,
-                       transfer_constant,
-                       subunits)';
+    flux[e] = (S_to_flux_map * get_flux(conc[e],
+                              experiment_enzyme,
+                              km,
+                              km_lookup,
+                              S,
+                              kcat,
+                              keq,
+                              ci_ix,
+                              ai_ix,
+                              aa_ix,
+                              n_ci,
+                              n_ai,
+                              n_aa,
+                              ki,
+                              dissociation_constant_t,
+                              dissociation_constant_r,
+                              transfer_constant,
+                              subunits))';
     if (squared_distance(conc_balanced[1], conc_balanced[2]) > 1){
       print("Balanced metabolite concentration at ", timepoint, " seconds is not steady.");
       print("Found ", conc_balanced[1], " at ", timepoint, " seconds and ",
