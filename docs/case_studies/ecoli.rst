@@ -15,7 +15,7 @@ using the online modelling tool `escher <https://escher.github.io/#/>`_.
 
 The target system has 5 reactions, including the interesting
 phosphofructokinase reaction, which is thought to be highly regulated and
-instrumental to the Warburg effect. The reactions are part of the glycolysis
+instrumental for alleviating `redox stress <http://linkinghub.elsevier.com/retrieve/pii/S2405471218301492>`_. The reactions are part of the glycolysis
 pathway, which converts glucose into pyruvate and some ATP.
 
 Constructing a suitable toml input
@@ -36,8 +36,8 @@ The full toml input can be found in Maud's GitHub repository
 Kinetic Model
 -------------
 
-The kinetic model can more or less be read off the above network diagram,
-though there are some details that need to be considered.
+The kinetic model is a representation of the reactions involved in the system
+defined above using enzyme kin
 
 First, we need to decide how we will define a steady state for this system. In
 practical terms this means we need to specify which of the metabolites in the
@@ -48,11 +48,11 @@ chose are f6p, fdp and dhap.
 The metabolites h2o and h --i.e. water and hydrogen ion--are involved in the
 PFK and FBP reactions, but are typically ignored in kinetic analyses. In order
 to avoid problems with interpreting prior information from the literature, we
-can ignore h by simply leaving it out of our representation of the PFK
+can ignore H by simply leaving it out of our representation of the PFK
 reaction. However, we cannot fully ignore the role of h2o in the FBP reaction
-because h2o has non-zero formation energy: leaving it out would re. We can
-inform Maud that it needs to make the necessary thermodynamic adjustment by
-adding a non-empty `water_stoichiometry` field to the FBP reaciton.
+because h2o has non-zero formation energy: leaving it out would not be
+representative of the true reaction thermodynamics. We accomodate this through
+the Legendre transform as described in `Thermodynamics of Biochemical Reactions <https://onlinelibrary.wiley.com/doi/book/10.1002/0471332607>`_
 
 Finally, for the sake of simplicity this case study ignores all regulation,
 even though this is not realistic as the PFK reaction is highly regulated.
