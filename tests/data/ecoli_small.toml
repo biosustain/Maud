@@ -115,7 +115,7 @@ kms = [
 ################## Experimental data #################
 
 [[experiments]]
-id = 'condition_1'
+id = 'Evo04ptsHIcrrEvo01EP'
 metabolite_measurements = [
   {target_id='g6p_c', value=2.0804108, uncertainty=0.188651},
   {target_id='f6p_c', value=0.6410029, uncertainty=0.146145},
@@ -130,12 +130,32 @@ metabolite_measurements = [
 ]
 reaction_measurements = [
   {target_id='PGI', value=4.087673533555556, uncertainty=0.1},
-  {target_id='FBP', value=-0.5, uncertainty=0.1},  # made up
 ]
 enzyme_measurements = [
-  {target_id='PGI', value=0.03338748587758992, uncertainty=0.06406406775305307},
-  {target_id='FBP', value=0.005712846258143446, uncertainty=0.1513769774104986},
-  {target_id='FBA', value=0.0704592675242211, uncertainty=0.2078269607533649},
-  # {target_id='GAPD', value=0.2845642447881268, uncertainty=0.2386915037960135},
-  # {target_id='PGK', value=0.1015118053600683, uncertainty=0.2444643294169102},
+  {target_id='PGI', value=0.033875912, uncertainty=0.06},
+  {target_id='FBP', value=0.00592291, uncertainty=0.047},
+  {target_id='FBA', value=0.0702922488972023, uncertainty=0.19},
+  {target_id='TPI', value=0.020866941, uncertainty=0.13},
+  {target_id='PFK', value=0.018055101, uncertainty=0.13}
+]
+
+[[experiments]]
+id = 'Evo04Evo01EP'
+metabolite_measurements = [
+  {target_id='g6p_c', value=2.0804108, uncertainty=0.188651},
+  {target_id='f6p_c', value=0.6410029, uncertainty=0.146145},
+  {target_id='adp_c', value=0.6113649, uncertainty=0.038811},
+  {target_id='atp_c', value=5.4080032, uncertainty=0.186962},
+  {target_id='fdp_c', value=4.5428601, uncertainty=0.237197},
+  {target_id='dhap_c', value=1.895018, uncertainty=0.078636},
+]
+reaction_measurements = [
+  {target_id='PGI', value=4.087673533555556, uncertainty=0.1},
+]
+enzyme_measurements = [
+  {target_id='PGI', value=0.033875912, uncertainty=0.06},
+  {target_id='FBP', value=0.00592291, uncertainty=0.047},
+  {target_id='FBA', value=0.0702922488972023, uncertainty=0.19},
+  {target_id='TPI', value=0.0198, uncertainty=0.1},
+  {target_id='PFK', value=0.0185, uncertainty=0.05}
 ]
