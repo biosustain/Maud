@@ -42,7 +42,7 @@ def get_full_stoichiometry(
     kinetic_model: KineticModel,
     enzyme_codes: Dict[str, int],
     metabolite_codes: Dict[str, int],
-    reaction_codes: Dict[str, int]
+    reaction_codes: Dict[str, int],
 ):
     """Get full stoichiometric matrix for each isoenzyme.
 
@@ -230,10 +230,9 @@ def get_input_data(
         mic_codes[mic.id]: met_codes[mic.metabolite_id] for mic in mics.values()
     }
     enzymes = {k: v for r in reactions.values() for k, v in r.enzymes.items()}
-    full_stoic, stoic_map_to_flux = get_full_stoichiometry(mi.kinetic_model, 
-                                                           enzyme_codes, 
-                                                           mic_codes, 
-                                                           reaction_codes)
+    full_stoic, stoic_map_to_flux = get_full_stoichiometry(
+        mi.kinetic_model, enzyme_codes, mic_codes, reaction_codes
+    )
     subunits = pd.DataFrame(
         {
             "enzyme_id": [e.id for e in enzymes.values()],
