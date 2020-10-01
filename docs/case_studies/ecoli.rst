@@ -29,8 +29,9 @@ how the system works, a prior model describing the pre-experimental information
 about the system's formation energies and kinetic parameters, and an
 experiments section describing some test data and its information content.
 
-The full toml input can be found in Maud's GitHub repository
-[LLLLLIIIINKKKK]. The following section explains how it was constructed.
+The full toml input can be found in `Maud's GitHub repository
+<https://github.com/biosustain/Maud/blob/master/tests/data/ecoli_small.toml>`_. The
+following section explains how it was constructed.
 
 
 Kinetic Model
@@ -230,50 +231,32 @@ diagnostic information:
 
     Checking sampler transitions treedepth.
     Treedepth satisfactory for all transitions.
-    
+
     Checking sampler transitions for divergences.
-    5 of 1600 (0.31%) transitions ended with a divergence.
-    These divergent transitions indicate that HMC is not fully able to explore the posterior distribution.
-    Try increasing adapt delta closer to 1.
-    If this doesn't remove all divergences, try to reparameterize the model.
-    
+    No divergent transitions found.
+
     Checking E-BFMI - sampler transitions HMC potential energy.
     E-BFMI satisfactory for all transitions.
-    
+
     Effective sample size satisfactory.
-    
+
     Split R-hat values satisfactory all parameters.
-    
-    Processing complete.
-                              Mean      MCSE   StdDev  ...    N_Eff   N_Eff/s    R_hat
-    name                                               ...                            
-    lp__                  -97.4621  0.342428  4.51631  ...  173.952  0.106822  1.02324
-    formation_energy[1] -1334.0000  0.039000  1.10000  ...  804.000  0.490000  1.00000
-    formation_energy[2] -1334.0000  0.038000  1.00000  ...  740.000  0.450000  1.00000
-    formation_energy[3] -2224.0000  0.071000  2.00000  ...  797.000  0.490000  1.00000
-    formation_energy[4] -1441.0000  0.078000  2.40000  ...  914.000  0.560000  1.00000
-    ...                        ...       ...      ...  ...      ...       ...      ...
-    log_lik[4]             -0.6100  0.062000  1.70000  ...  779.000  0.480000  1.00000
-    log_lik[5]              2.4000  0.033000  0.68000  ...  435.000  0.270000  1.00000
-    log_lik[6]             -1.5000  0.058000  0.86000  ...  219.000  0.130000  1.00000
-    log_lik[7]             -1.5000  0.033000  0.71000  ...  461.000  0.280000  1.00000
-    log_lik[8]              0.4300  0.039000  0.80000  ...  415.000  0.250000  1.00000
-    
-    [75 rows x 9 columns]
 
+The diagnostic message raises no warnings, indicating that Maud's output files
+probably represent draws from the posterior distribution defined by our input.
 
-The diagnostic message indicates that there were some post-warmup divergent
-transitions. This suggests that our output files might not represent draws from
-the posterior distribution defined by our input, as some parts of the
-distribution seem to be difficult to explore.
-
-Difficult posterior geometries are often caused by unrealistic assumptions
-implicit in the model, so a good way to look for the cause of the bad
-computation is to check whether our draws are broadly realistic. Looking at the
-posterior for steady state metabolite concentrations suggests not:
+Investigating the marginal posterior distributions for metabolite
+concentrations, the results appear broadly plausible.
 
 .. figure:: conc.png
 
-Most of these concentrations are broadly plausible, but the posterior
-distribution for phosphate ion concentration has substantial mass above 30
-mM, which is very unlikely.
+Similarly, the marginal posteriors for reaction fluxes are close to the
+measured value of -0.5 for FBP and 4.08 for other reactions:
+
+.. figure:: conc.png
+
+Finally, the marginal posteriors for kinetic parameters are also plausible,
+though the :math:`k_{cat}` parameter for the TPI reaction is very high at
+around 10000.
+
+.. figure:: kinetic_params.png

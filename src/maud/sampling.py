@@ -42,6 +42,7 @@ def get_full_stoichiometry(
     kinetic_model: KineticModel,
     enzyme_codes: Dict[str, int],
     metabolite_codes: Dict[str, int],
+    reaction_codes: Dict[str, int],
 ):
     """Get full stoichiometric matrix for each isoenzyme.
 
@@ -50,12 +51,15 @@ def get_full_stoichiometry(
     :param metabolite_codes: the codified metabolite codes
     """
     S = pd.DataFrame(index=enzyme_codes, columns=metabolite_codes)
-    for _, rxn in kinetic_model.reactions.items():
+    S_to_flux_map = pd.DataFrame(0, index=reaction_codes, columns=enzyme_codes)
+
+    for rxn_id, rxn in kinetic_model.reactions.items():
         for enz_id, _ in rxn.enzymes.items():
             for met, stoic in rxn.stoichiometry.items():
+                S_to_flux_map.loc[rxn_id, enz_id] = 1
                 S.loc[enz_id, met] = stoic
     S.fillna(0, inplace=True)
-    return S
+    return S, S_to_flux_map
 
 
 def get_knockout_matrix(mi: MaudInput):
@@ -147,12 +151,12 @@ def sample(
         iter_sampling=n_samples,
         output_dir=output_dir,
         iter_warmup=n_warmup,
-        max_treedepth=15,
+        max_treedepth=11,
         save_warmup=save_warmup,
         inits=init_filepath,
         show_progress=True,
         step_size=0.025,
-        adapt_delta=0.9,
+        adapt_delta=0.99,
     )
 
 
@@ -228,10 +232,12 @@ def get_input_data(
         mic_codes[mic.id]: met_codes[mic.metabolite_id] for mic in mics.values()
     }
     enzymes = {k: v for r in reactions.values() for k, v in r.enzymes.items()}
-    full_stoic = get_full_stoichiometry(mi.kinetic_model, enzyme_codes, mic_codes)
     water_stoichiometry = [
         r.water_stoichiometry for r in reactions.values() for e in r.enzymes.items()
     ]
+    full_stoic, stoic_map_to_flux = get_full_stoichiometry(
+        mi.kinetic_model, enzyme_codes, mic_codes, reaction_codes
+    )
     subunits = pd.DataFrame(
         {
             "enzyme_id": [e.id for e in enzymes.values()],
@@ -397,6 +403,7 @@ def get_input_data(
         "S": full_stoic.T.values,
         "water_stoichiometry": water_stoichiometry,
         "mic_to_met": list(mic_to_met.values()),
+        "S_to_flux_map": stoic_map_to_flux.values,
         "is_knockout": knockout_matrix.values,
         "km_lookup": km_lookup.values,
         "n_ci": n_modifier["ki"],
