@@ -1,0 +1,298 @@
+
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta charset="utf-8" />
+    <title>Specifying input data &#8212; Maud  documentation</title>
+    <link rel="stylesheet" href="../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <script id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+    <script src="../_static/jquery.js"></script>
+    <script src="../_static/underscore.js"></script>
+    <script src="../_static/doctools.js"></script>
+    <script src="../_static/language_data.js"></script>
+    <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Contributing to Maud" href="contributing.html" />
+    <link rel="prev" title="Installation" href="installation.html" />
+   
+  <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <div class="section" id="specifying-input-data">
+<h1>Specifying input data<a class="headerlink" href="#specifying-input-data" title="Permalink to this headline">¶</a></h1>
+<p>This document explains how to specify kinetic models, prior parameter
+distributions and experimental data in a form that Maud can use.</p>
+<div class="section" id="overview">
+<h2>Overview<a class="headerlink" href="#overview" title="Permalink to this headline">¶</a></h2>
+<p>Maud inputs are specified as <a class="reference external" href="https://github.com/toml-lang/toml">toml</a> files
+with three main components: a description of the kinetic model that is being
+analysed, a description of some experiments and a specification of prior
+distributions that represent pre-experimental information about the network’s
+kinetic parameters, thermodynamic parameters, unbalanced metabolite
+concentrations and enzyme concentrations.</p>
+<p>For some working examples of full inputs see <a class="reference external" href="https://github.com/biosustain/Maud/tree/master/data/in">here</a>.</p>
+<dl class="simple">
+<dt><strong>NB</strong> The fields depicted in the examples below are all required, except for a</dt><dd><p>few optional cases which should be explicitly highlighted.</p>
+</dd>
+</dl>
+</div>
+<div class="section" id="specifying-a-kinetic-model">
+<h2>Specifying a kinetic model<a class="headerlink" href="#specifying-a-kinetic-model" title="Permalink to this headline">¶</a></h2>
+<p>Kinetic models in Maud input files have three components: compartments,
+metabolites and reactions. All of these are specified as tables at the top
+level of the input file.</p>
+<p>A compartment must have an id, a name and a volume. Here is an example
+compartment specification:</p>
+<div class="highlight-toml notranslate"><div class="highlight"><pre><span></span><span class="k">[[compartments]]</span>
+<span class="n">id</span> <span class="o">=</span> <span class="s">&#39;cytosol&#39;</span>
+<span class="n">name</span> <span class="o">=</span> <span class="s">&#39;cytosol&#39;</span>
+<span class="n">volume</span> <span class="o">=</span> <span class="mi">1</span>
+</pre></div>
+</div>
+<p>The units for the <code class="code docutils literal notranslate"><span class="pre">volume</span></code> field are arbitrary.</p>
+<p>A metabolite must have an id, a name, compartment (this should be the id of a
+compartment) and a property ‘balanced’ specifying whether its concentration
+should be constant at steady state. Here is an example:</p>
+<div class="highlight-toml notranslate"><div class="highlight"><pre><span></span><span class="k">[[metabolites]]</span>
+<span class="n">id</span> <span class="o">=</span> <span class="s">&#39;AMP&#39;</span>
+<span class="n">name</span> <span class="o">=</span> <span class="s">&#39;adenosine monophosphate&#39;</span>
+<span class="n">balanced</span> <span class="o">=</span> <span class="kc">false</span>
+<span class="n">compartment</span> <span class="o">=</span> <span class="s">&#39;cytosol&#39;</span>
+</pre></div>
+</div>
+<p>A reaction can be specified as follows:</p>
+<div class="highlight-toml notranslate"><div class="highlight"><pre><span></span><span class="k">[[reactions]]</span>
+<span class="n">id</span> <span class="o">=</span> <span class="s">&#39;FBA&#39;</span>
+<span class="n">name</span> <span class="o">=</span> <span class="s">&#39;FBA&#39;</span>
+<span class="n">stoichiometry</span> <span class="o">=</span> <span class="p">{</span> <span class="n">f16p_c</span> <span class="o">=</span> <span class="mi">-1</span><span class="p">,</span> <span class="n">dhap_c</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span> <span class="n">g3p_c</span> <span class="o">=</span> <span class="mi">1</span> <span class="p">}</span>
+<span class="k">[[reactions.enzymes]]</span>
+<span class="n">id</span> <span class="o">=</span> <span class="s">&#39;FBA&#39;</span>
+<span class="n">name</span> <span class="o">=</span> <span class="s">&#39;FBA&#39;</span>
+<span class="n">mechanism</span> <span class="o">=</span> <span class="s">&quot;ordered_unibi&quot;</span>
+<span class="n">allosteric_inhibitors</span> <span class="o">=</span> <span class="p">[</span><span class="s">&#39;AMP&#39;</span><span class="p">]</span>  <span class="c1"># optional</span>
+</pre></div>
+</div>
+<p>Reaction level information is specified under <code class="code docutils literal notranslate"><span class="pre">[[reactions]]</span></code>, and
+enzyme-specific information goes under <code class="code docutils literal notranslate"><span class="pre">[[reactions]]</span></code>. The stoichiometry
+property should map metabolite ids to numerical stoichiometries with arbitrary
+units. The mechanism property must be one of the mechanisms that Maud
+supports - these can be found in the source code file
+<a class="reference external" href="https://github.com/biosustain/Maud/blob/master/src/maud/stan_code/big_k_rate_equations.stan">big_k_rate_equations.stan</a>. The
+optional property allosteric_inhibitors must be a list containing ids of
+metabolites that feature in the network.</p>
+</div>
+<div class="section" id="specifying-experiments">
+<h2>Specifying experiments<a class="headerlink" href="#specifying-experiments" title="Permalink to this headline">¶</a></h2>
+<p>Information about experiments comes in a table called <code class="code docutils literal notranslate"><span class="pre">experiments</span></code>,
+which can have arbitrarily many entries. Here is an example specification of an
+experiment:</p>
+<div class="highlight-toml notranslate"><div class="highlight"><pre><span></span><span class="k">[[experiments]]</span>
+<span class="n">id</span> <span class="o">=</span> <span class="s">&#39;condition_1&#39;</span>
+<span class="n">metadata</span> <span class="o">=</span> <span class="s">&quot;Condition 1&quot;</span>
+<span class="n">metabolite_measurements</span> <span class="o">=</span> <span class="p">[</span>
+  <span class="p">{</span> <span class="n">target_id</span> <span class="o">=</span> <span class="s">&#39;glc__D_c&#39;</span><span class="p">,</span> <span class="n">value</span> <span class="o">=</span> <span class="mf">0.6</span><span class="p">,</span> <span class="n">uncertainty</span> <span class="o">=</span> <span class="mf">0.1</span><span class="p">},</span>
+  <span class="p">{</span> <span class="n">target_id</span> <span class="o">=</span> <span class="s">&#39;g6p_c&#39;</span><span class="p">,</span> <span class="n">value</span> <span class="o">=</span> <span class="mf">1.2</span><span class="p">,</span> <span class="n">uncertainty</span> <span class="o">=</span> <span class="mf">0.1</span><span class="p">},</span>
+  <span class="p">{</span> <span class="n">target_id</span> <span class="o">=</span> <span class="s">&#39;f6p_c&#39;</span><span class="p">,</span> <span class="n">value</span> <span class="o">=</span> <span class="mf">0.3</span><span class="p">,</span> <span class="n">uncertainty</span> <span class="o">=</span> <span class="mf">0.1</span><span class="p">},</span>
+  <span class="p">{</span> <span class="n">target_id</span> <span class="o">=</span> <span class="s">&#39;f16p_c&#39;</span><span class="p">,</span> <span class="n">value</span> <span class="o">=</span> <span class="mf">2.8</span><span class="p">,</span> <span class="n">uncertainty</span> <span class="o">=</span> <span class="mf">0.1</span><span class="p">},</span>
+  <span class="p">{</span> <span class="n">target_id</span> <span class="o">=</span> <span class="s">&#39;g3p_c&#39;</span><span class="p">,</span> <span class="n">value</span> <span class="o">=</span> <span class="mf">0.067</span><span class="p">,</span> <span class="n">uncertainty</span> <span class="o">=</span> <span class="mf">0.1</span><span class="p">},</span>
+  <span class="p">{</span> <span class="n">target_id</span> <span class="o">=</span> <span class="s">&#39;dhap_c&#39;</span><span class="p">,</span> <span class="n">value</span> <span class="o">=</span> <span class="mf">1.58</span><span class="p">,</span> <span class="n">uncertainty</span> <span class="o">=</span> <span class="mf">0.1</span><span class="p">},</span>
+  <span class="p">{</span> <span class="n">target_id</span> <span class="o">=</span> <span class="s">&#39;13dpg_c&#39;</span><span class="p">,</span> <span class="n">value</span> <span class="o">=</span> <span class="mf">0.0016</span><span class="p">,</span> <span class="n">uncertainty</span> <span class="o">=</span> <span class="mf">0.1</span><span class="p">},</span>
+<span class="p">]</span>
+<span class="n">reaction_measurements</span> <span class="o">=</span> <span class="p">[</span>
+  <span class="p">{</span> <span class="n">target_id</span> <span class="o">=</span> <span class="s">&#39;GCLt1&#39;</span><span class="p">,</span> <span class="n">value</span> <span class="o">=</span> <span class="mf">1.99</span><span class="p">,</span> <span class="n">uncertainty</span> <span class="o">=</span> <span class="mf">0.0019</span><span class="p">},</span>
+<span class="p">]</span>
+</pre></div>
+</div>
+<p>Units here are arbitrary, but the values must agree with the rest of the model.</p>
+</div>
+<div class="section" id="specifying-priors">
+<h2>Specifying priors<a class="headerlink" href="#specifying-priors" title="Permalink to this headline">¶</a></h2>
+<p>Priors come in a toml table called <code class="code docutils literal notranslate"><span class="pre">priors</span></code>, which must have exactly four
+entries: <code class="code docutils literal notranslate"><span class="pre">kinetic_parameters</span></code>, <code class="code docutils literal notranslate"><span class="pre">thermodynamic_parameters</span></code>
+<code class="code docutils literal notranslate"><span class="pre">enzymes</span></code> and <code class="code docutils literal notranslate"><span class="pre">unbalanced_metabolites</span></code>.</p>
+<p>Thermodynamic parameters are specified using this syntax:</p>
+<div class="highlight-toml notranslate"><div class="highlight"><pre><span></span><span class="k">[priors.thermodynamic_parameters]</span>
+<span class="n">marginal_dgs</span> <span class="o">=</span> <span class="p">[</span>
+  <span class="p">{</span> <span class="n">target_id</span> <span class="o">=</span> <span class="s">&#39;GLCT1&#39;</span><span class="p">,</span> <span class="n">location</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span> <span class="n">scale</span> <span class="o">=</span> <span class="mf">0.05</span> <span class="p">},</span>
+  <span class="p">{</span> <span class="n">target_id</span> <span class="o">=</span> <span class="s">&#39;HEX1&#39;</span><span class="p">,</span> <span class="n">location</span> <span class="o">=</span> <span class="mi">-17</span><span class="mf">.3</span><span class="p">,</span> <span class="n">scale</span> <span class="o">=</span> <span class="mf">0.9</span> <span class="p">},</span>
+  <span class="p">{</span> <span class="n">target_id</span> <span class="o">=</span> <span class="s">&#39;PGI&#39;</span><span class="p">,</span> <span class="n">location</span> <span class="o">=</span> <span class="mf">2.5</span><span class="p">,</span> <span class="n">scale</span> <span class="o">=</span> <span class="mf">0.8</span> <span class="p">},</span>
+  <span class="p">{</span> <span class="n">target_id</span> <span class="o">=</span> <span class="s">&#39;PFK&#39;</span><span class="p">,</span> <span class="n">location</span> <span class="o">=</span> <span class="mi">-15</span><span class="p">,</span> <span class="n">scale</span> <span class="o">=</span> <span class="mf">1.3</span> <span class="p">},</span>
+  <span class="p">{</span> <span class="n">target_id</span> <span class="o">=</span> <span class="s">&#39;FBA&#39;</span><span class="p">,</span> <span class="n">location</span> <span class="o">=</span> <span class="mf">19.8</span><span class="p">,</span> <span class="n">scale</span> <span class="o">=</span> <span class="mf">1.0</span> <span class="p">},</span>
+  <span class="p">{</span> <span class="n">target_id</span> <span class="o">=</span> <span class="s">&#39;TPI&#39;</span><span class="p">,</span> <span class="n">location</span> <span class="o">=</span> <span class="mi">-5</span><span class="mf">.5</span><span class="p">,</span> <span class="n">scale</span> <span class="o">=</span> <span class="mf">1.1</span> <span class="p">},</span>
+  <span class="p">{</span> <span class="n">target_id</span> <span class="o">=</span> <span class="s">&#39;GAPD&#39;</span><span class="p">,</span> <span class="n">location</span> <span class="o">=</span> <span class="mf">7.8</span><span class="p">,</span> <span class="n">scale</span> <span class="o">=</span> <span class="mf">0.8</span> <span class="p">},</span>
+  <span class="p">{</span> <span class="n">target_id</span> <span class="o">=</span> <span class="s">&#39;PGK&#39;</span><span class="p">,</span> <span class="n">location</span> <span class="o">=</span> <span class="mf">18.5</span><span class="p">,</span> <span class="n">scale</span> <span class="o">=</span> <span class="mf">0.9</span> <span class="p">},</span>
+<span class="p">]</span>
+</pre></div>
+</div>
+<p>The <span class="math notranslate nohighlight">\(\Delta G\)</span> parameters are specified in units of kJ/mol. Each location
+and scale input denotes the mean and standard deviation of a normal
+distribution over possible values of the <span class="math notranslate nohighlight">\(\Delta G\)</span> parameter for the
+corresponding reaction. These distributions are independent - in future we hope
+to implement correlated <span class="math notranslate nohighlight">\(\Delta G\)</span> priors through separate properties
+<code class="code docutils literal notranslate"><span class="pre">mu_dg</span></code> and <code class="code docutils literal notranslate"><span class="pre">cov_matrix_dg</span></code>.</p>
+<p>The <code class="code docutils literal notranslate"><span class="pre">kinetic_parameters</span></code> priors should specify marginal kinetic parameter
+distributions as follows:</p>
+<div class="highlight-toml notranslate"><div class="highlight"><pre><span></span><span class="k">[priors.kinetic_parameters]</span>
+<span class="n">GCLt1</span> <span class="o">=</span> <span class="p">[</span>
+  <span class="p">{</span><span class="n">target_id</span> <span class="o">=</span> <span class="s">&#39;Kcat1&#39;</span><span class="p">,</span> <span class="n">location</span> <span class="o">=</span> <span class="mf">3.35</span><span class="p">,</span> <span class="n">scale</span> <span class="o">=</span> <span class="mf">0.1</span><span class="p">},</span>
+  <span class="p">{</span><span class="n">target_id</span> <span class="o">=</span> <span class="s">&#39;Ka&#39;</span><span class="p">,</span> <span class="n">location</span> <span class="o">=</span> <span class="mf">0.9</span><span class="p">,</span> <span class="n">scale</span> <span class="o">=</span> <span class="mf">0.1</span><span class="p">},</span>
+  <span class="p">{</span><span class="n">target_id</span> <span class="o">=</span> <span class="s">&#39;Kp&#39;</span><span class="p">,</span> <span class="n">location</span> <span class="o">=</span> <span class="mf">0.9</span><span class="p">,</span> <span class="n">scale</span> <span class="o">=</span> <span class="mf">0.1</span><span class="p">},</span>
+<span class="p">]</span>
+<span class="n">HEX1</span> <span class="o">=</span> <span class="p">[</span>
+  <span class="p">{</span> <span class="n">target_id</span> <span class="o">=</span> <span class="s">&#39;Kcat1&#39;</span><span class="p">,</span> <span class="n">location</span> <span class="o">=</span> <span class="mf">63.2</span><span class="p">,</span> <span class="n">scale</span> <span class="o">=</span> <span class="mf">0.1</span><span class="p">},</span>
+  <span class="p">{</span> <span class="n">target_id</span> <span class="o">=</span> <span class="s">&#39;Ka&#39;</span><span class="p">,</span> <span class="n">location</span> <span class="o">=</span> <span class="mf">0.15</span><span class="p">,</span> <span class="n">scale</span> <span class="o">=</span> <span class="mf">0.1</span><span class="p">},</span>
+  <span class="p">{</span> <span class="n">target_id</span> <span class="o">=</span> <span class="s">&#39;Kb&#39;</span><span class="p">,</span> <span class="n">location</span> <span class="o">=</span> <span class="mf">0.293</span><span class="p">,</span> <span class="n">scale</span> <span class="o">=</span> <span class="mf">0.1</span><span class="p">},</span>
+  <span class="p">{</span> <span class="n">target_id</span> <span class="o">=</span> <span class="s">&#39;Kp&#39;</span><span class="p">,</span> <span class="n">location</span> <span class="o">=</span> <span class="mi">30</span><span class="p">,</span> <span class="n">scale</span> <span class="o">=</span> <span class="mf">0.1</span><span class="p">},</span>
+  <span class="p">{</span> <span class="n">target_id</span> <span class="o">=</span> <span class="s">&#39;Kq&#39;</span><span class="p">,</span> <span class="n">location</span> <span class="o">=</span> <span class="mf">0.23</span><span class="p">,</span> <span class="n">scale</span> <span class="o">=</span> <span class="mf">0.1</span><span class="p">},</span>
+<span class="p">]</span>
+<span class="p">...</span>
+</pre></div>
+</div>
+<p>There should be an entry here for every enzyme id in the kinetic model,
+containing a line with a <code class="code docutils literal notranslate"><span class="pre">target_id</span></code> corresponding to every kinetic
+parameter in the enzyme’s mechanism.</p>
+<p>The kinetic parameters’ units are effectively set by those of the <span class="math notranslate nohighlight">\(\Delta
+G\)</span> parameters, through the equality <span class="math notranslate nohighlight">\(keq = \exp(\frac{\Delta G}{-RT})\)</span>
+and the Haldane relationships linking <span class="math notranslate nohighlight">\(keq\)</span> parameters with other kinetic
+parameters.</p>
+<p><strong>NB</strong> Even though kinetic parameters have to be greater than zero and have
+lognormal prior distributions, the <code class="code docutils literal notranslate"><span class="pre">location</span></code> in these toml inputs are
+specified on the standard scale. On the other hand, the <code class="code docutils literal notranslate"><span class="pre">scale</span></code> inputs
+are interpreted on the log scale with base <span class="math notranslate nohighlight">\(e\)</span>, representing
+multiplicative rather than additive uncertainty.</p>
+<p>Priors for steady state enzyme and unbalanced metabolite concentrations are
+specified as a series of tables - one for each experiment id - with the
+<code class="code docutils literal notranslate"><span class="pre">target_id</span></code> inputs corresponding to enzyme ids or metabolite ids. Here is
+an example for an input with one experiment called <code class="code docutils literal notranslate"><span class="pre">condition_1</span></code>:</p>
+<div class="highlight-toml notranslate"><div class="highlight"><pre><span></span><span class="k">[priors.enzymes]</span>
+<span class="n">condition_1</span> <span class="o">=</span> <span class="p">[</span>
+  <span class="p">{</span> <span class="n">target_id</span> <span class="o">=</span> <span class="s">&#39;GCLt1&#39;</span><span class="p">,</span> <span class="n">location</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span> <span class="n">scale</span> <span class="o">=</span> <span class="mf">0.05</span> <span class="p">},</span>
+  <span class="p">{</span> <span class="n">target_id</span> <span class="o">=</span> <span class="s">&#39;HEX1&#39;</span><span class="p">,</span> <span class="n">location</span> <span class="o">=</span> <span class="mf">0.062</span><span class="p">,</span> <span class="n">scale</span> <span class="o">=</span> <span class="mf">0.05</span> <span class="p">},</span>
+  <span class="p">{</span> <span class="n">target_id</span> <span class="o">=</span> <span class="s">&#39;PGI&#39;</span><span class="p">,</span> <span class="n">location</span> <span class="o">=</span> <span class="mf">0.138</span><span class="p">,</span> <span class="n">scale</span> <span class="o">=</span> <span class="mf">0.05</span> <span class="p">},</span>
+  <span class="p">{</span> <span class="n">target_id</span> <span class="o">=</span> <span class="s">&#39;PFK&#39;</span><span class="p">,</span> <span class="n">location</span> <span class="o">=</span> <span class="mf">0.047</span><span class="p">,</span> <span class="n">scale</span> <span class="o">=</span> <span class="mf">0.05</span> <span class="p">},</span>
+  <span class="p">{</span> <span class="n">target_id</span> <span class="o">=</span> <span class="s">&#39;FBA&#39;</span><span class="p">,</span> <span class="n">location</span> <span class="o">=</span> <span class="mf">1.34</span><span class="p">,</span> <span class="n">scale</span> <span class="o">=</span> <span class="mf">0.05</span> <span class="p">},</span>
+  <span class="p">{</span> <span class="n">target_id</span> <span class="o">=</span> <span class="s">&#39;TPI&#39;</span><span class="p">,</span> <span class="n">location</span> <span class="o">=</span> <span class="mf">0.295</span><span class="p">,</span> <span class="n">scale</span> <span class="o">=</span> <span class="mf">0.05</span> <span class="p">},</span>
+  <span class="p">{</span> <span class="n">target_id</span> <span class="o">=</span> <span class="s">&#39;GAPD&#39;</span><span class="p">,</span> <span class="n">location</span> <span class="o">=</span> <span class="mf">0.007</span><span class="p">,</span> <span class="n">scale</span> <span class="o">=</span> <span class="mf">0.05</span> <span class="p">},</span>
+  <span class="p">{</span> <span class="n">target_id</span> <span class="o">=</span> <span class="s">&#39;PGK&#39;</span><span class="p">,</span> <span class="n">location</span> <span class="o">=</span> <span class="mf">0.258</span><span class="p">,</span> <span class="n">scale</span> <span class="o">=</span> <span class="mf">0.05</span> <span class="p">},</span>
+<span class="p">]</span>
+
+<span class="k">[priors.unbalanced_metabolites]</span>
+<span class="n">condition_1</span> <span class="o">=</span> <span class="p">[</span>
+  <span class="p">{</span> <span class="n">target_id</span> <span class="o">=</span> <span class="s">&#39;glc__D_e&#39;</span><span class="p">,</span> <span class="n">location</span> <span class="o">=</span> <span class="mi">10</span><span class="p">,</span> <span class="n">scale</span> <span class="o">=</span> <span class="mf">1.0</span> <span class="p">},</span>
+  <span class="p">{</span> <span class="n">target_id</span> <span class="o">=</span> <span class="s">&#39;atp_c&#39;</span><span class="p">,</span> <span class="n">location</span> <span class="o">=</span> <span class="mf">3.95</span><span class="p">,</span> <span class="n">scale</span> <span class="o">=</span> <span class="mf">0.05</span> <span class="p">},</span>
+  <span class="p">{</span> <span class="n">target_id</span> <span class="o">=</span> <span class="s">&#39;adp_c&#39;</span><span class="p">,</span> <span class="n">location</span> <span class="o">=</span> <span class="mf">1.72</span><span class="p">,</span> <span class="n">scale</span> <span class="o">=</span> <span class="mf">0.05</span> <span class="p">},</span>
+  <span class="p">{</span> <span class="n">target_id</span> <span class="o">=</span> <span class="s">&#39;nad_c&#39;</span><span class="p">,</span> <span class="n">location</span> <span class="o">=</span> <span class="mf">1.41</span><span class="p">,</span> <span class="n">scale</span> <span class="o">=</span> <span class="mf">0.05</span> <span class="p">},</span>
+  <span class="p">{</span> <span class="n">target_id</span> <span class="o">=</span> <span class="s">&#39;nadh_c&#39;</span><span class="p">,</span> <span class="n">location</span> <span class="o">=</span> <span class="mf">0.178</span><span class="p">,</span> <span class="n">scale</span> <span class="o">=</span> <span class="mf">0.05</span> <span class="p">},</span>
+  <span class="p">{</span> <span class="n">target_id</span> <span class="o">=</span> <span class="s">&#39;3pg_c&#39;</span><span class="p">,</span> <span class="n">location</span> <span class="o">=</span> <span class="mf">0.52</span><span class="p">,</span> <span class="n">scale</span> <span class="o">=</span> <span class="mf">0.05</span> <span class="p">},</span>
+<span class="p">]</span>
+</pre></div>
+</div>
+<p>As with kinetic parameters, the locations are absolute and the scales are
+log-scale. The units are arbitrary. When setting them, bear in mind that Stan
+tends to work best when most numbers are reasonably close to zero.</p>
+</div>
+</div>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../index.html">Maud</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+<p class="caption"><span class="caption-text">How to use Maud:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="installation.html">Installation</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Specifying input data</a></li>
+<li class="toctree-l1"><a class="reference internal" href="contributing.html">Contributing to Maud</a></li>
+<li class="toctree-l1"><a class="reference internal" href="post_installation_usage.html">Generating posterior draws</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Theoretical background:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../theory/computation.html">Computation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../theory/enzyme_kinetics.html">Enzyme kinetics</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../theory/statistics.html">Statistical Model</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../theory/thermodynamics.html">Thermodynamics</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Case studies:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../case_studies/ecoli.html">A simple model of E. coli glycolysis</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Implementation details:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../implementation/data_model.html">Maud’s data model</a></li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../index.html">Documentation overview</a><ul>
+      <li>Previous: <a href="installation.html" title="previous chapter">Installation</a></li>
+      <li>Next: <a href="contributing.html" title="next chapter">Contributing to Maud</a></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2019, Novo Nordisk Foundation Center for Biosustainability, Technical University of Denmark.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 2.4.4</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      
+      |
+      <a href="../_sources/usage/inputting.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>
