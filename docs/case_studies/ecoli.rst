@@ -49,11 +49,11 @@ chose are f6p, fdp and dhap.
 The metabolites h2o and h --i.e. water and hydrogen ion--are involved in the
 PFK and FBP reactions, but are typically ignored in kinetic analyses. In order
 to avoid problems with interpreting prior information from the literature, we
-can ignore H by simply leaving it out of our representation of the PFK
+can ignore h by simply leaving it out of our representation of the PFK
 reaction. However, we cannot fully ignore the role of h2o in the FBP reaction
-because h2o has non-zero formation energy: leaving it out would not be
-representative of the true reaction thermodynamics. We accomodate this through
-the Legendre transform as described in `Thermodynamics of Biochemical Reactions <https://onlinelibrary.wiley.com/doi/book/10.1002/0471332607>`_
+because h2o has non-zero formation energy: leaving it out would result in incorrect Gibbs energy estimates. 
+We can inform Maud that it needs to make the necessary thermodynamic adjustment by
+adding a non-empty `water_stoichiometry` field to the FBP reaciton.
 
 Finally, for the sake of simplicity this case study ignores all regulation,
 even though this is not realistic as the PFK reaction is highly regulated.
