@@ -32,7 +32,7 @@ from maud.data_model import KineticModel, MaudInput
 HERE = os.path.dirname(os.path.abspath(__file__))
 INCLUDE_PATH = ""
 DEFAULT_PRIOR_LOC_UNBALANCED = 0.1
-DEFAULT_PRIOR_SCALE_UNBALANCED = 3
+DEFAULT_PRIOR_SCALE_UNBALANCED = 2
 DEFAULT_PRIOR_LOC_ENZYME = 0.1
 DEFAULT_PRIOR_SCALE_ENZYME = 2
 STAN_PROGRAM_RELATIVE_PATH = "inference_model.stan"
@@ -151,10 +151,12 @@ def sample(
         iter_sampling=n_samples,
         output_dir=output_dir,
         iter_warmup=n_warmup,
-        max_treedepth=15,
+        max_treedepth=11,
         save_warmup=save_warmup,
         inits=init_filepath,
         show_progress=True,
+        step_size=0.025,
+        adapt_delta=0.99,
     )
 
 
@@ -230,6 +232,9 @@ def get_input_data(
         mic_codes[mic.id]: met_codes[mic.metabolite_id] for mic in mics.values()
     }
     enzymes = {k: v for r in reactions.values() for k, v in r.enzymes.items()}
+    water_stoichiometry = [
+        r.water_stoichiometry for r in reactions.values() for e in r.enzymes.items()
+    ]
     full_stoic, stoic_map_to_flux = get_full_stoichiometry(
         mi.kinetic_model, enzyme_codes, mic_codes, reaction_codes
     )
@@ -396,8 +401,9 @@ def get_input_data(
         "prior_loc_enzyme": prior_loc_enzyme,
         "prior_scale_enzyme": prior_scale_enzyme,
         "S": full_stoic.T.values,
+        "water_stoichiometry": water_stoichiometry,
+        "mic_to_met": list(mic_to_met.values()),
         "S_to_flux_map": stoic_map_to_flux.values,
-        "metabolite_ix_stoichiometric_matrix": list(mic_to_met.values()),
         "is_knockout": knockout_matrix.values,
         "km_lookup": km_lookup.values,
         "n_ci": n_modifier["ki"],

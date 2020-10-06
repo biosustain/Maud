@@ -1,6 +1,6 @@
-int get_N_rxn_mics(matrix S, int i_rxn){
+int get_N_enz_mics(matrix S, int i_enz){
   int out = 0;
-  for (s in S[,i_rxn]){
+  for (s in S[,i_enz]){
     if (s != 0){
       out += 1;
     }
@@ -8,12 +8,12 @@ int get_N_rxn_mics(matrix S, int i_rxn){
   return out;
 }
 
-int[] get_rxn_mics(matrix S, int i_rxn){
-  int N_rxn_mics = get_N_rxn_mics(S, i_rxn);
-  int out[N_rxn_mics];
+int[] get_enz_mics(matrix S, int i_enz){
+  int N_enz_mics = get_N_enz_mics(S, i_enz);
+  int out[N_enz_mics];
   int ticker_pos = 1;
   for (i_met in 1:rows(S)){
-    if (S[i_met, i_rxn] != 0){
+    if (S[i_met, i_enz] != 0){
       out[ticker_pos] = i_met;
       ticker_pos += 1;
     }
@@ -44,61 +44,61 @@ vector get_flux(vector conc_mic,
   int pos_ai = 1;
   int pos_aa = 1;
   int pos_tc = 1;
-  for (i_rxn in 1:cols(S)){
-    int N_rxn_mics = get_N_rxn_mics(S, i_rxn);
-    int rxn_mics[N_rxn_mics] = get_rxn_mics(S, i_rxn);
-    vector[N_rxn_mics] km_rxn = km[km_lookup[rxn_mics, i_rxn]];
-    int nci_rxn = n_ci[i_rxn];
-    int nai_rxn = n_ai[i_rxn];
-    int naa_rxn = n_aa[i_rxn];
-    vector[nci_rxn] conc_ci;
-    vector[nai_rxn] conc_ai;
-    vector[naa_rxn] conc_aa;
-    vector[nci_rxn] ki_rxn;
-    vector[nai_rxn] diss_t_rxn;
-    vector[naa_rxn] diss_r_rxn;
+  for (i_enz in 1:cols(S)){
+    int N_enz_mics = get_N_enz_mics(S, i_enz);
+    int enz_mics[N_enz_mics] = get_enz_mics(S, i_enz);
+    vector[N_enz_mics] km_enz = km[km_lookup[enz_mics, i_enz]];
+    int nci_enz = n_ci[i_enz];
+    int nai_enz = n_ai[i_enz];
+    int naa_enz = n_aa[i_enz];
+    vector[nci_enz] conc_ci;
+    vector[nai_enz] conc_ai;
+    vector[naa_enz] conc_aa;
+    vector[nci_enz] ki_enz;
+    vector[nai_enz] diss_t_enz;
+    vector[naa_enz] diss_r_enz;
     real catalysis_factor;
     real allostery_factor = 1;
     real free_enzyme_ratio;
-    int is_allosteric = ((nai_rxn > 0) || (naa_rxn > 0));
-    if (nci_rxn != 0){
-      conc_ci = conc_mic[segment(ci_ix, pos_ci, nci_rxn)];
-      ki_rxn = segment(ki, pos_ci, nci_rxn);
+    int is_allosteric = ((nai_enz > 0) || (naa_enz > 0));
+    if (nci_enz != 0){
+      conc_ci = conc_mic[segment(ci_ix, pos_ci, nci_enz)];
+      ki_enz = segment(ki, pos_ci, nci_enz);
     }
-    if (nai_rxn != 0){
-      conc_ai = conc_mic[segment(ai_ix, pos_ai, nai_rxn)];
-      diss_t_rxn = segment(dissociation_constant_t, pos_ai, nai_rxn);
+    if (nai_enz != 0){
+      conc_ai = conc_mic[segment(ai_ix, pos_ai, nai_enz)];
+      diss_t_enz = segment(dissociation_constant_t, pos_ai, nai_enz);
     }
-    if (naa_rxn != 0){
-      conc_aa = conc_mic[segment(aa_ix, pos_aa, naa_rxn)];
-      diss_r_rxn = segment(dissociation_constant_r, pos_aa, naa_rxn);
+    if (naa_enz != 0){
+      conc_aa = conc_mic[segment(aa_ix, pos_aa, naa_enz)];
+      diss_r_enz = segment(dissociation_constant_r, pos_aa, naa_enz);
     }
-    free_enzyme_ratio = get_free_enzyme_ratio(conc_mic[rxn_mics],
-                                              km_rxn,
-                                              S[rxn_mics, i_rxn],
+    free_enzyme_ratio = get_free_enzyme_ratio(conc_mic[enz_mics],
+                                              km_enz,
+                                              S[enz_mics, i_enz],
                                               conc_ci,
-                                              ki_rxn);
-    catalysis_factor = modular_rate_law(conc_mic[rxn_mics],
-                                        km_rxn,
-                                        S[rxn_mics, i_rxn],
-                                        kcat[i_rxn],
-                                        keq[i_rxn],
-                                        conc_enz[i_rxn],
+                                              ki_enz);
+    catalysis_factor = modular_rate_law(conc_mic[enz_mics],
+                                        km_enz,
+                                        S[enz_mics, i_enz],
+                                        kcat[i_enz],
+                                        keq[i_enz],
+                                        conc_enz[i_enz],
                                         conc_ci,
-                                        ki_rxn);
+                                        ki_enz);
     if (is_allosteric == 1){
       allostery_factor = get_allostery(conc_aa,
                                        conc_ai,
                                        free_enzyme_ratio,
-                                       diss_r_rxn,
-                                       diss_t_rxn,
+                                       diss_r_enz,
+                                       diss_t_enz,
                                        transfer_constant[pos_tc],
-                                       subunits[i_rxn]);
+                                       subunits[i_enz]);
     }
-    flux[i_rxn] = catalysis_factor * allostery_factor;
-    pos_ci += n_ci[i_rxn];
-    pos_ai += n_ai[i_rxn];
-    pos_aa += n_aa[i_rxn];
+    flux[i_enz] = catalysis_factor * allostery_factor;
+    pos_ci += n_ci[i_enz];
+    pos_ai += n_ai[i_enz];
+    pos_aa += n_aa[i_enz];
     pos_tc += is_allosteric;
   }
   return flux;
