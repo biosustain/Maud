@@ -33,6 +33,13 @@ experiments and the existing literature.
 
 .. toctree::
    :maxdepth: 1
+   :caption: Case studies:
+
+   case_studies/ecoli
+
+
+.. toctree::
+   :maxdepth: 1
    :caption: Implementation details:
 
    implementation/data_model

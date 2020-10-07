@@ -140,6 +140,11 @@ def load_reaction_from_toml(toml_reaction: dict) -> Reaction:
     is_exchange = (
         toml_reaction["is_exchange"] if "is_exchange" in toml_reaction.keys() else None
     )
+    water_stoichiometry = (
+        toml_reaction["water_stoichiometry"]
+        if "water_stoichiometry" in toml_reaction.keys()
+        else 0
+    )
     for e in toml_reaction["enzymes"]:
         modifiers = {
             "competitive_inhibitor": [],
@@ -174,6 +179,7 @@ def load_reaction_from_toml(toml_reaction: dict) -> Reaction:
         is_exchange=is_exchange,
         stoichiometry=toml_reaction["stoichiometry"],
         enzymes=enzymes,
+        water_stoichiometry=water_stoichiometry,
     )
 
 

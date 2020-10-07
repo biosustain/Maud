@@ -143,6 +143,7 @@ class Reaction:
     :param stoichiometry: reaction stoichiometry,
     e.g. for the reaction: 1.5 f6p <-> fdp we have {'f6p'; -1.5, 'fdp': 1}
     :param enzymes: Dictionary mapping enzyme ids to Enzyme objects
+    :param water_stroichiometry: Reaction's stoichiometric coefficient for water
     """
 
     def __init__(
@@ -153,6 +154,7 @@ class Reaction:
         is_exchange: bool = None,
         stoichiometry: Dict[str, float] = None,
         enzymes: Dict[str, Enzyme] = None,
+        water_stoichiometry: float = 0,
     ):
         if stoichiometry is None:
             stoichiometry = defaultdict()
@@ -164,6 +166,7 @@ class Reaction:
         self.is_exchange = is_exchange
         self.stoichiometry = stoichiometry
         self.enzymes = enzymes
+        self.water_stoichiometry = water_stoichiometry
 
 
 class KineticModel:
