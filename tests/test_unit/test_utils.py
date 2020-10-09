@@ -8,12 +8,8 @@ import maud.utils as utils
 
 def test_get_lognormal_parameters_from_quantiles():
     """Test that the function get_lognormal_parameters_from_quantiles works."""
-    inputs = [
-        (0.4, 0.01, 6.8, 0.99),
-    ]
-    expected = [
-        (0.5003159401539531, 0.608940170915830),
-    ]
+    inputs = [(0.4, 0.01, 6.8, 0.99)]
+    expected = [(0.5003159401539531, 0.608940170915830)]
     for args, (expected_mu, expected_sigma) in zip(inputs, expected):
         mu, sigma = utils.get_lognormal_parameters_from_quantiles(*args)
         assert np.isclose(mu, expected_mu)
