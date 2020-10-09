@@ -1,0 +1,270 @@
+
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta charset="utf-8" />
+    <title>Computation &#8212; Maud  documentation</title>
+    <link rel="stylesheet" href="../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <script id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+    <script src="../_static/jquery.js"></script>
+    <script src="../_static/underscore.js"></script>
+    <script src="../_static/doctools.js"></script>
+    <script src="../_static/language_data.js"></script>
+    <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="prev" title="Maud’s data model" href="data_model.html" />
+   
+  <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <div class="section" id="computation">
+<h1>Computation<a class="headerlink" href="#computation" title="Permalink to this headline">¶</a></h1>
+<p>Fitting Bayesian statistical models of large metabolic networks poses
+distinctive computational problems. This document explains what the problems
+are and how Maud attempts to address them.</p>
+<div class="section" id="goal">
+<h2>Goal<a class="headerlink" href="#goal" title="Permalink to this headline">¶</a></h2>
+<p>Maud aims to fit Bayesian models of metabolic networks with about 100 internal
+reactions, each with its kinetics represented by the modular rate law and MWC
+formalism as described in the section on <a class="reference internal" href="../theory/statistics.html"><span class="doc">Maud’s statistical model</span></a>, and around 20 experiments.</p>
+</div>
+<div class="section" id="inputs">
+<h2>Inputs<a class="headerlink" href="#inputs" title="Permalink to this headline">¶</a></h2>
+<p>There should be informative prior information about all kinetic parameters,
+compound formation energies and unbalanced metabolite
+concentrations. Compartment volumes, measurements and measurement errors and a
+kinetic model definition must be entered exactly.</p>
+<p>This input information is put in a <a class="reference external" href="https://github.com/toml-lang/toml">toml</a>
+document.</p>
+<p>We are currently researching how accurate the measurements and priors should be
+in order to produce accurate results.</p>
+</div>
+<div class="section" id="how-maud-draws-posterior-samples">
+<h2>How Maud draws posterior samples<a class="headerlink" href="#how-maud-draws-posterior-samples" title="Permalink to this headline">¶</a></h2>
+<p>Maud draws posterior samples using Stan and cmdstanpy. When a user inputs a
+<code class="code docutils literal notranslate"><span class="pre">maud</span> <span class="pre">sample</span> <span class="pre">...</span></code> command, the chosen toml file, and any other
+configuration options are read and translated into <span class="xref std std-doc">Maud’s data model</span>, then initial parameter values and input data in Stan format are
+written as json files. If necessary, the Stan program <cite>&lt;inference_model.stan&gt;</cite>
+is then compiled to c++ and then binary. Next, Maud uses cmdstanpy to trigger
+Stan’s sampler using the specified input data and initial conditions. The
+resulting samples are written to csv files in Stan’s output format.</p>
+<p>Stan’s sampler uses an adaptive Hamiltonian Monte Carlo algorithm to
+efficiently explore the posterior probability distribution defined by the
+<span class="xref std std-doc">statistical model</span> And Input Data.</p>
+<div class="section" id="why-use-stan-and-adaptive-hmc">
+<h3>Why Use Stan And Adaptive Hmc?<a class="headerlink" href="#why-use-stan-and-adaptive-hmc" title="Permalink to this headline">¶</a></h3>
+<p>Our Approach Using Adaptive Hmc Is Preferable To Alternatives Based On
+Rejection Sampling Because The Parameter Space That Needs To Be Explored In
+Scientifically Interesting Problems Has A Large Number Of Dimensions. Rejection
+Sampling Is Known To Be Unreliable In High-Dimensional Problems.</p>
+<p>Compared To Other Markov Chain Monte Carlo Approaches, Ours Has The Following
+Notable Advantages:</p>
+<ul class="simple">
+<li><p>It Is Highly Efficient</p></li>
+<li><p>The well-tested and fast CVODES ODE solver and algebra solver are available</p></li>
+<li><p>Software complexity can be kept low compared to a custom sampler</p></li>
+<li><p>Effective diagnostic tools are available, so we can be relatively confident,
+in the absence of diagnostic warnings, that Maud’s output really represents
+draws from the target posterior distribution.</p></li>
+<li><p>It is under active development, allowing Maud to passively benefit from
+upstream work.</p></li>
+</ul>
+<p>In future we plan to explore alternative approaches using approximate tools
+like variational inference. However, since these can sometimes be unreliable
+and lack equivalent diagnostics to adaptive Hamiltonian Monte Carlo</p>
+</div>
+</div>
+<div class="section" id="bottlenecks">
+<h2>Bottlenecks<a class="headerlink" href="#bottlenecks" title="Permalink to this headline">¶</a></h2>
+<p>Even though it is more efficient than the available alternatives, exploring the
+whole parameter space using Stan’s adaptive Hamiltonian Monte Carlo algorithm
+requires many evaluations of the posterior density and its gradients with
+respect to the values of all unknown parameters. This is because, for each
+sample, the algorithm needs to calculate forwards and backwards Hamiltonian
+trajectories using a numerical leapfrog integration algorithm. These
+trajectories must traverse a large distance while avoiding discretisation
+errors. With clever adaptation it is possible to transform the posterior
+surface so that it can be explored more efficiently, but depending on the
+posterior distribution a large variation is possible in the number of
+leapfrog steps per iteration.</p>
+<p>Maud’s problem is unusual in that a large system of equations needs to be
+solved in order to evaluate the posterior density and gradients. Maud’s
+computational cost per leapfrog step is therefore relatively high. The
+posterior surfaces that Maud needs Stan to explore are also relatively
+complicated due to the many non-linearities in the target systems.</p>
+</div>
+<div class="section" id="steps-to-address-computational-issues">
+<h2>Steps to address computational issues<a class="headerlink" href="#steps-to-address-computational-issues" title="Permalink to this headline">¶</a></h2>
+<p>This section explains steps that we have taken to make Maud’s problem more
+computationally tractable.</p>
+<div class="section" id="use-fast-equation-solvers">
+<h3>Use fast equation solvers<a class="headerlink" href="#use-fast-equation-solvers" title="Permalink to this headline">¶</a></h3>
+<p>Maud currently uses the CVODES <a class="reference external" href="http://sundials.wikidot.com/bdf-method">backwards differentiation formula</a> ODE solver via its Stan interface to
+calculate steady state metabolite concentrations and fluxes. This solver
+<a class="reference external" href="http://www.stochasticlifestyle.com/comparison-differential-equation-solver-suites-matlab-r-julia-python-c-fortran/">compares favourably with alternatives</a>
+in efficiency and is well integrated into Stan.</p>
+<p>Better results could possibly be achieved by using a custom solver that is
+specifically tailored to metabolic steady state problems. However this would
+require not just writing a new solver but also integrating it with Stan’s
+automatic differentiation framework.</p>
+<p>Another approach which we have explored is to calculate steady states using a
+hybrid ODE solver / algebra solver approach as outlined in <a class="reference external" href="https://zenodo.org/record/1284375">this paper</a>. When implemented previously using <a class="reference external" href="https://mc-stan.org/docs/2_24/functions-reference/functions-algebraic-solver.html">Stan’s
+built in Powell solver</a>
+we achieved mixed results. For simple problems we saw speed increases, but for
+more complicated problems the algebra solver would often fail to find a
+solution. Since we tried this, Stan has introduced an interface to the Sundials
+Newton solver, which should be more robust. We therefore think it is worth
+exploring this approach again.</p>
+</div>
+<div class="section" id="parallelism">
+<h3>Parallelism<a class="headerlink" href="#parallelism" title="Permalink to this headline">¶</a></h3>
+<p>Maud currently uses two forms of parallelism it runs separate markov chains in
+separate processes and calculates likelihood sums using different threads via
+Stan’s <a class="reference external" href="https://mc-stan.org/docs/2_24/stan-users-guide/reduce-sum.html">reduce_sum</a>
+functionality.</p>
+<p>Further options include MPI and GPU parallelism. MPI parallelism can be used
+via Stan’s <a class="reference external" href="https://mc-stan.org/docs/2_24/stan-users-guide/map-rect.html">map_rect</a> functionality
+to distribute separable calculations between different processes. For example,
+it should be possible to calculate ODE solutions for different experiments in
+parallel. This functionality will be implemented when the speed gains can be
+shown to justify the cost in complexity.</p>
+<p>Finally, <a class="reference external" href="https://arxiv.org/abs/1907.01063">Stan is introducing support for GPU parallelism</a>. Exploiting these new features should not
+require any work on our part beyond configuring cmdstan to use GPU resources
+where possible. It may be possible to add new GPU functionality to Stan that
+specifically targets Maud’s speed bottlenecks, but this option has not yet been
+explored.</p>
+</div>
+<div class="section" id="efficient-stan-coding">
+<h3>Efficient Stan coding<a class="headerlink" href="#efficient-stan-coding" title="Permalink to this headline">¶</a></h3>
+<p>The following general principles tend to lead to faster Stan programs and have
+been kept to where possible:</p>
+<ul class="simple">
+<li><p>performing calculations in the transformed data and generated quantities
+blocks in preference to the transformed parameters and model blocks</p></li>
+<li><p>keeping parameters close to unit scale</p></li>
+<li><p>using vectorised operations rather than loops</p></li>
+<li><p>parameterising the model so that the parameters are as uncorrelated</p></li>
+</ul>
+<p>The final point about less correlated parameterisation is under active
+development - it is likely that the thermodynamic component of the model can be
+reparameterised so as to reduce parameter correlation.</p>
+</div>
+<div class="section" id="better-priors">
+<h3>Better priors<a class="headerlink" href="#better-priors" title="Permalink to this headline">¶</a></h3>
+<p>There are several as yet unexplored ways in which changing Maud represents
+prior information could improve performance.</p>
+<p>It is possible that the log-normal distribution that Maud uses to express prior
+information about non-negative unknowns is not optimal, allocating too much
+prior mass to the tails, contrary to both the available information and optimal
+computation. It is therefore worth exploring alternatives like the gamma
+distribution.</p>
+<p>Allowing information about parameter correlations to be expressed might also
+improve computaion.</p>
+<p>Finally, Maud does not currently support input of prior information about the
+values of fluxes or balanced metabolite concentrations, mainly because this is
+technically difficult to implement. Both of these features could make Maud’s
+posterior distributions less degenerate and easier to explore, thereby
+improving computation.</p>
+</div>
+</div>
+</div>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../index.html">Maud</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+<p class="caption"><span class="caption-text">How to use Maud:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../usage/installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../usage/inputting.html">Specifying input data</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../usage/contributing.html">Contributing to Maud</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../usage/post_installation_usage.html">Generating posterior draws</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Theoretical background:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../theory/computation.html">Computation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../theory/enzyme_kinetics.html">Enzyme kinetics</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../theory/statistics.html">Statistical issues</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../theory/thermodynamics.html">Thermodynamics</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Implementation details:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="data_model.html">Maud’s data model</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Computation</a></li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../index.html">Documentation overview</a><ul>
+      <li>Previous: <a href="data_model.html" title="previous chapter">Maud’s data model</a></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2019, Novo Nordisk Foundation Center for Biosustainability, Technical University of Denmark.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 2.4.4</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      
+      |
+      <a href="../_sources/implementation/computation.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

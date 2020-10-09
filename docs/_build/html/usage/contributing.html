@@ -1,0 +1,200 @@
+
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta charset="utf-8" />
+    <title>Contributing to Maud &#8212; Maud  documentation</title>
+    <link rel="stylesheet" href="../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <script id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+    <script src="../_static/jquery.js"></script>
+    <script src="../_static/underscore.js"></script>
+    <script src="../_static/doctools.js"></script>
+    <script src="../_static/language_data.js"></script>
+    <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Generating posterior draws" href="post_installation_usage.html" />
+    <link rel="prev" title="Specifying input data" href="inputting.html" />
+   
+  <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <div class="section" id="contributing-to-maud">
+<h1>Contributing to Maud<a class="headerlink" href="#contributing-to-maud" title="Permalink to this headline">¶</a></h1>
+<p>This document explains how you can contribute to Maud.</p>
+<div class="section" id="reporting-bugs-and-making-feature-requests">
+<h2>Reporting bugs and making feature requests<a class="headerlink" href="#reporting-bugs-and-making-feature-requests" title="Permalink to this headline">¶</a></h2>
+<p>If you find a bug in Maud or would like to request a new feature, consider
+adding to the <a class="reference external" href="https://github.com/biosustain/Maud/issues">issues list</a>. Bugs
+should get the red <code class="code docutils literal notranslate"><span class="pre">bug</span></code> label and features the turquoise
+<code class="code docutils literal notranslate"><span class="pre">enhancement</span></code> label.</p>
+</div>
+<div class="section" id="contributing-code-changes">
+<h2>Contributing code changes<a class="headerlink" href="#contributing-code-changes" title="Permalink to this headline">¶</a></h2>
+<p>If you want to add a new feature or fix a bug yourself, the first step is to
+clone the code. If you have ssh access to the <a class="reference external" href="https://github.com/biosustain/Maud">Maud github repository</a>, you can clone it by running</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>git clone git@github.com:biosustain/Maud.git
+</pre></div>
+</div>
+<p>Next, check out a new branch</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>git checkout -b descriptive_branch_name
+</pre></div>
+</div>
+<p>When you are happy with your changes, commit them to your new branch and then
+push it to github</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>git commit -m <span class="s2">&quot;Short description of the changes I&#39;ve made&quot;</span>
+git push
+</pre></div>
+</div>
+<p>Finally, use the online github interface to make a new pull request from your
+branch, complete with a longer description.</p>
+<p>At least one approving review is required before a pull request can be
+merged. You can make your reviewers’ lives a lot easier by adding as much
+detailed commentary as possible, referring to existing issues where appropriate
+and keeping your pull requests small and logically distinct.</p>
+</div>
+<div class="section" id="running-tests-locally">
+<h2>Running tests locally<a class="headerlink" href="#running-tests-locally" title="Permalink to this headline">¶</a></h2>
+<p>You will need to have the following python packages installed in order to run
+Maud’s tests locally</p>
+<ul class="simple">
+<li><p><a class="reference external" href="https://tox.readthedocs.io/en/latest/">tox</a></p></li>
+<li><p><a class="reference external" href="https://github.com/psf/black">black</a></p></li>
+<li><p><a class="reference external" href="http://flake8.pycqa.org/en/latest/">flake8</a></p></li>
+<li><p><a class="reference external" href="https://github.com/timothycrosley/isort">isort</a></p></li>
+</ul>
+<p>Follow the links for installation instructions - they are mostly</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>pip install &lt;package_name&gt;
+</pre></div>
+</div>
+<p>To run the tests locally, run the command</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>tox
+</pre></div>
+</div>
+<p>To painlessly ensure that your code complies with black and isort’s guidelines,
+you can run this reformatting command:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>make qa
+</pre></div>
+</div>
+</div>
+<div class="section" id="releasing-versions">
+<h2>Releasing versions<a class="headerlink" href="#releasing-versions" title="Permalink to this headline">¶</a></h2>
+<p>Maud uses <a href="#id1"><span class="problematic" id="id2">`versioneer&lt;https://github.com/warner/python-versioneer&gt;`_</span></a> to handle
+releases.</p>
+<p>To release a new version of Maud, first make a pull request updating the
+changelog with the new version number and explaining what has changed since the
+previous version.</p>
+<p>Once the changes are merged into the <code class="code docutils literal notranslate"><span class="pre">origin/master</span></code> branch, add a tag
+with the new version number to your local <code class="code docutils literal notranslate"><span class="pre">master</span></code> branch:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>git tag <span class="m">0</span>.2.1
+</pre></div>
+</div>
+<p>Now push the new tag to github:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>git push --tags
+</pre></div>
+</div>
+</div>
+</div>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../index.html">Maud</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+<p class="caption"><span class="caption-text">How to use Maud:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="inputting.html">Specifying input data</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Contributing to Maud</a></li>
+<li class="toctree-l1"><a class="reference internal" href="post_installation_usage.html">Generating posterior draws</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Theoretical background:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../theory/computation.html">Computation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../theory/enzyme_kinetics.html">Enzyme kinetics</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../theory/statistics.html">Statistical Model</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../theory/thermodynamics.html">Thermodynamics</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Case studies:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../case_studies/ecoli.html">A simple model of E. coli glycolysis</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Implementation details:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../implementation/data_model.html">Maud’s data model</a></li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../index.html">Documentation overview</a><ul>
+      <li>Previous: <a href="inputting.html" title="previous chapter">Specifying input data</a></li>
+      <li>Next: <a href="post_installation_usage.html" title="next chapter">Generating posterior draws</a></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2019, Novo Nordisk Foundation Center for Biosustainability, Technical University of Denmark.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 2.4.4</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      
+      |
+      <a href="../_sources/usage/contributing.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>
