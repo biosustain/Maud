@@ -1,9 +1,25 @@
+# Copyright (C) 2020 Novo Nordisk Foundation Center for Biosustainability,
+# Technical University of Denmark.
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <https://www.gnu.org/licenses/>.
+
+"""Code for plotting posterior distribution."""
 import os
+from typing import Dict, List
 
 import arviz as az
-import pandas as pd
 import plotnine as p9
-from matplotlib import pyplot as plt
 
 from maud import io
 
@@ -45,7 +61,22 @@ UNITS = {
 }
 
 
-def plot_violin_plots(par_id, dims, draws, log_scale_variables, units):
+def plot_violin_plots(
+    par_id: str,
+    dims: List[str],
+    draws,
+    log_scale_variables: List[str],
+    units: Dict[str:str],
+):
+    """Plot and save violin plots of parsed distributions.
+
+    :param par_id: Name of the parameter plotted
+    :param dims: Dimensions of the parameter
+    :param draws: pd.Dataframe of parameter distribution
+    indexed by dimensions and contains the population samples
+    :param log_scale_variables: Parameters that are log-distributed
+    :param units: Dictionary of units for each parameter
+    """
     par_units = units[par_id]
     x = fill = dims[0] if len(dims) <= 1 else "experiments"
     plot = (
@@ -76,6 +107,7 @@ def plot_violin_plots(par_id, dims, draws, log_scale_variables, units):
 
 
 def main():
+    """Plot posterior distributions of Maud model."""
     files = [
         CMDSTAN_FILE_TEMPLATE.format(run_number=run_number, i=str(i))
         for i in range(1, N_CHAINS + 1)
