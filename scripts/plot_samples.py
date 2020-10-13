@@ -25,19 +25,19 @@ from maud import io
 
 
 HERE = os.path.dirname(os.path.abspath(__file__))
-HOME = os.path.join(os.path.join(HERE, ".."), "..")
-model_name = "linear"  # toml name of file
-run_number = "202010091734"  # number specific to each run
+HOME = os.path.join(HERE, "..")
+model_name = ""  # Toml name of file
+run_number = "202010112057"  # Number specific to each run
 PATHS = {
-    "DATA": os.path.join(
-        HOME, "test/data"
+    "data": os.path.join(
+        HOME, ""
     ),  # Where the input toml file is stored, relative to the Maud folder
-    "RESULTS": os.path.join(
+    "results": os.path.join(
         HOME, ""
     ),  # The output directory, relative toe the Maud folder
 }
 CMDSTAN_FILE_TEMPLATE = os.path.join(
-    PATHS["RESULTS"], "inference_model-{run_number}-{i}.csv"
+    PATHS["results"], "inference_model-{run_number}-{i}.csv"
 )
 N_CHAINS = 4
 VARIABLES_TO_ANALYSE = [
@@ -64,9 +64,9 @@ UNITS = {
 def plot_violin_plots(
     par_id: str,
     dims: List[str],
-    draws,
+    draws: Dict,
     log_scale_variables: List[str],
-    units: Dict[str:str],
+    units: Dict[str, str],
 ):
     """Plot and save violin plots of parsed distributions.
 
@@ -112,7 +112,7 @@ def main():
         CMDSTAN_FILE_TEMPLATE.format(run_number=run_number, i=str(i))
         for i in range(1, N_CHAINS + 1)
     ]
-    mi = io.load_maud_input_from_toml(os.path.join(PATHS["DATA"], f"{model_name}.toml"))
+    mi = io.load_maud_input_from_toml(os.path.join(PATHS["data"], f"{model_name}.toml"))
     infd = az.from_cmdstan(
         files,
         coords={
@@ -145,7 +145,7 @@ def main():
         draws = var_to_draws[var]
         plot = plot_violin_plots(var, dims, draws, LOG_SCALE_VARIABLES, UNITS)
         plot.save(
-            filename=os.path.join(PATHS["RESULTS"], f"{var}_posterior.png"),
+            filename=os.path.join(PATHS["results"], f"{var}_posterior.png"),
             verbose=False,
             dpi=300,
         )
