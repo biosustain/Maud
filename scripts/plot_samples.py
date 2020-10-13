@@ -27,7 +27,7 @@ from maud import io
 HERE = os.path.dirname(os.path.abspath(__file__))
 HOME = os.path.join(HERE, "..")
 model_name = ""  # Toml name of file
-run_number = "202010112057"  # Number specific to each run
+run_number = ""  # Number specific to each run, found between "-"
 PATHS = {
     "data": os.path.join(
         HOME, ""
