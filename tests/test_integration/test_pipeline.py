@@ -3,6 +3,7 @@
 import os
 import shutil
 import tempfile
+import pandas as pd
 
 import maud.sampling as sampling
 
@@ -115,8 +116,8 @@ def test_linear():
         "rel_tol": 1e-6,
         "max_num_steps": int(1e9),
         "likelihood": 1,
-        "n_samples": 200,
-        "n_warmup": 200,
+        "n_samples": 2,
+        "n_warmup": 2,
         "n_chains": 1,
         "n_cores": 1,
         "timepoint": 500,
@@ -127,19 +128,17 @@ def test_linear():
     }
     fit = sampling.sample(**linear_input_values)
     samples_test = fit.draws_pd()
-    dict(
-        zip(
-            samples_test.columns,
-            map(list, samples_test.quantile([0.03, 0.97]).T.values),
-        )
-    )
-    assert list(samples_test.columns) == list(expected.keys())
+    expected_df = pd.DataFrame.from_dict(expected, orient="index", columns = ["5% CI", "95% CI"])
+    samples_test.loc['mean', :] = samples_test.mean()
+    sample_mean = samples_test.loc['mean'].transpose()
+    validation_df = expected_df.join(sample_mean)
     # Check that each output column (other than the diagnostic ones) is
     # statistically similar to its matching control column.
     test_mean = samples_test.mean()
-    cols = [c for c in samples_test.columns if not c.endswith("__")] + ["lp__"]
-    for col in cols:
-        assert test_mean[col] >= expected[col][0], col + " is too low."
-        assert test_mean[col] <= expected[col][1], col + " is too high."
+    remove_indicies = [idx for idx in validation_df.index if idx.endswith("__")] + ["lp__"]
+    validation_df.drop(remove_indicies, inplace=True)
+    for index, row in validation_df.iterrows():
+        assert row["mean"] >= row["5% CI"], index + " is too low."
+        assert row["mean"] <= row["95% CI"], index + " is too high."
     # Delete temporary directory
     shutil.rmtree(temp_directory)
