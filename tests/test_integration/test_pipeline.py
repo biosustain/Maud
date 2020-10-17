@@ -137,7 +137,6 @@ def test_linear():
     validation_df = expected_df.join(sample_mean)
     # Check that each output column (other than the diagnostic ones) is
     # statistically similar to its matching control column.
-    test_mean = samples_test.mean()
     remove_indicies = [idx for idx in validation_df.index if idx.endswith("__")]
     validation_df.drop(remove_indicies, inplace=True)
     for index, row in validation_df.iterrows():
