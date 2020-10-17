@@ -128,14 +128,16 @@ def test_linear():
     }
     fit = sampling.sample(**linear_input_values)
     samples_test = fit.draws_pd()
-    expected_df = pd.DataFrame.from_dict(expected, orient="index", columns = ["5% CI", "95% CI"])
-    samples_test.loc['mean', :] = samples_test.mean()
-    sample_mean = samples_test.loc['mean'].transpose()
+    expected_df = pd.DataFrame.from_dict(
+        expected, orient="index", columns=["5% CI", "95% CI"]
+    )
+    samples_test.loc["mean", :] = samples_test.mean()
+    sample_mean = samples_test.loc["mean"].transpose()
     validation_df = expected_df.join(sample_mean)
     # Check that each output column (other than the diagnostic ones) is
     # statistically similar to its matching control column.
     test_mean = samples_test.mean()
-    remove_indicies = [idx for idx in validation_df.index if idx.endswith("__")] + ["lp__"]
+    remove_indicies = [idx for idx in validation_df.index if idx.endswith("__")]
     validation_df.drop(remove_indicies, inplace=True)
     for index, row in validation_df.iterrows():
         assert row["mean"] >= row["5% CI"], index + " is too low."
