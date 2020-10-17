@@ -3,6 +3,7 @@
 import os
 import shutil
 import tempfile
+
 import pandas as pd
 
 import maud.sampling as sampling
@@ -116,8 +117,8 @@ def test_linear():
         "rel_tol": 1e-6,
         "max_num_steps": int(1e9),
         "likelihood": 1,
-        "n_samples": 2,
-        "n_warmup": 2,
+        "n_samples": 200,
+        "n_warmup": 200,
         "n_chains": 1,
         "n_cores": 1,
         "timepoint": 500,
