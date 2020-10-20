@@ -101,8 +101,12 @@ vector get_flux(vector conc_mic,
     pos_aa += n_aa[i_enz];
     pos_tc += is_allosteric;
   }
-  return flux;
+  return flux_enz;
 }
+
+vector get_flux_drain(vector S_drain,
+                      vector conc_mic,
+                      vector drain)
 
 vector dbalanced_dt(real time,
                     vector current_balanced,
@@ -112,7 +116,9 @@ vector dbalanced_dt(real time,
                     vector enzyme_concentration,
                     vector km,
                     int[,] km_lookup,
-                    matrix S,
+                    matrix S_enz,
+                    matrix S_drain,
+                    matrix S_full,
                     vector kcat,
                     vector keq,
                     int[] ci_ix,  // index of competitive inhibitors (long-form ragged)
@@ -125,26 +131,32 @@ vector dbalanced_dt(real time,
                     vector dissociation_constant_t,
                     vector dissociation_constant_r,
                     vector transfer_constant,
-                    int[] subunits){
+                    int[] subunits,
+                    vector drain){
   vector[rows(current_balanced)+rows(unbalanced)] current_concentration;
   current_concentration[balanced_ix] = current_balanced;
   current_concentration[unbalanced_ix] = unbalanced;
-  return S[balanced_ix] * get_flux(current_concentration,
-                                   enzyme_concentration,
-                                   km,
-                                   km_lookup,
-                                   S,
-                                   kcat,
-                                   keq,
-                                   ci_ix,
-                                   ai_ix,
-                                   aa_ix,
-                                   n_ci,
-                                   n_ai,
-                                   n_aa,
-                                   ki,
-                                   dissociation_constant_t,
-                                   dissociation_constant_r,
-                                   transfer_constant,
-                                   subunits);
+  flux_enz = get_flux_enz(current_concentration,
+                          enzyme_concentration,
+                          km,
+                          km_lookup,
+                          S_enz,
+                          kcat,
+                          keq,
+                          ci_ix,
+                          ai_ix,
+                          aa_ix,
+                          n_ci,
+                          n_ai,
+                          n_aa,
+                          ki,
+                          dissociation_constant_t,
+                          dissociation_constant_r,
+                          transfer_constant,
+                          subunits);
+  flux_drain = get_flux_drain(current_concentration,
+                              S_drain,
+                              drain);
+
+  return S_full * append_row(flux_enz, flux_drain)
 }
