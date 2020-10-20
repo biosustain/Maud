@@ -43,6 +43,7 @@ def get_full_stoichiometry(
     enzyme_codes: Dict[str, int],
     metabolite_codes: Dict[str, int],
     reaction_codes: Dict[str, int],
+    drain_codes: Dict[str, int]
 ):
     """Get full stoichiometric matrix for each isoenzyme.
 
@@ -50,16 +51,27 @@ def get_full_stoichiometry(
     :param enzyme_codes: the codified enzyme codes
     :param metabolite_codes: the codified metabolite codes
     """
-    S = pd.DataFrame(index=enzyme_codes, columns=metabolite_codes)
-    S_to_flux_map = pd.DataFrame(0, index=reaction_codes, columns=enzyme_codes)
+    S_enz = pd.DataFrame(index=enzyme_codes, columns=metabolite_codes)
+    S_drain = pd.DataFrame(index=drain_codes, columns=metabolite_codes)
+    S_complete = pd.DataFrame(index={**enzyme_codes, **drain_codes}, columns=metabolite_codes)
+    S_enz_to_flux_map = pd.DataFrame(0, index=reaction_codes, columns=enzyme_codes)
+
 
     for rxn_id, rxn in kinetic_model.reactions.items():
         for enz_id, _ in rxn.enzymes.items():
             for met, stoic in rxn.stoichiometry.items():
-                S_to_flux_map.loc[rxn_id, enz_id] = 1
-                S.loc[enz_id, met] = stoic
-    S.fillna(0, inplace=True)
-    return S, S_to_flux_map
+                S_enz_to_flux_map.loc[rxn_id, enz_id] = 1
+                S_enz.loc[enz_id, met] = stoic
+                S_complete.loc[enz_id, met] = stoic
+
+    for drain_id, drain in kinetic_model.drains.items():
+        for met, stoic in drain.stoichiometry.items():
+            S_complete.loc[drain_id, met] = stoic
+
+    S_enz.fillna(0, inplace=True)
+    S_drain.fillna(0, inplace=True)
+    S_complete.fillna(0, inplace=True)
+    return S_enz, S_drain, S_enz_to_flux_map, S_complete
 
 
 def get_knockout_matrix(mi: MaudInput):
@@ -235,7 +247,7 @@ def get_input_data(
     water_stoichiometry = [
         r.water_stoichiometry for r in reactions.values() for e in r.enzymes.items()
     ]
-    full_stoic, stoic_map_to_flux = get_full_stoichiometry(
+    enzyme_stoic, drain_stoic, stoic_map_to_flux, full_stoic = get_full_stoichiometry(
         mi.kinetic_model, enzyme_codes, mic_codes, reaction_codes
     )
     subunits = pd.DataFrame(
