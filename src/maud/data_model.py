@@ -196,6 +196,7 @@ class KineticModel:
     :param model_id: id of the kinetic model
     :param metabolites: dictionary mapping strings to metabolite objects
     :param reactions: dictionary mapping strings to reaction objects
+    :param drains: dictionary mapping strings to drain objects
     :param compartments: dictionary mapping strings to compartment objects
     :param mic: dictionary mapping strings to MetaboliteInCompartment objects
     """
@@ -225,7 +226,7 @@ class Measurement:
     :param uncertainty: uncertainty associated to the measurent
     :param scale: scale of the measurement, e.g. 'log10' or 'linear
     :param target_type: type of thing being measured, e.g. 'metabolite', 'reaction',
-    'enzyme', 'drain'.
+    'enzyme'.
     """
 
     def __init__(
