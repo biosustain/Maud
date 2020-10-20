@@ -51,9 +51,9 @@ def get_full_stoichiometry(
     :param enzyme_codes: the codified enzyme codes
     :param metabolite_codes: the codified metabolite codes
     """
-    S_enz = pd.DataFrame(index=enzyme_codes, columns=metabolite_codes)
-    S_drain = pd.DataFrame(index=drain_codes, columns=metabolite_codes)
-    S_complete = pd.DataFrame(index={**enzyme_codes, **drain_codes}, columns=metabolite_codes)
+    S_enz = pd.DataFrame(0, index=enzyme_codes, columns=metabolite_codes)
+    S_drain = pd.DataFrame(0, index=drain_codes, columns=metabolite_codes)
+    S_complete = pd.DataFrame(0, index={**enzyme_codes, **drain_codes}, columns=metabolite_codes)
     S_enz_to_flux_map = pd.DataFrame(0, index=reaction_codes, columns=enzyme_codes)
 
 
@@ -66,11 +66,9 @@ def get_full_stoichiometry(
 
     for drain_id, drain in kinetic_model.drains.items():
         for met, stoic in drain.stoichiometry.items():
+            S_drain.loc[drain_id, met] = stoic
             S_complete.loc[drain_id, met] = stoic
 
-    S_enz.fillna(0, inplace=True)
-    S_drain.fillna(0, inplace=True)
-    S_complete.fillna(0, inplace=True)
     return S_enz, S_drain, S_enz_to_flux_map, S_complete
 
 
