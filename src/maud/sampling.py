@@ -234,6 +234,7 @@ def get_input_data(
     mics = mi.kinetic_model.mics
     reactions = mi.kinetic_model.reactions
     reaction_codes = mi.stan_codes["reaction"]
+    drain_codes = mi.stan_codes["drains"]
     enzyme_codes = mi.stan_codes["enzyme"]
     experiment_codes = mi.stan_codes["experiment"]
     met_codes = mi.stan_codes["metabolite"]
@@ -289,8 +290,16 @@ def get_input_data(
     formation_energy_priors["stan_code"] = formation_energy_priors["metabolite_id"].map(
         met_codes
     )
-    formation_energy_priors = formation_energy_priors.sort_values("stan_code")
-
+formation_energy_priors.sort_values("stan_code", inplace=True)
+    drain_priors = pd.DataFrame(
+        {
+            "location": [p.location for p in mi.priors["drains"]],
+            "scale": [p.scale for p in mi.priors["drains"]]
+            "drain_id": [p.drain_id for p in mi.priors["drains"]]
+        }
+    )
+    drain_priors["stan_code"] = drain_priors["drain_id"].map(drain_codes)
+    drain_priors.sort_values("stan_code")
     ki_priors, diss_t_priors, diss_r_priors = (
         pd.DataFrame(
             {
@@ -334,6 +343,7 @@ def get_input_data(
     enzyme_shape = len(mi.experiments), len(enzymes)
     prior_loc_enzyme = np.full(enzyme_shape, DEFAULT_PRIOR_LOC_ENZYME)
     prior_scale_enzyme = np.full(enzyme_shape, DEFAULT_PRIOR_SCALE_ENZYME)
+
     # measurements
     mic_measurements, reaction_measurements, enzyme_measurements = (
         pd.DataFrame(
@@ -412,7 +422,9 @@ def get_input_data(
         "prior_scale_unbalanced": prior_scale_unb,
         "prior_loc_enzyme": prior_loc_enzyme,
         "prior_scale_enzyme": prior_scale_enzyme,
-        "S": full_stoic.T.values,
+        "S_enz": enzyme_stoic.T.values,
+        "S_drain": drain_stoic.T.values,
+        "S_full": full_stoic.T.values,
         "water_stoichiometry": water_stoichiometry,
         "mic_to_met": list(mic_to_met.values()),
         "S_to_flux_map": stoic_map_to_flux.values,
