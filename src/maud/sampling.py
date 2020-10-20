@@ -90,6 +90,19 @@ def get_knockout_matrix(mi: MaudInput):
                 ] = 1
     return enzyme_knockout_matrix
 
+def get_drain_priors(mi: MaudInput):
+    """Returns an experiment x drain matrix of location and scale priors for drains."""
+    drain_codes = mi.stan_codes["drain"]
+    enzyme_codes = mi.stan_codes["enzyme"]
+
+    drain_loc_prior = pd.DataFrame(index=experiment_codes, columns=drain_codes)
+    drain_scale_prior = pd.DataFrame(index=experiment_codes, columns=drain_codes)
+
+    for p in mi.priors["drains"]:
+        drain_loc_prior.loc[p["experiment_id"], p["drain_id"]] = p["location"]
+        drain_scale_prior.loc[p["experiment_id"], p["drain_id"]] = p["scale"]
+
+    return drain_loc_prior, drain_scale_prior
 
 def get_km_lookup(km_priors, mic_codes, enzyme_codes):
     """Get a mics x enzymes matrix of km indexes. 0 means null."""
@@ -232,7 +245,7 @@ def get_input_data(
     mics = mi.kinetic_model.mics
     reactions = mi.kinetic_model.reactions
     reaction_codes = mi.stan_codes["reaction"]
-    drain_codes = mi.stan_codes["drains"]
+    drain_codes = mi.stan_codes["drain"]
     enzyme_codes = mi.stan_codes["enzyme"]
     experiment_codes = mi.stan_codes["experiment"]
     met_codes = mi.stan_codes["metabolite"]
@@ -288,16 +301,8 @@ def get_input_data(
     formation_energy_priors["stan_code"] = formation_energy_priors["metabolite_id"].map(
         met_codes
     )
-formation_energy_priors.sort_values("stan_code", inplace=True)
-    drain_priors = pd.DataFrame(
-        {
-            "location": [p.location for p in mi.priors["drains"]],
-            "scale": [p.scale for p in mi.priors["drains"]]
-            "drain_id": [p.drain_id for p in mi.priors["drains"]]
-        }
-    )
-    drain_priors["stan_code"] = drain_priors["drain_id"].map(drain_codes)
-    drain_priors.sort_values("stan_code")
+    formation_energy_priors.sort_values("stan_code", inplace=True)
+    prior_loc_drain, prior_scale_drain = get_drain_priors(mi)
     ki_priors, diss_t_priors, diss_r_priors = (
         pd.DataFrame(
             {
@@ -420,6 +425,8 @@ formation_energy_priors.sort_values("stan_code", inplace=True)
         "prior_scale_unbalanced": prior_scale_unb,
         "prior_loc_enzyme": prior_loc_enzyme,
         "prior_scale_enzyme": prior_scale_enzyme,
+        "prior_loc_drain": prior_loc_drain.values,
+        "prior_scale_drain": prior_scale_drain.values,
         "S_enz": enzyme_stoic.T.values,
         "S_drain": drain_stoic.T.values,
         "S_full": full_stoic.T.values,
