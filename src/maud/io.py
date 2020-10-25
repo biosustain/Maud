@@ -89,7 +89,10 @@ def load_kinetic_model_from_toml(
         for m in parsed_toml["metabolites"]
     }
     reactions = {r["id"]: load_reaction_from_toml(r) for r in parsed_toml["reactions"]}
-    drains = {d["id"]: load_drain_from_toml(d) for d in parsed_toml["drains"]}
+    if "drains" in parsed_toml.keys():
+        drains = {d["id"]: load_drain_from_toml(d) for d in parsed_toml["drains"]}
+    else:
+        drains = None
     return KineticModel(
         model_id=model_id,
         metabolites=metabolites,
@@ -117,6 +120,10 @@ def get_stan_codes(km: KineticModel, experiments) -> Dict[str, Dict[str, int]]:
         for mic_id, code in mic_codes.items()
         if not km.mics[mic_id].balanced
     }
+    if km.drains != None:
+        drain_codes = codify(km.drains.keys())
+    else:
+        drain_codes = None
     return {
         "metabolite": codify(km.metabolites.keys()),
         "metabolite_in_compartment": mic_codes,
@@ -125,7 +132,7 @@ def get_stan_codes(km: KineticModel, experiments) -> Dict[str, Dict[str, int]]:
         "reaction": codify(km.reactions.keys()),
         "experiment": codify(experiments.keys()),
         "enzyme": codify(enzyme_ids),
-        "drain": codify(km.drains.keys())
+        "drain": drain_codes
     }
 
 def load_drain_from_toml(toml_drain: dict) -> Drain:
@@ -274,17 +281,18 @@ def load_maud_input_from_toml(filepath: str, id: str = "mi") -> MaudInput:
             )
         )
     for e in parsed_toml["experiments"]:
-        experiment = e["id"]
-        for d in e.drains:
-            priors["drains"].append(
-                Prior(
-                id=f"{d["id"]}_{experiment}",
-                location=drain["location"],
-                scale=d["scale"],
-                drain_id=d["id"],
-                experiment_id=experiment,
+        if "drains" in e.keys():
+            experiment = e["id"]
+            for d in e.drains:
+                priors["drains"].append(
+                    Prior(
+                        id=f'{d["id"]}_{experiment}',
+                        location=d["location"],
+                        scale=d["scale"],
+                        drain_id=d["id"],
+                        experiment_id=experiment,
+                    )
                 )
-            )
     for prior_type, prefix in zip(
         [
             "inhibition_constants",

@@ -206,9 +206,9 @@ class KineticModel:
         model_id: str,
         metabolites: Dict[str, Metabolite],
         reactions: Dict[str, Reaction],
-        drains: Dict[str, Drain],
         compartments: Dict[str, Compartment],
         mics: Dict[str, MetaboliteInCompartment],
+        drains: Dict[str, Drain] = None,
     ):
         self.model_id = model_id
         self.metabolites = metabolites
