@@ -1,6 +1,7 @@
 functions{
 #include allostery.stan
 #include modular_rate_law.stan
+#include drain_reaction.stan
 #include dbalanced_dt.stan
 #include partial_sums.stan
 #include thermodynamics.stan
@@ -13,7 +14,7 @@ data {
   int<lower=1> N_km;
   int<lower=1> N_reaction;
   int<lower=1> N_enzyme;
-  int<lower=0> N_drain
+  int<lower=0> N_drain;
   int<lower=1> N_experiment;
   int<lower=1> N_flux_measurement;
   int<lower=1> N_enzyme_measurement;
@@ -57,10 +58,10 @@ data {
   real prior_loc_enzyme[N_experiment, N_enzyme];
   real<lower=0> prior_scale_enzyme[N_experiment, N_enzyme];
   real prior_loc_drain[N_experiment, N_drain];
-  real<lower=0> prior_scale_drain[N_experiment, N_drain]
+  real<lower=0> prior_scale_drain[N_experiment, N_drain];
   // network properties
   matrix[N_mic, N_enzyme] S_enz;
-  matrix[N_mic, N_drain] S_full;
+  matrix[N_mic, N_drain] S_drain;
   matrix[N_mic, N_drain+N_enzyme] S_full;
   int<lower=1,upper=N_metabolite> mic_to_met[N_mic];
   vector[N_enzyme] water_stoichiometry;
@@ -89,7 +90,7 @@ transformed data {
 }
 parameters {
   vector[N_metabolite] formation_energy_z;
-  vector[N_experiment, N_drain] drain;
+  matrix[N_experiment, N_drain] drain;
   vector<lower=0>[N_enzyme] kcat;
   vector<lower=0>[N_km] km;
   matrix<lower=0, upper=100>[N_experiment, N_enzyme] enzyme;
@@ -137,10 +138,10 @@ transformed parameters {
                                                               dissociation_constant_r,
                                                               transfer_constant,
                                                               subunits,
-                                                              drain);
+                                                              drain[e,]');
     conc[e, balanced_mic_ix] = conc_balanced[1];
     conc[e, unbalanced_mic_ix] = conc_unbalanced[e]';
-    flux[e] = (S_to_flux_map * get_flux(conc[e],
+    flux[e] = (S_to_flux_map * get_flux_enz(conc[e],
                               experiment_enzyme,
                               km,
                               km_lookup,
@@ -199,7 +200,7 @@ model {
                              prior_scale_enzyme[e]);
     target += lognormal_lpdf(drain[e] |
                              log(prior_loc_drain[e]),
-                             prior_scale_drain[e])
+                             prior_scale_drain[e]);
   }
   if (LIKELIHOOD == 1){
     target += reduce_sum(partial_sum_conc, yconc, 1,

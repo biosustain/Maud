@@ -21,7 +21,7 @@ int[] get_enz_mics(matrix S, int i_enz){
   return out;
 }
 
-vector get_flux(vector conc_mic,
+vector get_flux_enz(vector conc_mic,
                 vector conc_enz,
                 vector km,
                 int[,] km_lookup,
@@ -39,7 +39,7 @@ vector get_flux(vector conc_mic,
                 vector dissociation_constant_r,
                 vector transfer_constant,
                 int[] subunits){
-  vector[cols(S)] flux;
+  vector[cols(S)] flux_enz;
   int pos_ci = 1;
   int pos_ai = 1;
   int pos_aa = 1;
@@ -95,7 +95,7 @@ vector get_flux(vector conc_mic,
                                        transfer_constant[pos_tc],
                                        subunits[i_enz]);
     }
-    flux[i_enz] = catalysis_factor * allostery_factor;
+    flux_enz[i_enz] = catalysis_factor * allostery_factor;
     pos_ci += n_ci[i_enz];
     pos_ai += n_ai[i_enz];
     pos_aa += n_aa[i_enz];
@@ -104,9 +104,18 @@ vector get_flux(vector conc_mic,
   return flux_enz;
 }
 
-vector get_flux_drain(vector S_drain,
+vector get_flux_drain(matrix S_drain,
                       vector conc_mic,
-                      vector drain)
+                      vector drain){
+  vector[cols(S_drain)] flux_drain;
+  for (i_drain in 1:cols(S_drain)){
+    int N_drain_mics = get_N_enz_mics(S_drain, i_drain);
+    int drain_mics[N_drain_mics] = get_enz_mics(S_drain, i_drain);
+    real drain_rate = drain_reaction(conc_mic[drain_mics], drain[i_drain]);
+    flux_drain[i_drain] = drain_rate;
+  }
+  return flux_drain;
+}
 
 vector dbalanced_dt(real time,
                     vector current_balanced,
@@ -134,8 +143,12 @@ vector dbalanced_dt(real time,
                     int[] subunits,
                     vector drain){
   vector[rows(current_balanced)+rows(unbalanced)] current_concentration;
+  vector[cols(S_enz)] flux_enz;
+  vector[cols(S_drain)] flux_drain;
+
   current_concentration[balanced_ix] = current_balanced;
   current_concentration[unbalanced_ix] = unbalanced;
+
   flux_enz = get_flux_enz(current_concentration,
                           enzyme_concentration,
                           km,
@@ -154,9 +167,9 @@ vector dbalanced_dt(real time,
                           dissociation_constant_r,
                           transfer_constant,
                           subunits);
-  flux_drain = get_flux_drain(current_concentration,
-                              S_drain,
+  flux_drain = get_flux_drain(S_drain,
+                              current_concentration,
                               drain);
 
-  return S_full * append_row(flux_enz, flux_drain)
+  return S_full[balanced_ix] * append_row(flux_enz, flux_drain);
 }
