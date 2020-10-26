@@ -198,9 +198,9 @@ model {
     target += lognormal_lpdf(enzyme[e] |
                              log(prior_loc_enzyme[e]),
                              prior_scale_enzyme[e]);
-    target += lognormal_lpdf(drain[e] |
-                             log(prior_loc_drain[e]),
-                             prior_scale_drain[e]);
+    target += normal_lpdf(drain[e] |
+                          prior_loc_drain[e],
+                          prior_scale_drain[e]);
   }
   if (LIKELIHOOD == 1){
     target += reduce_sum(partial_sum_conc, yconc, 1,

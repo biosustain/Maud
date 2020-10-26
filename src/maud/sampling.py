@@ -52,7 +52,7 @@ def get_full_stoichiometry(
     :param metabolite_codes: the codified metabolite codes
     """
     S_enz = pd.DataFrame(0, index=enzyme_codes, columns=metabolite_codes)
-    if drain_codes != None:
+    if drain_codes is not None:
         S_drain = pd.DataFrame(0, index=drain_codes, columns=metabolite_codes)
         S_complete = pd.DataFrame(0, index={**enzyme_codes, **drain_codes}, columns=metabolite_codes)
     else:
@@ -67,13 +67,13 @@ def get_full_stoichiometry(
                 S_enz.loc[enz_id, met] = stoic
                 S_complete.loc[enz_id, met] = stoic
 
-    if drain_codes != None:
+    if drain_codes is not None:
         for drain_id, drain in kinetic_model.drains.items():
             for met, stoic in drain.stoichiometry.items():
                 S_drain.loc[drain_id, met] = stoic
                 S_complete.loc[drain_id, met] = stoic
 
-    if drain_codes != None: 
+    if drain_codes is not None: 
         return S_enz, S_enz_to_flux_map, S_complete, S_drain
     else: 
         return S_enz, S_enz_to_flux_map, S_complete
@@ -101,14 +101,14 @@ def get_drain_priors(mi: MaudInput):
     """Returns an experiment x drain matrix of location and scale priors for drains."""
     drain_codes = mi.stan_codes["drain"]
     enzyme_codes = mi.stan_codes["enzyme"]
+    experiment_codes = mi.stan_codes["experiment"]
 
     drain_loc_prior = pd.DataFrame(index=experiment_codes, columns=drain_codes)
     drain_scale_prior = pd.DataFrame(index=experiment_codes, columns=drain_codes)
 
     for p in mi.priors["drains"]:
-        drain_loc_prior.loc[p["experiment_id"], p["drain_id"]] = p["location"]
-        drain_scale_prior.loc[p["experiment_id"], p["drain_id"]] = p["scale"]
-
+        drain_loc_prior.loc[p.experiment_id, p.drain_id] = p.location
+        drain_scale_prior.loc[p.experiment_id, p.drain_id] = p.scale
     return drain_loc_prior, drain_scale_prior
 
 def get_km_lookup(km_priors, mic_codes, enzyme_codes):
@@ -266,7 +266,7 @@ def get_input_data(
     water_stoichiometry = [
         r.water_stoichiometry for r in reactions.values() for e in r.enzymes.items()
     ]
-    if drain_codes != None:
+    if drain_codes is not None:
         enzyme_stoic, stoic_map_to_flux, full_stoic, drain_stoic = get_full_stoichiometry(
             mi.kinetic_model, enzyme_codes, mic_codes, reaction_codes, drain_codes
         )
@@ -315,7 +315,7 @@ def get_input_data(
         met_codes
     )
     formation_energy_priors.sort_values("stan_code", inplace=True)
-    if drain_codes != None:
+    if drain_codes is not None:
         prior_loc_drain, prior_scale_drain = get_drain_priors(mi)
     else:
         prior_loc_drain = pd.DataFrame()
@@ -402,7 +402,7 @@ def get_input_data(
         "N_allosteric_inhibitor": len(diss_t_priors),
         "N_allosteric_activator": len(diss_r_priors),
         "N_allosteric_enzyme": len(transfer_constant_priors),
-        "N_drain": len(prior_loc_drain),
+        "N_drain": len(mi.kinetic_model.drains),
         "unbalanced_mic_ix": list(unbalanced_mic_codes.values()),
         "balanced_mic_ix": list(balanced_mic_codes.values()),
         "experiment_yconc": (

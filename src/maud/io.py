@@ -120,7 +120,7 @@ def get_stan_codes(km: KineticModel, experiments) -> Dict[str, Dict[str, int]]:
         for mic_id, code in mic_codes.items()
         if not km.mics[mic_id].balanced
     }
-    if km.drains != None:
+    if km.drains is not None:
         drain_codes = codify(km.drains.keys())
     else:
         drain_codes = None
@@ -283,7 +283,7 @@ def load_maud_input_from_toml(filepath: str, id: str = "mi") -> MaudInput:
     for e in parsed_toml["experiments"]:
         if "drains" in e.keys():
             experiment = e["id"]
-            for d in e.drains:
+            for d in e["drains"]:
                 priors["drains"].append(
                     Prior(
                         id=f'{d["id"]}_{experiment}',
