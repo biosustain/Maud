@@ -305,6 +305,7 @@ class Prior:
         self.mic_id = mic_id
         self.metabolite_id = metabolite_id
         self.enzyme_id = enzyme_id
+        self.drain_id = drain_id
 
 
 class MaudInput:

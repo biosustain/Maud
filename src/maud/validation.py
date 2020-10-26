@@ -50,6 +50,7 @@ def validate_maud_input(mi: data_model.MaudInput):
     prior_kcats = [p.id for p in mi.priors["kcats"]]
     prior_kis = [p.id for p in mi.priors["inhibition_constants"]]
     prior_formation_energies = [p.id for p in mi.priors["formation_energies"]]
+    prior_drains = [p.id for p in mi.priors["drains"]]
     for model_pars, prior_pars in zip(
         [model_kms, model_kcats, model_formation_energies, model_kis],
         [prior_kms, prior_kcats, prior_formation_energies, prior_kis],
@@ -75,3 +76,11 @@ def validate_maud_input(mi: data_model.MaudInput):
                     f"reaction {meas.target_id} is measured in experiment {exp.id}"
                     "but is not in the kinetic model {mi.kinetic_model.model_id}."
                 )
+        if mi.kinetic_model.drains != None:
+            for drain_id in mi.kinetic_model.drains:
+                for drain in mi.priors["drains"]:
+                    if (drain_id != drain.drain_id) & (exp.id != drain.experiment_id):
+                        raise ValueError(
+                            f"drain {drain_id} was not included in experiment {exp.id}."
+                            "A drain prior is required for every drain and each experiment."
+                        )
