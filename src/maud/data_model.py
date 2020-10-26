@@ -184,8 +184,6 @@ class Drain:
     ):
         if stoichiometry is None:
             stoichiometry = defaultdict()
-        if enzymes is None:
-            enzymes = defaultdict()
         self.id = id
         self.name = name if name is not None else id
         self.stoichiometry = stoichiometry
