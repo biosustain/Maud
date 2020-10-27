@@ -50,7 +50,6 @@ def validate_maud_input(mi: data_model.MaudInput):
     prior_kcats = [p.id for p in mi.priors["kcats"]]
     prior_kis = [p.id for p in mi.priors["inhibition_constants"]]
     prior_formation_energies = [p.id for p in mi.priors["formation_energies"]]
-    prior_drains = [p.id for p in mi.priors["drains"]]
     for model_pars, prior_pars in zip(
         [model_kms, model_kcats, model_formation_energies, model_kis],
         [prior_kms, prior_kcats, prior_formation_energies, prior_kis],

@@ -100,9 +100,8 @@ def get_knockout_matrix(mi: MaudInput):
 
 
 def get_drain_priors(mi: MaudInput):
-    """Returns an experiment x drain matrix of location and scale priors for drains."""
+    """Return an experiment x drain matrix of location and scale priors for drains."""
     drain_codes = mi.stan_codes["drain"]
-    enzyme_codes = mi.stan_codes["enzyme"]
     experiment_codes = mi.stan_codes["experiment"]
 
     drain_loc_prior = pd.DataFrame(index=experiment_codes, columns=drain_codes)
