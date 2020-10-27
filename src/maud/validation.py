@@ -81,5 +81,5 @@ def validate_maud_input(mi: data_model.MaudInput):
                     if (drain_id != drain.drain_id) & (exp.id != drain.experiment_id):
                         raise ValueError(
                             f"drain {drain_id} was not included in experiment {exp.id}."
-                            "A drain prior is required for every drain and each experiment."
+                            "Required for each experiment and drain."
                         )
