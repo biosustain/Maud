@@ -56,7 +56,7 @@ mic_id = 'atp_c'
 [[reactions]]
 id = "FBP"
 name = "Fructose-bisphosphatase"
-water_stoichiometry = 1
+water_stoichiometry = -1
 enzymes = [{id = "FBP", name = "Fructose-bisphosphatase", gene = "fbp"}]
 stoichiometry = {f6p_c = 1, fdp_c = -1, pi_c = 1}
 
