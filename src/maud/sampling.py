@@ -410,7 +410,7 @@ def get_input_data(
         "N_allosteric_inhibitor": len(diss_t_priors),
         "N_allosteric_activator": len(diss_r_priors),
         "N_allosteric_enzyme": len(transfer_constant_priors),
-        "N_drain": len(mi.kinetic_model.drains),
+        "N_drain": len(drain_codes) if drain_codes is not None else 0,
         "unbalanced_mic_ix": list(unbalanced_mic_codes.values()),
         "balanced_mic_ix": list(balanced_mic_codes.values()),
         "experiment_yconc": (
