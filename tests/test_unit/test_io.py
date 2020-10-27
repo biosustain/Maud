@@ -19,6 +19,7 @@ def test_load_maud_input_from_toml():
         "reaction": {"r1": 2, "r2": 1, "r3": 3},
         "experiment": {"condition_1": 1, "condition_2": 2},
         "enzyme": {"r1": 2, "r2": 1, "r3": 3},
+        "drain": None,
     }
     mi = io.load_maud_input_from_toml(os.path.join(data_path, "linear.toml"))
     assert mi.kinetic_model.reactions["r1"].stoichiometry == {"M1_e": -1, "M1_c": 1}

@@ -43,6 +43,7 @@ def get_full_stoichiometry(
     enzyme_codes: Dict[str, int],
     metabolite_codes: Dict[str, int],
     reaction_codes: Dict[str, int],
+    drain_codes,
 ):
     """Get full stoichiometric matrix for each isoenzyme.
 
@@ -50,16 +51,33 @@ def get_full_stoichiometry(
     :param enzyme_codes: the codified enzyme codes
     :param metabolite_codes: the codified metabolite codes
     """
-    S = pd.DataFrame(index=enzyme_codes, columns=metabolite_codes)
-    S_to_flux_map = pd.DataFrame(0, index=reaction_codes, columns=enzyme_codes)
+    S_enz = pd.DataFrame(0, index=enzyme_codes, columns=metabolite_codes)
+    if drain_codes is not None:
+        S_drain = pd.DataFrame(0, index=drain_codes, columns=metabolite_codes)
+        S_complete = pd.DataFrame(
+            0, index={**enzyme_codes, **drain_codes}, columns=metabolite_codes
+        )
+    else:
+        S_complete = pd.DataFrame(0, index={**enzyme_codes}, columns=metabolite_codes)
+    S_enz_to_flux_map = pd.DataFrame(0, index=reaction_codes, columns=enzyme_codes)
 
     for rxn_id, rxn in kinetic_model.reactions.items():
         for enz_id, _ in rxn.enzymes.items():
             for met, stoic in rxn.stoichiometry.items():
-                S_to_flux_map.loc[rxn_id, enz_id] = 1
-                S.loc[enz_id, met] = stoic
-    S.fillna(0, inplace=True)
-    return S, S_to_flux_map
+                S_enz_to_flux_map.loc[rxn_id, enz_id] = 1
+                S_enz.loc[enz_id, met] = stoic
+                S_complete.loc[enz_id, met] = stoic
+
+    if drain_codes is not None:
+        for drain_id, drain in kinetic_model.drains.items():
+            for met, stoic in drain.stoichiometry.items():
+                S_drain.loc[drain_id, met] = stoic
+                S_complete.loc[drain_id, met] = stoic
+
+    if drain_codes is not None:
+        return S_enz, S_enz_to_flux_map, S_complete, S_drain
+    else:
+        return S_enz, S_enz_to_flux_map, S_complete
 
 
 def get_knockout_matrix(mi: MaudInput):
@@ -79,6 +97,20 @@ def get_knockout_matrix(mi: MaudInput):
                     experiment_codes[exp_name] - 1, enzyme_codes[enz] - 1
                 ] = 1
     return enzyme_knockout_matrix
+
+
+def get_drain_priors(mi: MaudInput):
+    """Return an experiment x drain matrix of location and scale priors for drains."""
+    drain_codes = mi.stan_codes["drain"]
+    experiment_codes = mi.stan_codes["experiment"]
+
+    drain_loc_prior = pd.DataFrame(index=experiment_codes, columns=drain_codes)
+    drain_scale_prior = pd.DataFrame(index=experiment_codes, columns=drain_codes)
+
+    for p in mi.priors["drains"]:
+        drain_loc_prior.loc[p.experiment_id, p.drain_id] = p.location
+        drain_scale_prior.loc[p.experiment_id, p.drain_id] = p.scale
+    return drain_loc_prior, drain_scale_prior
 
 
 def get_km_lookup(km_priors, mic_codes, enzyme_codes):
@@ -222,6 +254,7 @@ def get_input_data(
     mics = mi.kinetic_model.mics
     reactions = mi.kinetic_model.reactions
     reaction_codes = mi.stan_codes["reaction"]
+    drain_codes = mi.stan_codes["drain"]
     enzyme_codes = mi.stan_codes["enzyme"]
     experiment_codes = mi.stan_codes["experiment"]
     met_codes = mi.stan_codes["metabolite"]
@@ -235,9 +268,20 @@ def get_input_data(
     water_stoichiometry = [
         r.water_stoichiometry for r in reactions.values() for e in r.enzymes.items()
     ]
-    full_stoic, stoic_map_to_flux = get_full_stoichiometry(
-        mi.kinetic_model, enzyme_codes, mic_codes, reaction_codes
-    )
+    if drain_codes is not None:
+        (
+            enzyme_stoic,
+            stoic_map_to_flux,
+            full_stoic,
+            drain_stoic,
+        ) = get_full_stoichiometry(
+            mi.kinetic_model, enzyme_codes, mic_codes, reaction_codes, drain_codes
+        )
+    else:
+        enzyme_stoic, stoic_map_to_flux, full_stoic = get_full_stoichiometry(
+            mi.kinetic_model, enzyme_codes, mic_codes, reaction_codes, drain_codes
+        )
+        drain_stoic = pd.DataFrame()
     subunits = pd.DataFrame(
         {
             "enzyme_id": [e.id for e in enzymes.values()],
@@ -277,8 +321,12 @@ def get_input_data(
     formation_energy_priors["stan_code"] = formation_energy_priors["metabolite_id"].map(
         met_codes
     )
-    formation_energy_priors = formation_energy_priors.sort_values("stan_code")
-
+    formation_energy_priors.sort_values("stan_code", inplace=True)
+    if drain_codes is not None:
+        prior_loc_drain, prior_scale_drain = get_drain_priors(mi)
+    else:
+        prior_loc_drain = pd.DataFrame()
+        prior_scale_drain = pd.DataFrame()
     ki_priors, diss_t_priors, diss_r_priors = (
         pd.DataFrame(
             {
@@ -322,6 +370,7 @@ def get_input_data(
     enzyme_shape = len(mi.experiments), len(enzymes)
     prior_loc_enzyme = np.full(enzyme_shape, DEFAULT_PRIOR_LOC_ENZYME)
     prior_scale_enzyme = np.full(enzyme_shape, DEFAULT_PRIOR_SCALE_ENZYME)
+
     # measurements
     mic_measurements, reaction_measurements, enzyme_measurements = (
         pd.DataFrame(
@@ -360,6 +409,7 @@ def get_input_data(
         "N_allosteric_inhibitor": len(diss_t_priors),
         "N_allosteric_activator": len(diss_r_priors),
         "N_allosteric_enzyme": len(transfer_constant_priors),
+        "N_drain": len(drain_codes) if drain_codes is not None else 0,
         "unbalanced_mic_ix": list(unbalanced_mic_codes.values()),
         "balanced_mic_ix": list(balanced_mic_codes.values()),
         "experiment_yconc": (
@@ -400,7 +450,11 @@ def get_input_data(
         "prior_scale_unbalanced": prior_scale_unb,
         "prior_loc_enzyme": prior_loc_enzyme,
         "prior_scale_enzyme": prior_scale_enzyme,
-        "S": full_stoic.T.values,
+        "prior_loc_drain": prior_loc_drain.values.tolist(),
+        "prior_scale_drain": prior_scale_drain.values.tolist(),
+        "S_enz": enzyme_stoic.T.values,
+        "S_drain": drain_stoic.T.values.tolist(),
+        "S_full": full_stoic.T.values,
         "water_stoichiometry": water_stoichiometry,
         "mic_to_met": list(mic_to_met.values()),
         "S_to_flux_map": stoic_map_to_flux.values,
@@ -535,4 +589,5 @@ def get_initial_conditions(input_data, mi):
         "conc_unbalanced": init_unbalanced.values,
         "enzyme": init_enzyme.values,
         "formation_energy": input_data["prior_loc_formation_energy"],
+        "drain": input_data["prior_loc_drain"],
     }

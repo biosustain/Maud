@@ -169,12 +169,34 @@ class Reaction:
         self.water_stoichiometry = water_stoichiometry
 
 
+class Drain:
+    """Constructor for the reaction object.
+
+    :param id: drain id, use a BiGG id if possible.
+    :param name: drain name.
+    :param stoichiometry: reaction stoichiometry,
+    """
+
+    def __init__(
+        self,
+        id: str,
+        name: str = None,
+        stoichiometry: Dict[str, float] = None,
+    ):
+        if stoichiometry is None:
+            stoichiometry = defaultdict()
+        self.id = id
+        self.name = name if name is not None else id
+        self.stoichiometry = stoichiometry
+
+
 class KineticModel:
     """Constructor for representation of a system of metabolic reactions.
 
     :param model_id: id of the kinetic model
     :param metabolites: dictionary mapping strings to metabolite objects
     :param reactions: dictionary mapping strings to reaction objects
+    :param drains: dictionary mapping strings to drain objects
     :param compartments: dictionary mapping strings to compartment objects
     :param mic: dictionary mapping strings to MetaboliteInCompartment objects
     """
@@ -186,10 +208,12 @@ class KineticModel:
         reactions: Dict[str, Reaction],
         compartments: Dict[str, Compartment],
         mics: Dict[str, MetaboliteInCompartment],
+        drains: Dict[str, Drain] = None,
     ):
         self.model_id = model_id
         self.metabolites = metabolites
         self.reactions = reactions
+        self.drains = drains
         self.compartments = compartments
         self.mics = mics
 
@@ -257,6 +281,10 @@ class Prior:
     :param scale: a number specifying the scale of the distribution
     :param experiment_id: id of the relevant experiment (for enzymes or unbalanced
     metabolites)
+    :param mic_id: id of relevant metabolite-in-compartment
+    :param metabolite_id: id of relevant metabolite
+    :param enzyme_id: id of relevant enzyme
+    :param drain_id: id of relevant drain
     """
 
     def __init__(
@@ -268,6 +296,7 @@ class Prior:
         mic_id: str = None,
         metabolite_id: str = None,
         enzyme_id: str = None,
+        drain_id: str = None,
     ):
         self.id = id
         self.location = location
@@ -276,6 +305,7 @@ class Prior:
         self.mic_id = mic_id
         self.metabolite_id = metabolite_id
         self.enzyme_id = enzyme_id
+        self.drain_id = drain_id
 
 
 class MaudInput:

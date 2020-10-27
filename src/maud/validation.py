@@ -75,3 +75,11 @@ def validate_maud_input(mi: data_model.MaudInput):
                     f"reaction {meas.target_id} is measured in experiment {exp.id}"
                     "but is not in the kinetic model {mi.kinetic_model.model_id}."
                 )
+        if mi.kinetic_model.drains is not None:
+            for drain_id in mi.kinetic_model.drains:
+                for drain in mi.priors["drains"]:
+                    if (drain_id != drain.drain_id) & (exp.id != drain.experiment_id):
+                        raise ValueError(
+                            f"drain {drain_id} was not included in experiment {exp.id}."
+                            "Required for each experiment and drain."
+                        )

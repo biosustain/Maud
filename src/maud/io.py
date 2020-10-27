@@ -27,6 +27,7 @@ import toml
 from maud import validation
 from maud.data_model import (
     Compartment,
+    Drain,
     Enzyme,
     Experiment,
     KineticModel,
@@ -88,12 +89,17 @@ def load_kinetic_model_from_toml(
         for m in parsed_toml["metabolites"]
     }
     reactions = {r["id"]: load_reaction_from_toml(r) for r in parsed_toml["reactions"]}
+    if "drains" in parsed_toml.keys():
+        drains = {d["id"]: load_drain_from_toml(d) for d in parsed_toml["drains"]}
+    else:
+        drains = None
     return KineticModel(
         model_id=model_id,
         metabolites=metabolites,
         compartments=compartments,
         mics=mics,
         reactions=reactions,
+        drains=drains,
     )
 
 
@@ -114,6 +120,10 @@ def get_stan_codes(km: KineticModel, experiments) -> Dict[str, Dict[str, int]]:
         for mic_id, code in mic_codes.items()
         if not km.mics[mic_id].balanced
     }
+    if km.drains is not None:
+        drain_codes = codify(km.drains.keys())
+    else:
+        drain_codes = None
     return {
         "metabolite": codify(km.metabolites.keys()),
         "metabolite_in_compartment": mic_codes,
@@ -122,7 +132,23 @@ def get_stan_codes(km: KineticModel, experiments) -> Dict[str, Dict[str, int]]:
         "reaction": codify(km.reactions.keys()),
         "experiment": codify(experiments.keys()),
         "enzyme": codify(enzyme_ids),
+        "drain": drain_codes,
     }
+
+
+def load_drain_from_toml(toml_drain: dict) -> Drain:
+    """Turn a dictionary representing a drain into a Drain object.
+
+    :param toml_drain: Dictionary representing a drain, typically one of
+    the values of the 'drains' field in the output of toml.load.
+
+    """
+
+    return Drain(
+        id=toml_drain["id"],
+        name=toml_drain["name"],
+        stoichiometry=toml_drain["stoichiometry"],
+    )
 
 
 def load_reaction_from_toml(toml_reaction: dict) -> Reaction:
@@ -221,6 +247,7 @@ def load_maud_input_from_toml(filepath: str, id: str = "mi") -> MaudInput:
         "tense_dissociation_constants": [],
         "relaxed_dissociation_constants": [],
         "transfer_constants": [],
+        "drains": [],
     }
     for prior in parsed_toml["priors"]["formation_energies"]:
         metabolite_id = prior["metabolite_id"]
@@ -254,6 +281,19 @@ def load_maud_input_from_toml(filepath: str, id: str = "mi") -> MaudInput:
                 enzyme_id=enzyme_id,
             )
         )
+    for e in parsed_toml["experiments"]:
+        if "drains" in e.keys():
+            experiment = e["id"]
+            for d in e["drains"]:
+                priors["drains"].append(
+                    Prior(
+                        id=f'{d["id"]}_{experiment}',
+                        location=d["location"],
+                        scale=d["scale"],
+                        drain_id=d["id"],
+                        experiment_id=experiment,
+                    )
+                )
     for prior_type, prefix in zip(
         [
             "inhibition_constants",
