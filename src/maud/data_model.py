@@ -168,6 +168,7 @@ class Reaction:
         self.enzymes = enzymes
         self.water_stoichiometry = water_stoichiometry
 
+
 class Drain:
     """Constructor for the reaction object.
 
@@ -187,6 +188,7 @@ class Drain:
         self.id = id
         self.name = name if name is not None else id
         self.stoichiometry = stoichiometry
+
 
 class KineticModel:
     """Constructor for representation of a system of metabolic reactions.

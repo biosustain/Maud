@@ -27,6 +27,7 @@ import toml
 from maud import validation
 from maud.data_model import (
     Compartment,
+    Drain,
     Enzyme,
     Experiment,
     KineticModel,
@@ -37,7 +38,6 @@ from maud.data_model import (
     Modifier,
     Prior,
     Reaction,
-    Drain,
 )
 from maud.utils import codify
 
@@ -132,8 +132,9 @@ def get_stan_codes(km: KineticModel, experiments) -> Dict[str, Dict[str, int]]:
         "reaction": codify(km.reactions.keys()),
         "experiment": codify(experiments.keys()),
         "enzyme": codify(enzyme_ids),
-        "drain": drain_codes
+        "drain": drain_codes,
     }
+
 
 def load_drain_from_toml(toml_drain: dict) -> Drain:
     """Turn a dictionary representing a drain into a Drain object.
