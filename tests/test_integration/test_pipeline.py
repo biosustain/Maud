@@ -4,8 +4,6 @@ import os
 import shutil
 import tempfile
 
-import pandas as pd
-
 import maud.sampling as sampling
 
 
@@ -14,8 +12,7 @@ data_path = os.path.join(here, "../data")
 
 
 def test_linear():
-    """
-    Tests linear model.
+    """Tests linear model.
 
     tests from code generation to sampling of the linear model by computing 200
     samples after 200 warmups and checking if the sampled median is within the
@@ -129,18 +126,13 @@ def test_linear():
     }
     fit = sampling.sample(**linear_input_values)
     samples_test = fit.draws_pd()
-    expected_df = pd.DataFrame.from_dict(
-        expected, orient="index", columns=["5% CI", "95% CI"]
-    )
-    samples_test.loc["mean", :] = samples_test.mean()
-    sample_mean = samples_test.loc["mean"].transpose()
-    validation_df = expected_df.join(sample_mean)
+
     # Check that each output column (other than the diagnostic ones) is
     # statistically similar to its matching control column.
-    remove_indicies = [idx for idx in validation_df.index if idx.endswith("__")]
-    validation_df.drop(remove_indicies, inplace=True)
-    for index, row in validation_df.iterrows():
-        assert row["mean"] >= row["5% CI"], index + " is too low."
-        assert row["mean"] <= row["95% CI"], index + " is too high."
+    test_mean = samples_test.mean()
+    cols = [c for c in expected.keys() if not c.endswith("__")]
+    for col in cols:
+        assert test_mean[col] >= expected[col][0], col + " is too low."
+        assert test_mean[col] <= expected[col][1], col + " is too high."
     # Delete temporary directory
     shutil.rmtree(temp_directory)
