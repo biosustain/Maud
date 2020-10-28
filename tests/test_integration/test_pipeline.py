@@ -132,6 +132,7 @@ def test_linear():
     test_mean = samples_test.mean()
     cols = [c for c in expected.keys() if not c.endswith("__")]
     for col in cols:
+        assert col in samples_test.columns, col + " is not present in test"
         assert test_mean[col] >= expected[col][0], col + " is too low."
         assert test_mean[col] <= expected[col][1], col + " is too high."
     # Delete temporary directory
