@@ -12,8 +12,7 @@ data_path = os.path.join(here, "../data")
 
 
 def test_linear():
-    """
-    Tests linear model.
+    """Tests linear model.
 
     tests from code generation to sampling of the linear model by computing 200
     samples after 200 warmups and checking if the sampled median is within the
@@ -127,18 +126,13 @@ def test_linear():
     }
     fit = sampling.sample(**linear_input_values)
     samples_test = fit.draws_pd()
-    dict(
-        zip(
-            samples_test.columns,
-            map(list, samples_test.quantile([0.03, 0.97]).T.values),
-        )
-    )
-    assert list(samples_test.columns) == list(expected.keys())
+
     # Check that each output column (other than the diagnostic ones) is
     # statistically similar to its matching control column.
     test_mean = samples_test.mean()
-    cols = [c for c in samples_test.columns if not c.endswith("__")] + ["lp__"]
+    cols = [c for c in expected.keys() if not c.endswith("__")]
     for col in cols:
+        assert col in samples_test.columns, col + " is not present in test"
         assert test_mean[col] >= expected[col][0], col + " is too low."
         assert test_mean[col] <= expected[col][1], col + " is too high."
     # Delete temporary directory
