@@ -20,7 +20,7 @@
 
 """
 
-from typing import Dict
+from typing import Dict, List
 
 import toml
 
@@ -40,10 +40,9 @@ from maud.data_model import (
     Prior,
     PriorSet,
     Reaction,
-    StanCodeSet
+    StanCodeSet,
 )
 from maud.utils import codify
-from typing import List, Dict
 
 
 MECHANISM_TO_PARAM_IDS = {
@@ -117,8 +116,7 @@ def get_stan_codes(km: KineticModel, experiments: ExperimentSet) -> StanCodeSet:
     enzyme_ids = [eid for rxn in rxns for eid in rxn.enzymes.keys()]
     mic_codes = codify(km.mics.keys())
     balanced_mic_codes = {
-        mic_id: code for mic_id, code in mic_codes.items()
-        if km.mics[mic_id].balanced
+        mic_id: code for mic_id, code in mic_codes.items() if km.mics[mic_id].balanced
     }
     unbalanced_mic_codes = {
         mic_id: code
@@ -214,7 +212,8 @@ def load_reaction_from_toml(toml_reaction: dict) -> Reaction:
     )
 
 
-def get_experiment(raw: Dict):
+def get_experiment(raw: Dict) -> Experiment:
+    """Extract an Experiment object from a dictionary."""
     out = Experiment(id=raw["id"])
     for target_type in ["metabolite", "reaction", "enzyme"]:
         type_measurements = {}
@@ -234,8 +233,8 @@ def get_experiment(raw: Dict):
 
 
 def extract_priors(list_of_prior_dicts: List[Dict], id_func):
+    """Get a list of Prior objects from a list of dictionaries."""
     return [Prior(id_func(p), **p) for p in list_of_prior_dicts]
-
 
 
 def load_maud_input_from_toml(filepath: str, id: str = "mi") -> MaudInput:
@@ -248,9 +247,7 @@ def load_maud_input_from_toml(filepath: str, id: str = "mi") -> MaudInput:
     """
     parsed_toml = toml.load(filepath)
     kinetic_model = load_kinetic_model_from_toml(parsed_toml, id)
-    experiments = ExperimentSet(
-        [get_experiment(e) for e in parsed_toml["experiments"]]
-    )
+    experiments = ExperimentSet([get_experiment(e) for e in parsed_toml["experiments"]])
     prior_dict = parsed_toml["priors"]
     priors = PriorSet(
         km_priors=extract_priors(
@@ -261,23 +258,23 @@ def load_maud_input_from_toml(filepath: str, id: str = "mi") -> MaudInput:
         ),
         formation_energy_priors=extract_priors(
             prior_dict["formation_energies"],
-            lambda p: f"formation_energy_{p['metabolite_id']}"
+            lambda p: f"formation_energy_{p['metabolite_id']}",
         ),
         inhibition_constant_priors=extract_priors(
             prior_dict["inhibition_constants"],
-            lambda p: f"ki_{p['enzyme_id']}_{p['mic_id']}"
+            lambda p: f"ki_{p['enzyme_id']}_{p['mic_id']}",
         ),
         relaxed_dissociation_constant_priors=extract_priors(
             prior_dict["relaxed_dissociation_constants"],
-            lambda p: f"diss_r_{p['enzyme_id']}_{p['mic_id']}"
+            lambda p: f"diss_r_{p['enzyme_id']}_{p['mic_id']}",
         ),
         tense_dissociation_constant_priors=extract_priors(
             prior_dict["tense_dissociation_constants"],
-            lambda p: f"diss_r_{p['enzyme_id']}_{p['mic_id']}"
+            lambda p: f"diss_r_{p['enzyme_id']}_{p['mic_id']}",
         ),
         transfer_constant_priors=extract_priors(
             prior_dict["transfer_constants"],
-            lambda p: f"transfer_constant_{p['enzyme_id']}"
+            lambda p: f"transfer_constant_{p['enzyme_id']}",
         ),
         unbalanced_metabolite_priors=[
             Prior(
@@ -297,13 +294,15 @@ def load_maud_input_from_toml(filepath: str, id: str = "mi") -> MaudInput:
                 location=edd["location"],
                 scale=edd["scale"],
                 drain_id=dd["id"],
-                experiment_id=e["id"]
+                experiment_id=e["id"],
             )
             for dd in parsed_toml["drains"]
             for e in parsed_toml["experiments"]
             for edd in e["drains"]
             if edd["id"] == dd["id"]
-        ] if "drains" in parsed_toml.keys() else []
+        ]
+        if "drains" in parsed_toml.keys()
+        else [],
     )
     stan_codes = get_stan_codes(kinetic_model, experiments)
     mi = MaudInput(

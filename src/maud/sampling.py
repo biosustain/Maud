@@ -262,25 +262,22 @@ def get_input_data(
     water_stoichiometry = [
         r.water_stoichiometry for r in reactions.values() for e in r.enzymes.items()
     ]
-    (
-        enzyme_stoic, stoic_map_to_flux, full_stoic, drain_stoic
-    ) = get_full_stoichiometry(
+    (enzyme_stoic, stoic_map_to_flux, full_stoic, drain_stoic) = get_full_stoichiometry(
         mi.kinetic_model, enzyme_codes, mic_codes, reaction_codes, drain_codes
     )
-    subunits = pd.DataFrame({
-        "enzyme_id": [e.id for e in enzymes.values()],
-        "subunits": [e.subunits for e in enzymes.values()],
-        "index": [enzyme_codes[e.id] for e in enzymes.values()],
-    }).sort_values(by="index").reset_index(drop=True)
+    subunits = (
+        pd.DataFrame(
+            {
+                "enzyme_id": [e.id for e in enzymes.values()],
+                "subunits": [e.subunits for e in enzymes.values()],
+                "index": [enzyme_codes[e.id] for e in enzymes.values()],
+            }
+        )
+        .sort_values(by="index")
+        .reset_index(drop=True)
+    )
 
     # priors
-    formation_energy_priors = (
-        pd.DataFrame(
-            map(lambda p: p.__dict__, mi.priors.formation_energy_priors)
-        )
-        .assign(stan_code=lambda df: df["metabolite_id"].map(met_codes))
-        .sort_values("stan_code")
-    )
     prior_loc_drain, prior_scale_drain = get_drain_priors(mi)
     prior_dfs = {
         prior_type: pd.DataFrame(map(lambda p: p.__dict__, priors))
@@ -288,14 +285,17 @@ def get_input_data(
     }
     prior_dfs["formation_energy_priors"] = (
         prior_dfs["formation_energy_priors"]
-        .assign(stan_code=lambda df:df["metabolite_id"].map(met_codes))
+        .assign(stan_code=lambda df: df["metabolite_id"].map(met_codes))
         .sort_values("stan_code")
     )
     n_modifier = {}
     for df_name, param_type in zip(
-        ["inhibition_constant_priors",
-         "tense_dissociation_constant_priors",
-         "relaxed_dissociation_constant_priors"], ["ki", "diss_t", "diss_r"]
+        [
+            "inhibition_constant_priors",
+            "tense_dissociation_constant_priors",
+            "relaxed_dissociation_constant_priors",
+        ],
+        ["ki", "diss_t", "diss_r"],
     ):
         df = prior_dfs[df_name]
         df["mic_code"] = df["mic_id"].map(mic_codes)
@@ -352,7 +352,9 @@ def get_input_data(
         "N_conc_measurement": len(mic_measurements),
         "N_competitive_inhibitor": len(prior_dfs["inhibition_constant_priors"]),
         "N_allosteric_inhibitor": len(prior_dfs["tense_dissociation_constant_priors"]),
-        "N_allosteric_activator": len(prior_dfs["relaxed_dissociation_constant_priors"]),
+        "N_allosteric_activator": len(
+            prior_dfs["relaxed_dissociation_constant_priors"]
+        ),
         "N_allosteric_enzyme": len(prior_dfs["transfer_constant_priors"]),
         "N_drain": len(drain_codes) if drain_codes is not None else 0,
         "unbalanced_mic_ix": list(unbalanced_mic_codes.values()),
@@ -377,18 +379,30 @@ def get_input_data(
         "enzyme_yenz": (enzyme_measurements["target_id"].map(enzyme_codes).values),
         "yenz": enzyme_measurements["value"].values,
         "sigma_enz": enzyme_measurements["uncertainty"].values,
-        "prior_loc_formation_energy": prior_dfs["formation_energy_priors"]["location"].values,
-        "prior_scale_formation_energy": prior_dfs["formation_energy_priors"]["scale"].values,
+        "prior_loc_formation_energy": prior_dfs["formation_energy_priors"][
+            "location"
+        ].values,
+        "prior_scale_formation_energy": prior_dfs["formation_energy_priors"][
+            "scale"
+        ].values,
         "prior_loc_kcat": prior_dfs["kcat_priors"]["location"].values,
         "prior_scale_kcat": prior_dfs["kcat_priors"]["scale"].values,
         "prior_loc_km": prior_dfs["km_priors"]["location"].values,
         "prior_scale_km": prior_dfs["km_priors"]["scale"].values,
         "prior_loc_ki": prior_dfs["inhibition_constant_priors"]["location"].values,
         "prior_scale_ki": prior_dfs["inhibition_constant_priors"]["scale"].values,
-        "prior_loc_diss_t": prior_dfs["tense_dissociation_constant_priors"]["location"].values,
-        "prior_scale_diss_t": prior_dfs["tense_dissociation_constant_priors"]["scale"].values,
-        "prior_loc_diss_r": prior_dfs["relaxed_dissociation_constant_priors"]["location"].values,
-        "prior_scale_diss_r": prior_dfs["relaxed_dissociation_constant_priors"]["scale"].values,
+        "prior_loc_diss_t": prior_dfs["tense_dissociation_constant_priors"][
+            "location"
+        ].values,
+        "prior_scale_diss_t": prior_dfs["tense_dissociation_constant_priors"][
+            "scale"
+        ].values,
+        "prior_loc_diss_r": prior_dfs["relaxed_dissociation_constant_priors"][
+            "location"
+        ].values,
+        "prior_scale_diss_r": prior_dfs["relaxed_dissociation_constant_priors"][
+            "scale"
+        ].values,
         "prior_loc_tc": prior_dfs["transfer_constant_priors"]["location"].values,
         "prior_scale_tc": prior_dfs["transfer_constant_priors"]["scale"].values,
         "prior_loc_unbalanced": prior_loc_unb,
@@ -450,12 +464,16 @@ def get_init_enzyme(mi):
         return out.reset_index()
 
     def get_greatest_measured_flux(exp_id, enz_id, mi):
-        reaction_ids = list(set([
-            rxn.id
-            for rxn in mi.kinetic_model.reactions.values()
-            for enz in rxn.enzymes.values()
-            if enz.id == enz_id
-        ]))
+        reaction_ids = list(
+            set(
+                [
+                    rxn.id
+                    for rxn in mi.kinetic_model.reactions.values()
+                    for enz in rxn.enzymes.values()
+                    if enz.id == enz_id
+                ]
+            )
+        )
         measurements = [
             m
             for exp in mi.experiments.experiments
@@ -468,9 +486,9 @@ def get_init_enzyme(mi):
             return max([m.value for m in measurements])
 
     def get_vmax_component(enzyme_id, init, mi):
-        kcat = [
-            p.location for p in mi.priors.kcat_priors if p.enzyme_id == enzyme_id
-        ][0]
+        kcat = [p.location for p in mi.priors.kcat_priors if p.enzyme_id == enzyme_id][
+            0
+        ]
         return init * kcat
 
     def get_lowest_vmax(exp_id, enz_id, inits, mi):

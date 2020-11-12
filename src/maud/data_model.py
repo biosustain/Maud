@@ -308,7 +308,9 @@ class Prior:
         self.drain_id = drain_id
 
 
-class PriorSet():
+class PriorSet:
+    """Object containing all priors for a MaudInput."""
+
     def __init__(
         self,
         kcat_priors: List[Prior],
@@ -320,7 +322,6 @@ class PriorSet():
         relaxed_dissociation_constant_priors: List[Prior],
         transfer_constant_priors: List[Prior],
         drain_priors: List[Prior],
-        
     ):
         self.kcat_priors = kcat_priors
         self.km_priors = km_priors
@@ -333,7 +334,9 @@ class PriorSet():
         self.drain_priors = drain_priors
 
 
-class StanCodeSet():
+class StanCodeSet:
+    """Object containing all stan codes for a MaudInput."""
+
     def __init__(
         self,
         metabolite_codes: Dict[str, int],
@@ -355,7 +358,9 @@ class StanCodeSet():
         self.drain_codes = drain_codes
 
 
-class ExperimentSet():
+class ExperimentSet:
+    """Object containing all experiments for a MaudInput."""
+
     def __init__(self, experiments: List[Experiment]):
         self.experiments = experiments
 

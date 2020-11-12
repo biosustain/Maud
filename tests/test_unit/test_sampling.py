@@ -20,4 +20,8 @@ def test_get_input_data():
     actual = sampling.get_input_data(mi, 1e-06, 1e-06, int(1e9), 1, 500)
     assert actual.keys() == expected.keys()
     for k in actual.keys():
+        print("*" * 8 + " " + k + " " + "*" * 8)
+        print(actual[k])
+        print(expected[k])
+        print("\n")
         assert_equal(actual[k], expected[k], err_msg=f"{k} is different from expected.")
