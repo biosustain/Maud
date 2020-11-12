@@ -308,6 +308,58 @@ class Prior:
         self.drain_id = drain_id
 
 
+class PriorSet():
+    def __init__(
+        self,
+        kcat_priors: List[Prior],
+        km_priors: List[Prior],
+        formation_energy_priors: List[Prior],
+        unbalanced_metabolite_priors: List[Prior],
+        inhibition_constant_priors: List[Prior],
+        tense_dissociation_constant_priors: List[Prior],
+        relaxed_dissociation_constant_priors: List[Prior],
+        transfer_constant_priors: List[Prior],
+        drain_priors: List[Prior],
+        
+    ):
+        self.kcat_priors = kcat_priors
+        self.km_priors = km_priors
+        self.formation_energy_priors = formation_energy_priors
+        self.unbalanced_metabolite_priors = unbalanced_metabolite_priors
+        self.inhibition_constant_priors = inhibition_constant_priors
+        self.tense_dissociation_constant_priors = tense_dissociation_constant_priors
+        self.relaxed_dissociation_constant_priors = relaxed_dissociation_constant_priors
+        self.transfer_constant_priors = transfer_constant_priors
+        self.drain_priors = drain_priors
+
+
+class StanCodeSet():
+    def __init__(
+        self,
+        metabolite_codes: Dict[str, int],
+        mic_codes: Dict[str, int],
+        balanced_mic_codes: Dict[str, int],
+        unbalanced_mic_codes: Dict[str, int],
+        reaction_codes: Dict[str, int],
+        experiment_codes: Dict[str, int],
+        enzyme_codes: Dict[str, int],
+        drain_codes: Dict[str, int],
+    ):
+        self.metabolite_codes = metabolite_codes
+        self.mic_codes = mic_codes
+        self.balanced_mic_codes = balanced_mic_codes
+        self.unbalanced_mic_codes = unbalanced_mic_codes
+        self.reaction_codes = reaction_codes
+        self.experiment_codes = experiment_codes
+        self.enzyme_codes = enzyme_codes
+        self.drain_codes = drain_codes
+
+
+class ExperimentSet():
+    def __init__(self, experiments: List[Experiment]):
+        self.experiments = experiments
+
+
 class MaudInput:
     """Everything that is needed to run Maud.
 
@@ -322,12 +374,10 @@ class MaudInput:
     def __init__(
         self,
         kinetic_model: KineticModel,
-        priors: Dict[str, List[Prior]],
-        stan_codes: Dict[str, Dict[str, int]],
-        experiments: Dict[str, Experiment] = None,
+        priors: PriorSet,
+        stan_codes: StanCodeSet,
+        experiments: ExperimentSet,
     ):
-        if experiments is None:
-            experiments = defaultdict()
         self.kinetic_model = kinetic_model
         self.priors = priors
         self.stan_codes = stan_codes
