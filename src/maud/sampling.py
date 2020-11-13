@@ -194,6 +194,7 @@ def sample(
 
 def simulate_once(
     data_path: str,
+    param_vals: dict,
     rel_tol: float,
     abs_tol: float,
     max_num_steps: float,
@@ -203,11 +204,12 @@ def simulate_once(
     """Sample from a posterior distribution.
 
     :param data_path: A path to a toml file containing input data
+    :param param_vals: Dictionary of true parameter values
     :param rel_tol: Sets ODE solver's rel_tol control parameter
     :param abs_tol: Sets ODE solver's abs_tol control parameter
     :param max_num_steps: Sets ODE solver's max_num_steps control parameter
     from experimental data.
-    initial state with evolved state
+    :param timepoint: Time in seconds to simulate the ODE system for
     :param: output_dir: Directory to save output
     """
     model_name = os.path.splitext(os.path.basename(data_path))[0]
