@@ -20,7 +20,7 @@
 
 """
 
-from typing import Dict
+from typing import Dict, List
 
 import toml
 
@@ -30,6 +30,7 @@ from maud.data_model import (
     Drain,
     Enzyme,
     Experiment,
+    ExperimentSet,
     KineticModel,
     MaudInput,
     Measurement,
@@ -37,7 +38,9 @@ from maud.data_model import (
     MetaboliteInCompartment,
     Modifier,
     Prior,
+    PriorSet,
     Reaction,
+    StanCodeSet,
 )
 from maud.utils import codify
 
@@ -103,7 +106,7 @@ def load_kinetic_model_from_toml(
     )
 
 
-def get_stan_codes(km: KineticModel, experiments) -> Dict[str, Dict[str, int]]:
+def get_stan_codes(km: KineticModel, experiments: ExperimentSet) -> StanCodeSet:
     """Get the stan codes for a Maud input.
 
     :param km: KineticModel object
@@ -123,17 +126,17 @@ def get_stan_codes(km: KineticModel, experiments) -> Dict[str, Dict[str, int]]:
     if km.drains is not None:
         drain_codes = codify(km.drains.keys())
     else:
-        drain_codes = None
-    return {
-        "metabolite": codify(km.metabolites.keys()),
-        "metabolite_in_compartment": mic_codes,
-        "balanced_mic": balanced_mic_codes,
-        "unbalanced_mic": unbalanced_mic_codes,
-        "reaction": codify(km.reactions.keys()),
-        "experiment": codify(experiments.keys()),
-        "enzyme": codify(enzyme_ids),
-        "drain": drain_codes,
-    }
+        drain_codes = {}
+    return StanCodeSet(
+        metabolite_codes=codify(km.metabolites.keys()),
+        mic_codes=mic_codes,
+        balanced_mic_codes=balanced_mic_codes,
+        unbalanced_mic_codes=unbalanced_mic_codes,
+        reaction_codes=codify(km.reactions.keys()),
+        experiment_codes=codify([e.id for e in experiments.experiments]),
+        enzyme_codes=codify(enzyme_ids),
+        drain_codes=drain_codes,
+    )
 
 
 def load_drain_from_toml(toml_drain: dict) -> Drain:
@@ -209,6 +212,31 @@ def load_reaction_from_toml(toml_reaction: dict) -> Reaction:
     )
 
 
+def get_experiment(raw: Dict) -> Experiment:
+    """Extract an Experiment object from a dictionary."""
+    out = Experiment(id=raw["id"])
+    for target_type in ["metabolite", "reaction", "enzyme"]:
+        type_measurements = {}
+        for m in raw[target_type + "_measurements"]:
+            measurement = Measurement(
+                target_id=m["target_id"],
+                value=m["value"],
+                uncertainty=m["uncertainty"],
+                scale="ln",
+                target_type=target_type,
+            )
+            type_measurements.update({m["target_id"]: measurement})
+        out.measurements.update({target_type: type_measurements})
+    if "knockouts" in raw.keys():
+        out.knockouts = raw["knockouts"]
+    return out
+
+
+def extract_priors(list_of_prior_dicts: List[Dict], id_func):
+    """Get a list of Prior objects from a list of dictionaries."""
+    return [Prior(id_func(p), **p) for p in list_of_prior_dicts]
+
+
 def load_maud_input_from_toml(filepath: str, id: str = "mi") -> MaudInput:
     """
     Load an MaudInput object from a suitable toml file.
@@ -219,119 +247,69 @@ def load_maud_input_from_toml(filepath: str, id: str = "mi") -> MaudInput:
     """
     parsed_toml = toml.load(filepath)
     kinetic_model = load_kinetic_model_from_toml(parsed_toml, id)
-    experiments = {}
-    for e in parsed_toml["experiments"]:
-        experiment = Experiment(id=e["id"])
-        for target_type in ["metabolite", "reaction", "enzyme"]:
-            type_measurements = {}
-            for m in e[target_type + "_measurements"]:
-                measurement = Measurement(
-                    target_id=m["target_id"],
-                    value=m["value"],
-                    uncertainty=m["uncertainty"],
-                    scale="ln",
-                    target_type=target_type,
-                )
-                type_measurements.update({m["target_id"]: measurement})
-            experiment.measurements.update({target_type: type_measurements})
-        if "knockouts" in e.keys():
-            experiment.knockouts = e["knockouts"]
-        experiments.update({experiment.id: experiment})
-    priors = {
-        "kcats": [],
-        "kms": [],
-        "enzyme_concentrations": [],
-        "formation_energies": [],
-        "unbalanced_metabolites": [],
-        "inhibition_constants": [],
-        "tense_dissociation_constants": [],
-        "relaxed_dissociation_constants": [],
-        "transfer_constants": [],
-        "drains": [],
-    }
-    for prior in parsed_toml["priors"]["formation_energies"]:
-        metabolite_id = prior["metabolite_id"]
-        priors["formation_energies"].append(
+    experiments = ExperimentSet([get_experiment(e) for e in parsed_toml["experiments"]])
+    prior_dict = parsed_toml["priors"]
+    priors = PriorSet(
+        km_priors=extract_priors(
+            prior_dict["kms"], lambda p: f"km_{p['enzyme_id']}_{p['mic_id']}"
+        ),
+        kcat_priors=extract_priors(
+            prior_dict["kcats"], lambda p: f"kcat_{p['enzyme_id']}"
+        ),
+        formation_energy_priors=extract_priors(
+            prior_dict["formation_energies"],
+            lambda p: f"formation_energy_{p['metabolite_id']}",
+        ),
+        inhibition_constant_priors=extract_priors(
+            prior_dict["inhibition_constants"],
+            lambda p: f"ki_{p['enzyme_id']}_{p['mic_id']}",
+        ),
+        relaxed_dissociation_constant_priors=extract_priors(
+            prior_dict["relaxed_dissociation_constants"],
+            lambda p: f"diss_r_{p['enzyme_id']}_{p['mic_id']}",
+        ),
+        tense_dissociation_constant_priors=extract_priors(
+            prior_dict["tense_dissociation_constants"],
+            lambda p: f"diss_r_{p['enzyme_id']}_{p['mic_id']}",
+        ),
+        transfer_constant_priors=extract_priors(
+            prior_dict["transfer_constants"],
+            lambda p: f"transfer_constant_{p['enzyme_id']}",
+        ),
+        unbalanced_metabolite_priors=[
             Prior(
-                id=f"formation_energy_{metabolite_id}",
-                location=prior["location"],
-                scale=prior["scale"],
-                metabolite_id=metabolite_id,
+                id=f"{e['id']}_{m['target_id']}",
+                location=m["value"],
+                scale=m["uncertainty"],
+                experiment_id=e["id"],
+                mic_id=m["target_id"],
             )
-        )
-    for prior in parsed_toml["priors"]["kms"]:
-        enzyme_id = prior["enzyme_id"]
-        mic_id = prior["mic_id"]
-        priors["kms"].append(
-            Prior(
-                id=f"km_{enzyme_id}_{mic_id}",
-                location=prior["location"],
-                scale=prior["scale"],
-                mic_id=mic_id,
-                enzyme_id=enzyme_id,
-            )
-        )
-    for prior in parsed_toml["priors"]["kcats"]:
-        enzyme_id = prior["enzyme_id"]
-        priors["kcats"].append(
-            Prior(
-                id=f"kcat_{enzyme_id}",
-                location=prior["location"],
-                scale=prior["scale"],
-                enzyme_id=enzyme_id,
-            )
-        )
-    for e in parsed_toml["experiments"]:
-        if "drains" in e.keys():
-            experiment = e["id"]
-            for d in e["drains"]:
-                priors["drains"].append(
-                    Prior(
-                        id=f'{d["id"]}_{experiment}',
-                        location=d["location"],
-                        scale=d["scale"],
-                        drain_id=d["id"],
-                        experiment_id=experiment,
-                    )
-                )
-    for prior_type, prefix in zip(
-        [
-            "inhibition_constants",
-            "relaxed_dissociation_constants",
-            "tense_dissociation_constants",
+            for e in parsed_toml["experiments"]
+            for m in e["metabolite_measurements"]
+            if not kinetic_model.mics[m["target_id"]].balanced
         ],
-        ["ki", "diss_r", "diss_t"],
-    ):
-        if prior_type in parsed_toml["priors"].keys():
-            for prior in parsed_toml["priors"][prior_type]:
-                enzyme_id = prior["enzyme_id"]
-                mic_id = prior["mic_id"]
-                priors[prior_type].append(
-                    Prior(
-                        id=f"{prefix}_{enzyme_id}_{mic_id}",
-                        location=prior["location"],
-                        scale=prior["scale"],
-                        enzyme_id=enzyme_id,
-                        mic_id=mic_id,
-                    )
-                )
-    if "transfer_constants" in parsed_toml["priors"].keys():
-        for prior in parsed_toml["priors"]["transfer_constants"]:
-            enzyme_id = prior["enzyme_id"]
-            priors["transfer_constants"].append(
-                Prior(
-                    id=f"transfer_constant_{enzyme_id}",
-                    location=prior["location"],
-                    scale=prior["scale"],
-                    enzyme_id=enzyme_id,
-                )
+        drain_priors=[
+            Prior(
+                id=f"{dd['id']}_{e['id']}",
+                location=edd["location"],
+                scale=edd["scale"],
+                drain_id=dd["id"],
+                experiment_id=e["id"],
             )
+            for dd in parsed_toml["drains"]
+            for e in parsed_toml["experiments"]
+            for edd in e["drains"]
+            if edd["id"] == dd["id"]
+        ]
+        if "drains" in parsed_toml.keys()
+        else [],
+    )
     stan_codes = get_stan_codes(kinetic_model, experiments)
     mi = MaudInput(
+        experiments=experiments,
         kinetic_model=kinetic_model,
         priors=priors,
         stan_codes=stan_codes,
-        experiments=experiments,
     )
     validation.validate_maud_input(mi)
     return mi
