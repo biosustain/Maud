@@ -160,7 +160,7 @@ transformed parameters {
                               transfer_constant,
                               subunits))';
     if (squared_distance(conc_balanced[1], conc_balanced[2]) > 1){
-      print("Balanced metabolite concentration at ", timepoint, " seconds is not steady.");
+      print("Balanced metabolite concentration at ", timepoint, " seconds is not steady in experiment ", e, ".");
       print("Found ", conc_balanced[1], " at ", timepoint, " seconds and ",
             conc_balanced[2], " at ", timepoint + 10, " seconds.");
     }
