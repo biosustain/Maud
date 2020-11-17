@@ -6,6 +6,7 @@ from cmdstanpy import CmdStanModel, CmdStanMCMC
 from cmdstanpy.utils import jsondump
 from maud.data_model import MaudInput
 from copy import deepcopy
+import numpy as np
 import pandas as pd
 import os
 
@@ -20,8 +21,8 @@ TRUE_PARAMS = {
         0.69, 1.0, 0.5, 0.88, 0.1, 0.451, 2.4, 2.0, 0.33, 0.079
     ],
     "ki": [0.26],
-    "diss_t": [1, 1],
-    "diss_r": [0.01],
+    "dissociation_constant_t": [1, 1],
+    "dissociation_constant_r": [0.01],
     "transfer_constant": [1, 1],
     "kcat": [1550.0, 110.0, 56.0, 24.0, 5.67, 4.13, 6.0],
     "conc_unbalanced": [
@@ -101,6 +102,10 @@ def add_measurements_to_maud_input(mi: MaudInput, sim: CmdStanMCMC, input_data: 
     return out
 
 
+def standardise_list(l, mean, scale):
+    return ((np.array(l) - np.array(mean)) / np.array(scale)).tolist()
+
+
 def main():
     print("Compiling Stan model...")
     model = CmdStanModel(stan_file=STAN_PROGRAM_PATH)
@@ -108,17 +113,24 @@ def main():
     print("Generating simulation input...")
     mi_sim = load_maud_input_from_toml(TOML_PATH)
     input_data_sim = get_input_data(mi_sim, **ODE_CONFIG)
+    true_params = TRUE_PARAMS.copy()
+    true_params["formation_energy_z"] = standardise_list(
+        true_params["formation_energy"],
+        input_data_sim["prior_loc_formation_energy"],
+        input_data_sim["prior_scale_formation_energy"]
+    )
 
     print("Simulating...")
-    sim = model.sample(data=input_data_sim, inits=TRUE_PARAMS, **SIM_CONFIG)
+    sim = model.sample(data=input_data_sim, inits=true_params, **SIM_CONFIG)
 
     print("Generating fit input...")
     mi_fit = add_measurements_to_maud_input(mi_sim, sim, input_data_sim)
     input_data_fit = get_input_data(mi_fit, **ODE_CONFIG)
-    inits_fit = get_initial_conditions(input_data_fit, mi_fit)
+    # inits_fit = get_initial_conditions(input_data_fit, mi_fit)
+    inits_fit = {k: list(v) * FIT_CONFIG["chains"] for k, v in TRUE_PARAMS.items()}
 
     print("Fitting...")
-    fit = model.sample(data=input_data_fit, inits=inits_fit, **FIT_CONFIG)
+    fit = model.sample(data=input_data_fit, inits=true_params, **FIT_CONFIG)
 
     print(f"Done! See {output_dir} for output csvs.")
 
