@@ -43,7 +43,7 @@ def get_full_stoichiometry(
     enzyme_codes: Dict[str, int],
     metabolite_codes: Dict[str, int],
     reaction_codes: Dict[str, int],
-    drain_codes,
+    drain_codes: Dict[str, int],
 ):
     """Get full stoichiometric matrix for each isoenzyme.
 
@@ -60,24 +60,20 @@ def get_full_stoichiometry(
     else:
         S_complete = pd.DataFrame(0, index={**enzyme_codes}, columns=metabolite_codes)
     S_enz_to_flux_map = pd.DataFrame(0, index=reaction_codes, columns=enzyme_codes)
-
     for rxn_id, rxn in kinetic_model.reactions.items():
         for enz_id, _ in rxn.enzymes.items():
             for met, stoic in rxn.stoichiometry.items():
                 S_enz_to_flux_map.loc[rxn_id, enz_id] = 1
                 S_enz.loc[enz_id, met] = stoic
                 S_complete.loc[enz_id, met] = stoic
-
-    if drain_codes is not None:
+    if any(drain_codes):
         for drain_id, drain in kinetic_model.drains.items():
             for met, stoic in drain.stoichiometry.items():
                 S_drain.loc[drain_id, met] = stoic
                 S_complete.loc[drain_id, met] = stoic
-
-    if drain_codes is not None:
-        return S_enz, S_enz_to_flux_map, S_complete, S_drain
     else:
-        return S_enz, S_enz_to_flux_map, S_complete
+        S_drain = pd.DataFrame()
+    return S_enz, S_enz_to_flux_map, S_complete, S_drain
 
 
 def get_knockout_matrix(mi: MaudInput):
@@ -85,29 +81,27 @@ def get_knockout_matrix(mi: MaudInput):
 
     :param mi: a MaudInput object
     """
-    experiment_codes = mi.stan_codes["experiment"]
-    enzyme_codes = mi.stan_codes["enzyme"]
+    experiment_codes = mi.stan_codes.experiment_codes
+    enzyme_codes = mi.stan_codes.enzyme_codes
     enzyme_knockout_matrix = pd.DataFrame(
         0, index=np.arange(len(experiment_codes)), columns=np.arange(len(enzyme_codes))
     )
-    for exp_name, exp in mi.experiments.items():
+    for exp in mi.experiments.experiments:
         if exp.knockouts:
             for enz in exp.knockouts:
                 enzyme_knockout_matrix.loc[
-                    experiment_codes[exp_name] - 1, enzyme_codes[enz] - 1
+                    experiment_codes[exp.id] - 1, enzyme_codes[enz] - 1
                 ] = 1
     return enzyme_knockout_matrix
 
 
 def get_drain_priors(mi: MaudInput):
     """Return an experiment x drain matrix of location and scale priors for drains."""
-    drain_codes = mi.stan_codes["drain"]
-    experiment_codes = mi.stan_codes["experiment"]
-
+    drain_codes = mi.stan_codes.drain_codes
+    experiment_codes = mi.stan_codes.experiment_codes
     drain_loc_prior = pd.DataFrame(index=experiment_codes, columns=drain_codes)
     drain_scale_prior = pd.DataFrame(index=experiment_codes, columns=drain_codes)
-
-    for p in mi.priors["drains"]:
+    for p in mi.priors.drain_priors:
         drain_loc_prior.loc[p.experiment_id, p.drain_id] = p.location
         drain_scale_prior.loc[p.experiment_id, p.drain_id] = p.scale
     return drain_loc_prior, drain_scale_prior
@@ -253,14 +247,14 @@ def get_input_data(
     metabolites = mi.kinetic_model.metabolites
     mics = mi.kinetic_model.mics
     reactions = mi.kinetic_model.reactions
-    reaction_codes = mi.stan_codes["reaction"]
-    drain_codes = mi.stan_codes["drain"]
-    enzyme_codes = mi.stan_codes["enzyme"]
-    experiment_codes = mi.stan_codes["experiment"]
-    met_codes = mi.stan_codes["metabolite"]
-    mic_codes = mi.stan_codes["metabolite_in_compartment"]
-    balanced_mic_codes = mi.stan_codes["balanced_mic"]
-    unbalanced_mic_codes = mi.stan_codes["unbalanced_mic"]
+    reaction_codes = mi.stan_codes.reaction_codes
+    drain_codes = mi.stan_codes.drain_codes
+    enzyme_codes = mi.stan_codes.enzyme_codes
+    experiment_codes = mi.stan_codes.experiment_codes
+    met_codes = mi.stan_codes.metabolite_codes
+    mic_codes = mi.stan_codes.mic_codes
+    balanced_mic_codes = mi.stan_codes.balanced_mic_codes
+    unbalanced_mic_codes = mi.stan_codes.unbalanced_mic_codes
     mic_to_met = {
         mic_codes[mic.id]: met_codes[mic.metabolite_id] for mic in mics.values()
     }
@@ -268,86 +262,42 @@ def get_input_data(
     water_stoichiometry = [
         r.water_stoichiometry for r in reactions.values() for e in r.enzymes.items()
     ]
-    if drain_codes is not None:
-        (
-            enzyme_stoic,
-            stoic_map_to_flux,
-            full_stoic,
-            drain_stoic,
-        ) = get_full_stoichiometry(
-            mi.kinetic_model, enzyme_codes, mic_codes, reaction_codes, drain_codes
-        )
-    else:
-        enzyme_stoic, stoic_map_to_flux, full_stoic = get_full_stoichiometry(
-            mi.kinetic_model, enzyme_codes, mic_codes, reaction_codes, drain_codes
-        )
-        drain_stoic = pd.DataFrame()
-    subunits = pd.DataFrame(
-        {
-            "enzyme_id": [e.id for e in enzymes.values()],
-            "subunits": [e.subunits for e in enzymes.values()],
-            "index": [enzyme_codes[e.id] for e in enzymes.values()],
-        }
+    (enzyme_stoic, stoic_map_to_flux, full_stoic, drain_stoic) = get_full_stoichiometry(
+        mi.kinetic_model, enzyme_codes, mic_codes, reaction_codes, drain_codes
     )
-
-    subunits = subunits.sort_values(by="index").reset_index(drop=True)
+    subunits = (
+        pd.DataFrame(
+            {
+                "enzyme_id": [e.id for e in enzymes.values()],
+                "subunits": [e.subunits for e in enzymes.values()],
+                "index": [enzyme_codes[e.id] for e in enzymes.values()],
+            }
+        )
+        .sort_values(by="index")
+        .reset_index(drop=True)
+    )
 
     # priors
-    km_priors = pd.DataFrame(
-        {
-            "location": [p.location for p in mi.priors["kms"]],
-            "scale": [p.scale for p in mi.priors["kms"]],
-            "enzyme_id": [p.enzyme_id for p in mi.priors["kms"]],
-            "mic_id": [p.mic_id for p in mi.priors["kms"]],
-        }
-    )
-    kcat_priors, transfer_constant_priors = (
-        pd.DataFrame(
-            {
-                "location": [p.location for p in mi.priors[prior_type]],
-                "scale": [p.scale for p in mi.priors[prior_type]],
-                "enzyme_id": [p.enzyme_id for p in mi.priors[prior_type]],
-            }
-        )
-        for prior_type in ["kcats", "transfer_constants"]
-    )
-    formation_energy_priors = pd.DataFrame(
-        {
-            "location": [p.location for p in mi.priors["formation_energies"]],
-            "scale": [p.scale for p in mi.priors["formation_energies"]],
-            "metabolite_id": [p.metabolite_id for p in mi.priors["formation_energies"]],
-        }
-    )
-    formation_energy_priors["stan_code"] = formation_energy_priors["metabolite_id"].map(
-        met_codes
-    )
-    formation_energy_priors.sort_values("stan_code", inplace=True)
-    if drain_codes is not None:
-        prior_loc_drain, prior_scale_drain = get_drain_priors(mi)
-    else:
-        prior_loc_drain = pd.DataFrame()
-        prior_scale_drain = pd.DataFrame()
-    ki_priors, diss_t_priors, diss_r_priors = (
-        pd.DataFrame(
-            {
-                "location": [p.location for p in mi.priors[prior_type]],
-                "scale": [p.scale for p in mi.priors[prior_type]],
-                "mic_id": [p.mic_id for p in mi.priors[prior_type]],
-                "enzyme_id": [p.enzyme_id for p in mi.priors[prior_type]],
-            }
-        )
-        if prior_type in mi.priors.keys()
-        else pd.DataFrame()
-        for prior_type in [
-            "inhibition_constants",
-            "tense_dissociation_constants",
-            "relaxed_dissociation_constants",
-        ]
+    prior_loc_drain, prior_scale_drain = get_drain_priors(mi)
+    prior_dfs = {
+        prior_type: pd.DataFrame(map(lambda p: p.__dict__, priors))
+        for prior_type, priors in mi.priors.__dict__.items()
+    }
+    prior_dfs["formation_energy_priors"] = (
+        prior_dfs["formation_energy_priors"]
+        .assign(stan_code=lambda df: df["metabolite_id"].map(met_codes))
+        .sort_values("stan_code")
     )
     n_modifier = {}
-    for df, param_type in zip(
-        [ki_priors, diss_t_priors, diss_r_priors], ["ki", "diss_t", "diss_r"]
+    for df_name, param_type in zip(
+        [
+            "inhibition_constant_priors",
+            "tense_dissociation_constant_priors",
+            "relaxed_dissociation_constant_priors",
+        ],
+        ["ki", "diss_t", "diss_r"],
     ):
+        df = prior_dfs[df_name]
         df["mic_code"] = df["mic_id"].map(mic_codes)
         df["enzyme_code"] = df["enzyme_id"].map(enzyme_codes)
         df.sort_values("enzyme_code", inplace=True)
@@ -359,7 +309,7 @@ def get_input_data(
             .astype(int)
             .tolist()
         )
-    unb_shape = len(mi.experiments), len(unbalanced_mic_codes)
+    unb_shape = len(mi.experiments.experiments), len(unbalanced_mic_codes)
     prior_loc_unb = np.full(unb_shape, DEFAULT_PRIOR_LOC_UNBALANCED)
     prior_scale_unb = np.full(unb_shape, DEFAULT_PRIOR_SCALE_UNBALANCED)
     for p in mi.priors["unbalanced_metabolites"]:
@@ -378,7 +328,7 @@ def get_input_data(
         pd.DataFrame(
             [
                 [exp.id, meas.target_id, meas.value, meas.uncertainty]
-                for exp in mi.experiments.values()
+                for exp in mi.experiments.experiments
                 for meas in exp.measurements[measurement_type].values()
             ],
             columns=["experiment_id", "target_id", "value", "uncertainty"],
@@ -395,22 +345,23 @@ def get_input_data(
             column_ix = mic_codes[row["target_id"]]
             conc_init.loc[row_ix, column_ix] = row["value"]
     knockout_matrix = get_knockout_matrix(mi=mi)
-    km_lookup = get_km_lookup(km_priors, mic_codes, enzyme_codes)
-
+    km_lookup = get_km_lookup(prior_dfs["km_priors"], mic_codes, enzyme_codes)
     return {
         "N_mic": len(mics),
         "N_unbalanced": len(unbalanced_mic_codes),
         "N_metabolite": len(metabolites),
-        "N_km": len(km_priors),
+        "N_km": len(prior_dfs["km_priors"]),
         "N_reaction": len(reactions),
         "N_enzyme": len(enzymes),
-        "N_experiment": len(mi.experiments),
+        "N_experiment": len(mi.experiments.experiments),
         "N_flux_measurement": len(reaction_measurements),
         "N_conc_measurement": len(mic_measurements),
-        "N_competitive_inhibitor": len(ki_priors),
-        "N_allosteric_inhibitor": len(diss_t_priors),
-        "N_allosteric_activator": len(diss_r_priors),
-        "N_allosteric_enzyme": len(transfer_constant_priors),
+        "N_competitive_inhibitor": len(prior_dfs["inhibition_constant_priors"]),
+        "N_allosteric_inhibitor": len(prior_dfs["tense_dissociation_constant_priors"]),
+        "N_allosteric_activator": len(
+            prior_dfs["relaxed_dissociation_constant_priors"]
+        ),
+        "N_allosteric_enzyme": len(prior_dfs["transfer_constant_priors"]),
         "N_drain": len(drain_codes) if drain_codes is not None else 0,
         "unbalanced_mic_ix": list(unbalanced_mic_codes.values()),
         "balanced_mic_ix": list(balanced_mic_codes.values()),
@@ -428,20 +379,38 @@ def get_input_data(
         ),
         "yflux": reaction_measurements["value"].values,
         "sigma_flux": reaction_measurements["uncertainty"].values,
-        "prior_loc_formation_energy": formation_energy_priors["location"].values,
-        "prior_scale_formation_energy": formation_energy_priors["scale"].values,
-        "prior_loc_kcat": kcat_priors["location"].values,
-        "prior_scale_kcat": kcat_priors["scale"].values,
-        "prior_loc_km": km_priors["location"].values,
-        "prior_scale_km": km_priors["scale"].values,
-        "prior_loc_ki": ki_priors["location"].values,
-        "prior_scale_ki": ki_priors["scale"].values,
-        "prior_loc_diss_t": diss_t_priors["location"].values,
-        "prior_scale_diss_t": diss_t_priors["scale"].values,
-        "prior_loc_diss_r": diss_r_priors["location"].values,
-        "prior_scale_diss_r": diss_r_priors["scale"].values,
-        "prior_loc_tc": transfer_constant_priors["location"].values,
-        "prior_scale_tc": transfer_constant_priors["scale"].values,
+        "experiment_yenz": (
+            enzyme_measurements["experiment_id"].map(experiment_codes).values
+        ),
+        "enzyme_yenz": (enzyme_measurements["target_id"].map(enzyme_codes).values),
+        "yenz": enzyme_measurements["value"].values,
+        "sigma_enz": enzyme_measurements["uncertainty"].values,
+        "prior_loc_formation_energy": prior_dfs["formation_energy_priors"][
+            "location"
+        ].values,
+        "prior_scale_formation_energy": prior_dfs["formation_energy_priors"][
+            "scale"
+        ].values,
+        "prior_loc_kcat": prior_dfs["kcat_priors"]["location"].values,
+        "prior_scale_kcat": prior_dfs["kcat_priors"]["scale"].values,
+        "prior_loc_km": prior_dfs["km_priors"]["location"].values,
+        "prior_scale_km": prior_dfs["km_priors"]["scale"].values,
+        "prior_loc_ki": prior_dfs["inhibition_constant_priors"]["location"].values,
+        "prior_scale_ki": prior_dfs["inhibition_constant_priors"]["scale"].values,
+        "prior_loc_diss_t": prior_dfs["tense_dissociation_constant_priors"][
+            "location"
+        ].values,
+        "prior_scale_diss_t": prior_dfs["tense_dissociation_constant_priors"][
+            "scale"
+        ].values,
+        "prior_loc_diss_r": prior_dfs["relaxed_dissociation_constant_priors"][
+            "location"
+        ].values,
+        "prior_scale_diss_r": prior_dfs["relaxed_dissociation_constant_priors"][
+            "scale"
+        ].values,
+        "prior_loc_tc": prior_dfs["transfer_constant_priors"]["location"].values,
+        "prior_scale_tc": prior_dfs["transfer_constant_priors"]["scale"].values,
         "prior_loc_unbalanced": prior_loc_unb,
         "prior_scale_unbalanced": prior_scale_unb,
         "prior_loc_enzyme": prior_loc_enzyme,
@@ -459,9 +428,9 @@ def get_input_data(
         "n_ci": n_modifier["ki"],
         "n_ai": n_modifier["diss_t"],
         "n_aa": n_modifier["diss_r"],
-        "ci_ix": ki_priors["mic_code"].values,
-        "ai_ix": diss_t_priors["mic_code"].values,
-        "aa_ix": diss_r_priors["mic_code"].values,
+        "ci_ix": prior_dfs["inhibition_constant_priors"]["mic_code"].values,
+        "ai_ix": prior_dfs["tense_dissociation_constant_priors"]["mic_code"].values,
+        "aa_ix": prior_dfs["relaxed_dissociation_constant_priors"]["mic_code"].values,
         "subunits": subunits["subunits"].values,
         "conc_init": conc_init.values,
         "rel_tol": rel_tol,
@@ -484,8 +453,8 @@ def get_init_enzyme(mi):
     """
 
     def get_naive_init(mi):
-        enz_codes = mi.stan_codes["enzyme"]
-        exp_codes = mi.stan_codes["experiment"]
+        enz_codes = mi.stan_codes.enzyme_codes
+        exp_codes = mi.stan_codes.experiment_codes
         exp_ids, enz_ids = zip(*product(exp_codes.keys(), enz_codes.keys()))
         out = pd.DataFrame(
             {
@@ -494,30 +463,38 @@ def get_init_enzyme(mi):
                 "init": DEFAULT_PRIOR_LOC_ENZYME,
             }
         ).set_index(["experiment_id", "enzyme_id"])
-        for (exp_id, enz_id), _ in out.iterrows():
-            measurements = mi.experiments[exp_id].measurements
-            if "enzyme" in measurements.keys():
-                if enz_id in measurements["enzyme"].keys():
-                    out.loc[(exp_id, enz_id), "init"] = measurements["enzyme"][
-                        enz_id
-                    ].value
+        for exp in mi.experiments.experiments:
+            if "enzyme" in exp.measurements.keys():
+                for m in exp.measurements["enzyme"].values():
+                    out.loc[(exp.id, m.target_id), "init"] = m.value
         return out.reset_index()
 
     def get_greatest_measured_flux(exp_id, enz_id, mi):
-        measurements = mi.experiments[exp_id].measurements["reaction"]
-        rxn_ids = [
-            rid
-            for rid, r in mi.kinetic_model.reactions.items()
-            if enz_id in r.enzymes.keys() and rid in measurements.keys()
-        ]
-        return (
-            max([measurements[rid].value for rid in rxn_ids])
-            if len(rxn_ids) > 0
-            else np.nan
+        reaction_ids = list(
+            set(
+                [
+                    rxn.id
+                    for rxn in mi.kinetic_model.reactions.values()
+                    for enz in rxn.enzymes.values()
+                    if enz.id == enz_id
+                ]
+            )
         )
+        measurements = [
+            m
+            for exp in mi.experiments.experiments
+            for m in exp.measurements["reaction"].values()
+            if exp.id == exp_id and m.target_id in reaction_ids
+        ]
+        if len(measurements) == 0:
+            return np.nan
+        else:
+            return max([m.value for m in measurements])
 
     def get_vmax_component(enzyme_id, init, mi):
-        kcat = [p.location for p in mi.priors["kcats"] if p.enzyme_id == enzyme_id][0]
+        kcat = [p.location for p in mi.priors.kcat_priors if p.enzyme_id == enzyme_id][
+            0
+        ]
         return init * kcat
 
     def get_lowest_vmax(exp_id, enz_id, inits, mi):
@@ -536,8 +513,8 @@ def get_init_enzyme(mi):
         return min(vmaxes)
 
     e = get_naive_init(mi)
-    e["experiment_id_stan"] = e["experiment_id"].map(mi.stan_codes["experiment"])
-    e["enzyme_id_stan"] = e["enzyme_id"].map(mi.stan_codes["enzyme"])
+    e["experiment_id_stan"] = e["experiment_id"].map(mi.stan_codes.experiment_codes)
+    e["enzyme_id_stan"] = e["enzyme_id"].map(mi.stan_codes.enzyme_codes)
     e["measured_flux"] = e.apply(
         lambda row: get_greatest_measured_flux(
             row["experiment_id"], row["enzyme_id"], mi
