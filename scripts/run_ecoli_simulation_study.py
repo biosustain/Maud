@@ -15,29 +15,7 @@ OUTPUT_DIR_SIM = HERE
 OUTPUT_DIR_FIT = HERE
 STAN_PROGRAM_PATH = os.path.join(HERE, "../src/maud/inference_model.stan")
 TOML_PATH = os.path.join(HERE, "../tests/data/ecoli_small.toml")
-TRUE_PARAMS = {
-    "km": [
-        1.29732,0.218762,0.0266822,0.0518447,277.8,0.683763,14.0289,154.152,
-        116.026,0.0143132,0.0330762,0.161785,17.2858,272.124
-    ],
-    "ki": [],
-    "dissociation_constant_t": [],
-    "dissociation_constant_r": [],
-    "transfer_constant": [],
-    "kcat": [337.522,286.437,15.1183,42.8344,7523.77],
-    "conc_unbalanced": [
-        [3.42678,0.631678,7.40767,0.020583,0.0645036],
-        [3.16631,0.598144, 4.48383,0.208994,0.0620708]
-    ],
-    "enzyme": [
-        [0.036209,0.0194807,0.00546079,0.110759,0.0199832],
-        [0.0369087,0.0193412,0.00561568,0.11478,0.0194632]
-    ],
-    "formation_energy": [
-        -1335.52,-1335.65,-2221.07,-1442.76,-2308.77,-1070.99,-1113.11,-1105.54
-    ],
-    # "drain": [[-1.539, 2], [0.563, 1.2], [-0.456, 1.2], [0.194, 2], [0.1376979321, 2.2]]
-}
+TRUE_PARAM_PATH = os.path.join(HERE, "../tests/data/true_params_ecoli_small.json")
 ODE_CONFIG = {
     "abs_tol": 1e-6,
     "rel_tol": 1e-6,
@@ -47,6 +25,7 @@ ODE_CONFIG = {
 }
 SIM_CONFIG = {
     "chains": 1,
+    "inits": TRUE_PARAM_PATH,
     "iter_sampling": 1,
     "output_dir": OUTPUT_DIR_SIM,
     "fixed_param": True
@@ -54,6 +33,7 @@ SIM_CONFIG = {
 FIT_CONFIG = {
     "chains": 4,
     "parallel_chains": 2,
+    "inits": TRUE_PARAM_PATH,
     "iter_warmup": 200,
     "iter_sampling": 200,
     "output_dir": OUTPUT_DIR_FIT,
@@ -112,23 +92,16 @@ def main():
     print("Generating simulation input...")
     mi_sim = load_maud_input_from_toml(TOML_PATH)
     input_data_sim = get_input_data(mi_sim, **ODE_CONFIG)
-    true_params = TRUE_PARAMS.copy()
-    true_params["formation_energy_z"] = standardise_list(
-        true_params["formation_energy"],
-        input_data_sim["prior_loc_formation_energy"],
-        input_data_sim["prior_scale_formation_energy"]
-    )
 
     print("Simulating...")
-    sim = model.sample(data=input_data_sim, inits=true_params, **SIM_CONFIG)
+    sim = model.sample(data=input_data_sim, **SIM_CONFIG)
 
     print("Generating fit input...")
     mi_fit = add_measurements_to_maud_input(mi_sim, sim, input_data_sim)
     input_data_fit = get_input_data(mi_fit, **ODE_CONFIG)
-    inits_fit = {k: list(v) * FIT_CONFIG["chains"] for k, v in TRUE_PARAMS.items()}
 
     print("Fitting...")
-    fit = model.sample(data=input_data_sim, inits=inits_fit, **FIT_CONFIG)
+    fit = model.sample(data=input_data_sim, **FIT_CONFIG)
 
     print(f"Done! See {output_dir} for output csvs.")
 
