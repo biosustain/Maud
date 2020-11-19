@@ -14,36 +14,29 @@ HERE = os.path.dirname(os.path.abspath(__file__))
 OUTPUT_DIR_SIM = HERE
 OUTPUT_DIR_FIT = HERE
 STAN_PROGRAM_PATH = os.path.join(HERE, "../src/maud/inference_model.stan")
-TOML_PATH = os.path.join(HERE, "../tests/data/ecoli_small_experiments.toml")
+TOML_PATH = os.path.join(HERE, "../tests/data/ecoli_small.toml")
 TRUE_PARAMS = {
     "km": [
-        3.0, 0.16, 0.0125, 0.06, 15.0, 0.025, 0.03, 0.02, 15.0, 0.025, 1.7,
-        0.69, 1.0, 0.5, 0.88, 0.1, 0.451, 2.4, 2.0, 0.33, 0.079
+        1.29732,0.218762,0.0266822,0.0518447,277.8,0.683763,14.0289,154.152,
+        116.026,0.0143132,0.0330762,0.161785,17.2858,272.124
     ],
-    "ki": [0.26],
-    "dissociation_constant_t": [1, 1],
-    "dissociation_constant_r": [0.01],
-    "transfer_constant": [1, 1],
-    "kcat": [1550.0, 110.0, 56.0, 24.0, 5.67, 4.13, 6.0],
+    "ki": [],
+    "dissociation_constant_t": [],
+    "dissociation_constant_r": [],
+    "transfer_constant": [],
+    "kcat": [337.522,286.437,15.1183,42.8344,7523.77],
     "conc_unbalanced": [
-        [2.080410885611594, 0.6113649750632913, 5.408003186466161, 0.1, 0.1, 0.24187807672413633],
-        [14.302230807530746, 0.9898468738819469, 5.669676161196416, 0.1, 0.1, 0.33726831321487066],
-        [6.354952226318044, 0.7113810622662209, 2.843811705692167, 0.1, 0.1, 1.692546934887993],
-        [1.8990486465075278, 0.9105422318194938, 3.8454204039099675, 0.1, 0.1, 0.2833704100025282],
-        [2.58774462726839, 0.9806673979313613, 3.8811478289600676, 0.1, 0.1, 0.20534440886003383]
+        [3.42678,0.631678,7.40767,0.020583,0.0645036],
+        [3.16631,0.598144, 4.48383,0.208994,0.0620708]
     ],
     "enzyme": [
-        [0.03338748587758992, 0.03233687344889826, 0.00470561182567603, 0.0057128462581434464, 0.0704592675242211, 0.004038784112975896, 0.019814776219274497],
-        [0.1, 0.013087078730074364, 0.00365161452395729, 0.01173326160905437, 0.05228843722116154, 0.008492123537417372, 0.022968874089049705],
-        [0.044449648932757366, 0.04634699167660036, 0.008006922986439756, 0.04362849543945923, 0.06197117681867592, 0.028518936258079924, 0.020866940984252118],
-        [0.03421127030955773, 0.04930313430995316, 0.007853203230449156, 0.0075998055009798265, 0.06783806498863625, 0.0025627145433086006, 0.02367223995109299],
-        [0.053645551520857676, 0.04484149627257232, 0.003917011890185323, 0.006854744097845603, 0.06529811635401973, 0.009351216672916836, 0.1]
+        [0.036209,0.0194807,0.00546079,0.110759,0.0199832],
+        [0.0369087,0.0193412,0.00561568,0.11478,0.0194632]
     ],
     "formation_energy": [
-        -1336.3, -1333.8, -2220.9, -1440.8, -2313.0, -1073.3, -1111.9,
-        -1106.4, 0.0
+        -1335.52,-1335.65,-2221.07,-1442.76,-2308.77,-1070.99,-1113.11,-1105.54
     ],
-    "drain": [[-1.539], [0.563], [-0.456], [0.194], [0.1376979321]]
+    # "drain": [[-1.539, 2], [0.563, 1.2], [-0.456, 1.2], [0.194, 2], [0.1376979321, 2.2]]
 }
 ODE_CONFIG = {
     "abs_tol": 1e-6,
@@ -106,6 +99,12 @@ def standardise_list(l, mean, scale):
     return ((np.array(l) - np.array(mean)) / np.array(scale)).tolist()
 
 
+def get_2d_var_df(mcmc, varname, ix, cols):
+    vals = mcmc.stan_variable(varname).values
+    dims = mcmc.stan_variable_dims[varname]
+    return pd.DataFrame(vals.reshape(dims, order="F"), index=ix, columns=cols)
+
+
 def main():
     print("Compiling Stan model...")
     model = CmdStanModel(stan_file=STAN_PROGRAM_PATH)
@@ -126,11 +125,10 @@ def main():
     print("Generating fit input...")
     mi_fit = add_measurements_to_maud_input(mi_sim, sim, input_data_sim)
     input_data_fit = get_input_data(mi_fit, **ODE_CONFIG)
-    # inits_fit = get_initial_conditions(input_data_fit, mi_fit)
     inits_fit = {k: list(v) * FIT_CONFIG["chains"] for k, v in TRUE_PARAMS.items()}
 
     print("Fitting...")
-    fit = model.sample(data=input_data_fit, inits=true_params, **FIT_CONFIG)
+    fit = model.sample(data=input_data_sim, inits=inits_fit, **FIT_CONFIG)
 
     print(f"Done! See {output_dir} for output csvs.")
 
