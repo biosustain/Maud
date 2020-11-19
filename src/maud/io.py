@@ -249,6 +249,12 @@ def load_maud_input_from_toml(filepath: str, id: str = "mi") -> MaudInput:
     kinetic_model = load_kinetic_model_from_toml(parsed_toml, id)
     experiments = ExperimentSet([get_experiment(e) for e in parsed_toml["experiments"]])
     prior_dict = parsed_toml["priors"]
+    for k in [
+        "inhibition_constants", "tense_dissociation_constants",
+        "relaxed_dissociation_constants", "transfer_constants"
+    ]:
+        if k not in prior_dict.keys():
+            prior_dict[k] = {}
     priors = PriorSet(
         km_priors=extract_priors(
             prior_dict["kms"], lambda p: f"km_{p['enzyme_id']}_{p['mic_id']}"

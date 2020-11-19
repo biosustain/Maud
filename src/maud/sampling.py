@@ -283,6 +283,8 @@ def get_input_data(
     prior_loc_drain, prior_scale_drain = get_drain_priors(mi)
     prior_dfs = {
         prior_type: pd.DataFrame(map(lambda p: p.__dict__, priors))
+        if len(priors) > 0
+        else pd.DataFrame([], columns=["location", "scale", "mic_code"])
         for prior_type, priors in mi.priors.__dict__.items()
     }
     prior_dfs["formation_energy_priors"] = (
@@ -299,18 +301,21 @@ def get_input_data(
         ],
         ["ki", "diss_t", "diss_r"],
     ):
-        df = prior_dfs[df_name]
-        df["mic_code"] = df["mic_id"].map(mic_codes)
-        df["enzyme_code"] = df["enzyme_id"].map(enzyme_codes)
-        df.sort_values("enzyme_code", inplace=True)
-        n_modifier[param_type] = (
-            df.groupby("enzyme_code")
-            .size()
-            .reindex(enzyme_codes.values())
-            .fillna(0)
-            .astype(int)
-            .tolist()
-        )
+        if len(prior_dfs[df_name]) > 0:
+            df = prior_dfs[df_name]
+            df["mic_code"] = df["mic_id"].map(mic_codes)
+            df["enzyme_code"] = df["enzyme_id"].map(enzyme_codes)
+            df.sort_values("enzyme_code", inplace=True)
+            n_modifier[param_type] = (
+                df.groupby("enzyme_code")
+                .size()
+                .reindex(enzyme_codes.values())
+                .fillna(0)
+                .astype(int)
+                .tolist()
+            )
+        else:
+            n_modifier[param_type] = [0] * len(enzymes)
     unb_shape = len(mi.experiments.experiments), len(unbalanced_mic_codes)
     prior_loc_unb = np.full(unb_shape, DEFAULT_PRIOR_LOC_UNBALANCED)
     prior_scale_unb = np.full(unb_shape, DEFAULT_PRIOR_SCALE_UNBALANCED)
