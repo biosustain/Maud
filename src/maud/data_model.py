@@ -248,10 +248,10 @@ class Experiment:
     """Constructor for condition object.
 
     :param id: condition id
-    :param unbalanced_met_info:
-    :param measurements: dictionary mapping keys 'enzyme', 'metabolite' and 'reaction'
+    :param measurements: dictionary mapping keys 'metabolite' and 'reaction'
     to dictionaries with the form {target id: measurement}
     :param metadata: any info about the condition
+    :param knockouts: a list of enzymes knocked out, if any
     """
 
     def __init__(
