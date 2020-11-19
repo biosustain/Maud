@@ -219,24 +219,8 @@ def load_maud_input_from_toml(filepath: str, id: str = "mi") -> MaudInput:
     """
     parsed_toml = toml.load(filepath)
     kinetic_model = load_kinetic_model_from_toml(parsed_toml, id)
+    unbalanced_metabolite_codes = [m_id for m_id, m in kinetic_model.mics.items() if m.balanced is False]
     experiments = {}
-    for e in parsed_toml["experiments"]:
-        experiment = Experiment(id=e["id"])
-        for target_type in ["metabolite", "reaction", "enzyme"]:
-            type_measurements = {}
-            for m in e[target_type + "_measurements"]:
-                measurement = Measurement(
-                    target_id=m["target_id"],
-                    value=m["value"],
-                    uncertainty=m["uncertainty"],
-                    scale="ln",
-                    target_type=target_type,
-                )
-                type_measurements.update({m["target_id"]: measurement})
-            experiment.measurements.update({target_type: type_measurements})
-        if "knockouts" in e.keys():
-            experiment.knockouts = e["knockouts"]
-        experiments.update({experiment.id: experiment})
     priors = {
         "kcats": [],
         "kms": [],
@@ -249,6 +233,44 @@ def load_maud_input_from_toml(filepath: str, id: str = "mi") -> MaudInput:
         "transfer_constants": [],
         "drains": [],
     }
+    for e in parsed_toml["experiments"]:
+        experiment = Experiment(id=e["id"])
+        for target_type in ["metabolite", "reaction", "enzyme"]:
+            type_measurements = {}
+            for m in e[target_type + "_measurements"]:
+                if (m["target_id"] not in unbalanced_metabolite_codes) & (target_type not in ["enzyme"]):
+                    measurement = Measurement(
+                        target_id=m["target_id"],
+                        value=m["value"],
+                        uncertainty=m["uncertainty"],
+                        scale="ln",
+                        target_type=target_type,
+                    )
+                    type_measurements.update({m["target_id"]: measurement})
+                elif target_type in ["enzyme"]:
+                    priors["enzyme_concentrations"].append(
+                        Prior(
+                            id=f"{m['target_id']}_{e['id']}",
+                            location=m["value"],
+                            scale=m["uncertainty"],
+                            enzyme_id=m["target_id"],
+                            experiment_id=e["id"],
+                            )
+                        )
+                elif m["target_id"] in unbalanced_metabolite_codes:
+                    priors["unbalanced_metabolites"].append(
+                        Prior(
+                            id=f"{m['target_id']}_{e['id']}",
+                            location=m["value"],
+                            scale=m["uncertainty"],
+                            mic_id=m["target_id"],
+                            experiment_id=e["id"],
+                            )
+                        )
+            experiment.measurements.update({target_type: type_measurements})
+        if "knockouts" in e.keys():
+            experiment.knockouts = e["knockouts"]
+        experiments.update({experiment.id: experiment})
     for prior in parsed_toml["priors"]["formation_energies"]:
         metabolite_id = prior["metabolite_id"]
         priors["formation_energies"].append(

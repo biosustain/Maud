@@ -32,9 +32,9 @@ from maud.data_model import KineticModel, MaudInput
 HERE = os.path.dirname(os.path.abspath(__file__))
 INCLUDE_PATH = ""
 DEFAULT_PRIOR_LOC_UNBALANCED = 0.1
-DEFAULT_PRIOR_SCALE_UNBALANCED = 2
+DEFAULT_PRIOR_SCALE_UNBALANCED = 2.0
 DEFAULT_PRIOR_LOC_ENZYME = 0.1
-DEFAULT_PRIOR_SCALE_ENZYME = 2
+DEFAULT_PRIOR_SCALE_ENZYME = 2.0
 STAN_PROGRAM_RELATIVE_PATH = "inference_model.stan"
 
 
@@ -362,17 +362,19 @@ def get_input_data(
     unb_shape = len(mi.experiments), len(unbalanced_mic_codes)
     prior_loc_unb = np.full(unb_shape, DEFAULT_PRIOR_LOC_UNBALANCED)
     prior_scale_unb = np.full(unb_shape, DEFAULT_PRIOR_SCALE_UNBALANCED)
-    if "mic_concentrations" in mi.priors.keys():
-        for p in mi.priors["mic_concentrations"]:
-            ix = [experiment_codes[mic_codes[p.mic_id - 1], p.experiment_id] - 1]
-            prior_loc_unb[ix] = p.location
-            prior_scale_unb[ix] = p.scale
+    for p in mi.priors["unbalanced_metabolites"]:
+        ix = [experiment_codes[p.experiment_id] - 1, mic_codes[p.mic_id] - 1]
+        prior_loc_unb[ix[0], ix[1]] = p.location
+        prior_scale_unb[ix[0], ix[1]] = p.scale
     enzyme_shape = len(mi.experiments), len(enzymes)
     prior_loc_enzyme = np.full(enzyme_shape, DEFAULT_PRIOR_LOC_ENZYME)
     prior_scale_enzyme = np.full(enzyme_shape, DEFAULT_PRIOR_SCALE_ENZYME)
-
+    for p in mi.priors["enzyme_concentrations"]:
+        ix = [experiment_codes[p.experiment_id] - 1, enzyme_codes[p.enzyme_id] - 1]
+        prior_loc_enzyme[ix[0], ix[1]] = p.location
+        prior_scale_enzyme[ix[0], ix[1]] = p.scale
     # measurements
-    mic_measurements, reaction_measurements, enzyme_measurements = (
+    mic_measurements, reaction_measurements = (
         pd.DataFrame(
             [
                 [exp.id, meas.target_id, meas.value, meas.uncertainty]
@@ -381,7 +383,7 @@ def get_input_data(
             ],
             columns=["experiment_id", "target_id", "value", "uncertainty"],
         )
-        for measurement_type in ["metabolite", "reaction", "enzyme"]
+        for measurement_type in ["metabolite", "reaction"]
     )
 
     conc_init = pd.DataFrame(
@@ -394,6 +396,7 @@ def get_input_data(
             conc_init.loc[row_ix, column_ix] = row["value"]
     knockout_matrix = get_knockout_matrix(mi=mi)
     km_lookup = get_km_lookup(km_priors, mic_codes, enzyme_codes)
+
     return {
         "N_mic": len(mics),
         "N_unbalanced": len(unbalanced_mic_codes),
@@ -403,7 +406,6 @@ def get_input_data(
         "N_enzyme": len(enzymes),
         "N_experiment": len(mi.experiments),
         "N_flux_measurement": len(reaction_measurements),
-        "N_enzyme_measurement": len(enzyme_measurements),
         "N_conc_measurement": len(mic_measurements),
         "N_competitive_inhibitor": len(ki_priors),
         "N_allosteric_inhibitor": len(diss_t_priors),
@@ -426,12 +428,6 @@ def get_input_data(
         ),
         "yflux": reaction_measurements["value"].values,
         "sigma_flux": reaction_measurements["uncertainty"].values,
-        "experiment_yenz": (
-            enzyme_measurements["experiment_id"].map(experiment_codes).values
-        ),
-        "enzyme_yenz": (enzyme_measurements["target_id"].map(enzyme_codes).values),
-        "yenz": enzyme_measurements["value"].values,
-        "sigma_enz": enzyme_measurements["uncertainty"].values,
         "prior_loc_formation_energy": formation_energy_priors["location"].values,
         "prior_scale_formation_energy": formation_energy_priors["scale"].values,
         "prior_loc_kcat": kcat_priors["location"].values,
