@@ -28,7 +28,7 @@ SIM_CONFIG = {
     "inits": TRUE_PARAM_PATH,
     "iter_sampling": 1,
     "output_dir": OUTPUT_DIR_SIM,
-    "fixed_param": True
+    "fixed_param": True,
 }
 FIT_CONFIG = {
     "chains": 4,
