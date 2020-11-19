@@ -64,12 +64,16 @@ concentration and set of fluxes.
 
 The kinetic model's role in Maud's statistical model is to connect latent
 parameters - i.e. :math:`\theta` above - with measureable quantities,
-i.e. :math:`\mathbf{m}` and :math:`\mathbf{v}`. 
+i.e. :math:`\mathbf{m}` and :math:`\mathbf{v}`.
 
 
-Experimental Information
-========================
+Probabilistic Model
+===================
 
+
+
+Likelihood
+----------
 Maud represents information from experiments that measure enzyme concentrations
 and metabolite concentrations using the following regression model, where
 :math:`y` is the observation and :math:`\hat{y}` is the unobserved true value
@@ -79,7 +83,7 @@ of the experimentally measured quantity:
 
    y \sim LogNormal(\log(\hat{y}), \sigma)
 
-Measurements of reaction fluxes use the following similar regression model:
+Measurements of reaction fluxes and drains use the following similar regression model:
 
 .. math::
 
@@ -99,7 +103,7 @@ measured value is large, then the associated error is also proportionally
 large.
 
 Summary statistics
-------------------
+++++++++++++++++++
 
 It is common for experimental results to be reported in the form of a sample
 mean and standard deviation. It is important to note that for non-negative
@@ -109,7 +113,7 @@ possible, non-summarised measurement results should be used instead.
 
 
 Relative measurements
----------------------
++++++++++++++++++++++
 
 In many realistic cases a measurement apparatus will give comparatively
 accurate information about the relative concentrations of some metabolites or
@@ -118,8 +122,8 @@ values. While Maud currently does not support this kind of measurement, support
 is planned and will take the following form.
 
 
-Non-experimental Information
-============================
+Priors
+------
 
 Information that does not naturally take the form of an experimental
 measurement can be expressed in Maud's prior model. Maud allows users to
@@ -131,6 +135,21 @@ specify independent log-normal priors for the following quantities:
 - enzyme/metabolite-in-compartment inhibition and dissociation constants
 - enzyme concentrations
 - unbalanced metabolite concentrations
+
+The distinction between balanced and unbalanced metabolites is also found in
+the statistical model. Where information about the unbalanced metabolites
+is parsed in the form of a prior, whereas the balanced metabolites are evaluated
+as a model likelihood. This distinction becomes aparent when considering what
+the unbalanced metabolites represent, which is a boundary condition. These
+define the outcome of systems of differential equations, in the case of Maud
+this happens to be balanced metabolite concentrations and fluxes. And, our
+knowledge about the state of each condition is only conveyed through the
+boundary conditions:
+* unbalanced metabolite concentrations,
+* enzyme concentrations, 
+* kinetic parameters, and,
+* drains.
+
 
 For metabolite formation energies, which can be both negative and positive
 numbers, Maud allows users to specific independent normal priors.
@@ -157,7 +176,7 @@ can be used in a python environment as follows:
 
 
 Information about fluxes and balanced metabolite concentrations
-----------------------------------------------------
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
 It is currently not possible to include non-experimental information about
 fluxes and steady-state concentrations of balanced metabolites.
@@ -171,7 +190,7 @@ represent this information.
 
 
 Multivariate priors
--------------------
++++++++++++++++++++
 
 Sometimes the non-experimental information about two parameters is not
 independent. For example, some linear combinations of formation energies are
