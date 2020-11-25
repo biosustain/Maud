@@ -99,7 +99,7 @@ def main():
     jsondump("input_data.json", input_data_fit)
 
     print("Fitting...")
-    # model.sample(data=input_data_fit, **FIT_CONFIG)
+    model.sample(data=input_data_fit, **FIT_CONFIG)
 
     print("Analysing results...")
     with open(TRUE_PARAM_PATH, "r") as f:
