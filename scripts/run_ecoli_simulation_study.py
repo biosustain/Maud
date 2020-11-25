@@ -97,7 +97,7 @@ def main():
     input_data_fit = get_input_data(mi, **ODE_CONFIG)
 
     print("Fitting...")
-    fit = model.sample(data=input_data_sim, **FIT_CONFIG)
+    model.sample(data=input_data_sim, **FIT_CONFIG)
 
     print("Analysing results...")
     with open(TRUE_PARAM_PATH, "r") as f:
