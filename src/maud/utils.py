@@ -16,7 +16,7 @@
 
 """General purpose utility functions."""
 
-from typing import Dict, Iterable, List
+from typing import Dict, Iterable
 
 import numpy as np
 from scipy.stats import norm
@@ -77,8 +77,3 @@ def get_normal_parameters_from_quantiles(x1, p1, x2, p2):
     sigma = (x2 - x1) / denom
     mu = (x1 * norm.ppf(p2) - x2 * norm.ppf(p1)) / denom
     return mu, sigma
-
-
-def standardise_list(l: List[float], mean: float, scale: float) -> List[float]:
-    """Subtract the mean and divide by the sd."""
-    return ((np.array(l) - np.array(mean)) / np.array(scale)).tolist()

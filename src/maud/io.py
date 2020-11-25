@@ -250,8 +250,10 @@ def load_maud_input_from_toml(filepath: str, id: str = "mi") -> MaudInput:
     experiments = ExperimentSet([get_experiment(e) for e in parsed_toml["experiments"]])
     prior_dict = parsed_toml["priors"]
     for k in [
-        "inhibition_constants", "tense_dissociation_constants",
-        "relaxed_dissociation_constants", "transfer_constants"
+        "inhibition_constants",
+        "tense_dissociation_constants",
+        "relaxed_dissociation_constants",
+        "transfer_constants",
     ]:
         if k not in prior_dict.keys():
             prior_dict[k] = {}

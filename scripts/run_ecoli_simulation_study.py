@@ -1,19 +1,17 @@
-"""Script for running a simulation study based on the data at """
+"""Script for running a simulation study."""
 
-from maud.io import load_maud_input_from_toml
-from maud.sampling import get_input_data, get_initial_conditions
-from maud.analysis import load_infd, plot_1d_var, plot_experiment_var
-from maud.utils import standardise_list
-from cmdstanpy import CmdStanModel, CmdStanMCMC
-from cmdstanpy.utils import jsondump
-from maud.data_model import MaudInput
-from copy import deepcopy
-import numpy as np
-import pandas as pd
-import os
 import json
-import arviz as az
+import os
+from copy import deepcopy
+
+from cmdstanpy import CmdStanMCMC, CmdStanModel
 from matplotlib import pyplot as plt
+
+from maud.analysis import load_infd, plot_1d_var, plot_experiment_var
+from maud.data_model import MaudInput
+from maud.io import load_maud_input_from_toml
+from maud.sampling import get_input_data
+
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 OUTPUT_DIR_SIM = HERE
@@ -58,7 +56,7 @@ def add_measurements_to_maud_input(
     code_to_enz = {v: k for k, v in mi.stan_codes.enzyme_codes.items()}
     code_to_mic = {v: k for k, v in mi.stan_codes.mic_codes.items()}
     code_to_rxn = {v: k for k, v in mi.stan_codes.reaction_codes.items()}
-    yenz_experiments = [code_to_exp[i] for i in  input_data["experiment_yenz"]]
+    yenz_experiments = [code_to_exp[i] for i in input_data["experiment_yenz"]]
     yenz_enzymes = [code_to_enz[i] for i in input_data["enzyme_yenz"]]
     yconc_experiments = [code_to_exp[i] for i in input_data["experiment_yconc"]]
     yconc_mics = [code_to_mic[i] for i in input_data["mic_ix_yconc"]]
@@ -83,6 +81,7 @@ def add_measurements_to_maud_input(
 
 
 def main():
+    """Run the script."""
     print("Compiling Stan model...")
     model = CmdStanModel(stan_file=STAN_PROGRAM_PATH)
 
@@ -115,7 +114,7 @@ def main():
     km_codes = dict(zip(km_ids, range(1, len(km_ids) + 1)))
     for varname, codes, figsize, truth in (
         ["enzyme", enz_codes, [15, 8], true_params["enzyme"]],
-        ["conc", unb_codes, [15, 8], true_params["conc_unbalanced"]]
+        ["conc", unb_codes, [15, 8], true_params["conc_unbalanced"]],
     ):
         f, _ = plot_experiment_var(infd, varname, codes, exp_codes, truth)
         plt.tight_layout()
@@ -124,7 +123,7 @@ def main():
     for varname, codes, figsize in zip(
         ["formation_energy", "km", "kcat"],
         [met_codes, km_codes, enz_codes],
-        [[15, 8], [15, 10], [15, 8]]
+        [[15, 8], [15, 10], [15, 8]],
     ):
         f, _ = plot_1d_var(infd, varname, codes, true_params[varname])
         plt.tight_layout()
@@ -134,6 +133,6 @@ def main():
 
     print(f"Done! See {OUTPUT_DIR_FIT} for output csvs and plots.")
 
- 
+
 if __name__ == "__main__":
     main()

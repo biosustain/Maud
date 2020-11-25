@@ -1,11 +1,13 @@
 """Functions for analysing Maud output."""
 
-import arviz as az
+from math import ceil
 from typing import List, Union
-from maud.data_model import MaudInput
+
+import arviz as az
 import pandas as pd
 from matplotlib import pyplot as plt
-from math import ceil
+
+from maud.data_model import MaudInput
 
 
 def load_infd(csvs: List[str], mi: MaudInput) -> az.InferenceData:
@@ -27,16 +29,15 @@ def load_infd(csvs: List[str], mi: MaudInput) -> az.InferenceData:
             "formation_energy": ["metabolite"],
             "kcat": ["enzyme_name"],
             "km": ["km_id"],
-        }
-    ) 
-
+        },
+    )
 
 
 def plot_1d_var(
     infd: az.InferenceData,
     varname: str,
     codes: dict,
-    true_values: Union[List[float], None] = None
+    true_values: Union[List[float], None] = None,
 ) -> tuple:
     """Plot a 1 dimensional variable."""
     tv = dict(zip(codes.keys(), true_values))
@@ -51,11 +52,13 @@ def plot_1d_var(
         vline = ax.axvline(tv[col], color="red")
         ax.set_title(col)
     f.legend(
-        [hist_patches[0], vline],["Marginal posterior", "True value"],
-        frameon=False, loc="lower center", ncol=2
+        [hist_patches[0], vline],
+        ["Marginal posterior", "True value"],
+        frameon=False,
+        loc="lower center",
+        ncol=2,
     )
     return f, axes
-    
 
 
 def plot_experiment_var(
@@ -63,14 +66,12 @@ def plot_experiment_var(
     varname: str,
     var_codes: dict,
     exp_codes: dict,
-    true_values: Union[List[float], None] = None
+    true_values: Union[List[float], None] = None,
 ) -> tuple:
     """Plot a 2d variable where the first dimension is experiment."""
     samples = infd.posterior[varname].to_series().unstack([-1, -2])
     var_labs, exp_labs = samples.columns.levels
-    tvdf = pd.DataFrame(
-        true_values, columns=var_codes.keys(), index=exp_codes.keys()
-    )
+    tvdf = pd.DataFrame(true_values, columns=var_codes.keys(), index=exp_codes.keys())
     f, axes = plt.subplots(len(exp_labs), len(var_labs))
     for exp, axrow in zip(exp_labs, axes):
         for var, ax in zip(var_labs, axrow):
@@ -87,4 +88,3 @@ def plot_experiment_var(
         leg_labs = ["Marginal posterior", "True value"]
     f.legend(leg_handles, leg_labs, frameon=False, loc="lower center", ncol=2)
     return f, axes
-
