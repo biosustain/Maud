@@ -5,6 +5,7 @@ import os
 from copy import deepcopy
 
 from cmdstanpy import CmdStanMCMC, CmdStanModel
+from cmdstanpy.utils import jsondump
 from matplotlib import pyplot as plt
 
 from maud.analysis import load_infd, plot_1d_var, plot_experiment_var
@@ -95,9 +96,10 @@ def main():
     print("Generating fit input...")
     mi = add_measurements_to_maud_input(mi_sim, sim, input_data_sim)
     input_data_fit = get_input_data(mi, **ODE_CONFIG)
+    jsondump("input_data.json", input_data_fit)
 
     print("Fitting...")
-    model.sample(data=input_data_sim, **FIT_CONFIG)
+    # model.sample(data=input_data_fit, **FIT_CONFIG)
 
     print("Analysing results...")
     with open(TRUE_PARAM_PATH, "r") as f:
