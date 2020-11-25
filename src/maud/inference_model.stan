@@ -22,6 +22,7 @@ data {
   int<lower=0> N_allosteric_inhibitor;
   int<lower=0> N_allosteric_activator;
   int<lower=0> N_allosteric_enzyme;
+  int<lower=0> N_enzyme_measurement;
   // measurements
   int<lower=1,upper=N_mic> unbalanced_mic_ix[N_unbalanced];
   int<lower=1,upper=N_mic> balanced_mic_ix[N_mic-N_unbalanced];
@@ -33,6 +34,10 @@ data {
   int<lower=1,upper=N_reaction> reaction_yflux[N_flux_measurement];
   real yflux[N_flux_measurement];
   vector<lower=0>[N_flux_measurement] sigma_flux;
+  int<lower=0,upper=N_experiment> experiment_yenz[N_enzyme_measurement];
+  int<lower=0,upper=N_enzyme> enzyme_yenz[N_enzyme_measurement];
+  real yenz[N_enzyme_measurement];
+  vector<lower=0>[N_enzyme_measurement] sigma_enz;
   // hardcoded priors
   vector[N_metabolite] prior_loc_formation_energy;
   vector<lower=0>[N_metabolite] prior_scale_formation_energy;
@@ -200,6 +205,8 @@ model {
   if (LIKELIHOOD == 1){
     target += reduce_sum(partial_sum_conc, yconc, 1,
                          conc, experiment_yconc, mic_ix_yconc, sigma_conc);
+    target += reduce_sum(partial_sum_enz, yenz, 1,
+                         enzyme, experiment_yenz, enzyme_yenz, sigma_enz);
     target += reduce_sum(partial_sum_flux, yflux, 1,
                          flux, experiment_yflux, reaction_yflux, sigma_flux);
   }

@@ -276,18 +276,16 @@ def load_maud_input_from_toml(filepath: str, id: str = "mi") -> MaudInput:
             prior_dict["transfer_constants"],
             lambda p: f"transfer_constant_{p['enzyme_id']}",
         ),
-        unbalanced_metabolite_priors=[
-            Prior(
-                id=f"{e['id']}_{m['target_id']}",
-                location=m["value"],
-                scale=m["uncertainty"],
-                experiment_id=e["id"],
-                mic_id=m["target_id"],
-            )
-            for e in parsed_toml["experiments"]
-            for m in e["metabolite_measurements"]
-            if not kinetic_model.mics[m["target_id"]].balanced
-        ],
+        unbalanced_metabolite_priors=extract_priors(
+            prior_dict["unbalanced_metabolites"],
+            lambda p: f"unbalanced_metabolite_{p['mic_id']}_{p['experiment_id']}",
+        ) if "unbalanced_metabolites" in prior_dict.keys()
+        else [],
+        enzyme_concentration_priors=extract_priors(
+            prior_dict["enzyme_concentrations"],
+            lambda p: f"enzyme_concentrations{p['enzyme_id']}_{p['experiment_id']}",
+        ) if "enzyme_concentrations" in prior_dict.keys()
+        else [],
         drain_priors=[
             Prior(
                 id=f"{dd['id']}_{e['id']}",

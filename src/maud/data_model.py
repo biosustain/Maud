@@ -322,6 +322,7 @@ class PriorSet:
         relaxed_dissociation_constant_priors: List[Prior],
         transfer_constant_priors: List[Prior],
         drain_priors: List[Prior],
+        enzyme_concentration_priors: List[Prior],
     ):
         self.kcat_priors = kcat_priors
         self.km_priors = km_priors
@@ -332,6 +333,7 @@ class PriorSet:
         self.relaxed_dissociation_constant_priors = relaxed_dissociation_constant_priors
         self.transfer_constant_priors = transfer_constant_priors
         self.drain_priors = drain_priors
+        self.enzyme_concentration_priors = enzyme_concentration_priors
 
 
 class StanCodeSet:
