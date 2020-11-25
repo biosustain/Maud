@@ -2,6 +2,8 @@
 
 from maud.io import load_maud_input_from_toml
 from maud.sampling import get_input_data, get_initial_conditions
+from maud.analysis import load_infd, plot_1d_var, plot_experiment_var
+from maud.utils import standardise_list
 from cmdstanpy import CmdStanModel, CmdStanMCMC
 from cmdstanpy.utils import jsondump
 from maud.data_model import MaudInput
@@ -9,6 +11,9 @@ from copy import deepcopy
 import numpy as np
 import pandas as pd
 import os
+import json
+import arviz as az
+from matplotlib import pyplot as plt
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 OUTPUT_DIR_SIM = HERE
@@ -27,7 +32,6 @@ SIM_CONFIG = {
     "chains": 1,
     "inits": TRUE_PARAM_PATH,
     "iter_sampling": 1,
-    "output_dir": OUTPUT_DIR_SIM,
     "fixed_param": True,
 }
 FIT_CONFIG = {
@@ -45,7 +49,10 @@ FIT_CONFIG = {
 }
 
 
-def add_measurements_to_maud_input(mi: MaudInput, sim: CmdStanMCMC, input_data: dict):
+def add_measurements_to_maud_input(
+    mi: MaudInput, sim: CmdStanMCMC, input_data: dict
+) -> MaudInput:
+    """Replace the measurements in a maud input with simulated ones."""
     out = deepcopy(mi)
     code_to_exp = {v: k for k, v in mi.stan_codes.experiment_codes.items()}
     code_to_enz = {v: k for k, v in mi.stan_codes.enzyme_codes.items()}
@@ -75,16 +82,6 @@ def add_measurements_to_maud_input(mi: MaudInput, sim: CmdStanMCMC, input_data: 
     return out
 
 
-def standardise_list(l, mean, scale):
-    return ((np.array(l) - np.array(mean)) / np.array(scale)).tolist()
-
-
-def get_2d_var_df(mcmc, varname, ix, cols):
-    vals = mcmc.stan_variable(varname).values
-    dims = mcmc.stan_variable_dims[varname]
-    return pd.DataFrame(vals.reshape(dims, order="F"), index=ix, columns=cols)
-
-
 def main():
     print("Compiling Stan model...")
     model = CmdStanModel(stan_file=STAN_PROGRAM_PATH)
@@ -97,14 +94,46 @@ def main():
     sim = model.sample(data=input_data_sim, **SIM_CONFIG)
 
     print("Generating fit input...")
-    mi_fit = add_measurements_to_maud_input(mi_sim, sim, input_data_sim)
-    input_data_fit = get_input_data(mi_fit, **ODE_CONFIG)
+    mi = add_measurements_to_maud_input(mi_sim, sim, input_data_sim)
+    input_data_fit = get_input_data(mi, **ODE_CONFIG)
 
     print("Fitting...")
-    fit = model.sample(data=input_data_sim, **FIT_CONFIG)
+    # fit = model.sample(data=input_data_sim, **FIT_CONFIG)
 
-    print(f"Done! See {output_dir} for output csvs.")
+    print("Analysing results...")
+    with open(TRUE_PARAM_PATH, "r") as f:
+        true_params = json.load(f)
+    csvs = [f for f in os.listdir(".") if f.endswith(".csv")]
+    infd = load_infd(csvs, mi)
+    exp_codes = mi.stan_codes.experiment_codes
+    enz_codes = mi.stan_codes.enzyme_codes
+    met_codes = mi.stan_codes.metabolite_codes
+    mic_codes = mi.stan_codes.mic_codes
+    unbalanced_mics = input_data_fit["unbalanced_mic_ix"]
+    unb_codes = {k: v for k, v in mic_codes.items() if v in unbalanced_mics}
+    km_ids = infd.posterior.coords["km_id"].to_series().tolist()
+    km_codes = dict(zip(km_ids, range(1, len(km_ids) + 1)))
+    for varname, codes, figsize, truth in (
+        ["enzyme", enz_codes, [15, 8], true_params["enzyme"]],
+        ["conc", unb_codes, [15, 8], true_params["conc_unbalanced"]]
+    ):
+        f, _ = plot_experiment_var(infd, varname, codes, exp_codes, truth)
+        plt.tight_layout()
+        f.set_size_inches(figsize)
+        f.savefig(f"{varname}_posteriors.png", bbox_inches="tight")
+    for varname, codes, figsize in zip(
+        ["formation_energy", "km", "kcat"],
+        [met_codes, km_codes, enz_codes],
+        [[15, 8], [15, 10], [15, 8]]
+    ):
+        f, _ = plot_1d_var(infd, varname, codes, true_params[varname])
+        plt.tight_layout()
+        f.set_size_inches(figsize)
+        f.savefig(f"{varname}_posteriors.png", bbox_inches="tight")
+    plt.close("all")
 
-    
+    print(f"Done! See {OUTPUT_DIR_FIT} for output csvs and plots.")
+
+ 
 if __name__ == "__main__":
     main()
