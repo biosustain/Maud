@@ -329,8 +329,10 @@ def get_input_data(
         0.01, index=experiment_codes.values(), columns=mic_codes.values()
     )
     enz_conc_init = pd.DataFrame(
-        DEFAULT_PRIOR_LOC_ENZYME, index=experiment_codes.values(), columns=enzyme_codes.values()
-        )
+        DEFAULT_PRIOR_LOC_ENZYME,
+        index=experiment_codes.values(),
+        columns=enzyme_codes.values(),
+    )
     # measurements
     mic_measurements, reaction_measurements, enzyme_measurements = (
         pd.DataFrame(
@@ -467,6 +469,8 @@ def get_input_data(
         "LIKELIHOOD": likelihood,
         "timepoint": timepoint,
     }
+
+
 def get_initial_conditions(input_data, mi):
     """Specify parameters' initial conditions."""
     return {
