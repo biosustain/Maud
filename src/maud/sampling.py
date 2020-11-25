@@ -17,8 +17,6 @@
 """Code for sampling from a posterior distribution."""
 
 import os
-from copy import deepcopy
-from itertools import product
 from typing import Dict
 
 import cmdstanpy
