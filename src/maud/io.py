@@ -279,12 +279,14 @@ def load_maud_input_from_toml(filepath: str, id: str = "mi") -> MaudInput:
         unbalanced_metabolite_priors=extract_priors(
             prior_dict["unbalanced_metabolites"],
             lambda p: f"unbalanced_metabolite_{p['mic_id']}_{p['experiment_id']}",
-        ) if "unbalanced_metabolites" in prior_dict.keys()
+        )
+        if "unbalanced_metabolites" in prior_dict.keys()
         else [],
         enzyme_concentration_priors=extract_priors(
             prior_dict["enzyme_concentrations"],
             lambda p: f"enzyme_concentrations{p['enzyme_id']}_{p['experiment_id']}",
-        ) if "enzyme_concentrations" in prior_dict.keys()
+        )
+        if "enzyme_concentrations" in prior_dict.keys()
         else [],
         drain_priors=[
             Prior(
