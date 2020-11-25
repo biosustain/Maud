@@ -70,8 +70,6 @@ i.e. :math:`\mathbf{m}` and :math:`\mathbf{v}`.
 Probabilistic Model
 ===================
 
-
-
 Likelihood
 ----------
 Maud represents information from experiments that measure enzyme concentrations
@@ -83,7 +81,7 @@ of the experimentally measured quantity:
 
    y \sim LogNormal(\log(\hat{y}), \sigma)
 
-Measurements of reaction fluxes and drains use the following similar regression model:
+Measurements of reaction fluxes use the following similar regression model:
 
 .. math::
 
@@ -138,13 +136,13 @@ specify independent log-normal priors for the following quantities:
 
 The distinction between balanced and unbalanced metabolites is also found in
 the statistical model. Where information about the unbalanced metabolites
-is parsed in the form of a prior, whereas the balanced metabolites are evaluated
+can be parsed in the form of a prior, whereas the balanced metabolites are always evaluated
 as a model likelihood. This distinction becomes aparent when considering what
 the unbalanced metabolites represent, which is a boundary condition. These
 define the outcome of systems of differential equations, in the case of Maud
 this happens to be balanced metabolite concentrations and fluxes. And, our
-knowledge about the state of each condition is only conveyed through the
-boundary conditions:
+knowledge about the state of each condition is only conveyed through priors
+on the boundary conditions:
 * unbalanced metabolite concentrations,
 * enzyme concentrations, 
 * kinetic parameters, and,

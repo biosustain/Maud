@@ -22,7 +22,7 @@ boundaries).
 
 ## Decision
 
-Unbalanced metabolites and enzyme concentrations will be considered as prior distributions
+Unbalanced metabolites and enzyme concentrations can also be considered as prior distributions
 rather than likelihood evaluations.
 
 
