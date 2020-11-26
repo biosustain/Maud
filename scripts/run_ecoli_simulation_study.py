@@ -60,23 +60,22 @@ def add_measurements_to_maud_input(
     var_ids = {
         "yenz_sim": [code_to_enz[i] for i in input_data["enzyme_yenz"]],
         "yconc_sim": [code_to_mic[i] for i in input_data["mic_ix_yconc"]],
-        "yflux_sim": [code_to_rxn[i] for i in input_data["reaction_yflux"]]
+        "yflux_sim": [code_to_rxn[i] for i in input_data["reaction_yflux"]],
     }
     exp_ids = {
         "yenz_sim": [code_to_exp[i] for i in input_data["experiment_yenz"]],
         "yconc_sim": [code_to_exp[i] for i in input_data["experiment_yconc"]],
-        "yflux_sim": [code_to_exp[i] for i in input_data["experiment_yflux"]]
+        "yflux_sim": [code_to_exp[i] for i in input_data["experiment_yflux"]],
     }
     for var, measurement_type in zip(
-        ["yenz_sim", "yconc_sim", "yflux_sim"],
-        ["enzyme", "metabolite", "reaction"]
+        ["yenz_sim", "yconc_sim", "yflux_sim"], ["enzyme", "metabolite", "reaction"]
     ):
         if var in sim.stan_variable_dims.keys():
             for i, y in enumerate(sim.stan_variable(var).values[0]):
                 exp_id, var_id = exp_ids[var][i], var_ids[var][i]
-                experiment = [
-                    e for e in out.experiments.experiments if e.id == exp_id
-                ][0]
+                experiment = [e for e in out.experiments.experiments if e.id == exp_id][
+                    0
+                ]
                 measurement = experiment.measurements[measurement_type][var_id]
                 measurement.value = y
     return out
