@@ -343,6 +343,14 @@ def get_input_data(
         )
         for measurement_type in ["metabolite", "reaction", "enzyme"]
     )
+    for prior_unb in mi.priors.unbalanced_metabolite_priors:
+        mic_id = mic_codes[prior_unb.mic_id]
+        exp_id = experiment_codes[prior_unb.experiment_id]
+        conc_init.loc[exp_id, mic_id] = prior_unb.location
+    for prior_enz in mi.priors.enzyme_concentration_priors:
+        enz_id = enzyme_codes[prior_enz.enzyme_id]
+        exp_id = experiment_codes[prior_enz.experiment_id]
+        enz_conc_init.loc[exp_id, enz_id] = prior_enz.location
     for _i, row in mic_measurements.iterrows():
         if row["target_id"] in balanced_mic_codes.keys():
             row_ix = experiment_codes[row["experiment_id"]]
@@ -352,14 +360,6 @@ def get_input_data(
         row_ix = experiment_codes[row["experiment_id"]]
         column_ix = enzyme_codes[row["target_id"]]
         enz_conc_init.loc[row_ix, column_ix] = row["value"]
-    for prior_unb in mi.priors.unbalanced_metabolite_priors:
-        mic_id = mic_codes[prior_unb.mic_id]
-        exp_id = experiment_codes[prior_unb.experiment_id]
-        conc_init.loc[exp_id, mic_id] = prior_unb.location
-    for prior_enz in mi.priors.enzyme_concentration_priors:
-        enz_id = enzyme_codes[prior_enz.enzyme_id]
-        exp_id = experiment_codes[prior_enz.experiment_id]
-        enz_conc_init.loc[exp_id, enz_id] = prior_enz.location
     knockout_matrix = get_knockout_matrix(mi=mi)
     km_lookup = get_km_lookup(prior_dfs["km_priors"], mic_codes, enzyme_codes)
     for prior_unb in mi.priors.unbalanced_metabolite_priors:
