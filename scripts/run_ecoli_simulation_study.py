@@ -57,27 +57,28 @@ def add_measurements_to_maud_input(
     code_to_enz = {v: k for k, v in mi.stan_codes.enzyme_codes.items()}
     code_to_mic = {v: k for k, v in mi.stan_codes.mic_codes.items()}
     code_to_rxn = {v: k for k, v in mi.stan_codes.reaction_codes.items()}
-    yenz_experiments = [code_to_exp[i] for i in input_data["experiment_yenz"]]
-    yenz_enzymes = [code_to_enz[i] for i in input_data["enzyme_yenz"]]
-    yconc_experiments = [code_to_exp[i] for i in input_data["experiment_yconc"]]
-    yconc_mics = [code_to_mic[i] for i in input_data["mic_ix_yconc"]]
-    yflux_experiments = [code_to_exp[i] for i in input_data["experiment_yflux"]]
-    yflux_reactions = [code_to_rxn[i] for i in input_data["reaction_yflux"]]
-    for i, y in enumerate(sim.stan_variable("yenz_sim").values[0]):
-        exp_id, enz_id = yenz_experiments[i], yenz_enzymes[i]
-        experiment = [e for e in out.experiments.experiments if e.id == exp_id][0]
-        measurement = experiment.measurements["enzyme"][enz_id]
-        measurement.value = y
-    for i, y in enumerate(sim.stan_variable("yconc_sim").values[0]):
-        exp_id, mic_id = yconc_experiments[i], yconc_mics[i]
-        experiment = [e for e in out.experiments.experiments if e.id == exp_id][0]
-        measurement = experiment.measurements["metabolite"][mic_id]
-        measurement.value = y
-    for i, y in enumerate(sim.stan_variable("yflux_sim").values[0]):
-        exp_id, rxn_id = yflux_experiments[i], yflux_reactions[i]
-        experiment = [e for e in out.experiments.experiments if e.id == exp_id][0]
-        measurement = experiment.measurements["reaction"][rxn_id]
-        measurement.value = y
+    var_ids = {
+        "yenz_sim": [code_to_enz[i] for i in input_data["enzyme_yenz"]],
+        "yconc_sim": [code_to_mic[i] for i in input_data["mic_ix_yconc"]],
+        "yflux_sim": [code_to_rxn[i] for i in input_data["reaction_yflux"]]
+    }
+    exp_ids = {
+        "yenz_sim": [code_to_exp[i] for i in input_data["experiment_yenz"]],
+        "yconc_sim": [code_to_exp[i] for i in input_data["experiment_yconc"]],
+        "yflux_sim": [code_to_exp[i] for i in input_data["experiment_yflux"]]
+    }
+    for var, measurement_type in zip(
+        ["yenz_sim", "yconc_sim", "yflux_sim"],
+        ["enzyme", "metabolite", "reaction"]
+    ):
+        if var in sim.stan_variable_dims.keys():
+            for i, y in enumerate(sim.stan_variable(var).values[0]):
+                exp_id, var_id = exp_ids[var][i], var_ids[var][i]
+                experiment = [
+                    e for e in out.experiments.experiments if e.id == exp_id
+                ][0]
+                measurement = experiment.measurements[measurement_type][var_id]
+                measurement.value = y
     return out
 
 

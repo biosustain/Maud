@@ -17,12 +17,12 @@ data {
   int<lower=0> N_drain;
   int<lower=1> N_experiment;
   int<lower=1> N_flux_measurement;
-  int<lower=1> N_enzyme_measurement;
   int<lower=1> N_conc_measurement;
   int<lower=0> N_competitive_inhibitor;
   int<lower=0> N_allosteric_inhibitor;
   int<lower=0> N_allosteric_activator;
   int<lower=0> N_allosteric_enzyme;
+  int<lower=0> N_enzyme_measurement;
   // measurements
   int<lower=1,upper=N_mic> unbalanced_mic_ix[N_unbalanced];
   int<lower=1,upper=N_mic> balanced_mic_ix[N_mic-N_unbalanced];
@@ -34,8 +34,8 @@ data {
   int<lower=1,upper=N_reaction> reaction_yflux[N_flux_measurement];
   real yflux[N_flux_measurement];
   vector<lower=0>[N_flux_measurement] sigma_flux;
-  int<lower=1,upper=N_experiment> experiment_yenz[N_enzyme_measurement];
-  int<lower=1,upper=N_enzyme> enzyme_yenz[N_enzyme_measurement];
+  int<lower=0,upper=N_experiment> experiment_yenz[N_enzyme_measurement];
+  int<lower=0,upper=N_enzyme> enzyme_yenz[N_enzyme_measurement];
   real yenz[N_enzyme_measurement];
   vector<lower=0>[N_enzyme_measurement] sigma_enz;
   // hardcoded priors
@@ -210,7 +210,6 @@ model {
 }
 generated quantities {
   vector[N_conc_measurement] yconc_sim;
-  vector[N_enzyme_measurement] yenz_sim;
   vector[N_flux_measurement] yflux_sim;
   vector[N_flux_measurement+N_conc_measurement] log_lik;
   for (f in 1:N_flux_measurement){
@@ -221,9 +220,6 @@ generated quantities {
   }
   for (c in 1:N_conc_measurement){
     yconc_sim[c] = lognormal_rng(log(conc[experiment_yconc[c], mic_ix_yconc[c]]), sigma_conc[c]);
-  }
-  for (ec in 1:N_enzyme_measurement){
-    yenz_sim[ec] = lognormal_rng(log(enzyme[experiment_yenz[ec], enzyme_yenz[ec]]), sigma_enz[ec]);
   }
   for (f in 1:N_flux_measurement){
     yflux_sim[f] = normal_rng(flux[experiment_yflux[f], reaction_yflux[f]], sigma_flux[f]);
