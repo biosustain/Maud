@@ -11,8 +11,8 @@ In Review
 Unbalanced metabolites and enzyme concentrations are boundary conditions for our ODE
 model. Experimental conditions are defined with respect to these values and drains, 
 which are already defined as priors. Therefore, our prior knowledge about the
-metabolic phenotype is defined as what is measure about the boundary conditions. This
-decision aims shift the measurements of the enzymes and unbalanced metabolites from
+metabolic phenotype is defined as what is measured about the boundary conditions. This
+decision aims to shift the measurements of the enzymes and unbalanced metabolites from
 the likelihood evaluations to the prior information.
 
 The benefit of treating priors in this way is that we define a prior on the phenotype

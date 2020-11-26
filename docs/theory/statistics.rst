@@ -70,6 +70,11 @@ i.e. :math:`\mathbf{m}` and :math:`\mathbf{v}`.
 Probabilistic Model
 ===================
 
+Maud aims to implement a Bayesian probabilistic model where the joint distribution 
+:math:`\pi(\theta, y)` of unknowns and observations is factored into a measurement 
+model or likelihood :math:`\pi(y \mid \theta)` and a prior model :math:`\pi(\theta)`. 
+This section explains how each of these components is constructed.
+
 Likelihood
 ----------
 Maud represents information from experiments that measure enzyme concentrations
@@ -135,9 +140,10 @@ specify independent log-normal priors for the following quantities:
 - unbalanced metabolite concentrations
 
 The distinction between balanced and unbalanced metabolites is also found in
-the statistical model. Where information about the unbalanced metabolites
-can be parsed in the form of a prior, whereas the balanced metabolites are always evaluated
-as a model likelihood. This distinction becomes aparent when considering what
+the statistical model. Information about the unbalanced metabolites
+can be parsed in the form of a prior, however, due to the difficulty of non-linear transformations, 
+balanced metabolites are always evaluated as part of the model likelihood.
+The distinction between unbalanced and balanced becomes aparent when considering what
 the unbalanced metabolites represent, which is a boundary condition. These
 define the outcome of systems of differential equations, in the case of Maud
 this happens to be balanced metabolite concentrations and fluxes. And, our
