@@ -79,8 +79,12 @@ def validate_maud_input(mi: data_model.MaudInput):
         if mi.kinetic_model.drains is not None:
             for drain_id in mi.kinetic_model.drains:
                 for drain in mi.priors.drain_priors:
-                    if (drain_id != drain.drain_id) & (exp.id != drain.experiment_id):
-                        raise ValueError(
-                            f"drain {drain_id} was not included in experiment {exp.id}."
-                            "Required for each experiment and drain."
-                        )
+                    if drain.experiment_id == exp.id:
+                        if (drain_id != drain.drain_id) & (
+                            exp.id != drain.experiment_id
+                        ):
+                            raise ValueError(
+                                f"drain {drain_id} was not included in "
+                                "experiment {exp.id}. "
+                                "Required for each experiment and drain."
+                            )

@@ -217,15 +217,16 @@ def get_experiment(raw: Dict) -> Experiment:
     out = Experiment(id=raw["id"])
     for target_type in ["metabolite", "reaction", "enzyme"]:
         type_measurements = {}
-        for m in raw[target_type + "_measurements"]:
-            measurement = Measurement(
-                target_id=m["target_id"],
-                value=m["value"],
-                uncertainty=m["uncertainty"],
-                scale="ln",
-                target_type=target_type,
-            )
-            type_measurements.update({m["target_id"]: measurement})
+        if target_type + "_measurements" in raw.keys():
+            for m in raw[target_type + "_measurements"]:
+                measurement = Measurement(
+                    target_id=m["target_id"],
+                    value=m["value"],
+                    uncertainty=m["uncertainty"],
+                    scale="ln",
+                    target_type=target_type,
+                )
+                type_measurements.update({m["target_id"]: measurement})
         out.measurements.update({target_type: type_measurements})
     if "knockouts" in raw.keys():
         out.knockouts = raw["knockouts"]
@@ -249,6 +250,14 @@ def load_maud_input_from_toml(filepath: str, id: str = "mi") -> MaudInput:
     kinetic_model = load_kinetic_model_from_toml(parsed_toml, id)
     experiments = ExperimentSet([get_experiment(e) for e in parsed_toml["experiments"]])
     prior_dict = parsed_toml["priors"]
+    for k in [
+        "inhibition_constants",
+        "tense_dissociation_constants",
+        "relaxed_dissociation_constants",
+        "transfer_constants",
+    ]:
+        if k not in prior_dict.keys():
+            prior_dict[k] = {}
     priors = PriorSet(
         km_priors=extract_priors(
             prior_dict["kms"], lambda p: f"km_{p['enzyme_id']}_{p['mic_id']}"

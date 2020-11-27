@@ -105,10 +105,7 @@ transformed parameters {
     prior_loc_formation_energy + formation_energy_z .* prior_scale_formation_energy;
   vector<lower=0>[N_mic] conc[N_experiment];
   matrix[N_experiment, N_reaction] flux;
-  vector[N_enzyme] keq = get_keq(S_enz,
-                                 formation_energy,
-                                 mic_to_met,
-                                 water_stoichiometry);
+  vector[N_enzyme] keq = get_keq(S_enz, formation_energy, mic_to_met, water_stoichiometry);
   for (e in 1:N_experiment){
     vector[N_enzyme] experiment_enzyme = enzyme[e]' .* knockout[e]';
     vector[N_mic-N_unbalanced] conc_balanced[2] = ode_bdf_tol(dbalanced_dt,
@@ -160,7 +157,7 @@ transformed parameters {
                               transfer_constant,
                               subunits))';
     if (squared_distance(conc_balanced[1], conc_balanced[2]) > 1){
-      print("Balanced metabolite concentration at ", timepoint, " seconds is not steady.");
+      print("Balanced metabolite concentration at ", timepoint, " seconds is not steady in experiment ", e, ".");
       print("Found ", conc_balanced[1], " at ", timepoint, " seconds and ",
             conc_balanced[2], " at ", timepoint + 10, " seconds.");
     }

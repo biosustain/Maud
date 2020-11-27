@@ -7,7 +7,7 @@ metabolites = [
   {id="atp", name="ATP C10H12N5O13P3", compartment="c", balanced=false},
   {id="pi", name="Phosphate", compartment="c", balanced=false},
   {id="dhap", name="Dihydroxyacetone phosphate", compartment="c", balanced=true},
-  {id="g3p", name="Glyceraldehyde 3-phosphate", compartment="c", balanced=false},
+  {id="g3p", name="Glyceraldehyde 3-phosphate", compartment="c", balanced=true},
   {id="pep", name="phosphoenolpyruvate", compartment="c", balanced=false},
 ]
 
@@ -50,9 +50,6 @@ subunits = 2
 modifier_type = 'allosteric_inhibitor'
 mic_id = 'atp_c'
 
-
-
-
 [[reactions]]
 id = "FBP"
 name = "Fructose-bisphosphatase"
@@ -78,6 +75,11 @@ id = "f6p_drain"
 name = "f6p_from_PPP"
 stoichiometry = { f6p_c = 1 }
 
+[[drains]]
+id = "g3p_drain"
+name = "g3p_out"
+stoichiometry = { g3p_c = -1 }
+
 [priors]
 formation_energies = [
   {metabolite_id = "g6p", location = -1336.3, scale = 1.3},
@@ -88,7 +90,7 @@ formation_energies = [
   {metabolite_id = "fdp", location = -2220.9, scale = 2.1},
   {metabolite_id = "g3p", location = -1106.4, scale = 1.3},
   {metabolite_id = "dhap", location = -1111.9, scale = 1.1},
-  {metabolite_id = "pep", location = 0, scale = 1},
+  {metabolite_id = "pep", location = -1207.5, scale = 1},
 ]
 kcats = [
   {enzyme_id = "PGI", location = 1550.0, scale = 0.2}, # SabioRK ID: 32322
@@ -203,6 +205,11 @@ id = "f6p_drain"
 location = -1.539
 scale = 0.0846
 
+[[experiments.drains]]
+id = "g3p_drain"
+location = 2
+scale = 0.0846
+
 [[experiments.enzyme_measurements]]
 target_id = "FBAA"
 value = 0.0704592675242211
@@ -293,6 +300,11 @@ id = "f6p_drain"
 location = 0.563
 scale = 0.06012
 
+[[experiments.drains]]
+id = "g3p_drain"
+location = 1.2
+scale = 0.0846
+
 [[experiments.enzyme_measurements]]
 target_id = "FBAA"
 value = 0.05228843722116154
@@ -375,6 +387,11 @@ uncertainty = 0.05163781888888889
 id = "f6p_drain"
 location = -0.456
 scale = 0.036
+
+[[experiments.drains]]
+id = "g3p_drain"
+location = 1.2
+scale = 0.0846
 
 [[experiments.enzyme_measurements]]
 target_id = "FBAA"
@@ -464,6 +481,10 @@ id = "f6p_drain"
 location = 0.194
 scale = 0.01193
 
+[[experiments.drains]]
+id = "g3p_drain"
+location = 1.8
+scale = 0.0846
 
 [[experiments.enzyme_measurements]]
 target_id = "FBAA"
@@ -553,6 +574,11 @@ uncertainty = 0.08334212366666667
 id = "f6p_drain"
 location = 0.1376979321
 scale = 0.006
+
+[[experiments.drains]]
+id = "g3p_drain"
+location = 2.2
+scale = 0.0846
 
 [[experiments.enzyme_measurements]]
 target_id = "FBAA"
