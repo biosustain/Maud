@@ -111,16 +111,35 @@ kms = [
   # {enzyme_id = "PGK", mic_id = "13dpg_c", location = 2.02, scale = 1.5},
   # {enzyme_id = "PGK", mic_id = "adp_c", location = 0.6, scale = 1.5}
 ]
+enzyme_concentrations = [
+  {experiment_id="Evo04ptsHIcrrEvo01EP", enzyme_id='PGI', location=0.033875912, scale=0.06},
+  {experiment_id="Evo04ptsHIcrrEvo01EP", enzyme_id='FBP', location=0.00592291, scale=0.047},
+  {experiment_id="Evo04ptsHIcrrEvo01EP", enzyme_id='FBA', location=0.0702922488972023, scale=0.19},
+  {experiment_id="Evo04ptsHIcrrEvo01EP", enzyme_id='TPI', location=0.020866941, scale=0.13},
+  {experiment_id="Evo04ptsHIcrrEvo01EP", enzyme_id='PFK', location=0.018055101, scale=0.13}
+  {experiment_id="Evo04Evo01EP", enzyme_id='PGI', location=0.033875912, scale=0.06},
+  {experiment_id="Evo04Evo01EP", enzyme_id='FBP', location=0.00592291, scale=0.047},
+  {experiment_id="Evo04Evo01EP", enzyme_id='FBA', location=0.0702922488972023, scale=0.19},
+  {experiment_id="Evo04Evo01EP", enzyme_id='TPI', location=0.0198, scale=0.1},
+  {experiment_id="Evo04Evo01EP", enzyme_id='PFK', location=0.0185, scale=0.05}
+]
+unbalanced_metabolites = [
+  {experiment_id="Evo04ptsHIcrrEvo01EP", mic_id='g6p_c', location=2.0804108, scale=0.188651},
+  {experiment_id="Evo04ptsHIcrrEvo01EP", mic_id='adp_c', location=0.6113649, scale=0.038811},
+  {experiment_id="Evo04ptsHIcrrEvo01EP", mic_id='atp_c', location=5.4080032, scale=0.186962},
+
+  {experiment_id="Evo04Evo01EP", mic_id='g6p_c', location=2.0804108, scale=0.188651},
+  {experiment_id="Evo04Evo01EP", mic_id='adp_c', location=0.6113649, scale=0.038811},
+  {experiment_id="Evo04Evo01EP", mic_id='atp_c', location=5.4080032, scale=0.186962},
+]
+
 
 ################## Experimental data #################
 
 [[experiments]]
 id = 'Evo04ptsHIcrrEvo01EP'
 metabolite_measurements = [
-  {target_id='g6p_c', value=2.0804108, uncertainty=0.188651},
   {target_id='f6p_c', value=0.6410029, uncertainty=0.146145},
-  {target_id='adp_c', value=0.6113649, uncertainty=0.038811},
-  {target_id='atp_c', value=5.4080032, uncertainty=0.186962},
   # {target_id='pi_c', value=2.0, uncertainty=0.2},  # made up
   {target_id='fdp_c', value=4.5428601, uncertainty=0.237197},
   {target_id='dhap_c', value=1.895018, uncertainty=0.078636},
@@ -131,31 +150,14 @@ metabolite_measurements = [
 reaction_measurements = [
   {target_id='PGI', value=4.087673533555556, uncertainty=0.1},
 ]
-enzyme_measurements = [
-  {target_id='PGI', value=0.033875912, uncertainty=0.06},
-  {target_id='FBP', value=0.00592291, uncertainty=0.047},
-  {target_id='FBA', value=0.0702922488972023, uncertainty=0.19},
-  {target_id='TPI', value=0.020866941, uncertainty=0.13},
-  {target_id='PFK', value=0.018055101, uncertainty=0.13}
-]
 
 [[experiments]]
 id = 'Evo04Evo01EP'
 metabolite_measurements = [
-  {target_id='g6p_c', value=2.0804108, uncertainty=0.188651},
   {target_id='f6p_c', value=0.6410029, uncertainty=0.146145},
-  {target_id='adp_c', value=0.6113649, uncertainty=0.038811},
-  {target_id='atp_c', value=5.4080032, uncertainty=0.186962},
   {target_id='fdp_c', value=4.5428601, uncertainty=0.237197},
   {target_id='dhap_c', value=1.895018, uncertainty=0.078636},
 ]
 reaction_measurements = [
   {target_id='PGI', value=4.087673533555556, uncertainty=0.1},
-]
-enzyme_measurements = [
-  {target_id='PGI', value=0.033875912, uncertainty=0.06},
-  {target_id='FBP', value=0.00592291, uncertainty=0.047},
-  {target_id='FBA', value=0.0702922488972023, uncertainty=0.19},
-  {target_id='TPI', value=0.0198, uncertainty=0.1},
-  {target_id='PFK', value=0.0185, uncertainty=0.05}
 ]

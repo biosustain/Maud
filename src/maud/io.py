@@ -217,15 +217,16 @@ def get_experiment(raw: Dict) -> Experiment:
     out = Experiment(id=raw["id"])
     for target_type in ["metabolite", "reaction", "enzyme"]:
         type_measurements = {}
-        for m in raw[target_type + "_measurements"]:
-            measurement = Measurement(
-                target_id=m["target_id"],
-                value=m["value"],
-                uncertainty=m["uncertainty"],
-                scale="ln",
-                target_type=target_type,
-            )
-            type_measurements.update({m["target_id"]: measurement})
+        if target_type + "_measurements" in raw.keys():
+            for m in raw[target_type + "_measurements"]:
+                measurement = Measurement(
+                    target_id=m["target_id"],
+                    value=m["value"],
+                    uncertainty=m["uncertainty"],
+                    scale="ln",
+                    target_type=target_type,
+                )
+                type_measurements.update({m["target_id"]: measurement})
         out.measurements.update({target_type: type_measurements})
     if "knockouts" in raw.keys():
         out.knockouts = raw["knockouts"]

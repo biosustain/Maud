@@ -53,12 +53,12 @@ data {
   vector<lower=0>[N_allosteric_activator] prior_scale_diss_r;
   vector<lower=0>[N_allosteric_enzyme] prior_loc_tc;
   vector<lower=0>[N_allosteric_enzyme] prior_scale_tc;
-  real prior_loc_unbalanced[N_experiment, N_unbalanced];
-  real<lower=0> prior_scale_unbalanced[N_experiment, N_unbalanced];
-  real prior_loc_enzyme[N_experiment, N_enzyme];
-  real<lower=0> prior_scale_enzyme[N_experiment, N_enzyme];
-  real prior_loc_drain[N_experiment, N_drain];
-  real<lower=0> prior_scale_drain[N_experiment, N_drain];
+  matrix[N_experiment, N_unbalanced] prior_loc_unbalanced;
+  matrix<lower=0>[N_experiment, N_unbalanced] prior_scale_unbalanced;
+  matrix[N_experiment, N_enzyme] prior_loc_enzyme;
+  matrix<lower=0>[N_experiment, N_enzyme] prior_scale_enzyme;
+  matrix[N_experiment, N_drain] prior_loc_drain;
+  matrix<lower=0>[N_experiment, N_drain] prior_scale_drain;
   // network properties
   matrix[N_mic, N_enzyme] S_enz;
   matrix[N_mic, N_drain] S_drain;
@@ -90,22 +90,48 @@ transformed data {
 }
 parameters {
   vector[N_metabolite] formation_energy_z;
-  matrix[N_experiment, N_drain] drain;
-  vector<lower=0>[N_enzyme] kcat;
-  vector<lower=0>[N_km] km;
-  matrix<lower=0, upper=100>[N_experiment, N_enzyme] enzyme;
-  matrix<lower=0, upper=100>[N_experiment, N_unbalanced] conc_unbalanced;
-  vector<lower=0>[N_competitive_inhibitor] ki;
-  vector<lower=0>[N_allosteric_inhibitor] dissociation_constant_t;
-  vector<lower=0>[N_allosteric_activator] dissociation_constant_r;
-  vector<lower=0>[N_allosteric_enzyme] transfer_constant;
+  matrix[N_experiment, N_drain] drain_z;
+  vector[N_enzyme] log_kcat_z;
+  vector[N_km] log_km_z;
+  matrix[N_experiment, N_enzyme] log_enzyme_z;
+  matrix[N_experiment, N_unbalanced] log_conc_unbalanced_z;
+  vector[N_competitive_inhibitor] log_ki_z;
+  vector[N_allosteric_inhibitor] log_dissociation_constant_t_z;
+  vector[N_allosteric_activator] log_dissociation_constant_r_z;
+  vector[N_allosteric_enzyme] log_transfer_constant_z;
 }
 transformed parameters {
+  // rescale
   vector[N_metabolite] formation_energy =
     prior_loc_formation_energy + formation_energy_z .* prior_scale_formation_energy;
+  vector[N_km] km = exp(log(prior_loc_km) + log_km_z .* prior_scale_km);
+  vector[N_competitive_inhibitor] ki =
+    exp(log(prior_loc_ki) + log_ki_z .* prior_scale_ki);
+  vector[N_enzyme] kcat = exp(log(prior_loc_kcat) + log_kcat_z .* prior_scale_kcat);
+  vector[N_allosteric_inhibitor] dissociation_constant_t =
+    exp(log(prior_loc_diss_t) + log_dissociation_constant_t_z .* prior_scale_diss_t);
+  vector[N_allosteric_activator] dissociation_constant_r =
+    exp(log(prior_loc_diss_t) + log_dissociation_constant_r_z .* prior_scale_diss_r);
+  vector[N_allosteric_enzyme] transfer_constant =
+    exp(log(prior_loc_tc) + log_transfer_constant_z .* prior_scale_tc);
+  matrix[N_experiment, N_drain] drain;
+  matrix[N_experiment, N_enzyme] enzyme;
+  matrix[N_experiment, N_unbalanced] conc_unbalanced;
+  for (ex in 1:N_experiment){
+    drain[ex] = prior_loc_drain[ex] + drain_z[ex] .* prior_scale_drain[ex];
+    enzyme[ex] =
+      exp(log(prior_loc_enzyme[ex]) + log_enzyme_z[ex] .* prior_scale_enzyme[ex]);
+    conc_unbalanced[ex] =
+      exp(log(prior_loc_unbalanced[ex])
+          + log_conc_unbalanced_z[ex] .* prior_scale_unbalanced[ex]);
+  }
+  // transform
   vector<lower=0>[N_mic] conc[N_experiment];
   matrix[N_experiment, N_reaction] flux;
-  vector[N_enzyme] keq = get_keq(S_enz, formation_energy, mic_to_met, water_stoichiometry);
+  vector[N_enzyme] keq = get_keq(S_enz,
+                                 formation_energy,
+                                 mic_to_met,
+                                 water_stoichiometry);
   for (e in 1:N_experiment){
     vector[N_enzyme] experiment_enzyme = enzyme[e]' .* knockout[e]';
     vector[N_mic-N_unbalanced] conc_balanced[2] = ode_bdf_tol(dbalanced_dt,
@@ -157,7 +183,7 @@ transformed parameters {
                               transfer_constant,
                               subunits))';
     if (squared_distance(conc_balanced[1], conc_balanced[2]) > 1){
-      print("Balanced metabolite concentration at ", timepoint, " seconds is not steady in experiment ", e, ".");
+      print("Balanced metabolite concentration at ", timepoint, " seconds is not steady.");
       print("Found ", conc_balanced[1], " at ", timepoint, " seconds and ",
             conc_balanced[2], " at ", timepoint + 10, " seconds.");
     }
@@ -177,28 +203,16 @@ transformed parameters {
   }
 }
 model {
-  target += lognormal_lpdf(kcat | log(prior_loc_kcat), prior_scale_kcat);
-  target += lognormal_lpdf(km | log(prior_loc_km), prior_scale_km);
-  target += lognormal_lpdf(ki | log(prior_loc_ki), prior_scale_ki);
-  target += lognormal_lpdf(ki | log(prior_loc_ki), prior_scale_ki);
-  target += lognormal_lpdf(dissociation_constant_t |
-                           log(prior_loc_diss_t), prior_scale_diss_t);
-  target += lognormal_lpdf(dissociation_constant_r |
-                           log(prior_loc_diss_r), prior_scale_diss_r);
-  target += lognormal_lpdf(transfer_constant |
-                           log(prior_loc_tc), prior_scale_tc);
+  target += std_normal_lpdf(log_kcat_z |);
+  target += std_normal_lpdf(log_km_z |);
+  target += std_normal_lpdf(log_ki_z |);
+  target += std_normal_lpdf(log_dissociation_constant_t_z |);
+  target += std_normal_lpdf(log_dissociation_constant_r_z |);
+  target += std_normal_lpdf(log_transfer_constant_z |);
   target += std_normal_lpdf(formation_energy_z |);
-  for (e in 1:N_experiment){
-    target += lognormal_lpdf(conc_unbalanced[e] |
-                             log(prior_loc_unbalanced[e]),
-                             prior_scale_unbalanced[e]);
-    target += lognormal_lpdf(enzyme[e] |
-                             log(prior_loc_enzyme[e]),
-                             prior_scale_enzyme[e]);
-    target += normal_lpdf(drain[e] |
-                          prior_loc_drain[e],
-                          prior_scale_drain[e]);
-  }
+  target += std_normal_lpdf(to_vector(log_conc_unbalanced_z) |);
+  target += std_normal_lpdf(to_vector(log_enzyme_z) |);
+  target += std_normal_lpdf(to_vector(drain_z) |);
   if (LIKELIHOOD == 1){
     target += reduce_sum(partial_sum_conc, yconc, 1,
                          conc, experiment_yconc, mic_ix_yconc, sigma_conc);

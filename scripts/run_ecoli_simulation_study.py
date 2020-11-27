@@ -29,14 +29,12 @@ ODE_CONFIG = {
 }
 SIM_CONFIG = {
     "chains": 1,
-    "inits": TRUE_PARAM_PATH,
     "iter_sampling": 1,
     "fixed_param": True,
 }
 FIT_CONFIG = {
     "chains": 4,
     "parallel_chains": 2,
-    "inits": TRUE_PARAM_PATH,
     "iter_warmup": 200,
     "iter_sampling": 200,
     "output_dir": OUTPUT_DIR_FIT,
@@ -81,6 +79,73 @@ def add_measurements_to_maud_input(
     return out
 
 
+def enrich_true_values(tvin, input_data):
+    def logz_for_vec(truth, loc, scale):
+        t = np.array(truth)
+        l = np.array(loc)
+        s = np.array(scale)
+        return (np.log(t) - np.log(l)) / s
+    def z_for_vec(truth, loc, scale):
+        t = np.array(truth)
+        l = np.array(loc)
+        s = np.array(scale)
+        return (t - l) / s
+    def logz_for_mat(truth, loc, scale):
+        return np.array([
+            (np.log(np.array(loc[i])) - np.log(np.array(truth[i])))
+            / np.array(scale[i])
+            for i, _ in enumerate(truth)
+        ])
+    def z_for_mat(truth, loc, scale):
+        return np.array([
+            (np.array(loc[i]) - np.array(truth[i])) / np.array(scale[i])
+            for i, _ in enumerate(truth)
+        ])
+    return {**tvin, **{
+        "log_km_z": logz_for_vec(
+            tvin["km"], input_data["prior_loc_km"], input_data["prior_scale_km"]
+        ),
+        "log_kcat_z": logz_for_vec(
+            tvin["kcat"],
+            input_data["prior_loc_kcat"],
+            input_data["prior_scale_kcat"]
+        ),
+        "log_ki_z": logz_for_vec(
+            tvin["ki"], input_data["prior_loc_ki"], input_data["prior_scale_ki"]
+        ),
+        "log_dissociation_constant_t_z": logz_for_vec(
+            tvin["dissociation_constant_t"],
+            input_data["prior_loc_diss_t"],
+            input_data["prior_scale_diss_t"]
+        ),
+        "log_dissociation_constant_r_z": logz_for_vec(
+            tvin["dissociation_constant_r"],
+            input_data["prior_loc_diss_r"],
+            input_data["prior_scale_diss_r"]
+        ),
+        "log_transfer_constant_z": logz_for_vec(
+            tvin["transfer_constant"],
+            input_data["prior_loc_tc"],
+            input_data["prior_scale_tc"]
+        ),
+        "log_enzyme_z": logz_for_mat(
+            tvin["conc_unbalanced"],
+            input_data["prior_loc_unbalanced"],
+            input_data["prior_scale_unbalanced"],
+        ),
+        "log_conc_unbalanced_z": logz_for_mat(
+            tvin["conc_unbalanced"],
+            input_data["prior_loc_unbalanced"],
+            input_data["prior_scale_unbalanced"],
+        ),
+        "log_drain_z": z_for_mat(
+            tvin["conc_unbalanced"],
+            input_data["prior_loc_unbalanced"],
+            input_data["prior_scale_unbalanced"],
+        ),
+    }}
+
+
 def main():
     """Run the script."""
     print("Compiling Stan model...")
@@ -89,9 +154,12 @@ def main():
     print("Generating simulation input...")
     mi_sim = load_maud_input_from_toml(TOML_PATH)
     input_data_sim = get_input_data(mi_sim, **ODE_CONFIG)
+    with open(TRUE_PARAM_PATH, "r") as f:
+        true_values_in = json.load(f)
+    true_values = enrich_true_values(true_values_in, input_data_sim)
 
     print("Simulating...")
-    sim = model.sample(data=input_data_sim, **SIM_CONFIG)
+    sim = model.sample(data=input_data_sim, inits=true_values, **SIM_CONFIG)
 
     print("Generating fit input...")
     mi = add_measurements_to_maud_input(mi_sim, sim, input_data_sim)
@@ -99,7 +167,7 @@ def main():
     jsondump("input_data.json", input_data_fit)
 
     print("Fitting...")
-    model.sample(data=input_data_fit, **FIT_CONFIG)
+    model.sample(data=input_data_fit, inits=true_values, **FIT_CONFIG)
 
     print("Analysing results...")
     with open(TRUE_PARAM_PATH, "r") as f:
