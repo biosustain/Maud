@@ -29,14 +29,12 @@ ODE_CONFIG = {
 }
 SIM_CONFIG = {
     "chains": 1,
-    "inits": TRUE_PARAM_PATH,
     "iter_sampling": 1,
     "fixed_param": True,
 }
 FIT_CONFIG = {
     "chains": 4,
     "parallel_chains": 2,
-    "inits": TRUE_PARAM_PATH,
     "iter_warmup": 200,
     "iter_sampling": 200,
     "output_dir": OUTPUT_DIR_FIT,
@@ -89,9 +87,11 @@ def main():
     print("Generating simulation input...")
     mi_sim = load_maud_input_from_toml(TOML_PATH)
     input_data_sim = get_input_data(mi_sim, **ODE_CONFIG)
+    with open(TRUE_PARAM_PATH, "r") as f:
+        true_values = json.load(f)
 
     print("Simulating...")
-    sim = model.sample(data=input_data_sim, **SIM_CONFIG)
+    sim = model.sample(data=input_data_sim, inits=true_values, **SIM_CONFIG)
 
     print("Generating fit input...")
     mi = add_measurements_to_maud_input(mi_sim, sim, input_data_sim)
@@ -99,7 +99,7 @@ def main():
     jsondump("input_data.json", input_data_fit)
 
     print("Fitting...")
-    model.sample(data=input_data_fit, **FIT_CONFIG)
+    # model.sample(data=input_data_fit, inits=true_values, **FIT_CONFIG)
 
     print("Analysing results...")
     with open(TRUE_PARAM_PATH, "r") as f:
@@ -114,20 +114,43 @@ def main():
     unb_codes = {k: v for k, v in mic_codes.items() if v in unbalanced_mics}
     km_ids = infd.posterior.coords["km_id"].to_series().tolist()
     km_codes = dict(zip(km_ids, range(1, len(km_ids) + 1)))
-    for varname, codes, figsize, truth in (
-        ["enzyme", enz_codes, [15, 8], true_params["enzyme"]],
-        ["conc", unb_codes, [15, 8], true_params["conc_unbalanced"]],
+    true_enz = {
+        exp_name: dict(zip(enz_codes.keys(), true_params["enzyme"][i]))
+        for i, exp_name in enumerate(exp_codes.keys())
+    }
+    true_unb = {
+        exp_name: dict(zip(unb_codes.keys(), true_params["conc_unbalanced"][i]))
+        for i, exp_name in enumerate(exp_codes.keys())
+    }
+    yconc = input_data_fit["yconc"]
+    exp_yconc = [
+        list(exp_codes.keys())[i - 1] for i in input_data_fit["experiment_yconc"]
+    ]
+    mic_yconc = [list(mic_codes.keys())[i - 1] for i in input_data_fit["mic_ix_yconc"]]
+    meas_conc = {
+        exp_name: {
+            mic_yconc[i]: yconc[i] for i, e in enumerate(exp_yconc) if e == exp_name
+        }
+        for exp_name in exp_yconc
+    }
+    for varname, codes, figsize, truth, meas in (
+        ["enzyme", enz_codes, [16, 6], true_enz, None],
+        ["conc", unb_codes, [16, 6], true_unb, meas_conc],
     ):
-        f, _ = plot_experiment_var(infd, varname, codes, exp_codes, truth)
-        plt.tight_layout()
+        f, axes = plot_experiment_var(
+            infd, varname, codes, exp_codes, truth, meas, logscale=True
+        )
         f.set_size_inches(figsize)
         f.savefig(f"{varname}_posteriors.png", bbox_inches="tight")
-    for varname, codes, figsize in zip(
+    for varname, codes, figsize, logscale in zip(
         ["formation_energy", "km", "kcat"],
         [met_codes, km_codes, enz_codes],
         [[15, 8], [15, 10], [15, 8]],
+        [False, True, True],
     ):
-        f, _ = plot_1d_var(infd, varname, codes, true_params[varname])
+        f, _ = plot_1d_var(
+            infd, varname, codes, true_params[varname], logscale=logscale
+        )
         plt.tight_layout()
         f.set_size_inches(figsize)
         f.savefig(f"{varname}_posteriors.png", bbox_inches="tight")
