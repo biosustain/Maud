@@ -111,7 +111,7 @@ transformed parameters {
   vector[N_allosteric_inhibitor] dissociation_constant_t =
     exp(log(prior_loc_diss_t) + log_dissociation_constant_t_z .* prior_scale_diss_t);
   vector[N_allosteric_activator] dissociation_constant_r =
-    exp(log(prior_loc_diss_t) + log_dissociation_constant_r_z .* prior_scale_diss_r);
+    exp(log(prior_loc_diss_r) + log_dissociation_constant_r_z .* prior_scale_diss_r);
   vector[N_allosteric_enzyme] transfer_constant =
     exp(log(prior_loc_tc) + log_transfer_constant_z .* prior_scale_tc);
   matrix[N_experiment, N_drain] drain;
