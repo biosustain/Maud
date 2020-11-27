@@ -1,10 +1,10 @@
 """Functions for analysing Maud output."""
 
 from math import ceil
-from typing import List, Union
+from typing import Dict, List, Union
 
 import arviz as az
-import pandas as pd
+import numpy as np
 from matplotlib import pyplot as plt
 
 from maud.data_model import MaudInput
@@ -38,6 +38,7 @@ def plot_1d_var(
     varname: str,
     codes: dict,
     true_values: Union[List[float], None] = None,
+    logscale: bool = False,
 ) -> tuple:
     """Plot a 1 dimensional variable."""
     tv = dict(zip(codes.keys(), true_values))
@@ -48,7 +49,14 @@ def plot_1d_var(
     axes = axes.ravel()
     for i, col in enumerate(samples.columns):
         ax = axes[i]
-        _, _, hist_patches = ax.hist(samples[col], bins=30)
+        x = samples[col]
+        hist, bins = np.histogram(x, bins=30)
+        xscale = "linear"
+        if logscale:
+            bins = np.logspace(np.log10(bins[0]), np.log10(bins[-1]), len(bins))
+            xscale = "log"
+        _, _, hist_patches = ax.hist(x, bins=bins)
+        ax.set_xscale(xscale)
         vline = ax.axvline(tv[col], color="red")
         ax.set_title(col)
     f.legend(
@@ -66,25 +74,41 @@ def plot_experiment_var(
     varname: str,
     var_codes: dict,
     exp_codes: dict,
-    true_values: Union[List[float], None] = None,
+    true_values: Union[Dict[str, Dict[str, float]], None] = None,
+    meas_values: Union[Dict[str, Dict[str, float]], None] = None,
+    logscale: bool = False,
 ) -> tuple:
     """Plot a 2d variable where the first dimension is experiment."""
     samples = infd.posterior[varname].to_series().unstack([-1, -2])
     var_labs, exp_labs = samples.columns.levels
-    tvdf = pd.DataFrame(true_values, columns=var_codes.keys(), index=exp_codes.keys())
     f, axes = plt.subplots(len(exp_labs), len(var_labs))
     for exp, axrow in zip(exp_labs, axes):
         for var, ax in zip(var_labs, axrow):
-            _, _, hist_patches = ax.hist(samples[(var, exp)], bins=30)
-            if var in var_codes.keys() and true_values is not None:
-                vline = ax.axvline(tvdf.loc[exp, var], color="red")
+            x = samples[(var, exp)]
+            hist, bins = np.histogram(x, bins=30)
+            xscale = "linear"
+            if logscale:
+                bins = np.logspace(np.log10(bins[0]), np.log10(bins[-1]), len(bins))
+                xscale = "log"
+            _, _, hist_patches = ax.hist(x, bins=bins)
+            ax.set_xscale(xscale)
+            if true_values is not None:
+                if exp in true_values.keys():
+                    if var in true_values[exp].keys():
+                        vline_truth = ax.axvline(true_values[exp][var], color="red")
+            if meas_values is not None:
+                if exp in meas_values.keys():
+                    if var in meas_values[exp].keys():
+                        vline_meas = ax.axvline(meas_values[exp][var], color="orange")
             ax.set_title(var)
         axrow[0].set_ylabel(exp)
-    if true_values is None:
-        leg_handles = [hist_patches[0]]
-        leg_labs = ["Marginal posterior"]
-    else:
-        leg_handles = [hist_patches[0], vline]
-        leg_labs = ["Marginal posterior", "True value"]
-    f.legend(leg_handles, leg_labs, frameon=False, loc="lower center", ncol=2)
+    leg_handles = [hist_patches[0]]
+    leg_labs = ["Marginal posterior"]
+    if true_values is not None:
+        leg_handles += [vline_truth]
+        leg_labs += ["True value"]
+    if meas_values is not None:
+        leg_handles += [vline_meas]
+        leg_labs += ["Measured value"]
+    f.legend(leg_handles, leg_labs, frameon=False, loc="lower center", ncol=3)
     return f, axes
