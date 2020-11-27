@@ -4,6 +4,7 @@ import json
 import os
 from copy import deepcopy
 
+import numpy as np
 from cmdstanpy import CmdStanMCMC, CmdStanModel
 from cmdstanpy.utils import jsondump
 from matplotlib import pyplot as plt
@@ -80,70 +81,83 @@ def add_measurements_to_maud_input(
 
 
 def enrich_true_values(tvin, input_data):
+    """Add true values for auxiliary parameters."""
+
     def logz_for_vec(truth, loc, scale):
         t = np.array(truth)
-        l = np.array(loc)
+        lc = np.array(loc)
         s = np.array(scale)
-        return (np.log(t) - np.log(l)) / s
+        return (np.log(t) - np.log(lc)) / s
+
     def z_for_vec(truth, loc, scale):
         t = np.array(truth)
-        l = np.array(loc)
+        lc = np.array(loc)
         s = np.array(scale)
-        return (t - l) / s
+        return (t - lc) / s
+
     def logz_for_mat(truth, loc, scale):
-        return np.array([
-            (np.log(np.array(loc[i])) - np.log(np.array(truth[i])))
-            / np.array(scale[i])
-            for i, _ in enumerate(truth)
-        ])
+        return np.array(
+            [
+                (np.log(np.array(loc[i])) - np.log(np.array(truth[i])))
+                / np.array(scale[i])
+                for i, _ in enumerate(truth)
+            ]
+        )
+
     def z_for_mat(truth, loc, scale):
-        return np.array([
-            (np.array(loc[i]) - np.array(truth[i])) / np.array(scale[i])
-            for i, _ in enumerate(truth)
-        ])
-    return {**tvin, **{
-        "log_km_z": logz_for_vec(
-            tvin["km"], input_data["prior_loc_km"], input_data["prior_scale_km"]
-        ),
-        "log_kcat_z": logz_for_vec(
-            tvin["kcat"],
-            input_data["prior_loc_kcat"],
-            input_data["prior_scale_kcat"]
-        ),
-        "log_ki_z": logz_for_vec(
-            tvin["ki"], input_data["prior_loc_ki"], input_data["prior_scale_ki"]
-        ),
-        "log_dissociation_constant_t_z": logz_for_vec(
-            tvin["dissociation_constant_t"],
-            input_data["prior_loc_diss_t"],
-            input_data["prior_scale_diss_t"]
-        ),
-        "log_dissociation_constant_r_z": logz_for_vec(
-            tvin["dissociation_constant_r"],
-            input_data["prior_loc_diss_r"],
-            input_data["prior_scale_diss_r"]
-        ),
-        "log_transfer_constant_z": logz_for_vec(
-            tvin["transfer_constant"],
-            input_data["prior_loc_tc"],
-            input_data["prior_scale_tc"]
-        ),
-        "log_enzyme_z": logz_for_mat(
-            tvin["conc_unbalanced"],
-            input_data["prior_loc_unbalanced"],
-            input_data["prior_scale_unbalanced"],
-        ),
-        "log_conc_unbalanced_z": logz_for_mat(
-            tvin["conc_unbalanced"],
-            input_data["prior_loc_unbalanced"],
-            input_data["prior_scale_unbalanced"],
-        ),
-        "log_drain_z": z_for_mat(
-            tvin["conc_unbalanced"],
-            input_data["prior_loc_unbalanced"],
-            input_data["prior_scale_unbalanced"],
-        ),
-    }}
+        return np.array(
+            [
+                (np.array(loc[i]) - np.array(truth[i])) / np.array(scale[i])
+                for i, _ in enumerate(truth)
+            ]
+        )
+
+    return {
+        **tvin,
+        **{
+            "log_km_z": logz_for_vec(
+                tvin["km"], input_data["prior_loc_km"], input_data["prior_scale_km"]
+            ),
+            "log_kcat_z": logz_for_vec(
+                tvin["kcat"],
+                input_data["prior_loc_kcat"],
+                input_data["prior_scale_kcat"],
+            ),
+            "log_ki_z": logz_for_vec(
+                tvin["ki"], input_data["prior_loc_ki"], input_data["prior_scale_ki"]
+            ),
+            "log_dissociation_constant_t_z": logz_for_vec(
+                tvin["dissociation_constant_t"],
+                input_data["prior_loc_diss_t"],
+                input_data["prior_scale_diss_t"],
+            ),
+            "log_dissociation_constant_r_z": logz_for_vec(
+                tvin["dissociation_constant_r"],
+                input_data["prior_loc_diss_r"],
+                input_data["prior_scale_diss_r"],
+            ),
+            "log_transfer_constant_z": logz_for_vec(
+                tvin["transfer_constant"],
+                input_data["prior_loc_tc"],
+                input_data["prior_scale_tc"],
+            ),
+            "log_enzyme_z": logz_for_mat(
+                tvin["conc_unbalanced"],
+                input_data["prior_loc_unbalanced"],
+                input_data["prior_scale_unbalanced"],
+            ),
+            "log_conc_unbalanced_z": logz_for_mat(
+                tvin["conc_unbalanced"],
+                input_data["prior_loc_unbalanced"],
+                input_data["prior_scale_unbalanced"],
+            ),
+            "log_drain_z": z_for_mat(
+                tvin["conc_unbalanced"],
+                input_data["prior_loc_unbalanced"],
+                input_data["prior_scale_unbalanced"],
+            ),
+        },
+    }
 
 
 def main():
