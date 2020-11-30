@@ -19,6 +19,8 @@
 from collections import defaultdict
 from typing import Dict, List
 
+import numpy as np
+
 from maud.utils import (
     get_lognormal_parameters_from_quantiles,
     get_normal_parameters_from_quantiles,
@@ -317,12 +319,15 @@ class Prior:
         self.pct1 = pct1
         self.pct99 = pct99
         if pct1 is not None and pct99 is not None:
-            f = (
-                get_lognormal_parameters_from_quantiles
-                if is_non_negative
-                else get_normal_parameters_from_quantiles
-            )
-            self.location, self.scale = f(pct1, 0.01, pct99, 0.99)
+            if is_non_negative:
+                mu, self.scale = get_lognormal_parameters_from_quantiles(
+                    pct1, 0.01, pct99, 0.99
+                )
+                self.location = np.exp(mu)
+            else:
+                self.location, self.scale = get_normal_parameters_from_quantiles(
+                    pct1, 0.01, pct99, 0.99
+                )
         else:
             self.location = location
             self.scale = scale
