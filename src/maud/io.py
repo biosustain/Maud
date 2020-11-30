@@ -1,4 +1,4 @@
-# Copyrigh (C) 2019 Novo Nordisk Foundation Center for Biosustainability,
+# Copyright (C) 2019 Novo Nordisk Foundation Center for Biosustainability,
 # Technical University of Denmark.
 #
 # This program is free software: you can redistribute it and/or modify
