@@ -18,9 +18,10 @@
 
 from collections import defaultdict
 from typing import Dict, List
+
 from maud.utils import (
     get_lognormal_parameters_from_quantiles,
-    get_normal_parameters_from_quantiles
+    get_normal_parameters_from_quantiles,
 )
 
 
@@ -300,8 +301,8 @@ class Prior:
         metabolite_id: str = None,
         enzyme_id: str = None,
         drain_id: str = None,
-        pct1: float = None, 
-        pct99: float = None, 
+        pct1: float = None,
+        pct99: float = None,
         location: float = None,
         scale: float = None,
     ):
@@ -325,9 +326,6 @@ class Prior:
         else:
             self.location = location
             self.scale = scale
-
-            
-        
 
 
 class PriorSet:

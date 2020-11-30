@@ -234,9 +234,7 @@ def get_experiment(raw: Dict) -> Experiment:
 
 
 def extract_priors(
-    list_of_prior_dicts: List[Dict],
-    id_func,
-    is_non_negative: bool = True
+    list_of_prior_dicts: List[Dict], id_func, is_non_negative: bool = True
 ):
     """Get a list of Prior objects from a list of dictionaries."""
     return [Prior(id_func(p), is_non_negative, **p) for p in list_of_prior_dicts]
@@ -272,7 +270,7 @@ def load_maud_input_from_toml(filepath: str, id: str = "mi") -> MaudInput:
         formation_energy_priors=extract_priors(
             prior_dict["formation_energies"],
             lambda p: f"formation_energy_{p['metabolite_id']}",
-            is_non_negative=False
+            is_non_negative=False,
         ),
         inhibition_constant_priors=extract_priors(
             prior_dict["inhibition_constants"],
@@ -308,7 +306,7 @@ def load_maud_input_from_toml(filepath: str, id: str = "mi") -> MaudInput:
                 is_non_negative=False,
                 drain_id=dd["id"],
                 experiment_id=e["id"],
-                **edd
+                **edd,
             )
             for dd in parsed_toml["drains"]
             for e in parsed_toml["experiments"]
