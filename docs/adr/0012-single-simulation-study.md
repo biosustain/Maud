@@ -9,13 +9,14 @@ Draft
 ## Context
 
 We need a way to run simulation studies in order to verify that our models work
-and to answer design-of-experiments questions.
+and to answer questions about how informative particular measurements and
+priors are.
 
 
 ## Decision
 
 We will initially make a python script that implements a single simulation
-study, targetting the model at `ecoli_small_experiments.toml`. Based on how
+study, targeting the model at `ecoli_small_experiments.toml`. Based on how
 that goes, we can then think about how to make a more general system for
 running arbitrary simulation studies.
 
