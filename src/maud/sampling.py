@@ -301,14 +301,17 @@ def get_input_data(
             )
         else:
             n_modifier[param_type] = [0] * len(enzymes)
-    prior_loc_drain, prior_scale_drain = (
-        prior_dfs["drain_priors"]
-        .set_index(["experiment_id", "drain_id"])
-        [col]
-        .unstack()
-        .loc[experiment_codes.keys(), drain_codes.keys()]
-        for col in ["location", "scale"]
-    )
+    if mi.kinetic_model.drains is not None:
+        prior_loc_drain, prior_scale_drain = (
+            prior_dfs["drain_priors"]
+            .set_index(["experiment_id", "drain_id"])
+            [col]
+            .unstack()
+            .loc[experiment_codes.keys(), drain_codes.keys()]
+            for col in ["location", "scale"]
+        )
+    else:
+        prior_loc_drain = prior_scale_drain = pd.DataFrame([])
     prior_loc_unb = pd.DataFrame(
         DEFAULT_PRIOR_LOC_UNBALANCED,
         index=experiment_codes,
