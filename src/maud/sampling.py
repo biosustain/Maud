@@ -93,18 +93,6 @@ def get_knockout_matrix(mi: MaudInput):
     return enzyme_knockout_matrix
 
 
-def get_drain_priors(mi: MaudInput):
-    """Return an experiment x drain matrix of location and scale priors for drains."""
-    drain_codes = mi.stan_codes.drain_codes
-    experiment_codes = mi.stan_codes.experiment_codes
-    drain_loc_prior = pd.DataFrame(index=experiment_codes, columns=drain_codes)
-    drain_scale_prior = pd.DataFrame(index=experiment_codes, columns=drain_codes)
-    for p in mi.priors.drain_priors:
-        drain_loc_prior.loc[p.experiment_id, p.drain_id] = p.location
-        drain_scale_prior.loc[p.experiment_id, p.drain_id] = p.scale
-    return drain_loc_prior, drain_scale_prior
-
-
 def get_km_lookup(km_priors, mic_codes, enzyme_codes):
     """Get a mics x enzymes matrix of km indexes. 0 means null."""
     out = pd.DataFrame(0, index=mic_codes.values(), columns=enzyme_codes.values())
@@ -278,7 +266,6 @@ def get_input_data(
     )
 
     # priors
-    prior_loc_drain, prior_scale_drain = get_drain_priors(mi)
     prior_dfs = {
         prior_type: pd.DataFrame(map(lambda p: p.__dict__, priors))
         if len(priors) > 0
@@ -314,6 +301,14 @@ def get_input_data(
             )
         else:
             n_modifier[param_type] = [0] * len(enzymes)
+    prior_loc_drain, prior_scale_drain = (
+        prior_dfs["drain_priors"]
+        .set_index(["experiment_id", "drain_id"])
+        [col]
+        .unstack()
+        .loc[experiment_codes.keys(), drain_codes.keys()]
+        for col in ["location", "scale"]
+    )
     prior_loc_unb = pd.DataFrame(
         DEFAULT_PRIOR_LOC_UNBALANCED,
         index=experiment_codes,

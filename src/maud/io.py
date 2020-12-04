@@ -300,21 +300,11 @@ def load_maud_input_from_toml(filepath: str, id: str = "mi") -> MaudInput:
         )
         if "enzyme_concentrations" in prior_dict.keys()
         else [],
-        drain_priors=[
-            Prior(
-                id=f"{dd['id']}_{e['id']}",
-                is_non_negative=False,
-                drain_id=dd["id"],
-                experiment_id=e["id"],
-                **edd,
-            )
-            for dd in parsed_toml["drains"]
-            for e in parsed_toml["experiments"]
-            for edd in e["drains"]
-            if edd["id"] == dd["id"]
-        ]
-        if "drains" in parsed_toml.keys()
-        else [],
+        drain_priors=extract_priors(
+            prior_dict["drains"],
+            lambda p: f"{p['drain_id']}_{p['experiment_id']}"
+        ) if "drains" in prior_dict.keys()
+        else []
     )
     stan_codes = get_stan_codes(kinetic_model, experiments)
     mi = MaudInput(
