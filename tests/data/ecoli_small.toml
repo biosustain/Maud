@@ -137,8 +137,8 @@ unbalanced_metabolites = [
   {experiment_id="Evo04Evo01EP", mic_id='atp_c', location=5.4080032, scale=0.186962},
 ]
 drains = [
-  {drain_id="g3p_drain", experiment_id="Evo04ptsHIcrrEvo01EP", pct1=1.8, pct99=2.2},
-  {drain_id="g3p_drain", experiment_id="Evo04Evo01EP", pct1=1.8, pct99=2.2},
+  {drain_id="g3p_drain", experiment_id="Evo04ptsHIcrrEvo01EP", pct1=4.8, pct99=5.3},
+  {drain_id="g3p_drain", experiment_id="Evo04Evo01EP", pct1=4.8, pct99=5.3},
 ]
 
 
