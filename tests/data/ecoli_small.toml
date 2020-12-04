@@ -156,7 +156,7 @@ metabolite_measurements = [
   # {target_id='3pg_c', value=1.9065364, uncertainty=0.084368},
 ]
 reaction_measurements = [
-  {target_id='PGI', value=4.087673533555556, uncertainty=0.1},
+  {target_id='PGI', value=4.087673533555556, uncertainty=1},
 ]
 
 [[experiments]]
@@ -167,5 +167,5 @@ metabolite_measurements = [
   {target_id='dhap_c', value=1.895018, uncertainty=0.078636},
 ]
 reaction_measurements = [
-  {target_id='PGI', value=4.087673533555556, uncertainty=0.1},
+  {target_id='PGI', value=4.087673533555556, uncertainty=1},
 ]
