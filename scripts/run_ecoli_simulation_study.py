@@ -22,8 +22,8 @@ STAN_PROGRAM_PATH = os.path.join(HERE, "../src/maud/inference_model.stan")
 TOML_PATH = os.path.join(HERE, "../tests/data/ecoli_small.toml")
 TRUE_PARAM_PATH = os.path.join(HERE, "../tests/data/true_params_ecoli_small.json")
 ODE_CONFIG = {
-    "abs_tol": 1e-6,
-    "rel_tol": 1e-6,
+    "abs_tol": 1e-7,
+    "rel_tol": 1e-7,
     "max_num_steps": int(1e9),
     "likelihood": 1,
     "timepoint": 500,
