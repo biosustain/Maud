@@ -9,6 +9,11 @@ qa:
 	isort --recursive src/maud tests/ scripts/ setup.py
 	black src/maud tests/ scripts/ setup.py
 
+STAN_BINARY = src/maud/inference_model
+
+clean-stan:
+	$(RM) $(STAN_BINARY) $(STAN_BINARY).hpp $(STAN_BINARY).o
+
 ################################################################################
 # Self Documenting Commands                                                    #
 ################################################################################

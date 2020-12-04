@@ -121,8 +121,7 @@ enzyme_concentrations = [
   {experiment_id="Evo04ptsHIcrrEvo01EP", enzyme_id='FBP', location=0.00592291, scale=0.047},
   {experiment_id="Evo04ptsHIcrrEvo01EP", enzyme_id='FBA', location=0.0702922488972023, scale=0.19},
   {experiment_id="Evo04ptsHIcrrEvo01EP", enzyme_id='TPI', location=0.020866941, scale=0.13},
-  {experiment_id="Evo04ptsHIcrrEvo01EP", enzyme_id='PFK', location=0.018055101, scale=0.13}
-  {experiment_id="Evo04Evo01EP", enzyme_id='PGI', location=0.033875912, scale=0.06},
+  {experiment_id="Evo04ptsHIcrrEvo01EP", enzyme_id='PFK', location=0.018055101, scale=0.13},
   {experiment_id="Evo04Evo01EP", enzyme_id='FBP', location=0.00592291, scale=0.047},
   {experiment_id="Evo04Evo01EP", enzyme_id='FBA', location=0.0702922488972023, scale=0.19},
   {experiment_id="Evo04Evo01EP", enzyme_id='TPI', location=0.0198, scale=0.1},
