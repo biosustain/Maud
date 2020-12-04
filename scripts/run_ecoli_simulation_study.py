@@ -115,6 +115,9 @@ def enrich_true_values(tvin, input_data):
     return {
         **tvin,
         **{
+            "drain_z": z_for_vec(
+                tvin["drain"], input_data["prior_loc_drain"], input_data["prior_scale_drain"]
+            ),
             "log_km_z": logz_for_vec(
                 tvin["km"], input_data["prior_loc_km"], input_data["prior_scale_km"]
             ),
@@ -169,6 +172,7 @@ def main():
     mi_sim = load_maud_input_from_toml(TOML_PATH)
     input_data_sim = get_input_data(mi_sim, **ODE_CONFIG)
     with open(TRUE_PARAM_PATH, "r") as f:
+        print(TRUE_PARAM_PATH)
         true_values_in = json.load(f)
     true_values = enrich_true_values(true_values_in, input_data_sim)
 
