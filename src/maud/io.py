@@ -78,7 +78,10 @@ def load_kinetic_model_from_toml(
     else:
         drains = None
     if "phosphorylation" in parsed_toml.keys():
-        phosphorylation = {d["id"]: load_phosphorylation_from_toml(d) for d in parsed_toml["phosphorylation"]}
+        phosphorylation = {
+            d["id"]: load_phosphorylation_from_toml(d)
+            for d in parsed_toml["phosphorylation"]
+        }
     else:
         phosphorylation = None
     return KineticModel(
@@ -144,6 +147,7 @@ def load_drain_from_toml(toml_drain: dict) -> Drain:
         stoichiometry=toml_drain["stoichiometry"],
     )
 
+
 def load_phosphorylation_from_toml(toml_phosphorylation: dict) -> Phosphorylation:
     """Returns a dictionary representing a drain into a drain object.
 
@@ -156,12 +160,15 @@ def load_phosphorylation_from_toml(toml_phosphorylation: dict) -> Phosphorylatio
     return Drain(
         id=toml_phosphorylation["id"],
         name=toml_phosphorylation["name"],
-        activting=toml_phosphorylation["activating"] 
-        if toml_phosphorylation["activating"] else None,
+        activting=toml_phosphorylation["activating"]
+        if toml_phosphorylation["activating"]
+        else None,
         inhibiting=toml_phosphorylation["inhibiting"]
-        if toml_phosphorylation["inhibiting"] else None,
+        if toml_phosphorylation["inhibiting"]
+        else None,
         enzyme__id=toml_phosphorylation["enzyme_id"],
     )
+
 
 def load_reaction_from_toml(toml_reaction: dict) -> Reaction:
     """Turn a dictionary representing a reaction into a Reaction object.
@@ -272,8 +279,7 @@ def load_maud_input_from_toml(filepath: str, id: str = "mi") -> MaudInput:
             prior_dict["kms"], lambda p: f"km_{p['enzyme_id']}_{p['mic_id']}"
         ),
         phos_kcat_priors=extract_priors(
-            prior_dict["phos_kcats"], 
-            lambda p: f"phos_kcat_{p['phos_enz_id']}"
+            prior_dict["phos_kcats"], lambda p: f"phos_kcat_{p['phos_enz_id']}"
         )
         if "phos_enz_concentration" in prior_dict.keys()
         else [],
@@ -314,7 +320,7 @@ def load_maud_input_from_toml(filepath: str, id: str = "mi") -> MaudInput:
         else [],
         phos_enz_concentration_priors=extract_priors(
             prior_dict["phos_enz_concentration"],
-            lambda p: f"phos_enz_concentration_{p['phos_enz_id']}_{p['enzyme_id']}"
+            lambda p: f"phos_enz_concentration_{p['phos_enz_id']}_{p['enzyme_id']}",
         )
         if "phos_enz_concentration" in prior_dict.keys()
         else [],

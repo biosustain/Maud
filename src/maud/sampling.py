@@ -92,6 +92,7 @@ def get_knockout_matrix(mi: MaudInput):
                 ] = 1
     return enzyme_knockout_matrix
 
+
 def get_phos_knockout_matrix(mi: MaudInput):
     """Get binary experiment, phos_enzyme matrix, 1 if phos_enyzme knocked out, 0 if not.
 
@@ -100,7 +101,9 @@ def get_phos_knockout_matrix(mi: MaudInput):
     experiment_codes = mi.stan_codes.experiment_codes
     phos_enz_codes = mi.stan_codes.phos_enz_codes
     phos_enzyme_knockout_matrix = pd.DataFrame(
-        0, index=np.arange(len(experiment_codes)), columns=np.arange(len(phos_enz_codes))
+        0,
+        index=np.arange(len(experiment_codes)),
+        columns=np.arange(len(phos_enz_codes)),
     )
     for exp in mi.experiments.experiments:
         if exp.phos_knockouts:
@@ -110,6 +113,7 @@ def get_phos_knockout_matrix(mi: MaudInput):
                 ] = 1
     return phos_enzyme_knockout_matrix
 
+
 def get_phos_act_inh_matrix(mi: MaudInput):
     """Get binary experiment, enzyme matrix, 1 if enyzme knocked out, 0 if not.
 
@@ -117,10 +121,10 @@ def get_phos_act_inh_matrix(mi: MaudInput):
     """
     enzyme_codes = mi.stan_codes.enzyme_codes
     phos_enz_codes = mi.stan_codes.phos_enz_codes
-    S_phos_act= pd.DataFrame(
+    S_phos_act = pd.DataFrame(
         0, index=np.arange(len(enzyme_codes)), columns=np.arange(len(phos_enz_codes))
     )
-    S_phos_inh= pd.DataFrame(
+    S_phos_inh = pd.DataFrame(
         0, index=np.arange(len(enzyme_codes)), columns=np.arange(len(phos_enz_codes))
     )
     for phos in mi.kinetic_model.phosphorylation:
@@ -452,7 +456,9 @@ def get_input_data(
         "N_km": len(prior_dfs["km_priors"]),
         "N_reaction": len(reactions),
         "N_enzyme": len(enzymes),
-        "N_phophorylation_enzymes": len(phos_enz_codes) if phos_enz_codes is not None else 0,
+        "N_phophorylation_enzymes": len(phos_enz_codes)
+        if phos_enz_codes is not None
+        else 0,
         "N_experiment": len(mi.experiments.experiments),
         "N_flux_measurement": len(reaction_measurements),
         "N_enzyme_measurement": len(enzyme_measurements),

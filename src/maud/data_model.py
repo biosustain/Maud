@@ -189,6 +189,7 @@ class Drain:
         self.name = name if name is not None else id
         self.stoichiometry = stoichiometry
 
+
 class Phosphorylation:
     """Constructor for the reaction object.
 
@@ -212,7 +213,6 @@ class Phosphorylation:
         self.activating = activating
         self.inhibiting = inhibiting
         self.enzyme_id = target_enzyme
-
 
 
 class KineticModel:
@@ -357,7 +357,6 @@ class PriorSet:
         drain_priors: List[Prior],
         enzyme_concentration_priors: List[Prior],
         phos_enz_concentration_priors: List[Prior],
-
     ):
         self.kcat_priors = kcat_priors
         self.phos_kcat_priors = phos_kcat_priors
@@ -386,7 +385,7 @@ class StanCodeSet:
         experiment_codes: Dict[str, int],
         enzyme_codes: Dict[str, int],
         drain_codes: Dict[str, int],
-        phos_enz_codes: Dict[str, int]
+        phos_enz_codes: Dict[str, int],
     ):
         self.metabolite_codes = metabolite_codes
         self.mic_codes = mic_codes
