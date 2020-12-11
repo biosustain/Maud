@@ -1,3 +1,12 @@
+/* Equations taken from the following paper:
+
+- Liebermeister, W., Uhlendorf, J., & Klipp, E. (2010). Modular rate laws for
+  enzymatic reactions: thermodynamics, elasticities and
+  implementation. Bioinformatics, 26(12),
+  1528–1534. http://dx.doi.org/10.1093/bioinformatics/btq141
+
+ */
+
 real get_Tr(vector metabolite,
             vector km,
             vector stoichiometry,
