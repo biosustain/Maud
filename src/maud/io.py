@@ -37,32 +37,13 @@ from maud.data_model import (
     Metabolite,
     MetaboliteInCompartment,
     Modifier,
+    Phosphorylation,
     Prior,
     PriorSet,
     Reaction,
     StanCodeSet,
 )
 from maud.utils import codify
-
-
-MECHANISM_TO_PARAM_IDS = {
-    "uniuni": ["Kcat1", "Kcat2", "Ka"],
-    "ordered_unibi": ["Kcat1", "Kcat2", "Ka", "Kp", "Kq", "Kia"],
-    "ordered_bibi": ["Kcat1", "Kcat2", "Ka", "Kb", "Kp", "Kq", "Kib", "Kiq"],
-    "ping_pong": ["Kcat1", "Kcat2", "Ka", "Kb", "Kp", "Kq", "Kia", "Kib", "Kiq"],
-    "ordered_terbi": [
-        "Kcat1",
-        "Kcat2",
-        "Ka",
-        "Kb",
-        "Kc",
-        "Kq",
-        "Kia",
-        "Kib",
-        "Kic",
-        "Kiq",
-    ],
-}
 
 
 def load_kinetic_model_from_toml(
