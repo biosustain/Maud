@@ -21,6 +21,15 @@ int[] get_enz_mics(matrix S, int i_enz){
   return out;
 }
 
+real get_active_enzyme_fraction(vector activating_enzyme_conc,
+                                vector deactivating_enzyme_conc,
+                                vector phosphorylating_enzyme_kcat){
+  real alpha = sum(phosphorylating_enzyme_kcat .* phosphorylating_enzyme_kcat);
+  real beta = sum(phosphorylating_enzyme_kcat .* phosphorylating_enzyme_kcat);
+
+  return (alpha / (alpha + beta));
+}
+
 vector get_flux_enz(vector conc_mic,
                 vector conc_enz,
                 vector km,
@@ -38,12 +47,17 @@ vector get_flux_enz(vector conc_mic,
                 vector dissociation_constant_t,
                 vector dissociation_constant_r,
                 vector transfer_constant,
-                int[] subunits){
+                int[] subunits,
+                vector phos_enzyme_conc,
+                vector phos_enzyme_kcat,
+                matrix S_phos_act,
+                matrix S_phos_inh){
   vector[cols(S)] flux_enz;
   int pos_ci = 1;
   int pos_ai = 1;
   int pos_aa = 1;
   int pos_tc = 1;
+  vector[cols(S)] phos_frac;
   for (i_enz in 1:cols(S)){
     int N_enz_mics = get_N_enz_mics(S, i_enz);
     int enz_mics[N_enz_mics] = get_enz_mics(S, i_enz);
@@ -101,6 +115,14 @@ vector get_flux_enz(vector conc_mic,
     pos_aa += n_aa[i_enz];
     pos_tc += is_allosteric;
   }
+  if (rows(phos_enzyme_kcat) > 0){
+    for (i in 1:cols(S_phos_act)){
+      phos_frac[i] = get_active_enzyme_fraction(phos_enzyme_conc .* S_phos_act[:,i],
+                                                phos_enzyme_conc .* S_phos_inh[:,i],
+                                                phos_enzyme_kcat);
+    }
+    flux_enz = flux_enz .* phos_frac;
+  }
   return flux_enz;
 }
 
@@ -141,6 +163,10 @@ vector dbalanced_dt(real time,
                     vector dissociation_constant_r,
                     vector transfer_constant,
                     int[] subunits,
+                    vector phos_enzyme_conc,
+                    vector phos_enzyme_kcat,
+                    matrix S_phos_act,
+                    matrix S_phos_inh,
                     vector drain){
   vector[rows(current_balanced)+rows(unbalanced)] current_concentration;
   vector[cols(S_enz)] flux_enz;
@@ -166,7 +192,11 @@ vector dbalanced_dt(real time,
                           dissociation_constant_t,
                           dissociation_constant_r,
                           transfer_constant,
-                          subunits);
+                          subunits,
+                          phos_enzyme_conc,
+                          phos_enzyme_kcat,
+                          S_phos_act,
+                          S_phos_inh);
   flux_drain = get_flux_drain(S_drain,
                               current_concentration,
                               drain);
