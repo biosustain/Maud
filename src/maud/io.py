@@ -77,6 +77,10 @@ def load_kinetic_model_from_toml(
         drains = {d["id"]: load_drain_from_toml(d) for d in parsed_toml["drains"]}
     else:
         drains = None
+    if "phosphorylation" in parsed_toml.keys():
+        phosphorylation = {d["id"]: load_phosphorylation_from_toml(d) for d in parsed_toml["phosphorylation"]}
+    else:
+        phosphorylation = None
     return KineticModel(
         model_id=model_id,
         metabolites=metabolites,
@@ -84,6 +88,7 @@ def load_kinetic_model_from_toml(
         mics=mics,
         reactions=reactions,
         drains=drains,
+        phosphorylation=phosphorylation,
     )
 
 
@@ -108,6 +113,10 @@ def get_stan_codes(km: KineticModel, experiments: ExperimentSet) -> StanCodeSet:
         drain_codes = codify(km.drains.keys())
     else:
         drain_codes = {}
+    if km.phosphorylation is not None:
+        phos_enz_codes = codify(km.phosphorylation.keys())
+    else:
+        phos_enz_codes = {}
     return StanCodeSet(
         metabolite_codes=codify(km.metabolites.keys()),
         mic_codes=mic_codes,
@@ -116,12 +125,13 @@ def get_stan_codes(km: KineticModel, experiments: ExperimentSet) -> StanCodeSet:
         reaction_codes=codify(km.reactions.keys()),
         experiment_codes=codify([e.id for e in experiments.experiments]),
         enzyme_codes=codify(enzyme_ids),
+        phos_enz_codes=phos_enz_codes,
         drain_codes=drain_codes,
     )
 
 
 def load_drain_from_toml(toml_drain: dict) -> Drain:
-    """Turn a dictionary representing a drain into a Drain object.
+    """Return a dictionary representing a drain into a Drain object.
 
     :param toml_drain: Dictionary representing a drain, typically one of
     the values of the 'drains' field in the output of toml.load.
@@ -134,6 +144,24 @@ def load_drain_from_toml(toml_drain: dict) -> Drain:
         stoichiometry=toml_drain["stoichiometry"],
     )
 
+def load_phosphorylation_from_toml(toml_phosphorylation: dict) -> Phosphorylation:
+    """Returns a dictionary representing a drain into a drain object.
+
+    :param toml_phosphorylation: Dictionary representing a phosphorylation
+    enzyme, typically one of the values of the 'phosphorylation' field in
+    the output of toml.load.
+
+    """
+
+    return Drain(
+        id=toml_phosphorylation["id"],
+        name=toml_phosphorylation["name"],
+        activting=toml_phosphorylation["activating"] 
+        if toml_phosphorylation["activating"] else None,
+        inhibiting=toml_phosphorylation["inhibiting"]
+        if toml_phosphorylation["inhibiting"] else None,
+        enzyme__id=toml_phosphorylation["enzyme_id"],
+    )
 
 def load_reaction_from_toml(toml_reaction: dict) -> Reaction:
     """Turn a dictionary representing a reaction into a Reaction object.
@@ -243,6 +271,12 @@ def load_maud_input_from_toml(filepath: str, id: str = "mi") -> MaudInput:
         km_priors=extract_priors(
             prior_dict["kms"], lambda p: f"km_{p['enzyme_id']}_{p['mic_id']}"
         ),
+        phos_kcat_priors=extract_priors(
+            prior_dict["phos_kcats"], 
+            lambda p: f"phos_kcat_{p['phos_enz_id']}"
+        )
+        if "phos_enz_concentration" in prior_dict.keys()
+        else [],
         kcat_priors=extract_priors(
             prior_dict["kcats"], lambda p: f"kcat_{p['enzyme_id']}"
         ),
@@ -274,9 +308,15 @@ def load_maud_input_from_toml(filepath: str, id: str = "mi") -> MaudInput:
         else [],
         enzyme_concentration_priors=extract_priors(
             prior_dict["enzyme_concentrations"],
-            lambda p: f"enzyme_concentrations{p['enzyme_id']}_{p['experiment_id']}",
+            lambda p: f"enzyme_concentrations_{p['enzyme_id']}_{p['experiment_id']}",
         )
         if "enzyme_concentrations" in prior_dict.keys()
+        else [],
+        phos_enz_concentration_priors=extract_priors(
+            prior_dict["phos_enz_concentration"],
+            lambda p: f"phos_enz_concentration_{p['phos_enz_id']}_{p['enzyme_id']}"
+        )
+        if "phos_enz_concentration" in prior_dict.keys()
         else [],
         drain_priors=[
             Prior(
