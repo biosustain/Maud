@@ -73,7 +73,7 @@ mechanism = 'modular_rate_law'
 id = "p2"
 name = "phosphorylation on reaction number 2"
 enzyme_id = "r2"
-activating = 1
+activating = true
 
 ###### Experimental data ######
 [[experiments]]
