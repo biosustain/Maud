@@ -136,7 +136,6 @@ def get_phos_act_inh_matrix(mi: MaudInput):
             S_phos_inh.loc[
                 phos_enz_codes[phos_id] - 1, enzyme_codes[phos.enzyme_id] - 1
             ] = 1
-    print(S_phos_act)
     return S_phos_act, S_phos_inh
 
 
