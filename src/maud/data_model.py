@@ -19,6 +19,13 @@
 from collections import defaultdict
 from typing import Dict, List
 
+import numpy as np
+
+from maud.utils import (
+    get_lognormal_parameters_from_quantiles,
+    get_normal_parameters_from_quantiles,
+)
+
 
 class Compartment:
     """Constructor for compartment objects.
@@ -290,22 +297,40 @@ class Prior:
     def __init__(
         self,
         id: str,
-        location: float,
-        scale: float,
+        is_non_negative: bool,
         experiment_id: str = None,
         mic_id: str = None,
         metabolite_id: str = None,
         enzyme_id: str = None,
         drain_id: str = None,
+        pct1: float = None,
+        pct99: float = None,
+        location: float = None,
+        scale: float = None,
     ):
         self.id = id
-        self.location = location
-        self.scale = scale
+        self.is_non_negative = is_non_negative
         self.experiment_id = experiment_id
         self.mic_id = mic_id
         self.metabolite_id = metabolite_id
         self.enzyme_id = enzyme_id
         self.drain_id = drain_id
+
+        self.pct1 = pct1
+        self.pct99 = pct99
+        if pct1 is not None and pct99 is not None:
+            if is_non_negative:
+                mu, self.scale = get_lognormal_parameters_from_quantiles(
+                    pct1, 0.01, pct99, 0.99
+                )
+                self.location = np.exp(mu)
+            else:
+                self.location, self.scale = get_normal_parameters_from_quantiles(
+                    pct1, 0.01, pct99, 0.99
+                )
+        else:
+            self.location = location
+            self.scale = scale
 
 
 class PriorSet:

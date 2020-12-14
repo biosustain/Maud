@@ -22,8 +22,8 @@ STAN_PROGRAM_PATH = os.path.join(HERE, "../src/maud/inference_model.stan")
 TOML_PATH = os.path.join(HERE, "../tests/data/ecoli_small.toml")
 TRUE_PARAM_PATH = os.path.join(HERE, "../tests/data/true_params_ecoli_small.json")
 ODE_CONFIG = {
-    "abs_tol": 1e-6,
-    "rel_tol": 1e-6,
+    "abs_tol": 1e-7,
+    "rel_tol": 1e-7,
     "max_num_steps": int(1e9),
     "likelihood": 1,
     "timepoint": 500,
@@ -115,6 +115,11 @@ def enrich_true_values(tvin, input_data):
     return {
         **tvin,
         **{
+            "drain_z": z_for_vec(
+                tvin["drain"],
+                input_data["prior_loc_drain"],
+                input_data["prior_scale_drain"],
+            ),
             "log_km_z": logz_for_vec(
                 tvin["km"], input_data["prior_loc_km"], input_data["prior_scale_km"]
             ),
@@ -169,6 +174,7 @@ def main():
     mi_sim = load_maud_input_from_toml(TOML_PATH)
     input_data_sim = get_input_data(mi_sim, **ODE_CONFIG)
     with open(TRUE_PARAM_PATH, "r") as f:
+        print(TRUE_PARAM_PATH)
         true_values_in = json.load(f)
     true_values = enrich_true_values(true_values_in, input_data_sim)
 

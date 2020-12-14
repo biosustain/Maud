@@ -21,34 +21,10 @@ from typing import Dict, Iterable
 import numpy as np
 from scipy.stats import norm
 
-from maud.data_model import KineticModel
-
 
 def codify(lx: Iterable[str]) -> Dict[str, int]:
     """Turn an iterable of strings into a dictionary mapping them to integer indexes."""
     return dict(zip(lx, range(1, len(lx) + 1)))
-
-
-def get_metabolite_codes(kinetic_model: KineticModel) -> Dict[str, int]:
-    """Get a dictionary mapping metabolite ids to integer indexes.
-
-    :param kinetic_model: A KineticModel object
-    """
-
-    return codify(kinetic_model.metabolites.keys())
-
-
-def get_enzyme_codes(kinetic_model: KineticModel) -> Dict[str, int]:
-    """Get a dictionary mapping enzyme ids to integer indexes.
-
-    :param kinetic_model: A KineticModel object
-    """
-
-    enzyme_ids = []
-    for _, rxn in kinetic_model.reactions.items():
-        for enz_id, _ in rxn.enzymes.items():
-            enzyme_ids.append(enz_id)
-    return codify(enzyme_ids)
 
 
 def get_lognormal_parameters_from_quantiles(x1, p1, x2, p2):
