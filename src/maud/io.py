@@ -149,7 +149,7 @@ def load_drain_from_toml(toml_drain: dict) -> Drain:
 
 
 def load_phosphorylation_from_toml(toml_phosphorylation: dict) -> Phosphorylation:
-    """Returns a dictionary representing a drain into a drain object.
+    """Return a dictionary representing a drain into a drain object.
 
     :param toml_phosphorylation: Dictionary representing a phosphorylation
     enzyme, typically one of the values of the 'phosphorylation' field in
@@ -157,16 +157,16 @@ def load_phosphorylation_from_toml(toml_phosphorylation: dict) -> Phosphorylatio
 
     """
 
-    return Drain(
+    return Phosphorylation(
         id=toml_phosphorylation["id"],
         name=toml_phosphorylation["name"],
-        activting=toml_phosphorylation["activating"]
-        if toml_phosphorylation["activating"]
+        activating=toml_phosphorylation["activating"] 
+        if "activating" in toml_phosphorylation.keys() 
         else None,
-        inhibiting=toml_phosphorylation["inhibiting"]
-        if toml_phosphorylation["inhibiting"]
+        inhibiting=toml_phosphorylation["inhibiting"] 
+        if "inhibiting" in toml_phosphorylation.keys() 
         else None,
-        enzyme__id=toml_phosphorylation["enzyme_id"],
+        enzyme_id=toml_phosphorylation["enzyme_id"],
     )
 
 
@@ -320,7 +320,7 @@ def load_maud_input_from_toml(filepath: str, id: str = "mi") -> MaudInput:
         else [],
         phos_enz_concentration_priors=extract_priors(
             prior_dict["phos_enz_concentration"],
-            lambda p: f"phos_enz_concentration_{p['phos_enz_id']}_{p['enzyme_id']}",
+            lambda p: f"phos_enz_concentration_{p['phos_enz_id']}_{p['experiment_id']}",
         )
         if "phos_enz_concentration" in prior_dict.keys()
         else [],

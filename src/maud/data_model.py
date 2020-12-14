@@ -201,18 +201,16 @@ class Phosphorylation:
     def __init__(
         self,
         id: str,
-        phos_enz_id: str = None,
+        name: str = None,
         activating: bool = None,
         inhibiting: bool = None,
         enzyme_id: str = None,
     ):
-        if stoichiometry is None:
-            stoichiometry = defaultdict()
         self.id = id
         self.name = name
         self.activating = activating
         self.inhibiting = inhibiting
-        self.enzyme_id = target_enzyme
+        self.enzyme_id = enzyme_id
 
 
 class KineticModel:

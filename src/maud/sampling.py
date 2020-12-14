@@ -127,11 +127,12 @@ def get_phos_act_inh_matrix(mi: MaudInput):
     S_phos_inh = pd.DataFrame(
         0, index=np.arange(len(enzyme_codes)), columns=np.arange(len(phos_enz_codes))
     )
-    for phos in mi.kinetic_model.phosphorylation:
-        if phos.act:
-            S_phos_act.loc[phos.phos_enz_id, phos.enzyme_id] = 1
-        elif phos.inh:
-            S_phos_inh.loc[phos.phos_enz_id, phos.enzyme_id] = 1
+    for phos_id, phos in mi.kinetic_model.phosphorylation.items():
+        if phos.activating:
+            S_phos_act.loc[phos_enz_codes[phos_id]-1, enzyme_codes[phos.enzyme_id]-1] = 1
+        elif phos.inhbiting:
+            S_phos_inh.loc[phos_enz_codes[phos_id]-1, enzyme_codes[phos.enzyme_id]-1] = 1
+    print(S_phos_act)
     return S_phos_act, S_phos_inh
 
 
@@ -336,7 +337,7 @@ def get_input_data(
     if len(prior_dfs["phos_kcat_priors"]) > 0:
         prior_dfs["phos_kcat_priors"] = (
             prior_dfs["phos_kcat_priors"]
-            .assign(stan_code=lambda df: df["id"].map(phos_enz_codes))
+            .assign(stan_code=lambda df: df["phos_enz_id"].map(phos_enz_codes))
             .sort_values("stan_code")
         )
     n_modifier = {}
@@ -413,10 +414,6 @@ def get_input_data(
         enz_id = enzyme_codes[prior_enz.enzyme_id]
         exp_id = experiment_codes[prior_enz.experiment_id]
         enz_conc_init.loc[exp_id, enz_id] = prior_enz.location
-    for prior_phos_enz in mi.priors.phos_enz_concentration_priors:
-        penz_id = phos_enz_codes[prior_phos_enz.phos_enz_id]
-        exp_id = experiment_codes[prior_phos_enz.experiment_id]
-        phos_enz_conc_init.loc[exp_id, penz_id] = prior_phos_enz.location
     for _i, row in mic_measurements.iterrows():
         if row["target_id"] in balanced_mic_codes.keys():
             row_ix = experiment_codes[row["experiment_id"]]
@@ -530,9 +527,9 @@ def get_input_data(
         "prior_scale_drain": prior_scale_drain.values.tolist(),
         "S_enz": enzyme_stoic.T.values,
         "S_drain": drain_stoic.T.values.tolist(),
-        "S_full": full_stoic.T.values,
-        "S_phos_act": S_phos_act.values,
-        "S_phos_inh": S_phos_inh.values,
+        "S_full": full_stoic.T.values.tolist(),
+        "S_phos_act": S_phos_act.T.values.tolist(),
+        "S_phos_inh": S_phos_inh.T.values.tolist(),
         "water_stoichiometry": water_stoichiometry,
         "mic_to_met": list(mic_to_met.values()),
         "S_to_flux_map": stoic_map_to_flux.values,
@@ -569,4 +566,5 @@ def get_initial_conditions(input_data, mi):
         "enzyme": input_data["init_enzyme"],
         "formation_energy": input_data["prior_loc_formation_energy"],
         "drain": input_data["prior_loc_drain"],
+        "phos_enzyme_conc": input_data["prior_loc_phos_conc"]
     }
