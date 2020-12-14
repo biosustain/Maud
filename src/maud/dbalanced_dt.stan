@@ -26,8 +26,15 @@ real get_active_enzyme_fraction(vector activating_enzyme_conc,
                                 vector phosphorylating_enzyme_kcat){
   real alpha = sum(phosphorylating_enzyme_kcat .* activating_enzyme_conc);
   real beta = sum(phosphorylating_enzyme_kcat .* deactivating_enzyme_conc);
+  real active_fraction;
 
-  return (alpha / (alpha + beta));
+  if (alpha == 0 && beta == 0){
+    active_fraction = 1;
+  }
+  else {
+    active_fraction = (alpha / (alpha + beta));
+  }
+  return active_fraction;
 }
 
 vector get_flux_enz(vector conc_mic,
@@ -120,6 +127,7 @@ vector get_flux_enz(vector conc_mic,
       phos_frac[i] = get_active_enzyme_fraction(phos_enzyme_conc .* S_phos_act[:,i],
                                                 phos_enzyme_conc .* S_phos_inh[:,i],
                                                 phos_enzyme_kcat);
+      print(phos_frac);
     }
     flux_enz = flux_enz .* phos_frac;
   }
