@@ -129,9 +129,13 @@ def get_phos_act_inh_matrix(mi: MaudInput):
     )
     for phos_id, phos in mi.kinetic_model.phosphorylation.items():
         if phos.activating:
-            S_phos_act.loc[phos_enz_codes[phos_id]-1, enzyme_codes[phos.enzyme_id]-1] = 1
+            S_phos_act.loc[
+                phos_enz_codes[phos_id] - 1, enzyme_codes[phos.enzyme_id] - 1
+            ] = 1
         elif phos.inhbiting:
-            S_phos_inh.loc[phos_enz_codes[phos_id]-1, enzyme_codes[phos.enzyme_id]-1] = 1
+            S_phos_inh.loc[
+                phos_enz_codes[phos_id] - 1, enzyme_codes[phos.enzyme_id] - 1
+            ] = 1
     print(S_phos_act)
     return S_phos_act, S_phos_inh
 
@@ -566,5 +570,5 @@ def get_initial_conditions(input_data, mi):
         "enzyme": input_data["init_enzyme"],
         "formation_energy": input_data["prior_loc_formation_energy"],
         "drain": input_data["prior_loc_drain"],
-        "phos_enzyme_conc": input_data["prior_loc_phos_conc"]
+        "phos_enzyme_conc": input_data["prior_loc_phos_conc"],
     }

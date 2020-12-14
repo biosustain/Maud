@@ -160,11 +160,11 @@ def load_phosphorylation_from_toml(toml_phosphorylation: dict) -> Phosphorylatio
     return Phosphorylation(
         id=toml_phosphorylation["id"],
         name=toml_phosphorylation["name"],
-        activating=toml_phosphorylation["activating"] 
-        if "activating" in toml_phosphorylation.keys() 
+        activating=toml_phosphorylation["activating"]
+        if "activating" in toml_phosphorylation.keys()
         else None,
-        inhibiting=toml_phosphorylation["inhibiting"] 
-        if "inhibiting" in toml_phosphorylation.keys() 
+        inhibiting=toml_phosphorylation["inhibiting"]
+        if "inhibiting" in toml_phosphorylation.keys()
         else None,
         enzyme_id=toml_phosphorylation["enzyme_id"],
     )
