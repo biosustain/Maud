@@ -304,8 +304,7 @@ def get_input_data(
     if mi.kinetic_model.drains is not None:
         prior_loc_drain, prior_scale_drain = (
             prior_dfs["drain_priors"]
-            .set_index(["experiment_id", "drain_id"])
-            [col]
+            .set_index(["experiment_id", "drain_id"])[col]
             .unstack()
             .loc[experiment_codes.keys(), drain_codes.keys()]
             for col in ["location", "scale"]

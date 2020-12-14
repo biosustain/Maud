@@ -301,10 +301,10 @@ def load_maud_input_from_toml(filepath: str, id: str = "mi") -> MaudInput:
         if "enzyme_concentrations" in prior_dict.keys()
         else [],
         drain_priors=extract_priors(
-            prior_dict["drains"],
-            lambda p: f"{p['drain_id']}_{p['experiment_id']}"
-        ) if "drains" in prior_dict.keys()
-        else []
+            prior_dict["drains"], lambda p: f"{p['drain_id']}_{p['experiment_id']}"
+        )
+        if "drains" in prior_dict.keys()
+        else [],
     )
     stan_codes = get_stan_codes(kinetic_model, experiments)
     mi = MaudInput(

@@ -116,7 +116,9 @@ def enrich_true_values(tvin, input_data):
         **tvin,
         **{
             "drain_z": z_for_vec(
-                tvin["drain"], input_data["prior_loc_drain"], input_data["prior_scale_drain"]
+                tvin["drain"],
+                input_data["prior_loc_drain"],
+                input_data["prior_scale_drain"],
             ),
             "log_km_z": logz_for_vec(
                 tvin["km"], input_data["prior_loc_km"], input_data["prior_scale_km"]
