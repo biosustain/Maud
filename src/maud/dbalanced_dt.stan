@@ -24,8 +24,8 @@ int[] get_enz_mics(matrix S, int i_enz){
 real get_active_enzyme_fraction(vector activating_enzyme_conc,
                                 vector deactivating_enzyme_conc,
                                 vector phosphorylating_enzyme_kcat){
-  real alpha = sum(phosphorylating_enzyme_kcat .* phosphorylating_enzyme_kcat);
-  real beta = sum(phosphorylating_enzyme_kcat .* phosphorylating_enzyme_kcat);
+  real alpha = sum(phosphorylating_enzyme_kcat .* activating_enzyme_conc);
+  real beta = sum(phosphorylating_enzyme_kcat .* deactivating_enzyme_conc);
 
   return (alpha / (alpha + beta));
 }
