@@ -456,7 +456,7 @@ def get_input_data(
         "N_km": len(prior_dfs["km_priors"]),
         "N_reaction": len(reactions),
         "N_enzyme": len(enzymes),
-        "N_phophorylation_enzymes": len(phos_enz_codes)
+        "N_phosphorylation_enzymes": len(phos_enz_codes)
         if phos_enz_codes is not None
         else 0,
         "N_experiment": len(mi.experiments.experiments),

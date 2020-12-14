@@ -134,7 +134,7 @@ def get_stan_codes(km: KineticModel, experiments: ExperimentSet) -> StanCodeSet:
 
 
 def load_drain_from_toml(toml_drain: dict) -> Drain:
-    """Return a dictionary representing a drain into a Drain object.
+    """Turn a dictionary representing a drain into a Drain object.
 
     :param toml_drain: Dictionary representing a drain, typically one of
     the values of the 'drains' field in the output of toml.load.
@@ -149,7 +149,7 @@ def load_drain_from_toml(toml_drain: dict) -> Drain:
 
 
 def load_phosphorylation_from_toml(toml_phosphorylation: dict) -> Phosphorylation:
-    """Return a dictionary representing a drain into a drain object.
+    """Turn a dictionary representing phosphorylation into a phosphorylation object.
 
     :param toml_phosphorylation: Dictionary representing a phosphorylation
     enzyme, typically one of the values of the 'phosphorylation' field in

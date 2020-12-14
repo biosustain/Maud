@@ -191,11 +191,15 @@ class Drain:
 
 
 class Phosphorylation:
-    """Constructor for the reaction object.
+    """Constructor for the phosphorylation object.
 
-    :param id: drain id, use a BiGG id if possible.
-    :param name: drain name.
-    :param stoichiometry: reaction stoichiometry,
+    :param id: phosphorylation id. use BIGG id if possible.
+    :param name: name of phosphorylation reaction.
+    :param activating: if the interaction activates the
+    target enzyme.
+    :param inhibiting: if the interaction inhibits the
+    target enzyme.
+    :enzyme_id: the target enzyme of the interaction
     """
 
     def __init__(

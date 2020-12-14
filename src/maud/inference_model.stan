@@ -15,7 +15,7 @@ data {
   int<lower=1> N_reaction;
   int<lower=1> N_enzyme;
   int<lower=0> N_drain;
-  int<lower=0> N_phophorylation_enzymes;
+  int<lower=0> N_phosphorylation_enzymes;
   int<lower=1> N_experiment;
   int<lower=1> N_flux_measurement;
   int<lower=1> N_conc_measurement;
@@ -54,10 +54,10 @@ data {
   vector<lower=0>[N_allosteric_activator] prior_scale_diss_r;
   vector<lower=0>[N_allosteric_enzyme] prior_loc_tc;
   vector<lower=0>[N_allosteric_enzyme] prior_scale_tc;
-  vector<lower=0>[N_phophorylation_enzymes] prior_loc_phos_kcat;
-  vector<lower=0>[N_phophorylation_enzymes] prior_scale_phos_kcat;
-  matrix<lower=0>[N_experiment, N_phophorylation_enzymes] prior_loc_phos_conc;
-  matrix<lower=0>[N_experiment, N_phophorylation_enzymes] prior_scale_phos_conc;
+  vector<lower=0>[N_phosphorylation_enzymes] prior_loc_phos_kcat;
+  vector<lower=0>[N_phosphorylation_enzymes] prior_scale_phos_kcat;
+  matrix<lower=0>[N_experiment, N_phosphorylation_enzymes] prior_loc_phos_conc;
+  matrix<lower=0>[N_experiment, N_phosphorylation_enzymes] prior_scale_phos_conc;
   matrix[N_experiment, N_unbalanced] prior_loc_unbalanced;
   matrix<lower=0>[N_experiment, N_unbalanced] prior_scale_unbalanced;
   matrix[N_experiment, N_enzyme] prior_loc_enzyme;
@@ -72,9 +72,9 @@ data {
   vector[N_enzyme] water_stoichiometry;
   matrix[N_reaction, N_enzyme] S_to_flux_map;
   matrix<lower=0,upper=1>[N_experiment, N_enzyme] is_knockout;
-  matrix<lower=0,upper=1>[N_experiment, N_phophorylation_enzymes] is_phos_knockout;
-  matrix<lower=0,upper=1>[N_phophorylation_enzymes, N_enzyme] S_phos_act;
-  matrix<lower=0,upper=1>[N_phophorylation_enzymes, N_enzyme] S_phos_inh;
+  matrix<lower=0,upper=1>[N_experiment, N_phosphorylation_enzymes] is_phos_knockout;
+  matrix<lower=0,upper=1>[N_phosphorylation_enzymes, N_enzyme] S_phos_act;
+  matrix<lower=0,upper=1>[N_phosphorylation_enzymes, N_enzyme] S_phos_inh;
   int<lower=0,upper=N_km> km_lookup[N_mic, N_enzyme];
   int<lower=0,upper=N_mic> n_ci[N_enzyme];
   int<lower=0,upper=N_mic> n_ai[N_enzyme];
@@ -95,17 +95,17 @@ transformed data {
   real initial_time = 0;
   matrix[N_experiment, N_enzyme] knockout =
     rep_matrix(1, N_experiment, N_enzyme) - is_knockout;
-  matrix[N_experiment, N_phophorylation_enzymes] phos_knockout =
-    rep_matrix(1, N_experiment, N_phophorylation_enzymes) - is_phos_knockout;
+  matrix[N_experiment, N_phosphorylation_enzymes] phos_knockout =
+    rep_matrix(1, N_experiment, N_phosphorylation_enzymes) - is_phos_knockout;
 }
 parameters {
   vector[N_metabolite] formation_energy_z;
   matrix[N_experiment, N_drain] drain_z;
   vector[N_enzyme] log_kcat_z;
   vector[N_km] log_km_z;
-  vector[N_phophorylation_enzymes] log_phos_kcat_z;
+  vector[N_phosphorylation_enzymes] log_phos_kcat_z;
   matrix[N_experiment, N_enzyme] log_enzyme_z;
-  matrix[N_experiment, N_phophorylation_enzymes] log_phos_conc_z;
+  matrix[N_experiment, N_phosphorylation_enzymes] log_phos_conc_z;
   matrix[N_experiment, N_unbalanced] log_conc_unbalanced_z;
   vector[N_competitive_inhibitor] log_ki_z;
   vector[N_allosteric_inhibitor] log_dissociation_constant_t_z;
@@ -126,12 +126,12 @@ transformed parameters {
     exp(log(prior_loc_diss_r) + log_dissociation_constant_r_z .* prior_scale_diss_r);
   vector[N_allosteric_enzyme] transfer_constant =
     exp(log(prior_loc_tc) + log_transfer_constant_z .* prior_scale_tc);
-  vector[N_phophorylation_enzymes] phos_enzyme_kcat =
+  vector[N_phosphorylation_enzymes] phos_enzyme_kcat =
     exp(log(prior_loc_phos_kcat) + log_phos_kcat_z .* prior_scale_phos_kcat);
   matrix[N_experiment, N_drain] drain;
   matrix[N_experiment, N_enzyme] enzyme;
   matrix[N_experiment, N_unbalanced] conc_unbalanced;
-  matrix[N_experiment, N_phophorylation_enzymes] phos_enzyme_conc;
+  matrix[N_experiment, N_phosphorylation_enzymes] phos_enzyme_conc;
   for (ex in 1:N_experiment){
     drain[ex] = prior_loc_drain[ex] + drain_z[ex] .* prior_scale_drain[ex];
     enzyme[ex] =
@@ -151,7 +151,7 @@ transformed parameters {
                                  water_stoichiometry);
   for (e in 1:N_experiment){
     vector[N_enzyme] experiment_enzyme = enzyme[e]' .* knockout[e]';
-    vector[N_phophorylation_enzymes] experiment_phos_conc = 
+    vector[N_phosphorylation_enzymes] experiment_phos_conc = 
       phos_enzyme_conc[e]' .* phos_knockout[e]';
     vector[N_mic-N_unbalanced] conc_balanced[2] = ode_bdf_tol(dbalanced_dt,
                                                               conc_init[e, balanced_mic_ix],
