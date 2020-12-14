@@ -8,24 +8,24 @@ Draft
 
 ## Context
 
-Phosphorylation is the process which deactivates metabolic enzymes,
-the process is often conducted using kinases, which phosphorylate enzymes,
+Phosphorylation is the process which deactivates metabolic enzymes.
+The process is often conducted using kinases, which phosphorylate enzymes,
 and phosphotases, which dephosphorylate the enzyme. This is a major metabolic
 regulator and is essential for the accurate simulation of metabolic networks.
 
 
 ## Decision
 
-There are many potential regulatory mechanisms to implement, as discussed in
-https://doi.org/10.1016/j.biosystems.2005.05.015. with the following assumptions
-the selected rate law is the linear rate law:
+To mininimise the number of parameters and reducing sampling time,
+the linear rate law was selected (see [1] for a review). The linear mechanism 
+is approximately correct when the following assumptions are satisfied:
 
 * [Kinase] and [Phosphotase] << [Metabolic Enzyme],
 * Rapid equilibrium binding between phosphorylation enzymes and metabolic enzyme,
 * [Kinase] << dissociation constant for Kinase,
 * [Phosphotase] << dissociation constant for Phosphotse,
-* Competitive binding of phosphotases and kinases is negligable.
-* The ATP/ADP ratio
+* Competitive binding of phosphotases and kinases is negligable,
+* The ATP/ADP ratio remains approximately constant,
 * Phosphorylation and Dephosphorylation is an irreversible process.
 
 Using these assumptions the steady state phosphorylated concentration is defined as:
@@ -37,13 +37,24 @@ rates, which are linear with respect to the kinase and phosphotase concentration
 
 ```
 alpha = kcat * [Kinase]
-beta = kcat * [Phosphotase]
+beta = kcat * [Phosphatase]
 ```
 
 The activity of the metabolic enzyme is proportional to the dephosphorylated
-amount. In situations where the phosphorylated enzyme is active, for the sake
-of simplicity the kinases and phosphotases should be swapped in Maud. 
-Any measurements of phosphorylated fraction should also be inverted using the
-calculation `phosphorylated fraction = 1 - dephosphorylated fraction`.
+amount. To avoid situations where the kinase and phosphatase have the opposite
+impact on the target enzymem, Maud will only refer to them as activating
+and inhibiting enzymes.
 
 ## Consequences
+
+Higher level protein responses are not currently supported:
+* saturtion of target enzyme,
+* competitive interactions between kinases and phosphatases
+* allosteric regulation of kinases and phosphatases
+
+## Literature
+
+[1]	Salazar, C., & Höfer, T. (2006). Kinetic models of phosphorylation cycles: 
+	A systematic approach using the rapid-equilibrium approximation for protein–protein 
+	interactions. Biosystems, 83(2), 195–206. 
+	https://doi.org/10.1016/j.biosystems.2005.05.015
