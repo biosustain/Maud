@@ -249,9 +249,11 @@ def get_experiment(raw: Dict) -> Experiment:
     return out
 
 
-def extract_priors(list_of_prior_dicts: List[Dict], id_func):
+def extract_priors(
+    list_of_prior_dicts: List[Dict], id_func, is_non_negative: bool = True
+):
     """Get a list of Prior objects from a list of dictionaries."""
-    return [Prior(id_func(p), **p) for p in list_of_prior_dicts]
+    return [Prior(id_func(p), is_non_negative, **p) for p in list_of_prior_dicts]
 
 
 def load_maud_input_from_toml(filepath: str, id: str = "mi") -> MaudInput:
@@ -289,6 +291,7 @@ def load_maud_input_from_toml(filepath: str, id: str = "mi") -> MaudInput:
         formation_energy_priors=extract_priors(
             prior_dict["formation_energies"],
             lambda p: f"formation_energy_{p['metabolite_id']}",
+            is_non_negative=False,
         ),
         inhibition_constant_priors=extract_priors(
             prior_dict["inhibition_constants"],
@@ -324,20 +327,11 @@ def load_maud_input_from_toml(filepath: str, id: str = "mi") -> MaudInput:
         )
         if "phos_enz_concentration" in prior_dict.keys()
         else [],
-        drain_priors=[
-            Prior(
-                id=f"{dd['id']}_{e['id']}",
-                location=edd["location"],
-                scale=edd["scale"],
-                drain_id=dd["id"],
-                experiment_id=e["id"],
-            )
-            for dd in parsed_toml["drains"]
-            for e in parsed_toml["experiments"]
-            for edd in e["drains"]
-            if edd["id"] == dd["id"]
-        ]
-        if "drains" in parsed_toml.keys()
+        drain_priors=extract_priors(
+            prior_dict["drains"], lambda p: f"{p['drain_id']}_{p['experiment_id']}",
+            is_non_negative=False,
+        )
+        if "drains" in prior_dict.keys()
         else [],
     )
     stan_codes = get_stan_codes(kinetic_model, experiments)

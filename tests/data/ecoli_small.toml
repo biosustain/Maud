@@ -7,7 +7,7 @@ metabolites = [
   {id="atp", name="ATP C10H12N5O13P3", compartment="c", balanced=false},
   {id="pi", name="Phosphate", compartment="c", balanced=false},
   {id="dhap", name="Dihydroxyacetone phosphate", compartment="c", balanced=true},
-  {id="g3p", name="Glyceraldehyde 3-phosphate", compartment="c", balanced=false},
+  {id="g3p", name="Glyceraldehyde 3-phosphate", compartment="c", balanced=true},
 #   {id="nad", name="Nicotinamide adenine dinucleotide", compartment="c", balanced=false},
 #   {id="nadh", name="Nicotinamide adenine dinucleotide - reduced", compartment="c", balanced=false},
 #   {id="13dpg", name="3-Phospho-D-glyceroyl phosphate", compartment="c", balanced=true},
@@ -61,6 +61,11 @@ stoichiometry = {dhap_c = -1, g3p_c = 1}
 # name = "Phosphoglycerate kinase"
 # enzymes = [{id = "PGK", name = "Phosphoglycerate kinase"}]
 # stoichiometry = {13dpg_c = -1, 3pg_c = 1, adp_c = -1, atp_c = 1}
+
+[[drains]]
+id = "g3p_drain"
+name = "g3p_drain"
+stoichiometry = { g3p_c = -1 }
 
 [priors]
 formation_energies = [
@@ -131,6 +136,10 @@ unbalanced_metabolites = [
   {experiment_id="Evo04Evo01EP", mic_id='adp_c', location=0.6113649, scale=0.038811},
   {experiment_id="Evo04Evo01EP", mic_id='atp_c', location=5.4080032, scale=0.186962},
 ]
+drains = [
+  {drain_id="g3p_drain", experiment_id="Evo04ptsHIcrrEvo01EP", pct1=0.3, pct99=1.2},
+  {drain_id="g3p_drain", experiment_id="Evo04Evo01EP", pct1=0.3, pct99=1.2},
+]
 
 
 ################## Experimental data #################
@@ -147,7 +156,7 @@ metabolite_measurements = [
   # {target_id='3pg_c', value=1.9065364, uncertainty=0.084368},
 ]
 reaction_measurements = [
-  {target_id='PGI', value=4.087673533555556, uncertainty=0.1},
+  {target_id='PGI', value=4.087673533555556, uncertainty=1},
 ]
 
 [[experiments]]
@@ -158,5 +167,5 @@ metabolite_measurements = [
   {target_id='dhap_c', value=1.895018, uncertainty=0.078636},
 ]
 reaction_measurements = [
-  {target_id='PGI', value=4.087673533555556, uncertainty=0.1},
+  {target_id='PGI', value=4.087673533555556, uncertainty=1},
 ]
