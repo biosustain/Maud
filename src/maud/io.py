@@ -328,7 +328,8 @@ def load_maud_input_from_toml(filepath: str, id: str = "mi") -> MaudInput:
         if "phos_enz_concentration" in prior_dict.keys()
         else [],
         drain_priors=extract_priors(
-            prior_dict["drains"], lambda p: f"{p['drain_id']}_{p['experiment_id']}",
+            prior_dict["drains"],
+            lambda p: f"{p['drain_id']}_{p['experiment_id']}",
             is_non_negative=False,
         )
         if "drains" in prior_dict.keys()
