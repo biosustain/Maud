@@ -1,0 +1,12 @@
+{
+    "formation_energy": [-1, -2],
+    "drain": [],
+    "kcat": [1, 1, 1],
+    "km": [1, 1, 1, 1, 1, 1],
+    "enzyme": [[0.1, 0.1, 0.1], [0.1, 0.1, 0.1]],
+    "conc_unbalanced": [[0.1, 0.1], [0.1, 0.1]],
+    "ki": [1],
+    "dissociation_constant_t": [1],
+    "dissociation_constant_r": [1],
+    "transfer_constant": [1, 1]
+}

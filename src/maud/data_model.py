@@ -16,6 +16,7 @@
 
 """Definitions of Maud-specific objects."""
 
+from cmdstanpy import CmdStanMCMC
 from collections import defaultdict
 from typing import Dict, List
 
@@ -25,6 +26,7 @@ from maud.utils import (
     get_lognormal_parameters_from_quantiles,
     get_normal_parameters_from_quantiles,
 )
+from maud.analysis import load_infd
 
 
 class Compartment:
@@ -414,3 +416,32 @@ class MaudInput:
         self.priors = priors
         self.stan_codes = stan_codes
         self.experiments = experiments
+
+
+class SimulationStudyOutput:
+    """Expected output of a simulation study.
+
+    :param input_data_sim: dictionary used to create simulation
+    :param input_data_sample: dictionary used to create samples
+    :param true_values: dictionary mapping param names to true values
+    :param sim: CmdStanMCMC that generated simulated measurements
+    :param mi: Maud input used for sampling
+    :param samples: CmdStanMCMC output of the simulation study
+    """
+
+    def __init__(
+        self,
+        input_data_sim: dict,
+        input_data_sample: dict,
+        true_values: dict,
+        sim: CmdStanMCMC,
+        mi: MaudInput,
+        samples: CmdStanMCMC,
+    ):
+        self.input_data_sim = input_data_sim
+        self.input_data_sample = input_data_sample
+        self.true_values = true_values
+        self.sim = sim
+        self.mi = mi
+        self.samples = samples
+        self.infd = load_infd(samples.runset.csv_files, mi)
