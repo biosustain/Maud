@@ -19,7 +19,6 @@ ODE_CONFIG = {
 }
 SIM_CONFIG = {
     "chains": 1,
-    "iter_sampling": 1,
     "fixed_param": True,
 }
 
@@ -75,7 +74,7 @@ def enrich_true_values(tvin, input_data):
     def logz_for_mat(truth, loc, scale):
         return np.array(
             [
-                (np.log(np.array(loc[i])) - np.log(np.array(truth[i])))
+                (np.log(np.array(truth[i])) - np.log(np.array(loc[i])))
                 / np.array(scale[i])
                 for i, _ in enumerate(truth)
             ]
@@ -84,7 +83,7 @@ def enrich_true_values(tvin, input_data):
     def z_for_mat(truth, loc, scale):
         return np.array(
             [
-                (np.array(loc[i]) - np.array(truth[i])) / np.array(scale[i])
+                (np.array(truth[i]) - np.array(loc[i])) / np.array(scale[i])
                 for i, _ in enumerate(truth)
             ]
         )
