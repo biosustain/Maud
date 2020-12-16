@@ -17,8 +17,8 @@ DATA_PATH = reduce(os.path.join, [HERE, "..", "data"])
 MAUD_PATH = reduce(os.path.join, [HERE, "..", "..", "src", "maud"])
 SAMPLE_CONFIG = {
     "chains": 4,
-    "iter_warmup": 200,
-    "iter_sampling": 200,
+    "iter_warmup": 50,
+    "iter_sampling": 50,
     "show_progress": True,
     "max_treedepth": 11,
 }
