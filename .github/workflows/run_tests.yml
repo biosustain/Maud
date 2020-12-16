@@ -1,0 +1,25 @@
+# This workflow installs Maud on Ubuntu with Python 3.7 and then runs tox
+
+name: Run Maud tests
+
+on: push
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v2
+    - name: Set up Python 3.7
+      uses: actions/setup-python@v2
+      with:
+        python-version: 3.7
+    - name: Install Maud
+      run: |
+        python -m pip install --upgrade pip
+        pip install .[development]
+    - name: Install cmdstan
+      run: install_cmdstan
+    - name: Run tox
+      run: tox
