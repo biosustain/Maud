@@ -19,7 +19,6 @@ SAMPLE_CONFIG = {
     "chains": 1,
     "iter_warmup": 200,
     "iter_sampling": 200,
-    "show_progress": True,
     "max_treedepth": 11,
 }
 CASES = [
