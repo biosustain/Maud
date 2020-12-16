@@ -16,11 +16,11 @@
 
 """Definitions of Maud-specific objects."""
 
-from cmdstanpy import CmdStanMCMC
 from collections import defaultdict
 from typing import Dict, List
 
 import numpy as np
+from cmdstanpy import CmdStanMCMC
 
 from maud.utils import (
     get_lognormal_parameters_from_quantiles,

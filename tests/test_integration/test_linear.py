@@ -7,9 +7,9 @@ from functools import reduce
 import numpy as np
 import pytest
 
+from maud.analysis import load_infd
 from maud.io import load_maud_input_from_toml
 from maud.simulation_study import run_simulation_study
-from maud.analysis import load_infd
 
 
 HERE = os.path.dirname(__file__)
@@ -42,9 +42,7 @@ def test_linear(toml_file, truth_file):
     for param_name, param_vals in true_values_in.items():
         if any(param_vals):
             dimnames = [
-                d
-                for d in infd.posterior[param_name].dims
-                if d not in ["chain", "draw"]
+                d for d in infd.posterior[param_name].dims if d not in ["chain", "draw"]
             ]
             q = (
                 infd.posterior[param_name]
