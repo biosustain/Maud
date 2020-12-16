@@ -9,6 +9,7 @@ import pytest
 
 from maud.io import load_maud_input_from_toml
 from maud.simulation_study import run_simulation_study
+from maud.analysis import load_infd
 
 
 HERE = os.path.dirname(__file__)
@@ -37,15 +38,16 @@ def test_linear(toml_file, truth_file):
         true_values_in = json.load(f)
     mi_in = load_maud_input_from_toml(toml_path)
     study = run_simulation_study(stan_path, mi_in, true_values_in, SAMPLE_CONFIG)
+    infd = load_infd(study.samples.runset.csv_files, study.mi)
     for param_name, param_vals in true_values_in.items():
         if any(param_vals):
             dimnames = [
                 d
-                for d in study.infd.posterior[param_name].dims
+                for d in infd.posterior[param_name].dims
                 if d not in ["chain", "draw"]
             ]
             q = (
-                study.infd.posterior[param_name]
+                infd.posterior[param_name]
                 .to_series()
                 .unstack(dimnames)
                 .quantile([0.025, 0.975])

@@ -26,7 +26,6 @@ from maud.utils import (
     get_lognormal_parameters_from_quantiles,
     get_normal_parameters_from_quantiles,
 )
-from maud.analysis import load_infd
 
 
 class Compartment:
@@ -444,4 +443,3 @@ class SimulationStudyOutput:
         self.sim = sim
         self.mi = mi
         self.samples = samples
-        self.infd = load_infd(samples.runset.csv_files, mi)
