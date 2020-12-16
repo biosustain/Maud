@@ -124,9 +124,9 @@ def enrich_true_values(tvin, input_data):
                 input_data["prior_scale_tc"],
             ),
             "log_enzyme_z": logz_for_mat(
-                tvin["conc_unbalanced"],
-                input_data["prior_loc_unbalanced"],
-                input_data["prior_scale_unbalanced"],
+                tvin["enzyme"],
+                input_data["prior_loc_enzyme"],
+                input_data["prior_scale_enzyme"],
             ),
             "log_conc_unbalanced_z": logz_for_mat(
                 tvin["conc_unbalanced"],
@@ -134,9 +134,9 @@ def enrich_true_values(tvin, input_data):
                 input_data["prior_scale_unbalanced"],
             ),
             "log_drain_z": z_for_mat(
-                tvin["conc_unbalanced"],
-                input_data["prior_loc_unbalanced"],
-                input_data["prior_scale_unbalanced"],
+                tvin["drain"],
+                input_data["prior_loc_drain"],
+                input_data["prior_scale_drain"],
             ),
         },
     }
