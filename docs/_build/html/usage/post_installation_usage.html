@@ -1,9 +1,10 @@
 
 <!DOCTYPE html>
 
-<html xmlns="http://www.w3.org/1999/xhtml">
+<html>
   <head>
     <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Generating posterior draws &#8212; Maud  documentation</title>
     <link rel="stylesheet" href="../_static/alabaster.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
@@ -12,10 +13,10 @@
     <script src="../_static/underscore.js"></script>
     <script src="../_static/doctools.js"></script>
     <script src="../_static/language_data.js"></script>
-    <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="Computation" href="../theory/computation.html" />
+    <link rel="next" title="Enzyme kinetics" href="../theory/enzyme_kinetics.html" />
     <link rel="prev" title="Contributing to Maud" href="contributing.html" />
    
   <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
@@ -56,82 +57,82 @@ available options:</p>
 </pre></div>
 </div>
 <p class="rubric">Options</p>
-<dl class="option">
-<dt id="cmdoption-sample-rel-tol">
-<code class="sig-name descname">--rel_tol</code><code class="sig-prename descclassname"> &lt;rel_tol&gt;</code><a class="headerlink" href="#cmdoption-sample-rel-tol" title="Permalink to this definition">¶</a></dt>
+<dl class="std option">
+<dt id="cmdoption-sample-rel_tol">
+<span id="cmdoption-sample-rel-tol"></span><code class="sig-name descname">--rel_tol</code><code class="sig-prename descclassname"> &lt;rel_tol&gt;</code><a class="headerlink" href="#cmdoption-sample-rel_tol" title="Permalink to this definition">¶</a></dt>
 <dd><p>ODE solver’s relative tolerance parameter</p>
 </dd></dl>
 
-<dl class="option">
-<dt id="cmdoption-sample-abs-tol">
-<code class="sig-name descname">--abs_tol</code><code class="sig-prename descclassname"> &lt;abs_tol&gt;</code><a class="headerlink" href="#cmdoption-sample-abs-tol" title="Permalink to this definition">¶</a></dt>
+<dl class="std option">
+<dt id="cmdoption-sample-abs_tol">
+<span id="cmdoption-sample-abs-tol"></span><code class="sig-name descname">--abs_tol</code><code class="sig-prename descclassname"> &lt;abs_tol&gt;</code><a class="headerlink" href="#cmdoption-sample-abs_tol" title="Permalink to this definition">¶</a></dt>
 <dd><p>ODE solver’s absolute tolerance parameter</p>
 </dd></dl>
 
-<dl class="option">
-<dt id="cmdoption-sample-max-num-steps">
-<code class="sig-name descname">--max_num_steps</code><code class="sig-prename descclassname"> &lt;max_num_steps&gt;</code><a class="headerlink" href="#cmdoption-sample-max-num-steps" title="Permalink to this definition">¶</a></dt>
+<dl class="std option">
+<dt id="cmdoption-sample-max_num_steps">
+<span id="cmdoption-sample-max-num-steps"></span><code class="sig-name descname">--max_num_steps</code><code class="sig-prename descclassname"> &lt;max_num_steps&gt;</code><a class="headerlink" href="#cmdoption-sample-max_num_steps" title="Permalink to this definition">¶</a></dt>
 <dd><p>ODE solver’s maximum steps parameter</p>
 </dd></dl>
 
-<dl class="option">
+<dl class="std option">
 <dt id="cmdoption-sample-likelihood">
 <code class="sig-name descname">--likelihood</code><code class="sig-prename descclassname"> &lt;likelihood&gt;</code><a class="headerlink" href="#cmdoption-sample-likelihood" title="Permalink to this definition">¶</a></dt>
 <dd><p>Whether (1) or not (0) to run the model in likelihood mode</p>
 </dd></dl>
 
-<dl class="option">
-<dt id="cmdoption-sample-n-samples">
-<code class="sig-name descname">--n_samples</code><code class="sig-prename descclassname"> &lt;n_samples&gt;</code><a class="headerlink" href="#cmdoption-sample-n-samples" title="Permalink to this definition">¶</a></dt>
+<dl class="std option">
+<dt id="cmdoption-sample-n_samples">
+<span id="cmdoption-sample-n-samples"></span><code class="sig-name descname">--n_samples</code><code class="sig-prename descclassname"> &lt;n_samples&gt;</code><a class="headerlink" href="#cmdoption-sample-n_samples" title="Permalink to this definition">¶</a></dt>
 <dd><p>Number of post-warmup posterior samples</p>
 </dd></dl>
 
-<dl class="option">
-<dt id="cmdoption-sample-n-warmup">
-<code class="sig-name descname">--n_warmup</code><code class="sig-prename descclassname"> &lt;n_warmup&gt;</code><a class="headerlink" href="#cmdoption-sample-n-warmup" title="Permalink to this definition">¶</a></dt>
+<dl class="std option">
+<dt id="cmdoption-sample-n_warmup">
+<span id="cmdoption-sample-n-warmup"></span><code class="sig-name descname">--n_warmup</code><code class="sig-prename descclassname"> &lt;n_warmup&gt;</code><a class="headerlink" href="#cmdoption-sample-n_warmup" title="Permalink to this definition">¶</a></dt>
 <dd><p>Number of warmup samples</p>
 </dd></dl>
 
-<dl class="option">
-<dt id="cmdoption-sample-n-chains">
-<code class="sig-name descname">--n_chains</code><code class="sig-prename descclassname"> &lt;n_chains&gt;</code><a class="headerlink" href="#cmdoption-sample-n-chains" title="Permalink to this definition">¶</a></dt>
+<dl class="std option">
+<dt id="cmdoption-sample-n_chains">
+<span id="cmdoption-sample-n-chains"></span><code class="sig-name descname">--n_chains</code><code class="sig-prename descclassname"> &lt;n_chains&gt;</code><a class="headerlink" href="#cmdoption-sample-n_chains" title="Permalink to this definition">¶</a></dt>
 <dd><p>Number of MCMC chains</p>
 </dd></dl>
 
-<dl class="option">
-<dt id="cmdoption-sample-n-cores">
-<code class="sig-name descname">--n_cores</code><code class="sig-prename descclassname"> &lt;n_cores&gt;</code><a class="headerlink" href="#cmdoption-sample-n-cores" title="Permalink to this definition">¶</a></dt>
+<dl class="std option">
+<dt id="cmdoption-sample-n_cores">
+<span id="cmdoption-sample-n-cores"></span><code class="sig-name descname">--n_cores</code><code class="sig-prename descclassname"> &lt;n_cores&gt;</code><a class="headerlink" href="#cmdoption-sample-n_cores" title="Permalink to this definition">¶</a></dt>
 <dd><p>Number of chains to run in parallel</p>
 </dd></dl>
 
-<dl class="option">
+<dl class="std option">
 <dt id="cmdoption-sample-timepoint">
 <code class="sig-name descname">--timepoint</code><code class="sig-prename descclassname"> &lt;timepoint&gt;</code><a class="headerlink" href="#cmdoption-sample-timepoint" title="Permalink to this definition">¶</a></dt>
 <dd><p>How long the ODE simulates for (Units are whatever your time units are)</p>
 </dd></dl>
 
-<dl class="option">
-<dt id="cmdoption-sample-output-dir">
-<code class="sig-name descname">--output_dir</code><code class="sig-prename descclassname"> &lt;output_dir&gt;</code><a class="headerlink" href="#cmdoption-sample-output-dir" title="Permalink to this definition">¶</a></dt>
+<dl class="std option">
+<dt id="cmdoption-sample-output_dir">
+<span id="cmdoption-sample-output-dir"></span><code class="sig-name descname">--output_dir</code><code class="sig-prename descclassname"> &lt;output_dir&gt;</code><a class="headerlink" href="#cmdoption-sample-output_dir" title="Permalink to this definition">¶</a></dt>
 <dd><p>Where to save Maud’s output</p>
 </dd></dl>
 
-<dl class="option">
-<dt id="cmdoption-sample-threads-per-chain">
-<code class="sig-name descname">--threads_per_chain</code><code class="sig-prename descclassname"> &lt;threads_per_chain&gt;</code><a class="headerlink" href="#cmdoption-sample-threads-per-chain" title="Permalink to this definition">¶</a></dt>
+<dl class="std option">
+<dt id="cmdoption-sample-threads_per_chain">
+<span id="cmdoption-sample-threads-per-chain"></span><code class="sig-name descname">--threads_per_chain</code><code class="sig-prename descclassname"> &lt;threads_per_chain&gt;</code><a class="headerlink" href="#cmdoption-sample-threads_per_chain" title="Permalink to this definition">¶</a></dt>
 <dd><p>How many threads per chain</p>
 </dd></dl>
 
-<dl class="option">
-<dt id="cmdoption-sample-save-warmup">
-<code class="sig-name descname">--save_warmup</code><code class="sig-prename descclassname"> &lt;save_warmup&gt;</code><a class="headerlink" href="#cmdoption-sample-save-warmup" title="Permalink to this definition">¶</a></dt>
+<dl class="std option">
+<dt id="cmdoption-sample-save_warmup">
+<span id="cmdoption-sample-save-warmup"></span><code class="sig-name descname">--save_warmup</code><code class="sig-prename descclassname"> &lt;save_warmup&gt;</code><a class="headerlink" href="#cmdoption-sample-save_warmup" title="Permalink to this definition">¶</a></dt>
 <dd><p>Whether to save warmup draws</p>
 </dd></dl>
 
 <p class="rubric">Arguments</p>
-<dl class="option">
-<dt id="cmdoption-sample-arg-data-path">
-<code class="sig-name descname">DATA_PATH</code><code class="sig-prename descclassname"></code><a class="headerlink" href="#cmdoption-sample-arg-data-path" title="Permalink to this definition">¶</a></dt>
+<dl class="std option">
+<dt id="cmdoption-sample-arg-DATA_PATH">
+<span id="cmdoption-sample-arg-data-path"></span><code class="sig-name descname">DATA_PATH</code><code class="sig-prename descclassname"></code><a class="headerlink" href="#cmdoption-sample-arg-DATA_PATH" title="Permalink to this definition">¶</a></dt>
 <dd><p>Optional argument</p>
 </dd></dl>
 
@@ -164,10 +165,10 @@ available options:</p>
 </ul>
 <p class="caption"><span class="caption-text">Theoretical background:</span></p>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="../theory/computation.html">Computation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../theory/enzyme_kinetics.html">Enzyme kinetics</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../theory/statistics.html">Statistical Model</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../theory/thermodynamics.html">Thermodynamics</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../theory/drains.html">Drain Reactions</a></li>
 </ul>
 <p class="caption"><span class="caption-text">Case studies:</span></p>
 <ul>
@@ -176,6 +177,7 @@ available options:</p>
 <p class="caption"><span class="caption-text">Implementation details:</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../implementation/data_model.html">Maud’s data model</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../implementation/computation.html">Computation</a></li>
 </ul>
 
 <div class="relations">
@@ -183,7 +185,7 @@ available options:</p>
 <ul>
   <li><a href="../index.html">Documentation overview</a><ul>
       <li>Previous: <a href="contributing.html" title="previous chapter">Contributing to Maud</a></li>
-      <li>Next: <a href="../theory/computation.html" title="next chapter">Computation</a></li>
+      <li>Next: <a href="../theory/enzyme_kinetics.html" title="next chapter">Enzyme kinetics</a></li>
   </ul></li>
 </ul>
 </div>
@@ -213,7 +215,7 @@ available options:</p>
       &copy;2019, Novo Nordisk Foundation Center for Biosustainability, Technical University of Denmark.
       
       |
-      Powered by <a href="http://sphinx-doc.org/">Sphinx 2.4.4</a>
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 3.2.1</a>
       &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
       
       |

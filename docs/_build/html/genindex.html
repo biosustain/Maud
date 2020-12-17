@@ -1,10 +1,10 @@
 
-
 <!DOCTYPE html>
 
-<html xmlns="http://www.w3.org/1999/xhtml">
+<html>
   <head>
     <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Index &#8212; Maud  documentation</title>
     <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
@@ -13,7 +13,7 @@
     <script src="_static/underscore.js"></script>
     <script src="_static/doctools.js"></script>
     <script src="_static/language_data.js"></script>
-    <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
     <link rel="index" title="Index" href="#" />
     <link rel="search" title="Search" href="search.html" />
    
@@ -54,7 +54,7 @@
     --abs_tol &lt;abs_tol&gt;
 
       <ul>
-        <li><a href="usage/post_installation_usage.html#cmdoption-sample-abs-tol">sample command line option</a>
+        <li><a href="usage/post_installation_usage.html#cmdoption-sample-abs_tol">sample command line option</a>
 </li>
       </ul></li>
       <li>
@@ -68,28 +68,28 @@
     --max_num_steps &lt;max_num_steps&gt;
 
       <ul>
-        <li><a href="usage/post_installation_usage.html#cmdoption-sample-max-num-steps">sample command line option</a>
+        <li><a href="usage/post_installation_usage.html#cmdoption-sample-max_num_steps">sample command line option</a>
 </li>
       </ul></li>
       <li>
     --n_chains &lt;n_chains&gt;
 
       <ul>
-        <li><a href="usage/post_installation_usage.html#cmdoption-sample-n-chains">sample command line option</a>
+        <li><a href="usage/post_installation_usage.html#cmdoption-sample-n_chains">sample command line option</a>
 </li>
       </ul></li>
       <li>
     --n_cores &lt;n_cores&gt;
 
       <ul>
-        <li><a href="usage/post_installation_usage.html#cmdoption-sample-n-cores">sample command line option</a>
+        <li><a href="usage/post_installation_usage.html#cmdoption-sample-n_cores">sample command line option</a>
 </li>
       </ul></li>
       <li>
     --n_samples &lt;n_samples&gt;
 
       <ul>
-        <li><a href="usage/post_installation_usage.html#cmdoption-sample-n-samples">sample command line option</a>
+        <li><a href="usage/post_installation_usage.html#cmdoption-sample-n_samples">sample command line option</a>
 </li>
       </ul></li>
   </ul></td>
@@ -98,35 +98,35 @@
     --n_warmup &lt;n_warmup&gt;
 
       <ul>
-        <li><a href="usage/post_installation_usage.html#cmdoption-sample-n-warmup">sample command line option</a>
+        <li><a href="usage/post_installation_usage.html#cmdoption-sample-n_warmup">sample command line option</a>
 </li>
       </ul></li>
       <li>
     --output_dir &lt;output_dir&gt;
 
       <ul>
-        <li><a href="usage/post_installation_usage.html#cmdoption-sample-output-dir">sample command line option</a>
+        <li><a href="usage/post_installation_usage.html#cmdoption-sample-output_dir">sample command line option</a>
 </li>
       </ul></li>
       <li>
     --rel_tol &lt;rel_tol&gt;
 
       <ul>
-        <li><a href="usage/post_installation_usage.html#cmdoption-sample-rel-tol">sample command line option</a>
+        <li><a href="usage/post_installation_usage.html#cmdoption-sample-rel_tol">sample command line option</a>
 </li>
       </ul></li>
       <li>
     --save_warmup &lt;save_warmup&gt;
 
       <ul>
-        <li><a href="usage/post_installation_usage.html#cmdoption-sample-save-warmup">sample command line option</a>
+        <li><a href="usage/post_installation_usage.html#cmdoption-sample-save_warmup">sample command line option</a>
 </li>
       </ul></li>
       <li>
     --threads_per_chain &lt;threads_per_chain&gt;
 
       <ul>
-        <li><a href="usage/post_installation_usage.html#cmdoption-sample-threads-per-chain">sample command line option</a>
+        <li><a href="usage/post_installation_usage.html#cmdoption-sample-threads_per_chain">sample command line option</a>
 </li>
       </ul></li>
       <li>
@@ -154,9 +154,13 @@
     DATA_PATH
 
       <ul>
-        <li><a href="usage/post_installation_usage.html#cmdoption-sample-arg-data-path">sample command line option</a>
+        <li><a href="usage/post_installation_usage.html#cmdoption-sample-arg-DATA_PATH">sample command line option</a>
 </li>
       </ul></li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="implementation/data_model.html#maud.data_model.Drain">Drain (class in maud.data_model)</a>
+</li>
   </ul></td>
 </tr></table>
 
@@ -168,6 +172,8 @@
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="implementation/data_model.html#maud.data_model.Experiment">Experiment (class in maud.data_model)</a>
+</li>
+      <li><a href="implementation/data_model.html#maud.data_model.ExperimentSet">ExperimentSet (class in maud.data_model)</a>
 </li>
   </ul></td>
 </tr></table>
@@ -183,8 +189,13 @@
 <h2 id="M">M</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="implementation/data_model.html#module-maud.data_model">maud.data_model (module)</a>
+      <li>
+    maud.data_model
+
+      <ul>
+        <li><a href="implementation/data_model.html#module-maud.data_model">module</a>
 </li>
+      </ul></li>
       <li><a href="implementation/data_model.html#maud.data_model.MaudInput">MaudInput (class in maud.data_model)</a>
 </li>
       <li><a href="implementation/data_model.html#maud.data_model.Measurement">Measurement (class in maud.data_model)</a>
@@ -197,6 +208,13 @@
 </li>
       <li><a href="implementation/data_model.html#maud.data_model.Modifier">Modifier (class in maud.data_model)</a>
 </li>
+      <li>
+    module
+
+      <ul>
+        <li><a href="implementation/data_model.html#module-maud.data_model">maud.data_model</a>
+</li>
+      </ul></li>
   </ul></td>
 </tr></table>
 
@@ -208,6 +226,8 @@
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="implementation/data_model.html#maud.data_model.Prior">Prior (class in maud.data_model)</a>
+</li>
+      <li><a href="implementation/data_model.html#maud.data_model.PriorSet">PriorSet (class in maud.data_model)</a>
 </li>
   </ul></td>
 </tr></table>
@@ -227,33 +247,37 @@
     sample command line option
 
       <ul>
-        <li><a href="usage/post_installation_usage.html#cmdoption-sample-abs-tol">--abs_tol &lt;abs_tol&gt;</a>
+        <li><a href="usage/post_installation_usage.html#cmdoption-sample-abs_tol">--abs_tol &lt;abs_tol&gt;</a>
 </li>
         <li><a href="usage/post_installation_usage.html#cmdoption-sample-likelihood">--likelihood &lt;likelihood&gt;</a>
 </li>
-        <li><a href="usage/post_installation_usage.html#cmdoption-sample-max-num-steps">--max_num_steps &lt;max_num_steps&gt;</a>
+        <li><a href="usage/post_installation_usage.html#cmdoption-sample-max_num_steps">--max_num_steps &lt;max_num_steps&gt;</a>
 </li>
-        <li><a href="usage/post_installation_usage.html#cmdoption-sample-n-chains">--n_chains &lt;n_chains&gt;</a>
+        <li><a href="usage/post_installation_usage.html#cmdoption-sample-n_chains">--n_chains &lt;n_chains&gt;</a>
 </li>
-        <li><a href="usage/post_installation_usage.html#cmdoption-sample-n-cores">--n_cores &lt;n_cores&gt;</a>
+        <li><a href="usage/post_installation_usage.html#cmdoption-sample-n_cores">--n_cores &lt;n_cores&gt;</a>
 </li>
-        <li><a href="usage/post_installation_usage.html#cmdoption-sample-n-samples">--n_samples &lt;n_samples&gt;</a>
+        <li><a href="usage/post_installation_usage.html#cmdoption-sample-n_samples">--n_samples &lt;n_samples&gt;</a>
 </li>
-        <li><a href="usage/post_installation_usage.html#cmdoption-sample-n-warmup">--n_warmup &lt;n_warmup&gt;</a>
+        <li><a href="usage/post_installation_usage.html#cmdoption-sample-n_warmup">--n_warmup &lt;n_warmup&gt;</a>
 </li>
-        <li><a href="usage/post_installation_usage.html#cmdoption-sample-output-dir">--output_dir &lt;output_dir&gt;</a>
+        <li><a href="usage/post_installation_usage.html#cmdoption-sample-output_dir">--output_dir &lt;output_dir&gt;</a>
 </li>
-        <li><a href="usage/post_installation_usage.html#cmdoption-sample-rel-tol">--rel_tol &lt;rel_tol&gt;</a>
+        <li><a href="usage/post_installation_usage.html#cmdoption-sample-rel_tol">--rel_tol &lt;rel_tol&gt;</a>
 </li>
-        <li><a href="usage/post_installation_usage.html#cmdoption-sample-save-warmup">--save_warmup &lt;save_warmup&gt;</a>
+        <li><a href="usage/post_installation_usage.html#cmdoption-sample-save_warmup">--save_warmup &lt;save_warmup&gt;</a>
 </li>
-        <li><a href="usage/post_installation_usage.html#cmdoption-sample-threads-per-chain">--threads_per_chain &lt;threads_per_chain&gt;</a>
+        <li><a href="usage/post_installation_usage.html#cmdoption-sample-threads_per_chain">--threads_per_chain &lt;threads_per_chain&gt;</a>
 </li>
         <li><a href="usage/post_installation_usage.html#cmdoption-sample-timepoint">--timepoint &lt;timepoint&gt;</a>
 </li>
-        <li><a href="usage/post_installation_usage.html#cmdoption-sample-arg-data-path">DATA_PATH</a>
+        <li><a href="usage/post_installation_usage.html#cmdoption-sample-arg-DATA_PATH">DATA_PATH</a>
 </li>
       </ul></li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="implementation/data_model.html#maud.data_model.StanCodeSet">StanCodeSet (class in maud.data_model)</a>
+</li>
   </ul></td>
 </tr></table>
 
@@ -284,10 +308,11 @@
 </ul>
 <p class="caption"><span class="caption-text">Theoretical background:</span></p>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="theory/computation.html">Computation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="theory/enzyme_kinetics.html">Enzyme kinetics</a></li>
 <li class="toctree-l1"><a class="reference internal" href="theory/statistics.html">Statistical Model</a></li>
 <li class="toctree-l1"><a class="reference internal" href="theory/thermodynamics.html">Thermodynamics</a></li>
+<li class="toctree-l1"><a class="reference internal" href="theory/drains.html">Drain Reactions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="theory/papers.html">Relevant Reading</a></li>
 </ul>
 <p class="caption"><span class="caption-text">Case studies:</span></p>
 <ul>
@@ -296,6 +321,7 @@
 <p class="caption"><span class="caption-text">Implementation details:</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="implementation/data_model.html">Maud’s data model</a></li>
+<li class="toctree-l1"><a class="reference internal" href="implementation/computation.html">Computation</a></li>
 </ul>
 
 <div class="relations">
@@ -331,7 +357,7 @@
       &copy;2019, Novo Nordisk Foundation Center for Biosustainability, Technical University of Denmark.
       
       |
-      Powered by <a href="http://sphinx-doc.org/">Sphinx 2.4.4</a>
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 3.2.1</a>
       &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
       
     </div>

@@ -1,9 +1,10 @@
 
 <!DOCTYPE html>
 
-<html xmlns="http://www.w3.org/1999/xhtml">
+<html>
   <head>
     <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Maud’s data model &#8212; Maud  documentation</title>
     <link rel="stylesheet" href="../_static/alabaster.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
@@ -12,9 +13,10 @@
     <script src="../_static/underscore.js"></script>
     <script src="../_static/doctools.js"></script>
     <script src="../_static/language_data.js"></script>
-    <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Computation" href="computation.html" />
     <link rel="prev" title="A simple model of E. coli glycolysis" href="../case_studies/ecoli.html" />
    
   <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
@@ -35,9 +37,9 @@
   <div class="section" id="module-maud.data_model">
 <span id="maud-s-data-model"></span><h1>Maud’s data model<a class="headerlink" href="#module-maud.data_model" title="Permalink to this headline">¶</a></h1>
 <p>Definitions of Maud-specific objects.</p>
-<dl class="class">
+<dl class="py class">
 <dt id="maud.data_model.Compartment">
-<em class="property">class </em><code class="sig-prename descclassname">maud.data_model.</code><code class="sig-name descname">Compartment</code><span class="sig-paren">(</span><em class="sig-param">id: str</em>, <em class="sig-param">name: str = None</em>, <em class="sig-param">volume: float = 1.0</em><span class="sig-paren">)</span><a class="headerlink" href="#maud.data_model.Compartment" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">maud.data_model.</code><code class="sig-name descname">Compartment</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">id</span><span class="p">:</span> <span class="n">str</span></em>, <em class="sig-param"><span class="n">name</span><span class="p">:</span> <span class="n">str</span> <span class="o">=</span> <span class="default_value">None</span></em>, <em class="sig-param"><span class="n">volume</span><span class="p">:</span> <span class="n">float</span> <span class="o">=</span> <span class="default_value">1.0</span></em><span class="sig-paren">)</span><a class="headerlink" href="#maud.data_model.Compartment" title="Permalink to this definition">¶</a></dt>
 <dd><p>Constructor for compartment objects.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -50,9 +52,24 @@
 </dl>
 </dd></dl>
 
-<dl class="class">
+<dl class="py class">
+<dt id="maud.data_model.Drain">
+<em class="property">class </em><code class="sig-prename descclassname">maud.data_model.</code><code class="sig-name descname">Drain</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">id</span><span class="p">:</span> <span class="n">str</span></em>, <em class="sig-param"><span class="n">name</span><span class="p">:</span> <span class="n">str</span> <span class="o">=</span> <span class="default_value">None</span></em>, <em class="sig-param"><span class="n">stoichiometry</span><span class="p">:</span> <span class="n">Dict<span class="p">[</span>str<span class="p">, </span>float<span class="p">]</span></span> <span class="o">=</span> <span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#maud.data_model.Drain" title="Permalink to this definition">¶</a></dt>
+<dd><p>Constructor for the reaction object.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>id</strong> – drain id, use a BiGG id if possible.</p></li>
+<li><p><strong>name</strong> – drain name.</p></li>
+<li><p><strong>stoichiometry</strong> – reaction stoichiometry,</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py class">
 <dt id="maud.data_model.Enzyme">
-<em class="property">class </em><code class="sig-prename descclassname">maud.data_model.</code><code class="sig-name descname">Enzyme</code><span class="sig-paren">(</span><em class="sig-param">id: str</em>, <em class="sig-param">reaction_id: str</em>, <em class="sig-param">name: str</em>, <em class="sig-param">modifiers: Dict[str</em>, <em class="sig-param">List[maud.data_model.Modifier]] = None</em>, <em class="sig-param">subunits: int = 1</em><span class="sig-paren">)</span><a class="headerlink" href="#maud.data_model.Enzyme" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">maud.data_model.</code><code class="sig-name descname">Enzyme</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">id</span><span class="p">:</span> <span class="n">str</span></em>, <em class="sig-param"><span class="n">reaction_id</span><span class="p">:</span> <span class="n">str</span></em>, <em class="sig-param"><span class="n">name</span><span class="p">:</span> <span class="n">str</span></em>, <em class="sig-param"><span class="n">modifiers</span><span class="p">:</span> <span class="n">Dict<span class="p">[</span>str<span class="p">, </span>List<span class="p">[</span><a class="reference internal" href="#maud.data_model.Modifier" title="maud.data_model.Modifier">maud.data_model.Modifier</a><span class="p">]</span><span class="p">]</span></span> <span class="o">=</span> <span class="default_value">None</span></em>, <em class="sig-param"><span class="n">subunits</span><span class="p">:</span> <span class="n">int</span> <span class="o">=</span> <span class="default_value">1</span></em><span class="sig-paren">)</span><a class="headerlink" href="#maud.data_model.Enzyme" title="Permalink to this definition">¶</a></dt>
 <dd><p>Constructor for the enzyme object.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -67,26 +84,32 @@
 </dl>
 </dd></dl>
 
-<dl class="class">
+<dl class="py class">
 <dt id="maud.data_model.Experiment">
-<em class="property">class </em><code class="sig-prename descclassname">maud.data_model.</code><code class="sig-name descname">Experiment</code><span class="sig-paren">(</span><em class="sig-param">id: str</em>, <em class="sig-param">measurements: Dict[str</em>, <em class="sig-param">Dict[str</em>, <em class="sig-param">maud.data_model.Measurement]] = None</em>, <em class="sig-param">metadata: str = None</em>, <em class="sig-param">knockouts: List[str] = None</em><span class="sig-paren">)</span><a class="headerlink" href="#maud.data_model.Experiment" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">maud.data_model.</code><code class="sig-name descname">Experiment</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">id</span><span class="p">:</span> <span class="n">str</span></em>, <em class="sig-param"><span class="n">measurements</span><span class="p">:</span> <span class="n">Dict<span class="p">[</span>str<span class="p">, </span>Dict<span class="p">[</span>str<span class="p">, </span><a class="reference internal" href="#maud.data_model.Measurement" title="maud.data_model.Measurement">maud.data_model.Measurement</a><span class="p">]</span><span class="p">]</span></span> <span class="o">=</span> <span class="default_value">None</span></em>, <em class="sig-param"><span class="n">metadata</span><span class="p">:</span> <span class="n">str</span> <span class="o">=</span> <span class="default_value">None</span></em>, <em class="sig-param"><span class="n">knockouts</span><span class="p">:</span> <span class="n">List<span class="p">[</span>str<span class="p">]</span></span> <span class="o">=</span> <span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#maud.data_model.Experiment" title="Permalink to this definition">¶</a></dt>
 <dd><p>Constructor for condition object.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>id</strong> – condition id</p></li>
-<li><p><strong>unbalanced_met_info</strong> – </p></li>
-<li><p><strong>measurements</strong> – dictionary mapping keys ‘enzyme’, ‘metabolite’ and ‘reaction’</p></li>
+<li><p><strong>measurements</strong> – dictionary mapping keys ‘metabolite’ and ‘reaction’</p></li>
 </ul>
 </dd>
 </dl>
 <p>to dictionaries with the form {target id: measurement}
-:param metadata: any info about the condition</p>
+:param metadata: any info about the condition
+:param knockouts: a list of enzymes knocked out, if any</p>
 </dd></dl>
 
-<dl class="class">
+<dl class="py class">
+<dt id="maud.data_model.ExperimentSet">
+<em class="property">class </em><code class="sig-prename descclassname">maud.data_model.</code><code class="sig-name descname">ExperimentSet</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">experiments</span><span class="p">:</span> <span class="n">List<span class="p">[</span><a class="reference internal" href="#maud.data_model.Experiment" title="maud.data_model.Experiment">maud.data_model.Experiment</a><span class="p">]</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#maud.data_model.ExperimentSet" title="Permalink to this definition">¶</a></dt>
+<dd><p>Object containing all experiments for a MaudInput.</p>
+</dd></dl>
+
+<dl class="py class">
 <dt id="maud.data_model.KineticModel">
-<em class="property">class </em><code class="sig-prename descclassname">maud.data_model.</code><code class="sig-name descname">KineticModel</code><span class="sig-paren">(</span><em class="sig-param">model_id: str, metabolites: Dict[str, maud.data_model.Metabolite], reactions: Dict[str, maud.data_model.Reaction], compartments: Dict[str, maud.data_model.Compartment], mics: Dict[str, maud.data_model.MetaboliteInCompartment]</em><span class="sig-paren">)</span><a class="headerlink" href="#maud.data_model.KineticModel" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">maud.data_model.</code><code class="sig-name descname">KineticModel</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">model_id</span><span class="p">:</span> <span class="n">str</span></em>, <em class="sig-param"><span class="n">metabolites</span><span class="p">:</span> <span class="n">Dict<span class="p">[</span>str<span class="p">, </span><a class="reference internal" href="#maud.data_model.Metabolite" title="maud.data_model.Metabolite">maud.data_model.Metabolite</a><span class="p">]</span></span></em>, <em class="sig-param"><span class="n">reactions</span><span class="p">:</span> <span class="n">Dict<span class="p">[</span>str<span class="p">, </span><a class="reference internal" href="#maud.data_model.Reaction" title="maud.data_model.Reaction">maud.data_model.Reaction</a><span class="p">]</span></span></em>, <em class="sig-param"><span class="n">compartments</span><span class="p">:</span> <span class="n">Dict<span class="p">[</span>str<span class="p">, </span><a class="reference internal" href="#maud.data_model.Compartment" title="maud.data_model.Compartment">maud.data_model.Compartment</a><span class="p">]</span></span></em>, <em class="sig-param"><span class="n">mics</span><span class="p">:</span> <span class="n">Dict<span class="p">[</span>str<span class="p">, </span><a class="reference internal" href="#maud.data_model.MetaboliteInCompartment" title="maud.data_model.MetaboliteInCompartment">maud.data_model.MetaboliteInCompartment</a><span class="p">]</span></span></em>, <em class="sig-param"><span class="n">drains</span><span class="p">:</span> <span class="n">Dict<span class="p">[</span>str<span class="p">, </span><a class="reference internal" href="#maud.data_model.Drain" title="maud.data_model.Drain">maud.data_model.Drain</a><span class="p">]</span></span> <span class="o">=</span> <span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#maud.data_model.KineticModel" title="Permalink to this definition">¶</a></dt>
 <dd><p>Constructor for representation of a system of metabolic reactions.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -94,6 +117,7 @@
 <li><p><strong>model_id</strong> – id of the kinetic model</p></li>
 <li><p><strong>metabolites</strong> – dictionary mapping strings to metabolite objects</p></li>
 <li><p><strong>reactions</strong> – dictionary mapping strings to reaction objects</p></li>
+<li><p><strong>drains</strong> – dictionary mapping strings to drain objects</p></li>
 <li><p><strong>compartments</strong> – dictionary mapping strings to compartment objects</p></li>
 <li><p><strong>mic</strong> – dictionary mapping strings to MetaboliteInCompartment objects</p></li>
 </ul>
@@ -101,9 +125,9 @@
 </dl>
 </dd></dl>
 
-<dl class="class">
+<dl class="py class">
 <dt id="maud.data_model.MaudInput">
-<em class="property">class </em><code class="sig-prename descclassname">maud.data_model.</code><code class="sig-name descname">MaudInput</code><span class="sig-paren">(</span><em class="sig-param">kinetic_model: maud.data_model.KineticModel, priors: Dict[str, List[maud.data_model.Prior]], stan_codes: Dict[str, Dict[str, int]], experiments: Dict[str, maud.data_model.Experiment] = None</em><span class="sig-paren">)</span><a class="headerlink" href="#maud.data_model.MaudInput" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">maud.data_model.</code><code class="sig-name descname">MaudInput</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">kinetic_model</span><span class="p">:</span> <span class="n"><a class="reference internal" href="#maud.data_model.KineticModel" title="maud.data_model.KineticModel">maud.data_model.KineticModel</a></span></em>, <em class="sig-param"><span class="n">priors</span><span class="p">:</span> <span class="n"><a class="reference internal" href="#maud.data_model.PriorSet" title="maud.data_model.PriorSet">maud.data_model.PriorSet</a></span></em>, <em class="sig-param"><span class="n">stan_codes</span><span class="p">:</span> <span class="n"><a class="reference internal" href="#maud.data_model.StanCodeSet" title="maud.data_model.StanCodeSet">maud.data_model.StanCodeSet</a></span></em>, <em class="sig-param"><span class="n">experiments</span><span class="p">:</span> <span class="n"><a class="reference internal" href="#maud.data_model.ExperimentSet" title="maud.data_model.ExperimentSet">maud.data_model.ExperimentSet</a></span></em><span class="sig-paren">)</span><a class="headerlink" href="#maud.data_model.MaudInput" title="Permalink to this definition">¶</a></dt>
 <dd><p>Everything that is needed to run Maud.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -119,9 +143,9 @@ values are dictionaries mapping ids of the relevant objects to integer codes
 :param experiments: a dictionary mapping experiment ids to Experiment objects</p>
 </dd></dl>
 
-<dl class="class">
+<dl class="py class">
 <dt id="maud.data_model.Measurement">
-<em class="property">class </em><code class="sig-prename descclassname">maud.data_model.</code><code class="sig-name descname">Measurement</code><span class="sig-paren">(</span><em class="sig-param">target_id: str</em>, <em class="sig-param">value: float</em>, <em class="sig-param">uncertainty: float = None</em>, <em class="sig-param">scale: str = None</em>, <em class="sig-param">target_type: str = None</em><span class="sig-paren">)</span><a class="headerlink" href="#maud.data_model.Measurement" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">maud.data_model.</code><code class="sig-name descname">Measurement</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">target_id</span><span class="p">:</span> <span class="n">str</span></em>, <em class="sig-param"><span class="n">value</span><span class="p">:</span> <span class="n">float</span></em>, <em class="sig-param"><span class="n">uncertainty</span><span class="p">:</span> <span class="n">float</span> <span class="o">=</span> <span class="default_value">None</span></em>, <em class="sig-param"><span class="n">scale</span><span class="p">:</span> <span class="n">str</span> <span class="o">=</span> <span class="default_value">None</span></em>, <em class="sig-param"><span class="n">target_type</span><span class="p">:</span> <span class="n">str</span> <span class="o">=</span> <span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#maud.data_model.Measurement" title="Permalink to this definition">¶</a></dt>
 <dd><p>Constructor for measurement object.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -137,9 +161,9 @@ values are dictionaries mapping ids of the relevant objects to integer codes
 <p>‘enzyme’.</p>
 </dd></dl>
 
-<dl class="class">
+<dl class="py class">
 <dt id="maud.data_model.Metabolite">
-<em class="property">class </em><code class="sig-prename descclassname">maud.data_model.</code><code class="sig-name descname">Metabolite</code><span class="sig-paren">(</span><em class="sig-param">id: str</em>, <em class="sig-param">name: str = None</em><span class="sig-paren">)</span><a class="headerlink" href="#maud.data_model.Metabolite" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">maud.data_model.</code><code class="sig-name descname">Metabolite</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">id</span><span class="p">:</span> <span class="n">str</span></em>, <em class="sig-param"><span class="n">name</span><span class="p">:</span> <span class="n">str</span> <span class="o">=</span> <span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#maud.data_model.Metabolite" title="Permalink to this definition">¶</a></dt>
 <dd><p>Constructor for metabolite objects.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -151,9 +175,9 @@ values are dictionaries mapping ids of the relevant objects to integer codes
 </dl>
 </dd></dl>
 
-<dl class="class">
+<dl class="py class">
 <dt id="maud.data_model.MetaboliteInCompartment">
-<em class="property">class </em><code class="sig-prename descclassname">maud.data_model.</code><code class="sig-name descname">MetaboliteInCompartment</code><span class="sig-paren">(</span><em class="sig-param">id: str</em>, <em class="sig-param">metabolite_id: str = None</em>, <em class="sig-param">compartment_id: str = None</em>, <em class="sig-param">balanced: bool = None</em><span class="sig-paren">)</span><a class="headerlink" href="#maud.data_model.MetaboliteInCompartment" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">maud.data_model.</code><code class="sig-name descname">MetaboliteInCompartment</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">id</span><span class="p">:</span> <span class="n">str</span></em>, <em class="sig-param"><span class="n">metabolite_id</span><span class="p">:</span> <span class="n">str</span> <span class="o">=</span> <span class="default_value">None</span></em>, <em class="sig-param"><span class="n">compartment_id</span><span class="p">:</span> <span class="n">str</span> <span class="o">=</span> <span class="default_value">None</span></em>, <em class="sig-param"><span class="n">balanced</span><span class="p">:</span> <span class="n">bool</span> <span class="o">=</span> <span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#maud.data_model.MetaboliteInCompartment" title="Permalink to this definition">¶</a></dt>
 <dd><p>A metabolite, in a compartment, or mic for short.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -167,9 +191,9 @@ values are dictionaries mapping ids of the relevant objects to integer codes
 </dl>
 </dd></dl>
 
-<dl class="class">
+<dl class="py class">
 <dt id="maud.data_model.Modifier">
-<em class="property">class </em><code class="sig-prename descclassname">maud.data_model.</code><code class="sig-name descname">Modifier</code><span class="sig-paren">(</span><em class="sig-param">mic_id: str</em>, <em class="sig-param">enzyme_id: str</em>, <em class="sig-param">modifier_type: str = None</em><span class="sig-paren">)</span><a class="headerlink" href="#maud.data_model.Modifier" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">maud.data_model.</code><code class="sig-name descname">Modifier</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">mic_id</span><span class="p">:</span> <span class="n">str</span></em>, <em class="sig-param"><span class="n">enzyme_id</span><span class="p">:</span> <span class="n">str</span></em>, <em class="sig-param"><span class="n">modifier_type</span><span class="p">:</span> <span class="n">str</span> <span class="o">=</span> <span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#maud.data_model.Modifier" title="Permalink to this definition">¶</a></dt>
 <dd><p>Constructor for modifier objects.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -183,9 +207,9 @@ values are dictionaries mapping ids of the relevant objects to integer codes
 <p>‘allosteric_activator’, ‘allosteric_inhibitor’, ‘competitive inhibitor’</p>
 </dd></dl>
 
-<dl class="class">
+<dl class="py class">
 <dt id="maud.data_model.Parameter">
-<em class="property">class </em><code class="sig-prename descclassname">maud.data_model.</code><code class="sig-name descname">Parameter</code><span class="sig-paren">(</span><em class="sig-param">id: str</em>, <em class="sig-param">enzyme_id: str</em>, <em class="sig-param">metabolite_id: str = None</em>, <em class="sig-param">is_thermodynamic: bool = False</em><span class="sig-paren">)</span><a class="headerlink" href="#maud.data_model.Parameter" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">maud.data_model.</code><code class="sig-name descname">Parameter</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">id</span><span class="p">:</span> <span class="n">str</span></em>, <em class="sig-param"><span class="n">enzyme_id</span><span class="p">:</span> <span class="n">str</span></em>, <em class="sig-param"><span class="n">metabolite_id</span><span class="p">:</span> <span class="n">str</span> <span class="o">=</span> <span class="default_value">None</span></em>, <em class="sig-param"><span class="n">is_thermodynamic</span><span class="p">:</span> <span class="n">bool</span> <span class="o">=</span> <span class="default_value">False</span></em><span class="sig-paren">)</span><a class="headerlink" href="#maud.data_model.Parameter" title="Permalink to this definition">¶</a></dt>
 <dd><p>Constructor for parameter object.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -198,9 +222,9 @@ values are dictionaries mapping ids of the relevant objects to integer codes
 </dl>
 </dd></dl>
 
-<dl class="class">
+<dl class="py class">
 <dt id="maud.data_model.Prior">
-<em class="property">class </em><code class="sig-prename descclassname">maud.data_model.</code><code class="sig-name descname">Prior</code><span class="sig-paren">(</span><em class="sig-param">id: str</em>, <em class="sig-param">location: float</em>, <em class="sig-param">scale: float</em>, <em class="sig-param">experiment_id: str = None</em>, <em class="sig-param">mic_id: str = None</em>, <em class="sig-param">metabolite_id: str = None</em>, <em class="sig-param">enzyme_id: str = None</em><span class="sig-paren">)</span><a class="headerlink" href="#maud.data_model.Prior" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">maud.data_model.</code><code class="sig-name descname">Prior</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">id</span><span class="p">:</span> <span class="n">str</span></em>, <em class="sig-param"><span class="n">is_non_negative</span><span class="p">:</span> <span class="n">bool</span></em>, <em class="sig-param"><span class="n">experiment_id</span><span class="p">:</span> <span class="n">str</span> <span class="o">=</span> <span class="default_value">None</span></em>, <em class="sig-param"><span class="n">mic_id</span><span class="p">:</span> <span class="n">str</span> <span class="o">=</span> <span class="default_value">None</span></em>, <em class="sig-param"><span class="n">metabolite_id</span><span class="p">:</span> <span class="n">str</span> <span class="o">=</span> <span class="default_value">None</span></em>, <em class="sig-param"><span class="n">enzyme_id</span><span class="p">:</span> <span class="n">str</span> <span class="o">=</span> <span class="default_value">None</span></em>, <em class="sig-param"><span class="n">drain_id</span><span class="p">:</span> <span class="n">str</span> <span class="o">=</span> <span class="default_value">None</span></em>, <em class="sig-param"><span class="n">pct1</span><span class="p">:</span> <span class="n">float</span> <span class="o">=</span> <span class="default_value">None</span></em>, <em class="sig-param"><span class="n">pct99</span><span class="p">:</span> <span class="n">float</span> <span class="o">=</span> <span class="default_value">None</span></em>, <em class="sig-param"><span class="n">location</span><span class="p">:</span> <span class="n">float</span> <span class="o">=</span> <span class="default_value">None</span></em>, <em class="sig-param"><span class="n">scale</span><span class="p">:</span> <span class="n">float</span> <span class="o">=</span> <span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#maud.data_model.Prior" title="Permalink to this definition">¶</a></dt>
 <dd><p>A prior distribuition.</p>
 <p>As currently implemented, the target must be a single parameter and the
 distribution must have a location and a scale.</p>
@@ -215,12 +239,22 @@ distribution must have a location and a scale.</p>
 </ul>
 </dd>
 </dl>
-<p>metabolites)</p>
+<p>metabolites)
+:param mic_id: id of relevant metabolite-in-compartment
+:param metabolite_id: id of relevant metabolite
+:param enzyme_id: id of relevant enzyme
+:param drain_id: id of relevant drain</p>
 </dd></dl>
 
-<dl class="class">
+<dl class="py class">
+<dt id="maud.data_model.PriorSet">
+<em class="property">class </em><code class="sig-prename descclassname">maud.data_model.</code><code class="sig-name descname">PriorSet</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">kcat_priors</span><span class="p">:</span> <span class="n">List<span class="p">[</span><a class="reference internal" href="#maud.data_model.Prior" title="maud.data_model.Prior">maud.data_model.Prior</a><span class="p">]</span></span></em>, <em class="sig-param"><span class="n">km_priors</span><span class="p">:</span> <span class="n">List<span class="p">[</span><a class="reference internal" href="#maud.data_model.Prior" title="maud.data_model.Prior">maud.data_model.Prior</a><span class="p">]</span></span></em>, <em class="sig-param"><span class="n">formation_energy_priors</span><span class="p">:</span> <span class="n">List<span class="p">[</span><a class="reference internal" href="#maud.data_model.Prior" title="maud.data_model.Prior">maud.data_model.Prior</a><span class="p">]</span></span></em>, <em class="sig-param"><span class="n">unbalanced_metabolite_priors</span><span class="p">:</span> <span class="n">List<span class="p">[</span><a class="reference internal" href="#maud.data_model.Prior" title="maud.data_model.Prior">maud.data_model.Prior</a><span class="p">]</span></span></em>, <em class="sig-param"><span class="n">inhibition_constant_priors</span><span class="p">:</span> <span class="n">List<span class="p">[</span><a class="reference internal" href="#maud.data_model.Prior" title="maud.data_model.Prior">maud.data_model.Prior</a><span class="p">]</span></span></em>, <em class="sig-param"><span class="n">tense_dissociation_constant_priors</span><span class="p">:</span> <span class="n">List<span class="p">[</span><a class="reference internal" href="#maud.data_model.Prior" title="maud.data_model.Prior">maud.data_model.Prior</a><span class="p">]</span></span></em>, <em class="sig-param"><span class="n">relaxed_dissociation_constant_priors</span><span class="p">:</span> <span class="n">List<span class="p">[</span><a class="reference internal" href="#maud.data_model.Prior" title="maud.data_model.Prior">maud.data_model.Prior</a><span class="p">]</span></span></em>, <em class="sig-param"><span class="n">transfer_constant_priors</span><span class="p">:</span> <span class="n">List<span class="p">[</span><a class="reference internal" href="#maud.data_model.Prior" title="maud.data_model.Prior">maud.data_model.Prior</a><span class="p">]</span></span></em>, <em class="sig-param"><span class="n">drain_priors</span><span class="p">:</span> <span class="n">List<span class="p">[</span><a class="reference internal" href="#maud.data_model.Prior" title="maud.data_model.Prior">maud.data_model.Prior</a><span class="p">]</span></span></em>, <em class="sig-param"><span class="n">enzyme_concentration_priors</span><span class="p">:</span> <span class="n">List<span class="p">[</span><a class="reference internal" href="#maud.data_model.Prior" title="maud.data_model.Prior">maud.data_model.Prior</a><span class="p">]</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#maud.data_model.PriorSet" title="Permalink to this definition">¶</a></dt>
+<dd><p>Object containing all priors for a MaudInput.</p>
+</dd></dl>
+
+<dl class="py class">
 <dt id="maud.data_model.Reaction">
-<em class="property">class </em><code class="sig-prename descclassname">maud.data_model.</code><code class="sig-name descname">Reaction</code><span class="sig-paren">(</span><em class="sig-param">id: str</em>, <em class="sig-param">name: str = None</em>, <em class="sig-param">reversible: bool = True</em>, <em class="sig-param">is_exchange: bool = None</em>, <em class="sig-param">stoichiometry: Dict[str</em>, <em class="sig-param">float] = None</em>, <em class="sig-param">enzymes: Dict[str</em>, <em class="sig-param">maud.data_model.Enzyme] = None</em>, <em class="sig-param">water_stoichiometry: float = 0</em><span class="sig-paren">)</span><a class="headerlink" href="#maud.data_model.Reaction" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">maud.data_model.</code><code class="sig-name descname">Reaction</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">id</span><span class="p">:</span> <span class="n">str</span></em>, <em class="sig-param"><span class="n">name</span><span class="p">:</span> <span class="n">str</span> <span class="o">=</span> <span class="default_value">None</span></em>, <em class="sig-param"><span class="n">reversible</span><span class="p">:</span> <span class="n">bool</span> <span class="o">=</span> <span class="default_value">True</span></em>, <em class="sig-param"><span class="n">is_exchange</span><span class="p">:</span> <span class="n">bool</span> <span class="o">=</span> <span class="default_value">None</span></em>, <em class="sig-param"><span class="n">stoichiometry</span><span class="p">:</span> <span class="n">Dict<span class="p">[</span>str<span class="p">, </span>float<span class="p">]</span></span> <span class="o">=</span> <span class="default_value">None</span></em>, <em class="sig-param"><span class="n">enzymes</span><span class="p">:</span> <span class="n">Dict<span class="p">[</span>str<span class="p">, </span><a class="reference internal" href="#maud.data_model.Enzyme" title="maud.data_model.Enzyme">maud.data_model.Enzyme</a><span class="p">]</span></span> <span class="o">=</span> <span class="default_value">None</span></em>, <em class="sig-param"><span class="n">water_stoichiometry</span><span class="p">:</span> <span class="n">float</span> <span class="o">=</span> <span class="default_value">0</span></em><span class="sig-paren">)</span><a class="headerlink" href="#maud.data_model.Reaction" title="Permalink to this definition">¶</a></dt>
 <dd><p>Constructor for the reaction object.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -236,6 +270,12 @@ distribution must have a location and a scale.</p>
 <p>e.g. for the reaction: 1.5 f6p &lt;-&gt; fdp we have {‘f6p’; -1.5, ‘fdp’: 1}
 :param enzymes: Dictionary mapping enzyme ids to Enzyme objects
 :param water_stroichiometry: Reaction’s stoichiometric coefficient for water</p>
+</dd></dl>
+
+<dl class="py class">
+<dt id="maud.data_model.StanCodeSet">
+<em class="property">class </em><code class="sig-prename descclassname">maud.data_model.</code><code class="sig-name descname">StanCodeSet</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">metabolite_codes</span><span class="p">:</span> <span class="n">Dict<span class="p">[</span>str<span class="p">, </span>int<span class="p">]</span></span></em>, <em class="sig-param"><span class="n">mic_codes</span><span class="p">:</span> <span class="n">Dict<span class="p">[</span>str<span class="p">, </span>int<span class="p">]</span></span></em>, <em class="sig-param"><span class="n">balanced_mic_codes</span><span class="p">:</span> <span class="n">Dict<span class="p">[</span>str<span class="p">, </span>int<span class="p">]</span></span></em>, <em class="sig-param"><span class="n">unbalanced_mic_codes</span><span class="p">:</span> <span class="n">Dict<span class="p">[</span>str<span class="p">, </span>int<span class="p">]</span></span></em>, <em class="sig-param"><span class="n">reaction_codes</span><span class="p">:</span> <span class="n">Dict<span class="p">[</span>str<span class="p">, </span>int<span class="p">]</span></span></em>, <em class="sig-param"><span class="n">experiment_codes</span><span class="p">:</span> <span class="n">Dict<span class="p">[</span>str<span class="p">, </span>int<span class="p">]</span></span></em>, <em class="sig-param"><span class="n">enzyme_codes</span><span class="p">:</span> <span class="n">Dict<span class="p">[</span>str<span class="p">, </span>int<span class="p">]</span></span></em>, <em class="sig-param"><span class="n">drain_codes</span><span class="p">:</span> <span class="n">Dict<span class="p">[</span>str<span class="p">, </span>int<span class="p">]</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#maud.data_model.StanCodeSet" title="Permalink to this definition">¶</a></dt>
+<dd><p>Object containing all stan codes for a MaudInput.</p>
 </dd></dl>
 
 </div>
@@ -266,10 +306,10 @@ distribution must have a location and a scale.</p>
 </ul>
 <p class="caption"><span class="caption-text">Theoretical background:</span></p>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="../theory/computation.html">Computation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../theory/enzyme_kinetics.html">Enzyme kinetics</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../theory/statistics.html">Statistical Model</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../theory/thermodynamics.html">Thermodynamics</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../theory/drains.html">Drain Reactions</a></li>
 </ul>
 <p class="caption"><span class="caption-text">Case studies:</span></p>
 <ul>
@@ -278,6 +318,7 @@ distribution must have a location and a scale.</p>
 <p class="caption"><span class="caption-text">Implementation details:</span></p>
 <ul class="current">
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Maud’s data model</a></li>
+<li class="toctree-l1"><a class="reference internal" href="computation.html">Computation</a></li>
 </ul>
 
 <div class="relations">
@@ -285,6 +326,7 @@ distribution must have a location and a scale.</p>
 <ul>
   <li><a href="../index.html">Documentation overview</a><ul>
       <li>Previous: <a href="../case_studies/ecoli.html" title="previous chapter">A simple model of E. coli glycolysis</a></li>
+      <li>Next: <a href="computation.html" title="next chapter">Computation</a></li>
   </ul></li>
 </ul>
 </div>
@@ -314,7 +356,7 @@ distribution must have a location and a scale.</p>
       &copy;2019, Novo Nordisk Foundation Center for Biosustainability, Technical University of Denmark.
       
       |
-      Powered by <a href="http://sphinx-doc.org/">Sphinx 2.4.4</a>
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 3.2.1</a>
       &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
       
       |
