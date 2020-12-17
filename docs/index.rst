@@ -32,6 +32,7 @@ experiments and the existing literature.
    theory/statistics
    theory/thermodynamics
    theory/drains
+   theory/papers
 
 .. toctree::
    :maxdepth: 1
