@@ -132,12 +132,12 @@ def enrich_true_values(tvin, input_data):
                 tvin["ki"], input_data["prior_loc_ki"], input_data["prior_scale_ki"]
             ),
             "log_dissociation_constant_t_z": logz_for_vec(
-                tvin["dissociation_constant_t"],
+                tvin["diss_t"],
                 input_data["prior_loc_diss_t"],
                 input_data["prior_scale_diss_t"],
             ),
             "log_dissociation_constant_r_z": logz_for_vec(
-                tvin["dissociation_constant_r"],
+                tvin["diss_r"],
                 input_data["prior_loc_diss_r"],
                 input_data["prior_scale_diss_r"],
             ),
@@ -192,7 +192,7 @@ def main():
     print("Analysing results...")
     with open(TRUE_PARAM_PATH, "r") as f:
         true_params = json.load(f)
-    csvs = [f for f in os.listdir(".") if f.endswith(".csv")]
+    csvs = [os.path.join(HERE, f) for f in os.listdir(HERE) if f.endswith(".csv")]
     infd = load_infd(csvs, mi)
     exp_codes = mi.stan_codes.experiment_codes
     enz_codes = mi.stan_codes.enzyme_codes

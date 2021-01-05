@@ -20,8 +20,8 @@
     0.620708
   ],
   "ki": [],
-  "dissociation_constant_t": [],
-  "dissociation_constant_r": [],
+  "diss_t": [],
+  "diss_r": [],
   "transfer_constant": [],
   "kcat": [
     150,
