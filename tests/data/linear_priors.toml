@@ -69,37 +69,30 @@ id = 'r3'
 name = 'the enzyme that catalyses reaction r3'
 mechanism = 'modular_rate_law'
 
-###### Experimental data ######
 [[experiments]]
 id = 'condition_1'
-metadata = "A bat got in the bioreactor."
+metadata = ''
 metabolite_measurements = [
-  {target_id='M1_c', value=1.7, uncertainty=0.1},
-  {target_id='M2_c', value=1.4, uncertainty=0.1},
+  {target_id='M1_c', value=1.5536, uncertainty=0.1},
+  {target_id='M2_c', value=1.29479, uncertainty=0.1},
 ]
 reaction_measurements = [
-  {target_id='r3', value=0.29, uncertainty=0.1}
+  {target_id='r3', value=0.0894709, uncertainty=0.01},
 ]
 enzyme_measurements = [
-#   {target_id='r1', value=1, uncertainty=0.05},
-#   {target_id='r2', value=1, uncertainty=0.05},
-#   {target_id='r3', value=1, uncertainty=0.05},
 ]
 
 [[experiments]]
 id = 'condition_2'
-metadata = "I may have mixed up some/all of the numbers."
+metadata = ''
 metabolite_measurements = [
-  {target_id='M1_c', value=1.8, uncertainty=0.1},
-  {target_id='M2_c', value=1.3, uncertainty=0.1},
+  {target_id='M1_c', value=1.77325, uncertainty=0.1},
+  {target_id='M2_c', value=1.13565, uncertainty=0.1},
 ]
 reaction_measurements = [
-  {target_id='r3', value=0.21, uncertainty=0.1}
+  {target_id='r3', value=0.0648904, uncertainty=0.01},
 ]
 enzyme_measurements = [
-#   {target_id='r1', value=1.5, uncertainty=0.05},
-#   {target_id='r2', value=0.5, uncertainty=0.05},
-#   {target_id='r3', value=1.5, uncertainty=0.05},
 ]
 
 ###### Priors ######
