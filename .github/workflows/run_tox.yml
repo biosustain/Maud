@@ -1,6 +1,6 @@
 # This workflow installs Maud on Ubuntu with Python 3.7 and then runs tox
 
-name: Run Maud tests
+name: Install Maud and run tox
 
 on: push
 
