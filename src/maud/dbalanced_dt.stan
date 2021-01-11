@@ -23,16 +23,17 @@ int[] get_enz_mics(matrix S, int i_enz){
 
 real get_active_enzyme_fraction(vector activating_enzyme_conc,
                                 vector deactivating_enzyme_conc,
-                                vector phosphorylating_enzyme_kcat){
-  real alpha = sum(phosphorylating_enzyme_kcat .* activating_enzyme_conc);
-  real beta = sum(phosphorylating_enzyme_kcat .* deactivating_enzyme_conc);
+                                vector phosphorylating_enzyme_kcat,
+                                real subunits){
+  real alpha = sum(phosphorylating_enzyme_kcat .* deactivating_enzyme_conc);
+  real beta = sum(phosphorylating_enzyme_kcat .* activating_enzyme_conc);
   real active_fraction;
 
   if (alpha == 0 && beta == 0){
     active_fraction = 1;
   }
   else {
-    active_fraction = (alpha / (alpha + beta));
+    active_fraction = 1 / (1 + (alpha / beta)^subunits);
   }
   return active_fraction;
 }
@@ -126,8 +127,8 @@ vector get_flux_enz(vector conc_mic,
     for (i in 1:cols(S_phos_act)){
       phos_frac[i] = get_active_enzyme_fraction(phos_enzyme_conc .* S_phos_act[:,i],
                                                 phos_enzyme_conc .* S_phos_inh[:,i],
-                                                phos_enzyme_kcat);
-      print(phos_frac);
+                                                phos_enzyme_kcat,
+                                                subunits[i]);
     }
     flux_enz = flux_enz .* phos_frac;
   }
