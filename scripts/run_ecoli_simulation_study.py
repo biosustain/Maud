@@ -132,12 +132,12 @@ def enrich_true_values(tvin, input_data):
                 tvin["ki"], input_data["prior_loc_ki"], input_data["prior_scale_ki"]
             ),
             "log_dissociation_constant_t_z": logz_for_vec(
-                tvin["diss_t"],
+                tvin["dissociation_constant_t"],
                 input_data["prior_loc_diss_t"],
                 input_data["prior_scale_diss_t"],
             ),
             "log_dissociation_constant_r_z": logz_for_vec(
-                tvin["diss_r"],
+                tvin["dissociation_constant_r"],
                 input_data["prior_loc_diss_r"],
                 input_data["prior_scale_diss_r"],
             ),
