@@ -1,3 +1,4 @@
+#Example of a model that contains allosteric inhibition and acitvation#
 ###### Kinetic model ######
 [[compartments]]
 id = 'c'
@@ -41,6 +42,13 @@ stoichiometry = { M1_e = -1, M1_c = 1}
 id = 'r1'
 name = 'the enzyme that catalyses reaction r1'
 mechanism = 'modular_rate_law'
+subunits=4
+[[reactions.enzymes.modifiers]]
+modifier_type = 'allosteric_activator'
+mic_id = 'M2_c'
+[[reactions.enzymes.modifiers]]
+modifier_type = 'allosteric_inhibitor'
+mic_id = 'M1_c'
 
 [[reactions]]
 id = 'r2'
@@ -65,14 +73,15 @@ mechanism = 'modular_rate_law'
 id = 'condition_1'
 metadata = ''
 metabolite_measurements = [
-  {target_id='M1_c', value=1.44218, uncertainty=0.1},
-  {target_id='M2_c', value=1.43082, uncertainty=0.1},
+  {target_id='M1_c', value=1.43667, uncertainty=0.1},
+  {target_id='M2_c', value=1.42811, uncertainty=0.1},
 ]
 reaction_measurements = [
-  {target_id='r3', value=0.125573, uncertainty=0.01},
+  {target_id='r3', value=0.124883, uncertainty=0.01},
 ]
 enzyme_measurements = [
 ]
+
 [[priors.enzyme_concentrations]]
 enzyme_id = 'r1'
 experiment_id = 'condition_1'
@@ -105,22 +114,18 @@ experiment_id = 'condition_1'
 location = 1
 scale = 0.05
 
-
-
 [[experiments]]
 id = 'condition_2'
 metadata = ''
 metabolite_measurements = [
-  {target_id='M1_c', value=1.66444, uncertainty=0.1},
-  {target_id='M2_c', value=1.23255, uncertainty=0.1},
+  {target_id='M1_c', value=1.65694, uncertainty=0.1},
+  {target_id='M2_c', value=1.23116, uncertainty=0.1},
 ]
 reaction_measurements = [
-  {target_id='r3', value=0.107911, uncertainty=0.01},
+  {target_id='r3', value=0.107312, uncertainty=0.01},
 ]
 enzyme_measurements = [
 ]
-
-
 
 [[priors.enzyme_concentrations]]
 enzyme_id = 'r1'
@@ -215,3 +220,21 @@ scale = 0.05
 metabolite_id = "M2"
 location = -2
 scale = 0.05
+
+[[priors.relaxed_dissociation_constants]]
+enzyme_id = "r1"
+mic_id = "M2_c"
+location = 1
+scale = 0.6
+
+[[priors.tense_dissociation_constants]]
+enzyme_id = "r1"
+mic_id = "M1_c"
+location = 0.5
+scale = 0.6
+
+[[priors.transfer_constants]]
+enzyme_id = "r1"
+location = 1
+scale = 0.6
+
