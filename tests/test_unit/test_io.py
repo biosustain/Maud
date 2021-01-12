@@ -16,9 +16,9 @@ def test_load_maud_input_from_toml():
         "mic_codes": {"M1_e": 1, "M2_e": 2, "M1_c": 3, "M2_c": 4},
         "balanced_mic_codes": {"M1_c": 3, "M2_c": 4},
         "unbalanced_mic_codes": {"M1_e": 1, "M2_e": 2},
-        "reaction_codes": {"r1": 2, "r2": 1, "r3": 3},
+        "reaction_codes": {"r1": 1, "r2": 2, "r3": 3},
         "experiment_codes": {"condition_1": 1, "condition_2": 2},
-        "enzyme_codes": {"r1": 2, "r2": 1, "r3": 3},
+        "enzyme_codes": {"r1": 1, "r2": 2, "r3": 3},
         "phos_enz_codes": {},
         "drain_codes": {},
     }

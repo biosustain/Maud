@@ -1,3 +1,4 @@
+#Example of a model that contains a drain#
 ###### Kinetic model ######
 [[compartments]]
 id = 'c'
@@ -18,7 +19,7 @@ compartment = 'e'
 [[metabolites]]
 id = 'M2'
 name = 'External metabolite number 2'
-balanced = false
+balanced = true
 compartment = 'e'
 
 [[metabolites]]
@@ -33,6 +34,7 @@ name = 'Metabolite number 2'
 balanced = true
 compartment = 'c'
 
+
 [[reactions]]
 id = 'r1'
 name = 'reaction number 1'
@@ -41,9 +43,6 @@ stoichiometry = { M1_e = -1, M1_c = 1}
 id = 'r1'
 name = 'the enzyme that catalyses reaction r1'
 mechanism = 'modular_rate_law'
-[[reactions.enzymes.modifiers]]
-modifier_type = 'allosteric_activator'
-mic_id = 'M2_c'
 
 [[reactions]]
 id = 'r2'
@@ -53,12 +52,6 @@ stoichiometry = { M1_c = -1, M2_c = 1 }
 id = 'r2'
 name = 'the enzyme that catalyses reaction r2'
 mechanism = 'modular_rate_law'
-[[reactions.enzymes.modifiers]]
-modifier_type = 'allosteric_inhibitor'
-mic_id = 'M1_c'
-[[reactions.enzymes.modifiers]]
-modifier_type = 'competitive_inhibitor'
-mic_id = 'M2_c'
 
 [[reactions]]
 id = 'r3'
@@ -69,44 +62,108 @@ id = 'r3'
 name = 'the enzyme that catalyses reaction r3'
 mechanism = 'modular_rate_law'
 
+[[drains]]
+id = "M2_e_drain"
+name = "drain of external M2"
+stoichiometry = { M2_e = -1 }
+
 ###### Experimental data ######
 [[experiments]]
 id = 'condition_1'
-metadata = "A bat got in the bioreactor."
+metadata = ''
 metabolite_measurements = [
-  {target_id='M1_c', value=1.7, uncertainty=0.1},
-  {target_id='M2_c', value=1.4, uncertainty=0.1},
-  {target_id='M1_e', value=2, uncertainty=0.05},
-  {target_id='M2_e', value=1, uncertainty=0.05},
+  {target_id='M1_c', value=1.44218, uncertainty=0.1},
+  {target_id='M2_c', value=1.43082, uncertainty=0.1},
+  {target_id='M2_e', value=1.0, uncertainty=0.05},
 ]
 reaction_measurements = [
-  {target_id='r3', value=0.29, uncertainty=0.1}
+  {target_id='r3', value=0.125573, uncertainty=0.01},
 ]
 enzyme_measurements = [
-  {target_id='r1', value=1, uncertainty=0.05},
-  {target_id='r2', value=1, uncertainty=0.05},
-  {target_id='r3', value=1, uncertainty=0.05},
 ]
+
+[[priors.drains]]
+drain_id = "M2_e_drain"
+experiment_id = "condition_1"
+location = 0.125573
+scale = 0.01
+
+[[priors.enzyme_concentrations]]
+enzyme_id = 'r1'
+experiment_id = 'condition_1'
+location = 1
+scale = 0.05
+
+
+[[priors.enzyme_concentrations]]
+enzyme_id = 'r2'
+experiment_id = 'condition_1'
+location = 1
+scale = 0.05
+
+[[priors.enzyme_concentrations]]
+enzyme_id = 'r3'
+experiment_id = 'condition_1'
+location = 1
+scale = 0.05
+
+ 
+[[priors.unbalanced_metabolites]]
+mic_id = 'M1_e'
+experiment_id = 'condition_1'
+location = 2
+scale = 0.05
+
 
 [[experiments]]
 id = 'condition_2'
-metadata = "I may have mixed up some/all of the numbers."
+metadata = ''
 metabolite_measurements = [
-  {target_id='M1_c', value=1.8, uncertainty=0.1},
-  {target_id='M2_c', value=1.3, uncertainty=0.1},
-  {target_id='M1_e', value=2, uncertainty=0.05},
+  {target_id='M1_c', value=1.66444, uncertainty=0.1},
+  {target_id='M2_c', value=1.23255, uncertainty=0.1},
   {target_id='M2_e', value=1, uncertainty=0.05},
 ]
 reaction_measurements = [
-  {target_id='r3', value=0.21, uncertainty=0.1}
+  {target_id='r3', value=0.107911, uncertainty=0.01},
 ]
 enzyme_measurements = [
-  {target_id='r1', value=1.5, uncertainty=0.05},
-  {target_id='r2', value=0.5, uncertainty=0.05},
-  {target_id='r3', value=1.5, uncertainty=0.05},
 ]
 
+[[priors.drains]]
+drain_id = "M2_e_drain"
+experiment_id = "condition_2"
+location = 0.107911
+scale = 0.01
+
+
+[[priors.enzyme_concentrations]]
+enzyme_id = 'r1'
+experiment_id = 'condition_2'
+location = 1.5
+scale = 0.05
+
+
+[[priors.enzyme_concentrations]]
+enzyme_id = 'r2'
+experiment_id = 'condition_2'
+location = 0.5
+scale = 0.05
+
+[[priors.enzyme_concentrations]]
+enzyme_id = 'r3'
+experiment_id = 'condition_2'
+location = 1.5
+scale = 0.05
+
+[[priors.unbalanced_metabolites]]
+mic_id = 'M1_e'
+experiment_id = 'condition_2'
+location = 2
+scale = 0.05
+
+
 ###### Priors ######
+
 [[priors.kcats]]
 enzyme_id = "r1"
 location = 1
@@ -167,31 +224,3 @@ scale = 0.05
 metabolite_id = "M2"
 location = -2
 scale = 0.05
-
-[[priors.inhibition_constants]]
-enzyme_id = "r2"
-mic_id = "M2_c"
-location = 1
-scale = 0.6
-
-[[priors.transfer_constants]]
-enzyme_id = "r1"
-location = 1
-scale = 0.6
-
-[[priors.transfer_constants]]
-enzyme_id = "r2"
-location = 1
-scale = 0.6
-
-[[priors.relaxed_dissociation_constants]]
-enzyme_id = "r1"
-mic_id = "M2_c"
-location = 1
-scale = 0.6
-
-[[priors.tense_dissociation_constants]]
-enzyme_id = "r2"
-mic_id = "M1_c"
-location = 1
-scale = 0.6

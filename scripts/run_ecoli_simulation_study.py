@@ -192,7 +192,7 @@ def main():
     print("Analysing results...")
     with open(TRUE_PARAM_PATH, "r") as f:
         true_params = json.load(f)
-    csvs = [f for f in os.listdir(".") if f.endswith(".csv")]
+    csvs = [os.path.join(HERE, f) for f in os.listdir(HERE) if f.endswith(".csv")]
     infd = load_infd(csvs, mi)
     exp_codes = mi.stan_codes.experiment_codes
     enz_codes = mi.stan_codes.enzyme_codes
