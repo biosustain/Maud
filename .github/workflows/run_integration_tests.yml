@@ -1,8 +1,8 @@
-# This workflow installs Maud on Ubuntu with Python 3.7 and then runs tox
+# This workflow installs Maud on Ubuntu with Python 3.7 and then runs integration tests
 
-name: Run Maud tests
+name: Run Maud integration tests
 
-on: push
+on: workflow_dispatch
 
 jobs:
   build:
@@ -21,5 +21,6 @@ jobs:
         pip install .[development]
     - name: Install cmdstan
       run: install_cmdstan
-    - name: Run tox
-      run: tox
+    - name: Run integration tests
+      run: pytest tests/test_integration
+
