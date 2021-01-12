@@ -115,7 +115,7 @@ kms = [
   {enzyme_id = "PFKB", mic_id = "fdp_c", location = 15, scale = 1.5},
   {enzyme_id = "PFKB", mic_id = "adp_c", location = 0.025, scale = 1.5},
 
-  {enzyme_id = "FBP", mic_id = "fdp_c", location = 1.7, scale = 0.5}, # SabioRK ID: 40238 / 40239 says 16.0
+  {enzyme_id = "FBP", mic_id = "fdp_c", location = 0.0017, scale = 0.5}, # SabioRK ID: 40238 / 40239 says 16.0
   {enzyme_id = "FBP", mic_id = "f6p_c", location = 0.6899999999999999, scale = 1.5},
   {enzyme_id = "FBP", mic_id = "pi_c", location = 1.0, scale = 1.5},
 

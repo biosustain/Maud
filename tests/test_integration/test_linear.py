@@ -23,6 +23,19 @@ SAMPLE_CONFIG = {
 }
 CASES = [
     ("linear.toml", "true_params_linear.json"),
+    (
+        "example_features/linear_1_allo.toml",
+        "example_features/true_params_linear_1_allo.json",
+    ),
+    (
+        "example_features/linear_2_allo.toml",
+        "example_features/true_params_linear_2_allo.json",
+    ),
+    ("example_features/linear_MM.toml", "example_features/true_params_linear_MM.json"),
+    (
+        "example_features/linear_drain.toml",
+        "example_features/true_params_linear_drain.json",
+    ),
 ]
 
 
