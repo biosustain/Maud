@@ -25,6 +25,7 @@ from maud import sampling
 from maud.io import load_maud_input_from_toml
 
 import toml
+import shutil
 
 
 RELATIVE_PATH_EXAMPLE = "../../tests/data/inputs/linear"
@@ -59,15 +60,27 @@ pass
     default=get_example_path(RELATIVE_PATH_EXAMPLE),
 )
 def sample(data_path, output_dir):
-    """Sample from the model defined by the data at data_path."""
+    """Generate MCMC samples given a user input directory.
+
+    This function creates a new directory in output_dir with a name starting
+    with "maud_output". It first copies the directory at data_path into the new
+    this directory at new_dir/user_input, then runs the sampling.sample
+    function to write samples in new_dir/samples. Finally it prints the results
+    of cmdstanpy's diagnose and summary methods.
+
+    """
     mi = load_maud_input_from_toml(data_path)
     now = datetime.now().strftime("%Y%m%d%H%M%S")
-    output_dirname = "-".join(["maud_output", mi.config.name, now])
-    output_dirpath = os.path.join(output_dir, output_dirname)
+    output_name = f"maud_output-{mi.config.name}-{now}"
+    output_path = os.path.join(output_dir, output_name)
+    samples_path = os.path.join(output_path, "samples")
+    ui_dir = os.path.join(output_dirpath, "user_input")
     print("Creating output directory: " + output_dirpath)
-    os.mkdir(output_dirpath)
-    stanfit = sampling.sample(mi, output_dirpath)
-    stanfit.diagnose()
+    os.mkdir(output_path)
+    print(f"Copying user input from {data_path} to {ui_dir}")
+    shutil.copytree(data_path, ui_dir)
+    stanfit = sampling.sample(mi, samples_path)
+    print(stanfit.diagnose())
     print(stanfit.summary())
 
 
