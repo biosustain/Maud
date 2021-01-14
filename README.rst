@@ -43,14 +43,23 @@ environment from the latest master branch, run this command:
 
     pip install https://github.com/biosustain/Maud/archive/master.zip
 
-Cmdstanpy depends on `cmdstan <https://github.com/stan-dev/cmdstan>`_, which
-needs to be installed too. Fortunately, cmdstanpy comes with a command line
-script that installs cmdstan, so this step is pretty simple:
+Cmdstanpy depends on `cmdstan <https://github.com/stan-dev/cmdstan>`_, 
+which in turn requires a c++ toolchain. Fortunately, cmdstanpy comes with
+commands that can install these for you. On windows the necessary dependencies 
+can be installed with the following powershell commands:
+
+.. code-block:: console
+
+    python -m cmdstanpy.install_cxx_toolchain
+    python -m cmdstanpy.install_cmdstan --compiler
+
+On macos or Linux, you must install the c++ requirements manually 
+(see [here](https://cmdstanpy.readthedocs.io/en/v0.9.67/installation.html#install-cmdstan)) for instuctions. 
+Cmdstan can then be installed using this shell command:
 
 .. code-block:: console
 
     install_cmdstan
-
 
 Usage
 =====
