@@ -35,6 +35,56 @@ DEFAULT_PRIOR_LOC_ENZYME = 0.1
 DEFAULT_PRIOR_SCALE_ENZYME = 2.0
 STAN_PROGRAM_RELATIVE_PATH = "inference_model.stan"
 
+DEFAULT_SAMPLE_CONFIG = {
+    "iter_warmup": 5,
+    "iter_sampling": 5,
+    "chains": 2,
+    "max_treedepth": 11,
+    "inits": 0,
+    "show_progress": True,
+    "step_size": 0.025,
+    "adapt_delta": 0.99,
+    "save_warmup": True,
+    "threads_per_chain": 1,
+}
+DEFAULT_ODE_CONFIG = {
+    "rel_tol": 1e-9,
+    "abs_tol": 1e-9,
+    "max_num_steps": int(1e9),
+    "timepoint": 500,
+
+}
+
+def sample(mi: MaudInput, output_dir: str) -> cmdstanpy.CmdStanMCMC:
+    """Sample from the posterior defined by mi.
+
+    :param mi: a MaudInput object
+    :param output_dir: a string specifying where to save the output.
+    """
+    sample_config = {
+        **DEFAULT_SAMPLE_CONFIG,
+        **mi.config.cmdstanpy_config,
+        **{"output_dir": output_dir}
+    }
+    model_name = mi.config.name
+    input_filepath = os.path.join(output_dir, f"input_data.json")
+    input_data = get_input_data(mi)
+    cmdstanpy.utils.jsondump(input_filepath, input_data)
+    stan_program_filepath = os.path.join(HERE, STAN_PROGRAM_RELATIVE_PATH)
+    include_path = os.path.join(HERE, INCLUDE_PATH)
+    cpp_options = {}
+    stanc_options = {"include_paths": [include_path]}
+    if sample_config["threads_per_chain"] != 1:
+        cpp_options["STAN_THREADS"] = True
+        os.environ["STAN_NUM_THREADS"] = str(sample_config["threads_per_chain"])
+    model = cmdstanpy.CmdStanModel(
+        stan_file=stan_program_filepath,
+        stanc_options=stanc_options,
+        cpp_options=cpp_options,
+    )
+    return model.sample(data=input_filepath, **sample_config)
+
+
 
 def get_full_stoichiometry(
     kinetic_model: KineticModel,
@@ -103,75 +153,6 @@ def get_km_lookup(km_priors, mic_codes, enzyme_codes):
     return out
 
 
-def sample(
-    data_path: str,
-    rel_tol: float,
-    abs_tol: float,
-    max_num_steps: int,
-    likelihood: int,
-    n_samples: int,
-    n_warmup: int,
-    n_chains: int,
-    n_cores: int,
-    timepoint: float,
-    output_dir: str,
-    threads_per_chain: int,
-    save_warmup: bool,
-) -> cmdstanpy.CmdStanMCMC:
-    """Sample from a posterior distribution.
-
-    :param data_path: A path to a toml file containing input data
-    :param rel_tol: Sets ODE solver's rel_tol control parameter
-    :param abs_tol: Sets ODE solver's abs_tol control parameter
-    :param max_num_steps: Sets ODE solver's max_num_steps control parameter
-    :param likelihood: Set to zero if you don't want the model to include information
-    from experimental data.
-    :param n_samples: Number of post-warmup samples
-    :param n_warmup: Number of warmup samples
-    :param n_chains: Number of MCMC chains to run
-    :param n_cores: Number of cores to try and use
-    :param time_step: Amount of time for the ode solver to simulate in order to compare
-    initial state with evolved state
-    :param: output_dir: Directory to save output
-    :param: threads_per_chain: Number of threads per chain (default is 1)
-    :param: save_warmup: whether to save warmup draws (default is True)
-    """
-    if threads_per_chain != 1:
-        os.environ["STAN_NUM_THREADS"] = str(threads_per_chain)
-    model_name = os.path.splitext(os.path.basename(data_path))[0]
-    input_filepath = os.path.join(output_dir, f"input_data_{model_name}.json")
-    init_filepath = os.path.join(output_dir, f"initial_values_{model_name}.json")
-    mi = io.load_maud_input_from_toml(data_path)
-    input_data = get_input_data(
-        mi, abs_tol, rel_tol, max_num_steps, likelihood, timepoint
-    )
-    inits = get_initial_conditions(input_data, mi)
-    cmdstanpy.utils.jsondump(input_filepath, input_data)
-    cmdstanpy.utils.jsondump(init_filepath, inits)
-    stan_program_filepath = os.path.join(HERE, STAN_PROGRAM_RELATIVE_PATH)
-    include_path = os.path.join(HERE, INCLUDE_PATH)
-    cpp_options = {"STAN_THREADS": True} if threads_per_chain != 1 else None
-    model = cmdstanpy.CmdStanModel(
-        stan_file=stan_program_filepath,
-        stanc_options={"include_paths": [include_path]},
-        cpp_options=cpp_options,
-    )
-    return model.sample(
-        data=input_filepath,
-        chains=n_chains,
-        parallel_chains=n_cores,
-        iter_sampling=n_samples,
-        output_dir=output_dir,
-        iter_warmup=n_warmup,
-        max_treedepth=11,
-        save_warmup=save_warmup,
-        inits=0,
-        show_progress=True,
-        step_size=0.025,
-        adapt_delta=0.99,
-    )
-
-
 def simulate_once(
     data_path: str,
     param_vals: dict,
@@ -216,22 +197,14 @@ def simulate_once(
     )
 
 
-def get_input_data(
-    mi: MaudInput,
-    abs_tol: float,
-    rel_tol: float,
-    max_num_steps: int,
-    likelihood: int,
-    timepoint: float,
-) -> dict:
-    """Put a MaudInput and some config numbers into a Stan-friendly dictionary.
+def get_input_data(mi: MaudInput) -> dict:
+    """Put a MaudInput into a Stan-friendly dictionary.
 
     :param mi: a MaudInput object
-    :param abs_tol: Sets ODE solver's abs_tol control parameter
-    :param rel_tol: Sets ODE solver's rel_tol control parameter
-    :param max_num_steps: Sets ODE solver's max_num_steps control parameter
-    :param likelihood: Set to zero if you don't want the model to include information
     """
+    likelihood = mi.config.likelihood
+    ode_config = {**DEFAULT_ODE_CONFIG, **mi.config.ode_config}
+
     metabolites = mi.kinetic_model.metabolites
     mics = mi.kinetic_model.mics
     reactions = mi.kinetic_model.reactions
@@ -465,11 +438,11 @@ def get_input_data(
         "subunits": subunits["subunits"].values,
         "conc_init": conc_init.values,
         "init_enzyme": enz_conc_init.values,
-        "rel_tol": rel_tol,
-        "abs_tol": abs_tol,
-        "max_num_steps": max_num_steps,
-        "LIKELIHOOD": likelihood,
-        "timepoint": timepoint,
+        "rel_tol": ode_config["rel_tol"],
+        "abs_tol": ode_config["abs_tol"],
+        "max_num_steps": int(ode_config["max_num_steps"]),
+        "LIKELIHOOD": int(likelihood),
+        "timepoint": ode_config["timepoint"],
     }
 
 

@@ -20,6 +20,7 @@
 
 """
 
+import os
 from typing import Dict, List
 
 import toml
@@ -32,6 +33,7 @@ from maud.data_model import (
     Experiment,
     ExperimentSet,
     KineticModel,
+    MaudConfig,
     MaudInput,
     Measurement,
     Metabolite,
@@ -65,22 +67,20 @@ MECHANISM_TO_PARAM_IDS = {
 }
 
 
-def load_kinetic_model_from_toml(
-    parsed_toml: dict, model_id: str = "mi"
-) -> KineticModel:
+def parse_toml_kinetic_model(raw: dict) -> KineticModel:
     """Turn the output of toml.load into a KineticModel object.
 
-    :param parsed_toml: Result of running toml.load on a suitable toml file
-    :param model_id: String identifying the model.
+    :param raw: Result of running toml.load on a suitable toml file
 
     """
+    model_id = raw["model_id"] if "model_id" in raw.keys() else "mi" 
     compartments = {
         c["id"]: Compartment(id=c["id"], name=c["name"], volume=c["volume"])
-        for c in parsed_toml["compartments"]
+        for c in raw["compartments"]
     }
     metabolites = {
         m["id"]: Metabolite(id=m["id"], name=m["name"])
-        for m in parsed_toml["metabolites"]
+        for m in raw["metabolites"]
     }
     mics = {
         f"{m['id']}_{m['compartment']}": MetaboliteInCompartment(
@@ -89,11 +89,11 @@ def load_kinetic_model_from_toml(
             compartment_id=m["compartment"],
             balanced=m["balanced"],
         )
-        for m in parsed_toml["metabolites"]
+        for m in raw["metabolites"]
     }
-    reactions = {r["id"]: load_reaction_from_toml(r) for r in parsed_toml["reactions"]}
-    if "drains" in parsed_toml.keys():
-        drains = {d["id"]: load_drain_from_toml(d) for d in parsed_toml["drains"]}
+    reactions = {r["id"]: parse_toml_reaction(r) for r in raw["reactions"]}
+    if "drains" in raw.keys():
+        drains = {d["id"]: parse_toml_drain(d) for d in raw["drains"]}
     else:
         drains = None
     return KineticModel(
@@ -139,42 +139,42 @@ def get_stan_codes(km: KineticModel, experiments: ExperimentSet) -> StanCodeSet:
     )
 
 
-def load_drain_from_toml(toml_drain: dict) -> Drain:
+def parse_toml_drain(raw: dict) -> Drain:
     """Turn a dictionary representing a drain into a Drain object.
 
-    :param toml_drain: Dictionary representing a drain, typically one of
+    :param raw: Dictionary representing a drain, typically one of
     the values of the 'drains' field in the output of toml.load.
 
     """
 
     return Drain(
-        id=toml_drain["id"],
-        name=toml_drain["name"],
-        stoichiometry=toml_drain["stoichiometry"],
+        id=raw["id"],
+        name=raw["name"],
+        stoichiometry=raw["stoichiometry"],
     )
 
 
-def load_reaction_from_toml(toml_reaction: dict) -> Reaction:
+def parse_toml_reaction(raw: dict) -> Reaction:
     """Turn a dictionary representing a reaction into a Reaction object.
 
-    :param toml_reaction: Dictionary representing a reaction, typically one of
+    :param raw: Dictionary representing a reaction, typically one of
     the values of the 'reactions' field in the output of toml.load.
 
     """
     enzymes = {}
     subunits = 1
     reversible = (
-        toml_reaction["reversible"] if "reversible" in toml_reaction.keys() else None
+        raw["reversible"] if "reversible" in raw.keys() else None
     )
     is_exchange = (
-        toml_reaction["is_exchange"] if "is_exchange" in toml_reaction.keys() else None
+        raw["is_exchange"] if "is_exchange" in raw.keys() else None
     )
     water_stoichiometry = (
-        toml_reaction["water_stoichiometry"]
-        if "water_stoichiometry" in toml_reaction.keys()
+        raw["water_stoichiometry"]
+        if "water_stoichiometry" in raw.keys()
         else 0
     )
-    for e in toml_reaction["enzymes"]:
+    for e in raw["enzymes"]:
         modifiers = {
             "competitive_inhibitor": [],
             "allosteric_inhibitor": [],
@@ -197,16 +197,16 @@ def load_reaction_from_toml(toml_reaction: dict) -> Reaction:
         enzymes[e["id"]] = Enzyme(
             id=e["id"],
             name=e["name"],
-            reaction_id=toml_reaction["id"],
+            reaction_id=raw["id"],
             modifiers=modifiers,
             subunits=subunits,
         )
     return Reaction(
-        id=toml_reaction["id"],
-        name=toml_reaction["name"],
+        id=raw["id"],
+        name=raw["name"],
         reversible=reversible,
         is_exchange=is_exchange,
-        stoichiometry=toml_reaction["stoichiometry"],
+        stoichiometry=raw["stoichiometry"],
         enzymes=enzymes,
         water_stoichiometry=water_stoichiometry,
     )
@@ -233,25 +233,20 @@ def get_experiment(raw: Dict) -> Experiment:
     return out
 
 
-def extract_priors(
-    list_of_prior_dicts: List[Dict], id_func, is_non_negative: bool = True
-):
-    """Get a list of Prior objects from a list of dictionaries."""
-    return [Prior(id_func(p), is_non_negative, **p) for p in list_of_prior_dicts]
+def parse_toml_experiment_set(raw: dict) -> ExperimentSet:
+    """get an ExperimentSet object from a dictionary representation.
 
-
-def load_maud_input_from_toml(filepath: str, id: str = "mi") -> MaudInput:
+    :param raw: result of running toml.load on a suitable file
     """
-    Load an MaudInput object from a suitable toml file.
+    return ExperimentSet([get_experiment(e) for e in raw["experiments"]])
 
-    :param filepath: path to a toml file
-    :param id: id for the output object
 
+def parse_toml_prior_set(raw: dict) -> PriorSet:
+    """get an PriorSet object from a dictionary representation.
+
+    :param raw: result of running toml.load on a suitable file
     """
-    parsed_toml = toml.load(filepath)
-    kinetic_model = load_kinetic_model_from_toml(parsed_toml, id)
-    experiments = ExperimentSet([get_experiment(e) for e in parsed_toml["experiments"]])
-    prior_dict = parsed_toml["priors"]
+    prior_dict = raw.copy()
     for k in [
         "inhibition_constants",
         "tense_dissociation_constants",
@@ -260,7 +255,7 @@ def load_maud_input_from_toml(filepath: str, id: str = "mi") -> MaudInput:
     ]:
         if k not in prior_dict.keys():
             prior_dict[k] = {}
-    priors = PriorSet(
+    return PriorSet(
         km_priors=extract_priors(
             prior_dict["kms"], lambda p: f"km_{p['enzyme_id']}_{p['mic_id']}"
         ),
@@ -306,11 +301,51 @@ def load_maud_input_from_toml(filepath: str, id: str = "mi") -> MaudInput:
         if "drains" in prior_dict.keys()
         else [],
     )
-    stan_codes = get_stan_codes(kinetic_model, experiments)
+    
+
+def extract_priors(
+    list_of_prior_dicts: List[Dict], id_func, is_non_negative: bool = True
+):
+    """Get a list of Prior objects from a list of dictionaries."""
+    return [Prior(id_func(p), is_non_negative, **p) for p in list_of_prior_dicts]
+
+
+def parse_config(raw):
+    """Get a MaudConfig object from the result of toml.load.
+
+    :param raw: result of running toml.load on a suitable file
+    """
+    return MaudConfig(
+        name=raw["name"],
+        kinetic_model_file=raw["kinetic_model"],
+        priors_file=raw["priors"],
+        experiments_file=raw["experiments"],
+        likelihood=raw["likelihood"],
+        ode_config=raw["ode_config"],
+        cmdstanpy_config=raw["cmdstanpy_config"],
+    )
+
+
+def load_maud_input_from_toml(data_path: str) -> MaudInput:
+    """
+    Load an MaudInput object from a data path.
+
+    :param filepath: path to directory containing input toml file
+
+    """
+    config = parse_config(toml.load(os.path.join(data_path, "config.toml")))
+    kinetic_model_path = os.path.join(data_path, config.kinetic_model_file)
+    experiments_path = os.path.join(data_path, config.experiments_file)
+    priors_path = os.path.join(data_path, config.priors_file)
+    kinetic_model = parse_toml_kinetic_model(toml.load(kinetic_model_path))
+    experiment_set = parse_toml_experiment_set(toml.load(experiments_path))
+    prior_set = parse_toml_prior_set(toml.load(priors_path))
+    stan_codes = get_stan_codes(kinetic_model, experiment_set)
     mi = MaudInput(
-        experiments=experiments,
+        config=config,
         kinetic_model=kinetic_model,
-        priors=priors,
+        experiments=experiment_set,
+        priors=prior_set,
         stan_codes=stan_codes,
     )
     validation.validate_maud_input(mi)
