@@ -318,7 +318,7 @@ def get_input_data(mi: MaudInput) -> dict:
             ],
             columns=["experiment_id", "target_id", "value", "uncertainty"],
         )
-        for measurement_type in ["metabolite", "reaction", "enzyme"]
+        for measurement_type in ["mic", "flux", "enzyme"]
     )
     for prior_unb in mi.priors.unbalanced_metabolite_priors:
         mic_id = mic_codes[prior_unb.mic_id]

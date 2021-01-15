@@ -74,9 +74,10 @@ def sample(data_path, output_dir):
     output_name = f"maud_output-{mi.config.name}-{now}"
     output_path = os.path.join(output_dir, output_name)
     samples_path = os.path.join(output_path, "samples")
-    ui_dir = os.path.join(output_dirpath, "user_input")
-    print("Creating output directory: " + output_dirpath)
+    ui_dir = os.path.join(output_path, "user_input")
+    print("Creating output directory: " + output_path)
     os.mkdir(output_path)
+    os.mkdir(samples_path)
     print(f"Copying user input from {data_path} to {ui_dir}")
     shutil.copytree(data_path, ui_dir)
     stanfit = sampling.sample(mi, samples_path)
