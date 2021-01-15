@@ -42,5 +42,7 @@
     -1,
     -2
   ],
-  "drain": []
+  "drain": [],
+  "phos_enzyme_conc": [],
+  "phos_kcat": []
 }
