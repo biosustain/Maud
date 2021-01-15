@@ -232,7 +232,6 @@ class Measurement:
     :param target_id: id of the thing being measured
     :param value: value for the measurement
     :param uncertainty: uncertainty associated to the measurent
-    :param scale: scale of the measurement, e.g. 'log10' or 'linear
     :param target_type: type of thing being measured, e.g. 'metabolite', 'reaction',
     'enzyme'.
     """
@@ -242,14 +241,16 @@ class Measurement:
         target_id: str,
         value: float,
         uncertainty: float = None,
-        scale: str = None,
         target_type: str = None,
     ):
+        target_type_to_error_scale = {
+            "mic": "ln", "flux": "linear", "enzyme": "ln"
+        }
         self.target_id = target_id
         self.value = value
         self.uncertainty = uncertainty
-        self.scale = scale
         self.target_type = target_type
+        self.scale = target_type_to_error_scale[target_type]
 
 
 class Experiment:
