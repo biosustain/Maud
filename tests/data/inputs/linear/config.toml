@@ -1,7 +1,7 @@
 name = "linear"
 kinetic_model = "kinetic_model.toml"
-priors = "priors.toml"
-experiments = "experiments.toml"
+priors = "priors.csv"
+experiments = "experiments.csv"
 likelihood = true
 
 [cmdstanpy_config]
