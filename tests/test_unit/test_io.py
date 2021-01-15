@@ -19,6 +19,7 @@ def test_load_maud_input_from_toml():
         "reaction_codes": {"r1": 1, "r2": 2, "r3": 3},
         "experiment_codes": {"condition_1": 1, "condition_2": 2},
         "enzyme_codes": {"r1": 1, "r2": 2, "r3": 3},
+        "phos_enz_codes": {},
         "drain_codes": {},
     }
     mi = io.load_maud_input_from_toml(os.path.join(data_path, "linear.toml"))

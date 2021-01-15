@@ -37,32 +37,13 @@ from maud.data_model import (
     Metabolite,
     MetaboliteInCompartment,
     Modifier,
+    Phosphorylation,
     Prior,
     PriorSet,
     Reaction,
     StanCodeSet,
 )
 from maud.utils import codify
-
-
-MECHANISM_TO_PARAM_IDS = {
-    "uniuni": ["Kcat1", "Kcat2", "Ka"],
-    "ordered_unibi": ["Kcat1", "Kcat2", "Ka", "Kp", "Kq", "Kia"],
-    "ordered_bibi": ["Kcat1", "Kcat2", "Ka", "Kb", "Kp", "Kq", "Kib", "Kiq"],
-    "ping_pong": ["Kcat1", "Kcat2", "Ka", "Kb", "Kp", "Kq", "Kia", "Kib", "Kiq"],
-    "ordered_terbi": [
-        "Kcat1",
-        "Kcat2",
-        "Ka",
-        "Kb",
-        "Kc",
-        "Kq",
-        "Kia",
-        "Kib",
-        "Kic",
-        "Kiq",
-    ],
-}
 
 
 def load_kinetic_model_from_toml(
@@ -96,6 +77,13 @@ def load_kinetic_model_from_toml(
         drains = {d["id"]: load_drain_from_toml(d) for d in parsed_toml["drains"]}
     else:
         drains = None
+    if "phosphorylation" in parsed_toml.keys():
+        phosphorylation = {
+            d["id"]: load_phosphorylation_from_toml(d)
+            for d in parsed_toml["phosphorylation"]
+        }
+    else:
+        phosphorylation = None
     return KineticModel(
         model_id=model_id,
         metabolites=metabolites,
@@ -103,6 +91,7 @@ def load_kinetic_model_from_toml(
         mics=mics,
         reactions=reactions,
         drains=drains,
+        phosphorylation=phosphorylation,
     )
 
 
@@ -127,6 +116,10 @@ def get_stan_codes(km: KineticModel, experiments: ExperimentSet) -> StanCodeSet:
         drain_codes = codify(km.drains.keys())
     else:
         drain_codes = {}
+    if km.phosphorylation is not None:
+        phos_enz_codes = codify(km.phosphorylation.keys())
+    else:
+        phos_enz_codes = {}
     return StanCodeSet(
         metabolite_codes=codify(km.metabolites.keys()),
         mic_codes=mic_codes,
@@ -135,6 +128,7 @@ def get_stan_codes(km: KineticModel, experiments: ExperimentSet) -> StanCodeSet:
         reaction_codes=codify(km.reactions.keys()),
         experiment_codes=codify([e.id for e in experiments.experiments]),
         enzyme_codes=codify(enzyme_ids),
+        phos_enz_codes=phos_enz_codes,
         drain_codes=drain_codes,
     )
 
@@ -151,6 +145,28 @@ def load_drain_from_toml(toml_drain: dict) -> Drain:
         id=toml_drain["id"],
         name=toml_drain["name"],
         stoichiometry=toml_drain["stoichiometry"],
+    )
+
+
+def load_phosphorylation_from_toml(toml_phosphorylation: dict) -> Phosphorylation:
+    """Turn a dictionary representing phosphorylation into a phosphorylation object.
+
+    :param toml_phosphorylation: Dictionary representing a phosphorylation
+    enzyme, typically one of the values of the 'phosphorylation' field in
+    the output of toml.load.
+
+    """
+
+    return Phosphorylation(
+        id=toml_phosphorylation["id"],
+        name=toml_phosphorylation["name"],
+        activating=toml_phosphorylation["activating"]
+        if "activating" in toml_phosphorylation.keys()
+        else None,
+        inhibiting=toml_phosphorylation["inhibiting"]
+        if "inhibiting" in toml_phosphorylation.keys()
+        else None,
+        enzyme_id=toml_phosphorylation["enzyme_id"],
     )
 
 
@@ -264,6 +280,11 @@ def load_maud_input_from_toml(filepath: str, id: str = "mi") -> MaudInput:
         km_priors=extract_priors(
             prior_dict["kms"], lambda p: f"km_{p['enzyme_id']}_{p['mic_id']}"
         ),
+        phos_kcat_priors=extract_priors(
+            prior_dict["phos_kcats"], lambda p: f"phos_kcat_{p['phos_enz_id']}"
+        )
+        if "phos_enz_concentration" in prior_dict.keys()
+        else [],
         kcat_priors=extract_priors(
             prior_dict["kcats"], lambda p: f"kcat_{p['enzyme_id']}"
         ),
@@ -296,12 +317,20 @@ def load_maud_input_from_toml(filepath: str, id: str = "mi") -> MaudInput:
         else [],
         enzyme_concentration_priors=extract_priors(
             prior_dict["enzyme_concentrations"],
-            lambda p: f"enzyme_concentrations{p['enzyme_id']}_{p['experiment_id']}",
+            lambda p: f"enzyme_concentrations_{p['enzyme_id']}_{p['experiment_id']}",
         )
         if "enzyme_concentrations" in prior_dict.keys()
         else [],
+        phos_enz_concentration_priors=extract_priors(
+            prior_dict["phos_enz_concentration"],
+            lambda p: f"phos_enz_concentration_{p['phos_enz_id']}_{p['experiment_id']}",
+        )
+        if "phos_enz_concentration" in prior_dict.keys()
+        else [],
         drain_priors=extract_priors(
-            prior_dict["drains"], lambda p: f"{p['drain_id']}_{p['experiment_id']}"
+            prior_dict["drains"],
+            lambda p: f"{p['drain_id']}_{p['experiment_id']}",
+            is_non_negative=False,
         )
         if "drains" in prior_dict.keys()
         else [],
