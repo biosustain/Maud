@@ -198,6 +198,33 @@ class Drain:
         self.stoichiometry = stoichiometry
 
 
+class Phosphorylation:
+    """Constructor for the phosphorylation object.
+
+    :param id: phosphorylation id. use BIGG id if possible.
+    :param name: name of phosphorylation reaction.
+    :param activating: if the interaction activates the
+    target enzyme.
+    :param inhibiting: if the interaction inhibits the
+    target enzyme.
+    :enzyme_id: the target enzyme of the interaction
+    """
+
+    def __init__(
+        self,
+        id: str,
+        name: str = None,
+        activating: bool = None,
+        inhibiting: bool = None,
+        enzyme_id: str = None,
+    ):
+        self.id = id
+        self.name = name
+        self.activating = activating
+        self.inhibiting = inhibiting
+        self.enzyme_id = enzyme_id
+
+
 class KineticModel:
     """Constructor for representation of a system of metabolic reactions.
 
@@ -217,6 +244,7 @@ class KineticModel:
         compartments: Dict[str, Compartment],
         mics: Dict[str, MetaboliteInCompartment],
         drains: Dict[str, Drain] = None,
+        phosphorylation: Dict[str, Phosphorylation] = None,
     ):
         self.model_id = model_id
         self.metabolites = metabolites
@@ -224,6 +252,7 @@ class KineticModel:
         self.drains = drains
         self.compartments = compartments
         self.mics = mics
+        self.phosphorylation = phosphorylation
 
 
 class Measurement:
@@ -269,6 +298,7 @@ class Experiment:
         measurements: Dict[str, Dict[str, Measurement]] = None,
         metadata: str = None,
         knockouts: List[str] = None,
+        phos_knockouts: List[str] = None,
     ):
         if measurements is None:
             measurements = defaultdict()
@@ -276,6 +306,7 @@ class Experiment:
         self.measurements = measurements
         self.metadata = metadata
         self.knockouts = knockouts
+        self.phos_knockouts = phos_knockouts
 
 
 class Prior:
@@ -293,6 +324,7 @@ class Prior:
     :param mic_id: id of relevant metabolite-in-compartment
     :param metabolite_id: id of relevant metabolite
     :param enzyme_id: id of relevant enzyme
+    :param phos_enz_id: id of enzyme involved with phosphorylation reaction
     :param drain_id: id of relevant drain
     """
 
@@ -304,6 +336,7 @@ class Prior:
         mic_id: str = None,
         metabolite_id: str = None,
         enzyme_id: str = None,
+        phos_enz_id: str = None,
         drain_id: str = None,
         pct1: float = None,
         pct99: float = None,
@@ -316,6 +349,7 @@ class Prior:
         self.mic_id = mic_id
         self.metabolite_id = metabolite_id
         self.enzyme_id = enzyme_id
+        self.phos_enz_id = phos_enz_id
         self.drain_id = drain_id
 
         self.pct1 = pct1
@@ -341,6 +375,7 @@ class PriorSet:
     def __init__(
         self,
         kcat_priors: List[Prior],
+        phos_kcat_priors: List[Prior],
         km_priors: List[Prior],
         formation_energy_priors: List[Prior],
         unbalanced_metabolite_priors: List[Prior],
@@ -350,8 +385,10 @@ class PriorSet:
         transfer_constant_priors: List[Prior],
         drain_priors: List[Prior],
         enzyme_concentration_priors: List[Prior],
+        phos_enz_concentration_priors: List[Prior],
     ):
         self.kcat_priors = kcat_priors
+        self.phos_kcat_priors = phos_kcat_priors
         self.km_priors = km_priors
         self.formation_energy_priors = formation_energy_priors
         self.unbalanced_metabolite_priors = unbalanced_metabolite_priors
@@ -361,6 +398,7 @@ class PriorSet:
         self.transfer_constant_priors = transfer_constant_priors
         self.drain_priors = drain_priors
         self.enzyme_concentration_priors = enzyme_concentration_priors
+        self.phos_enz_concentration_priors = phos_enz_concentration_priors
 
 
 class StanCodeSet:
@@ -376,6 +414,7 @@ class StanCodeSet:
         experiment_codes: Dict[str, int],
         enzyme_codes: Dict[str, int],
         drain_codes: Dict[str, int],
+        phos_enz_codes: Dict[str, int],
     ):
         self.metabolite_codes = metabolite_codes
         self.mic_codes = mic_codes
@@ -385,6 +424,7 @@ class StanCodeSet:
         self.experiment_codes = experiment_codes
         self.enzyme_codes = enzyme_codes
         self.drain_codes = drain_codes
+        self.phos_enz_codes = phos_enz_codes
 
 
 class ExperimentSet:

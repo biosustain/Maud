@@ -8,5 +8,7 @@
     "ki": [1],
     "dissociation_constant_t": [1],
     "dissociation_constant_r": [1],
-    "transfer_constant": [1, 1]
+    "transfer_constant": [1, 1],
+    "phos_enzyme_conc": [],
+    "phos_kcat": []
 }

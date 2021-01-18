@@ -39,8 +39,8 @@ drain is shown in :numref:`(Fig. %s) <fraction_of_drain>`.
     :width: 400
 
     fraction of expected drain rate as a function of a metabolite concentration.
-    The red dotted line is the pseudo-Michaelis-Menten constant at a concentration
-    of :math:`10^{-6} mM`, and, the orange dotted line defines the concentration 
+    The orange dotted line is the pseudo-Michaelis-Menten constant at a concentration
+    of :math:`10^{-6} mM`, and, the green dotted line defines the concentration 
     required for 95% of the rate, which is :math:`1.9 \times 10^{-5} mM`.
 
 

@@ -143,6 +143,52 @@ def get_knockout_matrix(mi: MaudInput):
     return enzyme_knockout_matrix
 
 
+def get_phos_knockout_matrix(mi: MaudInput):
+    """Get binary experiment, phos_enzyme matrix, 1 if phos_enyzme knocked out, 0 if not.
+
+    :param mi: a MaudInput object
+    """
+    experiment_codes = mi.stan_codes.experiment_codes
+    phos_enz_codes = mi.stan_codes.phos_enz_codes
+    phos_enzyme_knockout_matrix = pd.DataFrame(
+        0,
+        index=np.arange(len(experiment_codes)),
+        columns=np.arange(len(phos_enz_codes)),
+    )
+    for exp in mi.experiments.experiments:
+        if exp.phos_knockouts:
+            for penz in exp.phos_knockouts:
+                phos_enzyme_knockout_matrix.loc[
+                    experiment_codes[exp.id] - 1, phos_enz_codes[penz] - 1
+                ] = 1
+    return phos_enzyme_knockout_matrix
+
+
+def get_phos_act_inh_matrix(mi: MaudInput):
+    """Get binary experiment, enzyme matrix, 1 if enyzme knocked out, 0 if not.
+
+    :param mi: a MaudInput object
+    """
+    enzyme_codes = mi.stan_codes.enzyme_codes
+    phos_enz_codes = mi.stan_codes.phos_enz_codes
+    S_phos_act = pd.DataFrame(
+        0, index=np.arange(len(enzyme_codes)), columns=np.arange(len(phos_enz_codes))
+    )
+    S_phos_inh = pd.DataFrame(
+        0, index=np.arange(len(enzyme_codes)), columns=np.arange(len(phos_enz_codes))
+    )
+    for phos_id, phos in mi.kinetic_model.phosphorylation.items():
+        if phos.activating:
+            S_phos_act.loc[
+                enzyme_codes[phos.enzyme_id] - 1, phos_enz_codes[phos_id] - 1
+            ] = 1
+        elif phos.inhbiting:
+            S_phos_inh.loc[
+                enzyme_codes[phos.enzyme_id] - 1, phos_enz_codes[phos_id] - 1
+            ] = 1
+    return S_phos_act, S_phos_inh
+
+
 def get_km_lookup(km_priors, mic_codes, enzyme_codes):
     """Get a mics x enzymes matrix of km indexes. 0 means null."""
     out = pd.DataFrame(0, index=mic_codes.values(), columns=enzyme_codes.values())
@@ -214,6 +260,7 @@ def get_input_data(mi: MaudInput) -> dict:
     experiment_codes = mi.stan_codes.experiment_codes
     met_codes = mi.stan_codes.metabolite_codes
     mic_codes = mi.stan_codes.mic_codes
+    phos_enz_codes = mi.stan_codes.phos_enz_codes
     balanced_mic_codes = mi.stan_codes.balanced_mic_codes
     unbalanced_mic_codes = mi.stan_codes.unbalanced_mic_codes
     mic_to_met = {
@@ -250,6 +297,12 @@ def get_input_data(mi: MaudInput) -> dict:
         .assign(stan_code=lambda df: df["metabolite_id"].map(met_codes))
         .sort_values("stan_code")
     )
+    if len(prior_dfs["phos_kcat_priors"]) > 0:
+        prior_dfs["phos_kcat_priors"] = (
+            prior_dfs["phos_kcat_priors"]
+            .assign(stan_code=lambda df: df["phos_enz_id"].map(phos_enz_codes))
+            .sort_values("stan_code")
+        )
     n_modifier = {}
     for df_name, param_type in zip(
         [
@@ -300,6 +353,12 @@ def get_input_data(mi: MaudInput) -> dict:
     prior_scale_enzyme = pd.DataFrame(
         DEFAULT_PRIOR_SCALE_ENZYME, index=experiment_codes, columns=enzyme_codes
     )
+    prior_loc_phos_conc = pd.DataFrame(
+        DEFAULT_PRIOR_LOC_ENZYME, index=experiment_codes, columns=phos_enz_codes
+    )
+    prior_scale_phos_conc = pd.DataFrame(
+        DEFAULT_PRIOR_SCALE_ENZYME, index=experiment_codes, columns=phos_enz_codes
+    )
     conc_init = pd.DataFrame(
         0.01, index=experiment_codes.values(), columns=mic_codes.values()
     )
@@ -338,6 +397,12 @@ def get_input_data(mi: MaudInput) -> dict:
         column_ix = enzyme_codes[row["target_id"]]
         enz_conc_init.loc[row_ix, column_ix] = row["value"]
     knockout_matrix = get_knockout_matrix(mi=mi)
+    phos_knockout_matrix = get_phos_knockout_matrix(mi=mi)
+    if len(phos_enz_codes) > 0:
+        S_phos_act, S_phos_inh = get_phos_act_inh_matrix(mi=mi)
+    else:
+        S_phos_act = pd.DataFrame()
+        S_phos_inh = pd.DataFrame()
     km_lookup = get_km_lookup(prior_dfs["km_priors"], mic_codes, enzyme_codes)
     for prior_unb in mi.priors.unbalanced_metabolite_priors:
         mic_id = prior_unb.mic_id
@@ -349,6 +414,11 @@ def get_input_data(mi: MaudInput) -> dict:
         exp_id = prior_enz.experiment_id
         prior_loc_enzyme.loc[exp_id, enz_id] = prior_enz.location
         prior_scale_enzyme.loc[exp_id, enz_id] = prior_enz.scale
+    for prior_phos_enz in mi.priors.phos_enz_concentration_priors:
+        penz_id = prior_phos_enz.phos_enz_id
+        exp_id = prior_phos_enz.experiment_id
+        prior_loc_phos_conc.loc[exp_id, penz_id] = prior_phos_enz.location
+        prior_scale_phos_conc.loc[exp_id, penz_id] = prior_phos_enz.scale
     return {
         "N_mic": len(mics),
         "N_unbalanced": len(unbalanced_mic_codes),
@@ -356,6 +426,9 @@ def get_input_data(mi: MaudInput) -> dict:
         "N_km": len(prior_dfs["km_priors"]),
         "N_reaction": len(reactions),
         "N_enzyme": len(enzymes),
+        "N_phosphorylation_enzymes": len(phos_enz_codes)
+        if phos_enz_codes is not None
+        else 0,
         "N_experiment": len(mi.experiments.experiments),
         "N_flux_measurement": len(reaction_measurements),
         "N_enzyme_measurement": len(enzyme_measurements),
@@ -397,6 +470,8 @@ def get_input_data(mi: MaudInput) -> dict:
         ].values,
         "prior_loc_kcat": prior_dfs["kcat_priors"]["location"].values,
         "prior_scale_kcat": prior_dfs["kcat_priors"]["scale"].values,
+        "prior_loc_phos_kcat": prior_dfs["phos_kcat_priors"]["location"].values,
+        "prior_scale_phos_kcat": prior_dfs["phos_kcat_priors"]["scale"].values,
         "prior_loc_km": prior_dfs["km_priors"]["location"].values,
         "prior_scale_km": prior_dfs["km_priors"]["scale"].values,
         "prior_loc_ki": prior_dfs["inhibition_constant_priors"]["location"].values,
@@ -419,15 +494,20 @@ def get_input_data(mi: MaudInput) -> dict:
         "prior_scale_unbalanced": prior_scale_unb.values,
         "prior_loc_enzyme": prior_loc_enzyme.values,
         "prior_scale_enzyme": prior_scale_enzyme.values,
+        "prior_loc_phos_conc": prior_loc_phos_conc.values,
+        "prior_scale_phos_conc": prior_scale_phos_conc.values,
         "prior_loc_drain": prior_loc_drain.values.tolist(),
         "prior_scale_drain": prior_scale_drain.values.tolist(),
         "S_enz": enzyme_stoic.T.values,
         "S_drain": drain_stoic.T.values.tolist(),
-        "S_full": full_stoic.T.values,
+        "S_full": full_stoic.T.values.tolist(),
+        "S_phos_act": S_phos_act.T.values.tolist(),
+        "S_phos_inh": S_phos_inh.T.values.tolist(),
         "water_stoichiometry": water_stoichiometry,
         "mic_to_met": list(mic_to_met.values()),
         "S_to_flux_map": stoic_map_to_flux.values,
         "is_knockout": knockout_matrix.values,
+        "is_phos_knockout": phos_knockout_matrix.values,
         "km_lookup": km_lookup.values,
         "n_ci": n_modifier["ki"],
         "n_ai": n_modifier["diss_t"],
@@ -459,4 +539,6 @@ def get_initial_conditions(input_data, mi):
         "enzyme": input_data["init_enzyme"],
         "formation_energy": input_data["prior_loc_formation_energy"],
         "drain": input_data["prior_loc_drain"],
+        "phos_enzyme_conc": input_data["prior_loc_phos_conc"],
+        "phos_kcat": input_data["prior_loc_phos_kcat"],
     }

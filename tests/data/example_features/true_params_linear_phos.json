@@ -7,12 +7,17 @@
     1,
     1
   ],
-  "ki": [],
+  "ki": [
+    1
+  ],
   "dissociation_constant_t": [
     1
   ],
-  "dissociation_constant_r": [],
+  "dissociation_constant_r": [
+    1
+  ],
   "transfer_constant": [
+    1,
     1
   ],
   "kcat": [
@@ -22,12 +27,12 @@
   ],
   "conc_unbalanced": [
     [
-      2.0,
-      1.0
+      0.1,
+      0.1
     ],
     [
-      2.0,
-      1.0
+      0.1,
+      0.1
     ]
   ],
   "enzyme": [
@@ -47,6 +52,15 @@
     -2
   ],
   "drain": [],
-  "phos_enzyme_conc": [],
-  "phos_kcat": []
+  "phos_enzyme_conc": [
+    [
+      1.0
+    ],
+    [
+      1.0
+    ]
+  ],
+  "phos_kcat": [
+    1
+  ]
 }

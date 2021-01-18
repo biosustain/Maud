@@ -161,6 +161,16 @@ def enrich_true_values(tvin, input_data):
                 input_data["prior_loc_unbalanced"],
                 input_data["prior_scale_unbalanced"],
             ),
+            "log_phos_kcat_z": logz_for_vec(
+                tvin["phos_kcat"],
+                input_data["prior_loc_phos_kcat"],
+                input_data["prior_scale_phos_kcat"],
+            ),
+            "log_phos_conc_z": logz_for_vec(
+                tvin["phos_enzyme_conc"],
+                input_data["prior_loc_phos_conc"],
+                input_data["prior_scale_phos_conc"],
+            ),
         },
     }
 
