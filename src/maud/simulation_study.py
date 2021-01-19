@@ -2,21 +2,15 @@
 
 
 from copy import deepcopy
+import os
 
 import numpy as np
 from cmdstanpy import CmdStanMCMC, CmdStanModel
 
 from maud.data_model import MaudInput, SimulationStudyOutput
-from maud.sampling import get_input_data
+from maud.sampling import get_input_data, STAN_PROGRAM_RELATIVE_PATH
 
 
-ODE_CONFIG = {
-    "abs_tol": 1e-7,
-    "rel_tol": 1e-7,
-    "max_num_steps": int(1e9),
-    "likelihood": 1,
-    "timepoint": 500,
-}
 SIM_CONFIG = {
     "chains": 1,
     "fixed_param": True,
@@ -43,7 +37,7 @@ def add_measurements_to_maud_input(
         "yflux_sim": [code_to_exp[i] for i in input_data["experiment_yflux"]],
     }
     for var, measurement_type in zip(
-        ["yenz_sim", "yconc_sim", "yflux_sim"], ["enzyme", "metabolite", "reaction"]
+        ["yenz_sim", "yconc_sim", "yflux_sim"], ["enzyme", "mic", "flux"]
     ):
         if var in sim.stan_variable_dims.keys():
             for i, y in enumerate(sim.stan_variable(var).values[0]):
@@ -151,25 +145,32 @@ def enrich_true_values(tvin, input_data):
     }
 
 
-def run_simulation_study(
-    stan_path: str, mi_in: MaudInput, true_values_in: dict, sample_config: dict
-):
-    """Run a simulation study."""
+def run_simulation_study(mi_in: MaudInput, true_params_raw):
+    """Run a simulation study.
+    
+    :param mi_in: A MaudInput object
+    :param true_params_raw: dictionary of param name -> true param values
+
+    """
 
     # compile stan model
+    here = os.path.dirname(os.path.abspath(__file__))
+    stan_path = os.path.join(here, STAN_PROGRAM_RELATIVE_PATH)
     model = CmdStanModel(stan_file=stan_path)
     # generate input data for simulation
-    input_data_sim = get_input_data(mi_in, **ODE_CONFIG)
+    input_data_sim = get_input_data(mi_in)
     # get all true values (including for non-centered parameters)
-    true_values = enrich_true_values(true_values_in, input_data_sim)
+    true_params = enrich_true_values(true_params_raw, input_data_sim)
     # generate simulated measurements
-    sim = model.sample(data=input_data_sim, inits=true_values, **SIM_CONFIG)
+    sim = model.sample(data=input_data_sim, inits=true_params, **SIM_CONFIG)
     # extract simulated measurements and add them to mi_in
     mi = add_measurements_to_maud_input(mi_in, sim, input_data_sim)
     # create new input data
-    input_data_sample = get_input_data(mi, **ODE_CONFIG)
+    input_data_sample = get_input_data(mi)
     # sample
-    samples = model.sample(data=input_data_sample, inits=true_values, **sample_config)
+    samples = model.sample(
+        data=input_data_sample, inits=true_params, **mi.config.cmdstanpy_config
+    )
     return SimulationStudyOutput(
-        input_data_sim, input_data_sample, true_values, sim, mi, samples
+        input_data_sim, input_data_sample, true_params, sim, mi, samples
     )

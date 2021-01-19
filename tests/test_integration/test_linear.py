@@ -13,43 +13,28 @@ from maud.simulation_study import run_simulation_study
 
 
 HERE = os.path.dirname(__file__)
-DATA_PATH = reduce(os.path.join, [HERE, "..", "data"])
-MAUD_PATH = reduce(os.path.join, [HERE, "..", "..", "src", "maud"])
-SAMPLE_CONFIG = {
-    "chains": 1,
-    "iter_warmup": 200,
-    "iter_sampling": 200,
-    "max_treedepth": 11,
-}
+CASES_DIR = os.path.join(HERE, "..", "data")
+MAUD_PATH = os.path.join(HERE, "..", "..", "src", "maud")
 CASES = [
-    ("linear.toml", "true_params_linear.json"),
-    (
-        "example_features/linear_1_allo.toml",
-        "example_features/true_params_linear_1_allo.json",
-    ),
-    (
-        "example_features/linear_2_allo.toml",
-        "example_features/true_params_linear_2_allo.json",
-    ),
-    ("example_features/linear_MM.toml", "example_features/true_params_linear_MM.json"),
-    (
-        "example_features/linear_drain.toml",
-        "example_features/true_params_linear_drain.json",
-    ),
+    "michaelis_menten",
+    "drain",
+    "phosphorylation",
+    "one_allosteric_modifier",
+    "two_allosteric_modifiers",
 ]
+TRUE_PARAMS_FILENAME = "true_params.json"
 
 
-@pytest.mark.parametrize("toml_file,truth_file", CASES)
-def test_linear(toml_file, truth_file):
+@pytest.mark.parametrize("input_dirname", CASES)
+def test_linear(input_dirname):
     """Test that the linear model works."""
 
-    toml_path = os.path.join(DATA_PATH, toml_file)
-    truth_path = os.path.join(DATA_PATH, truth_file)
-    stan_path = os.path.join(MAUD_PATH, "inference_model.stan")
-    with open(truth_path, "r") as f:
-        true_values_in = json.load(f)
-    mi_in = load_maud_input_from_toml(toml_path)
-    study = run_simulation_study(stan_path, mi_in, true_values_in, SAMPLE_CONFIG)
+    input_dir_path = os.path.join(HERE, input_dirname)
+    mi_in = load_maud_input_from_toml(input_dir_path)
+    true_params_path = os.path.join(input_dir_path, TRUE_PARAMS_FILENAME)
+    with open(true_params_path, "r") as f:
+        true_params_raw = json.load(f)
+    study = run_simulation_study(mi_in, true_params_raw)
     infd = load_infd(study.samples.runset.csv_files, study.mi)
     for param_name, param_vals in true_values_in.items():
         if any(param_vals):
