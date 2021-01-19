@@ -22,9 +22,9 @@ def test_load_maud_input_from_toml():
         "phos_enz_codes": {},
         "drain_codes": {},
     }
-    mi = io.load_maud_input_from_toml(os.path.join(data_path, "linear.toml"))
+    mi = io.load_maud_input_from_toml(os.path.join(data_path, "linear"))
     assert mi.kinetic_model.reactions["r1"].stoichiometry == {"M1_e": -1, "M1_c": 1}
     assert "r1" in map(lambda p: p.enzyme_id, mi.priors.kcat_priors)
     exp = [e for e in mi.experiments.experiments if e.id == "condition_1"][0]
-    assert exp.measurements["metabolite"]["M1_c"].target_type == "metabolite"
+    assert exp.measurements["mic"]["M1_c"].target_type == "mic"
     assert mi.stan_codes.__dict__ == expected_stan_codes
