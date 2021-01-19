@@ -1,87 +1,19 @@
-#Example of a model that contains allosteric inhibition and acitvation#
+#Example of a model that contains allosteric inhibition#
 ###### Kinetic model ######
-[[compartments]]
-id = 'c'
-name = 'cytosol'
-volume = 1
-
-[[compartments]]
-id = 'e'
-name = 'external'
-volume = 1
-
-[[metabolites]]
-id = 'M1'
-name = 'External metabolite number 1'
-balanced = false
-compartment = 'e'
-
-[[metabolites]]
-id = 'M2'
-name = 'External metabolite number 2'
-balanced = false
-compartment = 'e'
-
-[[metabolites]]
-id = 'M1'
-name = 'Metabolite number 1'
-balanced = true
-compartment = 'c'
-
-[[metabolites]]
-id = 'M2'
-name = 'Metabolite number 2'
-balanced = true
-compartment = 'c'
-
-[[reactions]]
-id = 'r1'
-name = 'reaction number 1'
-stoichiometry = { M1_e = -1, M1_c = 1}
-[[reactions.enzymes]]
-id = 'r1'
-name = 'the enzyme that catalyses reaction r1'
-mechanism = 'modular_rate_law'
-subunits=4
-[[reactions.enzymes.modifiers]]
-modifier_type = 'allosteric_activator'
-mic_id = 'M2_c'
-[[reactions.enzymes.modifiers]]
-modifier_type = 'allosteric_inhibitor'
-mic_id = 'M1_c'
-
-[[reactions]]
-id = 'r2'
-name = 'reaction number 2'
-stoichiometry = { M1_c = -1, M2_c = 1 }
-[[reactions.enzymes]]
-id = 'r2'
-name = 'the enzyme that catalyses reaction r2'
-mechanism = 'modular_rate_law'
-
-[[reactions]]
-id = 'r3'
-name = 'reaction number 3'
-stoichiometry = { M2_c = -1, M2_e = 1}
-[[reactions.enzymes]]
-id = 'r3'
-name = 'the enzyme that catalyses reaction r3'
-mechanism = 'modular_rate_law'
 
 ###### Experimental data ######
 [[experiments]]
 id = 'condition_1'
 metadata = ''
 metabolite_measurements = [
-  {target_id='M1_c', value=1.43667, uncertainty=0.1},
-  {target_id='M2_c', value=1.42811, uncertainty=0.1},
+  {target_id='M1_c', value=1.41342, uncertainty=0.1},
+  {target_id='M2_c', value=1.41664, uncertainty=0.1},
 ]
 reaction_measurements = [
-  {target_id='r3', value=0.124883, uncertainty=0.01},
+  {target_id='r3', value=0.121945, uncertainty=0.01},
 ]
 enzyme_measurements = [
 ]
-
 [[priors.enzyme_concentrations]]
 enzyme_id = 'r1'
 experiment_id = 'condition_1'
@@ -114,25 +46,27 @@ experiment_id = 'condition_1'
 location = 1
 scale = 0.05
 
+
+
 [[experiments]]
 id = 'condition_2'
 metadata = ''
 metabolite_measurements = [
-  {target_id='M1_c', value=1.65694, uncertainty=0.1},
-  {target_id='M2_c', value=1.23116, uncertainty=0.1},
+  {target_id='M1_c', value=1.65117, uncertainty=0.1},
+  {target_id='M2_c', value=1.23009, uncertainty=0.1},
 ]
 reaction_measurements = [
-  {target_id='r3', value=0.107312, uncertainty=0.01},
+  {target_id='r3', value=0.10685, uncertainty=0.01},
 ]
 enzyme_measurements = [
 ]
+
 
 [[priors.enzyme_concentrations]]
 enzyme_id = 'r1'
 experiment_id = 'condition_2'
 location = 1.5
 scale = 0.05
-
 
 [[priors.enzyme_concentrations]]
 enzyme_id = 'r2'
@@ -221,16 +155,10 @@ metabolite_id = "M2"
 location = -2
 scale = 0.05
 
-[[priors.relaxed_dissociation_constants]]
+[[priors.tense_dissociation_constants]]
 enzyme_id = "r1"
 mic_id = "M2_c"
 location = 1
-scale = 0.6
-
-[[priors.tense_dissociation_constants]]
-enzyme_id = "r1"
-mic_id = "M1_c"
-location = 0.5
 scale = 0.6
 
 [[priors.transfer_constants]]
