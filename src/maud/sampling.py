@@ -52,8 +52,8 @@ DEFAULT_ODE_CONFIG = {
     "abs_tol": 1e-9,
     "max_num_steps": int(1e9),
     "timepoint": 500,
-
 }
+
 
 def sample(mi: MaudInput, output_dir: str) -> cmdstanpy.CmdStanMCMC:
     """Sample from the posterior defined by mi.
@@ -64,10 +64,9 @@ def sample(mi: MaudInput, output_dir: str) -> cmdstanpy.CmdStanMCMC:
     sample_config = {
         **DEFAULT_SAMPLE_CONFIG,
         **mi.config.cmdstanpy_config,
-        **{"output_dir": output_dir}
+        **{"output_dir": output_dir},
     }
-    model_name = mi.config.name
-    input_filepath = os.path.join(output_dir, f"input_data.json")
+    input_filepath = os.path.join(output_dir, "input_data.json")
     input_data = get_input_data(mi)
     cmdstanpy.utils.jsondump(input_filepath, input_data)
     stan_program_filepath = os.path.join(HERE, STAN_PROGRAM_RELATIVE_PATH)
@@ -83,7 +82,6 @@ def sample(mi: MaudInput, output_dir: str) -> cmdstanpy.CmdStanMCMC:
         cpp_options=cpp_options,
     )
     return model.sample(data=input_filepath, **sample_config)
-
 
 
 def get_full_stoichiometry(

@@ -21,9 +21,8 @@
 """
 
 import os
-import pandas as pd
-from typing import Dict, List
 
+import pandas as pd
 import toml
 
 from maud import validation
@@ -81,14 +80,13 @@ def parse_toml_kinetic_model(raw: dict) -> KineticModel:
     :param raw: Result of running toml.load on a suitable toml file
 
     """
-    model_id = raw["model_id"] if "model_id" in raw.keys() else "mi" 
+    model_id = raw["model_id"] if "model_id" in raw.keys() else "mi"
     compartments = {
         c["id"]: Compartment(id=c["id"], name=c["name"], volume=c["volume"])
         for c in raw["compartments"]
     }
     metabolites = {
-        m["id"]: Metabolite(id=m["id"], name=m["name"])
-        for m in raw["metabolites"]
+        m["id"]: Metabolite(id=m["id"], name=m["name"]) for m in raw["metabolites"]
     }
     mics = {
         f"{m['id']}_{m['compartment']}": MetaboliteInCompartment(
@@ -106,8 +104,7 @@ def parse_toml_kinetic_model(raw: dict) -> KineticModel:
         drains = None
     if "phosphorylation" in raw.keys():
         phosphorylation = {
-            d["id"]: parse_toml_phosphorylation(d)
-            for d in raw["phosphorylation"]
+            d["id"]: parse_toml_phosphorylation(d) for d in raw["phosphorylation"]
         }
     else:
         phosphorylation = None
@@ -202,16 +199,10 @@ def parse_toml_reaction(raw: dict) -> Reaction:
     """
     enzymes = {}
     subunits = 1
-    reversible = (
-        raw["reversible"] if "reversible" in raw.keys() else None
-    )
-    is_exchange = (
-        raw["is_exchange"] if "is_exchange" in raw.keys() else None
-    )
+    reversible = raw["reversible"] if "reversible" in raw.keys() else None
+    is_exchange = raw["is_exchange"] if "is_exchange" in raw.keys() else None
     water_stoichiometry = (
-        raw["water_stoichiometry"]
-        if "water_stoichiometry" in raw.keys()
-        else 0
+        raw["water_stoichiometry"] if "water_stoichiometry" in raw.keys() else 0
     )
     for e in raw["enzymes"]:
         modifiers = {
@@ -252,15 +243,15 @@ def parse_toml_reaction(raw: dict) -> Reaction:
 
 
 def parse_experiment_set_df(raw: pd.DataFrame) -> ExperimentSet:
-    """get an ExperimentSet object from a dataframe.
+    """Get an ExperimentSet object from a dataframe.
 
     :param raw: result of running pd.read_csv on a suitable file
     """
     experiment_list = []
     for id, exp_df in raw.groupby("experiment_id"):
-        measurements = {"mic": {}, "flux": {}, "enzyme":{}}
+        measurements = {"mic": {}, "flux": {}, "enzyme": {}}
         knockouts = []
-        for i, row in exp_df.iterrows():
+        for _, row in exp_df.iterrows():
             measurement_type = row["measurement_type"]
             target_id = row["target_id"]
             if measurement_type == "knockout":
@@ -270,7 +261,7 @@ def parse_experiment_set_df(raw: pd.DataFrame) -> ExperimentSet:
                     target_id=target_id,
                     value=row["measurement"],
                     uncertainty=row["error_scale"],
-                    target_type=measurement_type
+                    target_type=measurement_type,
                 )
         experiment_list.append(
             Experiment(id=id, measurements=measurements, knockouts=knockouts)
@@ -279,7 +270,7 @@ def parse_experiment_set_df(raw: pd.DataFrame) -> ExperimentSet:
 
 
 def parse_prior_set_df(raw: pd.DataFrame) -> PriorSet:
-    """get a PriorSet object from a dataframe.
+    """Get a PriorSet object from a dataframe.
 
     :param raw: result of running pd.read_csv on a suitable file
     """
@@ -297,17 +288,17 @@ def parse_prior_set_df(raw: pd.DataFrame) -> PriorSet:
         "phos_kcat_priors": [],
         "phos_enz_concentration_priors": [],
     }
-    negative_param_types = ["formation_energy",]
+    negative_param_types = [
+        "formation_energy",
+    ]
     for _, row in raw.iterrows():
-        id = "_".join(
-            row.loc[lambda s: [isinstance(x, str) for x in s]].values
-        )
+        id = "_".join(row.loc[lambda s: [isinstance(x, str) for x in s]].values)
         parameter_type = row["parameter_type"]
         prior_dict = row.dropna().drop("parameter_type").to_dict()
         is_non_negative = parameter_type not in negative_param_types
-        priors[parameter_type + "_priors"].append(Prior(
-            id=id, is_non_negative=is_non_negative, **prior_dict
-        ))
+        priors[parameter_type + "_priors"].append(
+            Prior(id=id, is_non_negative=is_non_negative, **prior_dict)
+        )
     return PriorSet(**priors)
 
 
@@ -325,5 +316,3 @@ def parse_config(raw):
         ode_config=raw["ode_config"],
         cmdstanpy_config=raw["cmdstanpy_config"],
     )
-
-

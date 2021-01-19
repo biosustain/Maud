@@ -272,9 +272,7 @@ class Measurement:
         uncertainty: float = None,
         target_type: str = None,
     ):
-        target_type_to_error_scale = {
-            "mic": "ln", "flux": "linear", "enzyme": "ln"
-        }
+        target_type_to_error_scale = {"mic": "ln", "flux": "linear", "enzyme": "ln"}
         self.target_id = target_id
         self.value = value
         self.uncertainty = uncertainty
@@ -433,6 +431,7 @@ class ExperimentSet:
     def __init__(self, experiments: List[Experiment]):
         self.experiments = experiments
 
+
 class MaudConfig:
     """User's configuration for a Maud input.
 
@@ -462,6 +461,7 @@ class MaudConfig:
         self.likelihood = likelihood
         self.ode_config = ode_config
         self.cmdstanpy_config = cmdstanpy_config
+
 
 class MaudInput:
     """Everything that is needed to run Maud.

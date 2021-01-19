@@ -15,17 +15,14 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 """Functions that are exposed to the command line interface live here."""
-from datetime import datetime
-
 import os
+import shutil
+from datetime import datetime
 
 import click
 
 from maud import sampling
 from maud.io import load_maud_input_from_toml
-
-import toml
-import shutil
 
 
 RELATIVE_PATH_EXAMPLE = "../../tests/data/inputs/linear"
@@ -38,18 +35,11 @@ def get_example_path(relative_path_example):
     return os.path.join(here, relative_path_example)
 
 
-def read_config(path):
-    config_path = os.path.join(path, "config.toml")
-    return toml.load(config_path)
-
-
 @click.group()
 @click.help_option("--help", "-h")
 def cli():
     """Use Maud's command line interface."""
-
-
-pass
+    pass
 
 
 @cli.command()
