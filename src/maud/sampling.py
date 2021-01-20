@@ -17,13 +17,12 @@
 """Code for sampling from a posterior distribution."""
 
 import os
-from typing import Dict, Optional
+from typing import Dict
 
 import cmdstanpy
 import numpy as np
 import pandas as pd
 
-from maud import io
 from maud.data_model import KineticModel, MaudInput
 
 
@@ -91,7 +90,7 @@ def _sample_given_config(
     mi: MaudInput, output_dir: str, config: dict
 ) -> cmdstanpy.CmdStanMCMC:
     """Call CmdStanModel.sample, having already specified all arguments.
-    
+
     :param mi: a MaudInput object
     :param output_dir: a string specifying where to save the output.
     :param config: a dictionary of keyword arguments to CmdStanModel.sample.
@@ -226,8 +225,6 @@ def get_km_lookup(km_priors, mic_codes, enzyme_codes):
         enzyme_code = enzyme_codes[row["enzyme_id"]]
         out.loc[mic_code, enzyme_code] = i + 1
     return out
-
-
 
 
 def get_input_data(mi: MaudInput) -> dict:

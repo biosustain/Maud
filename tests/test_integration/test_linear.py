@@ -2,7 +2,6 @@
 
 import json
 import os
-from functools import reduce
 
 import numpy as np
 import pytest
@@ -33,10 +32,10 @@ def test_linear(input_dirname):
     mi_in = load_maud_input_from_toml(input_dir_path)
     true_params_path = os.path.join(input_dir_path, TRUE_PARAMS_FILENAME)
     with open(true_params_path, "r") as f:
-        true_params_raw = json.load(f)
-    study = run_simulation_study(mi_in, true_params_raw)
+        true_params = json.load(f)
+    study = run_simulation_study(mi_in, true_params)
     infd = load_infd(study.samples.runset.csv_files, study.mi)
-    for param_name, param_vals in true_values_in.items():
+    for param_name, param_vals in true_params.items():
         if any(param_vals):
             dimnames = [
                 d for d in infd.posterior[param_name].dims if d not in ["chain", "draw"]

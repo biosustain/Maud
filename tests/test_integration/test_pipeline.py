@@ -4,8 +4,8 @@ import os
 import shutil
 import tempfile
 
-from maud.sampling import sample
 from maud.io import load_maud_input_from_toml
+from maud.sampling import sample
 
 
 here = os.path.dirname(__file__)
@@ -95,12 +95,9 @@ def test_linear():
     linear_input = os.path.join(data_path, "linear")
     temp_directory = tempfile.mkdtemp(dir=data_path)
     mi = load_maud_input_from_toml(linear_input)
-    mi.config.cmdstanpy_config.update({
-        "chains": 1,
-        "iter_sampling": 50,
-        "iter_warmup": 50,
-        "save_warmup": False
-    })
+    mi.config.cmdstanpy_config.update(
+        {"chains": 1, "iter_sampling": 50, "iter_warmup": 50, "save_warmup": False}
+    )
     fit = sample(mi, output_dir=temp_directory)
     samples_test = fit.draws_pd()
     # Check that each output column (other than the diagnostic ones) is

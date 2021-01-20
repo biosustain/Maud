@@ -1,14 +1,14 @@
 """Code for running simulation studies."""
 
 
-from copy import deepcopy
 import os
+from copy import deepcopy
 
 import numpy as np
 from cmdstanpy import CmdStanMCMC, CmdStanModel
 
 from maud.data_model import MaudInput, SimulationStudyOutput
-from maud.sampling import get_input_data, STAN_PROGRAM_RELATIVE_PATH
+from maud.sampling import STAN_PROGRAM_RELATIVE_PATH, get_input_data
 
 
 SIM_CONFIG = {
@@ -147,7 +147,7 @@ def enrich_true_values(tvin, input_data):
 
 def run_simulation_study(mi_in: MaudInput, true_params_raw):
     """Run a simulation study.
-    
+
     :param mi_in: A MaudInput object
     :param true_params_raw: dictionary of param name -> true param values
 
