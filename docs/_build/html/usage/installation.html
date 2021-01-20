@@ -1,9 +1,10 @@
 
 <!DOCTYPE html>
 
-<html xmlns="http://www.w3.org/1999/xhtml">
+<html>
   <head>
     <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Installation &#8212; Maud  documentation</title>
     <link rel="stylesheet" href="../_static/alabaster.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
@@ -12,7 +13,7 @@
     <script src="../_static/underscore.js"></script>
     <script src="../_static/doctools.js"></script>
     <script src="../_static/language_data.js"></script>
-    <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
     <link rel="next" title="Specifying input data" href="inputting.html" />
@@ -50,9 +51,15 @@ environment from the latest master branch, run this command:</p>
 <div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="go">pip install https://github.com/biosustain/Maud/archive/master.zip</span>
 </pre></div>
 </div>
-<p>Cmdstanpy depends on <a class="reference external" href="https://github.com/stan-dev/cmdstan">cmdstan</a>, which
-needs to be installed too. Fortunately, cmdstanpy comes with a command line
-script that installs cmdstan, so this step is pretty simple:</p>
+<p>Cmdstanpy depends on <cite>cmdstan &lt;https://github.com/stan-dev/cmdstan&gt;</cite>, which
+in turn requires a c++ toolchain. Fortunately, cmdstanpy comes with commands
+that can install these for you. On windows the necessary dependencies can be
+installed with the following powershell commands:</p>
+<p>python -m cmdstanpy.install_cxx_toolchain
+python -m cmdstanpy.install_cmdstan –compiler</p>
+<p>On macos or Linux, you must install the c++ requirements manually
+(see [here](<a class="reference external" href="https://cmdstanpy.readthedocs.io/en/v0.9.67/installation.html#install-cmdstan">https://cmdstanpy.readthedocs.io/en/v0.9.67/installation.html#install-cmdstan</a>))
+for instuctions. Cmdstan can then be installed using this shell command:</p>
 <div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="go">install_cmdstan</span>
 </pre></div>
 </div>
@@ -85,10 +92,10 @@ script that installs cmdstan, so this step is pretty simple:</p>
 </ul>
 <p class="caption"><span class="caption-text">Theoretical background:</span></p>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="../theory/computation.html">Computation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../theory/enzyme_kinetics.html">Enzyme kinetics</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../theory/statistics.html">Statistical Model</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../theory/thermodynamics.html">Thermodynamics</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../theory/drains.html">Drain Reactions</a></li>
 </ul>
 <p class="caption"><span class="caption-text">Case studies:</span></p>
 <ul>
@@ -97,6 +104,7 @@ script that installs cmdstan, so this step is pretty simple:</p>
 <p class="caption"><span class="caption-text">Implementation details:</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../implementation/data_model.html">Maud’s data model</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../implementation/computation.html">Computation</a></li>
 </ul>
 
 <div class="relations">
@@ -134,7 +142,7 @@ script that installs cmdstan, so this step is pretty simple:</p>
       &copy;2019, Novo Nordisk Foundation Center for Biosustainability, Technical University of Denmark.
       
       |
-      Powered by <a href="http://sphinx-doc.org/">Sphinx 2.4.4</a>
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 3.2.1</a>
       &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
       
       |

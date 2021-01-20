@@ -1,9 +1,10 @@
 
 <!DOCTYPE html>
 
-<html xmlns="http://www.w3.org/1999/xhtml">
+<html>
   <head>
     <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>A simple model of E. coli glycolysis &#8212; Maud  documentation</title>
     <link rel="stylesheet" href="../_static/alabaster.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
@@ -12,11 +13,11 @@
     <script src="../_static/underscore.js"></script>
     <script src="../_static/doctools.js"></script>
     <script src="../_static/language_data.js"></script>
-    <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
     <link rel="next" title="Maud’s data model" href="../implementation/data_model.html" />
-    <link rel="prev" title="Thermodynamics" href="../theory/thermodynamics.html" />
+    <link rel="prev" title="Drain Reactions" href="../theory/drains.html" />
    
   <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
   
@@ -45,7 +46,7 @@ biological system:</p>
 using the online modelling tool <a class="reference external" href="https://escher.github.io/#/">escher</a>.</p>
 <p>The target system has 5 reactions, including the interesting
 phosphofructokinase reaction, which is thought to be highly regulated and
-instrumental to the Warburg effect. The reactions are part of the glycolysis
+instrumental for alleviating <a class="reference external" href="http://linkinghub.elsevier.com/retrieve/pii/S2405471218301492">redox stress</a>. The reactions are part of the glycolysis
 pathway, which converts glucose into pyruvate and some ATP.</p>
 <div class="section" id="constructing-a-suitable-toml-input">
 <h2>Constructing a suitable toml input<a class="headerlink" href="#constructing-a-suitable-toml-input" title="Permalink to this headline">¶</a></h2>
@@ -55,12 +56,12 @@ represent it, and some information about it, in Maud’s input format.</p>
 how the system works, a prior model describing the pre-experimental information
 about the system’s formation energies and kinetic parameters, and an
 experiments section describing some test data and its information content.</p>
-<p>The full toml input can be found in Maud’s GitHub repository
-[LLLLLIIIINKKKK]. The following section explains how it was constructed.</p>
+<p>The full toml input can be found in <a class="reference external" href="https://github.com/biosustain/Maud/blob/master/tests/data/ecoli_small.toml">Maud’s GitHub repository</a>. The
+following section explains how it was constructed.</p>
 <div class="section" id="kinetic-model">
 <h3>Kinetic Model<a class="headerlink" href="#kinetic-model" title="Permalink to this headline">¶</a></h3>
-<p>The kinetic model can more or less be read off the above network diagram,
-though there are some details that need to be considered.</p>
+<p>The kinetic model is a representation of the reactions involved in the system
+defined above using enzyme kin</p>
 <p>First, we need to decide how we will define a steady state for this system. In
 practical terms this means we need to specify which of the metabolites in the
 network we want to treat as “balanced”, i.e., such that at steady state their
@@ -71,8 +72,8 @@ PFK and FBP reactions, but are typically ignored in kinetic analyses. In order
 to avoid problems with interpreting prior information from the literature, we
 can ignore h by simply leaving it out of our representation of the PFK
 reaction. However, we cannot fully ignore the role of h2o in the FBP reaction
-because h2o has non-zero formation energy: leaving it out would re. We can
-inform Maud that it needs to make the necessary thermodynamic adjustment by
+because h2o has non-zero formation energy: leaving it out would result in incorrect Gibbs energy estimates.
+We can inform Maud that it needs to make the necessary thermodynamic adjustment by
 adding a non-empty <cite>water_stoichiometry</cite> field to the FBP reaciton.</p>
 <p>Finally, for the sake of simplicity this case study ignores all regulation,
 even though this is not realistic as the PFK reaction is highly regulated.</p>
@@ -253,7 +254,7 @@ measured value of -0.5 for FBP and 4.08 for other reactions:</p>
 <img alt="../_images/conc.png" src="../_images/conc.png" />
 </div>
 <p>Finally, the marginal posteriors for kinetic parameters are also plausible,
-though the <span class="math notranslate nohighlight">\(k_cat\)</span> parameter for the TPI reaction is very high at
+though the <span class="math notranslate nohighlight">\(k_{cat}\)</span> parameter for the TPI reaction is very high at
 around 10000.</p>
 <div class="figure align-default">
 <img alt="../_images/kinetic_params.png" src="../_images/kinetic_params.png" />
@@ -287,10 +288,10 @@ around 10000.</p>
 </ul>
 <p class="caption"><span class="caption-text">Theoretical background:</span></p>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="../theory/computation.html">Computation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../theory/enzyme_kinetics.html">Enzyme kinetics</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../theory/statistics.html">Statistical Model</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../theory/thermodynamics.html">Thermodynamics</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../theory/drains.html">Drain Reactions</a></li>
 </ul>
 <p class="caption"><span class="caption-text">Case studies:</span></p>
 <ul class="current">
@@ -299,13 +300,14 @@ around 10000.</p>
 <p class="caption"><span class="caption-text">Implementation details:</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../implementation/data_model.html">Maud’s data model</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../implementation/computation.html">Computation</a></li>
 </ul>
 
 <div class="relations">
 <h3>Related Topics</h3>
 <ul>
   <li><a href="../index.html">Documentation overview</a><ul>
-      <li>Previous: <a href="../theory/thermodynamics.html" title="previous chapter">Thermodynamics</a></li>
+      <li>Previous: <a href="../theory/drains.html" title="previous chapter">Drain Reactions</a></li>
       <li>Next: <a href="../implementation/data_model.html" title="next chapter">Maud’s data model</a></li>
   </ul></li>
 </ul>
@@ -336,7 +338,7 @@ around 10000.</p>
       &copy;2019, Novo Nordisk Foundation Center for Biosustainability, Technical University of Denmark.
       
       |
-      Powered by <a href="http://sphinx-doc.org/">Sphinx 2.4.4</a>
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 3.2.1</a>
       &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
       
       |
