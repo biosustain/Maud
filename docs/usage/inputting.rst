@@ -8,25 +8,70 @@ distributions and experimental data in a form that Maud can use.
 Overview
 ========
 
-Maud inputs are specified as `toml <https://github.com/toml-lang/toml>`_ files
-with three main components: a description of the kinetic model that is being
-analysed, a description of some experiments and a specification of prior
-distributions that represent pre-experimental information about the network's
-kinetic parameters, thermodynamic parameters, unbalanced metabolite
-concentrations and enzyme concentrations.
+Maud inputs are structured directories, somewhat inspired by the `PEtab
+<https://github.com/PEtab-dev/PEtab>`_ format. A Maud input directory must
+contain a `toml <https://github.com/toml-lang/toml>`_ file called `config.toml`
+which gives the input a name, configures how Maud will be run and tells Maud
+where to find the information it needs.
 
 For some working examples of full inputs see `here
-<https://github.com/biosustain/Maud/tree/master/data/in>`_.
+<https://github.com/biosustain/Maud/tree/master/tests/data>`_.
 
-**NB** The fields depicted in the examples below are all required, except for a
- few optional cases which should be explicitly highlighted.
+
+Specifying a configuration file
+===============================
+
+The file `config.toml` **must** contain the top-level fields `name`,
+`kinetic_model`, `priors` and `experiments`. It can also optionally include
+keyword arguments to the method `cmdstanpy.CmdStanModel.sample
+<https://github.com/stan-dev/cmdstanpy/blob/develop/cmdstanpy/model.py>`_ in
+the table `cmdstanpy_config` and control parameters for Stan's ODE solver in
+the table `ode_config`.
+
+Here is an example configuration file:
+
+.. code:: toml
+
+    name = "linear"
+    kinetic_model = "kinetic_model.toml"
+    priors = "priors.csv"
+    experiments = "experiments.csv"
+    likelihood = true
+
+    [cmdstanpy_config]
+    iter_warmup = 200
+    iter_sampling = 200
+    chains = 4
+    save_warmup = true
+
+    [ode_config]
+    abs_tol = 1e-4
+    rel_tol = 1e-4
+    max_num_steps = 1e9
+    timepoint = 50
+
+
+This file tells Maud that a file representing a kinetic model can be found at
+the relative path `kinetic_model.toml`, and that information about priors and
+experiments are at `priors.csv` and `experiments.csv` respectively.
+
+The line `likelihood = true` tells Maud to take into account the measurements
+in `experiments.csv`: in other words, **not** to run in priors-only mode.
+
+When Maud samples with this input, it will create 4 MCMC chains, each with 200
+warmup and 200 sampling iterations, which will all be saved in the output csv
+files. the ODE solver will find steady states by simulating for 50 seconds,
+with a step limit as well as absolute and relative tolerances.
+
 
 Specifying a kinetic model
 ==========================
 
-Kinetic models in Maud input files have three components: compartments,
-metabolites and reactions. All of these are specified as tables at the top
-level of the input file.
+Kinetic models files are specified in `toml
+<https://github.com/toml-lang/toml>`_ files, which have three obligatory top
+level tables, namely compartments, metabolites and reactions. In addition,
+kinetic models can include tables representing drains and phosphorylation
+reactions.
 
 A compartment must have an id, a name and a volume. Here is an example
 compartment specification:
@@ -34,7 +79,7 @@ compartment specification:
 .. code:: toml
 
     [[compartments]]
-    id = 'cytosol'
+    id = 'c'
     name = 'cytosol'
     volume = 1
 
@@ -47,10 +92,10 @@ should be constant at steady state. Here is an example:
 .. code:: toml
 
     [[metabolites]]
-    id = 'AMP'
+    id = 'amp'
     name = 'adenosine monophosphate'
     balanced = false
-    compartment = 'cytosol'
+    compartment = 'c'
 
 A reaction can be specified as follows:
 
@@ -63,8 +108,9 @@ A reaction can be specified as follows:
     [[reactions.enzymes]]
     id = 'FBA'
     name = 'FBA'
-    mechanism = "ordered_unibi"
-    allosteric_inhibitors = ['AMP']  # optional
+    [[reactions.enzymes.modifiers]]
+    modifier_type = 'allosteric_activator'
+    mic_id = 'amp_c'
 
 Reaction level information is specified under :code:`[[reactions]]`, and
 enzyme-specific information goes under :code:`[[reactions]]`. The stoichiometry
@@ -79,125 +125,129 @@ metabolites that feature in the network.
 Specifying experiments
 ======================
 
-Information about experiments comes in a table called :code:`experiments`,
-which can have arbitrarily many entries. Here is an example specification of an
-experiment:
+Files containing information about experimental measurements should be csvs
+with the following fields:
 
-.. code:: toml
+- `measurement_type`: one out of these options:
+  - `mic`: stands for metabolite-in-compartment, has the form `<metabolite_id>_<compartment_id>`
+  - `flux`
+  - `enzyme`
+- `target_id`: the id of the thing measured
+- `experiment_id`: an id corresponding to the experiment
+- `measurement`: the measured value
+- `error_scale`: a number representing the accuracy of the measurement
 
-    [[experiments]]
-    id = 'condition_1'
-    metadata = "Condition 1"
-    metabolite_measurements = [
-      { target_id = 'glc__D_c', value = 0.6, uncertainty = 0.1},
-      { target_id = 'g6p_c', value = 1.2, uncertainty = 0.1},
-      { target_id = 'f6p_c', value = 0.3, uncertainty = 0.1},
-      { target_id = 'f16p_c', value = 2.8, uncertainty = 0.1},
-      { target_id = 'g3p_c', value = 0.067, uncertainty = 0.1},
-      { target_id = 'dhap_c', value = 1.58, uncertainty = 0.1},
-      { target_id = '13dpg_c', value = 0.0016, uncertainty = 0.1},
-    ]
-    reaction_measurements = [
-      { target_id = 'GCLt1', value = 1.99, uncertainty = 0.0019},
-    ]
+Error scales are interpreted as the standard deviation of a normal distribution
+for flux measurements, which can be negative, or as scale parameters of
+lognormal distributions for concentration and enzyme measurements, as these are
+always non-negative.
+
+Here is an example experiment file:
+
+.. code:: csv
+
+    measurement_type,target_id,experiment_id,measurement,error_scale
+    mic,f6p_c,Evo04ptsHIcrrEvo01EP,0.6410029,0.146145
+    mic,fdp_c,Evo04ptsHIcrrEvo01EP,4.5428601,0.237197
+    mic,dhap_c,Evo04ptsHIcrrEvo01EP,1.895018,0.078636
+    mic,f6p_c,Evo04Evo01EP,0.6410029,0.146145
+    mic,fdp_c,Evo04Evo01EP,4.5428601,0.237197
+    mic,dhap_c,Evo04Evo01EP,1.895018,0.078636
+    flux,PGI,Evo04ptsHIcrrEvo01EP,4.08767353555,1
+    flux,PGI,Evo04Evo01EP,4.08767353555,1
 
 Units here are arbitrary, but the values must agree with the rest of the model.
 
 Specifying priors
 =================
 
-Priors come in a toml table called :code:`priors`, which must have exactly four
-entries: :code:`kinetic_parameters`, :code:`thermodynamic_parameters`
-:code:`enzymes` and :code:`unbalanced_metabolites`.
+Files with information about priors should be csvs with the following fields:
 
-Thermodynamic parameters are specified using this syntax:
+- `parameter_type`: see below for options and corresponding id fields:
+- `metabolite_id`
+- `mic_id`
+- `enzyme_id`
+- `drain_id`
+- `phos_enz_id`
+- `experiment_id`
+- `location`
+- `scale`
+- `pct1`: first percentile of the prior distribution
+- `pct99`: 99th percentile of the prior distribution
 
-.. code:: toml
+Each parameter type has specific required id fields, which are as follows:
 
-    [priors.thermodynamic_parameters]
-    marginal_dgs = [
-      { target_id = 'GLCT1', location = 1, scale = 0.05 },
-      { target_id = 'HEX1', location = -17.3, scale = 0.9 },
-      { target_id = 'PGI', location = 2.5, scale = 0.8 },
-      { target_id = 'PFK', location = -15, scale = 1.3 },
-      { target_id = 'FBA', location = 19.8, scale = 1.0 },
-      { target_id = 'TPI', location = -5.5, scale = 1.1 },
-      { target_id = 'GAPD', location = 7.8, scale = 0.8 },
-      { target_id = 'PGK', location = 18.5, scale = 0.9 },
-    ]
+- `kcat`: `enzyme_id`
+- `km`: `enzyme_id` and `mic_id`
+- `formation_energy`: `metabolite_id`
+- `inhibition_constant`: `enzyme_id`
+- `enzyme_concentration`: `enzyme_id` and `experiment_id`
+- `unbalanced_metabolite`: `mic_id` and `experiment_id`
+- `drain`: `drain_id` and `experiment_id`
+- `transfer_constant`: `enzyme_id`
+- `relaxed_dissociation_constant`: `enzyme_id` and `mic_id`
+- `tense_dissociation_constant`: `enzyme_id` and `mic_id`
+- `phos_kcat`: `phos_enz_id`
+- `phos_enz_concentration`: `phos_enz_id` and `experiment_id`
 
-The :math:`\Delta G` parameters are specified in units of kJ/mol. Each location
-and scale input denotes the mean and standard deviation of a normal
-distribution over possible values of the :math:`\Delta G` parameter for the
-corresponding reaction. These distributions are independent - in future we hope
-to implement correlated :math:`\Delta G` priors through separate properties
-:code:`mu_dg` and :code:`cov_matrix_dg`.
+Information in id fields other than the required ones will be ignored: for
+clarity it is best to leave these empty, as in the example below.
 
-The :code:`kinetic_parameters` priors should specify marginal kinetic parameter
-distributions as follows:
+Quantitative prior information must be represented either using the `location`
+and `scale` fields or else the `pct1` and `pct99` fields.
 
-.. code:: toml
-    
-    [priors.kinetic_parameters]
-    GCLt1 = [
-      {target_id = 'Kcat1', location = 3.35, scale = 0.1},
-      {target_id = 'Ka', location = 0.9, scale = 0.1},
-      {target_id = 'Kp', location = 0.9, scale = 0.1},
-    ]
-    HEX1 = [
-      { target_id = 'Kcat1', location = 63.2, scale = 0.1},
-      { target_id = 'Ka', location = 0.15, scale = 0.1},
-      { target_id = 'Kb', location = 0.293, scale = 0.1},
-      { target_id = 'Kp', location = 30, scale = 0.1},
-      { target_id = 'Kq', location = 0.23, scale = 0.1},
-    ]
-    ...
+Formation energy priors should have units of kJ/mol. The units for kinetic
+parameter priors are effectively set by those of the formation energies,
+through the equality :math:`keq = \exp(\frac{\Delta G}{-RT})` and the Haldane
+relationships linking :math:`keq` parameters with other kinetic parameters.
 
-There should be an entry here for every enzyme id in the kinetic model,
-containing a line with a :code:`target_id` corresponding to every kinetic
-parameter in the enzyme's mechanism.
+Below is an example priors file.
 
-The kinetic parameters' units are effectively set by those of the :math:`\Delta
-G` parameters, through the equality :math:`keq = \exp(\frac{\Delta G}{-RT})`
-and the Haldane relationships linking :math:`keq` parameters with other kinetic
-parameters.
+.. code:: csv
 
-**NB** Even though kinetic parameters have to be greater than zero and have
-lognormal prior distributions, the :code:`location` in these toml inputs are
-specified on the standard scale. On the other hand, the :code:`scale` inputs
-are interpreted on the log scale with base :math:`e`, representing
-multiplicative rather than additive uncertainty.
-
-Priors for steady state enzyme and unbalanced metabolite concentrations are
-specified as a series of tables - one for each experiment id - with the
-:code:`target_id` inputs corresponding to enzyme ids or metabolite ids. Here is
-an example for an input with one experiment called :code:`condition_1`:
-
-.. code:: toml
-
-    [priors.enzymes]
-    condition_1 = [
-      { target_id = 'GCLt1', location = 1, scale = 0.05 },
-      { target_id = 'HEX1', location = 0.062, scale = 0.05 },
-      { target_id = 'PGI', location = 0.138, scale = 0.05 },
-      { target_id = 'PFK', location = 0.047, scale = 0.05 },
-      { target_id = 'FBA', location = 1.34, scale = 0.05 },
-      { target_id = 'TPI', location = 0.295, scale = 0.05 },
-      { target_id = 'GAPD', location = 0.007, scale = 0.05 },
-      { target_id = 'PGK', location = 0.258, scale = 0.05 },
-    ]
-    
-    [priors.unbalanced_metabolites]
-    condition_1 = [
-      { target_id = 'glc__D_e', location = 10, scale = 1.0 },
-      { target_id = 'atp_c', location = 3.95, scale = 0.05 },
-      { target_id = 'adp_c', location = 1.72, scale = 0.05 },
-      { target_id = 'nad_c', location = 1.41, scale = 0.05 },
-      { target_id = 'nadh_c', location = 0.178, scale = 0.05 },
-      { target_id = '3pg_c', location = 0.52, scale = 0.05 },
-    ]
-
-As with kinetic parameters, the locations are absolute and the scales are
-log-scale. The units are arbitrary. When setting them, bear in mind that Stan
-tends to work best when most numbers are reasonably close to zero.
+    parameter_type,metabolite_id,mic_id,enzyme_id,drain_id,phos_enz_id,experiment_id,location,scale,pct1,pct99
+    kcat,,,PGI,,,,126.0,0.2,,
+    kcat,,,PFK,,,,110.0,0.2,,
+    kcat,,,FBP,,,,24.0,0.2,,
+    kcat,,,FBA,,,,7.0,0.2,,
+    kcat,,,TPI,,,,9000.0,0.2,,
+    km,,g6p_c,PGI,,,,3.0,0.2,,
+    km,,f6p_c,PGI,,,,0.16,0.2,,
+    km,,f6p_c,PFK,,,,0.04,0.2,,
+    km,,atp_c,PFK,,,,0.06,0.2,,
+    km,,fdp_c,PFK,,,,15,1.5,,
+    km,,adp_c,PFK,,,,0.55,1.5,,
+    km,,fdp_c,FBP,,,,16.0,0.2,,
+    km,,f6p_c,FBP,,,,0.689,1.5,,
+    km,,pi_c,FBP,,,,1.0,1.5,,
+    km,,fdp_c,FBA,,,,0.02,0.2,,
+    km,,g3p_c,FBA,,,,0.03,0.2,,
+    km,,dhap_c,FBA,,,,0.13,0.2,,
+    km,,dhap_c,TPI,,,,2.16,1.5,,
+    km,,g3p_c,TPI,,,,200.0,0.2,,
+    formation_energy,g6p,,,,,,-1336.3,1.3,,
+    formation_energy,f6p,,,,,,-1333.8,1.3,,
+    formation_energy,pi,,,,,,-1073.3,1.5,,
+    formation_energy,adp,,,,,,-1440.8,2.4,,
+    formation_energy,atp,,,,,,-2313.0,3.0,,
+    formation_energy,fdp,,,,,,-2220.9,2.1,,
+    formation_energy,g3p,,,,,,-1106.4,1.3,,
+    formation_energy,dhap,,,,,,-1111.9,1.1,,
+    enzyme_concentration,,,PGI,,,Evo04ptsHIcrrEvo01EP,0.033875912,0.06,,
+    enzyme_concentration,,,FBP,,,Evo04ptsHIcrrEvo01EP,0.00592291,0.047,,
+    enzyme_concentration,,,FBA,,,Evo04ptsHIcrrEvo01EP,0.0702922488972023,0.19,,
+    enzyme_concentration,,,TPI,,,Evo04ptsHIcrrEvo01EP,0.020866941,0.13,,
+    enzyme_concentration,,,PFK,,,Evo04ptsHIcrrEvo01EP,0.018055101,0.13,,
+    enzyme_concentration,,,FBP,,,Evo04Evo01EP,0.00592291,0.047,,
+    enzyme_concentration,,,FBA,,,Evo04Evo01EP,0.0702922488972023,0.19,,
+    enzyme_concentration,,,TPI,,,Evo04Evo01EP,0.0198,0.1,,
+    enzyme_concentration,,,PFK,,,Evo04Evo01EP,0.0185,0.05,,
+    unbalanced_metabolite,,g6p_c,,,,Evo04ptsHIcrrEvo01EP,2.0804108,0.188651,,
+    unbalanced_metabolite,,adp_c,,,,Evo04ptsHIcrrEvo01EP,0.6113649,0.038811,,
+    unbalanced_metabolite,,atp_c,,,,Evo04ptsHIcrrEvo01EP,5.4080032,0.186962,,
+    unbalanced_metabolite,,g6p_c,,,,Evo04Evo01EP,2.0804108,0.188651,,
+    unbalanced_metabolite,,adp_c,,,,Evo04Evo01EP,0.6113649,0.038811,,
+    unbalanced_metabolite,,atp_c,,,,Evo04Evo01EP,5.4080032,0.186962,,
+    drain,,,,g3p_drain,,Evo04ptsHIcrrEvo01EP,,,0.3,1.2
+    drain,,,,g3p_drain,,Evo04Evo01EP,,,0.3,1.2
 
