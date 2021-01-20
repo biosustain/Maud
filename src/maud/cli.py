@@ -75,34 +75,27 @@ def sample(data_path, output_dir):
     print(stanfit.summary())
 
 
-# @cli.command()
-# @click.option(
-#     "--rel_tol",
-#     default=SAMPLING_DEFAULTS["rel_tol"],
-#     help="ODE solver's relative tolerance parameter",
-# )
-# @click.option(
-#     "--abs_tol",
-#     default=SAMPLING_DEFAULTS["abs_tol"],
-#     help="ODE solver's absolute tolerance parameter",
-# )
-# @click.option(
-#     "--max_num_steps",
-#     default=SAMPLING_DEFAULTS["max_num_steps"],
-#     help="ODE solver's maximum steps parameter",
-# )
-# @click.option(
-#     "--timepoint",
-#     default=SAMPLING_DEFAULTS["timepoint"],
-#     help="How long the ODE simulates for (Units are whatever your time units are)",
-# )
-# @click.option("--output_dir", default=".", help="Where to save Maud's output")
-# @click.argument(
-#     "data_path",
-#     type=click.Path(exists=True, dir_okay=False),
-#     default=get_example_path(RELATIVE_PATH_EXAMPLE),
-# )
-# def simulate_once(data_path, **kwargs):
-#     """Generate one draw using the given initial conditions for diagnostics."""
-#     stanfit = sampling.simulate_once(data_path, **kwargs)
-#     print(stanfit.get_drawset(params=["conc"]).T)
+@cli.command()
+@click.option("--output_dir", default=".", help="Where to save Maud's output")
+@click.option("-n", default=1, type=int, help="Number of simulations")
+@click.argument(
+    "data_path",
+    type=click.Path(exists=True, dir_okay=True, file_okay=False),
+    default=get_example_path(RELATIVE_PATH_EXAMPLE),
+)
+def simulate(data_path, output_dir, n):
+    """Generate draws from the prior mean."""
+
+    mi = load_maud_input_from_toml(data_path)
+    now = datetime.now().strftime("%Y%m%d%H%M%S")
+    output_name = f"maud_output_sim-{mi.config.name}-{now}"
+    output_path = os.path.join(output_dir, output_name)
+    samples_path = os.path.join(output_path, "samples")
+    ui_dir = os.path.join(output_path, "user_input")
+    print("Creating output directory: " + output_path)
+    os.mkdir(output_path)
+    os.mkdir(samples_path)
+    print(f"Copying user input from {data_path} to {ui_dir}")
+    shutil.copytree(data_path, ui_dir)
+    stanfit = sampling.simulate(mi, samples_path, n)
+    print(stanfit.draws_pd(params=["conc"]).T)

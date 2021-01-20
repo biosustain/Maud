@@ -17,7 +17,7 @@
 """Code for sampling from a posterior distribution."""
 
 import os
-from typing import Dict
+from typing import Dict, Optional
 
 import cmdstanpy
 import numpy as np
@@ -53,6 +53,14 @@ DEFAULT_ODE_CONFIG = {
     "max_num_steps": int(1e9),
     "timepoint": 500,
 }
+SIM_CONFIG = {
+    "chains": 1,
+    "fixed_param": True,
+    "inits": 0,
+    "iter_warmup": 0,
+    "show_progress": False,
+    "threads_per_chain": 1,
+}
 
 
 def sample(mi: MaudInput, output_dir: str) -> cmdstanpy.CmdStanMCMC:
@@ -61,11 +69,34 @@ def sample(mi: MaudInput, output_dir: str) -> cmdstanpy.CmdStanMCMC:
     :param mi: a MaudInput object
     :param output_dir: a string specifying where to save the output.
     """
-    sample_config = {
+    config = {
         **DEFAULT_SAMPLE_CONFIG,
         **mi.config.cmdstanpy_config,
         **{"output_dir": output_dir},
     }
+    return _sample_given_config(mi, output_dir, config)
+
+
+def simulate(mi: MaudInput, output_dir: str, n: int) -> cmdstanpy.CmdStanMCMC:
+    """Generate simulations from the prior mean.
+
+    :param mi: a MaudInput object
+    :param output_dir: a string specifying where to save the output.
+    """
+    config = {**SIM_CONFIG, **{"output_dir": output_dir, "iter_sampling": n}}
+    return _sample_given_config(mi, output_dir, config)
+
+
+def _sample_given_config(
+    mi: MaudInput, output_dir: str, config: dict
+) -> cmdstanpy.CmdStanMCMC:
+    """Call CmdStanModel.sample, having already specified all arguments.
+    
+    :param mi: a MaudInput object
+    :param output_dir: a string specifying where to save the output.
+    :param config: a dictionary of keyword arguments to CmdStanModel.sample.
+    """
+
     input_filepath = os.path.join(output_dir, "input_data.json")
     input_data = get_input_data(mi)
     cmdstanpy.utils.jsondump(input_filepath, input_data)
@@ -73,15 +104,15 @@ def sample(mi: MaudInput, output_dir: str) -> cmdstanpy.CmdStanMCMC:
     include_path = os.path.join(HERE, INCLUDE_PATH)
     cpp_options = {}
     stanc_options = {"include_paths": [include_path]}
-    if sample_config["threads_per_chain"] != 1:
+    if config["threads_per_chain"] != 1:
         cpp_options["STAN_THREADS"] = True
-        os.environ["STAN_NUM_THREADS"] = str(sample_config["threads_per_chain"])
+        os.environ["STAN_NUM_THREADS"] = str(config["threads_per_chain"])
     model = cmdstanpy.CmdStanModel(
         stan_file=stan_program_filepath,
         stanc_options=stanc_options,
         cpp_options=cpp_options,
     )
-    return model.sample(data=input_filepath, **sample_config)
+    return model.sample(data=input_filepath, **config)
 
 
 def get_full_stoichiometry(
@@ -197,48 +228,6 @@ def get_km_lookup(km_priors, mic_codes, enzyme_codes):
     return out
 
 
-def simulate_once(
-    data_path: str,
-    param_vals: dict,
-    rel_tol: float,
-    abs_tol: float,
-    max_num_steps: float,
-    timepoint: float,
-    output_dir: str,
-) -> cmdstanpy.CmdStanMCMC:
-    """Sample from a posterior distribution.
-
-    :param data_path: A path to a toml file containing input data
-    :param param_vals: Dictionary of true parameter values
-    :param rel_tol: Sets ODE solver's rel_tol control parameter
-    :param abs_tol: Sets ODE solver's abs_tol control parameter
-    :param max_num_steps: Sets ODE solver's max_num_steps control parameter
-    from experimental data.
-    :param timepoint: Time in seconds to simulate the ODE system for
-    :param: output_dir: Directory to save output
-    """
-    model_name = os.path.splitext(os.path.basename(data_path))[0]
-    input_filepath = os.path.join(output_dir, f"input_data_{model_name}.json")
-    init_filepath = os.path.join(output_dir, f"initial_values_{model_name}.json")
-    mi = io.load_maud_input_from_toml(data_path)
-    input_data = get_input_data(mi, abs_tol, rel_tol, max_num_steps, 1, timepoint)
-    inits = get_initial_conditions(input_data, mi)
-    cmdstanpy.utils.jsondump(input_filepath, input_data)
-    cmdstanpy.utils.jsondump(init_filepath, inits)
-    stan_program_filepath = os.path.join(HERE, STAN_PROGRAM_RELATIVE_PATH)
-    include_path = os.path.join(HERE, INCLUDE_PATH)
-    model = cmdstanpy.CmdStanModel(
-        stan_file=stan_program_filepath, stanc_options={"include_paths": [include_path]}
-    )
-    return model.sample(
-        data=input_filepath,
-        chains=1,
-        iter_sampling=1,
-        output_dir=output_dir,
-        inits=init_filepath,
-        show_progress=True,
-        fixed_param=True,
-    )
 
 
 def get_input_data(mi: MaudInput) -> dict:
