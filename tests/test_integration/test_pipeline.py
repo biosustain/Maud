@@ -4,7 +4,8 @@ import os
 import shutil
 import tempfile
 
-import maud.sampling as sampling
+from maud.sampling import sample
+from maud.io import load_maud_input_from_toml
 
 
 here = os.path.dirname(__file__)
@@ -91,26 +92,17 @@ def test_linear():
         "log_lik_conc[8]": [-0.07020213300000022, 2.0754574999999997],
     }
 
-    linear_input = os.path.join(data_path, "linear.toml")
+    linear_input = os.path.join(data_path, "linear")
     temp_directory = tempfile.mkdtemp(dir=data_path)
-    linear_input_values = {
-        "abs_tol": 1e-6,
-        "rel_tol": 1e-6,
-        "max_num_steps": int(1e9),
-        "likelihood": 1,
-        "n_samples": 50,
-        "n_warmup": 50,
-        "n_chains": 1,
-        "n_cores": 1,
-        "timepoint": 500,
-        "output_dir": temp_directory,
-        "data_path": linear_input,
-        "threads_per_chain": 1,
-        "save_warmup": False,
-    }
-    fit = sampling.sample(**linear_input_values)
+    mi = load_maud_input_from_toml(linear_input)
+    mi.config.cmdstanpy_config.update({
+        "chains": 1,
+        "iter_sampling": 50,
+        "iter_warmup": 50,
+        "save_warmup": False
+    })
+    fit = sample(mi, output_dir=temp_directory)
     samples_test = fit.draws_pd()
-
     # Check that each output column (other than the diagnostic ones) is
     # statistically similar to its matching control column.
     test_mean = samples_test.mean()
