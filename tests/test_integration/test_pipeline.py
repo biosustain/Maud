@@ -15,8 +15,8 @@ data_path = os.path.join(here, "../data")
 def test_linear():
     """Tests linear model.
 
-    tests from code generation to sampling of the linear model by computing 200
-    samples after 200 warmups and checking if the sampled median is within the
+    tests from code generation to sampling of the linear model by computing 50
+    samples after 50 warmups and checking if the sampled median is within the
     94% CI of a precomputed set.
     """
     expected = {
