@@ -25,7 +25,7 @@ from maud import sampling
 from maud.io import load_maud_input_from_toml
 
 
-RELATIVE_PATH_EXAMPLE = "../../tests/data/inputs/linear"
+RELATIVE_PATH_EXAMPLE = "../../tests/data/linear"
 
 
 def get_example_path(relative_path_example):
