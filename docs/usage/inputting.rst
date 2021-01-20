@@ -10,9 +10,9 @@ Overview
 
 Maud inputs are structured directories, somewhat inspired by the `PEtab
 <https://github.com/PEtab-dev/PEtab>`_ format. A Maud input directory must
-contain a `toml <https://github.com/toml-lang/toml>`_ file called `config.toml`
-which gives the input a name, configures how Maud will be run and tells Maud
-where to find the information it needs.
+contain a `toml <https://github.com/toml-lang/toml>`_ file called
+:code:`config.toml` which gives the input a name, configures how Maud will be
+run and tells Maud where to find the information it needs.
 
 For some working examples of full inputs see `here
 <https://github.com/biosustain/Maud/tree/master/tests/data>`_.
@@ -21,12 +21,13 @@ For some working examples of full inputs see `here
 Specifying a configuration file
 ===============================
 
-The file `config.toml` **must** contain the top-level fields `name`,
-`kinetic_model`, `priors` and `experiments`. It can also optionally include
-keyword arguments to the method `cmdstanpy.CmdStanModel.sample
+The file :code:`config.toml` **must** contain the top-level fields
+:code:`name`, :code:`kinetic_model`, :code:`priors` and :code:`experiments`. It
+can also optionally include keyword arguments to the method
+`cmdstanpy.CmdStanModel.sample
 <https://github.com/stan-dev/cmdstanpy/blob/develop/cmdstanpy/model.py>`_ in
-the table `cmdstanpy_config` and control parameters for Stan's ODE solver in
-the table `ode_config`.
+the table :code:`cmdstanpy_config` and control parameters for Stan's ODE solver
+in the table :code:`ode_config`.
 
 Here is an example configuration file:
 
@@ -52,11 +53,13 @@ Here is an example configuration file:
 
 
 This file tells Maud that a file representing a kinetic model can be found at
-the relative path `kinetic_model.toml`, and that information about priors and
-experiments are at `priors.csv` and `experiments.csv` respectively.
+the relative path :code:`kinetic_model.toml`, and that information about priors
+and experiments are at :code:`priors.csv` and :code:`experiments.csv`
+respectively.
 
-The line `likelihood = true` tells Maud to take into account the measurements
-in `experiments.csv`: in other words, **not** to run in priors-only mode.
+The line :code:`likelihood = true` tells Maud to take into account the
+measurements in :code:`experiments.csv`: in other words, **not** to run in
+priors-only mode.
 
 When Maud samples with this input, it will create 4 MCMC chains, each with 200
 warmup and 200 sampling iterations, which will all be saved in the output csv
@@ -128,14 +131,14 @@ Specifying experiments
 Files containing information about experimental measurements should be csvs
 with the following fields:
 
-- `measurement_type`: one out of these options:
-  - `mic`: stands for metabolite-in-compartment, has the form `<metabolite_id>_<compartment_id>`
-  - `flux`
-  - `enzyme`
-- `target_id`: the id of the thing measured
-- `experiment_id`: an id corresponding to the experiment
-- `measurement`: the measured value
-- `error_scale`: a number representing the accuracy of the measurement
+- :code:`measurement_type`: one out of these options:
+  - :code:`mic`: stands for metabolite-in-compartment, has the form :code:`<metabolite_id>_<compartment_id>`
+  - :code:`flux`
+  - :code:`enzyme`
+- :code:`target_id`: the id of the thing measured
+- :code:`experiment_id`: an id corresponding to the experiment
+- :code:`measurement`: the measured value
+- :code:`error_scale`: a number representing the accuracy of the measurement
 
 Error scales are interpreted as the standard deviation of a normal distribution
 for flux measurements, which can be negative, or as scale parameters of
@@ -163,38 +166,39 @@ Specifying priors
 
 Files with information about priors should be csvs with the following fields:
 
-- `parameter_type`: see below for options and corresponding id fields:
-- `metabolite_id`
-- `mic_id`
-- `enzyme_id`
-- `drain_id`
-- `phos_enz_id`
-- `experiment_id`
-- `location`
-- `scale`
-- `pct1`: first percentile of the prior distribution
-- `pct99`: 99th percentile of the prior distribution
+- :code:`parameter_type`: see below for options and corresponding id fields:
+- :code:`metabolite_id`
+- :code:`mic_id`
+- :code:`enzyme_id`
+- :code:`drain_id`
+- :code:`phos_enz_id`
+- :code:`experiment_id`
+- :code:`location`
+- :code:`scale`
+- :code:`pct1`: first percentile of the prior distribution
+- :code:`pct99`: 99th percentile of the prior distribution
 
 Each parameter type has specific required id fields, which are as follows:
 
-- `kcat`: `enzyme_id`
-- `km`: `enzyme_id` and `mic_id`
-- `formation_energy`: `metabolite_id`
-- `inhibition_constant`: `enzyme_id`
-- `enzyme_concentration`: `enzyme_id` and `experiment_id`
-- `unbalanced_metabolite`: `mic_id` and `experiment_id`
-- `drain`: `drain_id` and `experiment_id`
-- `transfer_constant`: `enzyme_id`
-- `relaxed_dissociation_constant`: `enzyme_id` and `mic_id`
-- `tense_dissociation_constant`: `enzyme_id` and `mic_id`
-- `phos_kcat`: `phos_enz_id`
-- `phos_enz_concentration`: `phos_enz_id` and `experiment_id`
+- :code:`kcat`: :code:`enzyme_id`
+- :code:`km`: :code:`enzyme_id` and :code:`mic_id`
+- :code:`formation_energy`: :code:`metabolite_id`
+- :code:`inhibition_constant`: :code:`enzyme_id`
+- :code:`enzyme_concentration`: :code:`enzyme_id` and :code:`experiment_id`
+- :code:`unbalanced_metabolite`: :code:`mic_id` and :code:`experiment_id`
+- :code:`drain`: :code:`drain_id` and :code:`experiment_id`
+- :code:`transfer_constant`: :code:`enzyme_id`
+- :code:`relaxed_dissociation_constant`: :code:`enzyme_id` and :code:`mic_id`
+- :code:`tense_dissociation_constant`: :code:`enzyme_id` and :code:`mic_id`
+- :code:`phos_kcat`: :code:`phos_enz_id`
+- :code:`phos_enz_concentration`: :code:`phos_enz_id` and :code:`experiment_id`
 
 Information in id fields other than the required ones will be ignored: for
 clarity it is best to leave these empty, as in the example below.
 
-Quantitative prior information must be represented either using the `location`
-and `scale` fields or else the `pct1` and `pct99` fields.
+Quantitative prior information must be represented either using the
+:code:`location` and :code:`scale` fields or else the :code:`pct1` and
+:code:`pct99` fields.
 
 Formation energy priors should have units of kJ/mol. The units for kinetic
 parameter priors are effectively set by those of the formation energies,
