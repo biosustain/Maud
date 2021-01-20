@@ -15,7 +15,8 @@ data/in/*
 !data/in/inits_yeast.Rdump
 !data/in/model_input_yeast.Rdump
 
-!tests/data/*
+!tests/data/*/*.csv
+!tests/data/*/*/*.csv
 
 src/maud/stan_code/autogen/*
 !src/maud/stan_code/autogen/readme.md

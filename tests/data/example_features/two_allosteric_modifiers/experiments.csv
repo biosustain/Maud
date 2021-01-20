@@ -1,0 +1,8 @@
+measurement_type,target_id,experiment_id,measurement,error_scale
+mic,M1_c,condition_1,1.43667,0.1
+mic,M2_c,condition_1,1.42811,0.1
+flux,r3,condition_1,0.124883,0.1
+mic,M1_c,condition_2,1.65694,0.1
+mic,M2_c,condition_2,1.23116,0.1
+flux,r3,condition_2,0.107312,0.1
+
