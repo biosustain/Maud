@@ -76,7 +76,7 @@ def sample(data_path, output_dir):
 
 
 @cli.command()
-@click.option("--output_dir", default=".", help="Where to save Maud's output")
+@click.option("--output_dir", default=".", help="Where to save the output")
 @click.option("-n", default=1, type=int, help="Number of simulations")
 @click.argument(
     "data_path",
@@ -98,4 +98,9 @@ def simulate(data_path, output_dir, n):
     print(f"Copying user input from {data_path} to {ui_dir}")
     shutil.copytree(data_path, ui_dir)
     stanfit = sampling.simulate(mi, samples_path, n)
-    print(stanfit.draws_pd(params=["conc"]).T)
+    print("\nSimulated concentrations and fluxes:")
+    print(stanfit.draws_pd(params=["conc", "flux"]).T)
+    print("\nSimulated measurements:")
+    print(stanfit.draws_pd(params=["yconc_sim", "yflux_sim"]).T)
+    print("\nSimulated log likelihoods:")
+    print(stanfit.draws_pd(params=["log_lik_conc", "log_lik_flux"]).T)
