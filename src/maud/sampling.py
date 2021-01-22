@@ -25,6 +25,7 @@ import pandas as pd
 
 from maud import io
 from maud.data_model import KineticModel, MaudInput
+from maud.utils import null, rref
 
 
 HERE = os.path.dirname(os.path.abspath(__file__))
@@ -72,6 +73,40 @@ def get_full_stoichiometry(
     else:
         S_drain = pd.DataFrame()
     return S_enz, S_enz_to_flux_map, S_complete, S_drain
+
+
+def validate_specified_fluxes(S_complete, 
+                              rxn_measurements,  
+                              experiment_codes, 
+                              reaction_codes, 
+                              drain_codes,
+                              balanced_mic_codes):
+    complete_reactions = list(reaction_codes.keys()) + list(drain_codes.keys())
+    for exp in experiment_codes:
+        meas_rxns = rxn_measurements[rxn_measurements["experiment_id"] == exp]["target_id"]
+        measured_rxn_list = list(meas_rxns)
+        flux_paths = null(S_complete[balanced_mic_codes.keys()].T.values)
+        n_rxns, n_dof = np.shape(flux_paths)
+        rref_flux_paths = np.matrix(rref(flux_paths.T))
+        rref_flux_paths[np.abs(rref_flux_paths) < 1e-10] = 0
+        flux_paths_df = pd.DataFrame(rref_flux_paths, columns=complete_reactions)
+        for _, flux_path in flux_paths_df.iterrows():
+            if any(flux_path[measured_rxn_list]) != 0:
+                pass
+            else:
+                possible_measurements = []
+                for rxn, st in flux_path.items():
+                    if st != 0:
+                        possible_measurements.append(rxn)
+                print("Your system appears to be underdetermined in experiment:")
+                print(f"{exp}")
+                print("Please define a reaction from the following list:")
+                print(f"{possible_measurements}")
+
+        if len(measured_rxn_list) > n_dof:
+            print("You appear to have specified too many reactions.")
+            print("This will bias the sampling as the measurements")
+            print("are not independent.")
 
 
 def get_knockout_matrix(mi: MaudInput):
@@ -376,6 +411,12 @@ def get_input_data(
         exp_id = prior_enz.experiment_id
         prior_loc_enzyme.loc[exp_id, enz_id] = prior_enz.location
         prior_scale_enzyme.loc[exp_id, enz_id] = prior_enz.scale
+    validate_specified_fluxes(full_stoic, 
+                              reaction_measurements,  
+                              experiment_codes, 
+                              reaction_codes, 
+                              drain_codes,
+                              balanced_mic_codes)
     return {
         "N_mic": len(mics),
         "N_unbalanced": len(unbalanced_mic_codes),
