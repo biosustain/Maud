@@ -58,8 +58,9 @@ def get_normal_parameters_from_quantiles(x1, p1, x2, p2):
 
 def null(a, rtol=1e-5):
     u, s, v = np.linalg.svd(a)
-    rank = (s > rtol*s[0]).sum()
+    rank = (s > rtol * s[0]).sum()
     return v[rank:].T.copy()
 
+
 def rref(mat):
-    return sp.Matrix(mat).rref(iszerofunc=lambda x: abs(x)<1e-10)[0]
+    return sp.Matrix(mat).rref(iszerofunc=lambda x: abs(x) < 1e-10)[0]

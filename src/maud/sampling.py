@@ -75,15 +75,19 @@ def get_full_stoichiometry(
     return S_enz, S_enz_to_flux_map, S_complete, S_drain
 
 
-def validate_specified_fluxes(S_complete, 
-                              rxn_measurements,  
-                              experiment_codes, 
-                              reaction_codes, 
-                              drain_codes,
-                              balanced_mic_codes):
+def validate_specified_fluxes(
+    S_complete,
+    rxn_measurements,
+    experiment_codes,
+    reaction_codes,
+    drain_codes,
+    balanced_mic_codes,
+):
     complete_reactions = list(reaction_codes.keys()) + list(drain_codes.keys())
     for exp in experiment_codes:
-        meas_rxns = rxn_measurements[rxn_measurements["experiment_id"] == exp]["target_id"]
+        meas_rxns = rxn_measurements[rxn_measurements["experiment_id"] == exp][
+            "target_id"
+        ]
         measured_rxn_list = list(meas_rxns)
         flux_paths = null(S_complete[balanced_mic_codes.keys()].T.values)
         n_rxns, n_dof = np.shape(flux_paths)
@@ -411,12 +415,14 @@ def get_input_data(
         exp_id = prior_enz.experiment_id
         prior_loc_enzyme.loc[exp_id, enz_id] = prior_enz.location
         prior_scale_enzyme.loc[exp_id, enz_id] = prior_enz.scale
-    validate_specified_fluxes(full_stoic, 
-                              reaction_measurements,  
-                              experiment_codes, 
-                              reaction_codes, 
-                              drain_codes,
-                              balanced_mic_codes)
+    validate_specified_fluxes(
+        full_stoic,
+        reaction_measurements,
+        experiment_codes,
+        reaction_codes,
+        drain_codes,
+        balanced_mic_codes,
+    )
     return {
         "N_mic": len(mics),
         "N_unbalanced": len(unbalanced_mic_codes),
