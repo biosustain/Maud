@@ -78,11 +78,20 @@ def get_full_stoichiometry(
 def validate_specified_fluxes(
     S_complete,
     rxn_measurements,
-    experiment_codes,
-    reaction_codes,
-    drain_codes,
-    balanced_mic_codes,
+    experiment_codes: Dict[str, int],
+    reaction_codes: Dict[str, int],
+    drain_codes: Dict[str, int],
+    balanced_mic_codes: Dict[str, int],
 ):
+    """Validate measured fluxes.
+
+    :param S_complete: The stoichiometrix matrix including reactions and drains
+    :param rxn_measurements: A dataframe containing all flux measurements
+    :param experiment_codes: the codified experiment codes
+    :param reaction_codes: the codified reaction codes
+    :param drain_codes: the codified drain codes
+    :param balanced_mic_codes: the codified balanced_mic codes
+    """
     complete_reactions = list(reaction_codes.keys()) + list(drain_codes.keys())
     for exp in experiment_codes:
         meas_rxns = rxn_measurements[rxn_measurements["experiment_id"] == exp][
