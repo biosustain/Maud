@@ -56,13 +56,13 @@ def get_normal_parameters_from_quantiles(x1, p1, x2, p2):
     return mu, sigma
 
 
-def null(a, rtol=1e-5):
+def get_null_space(a, rtol=1e-5):
     """Calulate the null space of a matrix."""
     u, s, v = np.linalg.svd(a)
     rank = (s > rtol * s[0]).sum()
     return v[rank:].T.copy()
 
 
-def rref(mat):
+def get_rref(mat):
     """Return reduced row echelon form of a matrix."""
     return sp.Matrix(mat).rref(iszerofunc=lambda x: abs(x) < 1e-10)[0]
