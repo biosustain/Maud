@@ -1,4 +1,4 @@
-# 15. ensuring measured fluxes are unbiased
+# 16. checking that appropriate fluxes are measured
 
 Date: 2021-01-22
 
@@ -19,9 +19,9 @@ where reaction 1 and reaction 2 are dependent, implying that
 no additional information is achieved by including both.
 
 Another issue is knowing when you do not have enough fluxes
-define, resulting in an underdetermined system. Due to the
-Bayesian implementation of Maud, resoliving these systems
-are still resolvable. However, supplimenting as much information
+measured, resulting in an underdetermined system. Due to the
+Bayesian implementation of Maud, these systems are still theoretically
+resolvable. However, supplementing as much information
 as possible will likely be beneficial.
 
 ## Decision
