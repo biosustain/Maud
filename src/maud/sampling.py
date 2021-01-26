@@ -191,17 +191,18 @@ def validate_specified_fluxes(
                     if st != 0:
                         possible_measurements.append(rxn)
                 msg = (
-                    f"Your system appears to be underdetermined in experiment:\n{exp}\n" +
-                    "Please define a reaction from the following list:\n"+
-                    f"{'\n'.join(possible_measurements)}"
+                    "Your system appears to be underdetermined in"
+                    + f"experiment: {exp}\n"
+                    + "Please define a reaction from the following list:\n"
+                    + "\n".join(possible_measurements)
                 )
                 warnings.warn(msg)
 
         if len(measured_rxn_list) > n_dof:
             msg = (
-                "You appear to have specified too many reactions.\n" +
-                "This will bias the statistical model\n"+
-                "as the measurements are not independent."
+                "You appear to have specified too many reactions.\n"
+                + "This will bias the statistical model\n"
+                + "as the measurements are not independent."
             )
             warnings.warn(msg)
 
