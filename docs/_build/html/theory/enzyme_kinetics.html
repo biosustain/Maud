@@ -1,9 +1,10 @@
 
 <!DOCTYPE html>
 
-<html xmlns="http://www.w3.org/1999/xhtml">
+<html>
   <head>
     <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Enzyme kinetics &#8212; Maud  documentation</title>
     <link rel="stylesheet" href="../_static/alabaster.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
@@ -12,11 +13,11 @@
     <script src="../_static/underscore.js"></script>
     <script src="../_static/doctools.js"></script>
     <script src="../_static/language_data.js"></script>
-    <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
     <link rel="next" title="Statistical Model" href="statistics.html" />
-    <link rel="prev" title="Computation" href="computation.html" />
+    <link rel="prev" title="Generating posterior draws" href="../usage/post_installation_usage.html" />
    
   <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
   
@@ -73,7 +74,7 @@ MWC model seperating the regulatory modulators from the catalytic rate.</p>
 <h3>Example: 2 products and 2 substrate network<a class="headerlink" href="#example-2-products-and-2-substrate-network" title="Permalink to this headline">¶</a></h3>
 <div class="figure align-default" id="id1">
 <img alt="../_images/random-bibi.png" src="../_images/random-bibi.png" />
-<p class="caption"><span class="caption-text">A random mechanism with 2 products and 2 substrates with a slow conversion step. All of the reactant
+<p class="caption"><span class="caption-number">Fig. 1 </span><span class="caption-text">A random mechanism with 2 products and 2 substrates with a slow conversion step. All of the reactant
 binding/release steps are in rapid equilibrium. All enzyme states <span class="math notranslate nohighlight">\(E_X\)</span> and metabolites
 will be in terms of concentrations, however the square brackets will be removed for
 readability.</span><a class="headerlink" href="#id1" title="Permalink to this image">¶</a></p>
@@ -122,7 +123,7 @@ selectively binds to the free enzyme, preventing binding from either substrate o
 product.</p>
 <div class="figure align-default" id="id2">
 <img alt="../_images/random-bibi-competitive.png" src="../_images/random-bibi-competitive.png" />
-<p class="caption"><span class="caption-text">A random mechanism with 2 products and 2 substrates with a slow conversion step.
+<p class="caption"><span class="caption-number">Fig. 2 </span><span class="caption-text">A random mechanism with 2 products and 2 substrates with a slow conversion step.
 all metabolites including the inhibitor are in rapid equilibrium with the enzyme
 states.</span><a class="headerlink" href="#id2" title="Permalink to this image">¶</a></p>
 </div>
@@ -181,10 +182,10 @@ thermodynamics, elasticities and implementation. Bioinformatics 26, 1528–1534 
 </ul>
 <p class="caption"><span class="caption-text">Theoretical background:</span></p>
 <ul class="current">
-<li class="toctree-l1"><a class="reference internal" href="computation.html">Computation</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Enzyme kinetics</a></li>
 <li class="toctree-l1"><a class="reference internal" href="statistics.html">Statistical Model</a></li>
 <li class="toctree-l1"><a class="reference internal" href="thermodynamics.html">Thermodynamics</a></li>
+<li class="toctree-l1"><a class="reference internal" href="drains.html">Drain Reactions</a></li>
 </ul>
 <p class="caption"><span class="caption-text">Case studies:</span></p>
 <ul>
@@ -193,13 +194,14 @@ thermodynamics, elasticities and implementation. Bioinformatics 26, 1528–1534 
 <p class="caption"><span class="caption-text">Implementation details:</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../implementation/data_model.html">Maud’s data model</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../implementation/computation.html">Computation</a></li>
 </ul>
 
 <div class="relations">
 <h3>Related Topics</h3>
 <ul>
   <li><a href="../index.html">Documentation overview</a><ul>
-      <li>Previous: <a href="computation.html" title="previous chapter">Computation</a></li>
+      <li>Previous: <a href="../usage/post_installation_usage.html" title="previous chapter">Generating posterior draws</a></li>
       <li>Next: <a href="statistics.html" title="next chapter">Statistical Model</a></li>
   </ul></li>
 </ul>
@@ -230,7 +232,7 @@ thermodynamics, elasticities and implementation. Bioinformatics 26, 1528–1534 
       &copy;2019, Novo Nordisk Foundation Center for Biosustainability, Technical University of Denmark.
       
       |
-      Powered by <a href="http://sphinx-doc.org/">Sphinx 2.4.4</a>
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 3.2.1</a>
       &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
       
       |

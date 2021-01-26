@@ -27,7 +27,7 @@ def validate_maud_input(mi: data_model.MaudInput):
     model_metabolites = list(set([met.id for met in model.metabolites.values()]))
     model_rxns = [rxn.id for rxn in model.reactions.values()]
     model_kms = [
-        f"km_{enz.id}_{mic_id}"
+        f"km_{mic_id}_{enz.id}"
         for rxn in model.reactions.values()
         for enz in rxn.enzymes.values()
         for mic_id in rxn.stoichiometry.keys()
@@ -41,7 +41,7 @@ def validate_maud_input(mi: data_model.MaudInput):
         f"formation_energy_{met_id}" for met_id in model_metabolites
     ]
     model_kis = [
-        f"ki_{enz.id}_{modifier.mic_id}"
+        f"inhibition_constant_{modifier.mic_id}_{enz.id}"
         for rxn in model.reactions.values()
         for enz in rxn.enzymes.values()
         for modifier in enz.modifiers["competitive_inhibitor"]
@@ -64,13 +64,13 @@ def validate_maud_input(mi: data_model.MaudInput):
             if model_par not in prior_pars:
                 raise ValueError(msg)
     for exp in mi.experiments.experiments:
-        for meas in exp.measurements["metabolite"].values():
+        for meas in exp.measurements["mic"].values():
             if meas.target_id not in model_unb_mics + model_balanced_mics:
                 raise ValueError(
                     f"metabolite {meas.target_id} is measured in experiment {exp.id}"
                     "but is not in the kinetic model {mi.kinetic_model.model_id}."
                 )
-        for meas in exp.measurements["reaction"].values():
+        for meas in exp.measurements["flux"].values():
             if meas.target_id not in model_rxns:
                 raise ValueError(
                     f"reaction {meas.target_id} is measured in experiment {exp.id}"

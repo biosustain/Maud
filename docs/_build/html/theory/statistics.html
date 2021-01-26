@@ -1,9 +1,10 @@
 
 <!DOCTYPE html>
 
-<html xmlns="http://www.w3.org/1999/xhtml">
+<html>
   <head>
     <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Statistical Model &#8212; Maud  documentation</title>
     <link rel="stylesheet" href="../_static/alabaster.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
@@ -12,7 +13,7 @@
     <script src="../_static/underscore.js"></script>
     <script src="../_static/doctools.js"></script>
     <script src="../_static/language_data.js"></script>
-    <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
     <link rel="next" title="Thermodynamics" href="thermodynamics.html" />
@@ -87,8 +88,14 @@ concentration and set of fluxes.</p>
 parameters - i.e. <span class="math notranslate nohighlight">\(\theta\)</span> above - with measureable quantities,
 i.e. <span class="math notranslate nohighlight">\(\mathbf{m}\)</span> and <span class="math notranslate nohighlight">\(\mathbf{v}\)</span>.</p>
 </div>
-<div class="section" id="experimental-information">
-<h2>Experimental Information<a class="headerlink" href="#experimental-information" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="probabilistic-model">
+<h2>Probabilistic Model<a class="headerlink" href="#probabilistic-model" title="Permalink to this headline">¶</a></h2>
+<p>Maud aims to implement a Bayesian probabilistic model where the joint distribution
+<span class="math notranslate nohighlight">\(\pi(\theta, y)\)</span> of unknowns and observations is factored into a measurement
+model or likelihood <span class="math notranslate nohighlight">\(\pi(y \mid \theta)\)</span> and a prior model <span class="math notranslate nohighlight">\(\pi(\theta)\)</span>.
+This section explains how each of these components is constructed.</p>
+<div class="section" id="likelihood">
+<h3>Likelihood<a class="headerlink" href="#likelihood" title="Permalink to this headline">¶</a></h3>
 <p>Maud represents information from experiments that measure enzyme concentrations
 and metabolite concentrations using the following regression model, where
 <span class="math notranslate nohighlight">\(y\)</span> is the observation and <span class="math notranslate nohighlight">\(\hat{y}\)</span> is the unobserved true value
@@ -109,7 +116,7 @@ quantities typically have multiplicative errors. In other words, if the
 measured value is large, then the associated error is also proportionally
 large.</p>
 <div class="section" id="summary-statistics">
-<h3>Summary statistics<a class="headerlink" href="#summary-statistics" title="Permalink to this headline">¶</a></h3>
+<h4>Summary statistics<a class="headerlink" href="#summary-statistics" title="Permalink to this headline">¶</a></h4>
 <p>It is common for experimental results to be reported in the form of a sample
 mean and standard deviation. It is important to note that for non-negative
 quantities like metabolite and enzyme concentrations these summary statistics
@@ -117,7 +124,7 @@ will generally not be good values use as <span class="math notranslate nohighlig
 possible, non-summarised measurement results should be used instead.</p>
 </div>
 <div class="section" id="relative-measurements">
-<h3>Relative measurements<a class="headerlink" href="#relative-measurements" title="Permalink to this headline">¶</a></h3>
+<h4>Relative measurements<a class="headerlink" href="#relative-measurements" title="Permalink to this headline">¶</a></h4>
 <p>In many realistic cases a measurement apparatus will give comparatively
 accurate information about the relative concentrations of some metabolites or
 enzymes while being comparatively uninformative as to their absolute
@@ -125,8 +132,8 @@ values. While Maud currently does not support this kind of measurement, support
 is planned and will take the following form.</p>
 </div>
 </div>
-<div class="section" id="non-experimental-information">
-<h2>Non-experimental Information<a class="headerlink" href="#non-experimental-information" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="priors">
+<h3>Priors<a class="headerlink" href="#priors" title="Permalink to this headline">¶</a></h3>
 <p>Information that does not naturally take the form of an experimental
 measurement can be expressed in Maud’s prior model. Maud allows users to
 specify independent log-normal priors for the following quantities:</p>
@@ -138,6 +145,20 @@ specify independent log-normal priors for the following quantities:</p>
 <li><p>enzyme concentrations</p></li>
 <li><p>unbalanced metabolite concentrations</p></li>
 </ul>
+<p>The distinction between balanced and unbalanced metabolites is also found in
+the statistical model. Information about the unbalanced metabolites
+can be parsed in the form of a prior, however, due to the difficulty of non-linear transformations,
+balanced metabolites are always evaluated as part of the model likelihood.
+The distinction between unbalanced and balanced becomes aparent when considering what
+the unbalanced metabolites represent, which is a boundary condition. These
+define the outcome of systems of differential equations, in the case of Maud
+this happens to be balanced metabolite concentrations and fluxes. And, our
+knowledge about the state of each condition is only conveyed through priors
+on the boundary conditions:
+* unbalanced metabolite concentrations,
+* enzyme concentrations,
+* kinetic parameters, and,
+* drains.</p>
 <p>For metabolite formation energies, which can be both negative and positive
 numbers, Maud allows users to specific independent normal priors.</p>
 <p>Users are encouraged to choose prior locations and scales using the method by
@@ -158,7 +179,7 @@ can be used in a python environment as follows:</p>
 </pre></div>
 </div>
 <div class="section" id="information-about-fluxes-and-balanced-metabolite-concentrations">
-<h3>Information about fluxes and balanced metabolite concentrations<a class="headerlink" href="#information-about-fluxes-and-balanced-metabolite-concentrations" title="Permalink to this headline">¶</a></h3>
+<h4>Information about fluxes and balanced metabolite concentrations<a class="headerlink" href="#information-about-fluxes-and-balanced-metabolite-concentrations" title="Permalink to this headline">¶</a></h4>
 <p>It is currently not possible to include non-experimental information about
 fluxes and steady-state concentrations of balanced metabolites.</p>
 <p>This is due to a technical limitatation. Since fluxes and steady state
@@ -169,7 +190,7 @@ introduce this Jacobian adjustment, so Maud unfortunately cannot currently
 represent this information.</p>
 </div>
 <div class="section" id="multivariate-priors">
-<h3>Multivariate priors<a class="headerlink" href="#multivariate-priors" title="Permalink to this headline">¶</a></h3>
+<h4>Multivariate priors<a class="headerlink" href="#multivariate-priors" title="Permalink to this headline">¶</a></h4>
 <p>Sometimes the non-experimental information about two parameters is not
 independent. For example, some linear combinations of formation energies are
 known within a relatively small range even though the marginal value of each
@@ -177,6 +198,7 @@ component of the linear combination is not well known.</p>
 <p>In such cases a multivariate distribution is required in order to express the
 available information. This functionality is not yet supported, but will be
 soon.</p>
+</div>
 </div>
 </div>
 </div>
@@ -207,10 +229,10 @@ soon.</p>
 </ul>
 <p class="caption"><span class="caption-text">Theoretical background:</span></p>
 <ul class="current">
-<li class="toctree-l1"><a class="reference internal" href="computation.html">Computation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="enzyme_kinetics.html">Enzyme kinetics</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Statistical Model</a></li>
 <li class="toctree-l1"><a class="reference internal" href="thermodynamics.html">Thermodynamics</a></li>
+<li class="toctree-l1"><a class="reference internal" href="drains.html">Drain Reactions</a></li>
 </ul>
 <p class="caption"><span class="caption-text">Case studies:</span></p>
 <ul>
@@ -219,6 +241,7 @@ soon.</p>
 <p class="caption"><span class="caption-text">Implementation details:</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../implementation/data_model.html">Maud’s data model</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../implementation/computation.html">Computation</a></li>
 </ul>
 
 <div class="relations">
@@ -256,7 +279,7 @@ soon.</p>
       &copy;2019, Novo Nordisk Foundation Center for Biosustainability, Technical University of Denmark.
       
       |
-      Powered by <a href="http://sphinx-doc.org/">Sphinx 2.4.4</a>
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 3.2.1</a>
       &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
       
       |

@@ -1,9 +1,10 @@
 
 <!DOCTYPE html>
 
-<html xmlns="http://www.w3.org/1999/xhtml">
+<html>
   <head>
     <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Generating posterior draws &#8212; Maud  documentation</title>
     <link rel="stylesheet" href="../_static/alabaster.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
@@ -12,10 +13,10 @@
     <script src="../_static/underscore.js"></script>
     <script src="../_static/doctools.js"></script>
     <script src="../_static/language_data.js"></script>
-    <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="Computation" href="../theory/computation.html" />
+    <link rel="next" title="Enzyme kinetics" href="../theory/enzyme_kinetics.html" />
     <link rel="prev" title="Contributing to Maud" href="contributing.html" />
    
   <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
@@ -37,101 +38,70 @@
 <h1>Generating posterior draws<a class="headerlink" href="#generating-posterior-draws" title="Permalink to this headline">¶</a></h1>
 <p>Maud’s main purpose is to generate an ensemble of samples that collectively
 represent the information contained in some input data.</p>
-<p>To generate samples for input data at <code class="code docutils literal notranslate"><span class="pre">path/to/myinput.toml</span></code>, run the
+<p>To generate samples for input data at <code class="code docutils literal notranslate"><span class="pre">path/to/myinput</span></code>, run the
 following command:</p>
-<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="go">maud sample path/to/data --n_chains=3 --n_warmup=200 --n_samples=100</span>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="go">maud sample path/to/myinput</span>
 </pre></div>
 </div>
-<p>This will use the data file at <cite>path/to/myinput.toml</cite> to create a Stan program,
-compile it into a C++ Stan model, then start three independent MCMC chains,
-each using 200 iterations for adaptation and storing the contents of 100
-further iterations in a csv file. All the files will be stored in the directory
-where the command is run unless the option <cite>output_dir</cite> is specified.</p>
+<p>This will trigger maud to generate an output folder in the directory where the
+command is run. To save the output folder somewhere else, use the option
+<code class="code docutils literal notranslate"><span class="pre">output_dir</span></code> as follows:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="go">maud sample path/to/myinput --output_dir path/to/desired/output/dir</span>
+</pre></div>
+</div>
 <p>Here is the full documentation for the <code class="code docutils literal notranslate"><span class="pre">sample</span></code> command, listing all
 available options:</p>
 <div class="section" id="sample">
 <h2>sample<a class="headerlink" href="#sample" title="Permalink to this headline">¶</a></h2>
-<p>Sample from the model defined by the data at data_path.</p>
+<p>Generate MCMC samples given a user input directory.</p>
+<p>This function creates a new directory in output_dir with a name starting
+with “maud_output”. It first copies the directory at data_path into the new
+this directory at new_dir/user_input, then runs the sampling.sample
+function to write samples in new_dir/samples. Finally it prints the results
+of cmdstanpy’s diagnose and summary methods.</p>
 <div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>sample <span class="o">[</span>OPTIONS<span class="o">]</span> <span class="o">[</span>DATA_PATH<span class="o">]</span>
 </pre></div>
 </div>
 <p class="rubric">Options</p>
-<dl class="option">
-<dt id="cmdoption-sample-rel-tol">
-<code class="sig-name descname">--rel_tol</code><code class="sig-prename descclassname"> &lt;rel_tol&gt;</code><a class="headerlink" href="#cmdoption-sample-rel-tol" title="Permalink to this definition">¶</a></dt>
-<dd><p>ODE solver’s relative tolerance parameter</p>
-</dd></dl>
-
-<dl class="option">
-<dt id="cmdoption-sample-abs-tol">
-<code class="sig-name descname">--abs_tol</code><code class="sig-prename descclassname"> &lt;abs_tol&gt;</code><a class="headerlink" href="#cmdoption-sample-abs-tol" title="Permalink to this definition">¶</a></dt>
-<dd><p>ODE solver’s absolute tolerance parameter</p>
-</dd></dl>
-
-<dl class="option">
-<dt id="cmdoption-sample-max-num-steps">
-<code class="sig-name descname">--max_num_steps</code><code class="sig-prename descclassname"> &lt;max_num_steps&gt;</code><a class="headerlink" href="#cmdoption-sample-max-num-steps" title="Permalink to this definition">¶</a></dt>
-<dd><p>ODE solver’s maximum steps parameter</p>
-</dd></dl>
-
-<dl class="option">
-<dt id="cmdoption-sample-likelihood">
-<code class="sig-name descname">--likelihood</code><code class="sig-prename descclassname"> &lt;likelihood&gt;</code><a class="headerlink" href="#cmdoption-sample-likelihood" title="Permalink to this definition">¶</a></dt>
-<dd><p>Whether (1) or not (0) to run the model in likelihood mode</p>
-</dd></dl>
-
-<dl class="option">
-<dt id="cmdoption-sample-n-samples">
-<code class="sig-name descname">--n_samples</code><code class="sig-prename descclassname"> &lt;n_samples&gt;</code><a class="headerlink" href="#cmdoption-sample-n-samples" title="Permalink to this definition">¶</a></dt>
-<dd><p>Number of post-warmup posterior samples</p>
-</dd></dl>
-
-<dl class="option">
-<dt id="cmdoption-sample-n-warmup">
-<code class="sig-name descname">--n_warmup</code><code class="sig-prename descclassname"> &lt;n_warmup&gt;</code><a class="headerlink" href="#cmdoption-sample-n-warmup" title="Permalink to this definition">¶</a></dt>
-<dd><p>Number of warmup samples</p>
-</dd></dl>
-
-<dl class="option">
-<dt id="cmdoption-sample-n-chains">
-<code class="sig-name descname">--n_chains</code><code class="sig-prename descclassname"> &lt;n_chains&gt;</code><a class="headerlink" href="#cmdoption-sample-n-chains" title="Permalink to this definition">¶</a></dt>
-<dd><p>Number of MCMC chains</p>
-</dd></dl>
-
-<dl class="option">
-<dt id="cmdoption-sample-n-cores">
-<code class="sig-name descname">--n_cores</code><code class="sig-prename descclassname"> &lt;n_cores&gt;</code><a class="headerlink" href="#cmdoption-sample-n-cores" title="Permalink to this definition">¶</a></dt>
-<dd><p>Number of chains to run in parallel</p>
-</dd></dl>
-
-<dl class="option">
-<dt id="cmdoption-sample-timepoint">
-<code class="sig-name descname">--timepoint</code><code class="sig-prename descclassname"> &lt;timepoint&gt;</code><a class="headerlink" href="#cmdoption-sample-timepoint" title="Permalink to this definition">¶</a></dt>
-<dd><p>How long the ODE simulates for (Units are whatever your time units are)</p>
-</dd></dl>
-
-<dl class="option">
-<dt id="cmdoption-sample-output-dir">
-<code class="sig-name descname">--output_dir</code><code class="sig-prename descclassname"> &lt;output_dir&gt;</code><a class="headerlink" href="#cmdoption-sample-output-dir" title="Permalink to this definition">¶</a></dt>
+<dl class="std option">
+<dt id="cmdoption-sample-output_dir">
+<span id="cmdoption-sample-output-dir"></span><code class="sig-name descname">--output_dir</code><code class="sig-prename descclassname"> &lt;output_dir&gt;</code><a class="headerlink" href="#cmdoption-sample-output_dir" title="Permalink to this definition">¶</a></dt>
 <dd><p>Where to save Maud’s output</p>
 </dd></dl>
 
-<dl class="option">
-<dt id="cmdoption-sample-threads-per-chain">
-<code class="sig-name descname">--threads_per_chain</code><code class="sig-prename descclassname"> &lt;threads_per_chain&gt;</code><a class="headerlink" href="#cmdoption-sample-threads-per-chain" title="Permalink to this definition">¶</a></dt>
-<dd><p>How many threads per chain</p>
+<p class="rubric">Arguments</p>
+<dl class="std option">
+<dt id="cmdoption-sample-arg-DATA_PATH">
+<span id="cmdoption-sample-arg-data-path"></span><code class="sig-name descname">DATA_PATH</code><code class="sig-prename descclassname"></code><a class="headerlink" href="#cmdoption-sample-arg-DATA_PATH" title="Permalink to this definition">¶</a></dt>
+<dd><p>Optional argument</p>
 </dd></dl>
 
-<dl class="option">
-<dt id="cmdoption-sample-save-warmup">
-<code class="sig-name descname">--save_warmup</code><code class="sig-prename descclassname"> &lt;save_warmup&gt;</code><a class="headerlink" href="#cmdoption-sample-save-warmup" title="Permalink to this definition">¶</a></dt>
-<dd><p>Whether to save warmup draws</p>
+</div>
+<p>Maud also has a command called <code class="code docutils literal notranslate"><span class="pre">simulate</span></code>, which is used in much the same
+way as <code class="code docutils literal notranslate"><span class="pre">sample</span></code>:</p>
+<p>Here is a the full documentation for <code class="code docutils literal notranslate"><span class="pre">simulate</span></code>:</p>
+<div class="section" id="simulate">
+<h2>simulate<a class="headerlink" href="#simulate" title="Permalink to this headline">¶</a></h2>
+<p>Generate MCMC samples given a user input directory.</p>
+<p>This function creates a new directory in output_dir with a name starting
+with “maud_output”. It first copies the directory at data_path into the new
+this directory at new_dir/user_input, then runs the sampling.sample
+function to write samples in new_dir/samples. Finally it prints the results
+of cmdstanpy’s diagnose and summary methods.</p>
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>simulate <span class="o">[</span>OPTIONS<span class="o">]</span> <span class="o">[</span>DATA_PATH<span class="o">]</span>
+</pre></div>
+</div>
+<p class="rubric">Options</p>
+<dl class="std option">
+<dt id="cmdoption-simulate-output_dir">
+<span id="cmdoption-simulate-output-dir"></span><code class="sig-name descname">--output_dir</code><code class="sig-prename descclassname"> &lt;output_dir&gt;</code><a class="headerlink" href="#cmdoption-simulate-output_dir" title="Permalink to this definition">¶</a></dt>
+<dd><p>Where to save Maud’s output</p>
 </dd></dl>
 
 <p class="rubric">Arguments</p>
-<dl class="option">
-<dt id="cmdoption-sample-arg-data-path">
-<code class="sig-name descname">DATA_PATH</code><code class="sig-prename descclassname"></code><a class="headerlink" href="#cmdoption-sample-arg-data-path" title="Permalink to this definition">¶</a></dt>
+<dl class="std option">
+<dt id="cmdoption-simulate-arg-DATA_PATH">
+<span id="cmdoption-simulate-arg-data-path"></span><code class="sig-name descname">DATA_PATH</code><code class="sig-prename descclassname"></code><a class="headerlink" href="#cmdoption-simulate-arg-DATA_PATH" title="Permalink to this definition">¶</a></dt>
 <dd><p>Optional argument</p>
 </dd></dl>
 
@@ -164,10 +134,10 @@ available options:</p>
 </ul>
 <p class="caption"><span class="caption-text">Theoretical background:</span></p>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="../theory/computation.html">Computation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../theory/enzyme_kinetics.html">Enzyme kinetics</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../theory/statistics.html">Statistical Model</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../theory/thermodynamics.html">Thermodynamics</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../theory/drains.html">Drain Reactions</a></li>
 </ul>
 <p class="caption"><span class="caption-text">Case studies:</span></p>
 <ul>
@@ -176,6 +146,7 @@ available options:</p>
 <p class="caption"><span class="caption-text">Implementation details:</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../implementation/data_model.html">Maud’s data model</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../implementation/computation.html">Computation</a></li>
 </ul>
 
 <div class="relations">
@@ -183,7 +154,7 @@ available options:</p>
 <ul>
   <li><a href="../index.html">Documentation overview</a><ul>
       <li>Previous: <a href="contributing.html" title="previous chapter">Contributing to Maud</a></li>
-      <li>Next: <a href="../theory/computation.html" title="next chapter">Computation</a></li>
+      <li>Next: <a href="../theory/enzyme_kinetics.html" title="next chapter">Enzyme kinetics</a></li>
   </ul></li>
 </ul>
 </div>
@@ -213,7 +184,7 @@ available options:</p>
       &copy;2019, Novo Nordisk Foundation Center for Biosustainability, Technical University of Denmark.
       
       |
-      Powered by <a href="http://sphinx-doc.org/">Sphinx 2.4.4</a>
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 3.2.1</a>
       &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
       
       |

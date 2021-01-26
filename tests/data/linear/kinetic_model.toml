@@ -1,0 +1,70 @@
+###### Kinetic model ######
+[[compartments]]
+id = 'c'
+name = 'cytosol'
+volume = 1
+
+[[compartments]]
+id = 'e'
+name = 'external'
+volume = 1
+
+[[metabolites]]
+id = 'M1'
+name = 'External metabolite number 1'
+balanced = false
+compartment = 'e'
+
+[[metabolites]]
+id = 'M2'
+name = 'External metabolite number 2'
+balanced = false
+compartment = 'e'
+
+[[metabolites]]
+id = 'M1'
+name = 'Metabolite number 1'
+balanced = true
+compartment = 'c'
+
+[[metabolites]]
+id = 'M2'
+name = 'Metabolite number 2'
+balanced = true
+compartment = 'c'
+
+[[reactions]]
+id = 'r1'
+name = 'reaction number 1'
+stoichiometry = { M1_e = -1, M1_c = 1}
+[[reactions.enzymes]]
+id = 'r1'
+name = 'the enzyme that catalyses reaction r1'
+mechanism = 'modular_rate_law'
+[[reactions.enzymes.modifiers]]
+modifier_type = 'allosteric_activator'
+mic_id = 'M2_c'
+
+[[reactions]]
+id = 'r2'
+name = 'reaction number 2'
+stoichiometry = { M1_c = -1, M2_c = 1 }
+[[reactions.enzymes]]
+id = 'r2'
+name = 'the enzyme that catalyses reaction r2'
+mechanism = 'modular_rate_law'
+[[reactions.enzymes.modifiers]]
+modifier_type = 'allosteric_inhibitor'
+mic_id = 'M1_c'
+[[reactions.enzymes.modifiers]]
+modifier_type = 'competitive_inhibitor'
+mic_id = 'M2_c'
+
+[[reactions]]
+id = 'r3'
+name = 'reaction number 3'
+stoichiometry = { M2_c = -1, M2_e = 1}
+[[reactions.enzymes]]
+id = 'r3'
+name = 'the enzyme that catalyses reaction r3'
+mechanism = 'modular_rate_law'

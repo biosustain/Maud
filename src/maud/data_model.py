@@ -261,7 +261,6 @@ class Measurement:
     :param target_id: id of the thing being measured
     :param value: value for the measurement
     :param uncertainty: uncertainty associated to the measurent
-    :param scale: scale of the measurement, e.g. 'log10' or 'linear
     :param target_type: type of thing being measured, e.g. 'metabolite', 'reaction',
     'enzyme'.
     """
@@ -271,14 +270,14 @@ class Measurement:
         target_id: str,
         value: float,
         uncertainty: float = None,
-        scale: str = None,
         target_type: str = None,
     ):
+        target_type_to_error_scale = {"mic": "ln", "flux": "linear", "enzyme": "ln"}
         self.target_id = target_id
         self.value = value
         self.uncertainty = uncertainty
-        self.scale = scale
         self.target_type = target_type
+        self.scale = target_type_to_error_scale[target_type]
 
 
 class Experiment:
@@ -433,6 +432,37 @@ class ExperimentSet:
         self.experiments = experiments
 
 
+class MaudConfig:
+    """User's configuration for a Maud input.
+
+    :param name: name for the input. Used to name the output directory
+    :param kinetic_model_file: path to a valid kientic model file.
+    :param priors_file: path to a valid priors file.
+    :param experiments_file: path to a valid experiments file.
+    :param likelihood: Whether or not to take measurements into account.
+    :param ode_config: Configuration for Stan's ode solver.
+    :param cmdstanpy_config: Arguments to cmdstanpy.CmdStanModel.sample.
+    """
+
+    def __init__(
+        self,
+        name: str,
+        kinetic_model_file: str,
+        priors_file: str,
+        experiments_file: str,
+        likelihood: bool,
+        ode_config: dict,
+        cmdstanpy_config: dict,
+    ):
+        self.name = name
+        self.kinetic_model_file = kinetic_model_file
+        self.priors_file = priors_file
+        self.experiments_file = experiments_file
+        self.likelihood = likelihood
+        self.ode_config = ode_config
+        self.cmdstanpy_config = cmdstanpy_config
+
+
 class MaudInput:
     """Everything that is needed to run Maud.
 
@@ -446,11 +476,13 @@ class MaudInput:
 
     def __init__(
         self,
+        config: MaudConfig,
         kinetic_model: KineticModel,
         priors: PriorSet,
         stan_codes: StanCodeSet,
         experiments: ExperimentSet,
     ):
+        self.config = config
         self.kinetic_model = kinetic_model
         self.priors = priors
         self.stan_codes = stan_codes

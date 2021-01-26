@@ -1,0 +1,11 @@
+measurement_type,target_id,experiment_id,measurement,error_scale
+mic,f6p_c,Evo04ptsHIcrrEvo01EP,0.6410029,0.146145
+mic,fdp_c,Evo04ptsHIcrrEvo01EP,4.5428601,0.237197
+mic,dhap_c,Evo04ptsHIcrrEvo01EP,1.895018,0.078636
+mic,f6p_c,Evo04Evo01EP,0.6410029,0.146145
+mic,fdp_c,Evo04Evo01EP,4.5428601,0.237197
+mic,dhap_c,Evo04Evo01EP,1.895018,0.078636
+flux,PGI,Evo04ptsHIcrrEvo01EP,4.08767353555,1
+flux,PGI,Evo04Evo01EP,4.08767353555,1
+
+

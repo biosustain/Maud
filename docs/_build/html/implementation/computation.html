@@ -1,9 +1,10 @@
 
 <!DOCTYPE html>
 
-<html xmlns="http://www.w3.org/1999/xhtml">
+<html>
   <head>
     <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Computation &#8212; Maud  documentation</title>
     <link rel="stylesheet" href="../_static/alabaster.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
@@ -12,7 +13,7 @@
     <script src="../_static/underscore.js"></script>
     <script src="../_static/doctools.js"></script>
     <script src="../_static/language_data.js"></script>
-    <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
     <link rel="prev" title="Maud’s data model" href="data_model.html" />
@@ -39,9 +40,9 @@ distinctive computational problems. This document explains what the problems
 are and how Maud attempts to address them.</p>
 <div class="section" id="goal">
 <h2>Goal<a class="headerlink" href="#goal" title="Permalink to this headline">¶</a></h2>
-<p>Maud aims to fit Bayesian models of metabolic networks with about 100 internal
-reactions, each with its kinetics represented by the modular rate law and MWC
-formalism as described in the section on <a class="reference internal" href="../theory/statistics.html"><span class="doc">Maud’s statistical model</span></a>, and around 20 experiments.</p>
+<p>Maud aims to fit Bayesian models of metabolic networks at a scientifically
+interesting scale, each with its kinetics represented by the modular rate law
+and MWC formalism as described in the section on <a class="reference internal" href="../theory/statistics.html"><span class="doc">Maud’s statistical model</span></a>.</p>
 </div>
 <div class="section" id="inputs">
 <h2>Inputs<a class="headerlink" href="#inputs" title="Permalink to this headline">¶</a></h2>
@@ -68,14 +69,15 @@ efficiently explore the posterior probability distribution defined by the
 <span class="xref std std-doc">statistical model</span> And Input Data.</p>
 <div class="section" id="why-use-stan-and-adaptive-hmc">
 <h3>Why Use Stan And Adaptive Hmc?<a class="headerlink" href="#why-use-stan-and-adaptive-hmc" title="Permalink to this headline">¶</a></h3>
-<p>Our Approach Using Adaptive Hmc Is Preferable To Alternatives Based On
-Rejection Sampling Because The Parameter Space That Needs To Be Explored In
-Scientifically Interesting Problems Has A Large Number Of Dimensions. Rejection
-Sampling Is Known To Be Unreliable In High-Dimensional Problems.</p>
-<p>Compared To Other Markov Chain Monte Carlo Approaches, Ours Has The Following
-Notable Advantages:</p>
+<p>Our approach using adaptive hmc is preferable to alternatives based on
+rejection sampling because the parameter space that needs to be explored in
+scientifically interesting problems has a large number of dimensions. Rejection
+sampling is known to be unreliable in high-dimensional problems.</p>
+<p>Compared to other Markov Chain Monte Carlo approaches, ours has the following
+notable advantages:</p>
 <ul class="simple">
-<li><p>It Is Highly Efficient</p></li>
+<li><p>It tends to be highly efficient compared to other generic MCMC
+implementations in terms of the number of effective samples per second.</p></li>
 <li><p>The well-tested and fast CVODES ODE solver and algebra solver are available</p></li>
 <li><p>Software complexity can be kept low compared to a custom sampler</p></li>
 <li><p>Effective diagnostic tools are available, so we can be relatively confident,
@@ -158,7 +160,7 @@ been kept to where possible:</p>
 blocks in preference to the transformed parameters and model blocks</p></li>
 <li><p>keeping parameters close to unit scale</p></li>
 <li><p>using vectorised operations rather than loops</p></li>
-<li><p>parameterising the model so that the parameters are as uncorrelated</p></li>
+<li><p>parameterising the model so that the parameters are uncorrelated</p></li>
 </ul>
 <p>The final point about less correlated parameterisation is under active
 development - it is likely that the thermodynamic component of the model can be
@@ -210,10 +212,14 @@ improving computation.</p>
 </ul>
 <p class="caption"><span class="caption-text">Theoretical background:</span></p>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="../theory/computation.html">Computation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../theory/enzyme_kinetics.html">Enzyme kinetics</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../theory/statistics.html">Statistical issues</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../theory/statistics.html">Statistical Model</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../theory/thermodynamics.html">Thermodynamics</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../theory/drains.html">Drain Reactions</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Case studies:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../case_studies/ecoli.html">A simple model of E. coli glycolysis</a></li>
 </ul>
 <p class="caption"><span class="caption-text">Implementation details:</span></p>
 <ul class="current">
@@ -255,7 +261,7 @@ improving computation.</p>
       &copy;2019, Novo Nordisk Foundation Center for Biosustainability, Technical University of Denmark.
       
       |
-      Powered by <a href="http://sphinx-doc.org/">Sphinx 2.4.4</a>
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 3.2.1</a>
       &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
       
       |
