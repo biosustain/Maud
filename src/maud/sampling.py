@@ -17,6 +17,7 @@
 """Code for sampling from a posterior distribution."""
 
 import os
+import warnings
 from typing import Dict
 
 import cmdstanpy
@@ -24,6 +25,7 @@ import numpy as np
 import pandas as pd
 
 from maud.data_model import KineticModel, MaudInput
+from maud.utils import get_null_space, get_rref
 
 
 HERE = os.path.dirname(os.path.abspath(__file__))
@@ -150,6 +152,58 @@ def get_full_stoichiometry(
     else:
         S_drain = pd.DataFrame()
     return S_enz, S_enz_to_flux_map, S_complete, S_drain
+
+
+def validate_specified_fluxes(
+    S_complete,
+    rxn_measurements,
+    experiment_codes: Dict[str, int],
+    reaction_codes: Dict[str, int],
+    drain_codes: Dict[str, int],
+    balanced_mic_codes: Dict[str, int],
+):
+    """Check that appropriate fluxes have been measured.
+
+    :param S_complete: The stoichiometrix matrix including reactions and drains
+    :param rxn_measurements: A dataframe containing all flux measurements
+    :param experiment_codes: the codified experiment codes
+    :param reaction_codes: the codified reaction codes
+    :param drain_codes: the codified drain codes
+    :param balanced_mic_codes: the codified balanced_mic codes
+    """
+    complete_reactions = list(reaction_codes.keys()) + list(drain_codes.keys())
+    for exp in experiment_codes:
+        meas_rxns = rxn_measurements[rxn_measurements["experiment_id"] == exp][
+            "target_id"
+        ]
+        measured_rxn_list = list(meas_rxns)
+        flux_paths = get_null_space(S_complete[balanced_mic_codes.keys()].T.values)
+        n_rxns, n_dof = np.shape(flux_paths)
+        rref_flux_paths = np.matrix(get_rref(flux_paths.T))
+        rref_flux_paths[np.abs(rref_flux_paths) < 1e-10] = 0
+        flux_paths_df = pd.DataFrame(rref_flux_paths, columns=complete_reactions)
+        for _, flux_path in flux_paths_df.iterrows():
+            if any(flux_path[measured_rxn_list]) != 0:
+                pass
+            else:
+                possible_measurements = []
+                for rxn, st in flux_path.items():
+                    if st != 0:
+                        possible_measurements.append(rxn)
+                msg = (
+                    f"Your system appears to be underdetermined in experiment:\n{exp}\n" +
+                    "Please define a reaction from the following list:\n"+
+                    f"{'\n'.join(possible_measurements)}"
+                )
+                warnings.warn(msg)
+
+        if len(measured_rxn_list) > n_dof:
+            msg = (
+                "You appear to have specified too many reactions.\n" +
+                "This will bias the statistical model\n"+
+                "as the measurements are not independent."
+            )
+            warnings.warn(msg)
 
 
 def get_knockout_matrix(mi: MaudInput):
@@ -403,6 +457,14 @@ def get_input_data(mi: MaudInput) -> dict:
         exp_id = prior_phos_enz.experiment_id
         prior_loc_phos_conc.loc[exp_id, penz_id] = prior_phos_enz.location
         prior_scale_phos_conc.loc[exp_id, penz_id] = prior_phos_enz.scale
+    validate_specified_fluxes(
+        full_stoic,
+        reaction_measurements,
+        experiment_codes,
+        reaction_codes,
+        drain_codes,
+        balanced_mic_codes,
+    )
     return {
         "N_mic": len(mics),
         "N_unbalanced": len(unbalanced_mic_codes),
