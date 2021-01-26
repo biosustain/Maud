@@ -17,6 +17,7 @@
 """Code for sampling from a posterior distribution."""
 
 import os
+import warnings
 from typing import Dict
 
 import cmdstanpy
@@ -111,15 +112,20 @@ def validate_specified_fluxes(
                 for rxn, st in flux_path.items():
                     if st != 0:
                         possible_measurements.append(rxn)
-                print("Your system appears to be underdetermined in experiment:")
-                print(f"{exp}")
-                print("Please define a reaction from the following list:")
-                print(f"{possible_measurements}")
+                msg = (
+                    f"Your system appears to be underdetermined in experiment:\n{exp}\n" +
+                    "Please define a reaction from the following list:\n"+
+                    f"{'\n'.join(possible_measurements)}"
+                )
+                warnings.warn(msg)
 
         if len(measured_rxn_list) > n_dof:
-            print("You appear to have specified too many reactions.")
-            print("This will bias the sampling as the measurements")
-            print("are not independent.")
+            msg = (
+                "You appear to have specified too many reactions.\n" +
+                "This will bias the statistical model\n"+
+                "as the measurements are not independent."
+            )
+            warnings.warn(msg)
 
 
 def get_knockout_matrix(mi: MaudInput):
