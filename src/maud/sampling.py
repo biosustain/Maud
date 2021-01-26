@@ -26,7 +26,7 @@ import pandas as pd
 
 from maud import io
 from maud.data_model import KineticModel, MaudInput
-from maud.utils import null, rref
+from maud.utils import get_null_space, get_rref
 
 
 HERE = os.path.dirname(os.path.abspath(__file__))
@@ -84,7 +84,7 @@ def validate_specified_fluxes(
     drain_codes: Dict[str, int],
     balanced_mic_codes: Dict[str, int],
 ):
-    """Validate measured fluxes.
+    """Check that appropriate fluxes have been measured.
 
     :param S_complete: The stoichiometrix matrix including reactions and drains
     :param rxn_measurements: A dataframe containing all flux measurements
@@ -99,9 +99,9 @@ def validate_specified_fluxes(
             "target_id"
         ]
         measured_rxn_list = list(meas_rxns)
-        flux_paths = null(S_complete[balanced_mic_codes.keys()].T.values)
+        flux_paths = get_null_space(S_complete[balanced_mic_codes.keys()].T.values)
         n_rxns, n_dof = np.shape(flux_paths)
-        rref_flux_paths = np.matrix(rref(flux_paths.T))
+        rref_flux_paths = np.matrix(get_rref(flux_paths.T))
         rref_flux_paths[np.abs(rref_flux_paths) < 1e-10] = 0
         flux_paths_df = pd.DataFrame(rref_flux_paths, columns=complete_reactions)
         for _, flux_path in flux_paths_df.iterrows():
