@@ -191,7 +191,7 @@ def validate_specified_fluxes(
                     if st != 0:
                         possible_measurements.append(rxn)
                 msg = (
-                    "Your system appears to be underdetermined in"
+                    "\nYour system appears to be underdetermined in "
                     + f"experiment: {exp}\n"
                     + "Please define a reaction from the following list:\n"
                     + "\n".join(possible_measurements)
