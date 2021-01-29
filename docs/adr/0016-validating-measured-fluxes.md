@@ -7,9 +7,9 @@ Date: 2021-01-22
 In Review
 
 ## Context
-Defining the number of indenpendent fluxes isn't always clear.
-This is an issue as defining more fluxes than there are degrees
-of freedom when calculating the fluxes.
+Defining measurements for independent fluxes isn't always clear.
+This can occur when you measure more fluxes than there are degrees
+of freedom in a network.
 
 An example would be this simplified network:
 
@@ -44,7 +44,7 @@ For instance, a linear pathway where the influx and efflux are both measured.
 This is still valid as they are independent measurements.
 
 ## Consequences
-There are no direct consequences to the user, this effect Maud running in any
+There are no direct consequences to the user, this should not effect Maud sampling in any
 way. The output of this feature may warn the user about possible biases present
 in the experiment definition. It is however completely up to the user to determine
 if these warnings apply to their notwork or not.
