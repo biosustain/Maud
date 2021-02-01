@@ -165,11 +165,7 @@ def parse_toml_drain(raw: dict) -> Drain:
 
     """
 
-    return Drain(
-        id=raw["id"],
-        name=raw["name"],
-        stoichiometry=raw["stoichiometry"],
-    )
+    return Drain(id=raw["id"], name=raw["name"], stoichiometry=raw["stoichiometry"])
 
 
 def parse_toml_phosphorylation(raw: dict) -> Phosphorylation:
@@ -288,9 +284,7 @@ def parse_prior_set_df(raw: pd.DataFrame) -> PriorSet:
         "phos_kcat_priors": [],
         "phos_enz_concentration_priors": [],
     }
-    negative_param_types = [
-        "formation_energy",
-    ]
+    negative_param_types = ["formation_energy"]
     for _, row in raw.iterrows():
         id = "_".join(row.loc[lambda s: [isinstance(x, str) for x in s]].values)
         parameter_type = row["parameter_type"]

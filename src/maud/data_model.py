@@ -186,10 +186,7 @@ class Drain:
     """
 
     def __init__(
-        self,
-        id: str,
-        name: str = None,
-        stoichiometry: Dict[str, float] = None,
+        self, id: str, name: str = None, stoichiometry: Dict[str, float] = None
     ):
         if stoichiometry is None:
             stoichiometry = defaultdict()
