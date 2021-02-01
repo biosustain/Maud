@@ -130,6 +130,9 @@ def get_full_stoichiometry(
     :param metabolite_codes: the codified metabolite codes
     """
     S_enz = pd.DataFrame(0, index=enzyme_codes, columns=metabolite_codes)
+    S_reactions = pd.DataFrame(
+        0, index=metabolite_codes, columns={**reaction_codes, **drain_codes}
+    )
     if drain_codes is not None:
         S_drain = pd.DataFrame(0, index=drain_codes, columns=metabolite_codes)
         S_complete = pd.DataFrame(
@@ -144,18 +147,20 @@ def get_full_stoichiometry(
                 S_enz_to_flux_map.loc[rxn_id, enz_id] = 1
                 S_enz.loc[enz_id, met] = stoic
                 S_complete.loc[enz_id, met] = stoic
+                S_reactions.loc[met, rxn_id] = stoic
     if any(drain_codes):
         for drain_id, drain in kinetic_model.drains.items():
             for met, stoic in drain.stoichiometry.items():
                 S_drain.loc[drain_id, met] = stoic
                 S_complete.loc[drain_id, met] = stoic
+                S_reactions.loc[met, drain_id] = stoic
     else:
         S_drain = pd.DataFrame()
-    return S_enz, S_enz_to_flux_map, S_complete, S_drain
+    return S_enz, S_enz_to_flux_map, S_complete, S_drain, S_reactions
 
 
 def validate_specified_fluxes(
-    S_complete,
+    rxn_stoic,
     rxn_measurements,
     experiment_codes: Dict[str, int],
     reaction_codes: Dict[str, int],
@@ -177,7 +182,7 @@ def validate_specified_fluxes(
             "target_id"
         ]
         measured_rxn_list = list(meas_rxns)
-        flux_paths = get_null_space(S_complete[balanced_mic_codes.keys()].T.values)
+        flux_paths = get_null_space(rxn_stoic.loc[balanced_mic_codes.keys()].values)
         n_rxns, n_dof = np.shape(flux_paths)
         rref_flux_paths = np.matrix(get_rref(flux_paths.T))
         rref_flux_paths[np.abs(rref_flux_paths) < 1e-10] = 0
@@ -309,7 +314,13 @@ def get_input_data(mi: MaudInput) -> dict:
     water_stoichiometry = [
         r.water_stoichiometry for r in reactions.values() for e in r.enzymes.items()
     ]
-    (enzyme_stoic, stoic_map_to_flux, full_stoic, drain_stoic) = get_full_stoichiometry(
+    (
+        enzyme_stoic,
+        stoic_map_to_flux,
+        full_stoic,
+        drain_stoic,
+        rxn_stoic,
+    ) = get_full_stoichiometry(
         mi.kinetic_model, enzyme_codes, mic_codes, reaction_codes, drain_codes
     )
     subunits = (
@@ -459,7 +470,7 @@ def get_input_data(mi: MaudInput) -> dict:
         prior_loc_phos_conc.loc[exp_id, penz_id] = prior_phos_enz.location
         prior_scale_phos_conc.loc[exp_id, penz_id] = prior_phos_enz.scale
     validate_specified_fluxes(
-        full_stoic,
+        rxn_stoic,
         reaction_measurements,
         experiment_codes,
         reaction_codes,
