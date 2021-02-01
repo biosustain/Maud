@@ -28,11 +28,7 @@ ODE_CONFIG = {
     "likelihood": 1,
     "timepoint": 500,
 }
-SIM_CONFIG = {
-    "chains": 1,
-    "iter_sampling": 1,
-    "fixed_param": True,
-}
+SIM_CONFIG = {"chains": 1, "iter_sampling": 1, "fixed_param": True}
 FIT_CONFIG = {
     "chains": 4,
     "parallel_chains": 2,
