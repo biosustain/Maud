@@ -19,6 +19,7 @@
 from typing import Dict, Iterable
 
 import numpy as np
+import sympy as sp
 from scipy.stats import norm
 
 
@@ -53,3 +54,15 @@ def get_normal_parameters_from_quantiles(x1, p1, x2, p2):
     sigma = (x2 - x1) / denom
     mu = (x1 * norm.ppf(p2) - x2 * norm.ppf(p1)) / denom
     return mu, sigma
+
+
+def get_null_space(a, rtol=1e-5):
+    """Calulate the null space of a matrix."""
+    u, s, v = np.linalg.svd(a)
+    rank = (s > rtol * s[0]).sum()
+    return v[rank:].T.copy()
+
+
+def get_rref(mat):
+    """Return reduced row echelon form of a matrix."""
+    return sp.Matrix(mat).rref(iszerofunc=lambda x: abs(x) < 1e-10)[0]
