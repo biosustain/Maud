@@ -42,13 +42,6 @@ def cli():
     pass
 
 
-@cli.command()
-@click.option("--output_dir", default=".", help="Where to save Maud's output")
-@click.argument(
-    "data_path",
-    type=click.Path(exists=True, dir_okay=True, file_okay=False),
-    default=get_example_path(RELATIVE_PATH_EXAMPLE),
-)
 def sample(data_path, output_dir):
     """Generate MCMC samples given a user input directory.
 
@@ -73,16 +66,20 @@ def sample(data_path, output_dir):
     stanfit = sampling.sample(mi, samples_path)
     print(stanfit.diagnose())
     print(stanfit.summary())
+    return output_path
 
 
-@cli.command()
-@click.option("--output_dir", default=".", help="Where to save the output")
-@click.option("-n", default=1, type=int, help="Number of simulations")
+@cli.command("sample")
+@click.option("--output_dir", default=".", help="Where to save Maud's output")
 @click.argument(
     "data_path",
     type=click.Path(exists=True, dir_okay=True, file_okay=False),
     default=get_example_path(RELATIVE_PATH_EXAMPLE),
 )
+def sample_command(data_path, output_dir):
+    click.echo(sample(data_path, output_dir))
+
+
 def simulate(data_path, output_dir, n):
     """Generate draws from the prior mean."""
 
@@ -104,3 +101,15 @@ def simulate(data_path, output_dir, n):
     print(stanfit.draws_pd(params=["yconc_sim", "yflux_sim"]).T)
     print("\nSimulated log likelihoods:")
     print(stanfit.draws_pd(params=["log_lik_conc", "log_lik_flux"]).T)
+    return output_path
+
+@cli.command("simulate")
+@click.option("--output_dir", default=".", help="Where to save the output")
+@click.option("-n", default=1, type=int, help="Number of simulations")
+@click.argument(
+    "data_path",
+    type=click.Path(exists=True, dir_okay=True, file_okay=False),
+    default=get_example_path(RELATIVE_PATH_EXAMPLE),
+)
+def simulate_command(data_path, output_dir, n):
+    click.echo(simulate(data_path, output_dir, n))
