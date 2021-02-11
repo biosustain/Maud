@@ -77,6 +77,7 @@ def sample(data_path, output_dir):
     default=get_example_path(RELATIVE_PATH_EXAMPLE),
 )
 def sample_command(data_path, output_dir):
+    """Run the sample function as a click command."""
     click.echo(sample(data_path, output_dir))
 
 
@@ -103,6 +104,7 @@ def simulate(data_path, output_dir, n):
     print(stanfit.draws_pd(params=["log_lik_conc", "log_lik_flux"]).T)
     return output_path
 
+
 @cli.command("simulate")
 @click.option("--output_dir", default=".", help="Where to save the output")
 @click.option("-n", default=1, type=int, help="Number of simulations")
@@ -112,4 +114,5 @@ def simulate(data_path, output_dir, n):
     default=get_example_path(RELATIVE_PATH_EXAMPLE),
 )
 def simulate_command(data_path, output_dir, n):
+    """Run the simulate function as a click command."""
     click.echo(simulate(data_path, output_dir, n))
