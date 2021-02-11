@@ -1,0 +1,171 @@
+################ Kinetic model ##########
+metabolites = [
+  {id="g6p", name="D-Glucose 6-phosphate", compartment="c", balanced=false},
+  {id="f6p", name="D-Fructose 6-phosphate", compartment="c", balanced=true},
+  {id="fdp", name="D-Fructose 1,6-bisphosphate", compartment="c", balanced=true},
+  {id="adp", name="ADP C10H12N5O10P2", compartment="c", balanced=false},
+  {id="atp", name="ATP C10H12N5O13P3", compartment="c", balanced=false},
+  {id="pi", name="Phosphate", compartment="c", balanced=false},
+  {id="dhap", name="Dihydroxyacetone phosphate", compartment="c", balanced=true},
+  {id="g3p", name="Glyceraldehyde 3-phosphate", compartment="c", balanced=true},
+#   {id="nad", name="Nicotinamide adenine dinucleotide", compartment="c", balanced=false},
+#   {id="nadh", name="Nicotinamide adenine dinucleotide - reduced", compartment="c", balanced=false},
+#   {id="13dpg", name="3-Phospho-D-glyceroyl phosphate", compartment="c", balanced=true},
+#   {id="3pg", name="3-Phospho-D-glycerate", compartment="c", balanced=false}
+]
+
+[[compartments]]
+id = "c"
+name = "cytosol"
+volume = 1
+
+[[reactions]]
+id = "PGI"
+name = "Glucose-6-phosphate isomerase"
+enzymes = [{id = "PGI", name = "Glucose-6-phosphate isomerase"}]
+stoichiometry = {g6p_c = -1, f6p_c = 1}
+
+[[reactions]]
+id = "PFK"
+name = "Phosphofructokinase"
+enzymes = [{id = "PFK", name = "Phosphofructokinase"}]
+stoichiometry = {atp_c = -1, f6p_c = -1, adp_c = 1, fdp_c = 1}
+
+[[reactions]]
+id = "FBP"
+name = "Fructose-bisphosphatase"
+water_stoichiometry = 1
+enzymes = [{id = "FBP", name = "Fructose-bisphosphatase"}]
+stoichiometry = {f6p_c = -1, fdp_c = 1, pi_c = -1}
+
+[[reactions]]
+id = "FBA"
+name = "Fructose-bisphosphate aldolase"
+enzymes = [{id = "FBA", name = "Fructose-bisphosphate aldolase"}]
+stoichiometry = {dhap_c = 1, fdp_c = -1, g3p_c = 1}
+
+[[reactions]]
+id = "TPI"
+name = "Triose-phosphate isomerase"
+enzymes = [{id = "TPI", name = "Triose-phosphate isomerase"}]
+stoichiometry = {dhap_c = -1, g3p_c = 1}
+
+# [[reactions]]
+# id = "GAPD"
+# name = "Glyceraldehyde-3-phosphate dehydrogenase"
+# enzymes = [{id = "GAPD", name = "Glyceraldehyde-3-phosphate dehydrogenase"}]
+# stoichiometry = {13dpg_c = 1, g3p_c = -1, nad_c = -1, nadh_c = 1, pi_c = -1}
+
+# [[reactions]]
+# id = "PGK"
+# name = "Phosphoglycerate kinase"
+# enzymes = [{id = "PGK", name = "Phosphoglycerate kinase"}]
+# stoichiometry = {13dpg_c = -1, 3pg_c = 1, adp_c = -1, atp_c = 1}
+
+[[drains]]
+id = "g3p_drain"
+name = "g3p_drain"
+stoichiometry = { g3p_c = -1 }
+
+[priors]
+formation_energies = [
+  {metabolite_id = "g6p", location = -1336.3, scale = 1.3},
+  {metabolite_id = "f6p", location = -1333.8, scale = 1.3},
+  {metabolite_id = "pi", location = -1073.3, scale = 1.5},
+  {metabolite_id = "adp", location = -1440.8, scale = 2.4},
+  {metabolite_id = "atp", location = -2313.0, scale = 3.0},
+  {metabolite_id = "fdp", location = -2220.9, scale = 2.1},
+  {metabolite_id = "g3p", location = -1106.4, scale = 1.3},
+  {metabolite_id = "dhap", location = -1111.9, scale = 1.1},
+#   {metabolite_id = "13dpg", location = -2219.0, scale = 2.1},
+#   {metabolite_id = "nad", location = -1222.9, scale = 12.4},
+#   {metabolite_id = "nadh", location = -1158.7, scale = 12.4},
+#   {metabolite_id = "3pg", location = -1365.2, scale = 1.5}
+]
+kcats = [
+  {enzyme_id = "PGI", location = 126.0, scale = 0.2},
+  {enzyme_id = "PFK", location = 110.0, scale = 0.2},
+  {enzyme_id = "FBP", location = 24.0, scale = 0.2},
+  {enzyme_id = "FBA", location = 7.0, scale = 0.2},
+  {enzyme_id = "TPI", location = 9000.0, scale = 0.2},
+  # {enzyme_id = "GAPD", location = 268.0, scale = 0.2},
+  # {enzyme_id = "PGK", location = 329.0, scale = 1},
+]
+kms = [
+  {enzyme_id = "PGI", mic_id = "g6p_c", location = 3.0, scale = 0.2},
+  {enzyme_id = "PGI", mic_id = "f6p_c", location = 0.16, scale = 0.2},
+  {enzyme_id = "PFK", mic_id = "f6p_c", location = 0.03, scale = 0.2},
+  {enzyme_id = "PFK", mic_id = "atp_c", location = 0.06, scale = 0.2},
+  {enzyme_id = "PFK", mic_id = "fdp_c", location = 15, scale = 1.5},
+  {enzyme_id = "PFK", mic_id = "adp_c", location = 0.55, scale = 1.5},
+  {enzyme_id = "FBP", mic_id = "fdp_c", location = 16.0, scale = 0.2},
+  {enzyme_id = "FBP", mic_id = "f6p_c", location = 0.6899999999999999, scale = 1.5},
+  {enzyme_id = "FBP", mic_id = "pi_c", location = 1.0, scale = 1.5},
+  {enzyme_id = "FBA", mic_id = "fdp_c", location = 0.02, scale = 0.2},
+  {enzyme_id = "FBA", mic_id = "g3p_c", location = 0.03, scale = 0.2},
+  {enzyme_id = "FBA", mic_id = "dhap_c", location = 0.13, scale = 0.2},
+  {enzyme_id = "TPI", mic_id = "dhap_c", location = 2.16, scale = 1.5},
+  {enzyme_id = "TPI", mic_id = "g3p_c", location = 200.0, scale = 0.2},
+  # {enzyme_id = "GAPD", mic_id = "g3p_c", location = 0.89, scale = 0.2},
+  # {enzyme_id = "GAPD", mic_id = "nad_c", location = 0.045, scale = 0.2},
+  # {enzyme_id = "GAPD", mic_id = "pi_c", location = 1.0, scale = 1.5},
+  # {enzyme_id = "GAPD", mic_id = "13dpg_c", location = 2.02, scale = 1.5},
+  # {enzyme_id = "GAPD", mic_id = "nadh_c", location = 0.003, scale = 1.5},
+  # {enzyme_id = "PGK", mic_id = "3pg_c", location = 2.02, scale = 1.5},
+  # {enzyme_id = "PGK", mic_id = "atp_c", location = 5.37, scale = 1.5},
+  # {enzyme_id = "PGK", mic_id = "13dpg_c", location = 2.02, scale = 1.5},
+  # {enzyme_id = "PGK", mic_id = "adp_c", location = 0.6, scale = 1.5}
+]
+enzyme_concentrations = [
+  {experiment_id="Evo04ptsHIcrrEvo01EP", enzyme_id='PGI', location=0.033875912, scale=0.06},
+  {experiment_id="Evo04ptsHIcrrEvo01EP", enzyme_id='FBP', location=0.00592291, scale=0.047},
+  {experiment_id="Evo04ptsHIcrrEvo01EP", enzyme_id='FBA', location=0.0702922488972023, scale=0.19},
+  {experiment_id="Evo04ptsHIcrrEvo01EP", enzyme_id='TPI', location=0.020866941, scale=0.13},
+  {experiment_id="Evo04ptsHIcrrEvo01EP", enzyme_id='PFK', location=0.018055101, scale=0.13},
+  {experiment_id="Evo04Evo01EP", enzyme_id='FBP', location=0.00592291, scale=0.047},
+  {experiment_id="Evo04Evo01EP", enzyme_id='FBA', location=0.0702922488972023, scale=0.19},
+  {experiment_id="Evo04Evo01EP", enzyme_id='TPI', location=0.0198, scale=0.1},
+  {experiment_id="Evo04Evo01EP", enzyme_id='PFK', location=0.0185, scale=0.05}
+]
+unbalanced_metabolites = [
+  {experiment_id="Evo04ptsHIcrrEvo01EP", mic_id='g6p_c', location=2.0804108, scale=0.188651},
+  {experiment_id="Evo04ptsHIcrrEvo01EP", mic_id='adp_c', location=0.6113649, scale=0.038811},
+  {experiment_id="Evo04ptsHIcrrEvo01EP", mic_id='atp_c', location=5.4080032, scale=0.186962},
+
+  {experiment_id="Evo04Evo01EP", mic_id='g6p_c', location=2.0804108, scale=0.188651},
+  {experiment_id="Evo04Evo01EP", mic_id='adp_c', location=0.6113649, scale=0.038811},
+  {experiment_id="Evo04Evo01EP", mic_id='atp_c', location=5.4080032, scale=0.186962},
+]
+drains = [
+  {drain_id="g3p_drain", experiment_id="Evo04ptsHIcrrEvo01EP", pct1=0.3, pct99=1.2},
+  {drain_id="g3p_drain", experiment_id="Evo04Evo01EP", pct1=0.3, pct99=1.2},
+]
+
+
+################## Experimental data #################
+
+[[experiments]]
+id = 'Evo04ptsHIcrrEvo01EP'
+metabolite_measurements = [
+  {target_id='f6p_c', value=0.6410029, uncertainty=0.146145},
+  # {target_id='pi_c', value=2.0, uncertainty=0.2},  # made up
+  {target_id='fdp_c', value=4.5428601, uncertainty=0.237197},
+  {target_id='dhap_c', value=1.895018, uncertainty=0.078636},
+  # {target_id='nad_c', value=2.3760259, uncertainty=0.081215},
+  # {target_id='nadh_c', value=0.00300451, uncertainty=0.15119365},
+  # {target_id='3pg_c', value=1.9065364, uncertainty=0.084368},
+]
+reaction_measurements = [
+  {target_id='PGI', value=4.087673533555556, uncertainty=1},
+]
+
+[[experiments]]
+id = 'Evo04Evo01EP'
+metabolite_measurements = [
+  {target_id='f6p_c', value=0.6410029, uncertainty=0.146145},
+  {target_id='fdp_c', value=4.5428601, uncertainty=0.237197},
+  {target_id='dhap_c', value=1.895018, uncertainty=0.078636},
+]
+reaction_measurements = [
+  {target_id='PGI', value=4.087673533555556, uncertainty=1},
+]

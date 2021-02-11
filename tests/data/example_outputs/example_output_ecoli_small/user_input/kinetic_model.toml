@@ -1,0 +1,67 @@
+metabolites = [
+  {id="g6p", name="D-Glucose 6-phosphate", compartment="c", balanced=false},
+  {id="f6p", name="D-Fructose 6-phosphate", compartment="c", balanced=true},
+  {id="fdp", name="D-Fructose 1,6-bisphosphate", compartment="c", balanced=true},
+  {id="adp", name="ADP C10H12N5O10P2", compartment="c", balanced=false},
+  {id="atp", name="ATP C10H12N5O13P3", compartment="c", balanced=false},
+  {id="pi", name="Phosphate", compartment="c", balanced=false},
+  {id="dhap", name="Dihydroxyacetone phosphate", compartment="c", balanced=true},
+  {id="g3p", name="Glyceraldehyde 3-phosphate", compartment="c", balanced=true},
+#   {id="nad", name="Nicotinamide adenine dinucleotide", compartment="c", balanced=false},
+#   {id="nadh", name="Nicotinamide adenine dinucleotide - reduced", compartment="c", balanced=false},
+#   {id="13dpg", name="3-Phospho-D-glyceroyl phosphate", compartment="c", balanced=true},
+#   {id="3pg", name="3-Phospho-D-glycerate", compartment="c", balanced=false}
+]
+
+[[compartments]]
+id = "c"
+name = "cytosol"
+volume = 1
+
+[[reactions]]
+id = "PGI"
+name = "Glucose-6-phosphate isomerase"
+enzymes = [{id = "PGI", name = "Glucose-6-phosphate isomerase"}]
+stoichiometry = {g6p_c = -1, f6p_c = 1}
+
+[[reactions]]
+id = "PFK"
+name = "Phosphofructokinase"
+enzymes = [{id = "PFK", name = "Phosphofructokinase"}]
+stoichiometry = {atp_c = -1, f6p_c = -1, adp_c = 1, fdp_c = 1}
+
+[[reactions]]
+id = "FBP"
+name = "Fructose-bisphosphatase"
+water_stoichiometry = 1
+enzymes = [{id = "FBP", name = "Fructose-bisphosphatase"}]
+stoichiometry = {f6p_c = -1, fdp_c = 1, pi_c = -1}
+
+[[reactions]]
+id = "FBA"
+name = "Fructose-bisphosphate aldolase"
+enzymes = [{id = "FBA", name = "Fructose-bisphosphate aldolase"}]
+stoichiometry = {dhap_c = 1, fdp_c = -1, g3p_c = 1}
+
+[[reactions]]
+id = "TPI"
+name = "Triose-phosphate isomerase"
+enzymes = [{id = "TPI", name = "Triose-phosphate isomerase"}]
+stoichiometry = {dhap_c = -1, g3p_c = 1}
+
+# [[reactions]]
+# id = "GAPD"
+# name = "Glyceraldehyde-3-phosphate dehydrogenase"
+# enzymes = [{id = "GAPD", name = "Glyceraldehyde-3-phosphate dehydrogenase"}]
+# stoichiometry = {13dpg_c = 1, g3p_c = -1, nad_c = -1, nadh_c = 1, pi_c = -1}
+
+# [[reactions]]
+# id = "PGK"
+# name = "Phosphoglycerate kinase"
+# enzymes = [{id = "PGK", name = "Phosphoglycerate kinase"}]
+# stoichiometry = {13dpg_c = -1, 3pg_c = 1, adp_c = -1, atp_c = 1}
+
+[[drains]]
+id = "g3p_drain"
+name = "g3p_drain"
+stoichiometry = { g3p_c = -1 }

@@ -1,0 +1,611 @@
+################ Kinetic model ##########
+metabolites = [
+  {id="g6p", name="D-Glucose 6-phosphate", compartment="c", balanced=false},
+  {id="f6p", name="D-Fructose 6-phosphate", compartment="c", balanced=true},
+  {id="fdp", name="D-Fructose 1,6-bisphosphate", compartment="c", balanced=true},
+  {id="adp", name="ADP C10H12N5O10P2", compartment="c", balanced=false},
+  {id="atp", name="ATP C10H12N5O13P3", compartment="c", balanced=false},
+  {id="pi", name="Phosphate", compartment="c", balanced=false},
+  {id="dhap", name="Dihydroxyacetone phosphate", compartment="c", balanced=true},
+  {id="g3p", name="Glyceraldehyde 3-phosphate", compartment="c", balanced=true},
+  {id="pep", name="phosphoenolpyruvate", compartment="c", balanced=false},
+]
+
+[[compartments]]
+id = "c"
+name = "cytosol"
+volume = 1
+
+[[reactions]]
+id = "PGI"
+name = "Glucose-6-phosphate isomerase"
+enzymes = [{id = "PGI", name = "Glucose-6-phosphate isomerase", gene = "pgi"}]
+stoichiometry = {g6p_c = -1, f6p_c = 1}
+[[reactions.enzymes.modifiers]]
+modifier_type = 'competitive_inhibitor'
+mic_id = 'pep_c'
+
+
+[[reactions]]
+id = "PFK"
+name = "Phosphofructokinase"
+stoichiometry = {atp_c = -1, f6p_c = -1, adp_c = 1, fdp_c = 1}
+[[reactions.enzymes]]
+id = "PFKA"
+name = "Phosphofructokinase"
+gene = "pfkA"
+subunits = 4
+[[reactions.enzymes.modifiers]]
+modifier_type = 'allosteric_activator'
+mic_id = 'f6p_c'
+[[reactions.enzymes.modifiers]]
+modifier_type = 'allosteric_inhibitor'
+mic_id = 'atp_c'
+[[reactions.enzymes]]
+id = "PFKB"
+name = "Phosphofructokinase"
+gene = "pfkB"
+subunits = 2
+[[reactions.enzymes.modifiers]]
+modifier_type = 'allosteric_inhibitor'
+mic_id = 'atp_c'
+
+[[reactions]]
+id = "FBP"
+name = "Fructose-bisphosphatase"
+water_stoichiometry = -1
+enzymes = [{id = "FBP", name = "Fructose-bisphosphatase", gene = "fbp"}]
+stoichiometry = {f6p_c = 1, fdp_c = -1, pi_c = 1}
+
+[[reactions]]
+id = "FBA"
+name = "Fructose-bisphosphate aldolase"
+enzymes = [{id = "FBAA", name = "Fructose-bisphosphate aldolase", gene = "fbaA"},
+           {id = "FBAB", name = "Fructose-bisphosphate aldolase", gene = "fbaB"}]
+stoichiometry = {dhap_c = 1, fdp_c = -1, g3p_c = 1}
+
+[[reactions]]
+id = "TPI"
+name = "Triose-phosphate isomerase"
+enzymes = [{id = "TPIA", name = "Triose-phosphate isomerase", gene = "tpiA"}]
+stoichiometry = {dhap_c = -1, g3p_c = 1}
+
+[[drains]]
+id = "f6p_drain"
+name = "f6p_from_PPP"
+stoichiometry = { f6p_c = 1 }
+
+[[drains]]
+id = "g3p_drain"
+name = "g3p_out"
+stoichiometry = { g3p_c = -1 }
+
+[priors]
+formation_energies = [
+  {metabolite_id = "g6p", location = -1336.3, scale = 1.3},
+  {metabolite_id = "f6p", location = -1333.8, scale = 1.3},
+  {metabolite_id = "pi", location = -1073.3, scale = 1.5},
+  {metabolite_id = "adp", location = -1440.8, scale = 2.4},
+  {metabolite_id = "atp", location = -2313.0, scale = 3.0},
+  {metabolite_id = "fdp", location = -2220.9, scale = 2.1},
+  {metabolite_id = "g3p", location = -1106.4, scale = 1.3},
+  {metabolite_id = "dhap", location = -1111.9, scale = 1.1},
+  {metabolite_id = "pep", location = -1207.5, scale = 1},
+]
+kcats = [
+  {enzyme_id = "PGI", location = 1550.0, scale = 0.2}, # SabioRK ID: 32322
+  {enzyme_id = "PFKA", location = 110.0, scale = 0.2}, # https://doi.org/10.1016/0022-2836(68)90051-X
+  {enzyme_id = "PFKB", location = 56.0, scale = 0.2}, # https://www.sciencedirect.com/science/article/pii/S0300908416301663?via%3Dihub
+  {enzyme_id = "FBP", location = 24.0, scale = 0.2}, # SabioRK ID: 40238
+  {enzyme_id = "FBAA", location = 5.67, scale = 0.2}, # SabioRK ID: 43269
+  {enzyme_id = "FBAB", location = 4.13, scale = 0.2}, # SabioRK ID: 29371
+  {enzyme_id = "TPIA", location = 6.0, scale = 0.2}, # SabioRK ID: 8107
+]
+kms = [
+  {enzyme_id = "PGI", mic_id = "g6p_c", location = 3.0, scale = 0.5},  # SabioRK ID: 32322
+  {enzyme_id = "PGI", mic_id = "f6p_c", location = 0.16, scale = 0.5}, # SabioRK ID: 32322
+
+# All taken from https://doi.org/10.1016/0022-2836(68)90051-X and taken only of the active form
+  {enzyme_id = "PFKA", mic_id = "f6p_c", location = 0.0125, scale = 0.5},
+  {enzyme_id = "PFKA", mic_id = "atp_c", location = 0.06, scale = 0.5},
+  {enzyme_id = "PFKA", mic_id = "fdp_c", location = 15, scale = 1.5}, # Except this one
+  {enzyme_id = "PFKA", mic_id = "adp_c", location = 0.025, scale = 1.5},
+
+# All taken from https://www.sciencedirect.com/science/article/pii/S0300908416301663?via%3Dihub
+  {enzyme_id = "PFKB", mic_id = "f6p_c", location = 0.03, scale = 0.8}, # Altered
+  {enzyme_id = "PFKB", mic_id = "atp_c", location = 0.02, scale = 0.8}, # Altered
+  {enzyme_id = "PFKB", mic_id = "fdp_c", location = 15, scale = 1.5},
+  {enzyme_id = "PFKB", mic_id = "adp_c", location = 0.025, scale = 1.5},
+
+  {enzyme_id = "FBP", mic_id = "fdp_c", location = 1.7, scale = 0.5}, # SabioRK ID: 40238 / 40239 says 16.0
+  {enzyme_id = "FBP", mic_id = "f6p_c", location = 0.6899999999999999, scale = 1.5},
+  {enzyme_id = "FBP", mic_id = "pi_c", location = 1.0, scale = 1.5},
+
+  {enzyme_id = "FBAA", mic_id = "fdp_c", location = 0.5, scale = 0.5}, # SabioRK ID: 43269
+  {enzyme_id = "FBAA", mic_id = "g3p_c", location = 0.88, scale = 0.5}, # SabioRK ID: 30130 a lot mor info
+  {enzyme_id = "FBAA", mic_id = "dhap_c", location = 0.1, scale = 1}, # SabioRK ID: 43272
+
+# Taken from yeast, because the type 2 isoenzyme is the predominant form
+  {enzyme_id = "FBAB", mic_id = "fdp_c", location = 0.451, scale = 0.5}, # SabioRK ID: 29371
+  {enzyme_id = "FBAB", mic_id = "g3p_c", location = 2.4, scale = 0.5}, # SabioRK ID: 56570
+  {enzyme_id = "FBAB", mic_id = "dhap_c", location = 2.0, scale = 0.5}, # SabioRK ID: 56570
+
+  {enzyme_id = "TPIA", mic_id = "dhap_c", location = 0.33, scale = 0.5}, # SabioRK ID: 8107
+  {enzyme_id = "TPIA", mic_id = "g3p_c", location = 0.079, scale = 0.5}, # SabioRK ID: 8104
+]
+
+inhibition_constants = [
+  {enzyme_id = "PGI", mic_id = "pep_c", location = 0.26, scale = 0.5}, # DOI: 10.1111/j.1742-4658.2012.08719.x
+]
+
+transfer_constants = [
+  {enzyme_id = "PFKA", location = 1, scale = 1}, # Weakly informative
+  {enzyme_id = "PFKB", location = 1, scale = 1}  # Weakly informative
+]
+
+relaxed_dissociation_constants = [
+  {enzyme_id = "PFKA", mic_id = "f6p_c", location = 0.01, scale = 2}, # Weakly informative
+]
+
+tense_dissociation_constants = [
+  {enzyme_id = "PFKA", mic_id = "atp_c", location = 1, scale = 2}, # Weakly informative
+  {enzyme_id = "PFKB", mic_id = "atp_c", location = 1, scale = 2}, # Weakly informative
+]
+
+
+[[experiments]]
+id = "Evo04Evo01EP"
+[[experiments.metabolite_measurements]]
+target_id = "adp_c"
+value = 0.6113649750632913
+uncertainty = 0.0388109904946624
+
+[[experiments.metabolite_measurements]]
+target_id = "atp_c"
+value = 5.408003186466161
+uncertainty = 0.1869616315509312
+
+[[experiments.metabolite_measurements]]
+target_id = "dhap_c"
+value = 1.8950180049914704
+uncertainty = 0.07863612890170073
+
+[[experiments.metabolite_measurements]]
+target_id = "f6p_c"
+value = 0.6410029191697155
+uncertainty = 0.14614487486692876
+
+[[experiments.metabolite_measurements]]
+target_id = "fdp_c"
+value = 4.542860132534478
+uncertainty = 0.2371965696775391
+
+[[experiments.metabolite_measurements]]
+target_id = "g6p_c"
+value = 2.080410885611594
+uncertainty = 0.18865107495816608
+
+[[experiments.metabolite_measurements]]
+target_id = "pep_c"
+value = 0.24187807672413633
+uncertainty = 0.06558391428202388
+
+[[experiments.reaction_measurements]]
+target_id = "PFK"
+value = 2.547046894411111
+uncertainty = 0.08488393444444446
+
+[[experiments.reaction_measurements]]
+target_id = "PGI"
+value = 4.087673533555556
+uncertainty = 0.003811863433333334
+
+[[experiments.drains]]
+id = "f6p_drain"
+location = -1.539
+scale = 0.0846
+
+[[experiments.drains]]
+id = "g3p_drain"
+location = 2
+scale = 0.0846
+
+[[experiments.enzyme_measurements]]
+target_id = "FBAA"
+value = 0.0704592675242211
+uncertainty = 0.20782696075336488
+
+[[experiments.enzyme_measurements]]
+target_id = "FBAB"
+value = 0.004038784112975896
+uncertainty = 0.12020011828976535
+
+[[experiments.enzyme_measurements]]
+target_id = "FBP"
+value = 0.0057128462581434464
+uncertainty = 0.15137697741049863
+
+[[experiments.enzyme_measurements]]
+target_id = "PFKA"
+value = 0.018667759645417763
+uncertainty = 0.045107419272734525
+
+[[experiments.enzyme_measurements]]
+target_id = "PFKB"
+value = 0.0027165035198957518
+uncertainty = 0.10359845664750071
+
+[[experiments.enzyme_measurements]]
+target_id = "PGI"
+value = 0.03338748587758992
+uncertainty = 0.06406406775305307
+
+[[experiments.enzyme_measurements]]
+target_id = "TPIA"
+value = 0.019814776219274497
+uncertainty = 0.17934996340503315
+
+
+[[experiments]]
+id = "Evo04pgiEvo01EP"
+knockouts=["PGI"]
+[[experiments.metabolite_measurements]]
+target_id = "adp_c"
+value = 0.9898468738819469
+uncertainty = 0.21797657504975007
+
+[[experiments.metabolite_measurements]]
+target_id = "atp_c"
+value = 5.669676161196416
+uncertainty = 0.23917300737704036
+
+[[experiments.metabolite_measurements]]
+target_id = "dhap_c"
+value = 2.132128177522195
+uncertainty = 0.28389347194425885
+
+[[experiments.metabolite_measurements]]
+target_id = "f6p_c"
+value = 0.006999565018719214
+uncertainty = 0.03280572549660917
+
+[[experiments.metabolite_measurements]]
+target_id = "fdp_c"
+value = 2.4523650552579617
+uncertainty = 0.29310482511328734
+
+[[experiments.metabolite_measurements]]
+target_id = "g6p_c"
+value = 14.302230807530746
+uncertainty = 0.2845909585622701
+
+[[experiments.metabolite_measurements]]
+target_id = "pep_c"
+value = 0.33726831321487066
+uncertainty = 0.059083075015817256
+
+[[experiments.reaction_measurements]]
+target_id = "PFK"
+value = 0.2763849549777778
+uncertainty = 0.20655245166666666
+
+[[experiments.reaction_measurements]]
+target_id = "FBP"
+value = -0.2450241912888889
+uncertainty = 0.1983192256777778
+
+
+[[experiments.drains]]
+id = "f6p_drain"
+location = 0.563
+scale = 0.06012
+
+[[experiments.drains]]
+id = "g3p_drain"
+location = 1.2
+scale = 0.0846
+
+[[experiments.enzyme_measurements]]
+target_id = "FBAA"
+value = 0.05228843722116154
+uncertainty = 0.07593769142216951
+
+[[experiments.enzyme_measurements]]
+target_id = "FBAB"
+value = 0.008492123537417372
+uncertainty = 0.30063026829486644
+
+[[experiments.enzyme_measurements]]
+target_id = "FBP"
+value = 0.01173326160905437
+uncertainty = 0.08268696716809744
+
+[[experiments.enzyme_measurements]]
+target_id = "PFKA"
+value = 0.013087078730074364
+uncertainty = 0.10134398837983684
+
+[[experiments.enzyme_measurements]]
+target_id = "PFKB"
+value = 0.00365161452395729
+uncertainty = 0.10230865368378612
+
+[[experiments.enzyme_measurements]]
+target_id = "TPIA"
+value = 0.022968874089049705
+uncertainty = 0.21007623941536935
+
+
+[[experiments]]
+id = "Evo04ptsHIcrrEvo01EP"
+[[experiments.metabolite_measurements]]
+target_id = "adp_c"
+value = 0.7113810622662209
+uncertainty = 0.16307768842095036
+
+[[experiments.metabolite_measurements]]
+target_id = "atp_c"
+value = 2.843811705692167
+uncertainty = 0.16229153623960266
+
+[[experiments.metabolite_measurements]]
+target_id = "dhap_c"
+value = 14.532315397319556
+uncertainty = 0.20967718265106183
+
+[[experiments.metabolite_measurements]]
+target_id = "f6p_c"
+value = 1.5148518780433726
+uncertainty = 0.3483768307726212
+
+[[experiments.metabolite_measurements]]
+target_id = "fdp_c"
+value = 10.075083628141616
+uncertainty = 0.13603249146570004
+
+[[experiments.metabolite_measurements]]
+target_id = "g6p_c"
+value = 6.354952226318044
+uncertainty = 0.1259193435589386
+
+[[experiments.metabolite_measurements]]
+target_id = "pep_c"
+value = 1.692546934887993
+uncertainty = 0.24415120561189568
+
+[[experiments.reaction_measurements]]
+target_id = "PFK"
+value = 3.6977045144444447
+uncertainty = 2.0878608019333336
+
+[[experiments.reaction_measurements]]
+target_id = "PGI"
+value = 3.507300893222222
+uncertainty = 0.05163781888888889
+
+[[experiments.drains]]
+id = "f6p_drain"
+location = -0.456
+scale = 0.036
+
+[[experiments.drains]]
+id = "g3p_drain"
+location = 1.2
+scale = 0.0846
+
+[[experiments.enzyme_measurements]]
+target_id = "FBAA"
+value = 0.06197117681867592
+uncertainty = 0.24379723508407544
+
+[[experiments.enzyme_measurements]]
+target_id = "FBAB"
+value = 0.028518936258079924
+uncertainty = 0.24549345400151398
+
+[[experiments.enzyme_measurements]]
+target_id = "FBP"
+value = 0.04362849543945923
+uncertainty = 0.23128821644078507
+
+[[experiments.enzyme_measurements]]
+target_id = "PFKA"
+value = 0.018055100836139835
+uncertainty = 0.3408668499371984
+
+[[experiments.enzyme_measurements]]
+target_id = "PFKB"
+value = 0.0031192057278738978
+uncertainty = 0.19248881424441913
+
+[[experiments.enzyme_measurements]]
+target_id = "PGI"
+value = 0.044449648932757366
+uncertainty = 0.06404782655581638
+
+[[experiments.enzyme_measurements]]
+target_id = "TPIA"
+value = 0.020866940984252118
+uncertainty = 0.2271817627351765
+
+
+[[experiments]]
+id = "Evo04sdhCBEvo01EP"
+[[experiments.metabolite_measurements]]
+target_id = "adp_c"
+value = 0.9105422318194938
+uncertainty = 0.3382897136344312
+
+[[experiments.metabolite_measurements]]
+target_id = "atp_c"
+value = 3.8454204039099675
+uncertainty = 0.16216778566509346
+
+[[experiments.metabolite_measurements]]
+target_id = "dhap_c"
+value = 1.4279838721055658
+uncertainty = 0.17354717492955696
+
+[[experiments.metabolite_measurements]]
+target_id = "f6p_c"
+value = 0.6270933102170432
+uncertainty = 0.2131816117986779
+
+[[experiments.metabolite_measurements]]
+target_id = "fdp_c"
+value = 2.4387506157968084
+uncertainty = 0.1391831318567622
+
+[[experiments.metabolite_measurements]]
+target_id = "g6p_c"
+value = 1.8990486465075278
+uncertainty = 0.19296338386905101
+
+[[experiments.metabolite_measurements]]
+target_id = "pep_c"
+value = 0.2833704100025282
+uncertainty = 0.11194759506323777
+
+[[experiments.reaction_measurements]]
+target_id = "PFK"
+value = 3.9087494366666666
+uncertainty = 0.22217790074444446
+
+[[experiments.reaction_measurements]]
+target_id = "PGI"
+value = 3.588762064
+uncertainty = 0.03410617274444445
+
+[[experiments.drains]]
+id = "f6p_drain"
+location = 0.194
+scale = 0.01193
+
+[[experiments.drains]]
+id = "g3p_drain"
+location = 1.8
+scale = 0.0846
+
+[[experiments.enzyme_measurements]]
+target_id = "FBAA"
+value = 0.06783806498863625
+uncertainty = 0.24372713393253156
+
+[[experiments.enzyme_measurements]]
+target_id = "FBAB"
+value = 0.0025627145433086006
+uncertainty = 0.037991888056193975
+
+[[experiments.enzyme_measurements]]
+target_id = "FBP"
+value = 0.0075998055009798265
+uncertainty = 0.05923852094672056
+
+[[experiments.enzyme_measurements]]
+target_id = "PFKA"
+value = 0.016287811689366605
+uncertainty = 0.11416596445583596
+
+[[experiments.enzyme_measurements]]
+target_id = "PFKB"
+value = 0.002594388717190724
+uncertainty = 0.03972192566974019
+
+[[experiments.enzyme_measurements]]
+target_id = "PGI"
+value = 0.03421127030955773
+uncertainty = 0.04655571960370121
+
+[[experiments.enzyme_measurements]]
+target_id = "TPIA"
+value = 0.02367223995109299
+uncertainty = 0.18800141934549972
+
+
+[[experiments]]
+id = "Evo04tpiAEvo01EP"
+knockouts=["TPIA"]
+[[experiments.metabolite_measurements]]
+target_id = "adp_c"
+value = 0.9806673979313613
+uncertainty = 0.49831800816936744
+
+[[experiments.metabolite_measurements]]
+target_id = "atp_c"
+value = 3.8811478289600676
+uncertainty = 0.11871981381582054
+
+[[experiments.metabolite_measurements]]
+target_id = "dhap_c"
+value = 13.138997295776525
+uncertainty = 0.3207314633687042
+
+[[experiments.metabolite_measurements]]
+target_id = "f6p_c"
+value = 0.7247691646076762
+uncertainty = 0.2252014820629653
+
+[[experiments.metabolite_measurements]]
+target_id = "fdp_c"
+value = 7.143911209654637
+uncertainty = 0.22535098511608795
+
+[[experiments.metabolite_measurements]]
+target_id = "g6p_c"
+value = 2.58774462726839
+uncertainty = 0.33140961659475127
+
+[[experiments.metabolite_measurements]]
+target_id = "pep_c"
+value = 0.20534440886003383
+uncertainty = 0.10148067604685072
+
+[[experiments.reaction_measurements]]
+target_id = "PFK"
+value = 3.434611503888889
+uncertainty = 1.5703167096111112
+
+[[experiments.reaction_measurements]]
+target_id = "PGI"
+value = 2.2303923838
+uncertainty = 0.08334212366666667
+
+[[experiments.drains]]
+id = "f6p_drain"
+location = 0.1376979321
+scale = 0.006
+
+[[experiments.drains]]
+id = "g3p_drain"
+location = 2.2
+scale = 0.0846
+
+[[experiments.enzyme_measurements]]
+target_id = "FBAA"
+value = 0.06529811635401973
+uncertainty = 0.48783891013003017
+
+[[experiments.enzyme_measurements]]
+target_id = "FBAB"
+value = 0.009351216672916836
+uncertainty = 0.09530946442085171
+
+[[experiments.enzyme_measurements]]
+target_id = "FBP"
+value = 0.006854744097845603
+uncertainty = 0.10727364091977351
+
+[[experiments.enzyme_measurements]]
+target_id = "PFKA"
+value = 0.027993082781934988
+uncertainty = 0.28325081487141524
+
+[[experiments.enzyme_measurements]]
+target_id = "PFKB"
+value = 0.0024452626967055345
+uncertainty = 0.1975375049831248
+
+[[experiments.enzyme_measurements]]
+target_id = "PGI"
+value = 0.053645551520857676
+uncertainty = 0.1445172705025646
