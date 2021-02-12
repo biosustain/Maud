@@ -21,6 +21,8 @@ Template_Allo_Act_Inh = Template("""{%- for met in met_array -%} (1 + {{met[0]}}
 
 Template_flux = Template("""({{Tr}})/({{Dr}} + {{Drreg}} - 1)*{{Allo}}""")
 
+Template_drain
+
 
 
 Template_yaml = Template("""time:
@@ -43,10 +45,10 @@ odes:
 
 """)
 
-mi = io.load_maud_input_from_toml(os.path.join(HERE, "../../tests/data/linear.toml"))
+mi = io.load_maud_input_from_toml(os.path.join(HERE, "../tests/data/example/michaelis_menten"))
 kinetic_model = mi.kinetic_model
-enzyme_codes = mi.stan_codes['enzyme']
-mic_codes = mi.stan_codes["metabolite_in_compartment"]
+enzyme_codes = mi.stan_codes.enzyme_codes
+mic_codes = mi.stan_codes.mic_codes
 
 flux_vector = []
 
