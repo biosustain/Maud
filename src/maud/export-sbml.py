@@ -5,17 +5,23 @@ import os
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 
-Template_T_met = Template("""{%- for  met in met_array -%} ({{met[0]}}/{{met[1]}})^{{met[2]}} {%- if not loop.last %} * {% endif %} {%- endfor -%}""")
+Template_T_met = Template("""{%- for met in met_array -%} ({{met[0]}}/{{met[1]}})^{{met[2]}} {%- if not loop.last %} * {% endif %} {%- endfor -%}""")
 
-Template_Haldane =  Template("""{%- for  Km in Km_array -%} ({{Km[0]}})^{{Km[1]}} {%- if not loop.last %} * {% endif %} {%- endfor -%} / {{Keq}}""")
+Template_Haldane =  Template("""{%- for Km in Km_array -%} ({{Km[0]}})^{{Km[1]}} {%- if not loop.last %} * {% endif %} {%- endfor -%} / {{Keq}}""")
 
 Template_Tr = Template("""{{enz}} * {{kcat}} * ({{Trf}} - {{Trr}} * {{Hal}})""")
 
-Template_Dr = Template("""{%- for  met in met_array -%} (1 + {{met[0]}}/{{met[1]}})^{{met[2]}} {%- if not loop.last %} + {% endif %} {%- endfor -%}""")
+Template_Dr = Template("""{%- for met in met_array -%} (1 + {{met[0]}}/{{met[1]}})^{{met[2]}} {%- if not loop.last %} + {% endif %} {%- endfor -%}""")
 
-Template_Drreg = Template("""{%- for  met in met_array -%} ({{met[0]}}/{{met[1]}})^{{met[2]}} {%- if not loop.last %} + {% endif %} {%- endfor -%}""")
+Template_Drreg = Template("""{%- for met in met_array -%} ({{met[0]}}/{{met[1]}}) {%- if not loop.last %} + {% endif %} {%- endfor -%}""")
 
-Template_flux = Template("""({{Tr}})/({{Dr}} + {{Drreg}} - 1)""") 
+Template_Allo = Template("""1/(1 + {{L0}}*(({{Dr}} + {{Drreg}} - 1)*{{Allo_Inh}}/{{Allo_Act}})^{{Subunits}})""")
+
+Template_Allo_Act_Inh = Template("""{%- for met in met_array -%} (1 + {{met[0]}}/{{met[1]}}) {%- if not loop.last %} * {% endif %} {%- endfor -%}""")
+
+Template_flux = Template("""({{Tr}})/({{Dr}} + {{Drreg}} - 1)*{{Allo}}""")
+
+
 
 Template_yaml = Template("""time:
     variable: t
