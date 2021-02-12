@@ -20,63 +20,73 @@
 
 """
 
-from typing import Dict
+import os
 
+import pandas as pd
 import toml
 
 from maud import validation
 from maud.data_model import (
     Compartment,
+    Drain,
     Enzyme,
     Experiment,
+    ExperimentSet,
     KineticModel,
+    MaudConfig,
     MaudInput,
     Measurement,
     Metabolite,
     MetaboliteInCompartment,
     Modifier,
+    Phosphorylation,
     Prior,
+    PriorSet,
     Reaction,
+    StanCodeSet,
 )
 from maud.utils import codify
 
 
-MECHANISM_TO_PARAM_IDS = {
-    "uniuni": ["Kcat1", "Kcat2", "Ka"],
-    "ordered_unibi": ["Kcat1", "Kcat2", "Ka", "Kp", "Kq", "Kia"],
-    "ordered_bibi": ["Kcat1", "Kcat2", "Ka", "Kb", "Kp", "Kq", "Kib", "Kiq"],
-    "ping_pong": ["Kcat1", "Kcat2", "Ka", "Kb", "Kp", "Kq", "Kia", "Kib", "Kiq"],
-    "ordered_terbi": [
-        "Kcat1",
-        "Kcat2",
-        "Ka",
-        "Kb",
-        "Kc",
-        "Kq",
-        "Kia",
-        "Kib",
-        "Kic",
-        "Kiq",
-    ],
-}
+def load_maud_input_from_toml(data_path: str) -> MaudInput:
+    """
+    Load an MaudInput object from a data path.
 
-
-def load_kinetic_model_from_toml(
-    parsed_toml: dict, model_id: str = "mi"
-) -> KineticModel:
-    """Turn the output of toml.load into a KineticModel object.
-
-    :param parsed_toml: Result of running toml.load on a suitable toml file
-    :param model_id: String identifying the model.
+    :param filepath: path to directory containing input toml file
 
     """
+    config = parse_config(toml.load(os.path.join(data_path, "config.toml")))
+    kinetic_model_path = os.path.join(data_path, config.kinetic_model_file)
+    experiments_path = os.path.join(data_path, config.experiments_file)
+    priors_path = os.path.join(data_path, config.priors_file)
+    kinetic_model = parse_toml_kinetic_model(toml.load(kinetic_model_path))
+    experiment_set = parse_experiment_set_df(pd.read_csv(experiments_path))
+    prior_set = parse_prior_set_df(pd.read_csv(priors_path))
+    stan_codes = get_stan_codes(kinetic_model, experiment_set)
+    mi = MaudInput(
+        config=config,
+        kinetic_model=kinetic_model,
+        experiments=experiment_set,
+        priors=prior_set,
+        stan_codes=stan_codes,
+    )
+    validation.validate_maud_input(mi)
+    return mi
+
+
+def parse_toml_kinetic_model(raw: dict) -> KineticModel:
+    """Turn the output of toml.load into a KineticModel object.
+
+    :param raw: Result of running toml.load on a suitable toml file
+
+    """
+    model_id = raw["model_id"] if "model_id" in raw.keys() else "mi"
     compartments = {
         c["id"]: Compartment(id=c["id"], name=c["name"], volume=c["volume"])
-        for c in parsed_toml["compartments"]
+        for c in raw["compartments"]
     }
     metabolites = {
-        m["id"]: Metabolite(id=m["id"], name=m["name"])
-        for m in parsed_toml["metabolites"]
+        m["id"]: Metabolite(id=m["id"], name=m["name"]) for m in raw["metabolites"]
     }
     mics = {
         f"{m['id']}_{m['compartment']}": MetaboliteInCompartment(
@@ -85,19 +95,31 @@ def load_kinetic_model_from_toml(
             compartment_id=m["compartment"],
             balanced=m["balanced"],
         )
-        for m in parsed_toml["metabolites"]
+        for m in raw["metabolites"]
     }
-    reactions = {r["id"]: load_reaction_from_toml(r) for r in parsed_toml["reactions"]}
+    reactions = {r["id"]: parse_toml_reaction(r) for r in raw["reactions"]}
+    if "drains" in raw.keys():
+        drains = {d["id"]: parse_toml_drain(d) for d in raw["drains"]}
+    else:
+        drains = None
+    if "phosphorylation" in raw.keys():
+        phosphorylation = {
+            d["id"]: parse_toml_phosphorylation(d) for d in raw["phosphorylation"]
+        }
+    else:
+        phosphorylation = None
     return KineticModel(
         model_id=model_id,
         metabolites=metabolites,
         compartments=compartments,
         mics=mics,
         reactions=reactions,
+        drains=drains,
+        phosphorylation=phosphorylation,
     )
 
 
-def get_stan_codes(km: KineticModel, experiments) -> Dict[str, Dict[str, int]]:
+def get_stan_codes(km: KineticModel, experiments: ExperimentSet) -> StanCodeSet:
     """Get the stan codes for a Maud input.
 
     :param km: KineticModel object
@@ -114,33 +136,71 @@ def get_stan_codes(km: KineticModel, experiments) -> Dict[str, Dict[str, int]]:
         for mic_id, code in mic_codes.items()
         if not km.mics[mic_id].balanced
     }
-    return {
-        "metabolite": codify(km.metabolites.keys()),
-        "metabolite_in_compartment": mic_codes,
-        "balanced_mic": balanced_mic_codes,
-        "unbalanced_mic": unbalanced_mic_codes,
-        "reaction": codify(km.reactions.keys()),
-        "experiment": codify(experiments.keys()),
-        "enzyme": codify(enzyme_ids),
-    }
+    if km.drains is not None:
+        drain_codes = codify(km.drains.keys())
+    else:
+        drain_codes = {}
+    if km.phosphorylation is not None:
+        phos_enz_codes = codify(km.phosphorylation.keys())
+    else:
+        phos_enz_codes = {}
+    return StanCodeSet(
+        metabolite_codes=codify(km.metabolites.keys()),
+        mic_codes=mic_codes,
+        balanced_mic_codes=balanced_mic_codes,
+        unbalanced_mic_codes=unbalanced_mic_codes,
+        reaction_codes=codify(km.reactions.keys()),
+        experiment_codes=codify([e.id for e in experiments.experiments]),
+        enzyme_codes=codify(enzyme_ids),
+        phos_enz_codes=phos_enz_codes,
+        drain_codes=drain_codes,
+    )
 
 
-def load_reaction_from_toml(toml_reaction: dict) -> Reaction:
+def parse_toml_drain(raw: dict) -> Drain:
+    """Turn a dictionary representing a drain into a Drain object.
+
+    :param raw: Dictionary representing a drain, typically one of
+    the values of the 'drains' field in the output of toml.load.
+
+    """
+
+    return Drain(id=raw["id"], name=raw["name"], stoichiometry=raw["stoichiometry"])
+
+
+def parse_toml_phosphorylation(raw: dict) -> Phosphorylation:
+    """Turn a dictionary-format phosphorylation into a Maud object.
+
+    :param toml_phosphorylation: Dictionary representing a phosphorylation
+    enzyme, typically one of the values of the 'phosphorylation' field in the
+    output of toml.load.
+
+    """
+
+    return Phosphorylation(
+        id=raw["id"],
+        name=raw["name"],
+        activating=raw["activating"] if "activating" in raw.keys() else None,
+        inhibiting=raw["inhibiting"] if "inhibiting" in raw.keys() else None,
+        enzyme_id=raw["enzyme_id"],
+    )
+
+
+def parse_toml_reaction(raw: dict) -> Reaction:
     """Turn a dictionary representing a reaction into a Reaction object.
 
-    :param toml_reaction: Dictionary representing a reaction, typically one of
+    :param raw: Dictionary representing a reaction, typically one of
     the values of the 'reactions' field in the output of toml.load.
 
     """
     enzymes = {}
     subunits = 1
-    reversible = (
-        toml_reaction["reversible"] if "reversible" in toml_reaction.keys() else None
+    reversible = raw["reversible"] if "reversible" in raw.keys() else None
+    is_exchange = raw["is_exchange"] if "is_exchange" in raw.keys() else None
+    water_stoichiometry = (
+        raw["water_stoichiometry"] if "water_stoichiometry" in raw.keys() else 0
     )
-    is_exchange = (
-        toml_reaction["is_exchange"] if "is_exchange" in toml_reaction.keys() else None
-    )
-    for e in toml_reaction["enzymes"]:
+    for e in raw["enzymes"]:
         modifiers = {
             "competitive_inhibitor": [],
             "allosteric_inhibitor": [],
@@ -163,129 +223,90 @@ def load_reaction_from_toml(toml_reaction: dict) -> Reaction:
         enzymes[e["id"]] = Enzyme(
             id=e["id"],
             name=e["name"],
-            reaction_id=toml_reaction["id"],
+            reaction_id=raw["id"],
             modifiers=modifiers,
             subunits=subunits,
         )
     return Reaction(
-        id=toml_reaction["id"],
-        name=toml_reaction["name"],
+        id=raw["id"],
+        name=raw["name"],
         reversible=reversible,
         is_exchange=is_exchange,
-        stoichiometry=toml_reaction["stoichiometry"],
+        stoichiometry=raw["stoichiometry"],
         enzymes=enzymes,
+        water_stoichiometry=water_stoichiometry,
     )
 
 
-def load_maud_input_from_toml(filepath: str, id: str = "mi") -> MaudInput:
-    """
-    Load an MaudInput object from a suitable toml file.
+def parse_experiment_set_df(raw: pd.DataFrame) -> ExperimentSet:
+    """Get an ExperimentSet object from a dataframe.
 
-    :param filepath: path to a toml file
-    :param id: id for the output object
-
+    :param raw: result of running pd.read_csv on a suitable file
     """
-    parsed_toml = toml.load(filepath)
-    kinetic_model = load_kinetic_model_from_toml(parsed_toml, id)
-    experiments = {}
-    for e in parsed_toml["experiments"]:
-        experiment = Experiment(id=e["id"])
-        for target_type in ["metabolite", "reaction", "enzyme"]:
-            type_measurements = {}
-            for m in e[target_type + "_measurements"]:
-                measurement = Measurement(
-                    target_id=m["target_id"],
-                    value=m["value"],
-                    uncertainty=m["uncertainty"],
-                    scale="ln",
-                    target_type=target_type,
+    experiment_list = []
+    for id, exp_df in raw.groupby("experiment_id"):
+        measurements = {"mic": {}, "flux": {}, "enzyme": {}}
+        knockouts = []
+        for _, row in exp_df.iterrows():
+            measurement_type = row["measurement_type"]
+            target_id = row["target_id"]
+            if measurement_type == "knockout":
+                knockouts.append(target_id)
+            else:
+                measurements[measurement_type][target_id] = Measurement(
+                    target_id=target_id,
+                    value=row["measurement"],
+                    uncertainty=row["error_scale"],
+                    target_type=measurement_type,
                 )
-                type_measurements.update({m["target_id"]: measurement})
-            experiment.measurements.update({target_type: type_measurements})
-        if "knockouts" in e.keys():
-            experiment.knockouts = e["knockouts"]
-        experiments.update({experiment.id: experiment})
+        experiment_list.append(
+            Experiment(id=id, measurements=measurements, knockouts=knockouts)
+        )
+    return ExperimentSet(experiment_list)
+
+
+def parse_prior_set_df(raw: pd.DataFrame) -> PriorSet:
+    """Get a PriorSet object from a dataframe.
+
+    :param raw: result of running pd.read_csv on a suitable file
+    """
     priors = {
-        "kcats": [],
-        "kms": [],
-        "enzyme_concentrations": [],
-        "formation_energies": [],
-        "unbalanced_metabolites": [],
-        "inhibition_constants": [],
-        "tense_dissociation_constants": [],
-        "relaxed_dissociation_constants": [],
-        "transfer_constants": [],
+        "kcat_priors": [],
+        "km_priors": [],
+        "formation_energy_priors": [],
+        "unbalanced_metabolite_priors": [],
+        "inhibition_constant_priors": [],
+        "tense_dissociation_constant_priors": [],
+        "relaxed_dissociation_constant_priors": [],
+        "transfer_constant_priors": [],
+        "drain_priors": [],
+        "enzyme_concentration_priors": [],
+        "phos_kcat_priors": [],
+        "phos_enz_concentration_priors": [],
     }
-    for prior in parsed_toml["priors"]["formation_energies"]:
-        metabolite_id = prior["metabolite_id"]
-        priors["formation_energies"].append(
-            Prior(
-                id=f"formation_energy_{metabolite_id}",
-                location=prior["location"],
-                scale=prior["scale"],
-                metabolite_id=metabolite_id,
-            )
+    negative_param_types = ["formation_energy", "drain"]
+    for _, row in raw.iterrows():
+        id = "_".join(row.loc[lambda s: [isinstance(x, str) for x in s]].values)
+        parameter_type = row["parameter_type"]
+        prior_dict = row.dropna().drop("parameter_type").to_dict()
+        is_non_negative = parameter_type not in negative_param_types
+        priors[parameter_type + "_priors"].append(
+            Prior(id=id, is_non_negative=is_non_negative, **prior_dict)
         )
-    for prior in parsed_toml["priors"]["kms"]:
-        enzyme_id = prior["enzyme_id"]
-        mic_id = prior["mic_id"]
-        priors["kms"].append(
-            Prior(
-                id=f"km_{enzyme_id}_{mic_id}",
-                location=prior["location"],
-                scale=prior["scale"],
-                mic_id=mic_id,
-                enzyme_id=enzyme_id,
-            )
-        )
-    for prior in parsed_toml["priors"]["kcats"]:
-        enzyme_id = prior["enzyme_id"]
-        priors["kcats"].append(
-            Prior(
-                id=f"kcat_{enzyme_id}",
-                location=prior["location"],
-                scale=prior["scale"],
-                enzyme_id=enzyme_id,
-            )
-        )
-    for prior_type, prefix in zip(
-        [
-            "inhibition_constants",
-            "relaxed_dissociation_constants",
-            "tense_dissociation_constants",
-        ],
-        ["ki", "diss_r", "diss_t"],
-    ):
-        if prior_type in parsed_toml["priors"].keys():
-            for prior in parsed_toml["priors"][prior_type]:
-                enzyme_id = prior["enzyme_id"]
-                mic_id = prior["mic_id"]
-                priors[prior_type].append(
-                    Prior(
-                        id=f"{prefix}_{enzyme_id}_{mic_id}",
-                        location=prior["location"],
-                        scale=prior["scale"],
-                        enzyme_id=enzyme_id,
-                        mic_id=mic_id,
-                    )
-                )
-    if "transfer_constants" in parsed_toml["priors"].keys():
-        for prior in parsed_toml["priors"]["transfer_constants"]:
-            enzyme_id = prior["enzyme_id"]
-            priors["transfer_constants"].append(
-                Prior(
-                    id=f"transfer_constant_{enzyme_id}",
-                    location=prior["location"],
-                    scale=prior["scale"],
-                    enzyme_id=enzyme_id,
-                )
-            )
-    stan_codes = get_stan_codes(kinetic_model, experiments)
-    mi = MaudInput(
-        kinetic_model=kinetic_model,
-        priors=priors,
-        stan_codes=stan_codes,
-        experiments=experiments,
+    return PriorSet(**priors)
+
+
+def parse_config(raw):
+    """Get a MaudConfig object from the result of toml.load.
+
+    :param raw: result of running toml.load on a suitable file
+    """
+    return MaudConfig(
+        name=raw["name"],
+        kinetic_model_file=raw["kinetic_model"],
+        priors_file=raw["priors"],
+        experiments_file=raw["experiments"],
+        likelihood=raw["likelihood"],
+        ode_config=raw["ode_config"],
+        cmdstanpy_config=raw["cmdstanpy_config"],
     )
-    validation.validate_maud_input(mi)
-    return mi

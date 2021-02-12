@@ -1,8 +1,10 @@
 functions{
 #include allostery.stan
 #include modular_rate_law.stan
+#include drain_reaction.stan
 #include dbalanced_dt.stan
 #include partial_sums.stan
+#include thermodynamics.stan
 }
 data {
   // dimensions
@@ -12,14 +14,16 @@ data {
   int<lower=1> N_km;
   int<lower=1> N_reaction;
   int<lower=1> N_enzyme;
+  int<lower=0> N_drain;
+  int<lower=0> N_phosphorylation_enzymes;
   int<lower=1> N_experiment;
   int<lower=1> N_flux_measurement;
-  int<lower=1> N_enzyme_measurement;
   int<lower=1> N_conc_measurement;
   int<lower=0> N_competitive_inhibitor;
   int<lower=0> N_allosteric_inhibitor;
   int<lower=0> N_allosteric_activator;
   int<lower=0> N_allosteric_enzyme;
+  int<lower=0> N_enzyme_measurement;
   // measurements
   int<lower=1,upper=N_mic> unbalanced_mic_ix[N_unbalanced];
   int<lower=1,upper=N_mic> balanced_mic_ix[N_mic-N_unbalanced];
@@ -31,8 +35,8 @@ data {
   int<lower=1,upper=N_reaction> reaction_yflux[N_flux_measurement];
   real yflux[N_flux_measurement];
   vector<lower=0>[N_flux_measurement] sigma_flux;
-  int<lower=1,upper=N_experiment> experiment_yenz[N_enzyme_measurement];
-  int<lower=1,upper=N_enzyme> enzyme_yenz[N_enzyme_measurement];
+  int<lower=0,upper=N_experiment> experiment_yenz[N_enzyme_measurement];
+  int<lower=0,upper=N_enzyme> enzyme_yenz[N_enzyme_measurement];
   real yenz[N_enzyme_measurement];
   vector<lower=0>[N_enzyme_measurement] sigma_enz;
   // hardcoded priors
@@ -50,14 +54,27 @@ data {
   vector<lower=0>[N_allosteric_activator] prior_scale_diss_r;
   vector<lower=0>[N_allosteric_enzyme] prior_loc_tc;
   vector<lower=0>[N_allosteric_enzyme] prior_scale_tc;
-  real prior_loc_unbalanced[N_experiment, N_unbalanced];
-  real<lower=0> prior_scale_unbalanced[N_experiment, N_unbalanced];
-  real prior_loc_enzyme[N_experiment, N_enzyme];
-  real<lower=0> prior_scale_enzyme[N_experiment, N_enzyme];
+  vector<lower=0>[N_phosphorylation_enzymes] prior_loc_phos_kcat;
+  vector<lower=0>[N_phosphorylation_enzymes] prior_scale_phos_kcat;
+  matrix<lower=0>[N_experiment, N_phosphorylation_enzymes] prior_loc_phos_conc;
+  matrix<lower=0>[N_experiment, N_phosphorylation_enzymes] prior_scale_phos_conc;
+  matrix[N_experiment, N_unbalanced] prior_loc_unbalanced;
+  matrix<lower=0>[N_experiment, N_unbalanced] prior_scale_unbalanced;
+  matrix[N_experiment, N_enzyme] prior_loc_enzyme;
+  matrix<lower=0>[N_experiment, N_enzyme] prior_scale_enzyme;
+  matrix[N_experiment, N_drain] prior_loc_drain;
+  matrix<lower=0>[N_experiment, N_drain] prior_scale_drain;
   // network properties
-  matrix[N_mic, N_enzyme] S;
-  int<lower=1,upper=N_metabolite> metabolite_ix_stoichiometric_matrix[N_mic];
+  matrix[N_mic, N_enzyme] S_enz;
+  matrix[N_mic, N_drain] S_drain;
+  matrix[N_mic, N_drain+N_enzyme] S_full;
+  int<lower=1,upper=N_metabolite> mic_to_met[N_mic];
+  vector[N_enzyme] water_stoichiometry;
+  matrix[N_reaction, N_enzyme] S_to_flux_map;
   matrix<lower=0,upper=1>[N_experiment, N_enzyme] is_knockout;
+  matrix<lower=0,upper=1>[N_experiment, N_phosphorylation_enzymes] is_phos_knockout;
+  matrix<lower=0,upper=1>[N_phosphorylation_enzymes, N_enzyme] S_phos_act;
+  matrix<lower=0,upper=1>[N_phosphorylation_enzymes, N_enzyme] S_phos_inh;
   int<lower=0,upper=N_km> km_lookup[N_mic, N_enzyme];
   int<lower=0,upper=N_mic> n_ci[N_enzyme];
   int<lower=0,upper=N_mic> n_ai[N_enzyme];
@@ -75,31 +92,67 @@ data {
   real<lower=0> timepoint;
 }
 transformed data {
-  real minus_RT = - 0.008314 * 298.15;
   real initial_time = 0;
   matrix[N_experiment, N_enzyme] knockout =
     rep_matrix(1, N_experiment, N_enzyme) - is_knockout;
+  matrix[N_experiment, N_phosphorylation_enzymes] phos_knockout =
+    rep_matrix(1, N_experiment, N_phosphorylation_enzymes) - is_phos_knockout;
 }
 parameters {
-  vector[N_metabolite] formation_energy;
-  vector<lower=0>[N_enzyme] kcat;
-  vector<lower=0>[N_km] km;
-  matrix<lower=0>[N_experiment, N_enzyme] enzyme;
-  matrix<lower=0>[N_experiment, N_unbalanced] conc_unbalanced;
-  vector<lower=0>[N_competitive_inhibitor] ki;
-  vector<lower=0>[N_allosteric_inhibitor] dissociation_constant_t;
-  vector<lower=0>[N_allosteric_activator] dissociation_constant_r;
-  vector<lower=0>[N_allosteric_enzyme] transfer_constant;
+  vector[N_metabolite] formation_energy_z;
+  matrix[N_experiment, N_drain] drain_z;
+  vector[N_enzyme] log_kcat_z;
+  vector[N_km] log_km_z;
+  vector[N_phosphorylation_enzymes] log_phos_kcat_z;
+  matrix[N_experiment, N_enzyme] log_enzyme_z;
+  matrix[N_experiment, N_phosphorylation_enzymes] log_phos_conc_z;
+  matrix[N_experiment, N_unbalanced] log_conc_unbalanced_z;
+  vector[N_competitive_inhibitor] log_ki_z;
+  vector[N_allosteric_inhibitor] log_dissociation_constant_t_z;
+  vector[N_allosteric_activator] log_dissociation_constant_r_z;
+  vector[N_allosteric_enzyme] log_transfer_constant_z;
 }
 transformed parameters {
+  // rescale
+  vector[N_metabolite] formation_energy =
+    prior_loc_formation_energy + formation_energy_z .* prior_scale_formation_energy;
+  vector[N_km] km = exp(log(prior_loc_km) + log_km_z .* prior_scale_km);
+  vector[N_competitive_inhibitor] ki =
+    exp(log(prior_loc_ki) + log_ki_z .* prior_scale_ki);
+  vector[N_enzyme] kcat = exp(log(prior_loc_kcat) + log_kcat_z .* prior_scale_kcat);
+  vector[N_allosteric_inhibitor] dissociation_constant_t =
+    exp(log(prior_loc_diss_t) + log_dissociation_constant_t_z .* prior_scale_diss_t);
+  vector[N_allosteric_activator] dissociation_constant_r =
+    exp(log(prior_loc_diss_r) + log_dissociation_constant_r_z .* prior_scale_diss_r);
+  vector[N_allosteric_enzyme] transfer_constant =
+    exp(log(prior_loc_tc) + log_transfer_constant_z .* prior_scale_tc);
+  vector[N_phosphorylation_enzymes] phos_enzyme_kcat =
+    exp(log(prior_loc_phos_kcat) + log_phos_kcat_z .* prior_scale_phos_kcat);
+  matrix[N_experiment, N_drain] drain;
+  matrix[N_experiment, N_enzyme] enzyme;
+  matrix[N_experiment, N_unbalanced] conc_unbalanced;
+  matrix[N_experiment, N_phosphorylation_enzymes] phos_enzyme_conc;
+  for (ex in 1:N_experiment){
+    drain[ex] = prior_loc_drain[ex] + drain_z[ex] .* prior_scale_drain[ex];
+    enzyme[ex] =
+      exp(log(prior_loc_enzyme[ex]) + log_enzyme_z[ex] .* prior_scale_enzyme[ex]);
+    conc_unbalanced[ex] =
+      exp(log(prior_loc_unbalanced[ex])
+          + log_conc_unbalanced_z[ex] .* prior_scale_unbalanced[ex]);
+    phos_enzyme_conc[ex] = 
+    exp(log(prior_loc_phos_conc[ex]) + log_phos_conc_z[ex] .* prior_scale_phos_conc[ex]);
+  }
+  // transform
   vector<lower=0>[N_mic] conc[N_experiment];
   matrix[N_experiment, N_reaction] flux;
-  vector[N_enzyme] delta_g;
-  vector[N_enzyme] keq;
-  delta_g = S' * formation_energy[metabolite_ix_stoichiometric_matrix];
-  keq = exp(delta_g / minus_RT);
+  vector[N_enzyme] keq = get_keq(S_enz,
+                                 formation_energy,
+                                 mic_to_met,
+                                 water_stoichiometry);
   for (e in 1:N_experiment){
     vector[N_enzyme] experiment_enzyme = enzyme[e]' .* knockout[e]';
+    vector[N_phosphorylation_enzymes] experiment_phos_conc = 
+      phos_enzyme_conc[e]' .* phos_knockout[e]';
     vector[N_mic-N_unbalanced] conc_balanced[2] = ode_bdf_tol(dbalanced_dt,
                                                               conc_init[e, balanced_mic_ix],
                                                               initial_time,
@@ -111,7 +164,9 @@ transformed parameters {
                                                               experiment_enzyme,
                                                               km,
                                                               km_lookup,
-                                                              S,
+                                                              S_enz,
+                                                              S_drain,
+                                                              S_full,
                                                               kcat,
                                                               keq,
                                                               ci_ix,
@@ -124,27 +179,36 @@ transformed parameters {
                                                               dissociation_constant_t,
                                                               dissociation_constant_r,
                                                               transfer_constant,
-                                                              subunits);
+                                                              subunits,
+                                                              experiment_phos_conc,
+                                                              phos_enzyme_kcat,
+                                                              S_phos_act,
+                                                              S_phos_inh,
+                                                              drain[e,]');
     conc[e, balanced_mic_ix] = conc_balanced[1];
     conc[e, unbalanced_mic_ix] = conc_unbalanced[e]';
-    flux[e] = get_flux(conc[e],
-                       experiment_enzyme,
-                       km,
-                       km_lookup,
-                       S,
-                       kcat,
-                       keq,
-                       ci_ix,
-                       ai_ix,
-                       aa_ix,
-                       n_ci,
-                       n_ai,
-                       n_aa,
-                       ki,
-                       dissociation_constant_t,
-                       dissociation_constant_r,
-                       transfer_constant,
-                       subunits)';
+    flux[e] = (S_to_flux_map * get_flux_enz(conc[e],
+                              experiment_enzyme,
+                              km,
+                              km_lookup,
+                              S_enz,
+                              kcat,
+                              keq,
+                              ci_ix,
+                              ai_ix,
+                              aa_ix,
+                              n_ci,
+                              n_ai,
+                              n_aa,
+                              ki,
+                              dissociation_constant_t,
+                              dissociation_constant_r,
+                              transfer_constant,
+                              subunits,
+                              phos_enzyme_conc[e]',
+                              phos_enzyme_kcat,
+                              S_phos_act,
+                              S_phos_inh))';
     if (squared_distance(conc_balanced[1], conc_balanced[2]) > 1){
       print("Balanced metabolite concentration at ", timepoint, " seconds is not steady.");
       print("Found ", conc_balanced[1], " at ", timepoint, " seconds and ",
@@ -154,7 +218,7 @@ transformed parameters {
       print("Metabolite concentration is really high in experiment ", e, ".");
       print("metabolite concentration: ", conc[e]);
       print("kcat: ", kcat);
-      print("km: ", kcat);
+      print("km: ", km);
       print("keq: ", keq);
       print("flux: ", flux[e]);
       print("enzyme concentration: ", enzyme[e]);
@@ -166,27 +230,18 @@ transformed parameters {
   }
 }
 model {
-  target += lognormal_lpdf(kcat | log(prior_loc_kcat), prior_scale_kcat);
-  target += lognormal_lpdf(km | log(prior_loc_km), prior_scale_km);
-  target += lognormal_lpdf(ki | log(prior_loc_ki), prior_scale_ki);
-  target += lognormal_lpdf(ki | log(prior_loc_ki), prior_scale_ki);
-  target += lognormal_lpdf(dissociation_constant_t |
-                           log(prior_loc_diss_t), prior_scale_diss_t);
-  target += lognormal_lpdf(dissociation_constant_r |
-                           log(prior_loc_diss_r), prior_scale_diss_r);
-  target += lognormal_lpdf(transfer_constant |
-                           log(prior_loc_tc), prior_scale_tc);
-  target += normal_lpdf(formation_energy |
-                        prior_loc_formation_energy,
-                        prior_scale_formation_energy);
-  for (e in 1:N_experiment){
-    target += lognormal_lpdf(conc_unbalanced[e] |
-                             log(prior_loc_unbalanced[e]),
-                             prior_scale_unbalanced[e]);
-    target += lognormal_lpdf(enzyme[e] |
-                             log(prior_loc_enzyme[e]),
-                             prior_scale_enzyme[e]);
-  }
+  target += std_normal_lpdf(log_kcat_z |);
+  target += std_normal_lpdf(log_km_z |);
+  target += std_normal_lpdf(log_ki_z |);
+  target += std_normal_lpdf(log_dissociation_constant_t_z |);
+  target += std_normal_lpdf(log_dissociation_constant_r_z |);
+  target += std_normal_lpdf(log_transfer_constant_z |);
+  target += std_normal_lpdf(formation_energy_z |);
+  target += std_normal_lpdf(log_phos_kcat_z |);
+  target += std_normal_lpdf(to_vector(log_conc_unbalanced_z) |);
+  target += std_normal_lpdf(to_vector(log_enzyme_z) |);
+  target += std_normal_lpdf(to_vector(log_phos_conc_z) |);
+  target += std_normal_lpdf(to_vector(drain_z) |);
   if (LIKELIHOOD == 1){
     target += reduce_sum(partial_sum_conc, yconc, 1,
                          conc, experiment_yconc, mic_ix_yconc, sigma_conc);
@@ -198,22 +253,15 @@ model {
 }
 generated quantities {
   vector[N_conc_measurement] yconc_sim;
-  vector[N_enzyme_measurement] yenz_sim;
   vector[N_flux_measurement] yflux_sim;
-  vector[N_flux_measurement+N_conc_measurement] log_lik;
-  for (f in 1:N_flux_measurement){
-    log_lik[f] = normal_lpdf(yflux[f] | flux[experiment_yflux[f], reaction_yflux[f]], sigma_flux[f]);
-  }
-  for (c in 1:N_conc_measurement){
-    log_lik[N_flux_measurement+c] = lognormal_lpdf(yconc[c] | log(conc[experiment_yconc[c], mic_ix_yconc[c]]), sigma_conc[c]);
-  }
+  vector[N_conc_measurement] log_lik_conc;
+  vector[N_flux_measurement] log_lik_flux;
   for (c in 1:N_conc_measurement){
     yconc_sim[c] = lognormal_rng(log(conc[experiment_yconc[c], mic_ix_yconc[c]]), sigma_conc[c]);
-  }
-  for (ec in 1:N_enzyme_measurement){
-    yenz_sim[ec] = lognormal_rng(log(enzyme[experiment_yenz[ec], enzyme_yenz[ec]]), sigma_enz[ec]);
+    log_lik_conc[c] = lognormal_lpdf(yconc[c] | log(conc[experiment_yconc[c], mic_ix_yconc[c]]), sigma_conc[c]);
   }
   for (f in 1:N_flux_measurement){
     yflux_sim[f] = normal_rng(flux[experiment_yflux[f], reaction_yflux[f]], sigma_flux[f]);
+    log_lik_flux[f] = normal_lpdf(yflux[f] | flux[experiment_yflux[f], reaction_yflux[f]], sigma_flux[f]);
   }
 }

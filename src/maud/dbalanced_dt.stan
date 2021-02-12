@@ -1,6 +1,6 @@
-int get_N_rxn_mics(matrix S, int i_rxn){
+int get_N_enz_mics(matrix S, int i_enz){
   int out = 0;
-  for (s in S[,i_rxn]){
+  for (s in S[,i_enz]){
     if (s != 0){
       out += 1;
     }
@@ -8,12 +8,12 @@ int get_N_rxn_mics(matrix S, int i_rxn){
   return out;
 }
 
-int[] get_rxn_mics(matrix S, int i_rxn){
-  int N_rxn_mics = get_N_rxn_mics(S, i_rxn);
-  int out[N_rxn_mics];
+int[] get_enz_mics(matrix S, int i_enz){
+  int N_enz_mics = get_N_enz_mics(S, i_enz);
+  int out[N_enz_mics];
   int ticker_pos = 1;
   for (i_met in 1:rows(S)){
-    if (S[i_met, i_rxn] != 0){
+    if (S[i_met, i_enz] != 0){
       out[ticker_pos] = i_met;
       ticker_pos += 1;
     }
@@ -21,7 +21,24 @@ int[] get_rxn_mics(matrix S, int i_rxn){
   return out;
 }
 
-vector get_flux(vector conc_mic,
+real get_active_enzyme_fraction(vector activating_enzyme_conc,
+                                vector deactivating_enzyme_conc,
+                                vector phosphorylating_enzyme_kcat,
+                                real subunits){
+  real alpha = sum(phosphorylating_enzyme_kcat .* deactivating_enzyme_conc);
+  real beta = sum(phosphorylating_enzyme_kcat .* activating_enzyme_conc);
+  real active_fraction;
+
+  if (alpha == 0 && beta == 0){
+    active_fraction = 1;
+  }
+  else {
+    active_fraction = 1 / (1 + (alpha / beta)^subunits);
+  }
+  return active_fraction;
+}
+
+vector get_flux_enz(vector conc_mic,
                 vector conc_enz,
                 vector km,
                 int[,] km_lookup,
@@ -38,70 +55,97 @@ vector get_flux(vector conc_mic,
                 vector dissociation_constant_t,
                 vector dissociation_constant_r,
                 vector transfer_constant,
-                int[] subunits){
-  vector[cols(S)] flux;
+                int[] subunits,
+                vector phos_enzyme_conc,
+                vector phos_enzyme_kcat,
+                matrix S_phos_act,
+                matrix S_phos_inh){
+  vector[cols(S)] flux_enz;
   int pos_ci = 1;
   int pos_ai = 1;
   int pos_aa = 1;
   int pos_tc = 1;
-  for (i_rxn in 1:cols(S)){
-    int N_rxn_mics = get_N_rxn_mics(S, i_rxn);
-    int rxn_mics[N_rxn_mics] = get_rxn_mics(S, i_rxn);
-    vector[N_rxn_mics] km_rxn = km[km_lookup[rxn_mics, i_rxn]];
-    int nci_rxn = n_ci[i_rxn];
-    int nai_rxn = n_ai[i_rxn];
-    int naa_rxn = n_aa[i_rxn];
-    vector[nci_rxn] conc_ci;
-    vector[nai_rxn] conc_ai;
-    vector[naa_rxn] conc_aa;
-    vector[nci_rxn] ki_rxn;
-    vector[nai_rxn] diss_t_rxn;
-    vector[naa_rxn] diss_r_rxn;
+  vector[cols(S)] phos_frac;
+  for (i_enz in 1:cols(S)){
+    int N_enz_mics = get_N_enz_mics(S, i_enz);
+    int enz_mics[N_enz_mics] = get_enz_mics(S, i_enz);
+    vector[N_enz_mics] km_enz = km[km_lookup[enz_mics, i_enz]];
+    int nci_enz = n_ci[i_enz];
+    int nai_enz = n_ai[i_enz];
+    int naa_enz = n_aa[i_enz];
+    vector[nci_enz] conc_ci;
+    vector[nai_enz] conc_ai;
+    vector[naa_enz] conc_aa;
+    vector[nci_enz] ki_enz;
+    vector[nai_enz] diss_t_enz;
+    vector[naa_enz] diss_r_enz;
     real catalysis_factor;
     real allostery_factor = 1;
     real free_enzyme_ratio;
-    int is_allosteric = ((nai_rxn > 0) || (naa_rxn > 0));
-    if (nci_rxn != 0){
-      conc_ci = conc_mic[segment(ci_ix, pos_ci, nci_rxn)];
-      ki_rxn = segment(ki, pos_ci, nci_rxn);
+    int is_allosteric = ((nai_enz > 0) || (naa_enz > 0));
+    if (nci_enz != 0){
+      conc_ci = conc_mic[segment(ci_ix, pos_ci, nci_enz)];
+      ki_enz = segment(ki, pos_ci, nci_enz);
     }
-    if (nai_rxn != 0){
-      conc_ai = conc_mic[segment(ai_ix, pos_ai, nai_rxn)];
-      diss_t_rxn = segment(dissociation_constant_t, pos_ai, nai_rxn);
+    if (nai_enz != 0){
+      conc_ai = conc_mic[segment(ai_ix, pos_ai, nai_enz)];
+      diss_t_enz = segment(dissociation_constant_t, pos_ai, nai_enz);
     }
-    if (naa_rxn != 0){
-      conc_aa = conc_mic[segment(aa_ix, pos_aa, naa_rxn)];
-      diss_r_rxn = segment(dissociation_constant_r, pos_aa, naa_rxn);
+    if (naa_enz != 0){
+      conc_aa = conc_mic[segment(aa_ix, pos_aa, naa_enz)];
+      diss_r_enz = segment(dissociation_constant_r, pos_aa, naa_enz);
     }
-    free_enzyme_ratio = get_free_enzyme_ratio(conc_mic[rxn_mics],
-                                              km_rxn,
-                                              S[rxn_mics, i_rxn],
+    free_enzyme_ratio = get_free_enzyme_ratio(conc_mic[enz_mics],
+                                              km_enz,
+                                              S[enz_mics, i_enz],
                                               conc_ci,
-                                              ki_rxn);
-    catalysis_factor = modular_rate_law(conc_mic[rxn_mics],
-                                        km_rxn,
-                                        S[rxn_mics, i_rxn],
-                                        kcat[i_rxn],
-                                        keq[i_rxn],
-                                        conc_enz[i_rxn],
+                                              ki_enz);
+    catalysis_factor = modular_rate_law(conc_mic[enz_mics],
+                                        km_enz,
+                                        S[enz_mics, i_enz],
+                                        kcat[i_enz],
+                                        keq[i_enz],
+                                        conc_enz[i_enz],
                                         conc_ci,
-                                        ki_rxn);
+                                        ki_enz);
     if (is_allosteric == 1){
       allostery_factor = get_allostery(conc_aa,
                                        conc_ai,
                                        free_enzyme_ratio,
-                                       diss_r_rxn,
-                                       diss_t_rxn,
+                                       diss_r_enz,
+                                       diss_t_enz,
                                        transfer_constant[pos_tc],
-                                       subunits[i_rxn]);
+                                       subunits[i_enz]);
     }
-    flux[i_rxn] = catalysis_factor * allostery_factor;
-    pos_ci += n_ci[i_rxn];
-    pos_ai += n_ai[i_rxn];
-    pos_aa += n_aa[i_rxn];
+    flux_enz[i_enz] = catalysis_factor * allostery_factor;
+    pos_ci += n_ci[i_enz];
+    pos_ai += n_ai[i_enz];
+    pos_aa += n_aa[i_enz];
     pos_tc += is_allosteric;
   }
-  return flux;
+  if (rows(phos_enzyme_kcat) > 0){
+    for (i in 1:cols(S_phos_act)){
+      phos_frac[i] = get_active_enzyme_fraction(phos_enzyme_conc .* S_phos_act[:,i],
+                                                phos_enzyme_conc .* S_phos_inh[:,i],
+                                                phos_enzyme_kcat,
+                                                subunits[i]);
+    }
+    flux_enz = flux_enz .* phos_frac;
+  }
+  return flux_enz;
+}
+
+vector get_flux_drain(matrix S_drain,
+                      vector conc_mic,
+                      vector drain){
+  vector[cols(S_drain)] flux_drain;
+  for (i_drain in 1:cols(S_drain)){
+    int N_drain_mics = get_N_enz_mics(S_drain, i_drain);
+    int drain_mics[N_drain_mics] = get_enz_mics(S_drain, i_drain);
+    real drain_rate = drain_reaction(conc_mic[drain_mics], drain[i_drain]);
+    flux_drain[i_drain] = drain_rate;
+  }
+  return flux_drain;
 }
 
 vector dbalanced_dt(real time,
@@ -112,7 +156,9 @@ vector dbalanced_dt(real time,
                     vector enzyme_concentration,
                     vector km,
                     int[,] km_lookup,
-                    matrix S,
+                    matrix S_enz,
+                    matrix S_drain,
+                    matrix S_full,
                     vector kcat,
                     vector keq,
                     int[] ci_ix,  // index of competitive inhibitors (long-form ragged)
@@ -125,26 +171,44 @@ vector dbalanced_dt(real time,
                     vector dissociation_constant_t,
                     vector dissociation_constant_r,
                     vector transfer_constant,
-                    int[] subunits){
+                    int[] subunits,
+                    vector phos_enzyme_conc,
+                    vector phos_enzyme_kcat,
+                    matrix S_phos_act,
+                    matrix S_phos_inh,
+                    vector drain){
   vector[rows(current_balanced)+rows(unbalanced)] current_concentration;
+  vector[cols(S_enz)] flux_enz;
+  vector[cols(S_drain)] flux_drain;
+
   current_concentration[balanced_ix] = current_balanced;
   current_concentration[unbalanced_ix] = unbalanced;
-  return S[balanced_ix] * get_flux(current_concentration,
-                                   enzyme_concentration,
-                                   km,
-                                   km_lookup,
-                                   S,
-                                   kcat,
-                                   keq,
-                                   ci_ix,
-                                   ai_ix,
-                                   aa_ix,
-                                   n_ci,
-                                   n_ai,
-                                   n_aa,
-                                   ki,
-                                   dissociation_constant_t,
-                                   dissociation_constant_r,
-                                   transfer_constant,
-                                   subunits);
+
+  flux_enz = get_flux_enz(current_concentration,
+                          enzyme_concentration,
+                          km,
+                          km_lookup,
+                          S_enz,
+                          kcat,
+                          keq,
+                          ci_ix,
+                          ai_ix,
+                          aa_ix,
+                          n_ci,
+                          n_ai,
+                          n_aa,
+                          ki,
+                          dissociation_constant_t,
+                          dissociation_constant_r,
+                          transfer_constant,
+                          subunits,
+                          phos_enzyme_conc,
+                          phos_enzyme_kcat,
+                          S_phos_act,
+                          S_phos_inh);
+  flux_drain = get_flux_drain(S_drain,
+                              current_concentration,
+                              drain);
+
+  return S_full[balanced_ix] * append_row(flux_enz, flux_drain);
 }

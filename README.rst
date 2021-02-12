@@ -43,14 +43,23 @@ environment from the latest master branch, run this command:
 
     pip install https://github.com/biosustain/Maud/archive/master.zip
 
-Cmdstanpy depends on `cmdstan <https://github.com/stan-dev/cmdstan>`_, which
-needs to be installed too. Fortunately, cmdstanpy comes with a command line
-script that installs cmdstan, so this step is pretty simple:
+Cmdstanpy depends on `cmdstan <https://github.com/stan-dev/cmdstan>`_, 
+which in turn requires a c++ toolchain. Fortunately, cmdstanpy comes with
+commands that can install these for you. On windows the necessary dependencies 
+can be installed with the following powershell commands:
+
+.. code-block:: console
+
+    python -m cmdstanpy.install_cxx_toolchain
+    python -m cmdstanpy.install_cmdstan --compiler
+
+On macos or Linux, you must install the c++ requirements manually 
+(see [here](https://cmdstanpy.readthedocs.io/en/v0.9.67/installation.html#install-cmdstan)) for instuctions. 
+Cmdstan can then be installed using this shell command:
 
 .. code-block:: console
 
     install_cmdstan
-
 
 Usage
 =====
@@ -60,11 +69,11 @@ To run the simple linear model, use the following command:
 
     maud sample
 
-This will use the data file at `data/in/linar.toml
-<https://github.com/biosustain/Maud/blob/master/data/in/linear.toml>`_ to
-create a Stan program called :code:`inference_model_linear.stan` in your
-working directory, compile it into a C++ Stan model, draw samples from the
-resulting posterior and store them in csv files starting with
+This will compile the Stan program at `src/maud/inference_model.stan
+<https://github.com/biosustain/Maud/blob/master/src/maud/inference_model.stan>`_, 
+then run the resulting binary file using the data at `tests/data/linar.toml
+<https://github.com/biosustain/Maud/blob/master/tests/data/linear.toml>`_, storing
+the results in csv files starting with
 :code:`model_output_linear`.
 
 The `sample` command can be configured in a few ways - to check out all the

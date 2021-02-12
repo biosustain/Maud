@@ -55,3 +55,6 @@ html_static_path = ['_static']
 
 # So that readthedocs will look for index.rst rather than contents.rst
 master_doc = 'index'
+
+# Including numbered cross-referencing of figures
+numfig = True

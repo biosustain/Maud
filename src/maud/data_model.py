@@ -19,6 +19,14 @@
 from collections import defaultdict
 from typing import Dict, List
 
+import numpy as np
+from cmdstanpy import CmdStanMCMC
+
+from maud.utils import (
+    get_lognormal_parameters_from_quantiles,
+    get_normal_parameters_from_quantiles,
+)
+
 
 class Compartment:
     """Constructor for compartment objects.
@@ -143,6 +151,7 @@ class Reaction:
     :param stoichiometry: reaction stoichiometry,
     e.g. for the reaction: 1.5 f6p <-> fdp we have {'f6p'; -1.5, 'fdp': 1}
     :param enzymes: Dictionary mapping enzyme ids to Enzyme objects
+    :param water_stroichiometry: Reaction's stoichiometric coefficient for water
     """
 
     def __init__(
@@ -153,6 +162,7 @@ class Reaction:
         is_exchange: bool = None,
         stoichiometry: Dict[str, float] = None,
         enzymes: Dict[str, Enzyme] = None,
+        water_stoichiometry: float = 0,
     ):
         if stoichiometry is None:
             stoichiometry = defaultdict()
@@ -164,6 +174,52 @@ class Reaction:
         self.is_exchange = is_exchange
         self.stoichiometry = stoichiometry
         self.enzymes = enzymes
+        self.water_stoichiometry = water_stoichiometry
+
+
+class Drain:
+    """Constructor for the reaction object.
+
+    :param id: drain id, use a BiGG id if possible.
+    :param name: drain name.
+    :param stoichiometry: reaction stoichiometry,
+    """
+
+    def __init__(
+        self, id: str, name: str = None, stoichiometry: Dict[str, float] = None
+    ):
+        if stoichiometry is None:
+            stoichiometry = defaultdict()
+        self.id = id
+        self.name = name if name is not None else id
+        self.stoichiometry = stoichiometry
+
+
+class Phosphorylation:
+    """Constructor for the phosphorylation object.
+
+    :param id: phosphorylation id. use BIGG id if possible.
+    :param name: name of phosphorylation reaction.
+    :param activating: if the interaction activates the
+    target enzyme.
+    :param inhibiting: if the interaction inhibits the
+    target enzyme.
+    :enzyme_id: the target enzyme of the interaction
+    """
+
+    def __init__(
+        self,
+        id: str,
+        name: str = None,
+        activating: bool = None,
+        inhibiting: bool = None,
+        enzyme_id: str = None,
+    ):
+        self.id = id
+        self.name = name
+        self.activating = activating
+        self.inhibiting = inhibiting
+        self.enzyme_id = enzyme_id
 
 
 class KineticModel:
@@ -172,6 +228,7 @@ class KineticModel:
     :param model_id: id of the kinetic model
     :param metabolites: dictionary mapping strings to metabolite objects
     :param reactions: dictionary mapping strings to reaction objects
+    :param drains: dictionary mapping strings to drain objects
     :param compartments: dictionary mapping strings to compartment objects
     :param mic: dictionary mapping strings to MetaboliteInCompartment objects
     """
@@ -183,12 +240,16 @@ class KineticModel:
         reactions: Dict[str, Reaction],
         compartments: Dict[str, Compartment],
         mics: Dict[str, MetaboliteInCompartment],
+        drains: Dict[str, Drain] = None,
+        phosphorylation: Dict[str, Phosphorylation] = None,
     ):
         self.model_id = model_id
         self.metabolites = metabolites
         self.reactions = reactions
+        self.drains = drains
         self.compartments = compartments
         self.mics = mics
+        self.phosphorylation = phosphorylation
 
 
 class Measurement:
@@ -197,7 +258,6 @@ class Measurement:
     :param target_id: id of the thing being measured
     :param value: value for the measurement
     :param uncertainty: uncertainty associated to the measurent
-    :param scale: scale of the measurement, e.g. 'log10' or 'linear
     :param target_type: type of thing being measured, e.g. 'metabolite', 'reaction',
     'enzyme'.
     """
@@ -207,24 +267,24 @@ class Measurement:
         target_id: str,
         value: float,
         uncertainty: float = None,
-        scale: str = None,
         target_type: str = None,
     ):
+        target_type_to_error_scale = {"mic": "ln", "flux": "linear", "enzyme": "ln"}
         self.target_id = target_id
         self.value = value
         self.uncertainty = uncertainty
-        self.scale = scale
         self.target_type = target_type
+        self.scale = target_type_to_error_scale[target_type]
 
 
 class Experiment:
     """Constructor for condition object.
 
     :param id: condition id
-    :param unbalanced_met_info:
-    :param measurements: dictionary mapping keys 'enzyme', 'metabolite' and 'reaction'
+    :param measurements: dictionary mapping keys 'metabolite' and 'reaction'
     to dictionaries with the form {target id: measurement}
     :param metadata: any info about the condition
+    :param knockouts: a list of enzymes knocked out, if any
     """
 
     def __init__(
@@ -233,6 +293,7 @@ class Experiment:
         measurements: Dict[str, Dict[str, Measurement]] = None,
         metadata: str = None,
         knockouts: List[str] = None,
+        phos_knockouts: List[str] = None,
     ):
         if measurements is None:
             measurements = defaultdict()
@@ -240,6 +301,7 @@ class Experiment:
         self.measurements = measurements
         self.metadata = metadata
         self.knockouts = knockouts
+        self.phos_knockouts = phos_knockouts
 
 
 class Prior:
@@ -254,25 +316,148 @@ class Prior:
     :param scale: a number specifying the scale of the distribution
     :param experiment_id: id of the relevant experiment (for enzymes or unbalanced
     metabolites)
+    :param mic_id: id of relevant metabolite-in-compartment
+    :param metabolite_id: id of relevant metabolite
+    :param enzyme_id: id of relevant enzyme
+    :param phos_enz_id: id of enzyme involved with phosphorylation reaction
+    :param drain_id: id of relevant drain
     """
 
     def __init__(
         self,
         id: str,
-        location: float,
-        scale: float,
+        is_non_negative: bool,
         experiment_id: str = None,
         mic_id: str = None,
         metabolite_id: str = None,
         enzyme_id: str = None,
+        phos_enz_id: str = None,
+        drain_id: str = None,
+        pct1: float = None,
+        pct99: float = None,
+        location: float = None,
+        scale: float = None,
     ):
         self.id = id
-        self.location = location
-        self.scale = scale
+        self.is_non_negative = is_non_negative
         self.experiment_id = experiment_id
         self.mic_id = mic_id
         self.metabolite_id = metabolite_id
         self.enzyme_id = enzyme_id
+        self.phos_enz_id = phos_enz_id
+        self.drain_id = drain_id
+
+        self.pct1 = pct1
+        self.pct99 = pct99
+        if pct1 is not None and pct99 is not None:
+            if is_non_negative:
+                mu, self.scale = get_lognormal_parameters_from_quantiles(
+                    pct1, 0.01, pct99, 0.99
+                )
+                self.location = np.exp(mu)
+            else:
+                self.location, self.scale = get_normal_parameters_from_quantiles(
+                    pct1, 0.01, pct99, 0.99
+                )
+        else:
+            self.location = location
+            self.scale = scale
+
+
+class PriorSet:
+    """Object containing all priors for a MaudInput."""
+
+    def __init__(
+        self,
+        kcat_priors: List[Prior],
+        phos_kcat_priors: List[Prior],
+        km_priors: List[Prior],
+        formation_energy_priors: List[Prior],
+        unbalanced_metabolite_priors: List[Prior],
+        inhibition_constant_priors: List[Prior],
+        tense_dissociation_constant_priors: List[Prior],
+        relaxed_dissociation_constant_priors: List[Prior],
+        transfer_constant_priors: List[Prior],
+        drain_priors: List[Prior],
+        enzyme_concentration_priors: List[Prior],
+        phos_enz_concentration_priors: List[Prior],
+    ):
+        self.kcat_priors = kcat_priors
+        self.phos_kcat_priors = phos_kcat_priors
+        self.km_priors = km_priors
+        self.formation_energy_priors = formation_energy_priors
+        self.unbalanced_metabolite_priors = unbalanced_metabolite_priors
+        self.inhibition_constant_priors = inhibition_constant_priors
+        self.tense_dissociation_constant_priors = tense_dissociation_constant_priors
+        self.relaxed_dissociation_constant_priors = relaxed_dissociation_constant_priors
+        self.transfer_constant_priors = transfer_constant_priors
+        self.drain_priors = drain_priors
+        self.enzyme_concentration_priors = enzyme_concentration_priors
+        self.phos_enz_concentration_priors = phos_enz_concentration_priors
+
+
+class StanCodeSet:
+    """Object containing all stan codes for a MaudInput."""
+
+    def __init__(
+        self,
+        metabolite_codes: Dict[str, int],
+        mic_codes: Dict[str, int],
+        balanced_mic_codes: Dict[str, int],
+        unbalanced_mic_codes: Dict[str, int],
+        reaction_codes: Dict[str, int],
+        experiment_codes: Dict[str, int],
+        enzyme_codes: Dict[str, int],
+        drain_codes: Dict[str, int],
+        phos_enz_codes: Dict[str, int],
+    ):
+        self.metabolite_codes = metabolite_codes
+        self.mic_codes = mic_codes
+        self.balanced_mic_codes = balanced_mic_codes
+        self.unbalanced_mic_codes = unbalanced_mic_codes
+        self.reaction_codes = reaction_codes
+        self.experiment_codes = experiment_codes
+        self.enzyme_codes = enzyme_codes
+        self.drain_codes = drain_codes
+        self.phos_enz_codes = phos_enz_codes
+
+
+class ExperimentSet:
+    """Object containing all experiments for a MaudInput."""
+
+    def __init__(self, experiments: List[Experiment]):
+        self.experiments = experiments
+
+
+class MaudConfig:
+    """User's configuration for a Maud input.
+
+    :param name: name for the input. Used to name the output directory
+    :param kinetic_model_file: path to a valid kientic model file.
+    :param priors_file: path to a valid priors file.
+    :param experiments_file: path to a valid experiments file.
+    :param likelihood: Whether or not to take measurements into account.
+    :param ode_config: Configuration for Stan's ode solver.
+    :param cmdstanpy_config: Arguments to cmdstanpy.CmdStanModel.sample.
+    """
+
+    def __init__(
+        self,
+        name: str,
+        kinetic_model_file: str,
+        priors_file: str,
+        experiments_file: str,
+        likelihood: bool,
+        ode_config: dict,
+        cmdstanpy_config: dict,
+    ):
+        self.name = name
+        self.kinetic_model_file = kinetic_model_file
+        self.priors_file = priors_file
+        self.experiments_file = experiments_file
+        self.likelihood = likelihood
+        self.ode_config = ode_config
+        self.cmdstanpy_config = cmdstanpy_config
 
 
 class MaudInput:
@@ -288,14 +473,42 @@ class MaudInput:
 
     def __init__(
         self,
+        config: MaudConfig,
         kinetic_model: KineticModel,
-        priors: Dict[str, List[Prior]],
-        stan_codes: Dict[str, Dict[str, int]],
-        experiments: Dict[str, Experiment] = None,
+        priors: PriorSet,
+        stan_codes: StanCodeSet,
+        experiments: ExperimentSet,
     ):
-        if experiments is None:
-            experiments = defaultdict()
+        self.config = config
         self.kinetic_model = kinetic_model
         self.priors = priors
         self.stan_codes = stan_codes
         self.experiments = experiments
+
+
+class SimulationStudyOutput:
+    """Expected output of a simulation study.
+
+    :param input_data_sim: dictionary used to create simulation
+    :param input_data_sample: dictionary used to create samples
+    :param true_values: dictionary mapping param names to true values
+    :param sim: CmdStanMCMC that generated simulated measurements
+    :param mi: Maud input used for sampling
+    :param samples: CmdStanMCMC output of the simulation study
+    """
+
+    def __init__(
+        self,
+        input_data_sim: dict,
+        input_data_sample: dict,
+        true_values: dict,
+        sim: CmdStanMCMC,
+        mi: MaudInput,
+        samples: CmdStanMCMC,
+    ):
+        self.input_data_sim = input_data_sim
+        self.input_data_sample = input_data_sample
+        self.true_values = true_values
+        self.sim = sim
+        self.mi = mi
+        self.samples = samples

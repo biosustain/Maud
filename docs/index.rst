@@ -27,16 +27,24 @@ experiments and the existing literature.
    :maxdepth: 1
    :caption: Theoretical background:
 
-   theory/computation
    theory/enzyme_kinetics
    theory/statistics
    theory/thermodynamics
+   theory/drains
+
+.. toctree::
+   :maxdepth: 1
+   :caption: Case studies:
+
+   case_studies/ecoli
+
 
 .. toctree::
    :maxdepth: 1
    :caption: Implementation details:
 
    implementation/data_model
+   implementation/computation
 
 
 

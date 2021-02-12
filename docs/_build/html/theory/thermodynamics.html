@@ -1,0 +1,187 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Thermodynamics &#8212; Maud  documentation</title>
+    <link rel="stylesheet" href="../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <script id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+    <script src="../_static/jquery.js"></script>
+    <script src="../_static/underscore.js"></script>
+    <script src="../_static/doctools.js"></script>
+    <script src="../_static/language_data.js"></script>
+    <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Drain Reactions" href="drains.html" />
+    <link rel="prev" title="Statistical Model" href="statistics.html" />
+   
+  <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <div class="section" id="thermodynamics">
+<h1>Thermodynamics<a class="headerlink" href="#thermodynamics" title="Permalink to this headline">¶</a></h1>
+<p>Each enzyme in a reaction network model has a thermodynamic parameter called
+<span class="math notranslate nohighlight">\(k_{eq}\)</span>, which represents how much energy the corresponding chemical
+reaction stores (<span class="math notranslate nohighlight">\(k_{eq}\)</span> less than 1) or releases (<span class="math notranslate nohighlight">\(k_{eq}\)</span>
+greater than 1) from its environment. This document explains how the laws of
+thermodynamics constrain these parameters and how Maud ensures that these
+constraints are satisfied.</p>
+<div class="section" id="why-the-laws-of-thermodynamics-impose-constraints">
+<h2>Why the laws of thermodynamics impose constraints<a class="headerlink" href="#why-the-laws-of-thermodynamics-impose-constraints" title="Permalink to this headline">¶</a></h2>
+<p>Thermodynamic parameters are constrained in two main ways.</p>
+<p>First, each thermodynamic parameter must agree with the kinetic parameters
+describing its enzyme, according to the Haldane relationships governing the
+enzyme’s mechanism. For example, the Haldane relationships for an enzyme with
+an ordered unibi mechanism are as follows:</p>
+<div class="math notranslate nohighlight">
+\[k_{eq} = \frac{ k_{cat1}k_{ip}k_{q} }{k_{cat2}k_{ia}} = \frac{ k_{cat1}k_{p}k_{iq} }{k_{cat2}k_{a}}\]</div>
+<p>Second, the thermodynamic parameters in a network must not jointly imply that
+it is possible to create or destroy energy simply by following a series of
+reactions round in a loop. This implies that, at equilibrium, the net change in
+Gibbs free energy due to the reactions in a loop should be exactly zero. In
+mathematical notation:</p>
+<div class="math notranslate nohighlight">
+\[\Sigma_{i\in loop}\Delta G_i = 0\]</div>
+<p>Since there is a one-to-one relationship between <span class="math notranslate nohighlight">\(k_eq\)</span> s and
+<span class="math notranslate nohighlight">\(DeltaG\)</span> s, this condition further constrains the feasible area of
+thermodynamic parameter space for networks with loops.</p>
+</div>
+<div class="section" id="how-maud-ensures-thermodynamic-consistency">
+<h2>How Maud ensures thermodynamic consistency<a class="headerlink" href="#how-maud-ensures-thermodynamic-consistency" title="Permalink to this headline">¶</a></h2>
+<p>In order to ensure that each enzyme’s kinetic and thermodynamic parameters
+agree, Maud ensures that one parameter per Haldane relationship is fixed based
+on the values of the other parameters. For example, in the ordered unibi case
+the <span class="math notranslate nohighlight">\(k_{ip}\)</span> and <span class="math notranslate nohighlight">\(k_{iq}\)</span> parameters are fixed as follows:</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}k_{ip} = \frac{k_{eq}k_{ia}k_{cat2}}{k_{q}k_{cat1}} \\
+k_{iq} = \frac{k_{eq}k_{cat2}k_{a}}{k_{cat1}k_{p}}\end{split}\]</div>
+<p>In order to avoid free energy loops, Maud generates <span class="math notranslate nohighlight">\(k_{eq}\)</span> parameters
+from <span class="math notranslate nohighlight">\(\Delta G\)</span> parameters according to the following equation:</p>
+<div class="math notranslate nohighlight">
+\[\mathbf{k_{eq}} = \exp(\frac{\Delta G}{-RT})\]</div>
+<p>where R is the universal gas constant and T is the temperature in kelvin
+(currently this is assumed to be 298). <span class="math notranslate nohighlight">\(Delta G\)</span> parameters, in turn, are
+generated as follows:</p>
+<div class="math notranslate nohighlight">
+\[\Delta G = K\mathbf{b}\]</div>
+<p>where <span class="math notranslate nohighlight">\(\mathbf{b}\)</span> of auxiliary basis parameters whose length is the same
+as the rank of the network’s stoichiometric matrix and <span class="math notranslate nohighlight">\(K =
+Nullspace(Nullspace(S^{T})^{T})\)</span> is a matrix generated from the network’s stoichiometric matrix
+<span class="math notranslate nohighlight">\(S\)</span> so as to ensure that <span class="math notranslate nohighlight">\(\Delta G\)</span> sums to zero for loops.</p>
+<p>In the case where the network has no loops, the width of <cite>K</cite> will be a diagonal
+matrix and the basis parameters directly determine to the <span class="math notranslate nohighlight">\(\Delta G\)</span> s. If
+there are loops, there will be fewer basis parameters than <span class="math notranslate nohighlight">\(\Delta G\)</span> s.</p>
+<p>Information about marginal values of <span class="math notranslate nohighlight">\(Delta G\)</span> - for example from <em>in
+vitro</em> measurements - is represented directly as prior distributions on the
+transformed <span class="math notranslate nohighlight">\(Delta G\)</span> parameters. Since the transformation from basis
+parameters to <span class="math notranslate nohighlight">\(Delta G\)</span> s is linear and the posterior only needs to be
+ascertained up to proportionality, there is no need for any adjustments to take
+into account the effect of this transformation.</p>
+</div>
+</div>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../index.html">Maud</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+<p class="caption"><span class="caption-text">How to use Maud:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../usage/installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../usage/inputting.html">Specifying input data</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../usage/contributing.html">Contributing to Maud</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../usage/post_installation_usage.html">Generating posterior draws</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Theoretical background:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="enzyme_kinetics.html">Enzyme kinetics</a></li>
+<li class="toctree-l1"><a class="reference internal" href="statistics.html">Statistical Model</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Thermodynamics</a></li>
+<li class="toctree-l1"><a class="reference internal" href="drains.html">Drain Reactions</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Case studies:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../case_studies/ecoli.html">A simple model of E. coli glycolysis</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Implementation details:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../implementation/data_model.html">Maud’s data model</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../implementation/computation.html">Computation</a></li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../index.html">Documentation overview</a><ul>
+      <li>Previous: <a href="statistics.html" title="previous chapter">Statistical Model</a></li>
+      <li>Next: <a href="drains.html" title="next chapter">Drain Reactions</a></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2019, Novo Nordisk Foundation Center for Biosustainability, Technical University of Denmark.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 3.2.1</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      
+      |
+      <a href="../_sources/theory/thermodynamics.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

@@ -1,0 +1,199 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Generating posterior draws &#8212; Maud  documentation</title>
+    <link rel="stylesheet" href="../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <script id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+    <script src="../_static/jquery.js"></script>
+    <script src="../_static/underscore.js"></script>
+    <script src="../_static/doctools.js"></script>
+    <script src="../_static/language_data.js"></script>
+    <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Enzyme kinetics" href="../theory/enzyme_kinetics.html" />
+    <link rel="prev" title="Contributing to Maud" href="contributing.html" />
+   
+  <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <div class="section" id="generating-posterior-draws">
+<h1>Generating posterior draws<a class="headerlink" href="#generating-posterior-draws" title="Permalink to this headline">¶</a></h1>
+<p>Maud’s main purpose is to generate an ensemble of samples that collectively
+represent the information contained in some input data.</p>
+<p>To generate samples for input data at <code class="code docutils literal notranslate"><span class="pre">path/to/myinput</span></code>, run the
+following command:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="go">maud sample path/to/myinput</span>
+</pre></div>
+</div>
+<p>This will trigger maud to generate an output folder in the directory where the
+command is run. To save the output folder somewhere else, use the option
+<code class="code docutils literal notranslate"><span class="pre">output_dir</span></code> as follows:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="go">maud sample path/to/myinput --output_dir path/to/desired/output/dir</span>
+</pre></div>
+</div>
+<p>Here is the full documentation for the <code class="code docutils literal notranslate"><span class="pre">sample</span></code> command, listing all
+available options:</p>
+<div class="section" id="sample">
+<h2>sample<a class="headerlink" href="#sample" title="Permalink to this headline">¶</a></h2>
+<p>Generate MCMC samples given a user input directory.</p>
+<p>This function creates a new directory in output_dir with a name starting
+with “maud_output”. It first copies the directory at data_path into the new
+this directory at new_dir/user_input, then runs the sampling.sample
+function to write samples in new_dir/samples. Finally it prints the results
+of cmdstanpy’s diagnose and summary methods.</p>
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>sample <span class="o">[</span>OPTIONS<span class="o">]</span> <span class="o">[</span>DATA_PATH<span class="o">]</span>
+</pre></div>
+</div>
+<p class="rubric">Options</p>
+<dl class="std option">
+<dt id="cmdoption-sample-output_dir">
+<span id="cmdoption-sample-output-dir"></span><code class="sig-name descname">--output_dir</code><code class="sig-prename descclassname"> &lt;output_dir&gt;</code><a class="headerlink" href="#cmdoption-sample-output_dir" title="Permalink to this definition">¶</a></dt>
+<dd><p>Where to save Maud’s output</p>
+</dd></dl>
+
+<p class="rubric">Arguments</p>
+<dl class="std option">
+<dt id="cmdoption-sample-arg-DATA_PATH">
+<span id="cmdoption-sample-arg-data-path"></span><code class="sig-name descname">DATA_PATH</code><code class="sig-prename descclassname"></code><a class="headerlink" href="#cmdoption-sample-arg-DATA_PATH" title="Permalink to this definition">¶</a></dt>
+<dd><p>Optional argument</p>
+</dd></dl>
+
+</div>
+<p>Maud also has a command called <code class="code docutils literal notranslate"><span class="pre">simulate</span></code>, which is used in much the same
+way as <code class="code docutils literal notranslate"><span class="pre">sample</span></code>:</p>
+<p>Here is a the full documentation for <code class="code docutils literal notranslate"><span class="pre">simulate</span></code>:</p>
+<div class="section" id="simulate">
+<h2>simulate<a class="headerlink" href="#simulate" title="Permalink to this headline">¶</a></h2>
+<p>Generate MCMC samples given a user input directory.</p>
+<p>This function creates a new directory in output_dir with a name starting
+with “maud_output”. It first copies the directory at data_path into the new
+this directory at new_dir/user_input, then runs the sampling.sample
+function to write samples in new_dir/samples. Finally it prints the results
+of cmdstanpy’s diagnose and summary methods.</p>
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>simulate <span class="o">[</span>OPTIONS<span class="o">]</span> <span class="o">[</span>DATA_PATH<span class="o">]</span>
+</pre></div>
+</div>
+<p class="rubric">Options</p>
+<dl class="std option">
+<dt id="cmdoption-simulate-output_dir">
+<span id="cmdoption-simulate-output-dir"></span><code class="sig-name descname">--output_dir</code><code class="sig-prename descclassname"> &lt;output_dir&gt;</code><a class="headerlink" href="#cmdoption-simulate-output_dir" title="Permalink to this definition">¶</a></dt>
+<dd><p>Where to save Maud’s output</p>
+</dd></dl>
+
+<p class="rubric">Arguments</p>
+<dl class="std option">
+<dt id="cmdoption-simulate-arg-DATA_PATH">
+<span id="cmdoption-simulate-arg-data-path"></span><code class="sig-name descname">DATA_PATH</code><code class="sig-prename descclassname"></code><a class="headerlink" href="#cmdoption-simulate-arg-DATA_PATH" title="Permalink to this definition">¶</a></dt>
+<dd><p>Optional argument</p>
+</dd></dl>
+
+</div>
+</div>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../index.html">Maud</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+<p class="caption"><span class="caption-text">How to use Maud:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="inputting.html">Specifying input data</a></li>
+<li class="toctree-l1"><a class="reference internal" href="contributing.html">Contributing to Maud</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Generating posterior draws</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Theoretical background:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../theory/enzyme_kinetics.html">Enzyme kinetics</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../theory/statistics.html">Statistical Model</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../theory/thermodynamics.html">Thermodynamics</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../theory/drains.html">Drain Reactions</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Case studies:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../case_studies/ecoli.html">A simple model of E. coli glycolysis</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Implementation details:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../implementation/data_model.html">Maud’s data model</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../implementation/computation.html">Computation</a></li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../index.html">Documentation overview</a><ul>
+      <li>Previous: <a href="contributing.html" title="previous chapter">Contributing to Maud</a></li>
+      <li>Next: <a href="../theory/enzyme_kinetics.html" title="next chapter">Enzyme kinetics</a></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2019, Novo Nordisk Foundation Center for Biosustainability, Technical University of Denmark.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 3.2.1</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      
+      |
+      <a href="../_sources/usage/post_installation_usage.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

@@ -27,7 +27,7 @@ def validate_maud_input(mi: data_model.MaudInput):
     model_metabolites = list(set([met.id for met in model.metabolites.values()]))
     model_rxns = [rxn.id for rxn in model.reactions.values()]
     model_kms = [
-        f"km_{enz.id}_{mic_id}"
+        f"km_{mic_id}_{enz.id}"
         for rxn in model.reactions.values()
         for enz in rxn.enzymes.values()
         for mic_id in rxn.stoichiometry.keys()
@@ -41,15 +41,15 @@ def validate_maud_input(mi: data_model.MaudInput):
         f"formation_energy_{met_id}" for met_id in model_metabolites
     ]
     model_kis = [
-        f"ki_{enz.id}_{modifier.mic_id}"
+        f"inhibition_constant_{modifier.mic_id}_{enz.id}"
         for rxn in model.reactions.values()
         for enz in rxn.enzymes.values()
         for modifier in enz.modifiers["competitive_inhibitor"]
     ]
-    prior_kms = [p.id for p in mi.priors["kms"]]
-    prior_kcats = [p.id for p in mi.priors["kcats"]]
-    prior_kis = [p.id for p in mi.priors["inhibition_constants"]]
-    prior_formation_energies = [p.id for p in mi.priors["formation_energies"]]
+    prior_kms = [p.id for p in mi.priors.km_priors]
+    prior_kcats = [p.id for p in mi.priors.kcat_priors]
+    prior_kis = [p.id for p in mi.priors.inhibition_constant_priors]
+    prior_formation_energies = [p.id for p in mi.priors.formation_energy_priors]
     for model_pars, prior_pars in zip(
         [model_kms, model_kcats, model_formation_energies, model_kis],
         [prior_kms, prior_kcats, prior_formation_energies, prior_kis],
@@ -57,21 +57,34 @@ def validate_maud_input(mi: data_model.MaudInput):
         for prior_par in prior_pars:
             msg = f"{prior_par} is in the priors but not the kinetic model."
             if prior_par not in model_pars:
+                print(model_pars)
                 raise ValueError(msg)
         for model_par in model_pars:
             msg = f"{model_par} is in the kinetic model but not the priors."
             if model_par not in prior_pars:
                 raise ValueError(msg)
-    for exp in mi.experiments.values():
-        for meas in exp.measurements["metabolite"].values():
+    for exp in mi.experiments.experiments:
+        for meas in exp.measurements["mic"].values():
             if meas.target_id not in model_unb_mics + model_balanced_mics:
                 raise ValueError(
                     f"metabolite {meas.target_id} is measured in experiment {exp.id}"
                     "but is not in the kinetic model {mi.kinetic_model.model_id}."
                 )
-        for meas in exp.measurements["reaction"].values():
+        for meas in exp.measurements["flux"].values():
             if meas.target_id not in model_rxns:
                 raise ValueError(
                     f"reaction {meas.target_id} is measured in experiment {exp.id}"
                     "but is not in the kinetic model {mi.kinetic_model.model_id}."
                 )
+        if mi.kinetic_model.drains is not None:
+            for drain_id in mi.kinetic_model.drains:
+                for drain in mi.priors.drain_priors:
+                    if drain.experiment_id == exp.id:
+                        if (drain_id != drain.drain_id) & (
+                            exp.id != drain.experiment_id
+                        ):
+                            raise ValueError(
+                                f"drain {drain_id} was not included in "
+                                "experiment {exp.id}. "
+                                "Required for each experiment and drain."
+                            )

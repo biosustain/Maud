@@ -1,0 +1,17 @@
+measurement_type,target_id,experiment_id,measurement,error_scale
+mic,M1_c,condition_1,1.7,0.1
+mic,M2_c,condition_1,1.4,0.1
+mic,M1_e,condition_1,2,0.05
+mic,M2_e,condition_1,1,0.05
+flux,r3,condition_1,0.29,0.1
+enzyme,r1,condition_1,1,0.05
+enzyme,r2,condition_1,1,0.05
+enzyme,r3,condition_1,1,0.05
+mic,M1_c,condition_2,1.8,0.1
+mic,M2_c,condition_2,1.3,0.1
+mic,M1_e,condition_2,2,0.05
+mic,M2_e,condition_2,1,0.05
+flux,r3,condition_2,0.21,0.1
+enzyme,r1,condition_2,1.5,0.05
+enzyme,r2,condition_2,0.5,0.05
+enzyme,r3,condition_2,1.5,0.05

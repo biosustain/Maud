@@ -18,7 +18,9 @@
 
 from typing import Dict, Iterable
 
-from maud.data_model import KineticModel
+import numpy as np
+import sympy as sp
+from scipy.stats import norm
 
 
 def codify(lx: Iterable[str]) -> Dict[str, int]:
@@ -26,23 +28,41 @@ def codify(lx: Iterable[str]) -> Dict[str, int]:
     return dict(zip(lx, range(1, len(lx) + 1)))
 
 
-def get_metabolite_codes(kinetic_model: KineticModel) -> Dict[str, int]:
-    """Get a dictionary mapping metabolite ids to integer indexes.
+def get_lognormal_parameters_from_quantiles(x1, p1, x2, p2):
+    """Find parameters for a lognormal distribution from two quantiles.
 
-    :param kinetic_model: A KineticModel object
+    i.e. get mu and sigma such that if X ~ lognormal(mu, sigma), then pr(X <
+    x1) = p1 and pr(X < x2) = p2.
+
     """
+    logx1 = np.log(x1)
+    logx2 = np.log(x2)
+    denom = norm.ppf(p2) - norm.ppf(p1)
+    sigma = (logx2 - logx1) / denom
+    mu = (logx1 * norm.ppf(p2) - logx2 * norm.ppf(p1)) / denom
+    return mu, sigma
 
-    return codify(kinetic_model.metabolites.keys())
 
+def get_normal_parameters_from_quantiles(x1, p1, x2, p2):
+    """Find parameters for a normal distribution from two quantiles.
 
-def get_enzyme_codes(kinetic_model: KineticModel) -> Dict[str, int]:
-    """Get a dictionary mapping enzyme ids to integer indexes.
+    i.e. get mu and sigma such that if X ~ normal(mu, sigma), then pr(X <
+    x1) = p1 and pr(X < x2) = p2.
 
-    :param kinetic_model: A KineticModel object
     """
+    denom = norm.ppf(p2) - norm.ppf(p1)
+    sigma = (x2 - x1) / denom
+    mu = (x1 * norm.ppf(p2) - x2 * norm.ppf(p1)) / denom
+    return mu, sigma
 
-    enzyme_ids = []
-    for _, rxn in kinetic_model.reactions.items():
-        for enz_id, _ in rxn.enzymes.items():
-            enzyme_ids.append(enz_id)
-    return codify(enzyme_ids)
+
+def get_null_space(a, rtol=1e-5):
+    """Calulate the null space of a matrix."""
+    u, s, v = np.linalg.svd(a)
+    rank = (s > rtol * s[0]).sum()
+    return v[rank:].T.copy()
+
+
+def get_rref(mat):
+    """Return reduced row echelon form of a matrix."""
+    return sp.Matrix(mat).rref(iszerofunc=lambda x: abs(x) < 1e-10)[0]

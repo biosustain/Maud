@@ -1,0 +1,294 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Statistical Model &#8212; Maud  documentation</title>
+    <link rel="stylesheet" href="../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <script id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+    <script src="../_static/jquery.js"></script>
+    <script src="../_static/underscore.js"></script>
+    <script src="../_static/doctools.js"></script>
+    <script src="../_static/language_data.js"></script>
+    <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Thermodynamics" href="thermodynamics.html" />
+    <link rel="prev" title="Enzyme kinetics" href="enzyme_kinetics.html" />
+   
+  <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <div class="section" id="statistical-model">
+<h1>Statistical Model<a class="headerlink" href="#statistical-model" title="Permalink to this headline">¶</a></h1>
+<p>This document describes Maud from a statistical point of view.</p>
+<p>Maud’s statistical model separates the information that might be available
+about a metabolic network into three different kinds:</p>
+<ul class="simple">
+<li><p>structural information implicit in a kinetic model</p></li>
+<li><p>information contained in directly modelled experiments</p></li>
+<li><p>information from other sources</p></li>
+</ul>
+<p>The role of the statistical model is to synthesise these different sources of
+information, making it possible to say exactly what is known about a metabolic
+network after a series of experiments.</p>
+<p>More specifically, the statistical model is a joint probability distribution
+<span class="math notranslate nohighlight">\(\pi: \Theta \times Y\rightarrow [0,1]\)</span> that defines the probability
+density <span class="math notranslate nohighlight">\(\pi(\theta, y)\)</span> of any possible combination of unknown
+parameters <span class="math notranslate nohighlight">\(\theta\)</span> and observations <span class="math notranslate nohighlight">\(y\)</span>. This model is written
+explicitly as a Stan program.</p>
+<p>Given a kinetic model and a set of observations <span class="math notranslate nohighlight">\(y\)</span>, Maud uses Stan’s
+adaptive Hamiltonian Monte Carlo algorithm to draw samples from the posterior
+distribution <span class="math notranslate nohighlight">\(p(\theta\mid y)\)</span>. Each draw contains a configuration of
+unknown parameter values. Quantitative questions about the metabolic network
+can be answered by interrogating the ensemble of posterior draws.</p>
+<div class="section" id="structural-information">
+<h2>Structural Information<a class="headerlink" href="#structural-information" title="Permalink to this headline">¶</a></h2>
+<p>Maud assumes that the following structural information is known in advance:</p>
+<ul class="simple">
+<li><p>The volume of each compartment and the metabolites it houses</p></li>
+<li><p>The network stoichiometry, i.e. the proportions in which each reaction in the
+network creates and destroys metabolites and which enzymes catalyse which
+reactions. This information is encapsulated in a stoichiometric matrix
+<span class="math notranslate nohighlight">\(S\)</span> with a row for each metabolite-in-compartment and a column for each
+enzyme.</p></li>
+<li><p>Which metabolites-in-compartment modify which enzymes and how</p></li>
+<li><p>Which metabolites-in-compartments are ‘balanced’, i.e. their concentrations
+do not change when the system is in a steady state.</p></li>
+</ul>
+<p>We refer to this structural information collectively as a kinetic model. See
+[LINK] for a detailed description of these from a scientific point of view.</p>
+<p>The kinetic model defines a system of ODEs - one differential equation for each
+metabolite-in-compartment - with the rate of change of each
+metabolite-in-compartment <span class="math notranslate nohighlight">\(m_i\)</span> described by the following equation:</p>
+<div class="math notranslate nohighlight">
+\[\frac{dm_{i}}{dt} = \sum_{j} S_{ij} v_{j}(\theta, \mathbf{m})\]</div>
+<p>When the system is at a steady state, all the balanced
+metabolites-in-compartments have unchanging concentrations, so their entries in
+the equation above are zero.</p>
+<p>For a given set of parameters, enzyme concentrations and initial metabolite
+conditions, there should be a single steady state balanced metabolite
+concentration and set of fluxes.</p>
+<p>The kinetic model’s role in Maud’s statistical model is to connect latent
+parameters - i.e. <span class="math notranslate nohighlight">\(\theta\)</span> above - with measureable quantities,
+i.e. <span class="math notranslate nohighlight">\(\mathbf{m}\)</span> and <span class="math notranslate nohighlight">\(\mathbf{v}\)</span>.</p>
+</div>
+<div class="section" id="probabilistic-model">
+<h2>Probabilistic Model<a class="headerlink" href="#probabilistic-model" title="Permalink to this headline">¶</a></h2>
+<p>Maud aims to implement a Bayesian probabilistic model where the joint distribution
+<span class="math notranslate nohighlight">\(\pi(\theta, y)\)</span> of unknowns and observations is factored into a measurement
+model or likelihood <span class="math notranslate nohighlight">\(\pi(y \mid \theta)\)</span> and a prior model <span class="math notranslate nohighlight">\(\pi(\theta)\)</span>.
+This section explains how each of these components is constructed.</p>
+<div class="section" id="likelihood">
+<h3>Likelihood<a class="headerlink" href="#likelihood" title="Permalink to this headline">¶</a></h3>
+<p>Maud represents information from experiments that measure enzyme concentrations
+and metabolite concentrations using the following regression model, where
+<span class="math notranslate nohighlight">\(y\)</span> is the observation and <span class="math notranslate nohighlight">\(\hat{y}\)</span> is the unobserved true value
+of the experimentally measured quantity:</p>
+<div class="math notranslate nohighlight">
+\[y \sim LogNormal(\log(\hat{y}), \sigma)\]</div>
+<p>Measurements of reaction fluxes use the following similar regression model:</p>
+<div class="math notranslate nohighlight">
+\[y \sim Normal(\hat{y}, \sigma)\]</div>
+<p>In all three cases it is assumed that for each kind of measurement the error
+standard deviation <span class="math notranslate nohighlight">\(\sigma\)</span> is known (though this number is in general
+different for each measured quantity in each experiment). It is the user’s
+responsibility to choose values that reflect the accuracy of the measurement
+apparatus.</p>
+<p>The log-normal distribution was chosen to represent experimental metabolite and
+enzyme concentration measurements because the apparatuses used to measure these
+quantities typically have multiplicative errors. In other words, if the
+measured value is large, then the associated error is also proportionally
+large.</p>
+<div class="section" id="summary-statistics">
+<h4>Summary statistics<a class="headerlink" href="#summary-statistics" title="Permalink to this headline">¶</a></h4>
+<p>It is common for experimental results to be reported in the form of a sample
+mean and standard deviation. It is important to note that for non-negative
+quantities like metabolite and enzyme concentrations these summary statistics
+will generally not be good values use as <span class="math notranslate nohighlight">\(y\)</span> and <span class="math notranslate nohighlight">\(\sigma\)</span> above. If
+possible, non-summarised measurement results should be used instead.</p>
+</div>
+<div class="section" id="relative-measurements">
+<h4>Relative measurements<a class="headerlink" href="#relative-measurements" title="Permalink to this headline">¶</a></h4>
+<p>In many realistic cases a measurement apparatus will give comparatively
+accurate information about the relative concentrations of some metabolites or
+enzymes while being comparatively uninformative as to their absolute
+values. While Maud currently does not support this kind of measurement, support
+is planned and will take the following form.</p>
+</div>
+</div>
+<div class="section" id="priors">
+<h3>Priors<a class="headerlink" href="#priors" title="Permalink to this headline">¶</a></h3>
+<p>Information that does not naturally take the form of an experimental
+measurement can be expressed in Maud’s prior model. Maud allows users to
+specify independent log-normal priors for the following quantities:</p>
+<ul class="simple">
+<li><p>enzyme <span class="math notranslate nohighlight">\(kcat\)</span> parameters</p></li>
+<li><p>enzyme/metabolite-in-compartment <span class="math notranslate nohighlight">\(km\)</span> parameters</p></li>
+<li><p>enzyme transfer constants</p></li>
+<li><p>enzyme/metabolite-in-compartment inhibition and dissociation constants</p></li>
+<li><p>enzyme concentrations</p></li>
+<li><p>unbalanced metabolite concentrations</p></li>
+</ul>
+<p>The distinction between balanced and unbalanced metabolites is also found in
+the statistical model. Information about the unbalanced metabolites
+can be parsed in the form of a prior, however, due to the difficulty of non-linear transformations,
+balanced metabolites are always evaluated as part of the model likelihood.
+The distinction between unbalanced and balanced becomes aparent when considering what
+the unbalanced metabolites represent, which is a boundary condition. These
+define the outcome of systems of differential equations, in the case of Maud
+this happens to be balanced metabolite concentrations and fluxes. And, our
+knowledge about the state of each condition is only conveyed through priors
+on the boundary conditions:
+* unbalanced metabolite concentrations,
+* enzyme concentrations,
+* kinetic parameters, and,
+* drains.</p>
+<p>For metabolite formation energies, which can be both negative and positive
+numbers, Maud allows users to specific independent normal priors.</p>
+<p>Users are encouraged to choose prior locations and scales using the method by
+calculating quantiles. Prior information is often easiest to ellicit in the
+form of qualitative statements like “it is very unlikely that <span class="math notranslate nohighlight">\(kcat_e\)</span> is
+higher than 6.8 or lower than 0.4”. Information in this form naturally
+translates into restrictions on the quantiles of the corresponding marginal
+prior distribution - for example that the prior mass for the events
+<span class="math notranslate nohighlight">\(kcat_e &gt; 6.8\)</span> and <span class="math notranslate nohighlight">\(kcat_e &lt; 0.4\)</span> should each be about 1%. The
+prior values can then be calculated as roughly <span class="math notranslate nohighlight">\(\mu_{kcat_e} = 0.5003\)</span>
+and <span class="math notranslate nohighlight">\(\sigma_{kcat_e} = 0.6089\)</span>.</p>
+<p>Maud includes convenience functions for working out priors in this way, which
+can be used in a python environment as follows:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">In</span> <span class="p">[</span><span class="mi">1</span><span class="p">]:</span> <span class="kn">from</span> <span class="nn">maud.utils</span> <span class="kn">import</span> <span class="n">get_lognormal_parameters_from_quantiles</span>
+
+<span class="n">In</span> <span class="p">[</span><span class="mi">2</span><span class="p">]:</span> <span class="n">get_lognormal_parameters_from_quantiles</span><span class="p">(</span><span class="mf">0.4</span><span class="p">,</span> <span class="mf">0.01</span><span class="p">,</span> <span class="mf">6.8</span><span class="p">,</span> <span class="mf">0.99</span><span class="p">)</span>
+<span class="n">Out</span><span class="p">[</span><span class="mi">2</span><span class="p">]:</span> <span class="p">(</span><span class="mf">0.5003159401539531</span><span class="p">,</span> <span class="mf">0.608940170915830</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="section" id="information-about-fluxes-and-balanced-metabolite-concentrations">
+<h4>Information about fluxes and balanced metabolite concentrations<a class="headerlink" href="#information-about-fluxes-and-balanced-metabolite-concentrations" title="Permalink to this headline">¶</a></h4>
+<p>It is currently not possible to include non-experimental information about
+fluxes and steady-state concentrations of balanced metabolites.</p>
+<p>This is due to a technical limitatation. Since fluxes and steady state
+metabolite concentrations are calculated from the values of other parameters by
+finding the solution to the ODE system, directly setting priors would introduce
+a bias without a compensating Jacobian adjustment. We have not found a way to
+introduce this Jacobian adjustment, so Maud unfortunately cannot currently
+represent this information.</p>
+</div>
+<div class="section" id="multivariate-priors">
+<h4>Multivariate priors<a class="headerlink" href="#multivariate-priors" title="Permalink to this headline">¶</a></h4>
+<p>Sometimes the non-experimental information about two parameters is not
+independent. For example, some linear combinations of formation energies are
+known within a relatively small range even though the marginal value of each
+component of the linear combination is not well known.</p>
+<p>In such cases a multivariate distribution is required in order to express the
+available information. This functionality is not yet supported, but will be
+soon.</p>
+</div>
+</div>
+</div>
+</div>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../index.html">Maud</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+<p class="caption"><span class="caption-text">How to use Maud:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../usage/installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../usage/inputting.html">Specifying input data</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../usage/contributing.html">Contributing to Maud</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../usage/post_installation_usage.html">Generating posterior draws</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Theoretical background:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="enzyme_kinetics.html">Enzyme kinetics</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Statistical Model</a></li>
+<li class="toctree-l1"><a class="reference internal" href="thermodynamics.html">Thermodynamics</a></li>
+<li class="toctree-l1"><a class="reference internal" href="drains.html">Drain Reactions</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Case studies:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../case_studies/ecoli.html">A simple model of E. coli glycolysis</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Implementation details:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../implementation/data_model.html">Maud’s data model</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../implementation/computation.html">Computation</a></li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../index.html">Documentation overview</a><ul>
+      <li>Previous: <a href="enzyme_kinetics.html" title="previous chapter">Enzyme kinetics</a></li>
+      <li>Next: <a href="thermodynamics.html" title="next chapter">Thermodynamics</a></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2019, Novo Nordisk Foundation Center for Biosustainability, Technical University of Denmark.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 3.2.1</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      
+      |
+      <a href="../_sources/theory/statistics.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

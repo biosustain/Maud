@@ -6,7 +6,7 @@ real get_Tr(vector metabolite,
   real plus_product = 1;
   real minus_product = 1;
   real k_minus = (kcat / keq);
-  for (m in 1:size(metabolite)){
+  for (m in 1:rows(metabolite)){
     real multiplicand = (metabolite[m] / km[m]) ^ abs(stoichiometry[m]);
     k_minus *= km[m] ^ stoichiometry[m];
     if (stoichiometry[m] < 0)
@@ -20,7 +20,7 @@ real get_Tr(vector metabolite,
 real get_Dr_common_rate_law(vector metabolite, vector km, vector stoichiometry){
   real psi_plus = 1;
   real psi_minus = 1;
-  for (m in 1:size(metabolite)){
+  for (m in 1:rows(metabolite)){
     real multiplicand = (1 + metabolite[m] / km[m]) ^ abs(stoichiometry[m]);
     if (stoichiometry[m] < 0)
       psi_plus *= multiplicand;
@@ -31,11 +31,11 @@ real get_Dr_common_rate_law(vector metabolite, vector km, vector stoichiometry){
 }
 
 real get_Dr_reg(vector conc_ci, vector ki){
-  if (rows(conc_ci) > 0){
+  if (rows(conc_ci) < 1){
     return 0;
   }
   else {
-    return prod(conc_ci ./ ki);
+    return sum(conc_ci ./ ki);
   }
 }
 

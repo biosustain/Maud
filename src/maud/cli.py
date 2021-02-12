@@ -15,26 +15,17 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 """Functions that are exposed to the command line interface live here."""
-
 import os
+import shutil
+from datetime import datetime
 
 import click
 
 from maud import sampling
+from maud.io import load_maud_input_from_toml
 
 
-SAMPLING_DEFAULTS = {
-    "rel_tol": 1e-6,
-    "abs_tol": 1e-6,
-    "max_num_steps": int(1e9),
-    "likelihood": 1,
-    "n_samples": 5,
-    "n_warmup": 5,
-    "n_chains": 4,
-    "n_cores": 4,
-    "timepoint": 500,
-}
-RELATIVE_PATH_EXAMPLE = "../../tests/data/linear.toml"
+RELATIVE_PATH_EXAMPLE = "../../tests/data/linear"
 
 
 def get_example_path(relative_path_example):
@@ -48,95 +39,68 @@ def get_example_path(relative_path_example):
 @click.help_option("--help", "-h")
 def cli():
     """Use Maud's command line interface."""
-
-
-pass
+    pass
 
 
 @cli.command()
-@click.option(
-    "--rel_tol",
-    default=SAMPLING_DEFAULTS["rel_tol"],
-    help="ODE solver's relative tolerance parameter",
-)
-@click.option(
-    "--abs_tol",
-    default=SAMPLING_DEFAULTS["abs_tol"],
-    help="ODE solver's absolute tolerance parameter",
-)
-@click.option(
-    "--max_num_steps",
-    default=SAMPLING_DEFAULTS["max_num_steps"],
-    help="ODE solver's maximum steps parameter",
-)
-@click.option(
-    "--likelihood",
-    default=SAMPLING_DEFAULTS["likelihood"],
-    help="Whether (1) or not (0) to run the model in likelihood mode",
-)
-@click.option(
-    "--n_samples",
-    default=SAMPLING_DEFAULTS["n_samples"],
-    help="Number of post-warmup posterior samples",
-)
-@click.option(
-    "--n_warmup", default=SAMPLING_DEFAULTS["n_warmup"], help="Number of warmup samples"
-)
-@click.option(
-    "--n_chains", default=SAMPLING_DEFAULTS["n_chains"], help="Number of MCMC chains"
-)
-@click.option(
-    "--n_cores",
-    default=SAMPLING_DEFAULTS["n_cores"],
-    help="Number of chains to run in parallel",
-)
-@click.option(
-    "--timepoint",
-    default=SAMPLING_DEFAULTS["timepoint"],
-    help="How long the ODE simulates for (Units are whatever your time units are)",
-)
 @click.option("--output_dir", default=".", help="Where to save Maud's output")
-@click.option("--threads_per_chain", default=1, help="How many threads per chain")
 @click.argument(
     "data_path",
-    type=click.Path(exists=True, dir_okay=False),
+    type=click.Path(exists=True, dir_okay=True, file_okay=False),
     default=get_example_path(RELATIVE_PATH_EXAMPLE),
 )
-def sample(data_path, **kwargs):
-    """Sample from the model defined by the data at data_path."""
-    stanfit = sampling.sample(data_path, **kwargs)
-    stanfit.diagnose()
+def sample(data_path, output_dir):
+    """Generate MCMC samples given a user input directory.
+
+    This function creates a new directory in output_dir with a name starting
+    with "maud_output". It first copies the directory at data_path into the new
+    this directory at new_dir/user_input, then runs the sampling.sample
+    function to write samples in new_dir/samples. Finally it prints the results
+    of cmdstanpy's diagnose and summary methods.
+
+    """
+    mi = load_maud_input_from_toml(data_path)
+    now = datetime.now().strftime("%Y%m%d%H%M%S")
+    output_name = f"maud_output-{mi.config.name}-{now}"
+    output_path = os.path.join(output_dir, output_name)
+    samples_path = os.path.join(output_path, "samples")
+    ui_dir = os.path.join(output_path, "user_input")
+    print("Creating output directory: " + output_path)
+    os.mkdir(output_path)
+    os.mkdir(samples_path)
+    print(f"Copying user input from {data_path} to {ui_dir}")
+    shutil.copytree(data_path, ui_dir)
+    stanfit = sampling.sample(mi, samples_path)
+    print(stanfit.diagnose())
     print(stanfit.summary())
 
 
 @cli.command()
-@click.option(
-    "--rel_tol",
-    default=SAMPLING_DEFAULTS["rel_tol"],
-    help="ODE solver's relative tolerance parameter",
-)
-@click.option(
-    "--abs_tol",
-    default=SAMPLING_DEFAULTS["abs_tol"],
-    help="ODE solver's absolute tolerance parameter",
-)
-@click.option(
-    "--max_num_steps",
-    default=SAMPLING_DEFAULTS["max_num_steps"],
-    help="ODE solver's maximum steps parameter",
-)
-@click.option(
-    "--timepoint",
-    default=SAMPLING_DEFAULTS["timepoint"],
-    help="How long the ODE simulates for (Units are whatever your time units are)",
-)
-@click.option("--output_dir", default=".", help="Where to save Maud's output")
+@click.option("--output_dir", default=".", help="Where to save the output")
+@click.option("-n", default=1, type=int, help="Number of simulations")
 @click.argument(
     "data_path",
-    type=click.Path(exists=True, dir_okay=False),
+    type=click.Path(exists=True, dir_okay=True, file_okay=False),
     default=get_example_path(RELATIVE_PATH_EXAMPLE),
 )
-def simulate_once(data_path, **kwargs):
-    """Generate one draw using the given initial conditions for diagnostics."""
-    stanfit = sampling.simulate_once(data_path, **kwargs)
-    print(stanfit.get_drawset(params=["conc"]).T)
+def simulate(data_path, output_dir, n):
+    """Generate draws from the prior mean."""
+
+    mi = load_maud_input_from_toml(data_path)
+    now = datetime.now().strftime("%Y%m%d%H%M%S")
+    output_name = f"maud_output_sim-{mi.config.name}-{now}"
+    output_path = os.path.join(output_dir, output_name)
+    samples_path = os.path.join(output_path, "samples")
+    ui_dir = os.path.join(output_path, "user_input")
+    print("Creating output directory: " + output_path)
+    os.mkdir(output_path)
+    os.mkdir(samples_path)
+    print(f"Copying user input from {data_path} to {ui_dir}")
+    shutil.copytree(data_path, ui_dir)
+    stanfit = sampling.simulate(mi, samples_path, n)
+    print("\nSimulated concentrations and fluxes:")
+    print(stanfit.draws_pd(params=["conc", "flux"]).T)
+    print("\nSimulated measurements:")
+    print(stanfit.draws_pd(params=["yconc_sim", "yflux_sim"]).T)
+    print("\nSimulated log likelihoods:")
+    print(stanfit.draws_pd(params=["log_lik_conc", "log_lik_flux"]).T)
