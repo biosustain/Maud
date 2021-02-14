@@ -21,7 +21,7 @@ Template_Allo_Act_Inh = Template("""{%- for met in met_array -%} (1 + {{met[0]}}
 
 Template_flux = Template("""({{Tr}})/({{Dr}} + {{Drreg}} - 1)*{{Allo}}""")
 
-Template_drain
+Template_drain = Template("""{{Drain}}""")
 
 
 
@@ -49,6 +49,14 @@ mi = io.load_maud_input_from_toml(os.path.join(HERE, "../tests/data/example/mich
 kinetic_model = mi.kinetic_model
 enzyme_codes = mi.stan_codes.enzyme_codes
 mic_codes = mi.stan_codes.mic_codes
+metabolite_codes = mi.stan_codes.metabolite_codes
+drain_codes = mi.stan_codes.drain_codes
+reaction_codes = mi.stan_codes.reaction_codes
+_, _, S, _, _ = get_full_stoichiometry(kinetic_model,
+                                       enzyme_codes,
+                                       metabolite_codes,
+                                       reaction_codes,
+                                       drain_codes)
 
 flux_vector = []
 
@@ -108,9 +116,6 @@ for rxn in mi.kinetic_model.reactions.values():
 
         flux_vector.append(flux)
 
-S = sampling.get_full_stoichiometry(kinetic_model,
-                                    enzyme_codes,
-                                    mic_codes)
 system_odes = []
 
 for met_ix, met_vec in enumerate(S.T.values):
