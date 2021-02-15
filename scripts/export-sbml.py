@@ -7,7 +7,7 @@ import os
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 
-Template_T_met = Template("""{%- for met in met_array -%} ({{met[0]}}/{{met[1]}})^{{met[2]}} {%- if not loop.last %} * {% endif %} {%- endfor -%}""")
+Template_T_met = Template("""{%- for met in met_array -%} ({{met[0]}} /{{met[1]}})^{{met[2]}} {%- if not loop.last %} * {% endif %} {%- endfor -%}""")
 
 Template_Haldane =  Template("""{%- for Km in Km_array -%} ({{Km[0]}})^{{Km[1]}} {%- if not loop.last %} * {% endif %} {%- endfor -%} / {{Keq}}""")
 
@@ -47,7 +47,7 @@ odes:
 
 """)
 
-mi = io.load_maud_input_from_toml(os.path.join(HERE, "../tests/data/example_features/michaelis_menten"))
+mi = io.load_maud_input_from_toml(os.path.join(HERE, "../../Desktop/shiitake_pathway"))
 selected_experiment = None
 if selected_experiment == None:
     selected_experiment = list(mi.stan_codes.experiment_codes.keys())[0]
@@ -55,6 +55,7 @@ if selected_experiment == None:
 kinetic_model = mi.kinetic_model
 enzyme_codes = mi.stan_codes.enzyme_codes
 mic_codes = mi.stan_codes.mic_codes
+balanced_mic_codes = mi.stan_codes.balanced_mic_codes
 met_codes = mi.stan_codes.metabolite_codes
 drain_codes = mi.stan_codes.drain_codes
 reaction_codes = mi.stan_codes.reaction_codes
@@ -88,7 +89,7 @@ for rxn in mi.kinetic_model.reactions.values():
         }
     if rxn.water_stoichiometry:
         tmp_stoic.loc[-1] = ["h2o", rxn.water_stoichiometry]
-        tmp_formation_energies.append({"h2o": -157.6})
+        tmp_formation_energies.update({"h2o": -157.6})
 
     tmp_dG = 0
     for _, row in tmp_stoic.iterrows():
@@ -127,12 +128,13 @@ for rxn in mi.kinetic_model.reactions.values():
         competitive_entry = []
         allosteric_inhibitors = []
         allosteric_activators = []
+
         for mod in enz.modifiers["competitive_inhibitor"]:
-            competitive_entry.append([mod.mic_id, tmp_inh[tmp_inh["mic_id"] == mod.mic_id].id])
+            competitive_entry.append([mod.mic_id, tmp_inh[tmp_inh["mic_id"] == mod.mic_id].id.values[0]])
         for mod in enz.modifiers["allosteric_activator"]:
-            allosteric_activators.append(mod.mic_id, tmp_allo_act[tmp_allo_act["mic_id"] == mod.mic_id].id)
+            allosteric_activators.append([mod.mic_id, tmp_allo_act[tmp_allo_act["mic_id"] == mod.mic_id].id.values[0]])
         for mod in enz.modifiers["allosteric_inhibitor"]:
-            allosteric_inhibitors.append(mod.mic_id, tmp_allo_inh[tmp_allo_inh["mic_id"] == mod.mic_id].id)
+            allosteric_inhibitors.append([mod.mic_id, tmp_allo_inh[tmp_allo_inh["mic_id"] == mod.mic_id].id.values[0]])
 
         Drreg = Template_Drreg.render(met_array=competitive_entry)
         Trf = Template_T_met.render(met_array=substrate_entry)
@@ -168,12 +170,16 @@ for rxn in mi.kinetic_model.reactions.values():
 
         flux_vector.append(flux)
 
+if any(drain_codes):
+    for drain_id, drain in kinetic_model.drains.items():
+        flux_vector.append(drain_id)
+
 system_odes = []
 
 for met_ix, met_vec in enumerate(S.T.values):
-    tmp_met_ode = ''
-    first = 0
     if mi.kinetic_model.mics[list(mic_codes.keys())[met_ix]].balanced == 1:
+        tmp_met_ode = ''
+        first = 0
         for flux_ix, stoic in enumerate(met_vec):
             if stoic != 0:
                 if first == 0:
@@ -181,10 +187,8 @@ for met_ix, met_vec in enumerate(S.T.values):
                     tmp_met_ode += f'({stoic}*{flux_vector[flux_ix]})'
                 else:
                     tmp_met_ode += f'+({stoic}*{flux_vector[flux_ix]})' 
-    else:
-        tmp_met_ode = "Zero"
+        system_odes.append(tmp_met_ode)
 
-    system_odes.append(tmp_met_ode)
 par_input = []
 par_input = par_input + [[par.id, par.location] for par in mi.priors.kcat_priors]
 par_input = par_input + [[par.id, par.location] for par in mi.priors.km_priors]
@@ -192,18 +196,17 @@ par_input = par_input + [[par.id, par.location] for par in mi.priors.inhibition_
 par_input = par_input + [[par.id, par.location] for par in mi.priors.tense_dissociation_constant_priors]
 par_input = par_input + [[par.id, par.location] for par in mi.priors.relaxed_dissociation_constant_priors]
 par_input = par_input + [[par.id, par.location] for par in mi.priors.transfer_constant_priors]
-par_input = par_input + [[par.id, par.location] for par in mi.priors.drain_priors]
+par_input = par_input + [[par.drain_id, par.location] for par in mi.priors.drain_priors if par.experiment_id == selected_experiment]
 par_input = par_input + [[par.enzyme_id, par.location] for par in mi.priors.enzyme_concentration_priors if par.experiment_id == selected_experiment]
+par_input = par_input + [[par.mic_id, par.location] for par in mi.priors.unbalanced_metabolite_priors if par.experiment_id == selected_experiment]
 
-met_init = pd.DataFrame(0.01, index=mic_codes, columns=["init"])
-for par in mi.priors.unbalanced_metabolite_priors:
-    if par.experiment_id == selected_experiment:
-        met_init.loc[par.mic_id, "init"] = par.location
+met_init = pd.DataFrame(0.01, index=balanced_mic_codes, columns=["init"])
+
 for exp in mi.experiments.experiments:
     if exp.id == selected_experiment:
         for meas in exp.measurements["mic"].values():
             met_init.loc[meas.target_id, "init"] = meas.value
-ode_input = [[met, system_odes[ix], met_init.loc[met, "init"]] for ix, met in enumerate(mic_codes.keys())]
+ode_input = [[met, system_odes[ix], met_init.loc[met, "init"]] for ix, met in enumerate(balanced_mic_codes.keys())]
 yaml_input = Template_yaml.render(parameters=par_input,
                                   odes=ode_input)
 with open("test.yaml", 'w') as file:
