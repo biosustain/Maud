@@ -83,7 +83,7 @@ class Modifier:
     :param mic_id: the id of the modifying metabolite-in-compartment
     :param enzyme_id: the id of the modified enzyme
     :param modifier_type: what is the modifier type, e.g.
-    'allosteric_activator', 'allosteric_inhibitor', 'competitive inhibitor'
+    'allosteric_activator', 'allosteric_inhibitor', 'competitive_inhibitor'
     """
 
     def __init__(self, mic_id: str, enzyme_id: str, modifier_type: str = None):
