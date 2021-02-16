@@ -2,7 +2,7 @@ import os
 
 import numpy as np
 import pandas as pd
-from jinja2 import Environment, PackageLoader, Template
+from jinja2 import Template
 
 from maud import io, sampling
 from maud.sampling import get_full_stoichiometry
