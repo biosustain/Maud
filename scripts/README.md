@@ -17,4 +17,5 @@ COPASI.
 ### Limitations
 * Currently doesn't handle phosphorylation
 * Metabolites/Reactions/Drains cannot begin with numbers, even though it's a standard for BiGG identifiers
-* cannot handle the `-` character in any way.
+* Cannot handle the `-` character in any way.
+* Doesn't work with priors specified using percentiles
