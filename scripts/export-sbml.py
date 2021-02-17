@@ -136,10 +136,9 @@ for rxn in mi.kinetic_model.reactions.values():
     tmp_dG = 0
     for _, row in tmp_stoic.iterrows():
         tmp_dG += (
-            0.008314
-            * 298.15
-            * row["stoichiometry"]
+            row["stoichiometry"]
             * tmp_formation_energies[row["mic_id"]]
+            / (0.008314 * 298.15)
         )
 
     tmp_Keq = np.exp(tmp_dG)
