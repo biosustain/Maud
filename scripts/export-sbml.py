@@ -1,14 +1,15 @@
+
+"""Export yaml file combatible with yaml2sbml."""
+
 import os
 
 import numpy as np
 import pandas as pd
 from jinja2 import Template
 
-from maud import io, sampling
+from maud import io
 from maud.sampling import get_full_stoichiometry
 
-
-HERE = os.path.dirname(os.path.abspath(__file__))
 
 Template_T_met = Template(
     """{%- for met in met_array -%} ({{met[0]}} /{{met[1]}})^{{met[2]}} \
@@ -69,9 +70,13 @@ odes:
 """
 )
 
-mi = io.load_maud_input_from_toml(os.path.join(HERE, "../tests/data/ecoli_small/"))
+HERE = os.path.dirname(os.path.abspath(__file__))
+relative_path_Maud_Input = "../tests/data/ecoli_small/"
+relative_path_output = "output.yaml"
+
+mi = io.load_maud_input_from_toml(os.path.join(HERE, relative_path_Maud_Input))
 selected_experiment = None
-if selected_experiment == None:
+if selected_experiment is None:
     selected_experiment = list(mi.stan_codes.experiment_codes.keys())[0]
 
 kinetic_model = mi.kinetic_model
@@ -221,7 +226,7 @@ for rxn in mi.kinetic_model.reactions.values():
         flux_vector.append(flux)
 
 if any(drain_codes):
-    for drain_id, drain in kinetic_model.drains.items():
+    for drain_id in kinetic_model.drains.keys():
         flux_vector.append(drain_id)
 
 system_odes = []
@@ -281,5 +286,5 @@ ode_input = [
     for ix, met in enumerate(balanced_mic_codes.keys())
 ]
 yaml_input = Template_yaml.render(parameters=par_input, odes=ode_input)
-with open("test.yaml", "w") as file:
+with open(relative_path_output, "w") as file:
     file.writelines(yaml_input)
