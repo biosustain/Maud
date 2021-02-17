@@ -11,29 +11,35 @@ from maud.sampling import get_full_stoichiometry
 HERE = os.path.dirname(os.path.abspath(__file__))
 
 Template_T_met = Template(
-    """{%- for met in met_array -%} ({{met[0]}} /{{met[1]}})^{{met[2]}} {%- if not loop.last %} * {% endif %} {%- endfor -%}"""
+    """{%- for met in met_array -%} ({{met[0]}} /{{met[1]}})^{{met[2]}} \
+    {%- if not loop.last %} * {% endif %} {%- endfor -%}"""
 )
 
 Template_Haldane = Template(
-    """{%- for Km in Km_array -%} ({{Km[0]}})^{{Km[1]}} {%- if not loop.last %} * {% endif %} {%- endfor -%} / {{Keq}}"""
+    """{%- for Km in Km_array -%} ({{Km[0]}})^{{Km[1]}} \
+    {%- if not loop.last %} * {% endif %} {%- endfor -%} / {{Keq}}"""
 )
 
 Template_Tr = Template("""{{enz}} * {{kcat}} * ({{Trf}} - {{Trr}} * {{Hal}})""")
 
 Template_Dr = Template(
-    """{%- for met in met_array -%} (1 + {{met[0]}}/{{met[1]}})^{{met[2]}} {%- if not loop.last %} + {% endif %} {%- endfor -%}"""
+    """{%- for met in met_array -%} (1 + {{met[0]}}/{{met[1]}})^{{met[2]}} \
+    {%- if not loop.last %} + {% endif %} {%- endfor -%}"""
 )
 
 Template_Drreg = Template(
-    """{%- for met in met_array -%} ({{met[0]}}/{{met[1]}}) {%- if not loop.last %} + {% endif %} {%- endfor -%}"""
+    """{%- for met in met_array -%} ({{met[0]}}/{{met[1]}}) \
+    {%- if not loop.last %} + {% endif %} {%- endfor -%}"""
 )
 
 Template_Allo = Template(
-    """1/(1 + {{L0}}*(({{Dr}} + {{Drreg}} - 1)*{{Allo_Inh}}/{{Allo_Act}})^{{Subunits}})"""
+    """1/(1 + {{L0}}*(({{Dr}} + {{Drreg}} - 1)*\
+    {{Allo_Inh}}/{{Allo_Act}})^{{Subunits}})"""
 )
 
 Template_Allo_Act_Inh = Template(
-    """{%- for met in met_array -%} (1 + {{met[0]}}/{{met[1]}}) {%- if not loop.last %} * {% endif %} {%- endfor -%}"""
+    """{%- for met in met_array -%} (1 + {{met[0]}}/{{met[1]}}) \
+    {%- if not loop.last %} * {% endif %} {%- endfor -%}"""
 )
 
 Template_flux = Template("""({{Tr}})/({{Dr}} + {{Drreg}} - 1)*{{Allo}}""")
@@ -63,7 +69,7 @@ odes:
 """
 )
 
-mi = io.load_maud_input_from_toml(os.path.join(HERE, "../../Desktop/shiitake_pathway"))
+mi = io.load_maud_input_from_toml(os.path.join(HERE, "../tests/data/ecoli_small/"))
 selected_experiment = None
 if selected_experiment == None:
     selected_experiment = list(mi.stan_codes.experiment_codes.keys())[0]
