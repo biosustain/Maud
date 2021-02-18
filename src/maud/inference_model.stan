@@ -19,7 +19,7 @@ data {
   int<lower=1> N_experiment;
   int<lower=1> N_flux_measurement;
   int<lower=1> N_conc_measurement;
-  int<lower=0> N_competitive_inhibitor;
+  int<lower=0> N_ki;
   int<lower=0> N_allosteric_inhibitor;
   int<lower=0> N_allosteric_activator;
   int<lower=0> N_allosteric_enzyme;
@@ -40,30 +40,18 @@ data {
   real yenz[N_enzyme_measurement];
   vector<lower=0>[N_enzyme_measurement] sigma_enz;
   // hardcoded priors
-  vector[N_metabolite] prior_loc_formation_energy;
-  vector<lower=0>[N_metabolite] prior_scale_formation_energy;
-  vector[N_enzyme] prior_loc_kcat;
-  vector<lower=0>[N_enzyme] prior_scale_kcat;
-  vector[N_km] prior_loc_km;
-  vector<lower=0>[N_km] prior_scale_km;
-  vector[N_competitive_inhibitor] prior_loc_ki;
-  vector<lower=0>[N_competitive_inhibitor] prior_scale_ki;
-  vector[N_allosteric_inhibitor] prior_loc_diss_t;
-  vector<lower=0>[N_allosteric_inhibitor] prior_scale_diss_t;
-  vector[N_allosteric_activator] prior_loc_diss_r;
-  vector<lower=0>[N_allosteric_activator] prior_scale_diss_r;
-  vector<lower=0>[N_allosteric_enzyme] prior_loc_tc;
-  vector<lower=0>[N_allosteric_enzyme] prior_scale_tc;
-  vector<lower=0>[N_phosphorylation_enzymes] prior_loc_phos_kcat;
-  vector<lower=0>[N_phosphorylation_enzymes] prior_scale_phos_kcat;
-  matrix<lower=0>[N_experiment, N_phosphorylation_enzymes] prior_loc_phos_conc;
-  matrix<lower=0>[N_experiment, N_phosphorylation_enzymes] prior_scale_phos_conc;
-  matrix[N_experiment, N_unbalanced] prior_loc_unbalanced;
-  matrix<lower=0>[N_experiment, N_unbalanced] prior_scale_unbalanced;
-  matrix[N_experiment, N_enzyme] prior_loc_enzyme;
-  matrix<lower=0>[N_experiment, N_enzyme] prior_scale_enzyme;
-  matrix[N_experiment, N_drain] prior_loc_drain;
-  matrix<lower=0>[N_experiment, N_drain] prior_scale_drain;
+  matrix[N_metabolite, 2] fe_priors;
+  matrix[N_enzyme, 2] kcat_priors;
+  matrix[N_km, 2] km_priors;
+  matrix[N_ki, 2] ki_priors;
+  matrix[N_allosteric_inhibitor, 2] diss_t_priors;
+  matrix[N_allosteric_activator, 2] diss_r_priors;
+  matrix[N_allosteric_enzyme, 2] tc_priors;
+  matrix[N_phosphorylation_enzymes, 2] phos_kcat_priors;
+  matrix[N_phosphorylation_enzymes, 2] phos_conc_priors[N_experiment];
+  matrix[N_unbalanced, 2] unbalanced_priors[N_experiment];
+  matrix[N_enzyme, 2] enzyme_priors[N_experiment];
+  matrix[N_drain, 2] drain_priors[N_experiment];
   // network properties
   matrix[N_mic, N_enzyme] S_enz;
   matrix[N_mic, N_drain] S_drain;
@@ -79,7 +67,7 @@ data {
   int<lower=0,upper=N_mic> n_ci[N_enzyme];
   int<lower=0,upper=N_mic> n_ai[N_enzyme];
   int<lower=0,upper=N_mic> n_aa[N_enzyme];
-  int<lower=0,upper=N_mic> ci_ix[N_competitive_inhibitor];
+  int<lower=0,upper=N_mic> ci_ix[N_ki];
   int<lower=0,upper=N_mic> ai_ix[N_allosteric_inhibitor];
   int<lower=0,upper=N_mic> aa_ix[N_allosteric_activator];
   int<lower=0> subunits[N_enzyme];
@@ -99,7 +87,7 @@ transformed data {
     rep_matrix(1, N_experiment, N_phosphorylation_enzymes) - is_phos_knockout;
 }
 parameters {
-  vector[N_metabolite] formation_energy_z;
+  vector[N_metabolite] fe_z;
   matrix[N_experiment, N_drain] drain_z;
   vector[N_enzyme] log_kcat_z;
   vector[N_km] log_km_z;
@@ -107,40 +95,36 @@ parameters {
   matrix[N_experiment, N_enzyme] log_enzyme_z;
   matrix[N_experiment, N_phosphorylation_enzymes] log_phos_conc_z;
   matrix[N_experiment, N_unbalanced] log_conc_unbalanced_z;
-  vector[N_competitive_inhibitor] log_ki_z;
-  vector[N_allosteric_inhibitor] log_dissociation_constant_t_z;
-  vector[N_allosteric_activator] log_dissociation_constant_r_z;
-  vector[N_allosteric_enzyme] log_transfer_constant_z;
+  vector[N_ki] log_ki_z;
+  vector[N_ai] log_dt_z;
+  vector[N_aa] log_dr_z;
+  vector[N_ae] log_tc_z;
 }
 transformed parameters {
   // rescale
-  vector[N_metabolite] formation_energy =
-    prior_loc_formation_energy + formation_energy_z .* prior_scale_formation_energy;
-  vector[N_km] km = exp(log(prior_loc_km) + log_km_z .* prior_scale_km);
-  vector[N_competitive_inhibitor] ki =
-    exp(log(prior_loc_ki) + log_ki_z .* prior_scale_ki);
-  vector[N_enzyme] kcat = exp(log(prior_loc_kcat) + log_kcat_z .* prior_scale_kcat);
-  vector[N_allosteric_inhibitor] dissociation_constant_t =
-    exp(log(prior_loc_diss_t) + log_dissociation_constant_t_z .* prior_scale_diss_t);
-  vector[N_allosteric_activator] dissociation_constant_r =
-    exp(log(prior_loc_diss_r) + log_dissociation_constant_r_z .* prior_scale_diss_r);
-  vector[N_allosteric_enzyme] transfer_constant =
-    exp(log(prior_loc_tc) + log_transfer_constant_z .* prior_scale_tc);
+  vector[N_metabolite] formation_energy = fe_priors[,1] + fe_z .* fe_priors[,2];
+  vector[N_km] km = exp(log(km_priors[,1]) + log_km_z .* km_priors[,2]);
+  vector[N_ki] ki = exp(log(ki_priors[,1]) + log_ki_z .* ki_priors[,2]);
+  vector[N_enzyme] kcat = exp(log(kcat_priors[,1]) + log_kcat_z .* kcat_priors[,2]);
+  vector[N_ai] diss_t = exp(log(diss_t_priors[,1]) + log_dt_z .* diss_t_priors[,2]);
+  vector[N_aa] diss_r = exp(log(diss_r_priors[,1]) + log_dt_z .* diss_r_priors[,2]);
+  vector[N_ae] transfer_constant =
+    exp(log(tc_priors[,1]) + log_tc_z .* tc_priors[,2]);
   vector[N_phosphorylation_enzymes] phos_enzyme_kcat =
-    exp(log(prior_loc_phos_kcat) + log_phos_kcat_z .* prior_scale_phos_kcat);
+    exp(log(phos_kcat_priors[,1]) + log_phos_kcat_z .* phos_kcat_priors[,2]);
   matrix[N_experiment, N_drain] drain;
   matrix[N_experiment, N_enzyme] enzyme;
   matrix[N_experiment, N_unbalanced] conc_unbalanced;
   matrix[N_experiment, N_phosphorylation_enzymes] phos_enzyme_conc;
   for (ex in 1:N_experiment){
-    drain[ex] = prior_loc_drain[ex] + drain_z[ex] .* prior_scale_drain[ex];
+    drain[ex] = drain_priors[ex][,1] + drain_z[ex] .* drain_priors[ex][,2];
     enzyme[ex] =
-      exp(log(prior_loc_enzyme[ex]) + log_enzyme_z[ex] .* prior_scale_enzyme[ex]);
+      exp(log(enzyme_priors[ex][,1]) + log_enzyme_z[ex] .* enzyme_priors[ex][,2]);
     conc_unbalanced[ex] =
-      exp(log(prior_loc_unbalanced[ex])
-          + log_conc_unbalanced_z[ex] .* prior_scale_unbalanced[ex]);
+      exp(log(unbalanced_priors[ex][,1])
+          + log_conc_unbalanced_z[ex] .* unbalanced_priors[ex][,2]);
     phos_enzyme_conc[ex] = 
-    exp(log(prior_loc_phos_conc[ex]) + log_phos_conc_z[ex] .* prior_scale_phos_conc[ex]);
+      exp(log(phos_conc_priors[ex][,1]) + log_phos_conc_z[ex] .* phos_conc_priors[ex][,2]);
   }
   // transform
   vector<lower=0>[N_mic] conc[N_experiment];
@@ -233,10 +217,10 @@ model {
   target += std_normal_lpdf(log_kcat_z |);
   target += std_normal_lpdf(log_km_z |);
   target += std_normal_lpdf(log_ki_z |);
-  target += std_normal_lpdf(log_dissociation_constant_t_z |);
-  target += std_normal_lpdf(log_dissociation_constant_r_z |);
-  target += std_normal_lpdf(log_transfer_constant_z |);
-  target += std_normal_lpdf(formation_energy_z |);
+  target += std_normal_lpdf(log_dt_z |);
+  target += std_normal_lpdf(log_dr_z |);
+  target += std_normal_lpdf(log_tc_z |);
+  target += std_normal_lpdf(fe_z |);
   target += std_normal_lpdf(log_phos_kcat_z |);
   target += std_normal_lpdf(to_vector(log_conc_unbalanced_z) |);
   target += std_normal_lpdf(to_vector(log_enzyme_z) |);

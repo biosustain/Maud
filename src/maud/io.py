@@ -30,9 +30,8 @@ from maud.data_model import (
     Compartment,
     Drain,
     Enzyme,
-    Experiment,
-    ExperimentSet,
     KineticModel,
+    Knockout,
     MaudConfig,
     MaudInput,
     Measurement,
@@ -46,6 +45,7 @@ from maud.data_model import (
     StanCodeSet,
 )
 from maud.utils import codify
+from typing import List, Tuple
 
 
 def load_maud_input_from_toml(data_path: str) -> MaudInput:
@@ -60,17 +60,18 @@ def load_maud_input_from_toml(data_path: str) -> MaudInput:
     experiments_path = os.path.join(data_path, config.experiments_file)
     priors_path = os.path.join(data_path, config.priors_file)
     kinetic_model = parse_toml_kinetic_model(toml.load(kinetic_model_path))
-    experiment_set = parse_experiment_set_df(pd.read_csv(experiments_path))
+    measurements, knockouts = parse_measurements(pd.read_csv(experiments_path))
     prior_set = parse_prior_set_df(pd.read_csv(priors_path))
-    stan_codes = get_stan_codes(kinetic_model, experiment_set)
+    stan_codes = get_stan_codes(kinetic_model, measurements)
     mi = MaudInput(
         config=config,
         kinetic_model=kinetic_model,
-        experiments=experiment_set,
         priors=prior_set,
         stan_codes=stan_codes,
+        measurements=measurements,
+        knockouts=knockouts,
     )
-    validation.validate_maud_input(mi)
+    # validation.validate_maud_input(mi)
     return mi
 
 
@@ -81,33 +82,31 @@ def parse_toml_kinetic_model(raw: dict) -> KineticModel:
 
     """
     model_id = raw["model_id"] if "model_id" in raw.keys() else "mi"
-    compartments = {
-        c["id"]: Compartment(id=c["id"], name=c["name"], volume=c["volume"])
+    compartments = [
+        Compartment(id=c["id"], name=c["name"], volume=c["volume"])
         for c in raw["compartments"]
-    }
-    metabolites = {
-        m["id"]: Metabolite(id=m["id"], name=m["name"]) for m in raw["metabolites"]
-    }
-    mics = {
-        f"{m['id']}_{m['compartment']}": MetaboliteInCompartment(
+    ]
+    metabolites = [
+        Metabolite(id=m["id"], name=m["name"]) for m in raw["metabolites"]
+    ]
+    mics = [
+        MetaboliteInCompartment(
             id=f"{m['id']}_{m['compartment']}",
             metabolite_id=m["id"],
             compartment_id=m["compartment"],
             balanced=m["balanced"],
         )
         for m in raw["metabolites"]
-    }
-    reactions = {r["id"]: parse_toml_reaction(r) for r in raw["reactions"]}
-    if "drains" in raw.keys():
-        drains = {d["id"]: parse_toml_drain(d) for d in raw["drains"]}
-    else:
-        drains = None
-    if "phosphorylation" in raw.keys():
-        phosphorylation = {
-            d["id"]: parse_toml_phosphorylation(d) for d in raw["phosphorylation"]
-        }
-    else:
-        phosphorylation = None
+    ]
+    reactions = [parse_toml_reaction(r) for r in raw["reactions"]]
+    drains = (
+        [parse_toml_drain(d) for d in raw["drains"]]
+        if "drains" in raw.keys() else []
+    )
+    phosphorylation = (
+        [parse_toml_phosphorylation(d) for d in raw["phosphorylation"]]
+        if "phosphorylation" in raw.keys() else []
+    )
     return KineticModel(
         model_id=model_id,
         metabolites=metabolites,
@@ -119,41 +118,29 @@ def parse_toml_kinetic_model(raw: dict) -> KineticModel:
     )
 
 
-def get_stan_codes(km: KineticModel, experiments: ExperimentSet) -> StanCodeSet:
+def get_stan_codes(km: KineticModel, ms: List[Measurement]) -> StanCodeSet:
     """Get the stan codes for a Maud input.
 
     :param km: KineticModel object
-    :param experiments: dictionary mapping experiment ids to Experiment objects
+    :param ms: MeasurementSet object
     """
-    rxns = km.reactions.values()
-    enzyme_ids = [eid for rxn in rxns for eid in rxn.enzymes.keys()]
-    mic_codes = codify(km.mics.keys())
-    balanced_mic_codes = {
-        mic_id: code for mic_id, code in mic_codes.items() if km.mics[mic_id].balanced
-    }
-    unbalanced_mic_codes = {
-        mic_id: code
-        for mic_id, code in mic_codes.items()
-        if not km.mics[mic_id].balanced
-    }
-    if km.drains is not None:
-        drain_codes = codify(km.drains.keys())
-    else:
-        drain_codes = {}
-    if km.phosphorylation is not None:
-        phos_enz_codes = codify(km.phosphorylation.keys())
-    else:
-        phos_enz_codes = {}
+    km_codes = [
+        f"{m}_{e.id}"
+        for r in km.reactions
+        for e in r.enzymes
+        for m in r.stoichiometry
+    ]
     return StanCodeSet(
-        metabolite_codes=codify(km.metabolites.keys()),
-        mic_codes=mic_codes,
-        balanced_mic_codes=balanced_mic_codes,
-        unbalanced_mic_codes=unbalanced_mic_codes,
-        reaction_codes=codify(km.reactions.keys()),
-        experiment_codes=codify([e.id for e in experiments.experiments]),
-        enzyme_codes=codify(enzyme_ids),
-        phos_enz_codes=phos_enz_codes,
-        drain_codes=drain_codes,
+        metabolite_codes=[m.id for m in km.metabolites],
+        mic_codes=[m.id for m in km.mics],
+        km_codes=km_codes,
+        balanced_mic_codes=[m.id for m in km.mics if m.balanced],
+        unbalanced_mic_codes=[m.id for m in km.mics if not m.balanced],
+        reaction_codes=[r.id for r in km.reactions],
+        experiment_codes=list(set([m.experiment_id for m in ms])),
+        enzyme_codes=[e.id for r in km.reactions for e in r.enzymes],
+        phos_enz_codes=[e.id for e in km.phosphorylation],
+        drain_codes=[d.id for d in km.drains],
     )
 
 
@@ -193,10 +180,8 @@ def parse_toml_reaction(raw: dict) -> Reaction:
     the values of the 'reactions' field in the output of toml.load.
 
     """
-    enzymes = {}
+    enzymes = []
     subunits = 1
-    reversible = raw["reversible"] if "reversible" in raw.keys() else None
-    is_exchange = raw["is_exchange"] if "is_exchange" in raw.keys() else None
     water_stoichiometry = (
         raw["water_stoichiometry"] if "water_stoichiometry" in raw.keys() else 0
     )
@@ -220,49 +205,51 @@ def parse_toml_reaction(raw: dict) -> Reaction:
         if "subunits" in e.keys():
             subunits = e["subunits"]
 
-        enzymes[e["id"]] = Enzyme(
-            id=e["id"],
-            name=e["name"],
-            reaction_id=raw["id"],
-            modifiers=modifiers,
-            subunits=subunits,
+        enzymes.append(
+            Enzyme(
+                id=e["id"],
+                name=e["name"],
+                reaction_id=raw["id"],
+                modifiers=modifiers,
+                subunits=subunits,
+            )
         )
     return Reaction(
         id=raw["id"],
         name=raw["name"],
-        reversible=reversible,
-        is_exchange=is_exchange,
         stoichiometry=raw["stoichiometry"],
         enzymes=enzymes,
         water_stoichiometry=water_stoichiometry,
     )
 
 
-def parse_experiment_set_df(raw: pd.DataFrame) -> ExperimentSet:
-    """Get an ExperimentSet object from a dataframe.
+def parse_measurements(raw: pd.DataFrame) -> Tuple[List[Measurement], List[Knockout]]:
+    """Parse a measurements dataframe.
 
     :param raw: result of running pd.read_csv on a suitable file
     """
-    experiment_list = []
-    for id, exp_df in raw.groupby("experiment_id"):
-        measurements = {"mic": {}, "flux": {}, "enzyme": {}}
-        knockouts = []
-        for _, row in exp_df.iterrows():
-            measurement_type = row["measurement_type"]
-            target_id = row["target_id"]
-            if measurement_type == "knockout":
-                knockouts.append(target_id)
-            else:
-                measurements[measurement_type][target_id] = Measurement(
-                    target_id=target_id,
-                    value=row["measurement"],
-                    uncertainty=row["error_scale"],
-                    target_type=measurement_type,
+    measurements = []
+    knockouts = []
+    for _, row in raw.iterrows():
+        if row["measurement_type"] in ["knockout_enz", "knockout_phos"]:
+            knockouts.append(
+                Knockout(
+                    experiment_id=row["experiment_id"],
+                    target_id=row["target_id"],
+                    knockout_type=row["measurement_type"]
                 )
-        experiment_list.append(
-            Experiment(id=id, measurements=measurements, knockouts=knockouts)
-        )
-    return ExperimentSet(experiment_list)
+            )
+        else:
+            measurements.append(
+                Measurement(
+                    target_id=row["target_id"],
+                    experiment_id=row["experiment_id"],
+                    target_type=row["measurement_type"],
+                    value=row["measurement"],
+                    error=row["error_scale"]
+                )
+            )
+    return measurements, knockouts
 
 
 def parse_prior_set_df(raw: pd.DataFrame) -> PriorSet:

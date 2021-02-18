@@ -157,11 +157,9 @@ class Reaction:
     def __init__(
         self,
         id: str,
-        name: str = None,
-        reversible: bool = True,
-        is_exchange: bool = None,
-        stoichiometry: Dict[str, float] = None,
-        enzymes: Dict[str, Enzyme] = None,
+        name: str,
+        stoichiometry: Dict[str, float],
+        enzymes: List[Enzyme],
         water_stoichiometry: float = 0,
     ):
         if stoichiometry is None:
@@ -170,8 +168,6 @@ class Reaction:
             enzymes = defaultdict()
         self.id = id
         self.name = name if name is not None else id
-        self.reversible = reversible
-        self.is_exchange = is_exchange
         self.stoichiometry = stoichiometry
         self.enzymes = enzymes
         self.water_stoichiometry = water_stoichiometry
@@ -236,12 +232,12 @@ class KineticModel:
     def __init__(
         self,
         model_id: str,
-        metabolites: Dict[str, Metabolite],
-        reactions: Dict[str, Reaction],
-        compartments: Dict[str, Compartment],
-        mics: Dict[str, MetaboliteInCompartment],
-        drains: Dict[str, Drain] = None,
-        phosphorylation: Dict[str, Phosphorylation] = None,
+        metabolites: List[Metabolite],
+        reactions: List[Reaction],
+        compartments: List[Compartment],
+        mics: List[MetaboliteInCompartment],
+        drains: List[Drain] = [],
+        phosphorylation: List[Phosphorylation] = [],
     ):
         self.model_id = model_id
         self.metabolites = metabolites
@@ -256,8 +252,9 @@ class Measurement:
     """Constructor for measurement object.
 
     :param target_id: id of the thing being measured
-    :param value: value for the measurement
-    :param uncertainty: uncertainty associated to the measurent
+    :param experiment_id: id of the experiment where the measurement was done
+    :param value: measured value
+    :param error: error associated to the measurent
     :param target_type: type of thing being measured, e.g. 'metabolite', 'reaction',
     'enzyme'.
     """
@@ -265,43 +262,34 @@ class Measurement:
     def __init__(
         self,
         target_id: str,
+        experiment_id: str,
+        target_type: str,
         value: float,
-        uncertainty: float = None,
-        target_type: str = None,
+        error: float,
     ):
-        target_type_to_error_scale = {"mic": "ln", "flux": "linear", "enzyme": "ln"}
         self.target_id = target_id
-        self.value = value
-        self.uncertainty = uncertainty
+        self.experiment_id = experiment_id
         self.target_type = target_type
-        self.scale = target_type_to_error_scale[target_type]
+        self.value = value
+        self.error = error
 
 
-class Experiment:
-    """Constructor for condition object.
+class Knockout:
+    """Constructor for knockout object.
 
-    :param id: condition id
-    :param measurements: dictionary mapping keys 'metabolite' and 'reaction'
-    to dictionaries with the form {target id: measurement}
-    :param metadata: any info about the condition
-    :param knockouts: a list of enzymes knocked out, if any
+    :param experiment_id: id of the experiment where the thing was knocked out
+    :target_id: id of the thing that was knocked out
+    :knockout_type: either "enz" or "phos"
     """
-
     def __init__(
         self,
-        id: str,
-        measurements: Dict[str, Dict[str, Measurement]] = None,
-        metadata: str = None,
-        knockouts: List[str] = None,
-        phos_knockouts: List[str] = None,
+        experiment_id: str,
+        target_id: str,
+        knockout_type: str,
     ):
-        if measurements is None:
-            measurements = defaultdict()
-        self.id = id
-        self.measurements = measurements
-        self.metadata = metadata
-        self.knockouts = knockouts
-        self.phos_knockouts = phos_knockouts
+        self.experiment_id = experiment_id
+        self.target_id = target_id
+        self.knockout_type = knockout_type
 
 
 class Prior:
@@ -401,32 +389,28 @@ class StanCodeSet:
 
     def __init__(
         self,
-        metabolite_codes: Dict[str, int],
-        mic_codes: Dict[str, int],
-        balanced_mic_codes: Dict[str, int],
-        unbalanced_mic_codes: Dict[str, int],
-        reaction_codes: Dict[str, int],
-        experiment_codes: Dict[str, int],
-        enzyme_codes: Dict[str, int],
-        drain_codes: Dict[str, int],
-        phos_enz_codes: Dict[str, int],
+        metabolite_codes: List[str],
+        mic_codes: List[str],
+        balanced_mic_codes: List[str],
+        unbalanced_mic_codes: List[str],
+        km_codes: List[str],
+        reaction_codes: List[str],
+        experiment_codes: List[str],
+        enzyme_codes: List[str],
+        drain_codes: List[str],
+        phos_enz_codes: List[str],
     ):
         self.metabolite_codes = metabolite_codes
         self.mic_codes = mic_codes
         self.balanced_mic_codes = balanced_mic_codes
         self.unbalanced_mic_codes = unbalanced_mic_codes
+        self.km_codes = km_codes
         self.reaction_codes = reaction_codes
         self.experiment_codes = experiment_codes
         self.enzyme_codes = enzyme_codes
         self.drain_codes = drain_codes
         self.phos_enz_codes = phos_enz_codes
 
-
-class ExperimentSet:
-    """Object containing all experiments for a MaudInput."""
-
-    def __init__(self, experiments: List[Experiment]):
-        self.experiments = experiments
 
 
 class MaudConfig:
@@ -468,7 +452,8 @@ class MaudInput:
     :param stan codes: a dictionary with keys 'metabolite', 'reaction', 'mic',
     'experiment', 'balanced_mic', 'unbalanced_mic' and 'kinetic_parameter', whose
     values are dictionaries mapping ids of the relevant objects to integer codes
-    :param experiments: a dictionary mapping experiment ids to Experiment objects
+    :param measurement_set: a list of Measurement objects
+    :param knockout_set: a list of Knockout objects
     """
 
     def __init__(
@@ -477,13 +462,16 @@ class MaudInput:
         kinetic_model: KineticModel,
         priors: PriorSet,
         stan_codes: StanCodeSet,
-        experiments: ExperimentSet,
+        measurements: List[Measurement],
+        knockouts: List[Knockout],
     ):
         self.config = config
         self.kinetic_model = kinetic_model
         self.priors = priors
         self.stan_codes = stan_codes
-        self.experiments = experiments
+        self.measurements = measurements
+        self.knockouts = knockouts
+
 
 
 class SimulationStudyOutput:
