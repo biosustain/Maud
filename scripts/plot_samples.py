@@ -24,22 +24,10 @@ import plotnine as p9
 from maud import io
 
 
-HERE = os.path.dirname(os.path.abspath(__file__))
-HOME = os.path.join(HERE, "..")
-model_name = ""  # Toml name of file
-run_number = ""  # Number specific to each run, found between "-"
-PATHS = {
-    "data": os.path.join(
-        HOME, ""
-    ),  # Where the input toml file is stored, relative to the Maud folder
-    "results": os.path.join(
-        HOME, ""
-    ),  # The output directory, relative toe the Maud folder
-}
-CMDSTAN_FILE_TEMPLATE = os.path.join(
-    PATHS["results"], "inference_model-{run_number}-{i}.csv"
+MAUD_OUTPUT = os.path.join(
+    "..", "tests", "data", "example_outputs", "example_output_ecoli_small"
 )
-N_CHAINS = 4
+PLOT_DIR = "."
 VARIABLES_TO_ANALYSE = [
     "conc",
     "flux",
@@ -108,20 +96,21 @@ def plot_violin_plots(
 
 def main():
     """Plot posterior distributions of Maud model."""
-    files = [
-        CMDSTAN_FILE_TEMPLATE.format(run_number=run_number, i=str(i))
-        for i in range(1, N_CHAINS + 1)
+    csvs = [
+        os.path.join(MAUD_OUTPUT, "samples", f)
+        for f in os.listdir(os.path.join(MAUD_OUTPUT, "samples"))
+        if f.endswith(".csv")
     ]
-    mi = io.load_maud_input_from_toml(os.path.join(PATHS["data"], f"{model_name}.toml"))
+    mi = io.load_maud_input_from_toml(os.path.join(MAUD_OUTPUT, "user_input"))
     infd = az.from_cmdstan(
-        files,
+        csvs,
         coords={
-            "mics": list(mi.stan_codes["metabolite_in_compartment"].keys()),
-            "mets": list(mi.stan_codes["metabolite"].keys()),
-            "kms": [f"{p.enzyme_id}_{p.mic_id}" for p in mi.priors["kms"]],
-            "enzymes": list(mi.stan_codes["enzyme"].keys()),
-            "reactions": list(mi.stan_codes["reaction"].keys()),
-            "experiments": list(mi.stan_codes["experiment"].keys()),
+            "mics": list(mi.stan_codes.mic_codes.keys()),
+            "mets": list(mi.stan_codes.metabolite_codes.keys()),
+            "kms": [f"{p.enzyme_id}_{p.mic_id}" for p in mi.priors.km_priors],
+            "enzymes": list(mi.stan_codes.enzyme_codes.keys()),
+            "reactions": list(mi.stan_codes.reaction_codes.keys()),
+            "experiments": list(mi.stan_codes.experiment_codes.keys()),
         },
         dims={
             "conc": ["experiments", "mics"],
@@ -145,7 +134,7 @@ def main():
         draws = var_to_draws[var]
         plot = plot_violin_plots(var, dims, draws, LOG_SCALE_VARIABLES, UNITS)
         plot.save(
-            filename=os.path.join(PATHS["results"], f"{var}_posterior.png"),
+            filename=os.path.join(PLOT_DIR, f"{var}_posterior.png"),
             verbose=False,
             dpi=300,
         )
