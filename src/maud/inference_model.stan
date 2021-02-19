@@ -20,9 +20,9 @@ data {
   int<lower=1> N_flux_measurement;
   int<lower=1> N_conc_measurement;
   int<lower=0> N_ki;
-  int<lower=0> N_allosteric_inhibitor;
-  int<lower=0> N_allosteric_activator;
-  int<lower=0> N_allosteric_enzyme;
+  int<lower=0> N_ai;
+  int<lower=0> N_aa;
+  int<lower=0> N_ae;
   int<lower=0> N_enzyme_measurement;
   // measurements
   int<lower=1,upper=N_mic> unbalanced_mic_ix[N_unbalanced];
@@ -44,9 +44,9 @@ data {
   matrix[N_enzyme, 2] kcat_priors;
   matrix[N_km, 2] km_priors;
   matrix[N_ki, 2] ki_priors;
-  matrix[N_allosteric_inhibitor, 2] diss_t_priors;
-  matrix[N_allosteric_activator, 2] diss_r_priors;
-  matrix[N_allosteric_enzyme, 2] tc_priors;
+  matrix[N_ai, 2] diss_t_priors;
+  matrix[N_aa, 2] diss_r_priors;
+  matrix[N_ae, 2] tc_priors;
   matrix[N_phosphorylation_enzymes, 2] phos_kcat_priors;
   matrix[N_phosphorylation_enzymes, 2] phos_conc_priors[N_experiment];
   matrix[N_unbalanced, 2] unbalanced_priors[N_experiment];
@@ -68,8 +68,8 @@ data {
   int<lower=0,upper=N_mic> n_ai[N_enzyme];
   int<lower=0,upper=N_mic> n_aa[N_enzyme];
   int<lower=0,upper=N_mic> ci_ix[N_ki];
-  int<lower=0,upper=N_mic> ai_ix[N_allosteric_inhibitor];
-  int<lower=0,upper=N_mic> aa_ix[N_allosteric_activator];
+  int<lower=0,upper=N_mic> ai_ix[N_ai];
+  int<lower=0,upper=N_mic> aa_ix[N_aa];
   int<lower=0> subunits[N_enzyme];
   // configuration
   vector<lower=0>[N_mic] conc_init[N_experiment];
@@ -117,14 +117,14 @@ transformed parameters {
   matrix[N_experiment, N_unbalanced] conc_unbalanced;
   matrix[N_experiment, N_phosphorylation_enzymes] phos_enzyme_conc;
   for (ex in 1:N_experiment){
-    drain[ex] = drain_priors[ex][,1] + drain_z[ex] .* drain_priors[ex][,2];
+    drain[ex] = drain_priors[ex][,1]' + drain_z[ex] .* drain_priors[ex][,2]';
     enzyme[ex] =
-      exp(log(enzyme_priors[ex][,1]) + log_enzyme_z[ex] .* enzyme_priors[ex][,2]);
+      exp(log(enzyme_priors[ex][,1])' + log_enzyme_z[ex] .* enzyme_priors[ex][,2]');
     conc_unbalanced[ex] =
-      exp(log(unbalanced_priors[ex][,1])
-          + log_conc_unbalanced_z[ex] .* unbalanced_priors[ex][,2]);
+      exp(log(unbalanced_priors[ex][,1])'
+          + log_conc_unbalanced_z[ex] .* unbalanced_priors[ex][,2]');
     phos_enzyme_conc[ex] = 
-      exp(log(phos_conc_priors[ex][,1]) + log_phos_conc_z[ex] .* phos_conc_priors[ex][,2]);
+      exp(log(phos_conc_priors[ex][,1])' + log_phos_conc_z[ex] .* phos_conc_priors[ex][,2]');
   }
   // transform
   vector<lower=0>[N_mic] conc[N_experiment];
@@ -160,8 +160,8 @@ transformed parameters {
                                                               n_ai,
                                                               n_aa,
                                                               ki,
-                                                              dissociation_constant_t,
-                                                              dissociation_constant_r,
+                                                              diss_t,
+                                                              diss_r,
                                                               transfer_constant,
                                                               subunits,
                                                               experiment_phos_conc,
@@ -185,8 +185,8 @@ transformed parameters {
                               n_ai,
                               n_aa,
                               ki,
-                              dissociation_constant_t,
-                              dissociation_constant_r,
+                              diss_t,
+                              diss_r,
                               transfer_constant,
                               subunits,
                               phos_enzyme_conc[e]',
@@ -207,8 +207,8 @@ transformed parameters {
       print("flux: ", flux[e]);
       print("enzyme concentration: ", enzyme[e]);
       print("ki: ", ki);
-      print("tense dissociation constants: ", dissociation_constant_t);
-      print("relaxed dissociation constants: ", dissociation_constant_r);
+      print("tense dissociation constants: ", diss_t);
+      print("relaxed dissociation constants: ", diss_r);
       print("transfer constants: ", transfer_constant);
     }
   }

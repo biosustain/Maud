@@ -127,19 +127,20 @@ def get_stoics(mi: MaudInput):
     kinetic_model = mi.kinetic_model
     enzyme_codes = mi.stan_codes.enzyme_codes
     metabolite_codes = mi.stan_codes.metabolite_codes
+    mic_codes = mi.stan_codes.mic_codes
     reaction_codes = mi.stan_codes.reaction_codes
     drain_codes = mi.stan_codes.drain_codes
-    S_enz = pd.DataFrame(0, index=enzyme_codes, columns=metabolite_codes)
+    S_enz = pd.DataFrame(0, index=enzyme_codes, columns=mic_codes)
     S_reactions = pd.DataFrame(
-        0, index=metabolite_codes, columns=reaction_codes+drain_codes
+        0, index=mic_codes, columns=reaction_codes+drain_codes
     )
     if len(drain_codes) > 0:
-        S_drain = pd.DataFrame(0, index=drain_codes, columns=metabolite_codes)
+        S_drain = pd.DataFrame(0, index=drain_codes, columns=mic_codes)
         S_complete = pd.DataFrame(
-            0, index=enzyme_codes+drain_codes, columns=metabolite_codes
+            0, index=enzyme_codes+drain_codes, columns=mic_codes
         )
     else:
-        S_complete = pd.DataFrame(0, index=enzyme_codes, columns=metabolite_codes)
+        S_complete = pd.DataFrame(0, index=enzyme_codes, columns=mic_codes)
     S_enz_to_flux_map = pd.DataFrame(0, index=reaction_codes, columns=enzyme_codes)
     for rxn in kinetic_model.reactions:
         for enz in rxn.enzymes:
@@ -159,36 +160,26 @@ def get_stoics(mi: MaudInput):
     return S_enz, S_enz_to_flux_map, S_complete, S_drain, S_reactions
 
 
-def validate_specified_fluxes(
-    rxn_stoic,
-    rxn_measurements,
-    experiment_codes: Dict[str, int],
-    reaction_codes: Dict[str, int],
-    drain_codes: Dict[str, int],
-    balanced_mic_codes: Dict[str, int],
-):
+def validate_specified_fluxes(mi: MaudInput):
     """Check that appropriate fluxes have been measured.
 
-    :param S_complete: The stoichiometrix matrix including reactions and drains
-    :param rxn_measurements: A dataframe containing all flux measurements
-    :param experiment_codes: the codified experiment codes
-    :param reaction_codes: the codified reaction codes
-    :param drain_codes: the codified drain codes
-    :param balanced_mic_codes: the codified balanced_mic codes
+    :param mi: A MaudInput object
     """
-    complete_reactions = list(reaction_codes.keys()) + list(drain_codes.keys())
-    for exp in experiment_codes:
-        meas_rxns = rxn_measurements[rxn_measurements["experiment_id"] == exp][
-            "target_id"
+    _, _, _, _, rxn_stoic = get_stoics(mi)
+    balanced_mic_codes = mi.stan_codes.balanced_mic_codes
+    rxn_measurements = [m for m in mi.measurements if m.target_type == "flux"]
+    complete_reactions = mi.stan_codes.reaction_codes + mi.stan_codes.drain_codes
+    for exp in mi.stan_codes.experiment_codes:
+        measured_rxns = [
+            m.target_id for m in rxn_measurements if m.experiment_id == exp
         ]
-        measured_rxn_list = list(meas_rxns)
-        flux_paths = get_null_space(rxn_stoic.loc[balanced_mic_codes.keys()].values)
+        flux_paths = get_null_space(rxn_stoic.loc[balanced_mic_codes].values)
         n_rxns, n_dof = np.shape(flux_paths)
         rref_flux_paths = np.matrix(get_rref(flux_paths.T))
         rref_flux_paths[np.abs(rref_flux_paths) < 1e-10] = 0
         flux_paths_df = pd.DataFrame(rref_flux_paths, columns=complete_reactions)
         for _, flux_path in flux_paths_df.iterrows():
-            if any(flux_path[measured_rxn_list]) != 0:
+            if any(flux_path[measured_rxns]) != 0:
                 pass
             else:
                 possible_measurements = []
@@ -203,7 +194,7 @@ def validate_specified_fluxes(
                 )
                 warnings.warn(msg)
 
-        if len(measured_rxn_list) > n_dof:
+        if len(measured_rxns) > n_dof:
             msg = (
                 "You appear to have specified too many reactions.\n"
                 + "This will bias the statistical model\n"
@@ -212,79 +203,45 @@ def validate_specified_fluxes(
             warnings.warn(msg)
 
 
-def get_knockout_matrix(mi: MaudInput):
+def get_knockout_matrix(mi: MaudInput, knockout_type: str):
     """Get binary experiment, enzyme matrix, 1 if enyzme knocked out, 0 if not.
 
     :param mi: a MaudInput object
+    :param knockout_type: either "enz" or "phos"
     """
+    if knockout_type not in ["enz", "phos"]:
+        raise ValueError("knockout_type must be either 'enz' or 'phos'.")
     experiment_codes = mi.stan_codes.experiment_codes
-    enzyme_codes = mi.stan_codes.enzyme_codes
-    enzyme_knockout_matrix = pd.DataFrame(
-        0, index=np.arange(len(experiment_codes)), columns=np.arange(len(enzyme_codes))
+    col_codes = (
+        mi.stan_codes.enzyme_codes
+        if knockout_type == "enz"
+        else mi.stan_codes.phos_enz_codes
     )
-    for exp in mi.experiments.experiments:
-        if exp.knockouts:
-            for enz in exp.knockouts:
-                enzyme_knockout_matrix.loc[
-                    experiment_codes[exp.id] - 1, enzyme_codes[enz] - 1
-                ] = 1
-    return enzyme_knockout_matrix
-
-
-def get_phos_knockout_matrix(mi: MaudInput):
-    """Get binary experiment, phos_enzyme matrix, 1 if phos_enyzme knocked out, 0 if not.
-
-    :param mi: a MaudInput object
-    """
-    experiment_codes = mi.stan_codes.experiment_codes
-    phos_enz_codes = mi.stan_codes.phos_enz_codes
-    phos_enzyme_knockout_matrix = pd.DataFrame(
-        0,
-        index=np.arange(len(experiment_codes)),
-        columns=np.arange(len(phos_enz_codes)),
-    )
-    for exp in mi.experiments.experiments:
-        if exp.phos_knockouts:
-            for penz in exp.phos_knockouts:
-                phos_enzyme_knockout_matrix.loc[
-                    experiment_codes[exp.id] - 1, phos_enz_codes[penz] - 1
-                ] = 1
-    return phos_enzyme_knockout_matrix
+    knockout_matrix = np.zeros([len(experiment_codes), len(col_codes)])
+    for knockout in mi.knockouts:
+        if knockout.knockout_type == knockout_type:
+            i = codify(experiment_codes)[knockout.experiment_id] - 1
+            j = codify(col_codes)[knockout.target_id] - 1
+    return knockout_matrix.tolist()
 
 
 def get_phos_act_inh_matrix(mi: MaudInput):
-    """Get binary experiment, enzyme matrix, 1 if enyzme knocked out, 0 if not.
+    """Get two enzyme/phos_enzyme matrix, 1 if enyzme modified, else 0.
 
     :param mi: a MaudInput object
     """
     enzyme_codes = mi.stan_codes.enzyme_codes
     phos_enz_codes = mi.stan_codes.phos_enz_codes
-    S_phos_act = pd.DataFrame(
-        0, index=np.arange(len(enzyme_codes)), columns=np.arange(len(phos_enz_codes))
-    )
-    S_phos_inh = pd.DataFrame(
-        0, index=np.arange(len(enzyme_codes)), columns=np.arange(len(phos_enz_codes))
-    )
-    for phos_id, phos in mi.kinetic_model.phosphorylation.items():
+    S_phos_act = np.zeros([len(enzyme_codes), len(phos_enz_codes)])
+    S_phos_inh = np.zeros([len(enzyme_codes), len(phos_enz_codes)])
+    for phos in mi.kinetic_model.phosphorylation:
+        i = codify(enzyme_codes)[phos.enzyme_id] - 1
+        j = codify(phos_enz_codes)[phos_id] - 1
         if phos.activating:
-            S_phos_act.loc[
-                enzyme_codes[phos.enzyme_id] - 1, phos_enz_codes[phos_id] - 1
-            ] = 1
+            S_phos_act[i, j] = 1
         elif phos.inhbiting:
-            S_phos_inh.loc[
-                enzyme_codes[phos.enzyme_id] - 1, phos_enz_codes[phos_id] - 1
-            ] = 1
-    return S_phos_act, S_phos_inh
-
-
-# def get_km_lookup(km_priors, mic_codes, enzyme_codes):
-    # """Get a mics x enzymes matrix of km indexes. 0 means null."""
-    # out = pd.DataFrame(0, index=mic_codes.values(), columns=enzyme_codes.values())
-    # for i, row in km_priors.iterrows():
-        # mic_code = mic_codes[row["mic_id"]]
-        # enzyme_code = enzyme_codes[row["enzyme_id"]]
-        # out.loc[mic_code, enzyme_code] = i + 1
-    # return out
+            S_phos_inh[i, j] = 1
+    return S_phos_act.tolist(), S_phos_inh.tolist()
 
 
 def get_km_lookup(mi: MaudInput) -> List[List[int]]:
@@ -301,14 +258,23 @@ def get_km_lookup(mi: MaudInput) -> List[List[int]]:
     return out
 
 
-def tabulate_priors(prior_list: List[Prior]) -> List:
-    if prior_list[0].experiment_id is not None:
-        return [
-            [[p.location, p.scale] for p in priors if p.experiment_id == e]
-            for e in list(set([p.experiment_id for p in prior_list]))
-        ]
-    else:
-        return [[p.location, p.scale] for p in prior_list]
+def tabulate_priors_1d(priors: List[Prior]) -> List[List[float]]:
+    return [[p.location, p.scale] for p in priors]
+
+def tabulate_priors_2d(priors: List[Prior], exp_codes, target_codes, defaults):
+    out = []
+    for exp in exp_codes:
+        row = []
+        for target in target_codes:
+            f = lambda p: p.experiment_id == exp and p.target_id == target
+            match = list(filter(f, priors))
+            if any(match):
+                p = match[0]
+                row.append([p.location, p.scale])
+            else:
+                row.append(defaults)
+        out.append(row)
+    return out
 
 
 def get_conc_init(mi):
@@ -328,6 +294,7 @@ def get_input_data(mi: MaudInput) -> dict:
     - mi has an attribut measurements 
 
     """
+    validate_specified_fluxes(mi)
     sorted_enzymes = sorted(
         [e for r in mi.kinetic_model.reactions for e in r.enzymes],
         key=lambda e: codify(mi.stan_codes.enzyme_codes)[e.id]
@@ -340,8 +307,16 @@ def get_input_data(mi: MaudInput) -> dict:
         for mic in mi.kinetic_model.mics
     ]
     S_enz, S_to_flux, S_full, S_drain, S_reactions = get_stoics(mi)
-    knockout_matrix = get_knockout_matrix(mi=mi)
-    phos_knockout_matrix = get_phos_knockout_matrix(mi=mi)
+    knockout_matrix_enzyme = get_knockout_matrix(mi, knockout_type="enz")
+    knockout_matrix_phos = get_knockout_matrix(mi, knockout_type="phos")
+    S_phos_act, S_phos_inh = get_phos_act_inh_matrix(mi)
+    unbalanced_mic_ix, balanced_mic_ix = (
+        [codify(mi.stan_codes.mic_codes)[mic_id] for mic_id in codes]
+        for codes in (
+            mi.stan_codes.unbalanced_mic_codes, mi.stan_codes.balanced_mic_codes
+        )
+    )
+
     return {
         # sizes
         "N_mic": len(mi.kinetic_model.mics),
@@ -361,8 +336,8 @@ def get_input_data(mi: MaudInput) -> dict:
         "N_allosteric_enzyme": len(mi.priors.transfer_constant_priors),
         "N_drain": len(mi.stan_codes.drain_codes),
         # codes
-        "unbalanced_mic_ix": mi.stan_codes.unbalanced_mic_codes,
-        "balanced_mic_ix": mi.stan_codes.balanced_mic_codes,
+        "unbalanced_mic_ix": unbalanced_mic_ix,
+        "balanced_mic_ix": balanced_mic_ix,
         "experiment_yconc": mi.stan_codes.yconc_exp_codes,
         "mic_ix_yconc": mi.stan_codes.yconc_mic_codes,
         "experiment_yflux": mi.stan_codes.yflux_exp_codes,
@@ -372,42 +347,62 @@ def get_input_data(mi: MaudInput) -> dict:
         "ci_ix": mi.stan_codes.ci_mic_codes,
         "ai_ix": mi.stan_codes.ai_mic_codes,
         "aa_ix": mi.stan_codes.aa_mic_codes,
-        "yconc": mi.measurements.yconc,
-        "sigma_conc": mi.measurements.sigma_conc,
         # network properties
         "S_enz": S_enz.values,
         "S_to_flux_map": S_to_flux.values,
         "S_drain": S_drain.values,
         "S_full": S_full.values,
-        "S_phos_act": S_phos_act.values,
-        "S_phos_inh": S_phos_inh.values,
+        "S_phos_act": S_phos_act,
+        "S_phos_inh": S_phos_inh,
         "water_stoichiometry": water_stoichiometry,
         "mic_to_met": mic_to_met,
         "km_lookup": get_km_lookup(mi),
-        "is_knockout": knockout_matrix,
-        "is_phos_knockout": phos_knockout_matrix,
+        "is_knockout": knockout_matrix_enzyme,
+        "is_phos_knockout": knockout_matrix_phos,
         "subunits": [e.subunits for e in sorted_enzymes],
         "n_ci": [len(e.modifiers["competitive_inhibitor"]) for e in sorted_enzymes],
-        "n_ai": [len(e.modifiers["diss_t"]) for e in sorted_enzymes],
-        "n_aa": [len(e.modifiers["diss_r"]) for e in sorted_enzymes],
+        "n_ai": [len(e.modifiers["allosteric_inhibitor"]) for e in sorted_enzymes],
+        "n_aa": [len(e.modifiers["allosteric_activator"]) for e in sorted_enzymes],
         # measurements
-        "yflux": mi.measurements.yflux,
-        "sigma_flux": mi.measurements.sigma_flux,
-        "yenz": mi.measurements.yenz,
-        "sigma_enz": mi.measurements.sigma_enz,
+        "yconc": [m.value for m in mi.measurements if m.target_type == "mic"],
+        "sigma_conc": [m.error for m in mi.measurements if m.target_type == "mic"],
+        "yflux": [m.value for m in mi.measurements if m.target_type == "flux"],
+        "sigma_flux": [m.error for m in mi.measurements if m.target_type == "flux"],
+        "yenz": [m.value for m in mi.measurements if m.target_type == "enz"],
+        "sigma_enz": [m.error for m in mi.measurements if m.target_type == "enz"],
         # priors
-        "fe_priors": tabluate_priors(mi.priors.formation_energy_priors),
-        "kcat_priors": tabluate_priors(mi.priors.kcat_priors),
-        "km_priors": tabulate_priors(mi.priors.km_priors),
-        "ki_priors": tabulate_priors(mi.priors.inhibition_constant_priors),
-        "diss_t_priors": tabulate_priors(mi.priors.tense_dissociation_constant_priors),
-        "diss_r_priors": tabulate_priors(mi.priors.relaxed_dissociation_constant_priors),
-        "phos_kcat_priors": tabulate_priors(mi.priors.phos_kcat_priors),
-        "tc_priors": tabulate_priors(mi.priors.transfer_constant_priors),
-        "unbalanced_priors": tabulate_priors(mi.priors.unbalanced_metabolite_priors),
-        "enzyme_priors": tabulate_priors(mi.priors.enzyme_concentration_priors),
-        "phos_conc_priors": tabulate_priors(mi.priors.phos_enz_concentration_priors),
-        "drain_priors": tabulate_priors(mi.priors.drain_priors),
+        "fe_priors": tabulate_priors_1d(mi.priors.formation_energy_priors),
+        "kcat_priors": tabulate_priors_1d(mi.priors.kcat_priors),
+        "km_priors": tabulate_priors_1d(mi.priors.km_priors),
+        "ki_priors": tabulate_priors_1d(mi.priors.inhibition_constant_priors),
+        "diss_t_priors": tabulate_priors_1d(mi.priors.tense_dissociation_constant_priors),
+        "diss_r_priors": tabulate_priors_1d(mi.priors.relaxed_dissociation_constant_priors),
+        "phos_kcat_priors": tabulate_priors_1d(mi.priors.phos_kcat_priors),
+        "tc_priors": tabulate_priors_1d(mi.priors.transfer_constant_priors),
+        "unbalanced_priors": tabulate_priors_2d(
+            mi.priors.unbalanced_metabolite_priors,
+            mi.stan_codes.experiment_codes,
+            mi.stan_codes.unbalanced_mic_codes,
+            [DEFAULT_PRIOR_LOC_UNBALANCED, DEFAULT_PRIOR_SCALE_UNBALANCED],
+        ),
+        "enzyme_priors": tabulate_priors_2d(
+            mi.priors.enzyme_concentration_priors,
+            mi.stan_codes.experiment_codes,
+            mi.stan_codes.enzyme_codes,
+            [DEFAULT_PRIOR_LOC_ENZYME, DEFAULT_PRIOR_SCALE_ENZYME],
+        ),
+        "phos_conc_priors": tabulate_priors_2d(
+            mi.priors.phos_enz_concentration_priors,
+            mi.stan_codes.experiment_codes,
+            mi.stan_codes.phos_enz_codes,
+            [DEFAULT_PRIOR_LOC_ENZYME, DEFAULT_PRIOR_SCALE_ENZYME],
+        ),
+        "drain_priors": tabulate_priors_2d(
+            mi.priors.drain_priors,
+            mi.stan_codes.experiment_codes,
+            mi.stan_codes.drain_codes,
+            [0, 1],
+        ),
         # config
         "rel_tol": mi.config.ode_config["rel_tol"],
         "abs_tol": mi.config.ode_config["abs_tol"],
@@ -716,20 +711,3 @@ def get_input_data(mi: MaudInput) -> dict:
 #         "timepoint": ode_config["timepoint"],
 #     }
 
-
-def get_initial_conditions(input_data, mi):
-    """Specify parameters' initial conditions."""
-    return {
-        "km": input_data["prior_loc_km"],
-        "ki": input_data["prior_loc_ki"],
-        "diss_t": input_data["prior_loc_diss_t"],
-        "diss_r": input_data["prior_loc_diss_r"],
-        "transfer_constant": input_data["prior_loc_tc"],
-        "kcat": input_data["prior_loc_kcat"],
-        "conc_unbalanced": input_data["prior_loc_unbalanced"],
-        "enzyme": input_data["init_enzyme"],
-        "formation_energy": input_data["prior_loc_formation_energy"],
-        "drain": input_data["prior_loc_drain"],
-        "phos_enzyme_conc": input_data["prior_loc_phos_conc"],
-        "phos_kcat": input_data["prior_loc_phos_kcat"],
-    }

@@ -399,6 +399,15 @@ class StanCodeSet:
         enzyme_codes: List[str],
         drain_codes: List[str],
         phos_enz_codes: List[str],
+        yconc_exp_codes: List[str],
+        yconc_mic_codes: List[str],
+        yflux_exp_codes: List[str],
+        yflux_reaction_codes: List[str],
+        yenz_exp_codes: List[str],
+        yenz_enz_codes: List[str],
+        ci_mic_codes: List[str],
+        ai_mic_codes: List[str],
+        aa_mic_codes: List[str],
     ):
         self.metabolite_codes = metabolite_codes
         self.mic_codes = mic_codes
@@ -410,6 +419,15 @@ class StanCodeSet:
         self.enzyme_codes = enzyme_codes
         self.drain_codes = drain_codes
         self.phos_enz_codes = phos_enz_codes
+        self.yconc_exp_codes = yconc_exp_codes
+        self.yconc_mic_codes = yconc_mic_codes
+        self.yflux_exp_codes = yflux_exp_codes
+        self.yflux_reaction_codes = yflux_reaction_codes
+        self.yenz_exp_codes = yenz_exp_codes
+        self.yenz_enz_codes = yenz_enz_codes
+        self.ci_mic_codes = ci_mic_codes
+        self.ai_mic_codes = ai_mic_codes
+        self.aa_mic_codes = aa_mic_codes
 
 
 

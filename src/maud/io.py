@@ -62,7 +62,7 @@ def load_maud_input_from_toml(data_path: str) -> MaudInput:
     kinetic_model = parse_toml_kinetic_model(toml.load(kinetic_model_path))
     measurements, knockouts = parse_measurements(pd.read_csv(experiments_path))
     prior_set = parse_prior_set_df(pd.read_csv(priors_path))
-    stan_codes = get_stan_codes(kinetic_model, measurements)
+    stan_codes = get_stan_codes(kinetic_model, measurements, prior_set)
     mi = MaudInput(
         config=config,
         kinetic_model=kinetic_model,
@@ -118,7 +118,7 @@ def parse_toml_kinetic_model(raw: dict) -> KineticModel:
     )
 
 
-def get_stan_codes(km: KineticModel, ms: List[Measurement]) -> StanCodeSet:
+def get_stan_codes(km: KineticModel, ms: List[Measurement], ps: PriorSet) -> StanCodeSet:
     """Get the stan codes for a Maud input.
 
     :param km: KineticModel object
@@ -130,17 +130,56 @@ def get_stan_codes(km: KineticModel, ms: List[Measurement]) -> StanCodeSet:
         for e in r.enzymes
         for m in r.stoichiometry
     ]
+    experiment_codes = list(set([m.experiment_id for m in ms]))
+    mic_codes = [m.id for m in km.mics]
+    reaction_codes = [r.id for r in km.reactions]
+    enzyme_codes = [e.id for r in km.reactions for e in r.enzymes]
+    yconc_exp_codes, yflux_exp_codes, yenz_exp_codes = (
+        [
+            codify(experiment_codes)[m.experiment_id]
+            for m in ms if m.target_type == t
+        ]
+        for t in ["mic", "flux", "enzyme"]
+    )
+    yconc_mic_codes, yflux_reaction_codes, yenz_enz_codes = (
+        [
+            codify(codes)[m.target_id]
+            for m in ms if m.target_type == t
+        ]
+        for t, codes in [
+            ("mic", mic_codes),
+            ("flux", reaction_codes),
+            ("enzyme", enzyme_codes)
+        ]
+    )
+    ci_mic_codes, ai_mic_codes, aa_mic_codes = (
+        [codify(mic_codes)[p.mic_id] for p in mod_priors]
+        for mod_priors in (
+            ps.inhibition_constant_priors,
+            ps.tense_dissociation_constant_priors,
+            ps.relaxed_dissociation_constant_priors
+        )
+    )
     return StanCodeSet(
         metabolite_codes=[m.id for m in km.metabolites],
-        mic_codes=[m.id for m in km.mics],
+        mic_codes=mic_codes,
         km_codes=km_codes,
         balanced_mic_codes=[m.id for m in km.mics if m.balanced],
         unbalanced_mic_codes=[m.id for m in km.mics if not m.balanced],
-        reaction_codes=[r.id for r in km.reactions],
-        experiment_codes=list(set([m.experiment_id for m in ms])),
-        enzyme_codes=[e.id for r in km.reactions for e in r.enzymes],
+        reaction_codes=reaction_codes,
+        experiment_codes=experiment_codes,
+        enzyme_codes=enzyme_codes,
         phos_enz_codes=[e.id for e in km.phosphorylation],
         drain_codes=[d.id for d in km.drains],
+        yconc_exp_codes=yconc_exp_codes,
+        yconc_mic_codes=yconc_mic_codes,
+        yflux_exp_codes=yflux_exp_codes,
+        yflux_reaction_codes=yflux_reaction_codes,
+        yenz_exp_codes=yenz_exp_codes,
+        yenz_enz_codes=yenz_enz_codes,
+        ci_mic_codes=ci_mic_codes,
+        ai_mic_codes=ai_mic_codes,
+        aa_mic_codes=aa_mic_codes,
     )
 
 
