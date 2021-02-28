@@ -10,9 +10,10 @@ import pandas as pd
 
 from maud.cli import sample, simulate
 from maud.io import load_maud_input_from_toml
+from maud.utils import export_means_from_draw
 
 
-INPUT_DATA = "../tests/data/ecoli_small"
+INPUT_DATA = "../../Models/data/february-2021/methionine_cycle"
 
 
 def get_experiment_table_from_sim(sim_dir: str) -> pd.DataFrame:
@@ -53,10 +54,50 @@ def get_experiment_table_from_sim(sim_dir: str) -> pd.DataFrame:
             "error_scale": stan_input["sigma_flux"],
         }
     )
-    enz_og = pd.read_csv(mi.config.experiments_file).loc[
+    enz_og = pd.read_csv(os.path.join(ui_path, mi.config.experiments_file)).loc[
         lambda df: df["measurement_type"] == "enz"
     ]
     return pd.concat([conc_sim, flux_sim, enz_og], ignore_index=True)
+
+def overwrite_prior_mean(sim_dir: str):
+    ui_path = os.path.join(sim_dir, "user_input")
+    sim_csv_path = os.path.join(sim_dir, "samples")
+    csv_file = os.path.join(
+        sim_csv_path,
+        next(filter(lambda f: f.endswith(".csv"), os.listdir(sim_csv_path))),
+    )
+    with open(os.path.join(sim_csv_path, "input_data.json"), "r") as f:
+        stan_input = json.load(f)
+    mi = load_maud_input_from_toml(ui_path)
+    infd = az.from_cmdstan(csv_file)
+    updated_means = export_means_from_draw(infd, 0, 0)
+    list_of_input_inits = ["km",
+                           "drain",
+                           "ki",
+                           "dissociation_constant_t",
+                           "dissociation_constant_r",
+                           "transfer_constant",
+                           "kcat",
+                           "conc_unbalanced",
+                           "enzyme",
+                           "formation_energy"]
+
+    list_of_input_names = ["prior_loc_km",
+                           "prior_loc_drain",
+                           "prior_loc_ki",
+                           "prior_loc_diss_t",
+                           "prior_loc_diss_r",
+                           "prior_loc_tc",
+                           "prior_loc_kcat",
+                           "prior_loc_unbalanced",
+                           "prior_loc_enzyme",
+                           "prior_loc_formation_energy"]
+    input_prior_means = {
+        input_name: updated_means[calc_name]
+        for input_name, calc_name in zip(list_of_input_names, list_of_input_inits)
+    }
+    return input_prior_means
+    
 
 
 def main():
@@ -79,8 +120,10 @@ def main():
     new_experiments = get_experiment_table_from_sim(sim_dir)
     csv_target = load_maud_input_from_toml(sample_input_dir).config.experiments_file
     new_experiments.to_csv(csv_target)
+    # overwrite priors and parse them as the mean values
+    prior_mean = overwrite_prior_mean(sim_dir)
     # run maud sample against the doctored input
-    sample(sample_input_dir, output_dir=sim_study_folder)
+    sample(sample_input_dir, output_dir=sim_study_folder, updated_means=prior_mean)
 
 
 if __name__ == "__main__":

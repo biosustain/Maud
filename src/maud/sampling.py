@@ -40,7 +40,7 @@ DEFAULT_SAMPLE_CONFIG = {
     "iter_warmup": 5,
     "iter_sampling": 5,
     "chains": 2,
-    "max_treedepth": 11,
+    "max_treedepth": 9,
     "inits": 0,
     "show_progress": True,
     "step_size": 0.025,
@@ -63,8 +63,7 @@ SIM_CONFIG = {
     "threads_per_chain": 1,
 }
 
-
-def sample(mi: MaudInput, output_dir: str) -> cmdstanpy.CmdStanMCMC:
+def sample(mi: MaudInput, output_dir: str, updated_means: dict = None) -> cmdstanpy.CmdStanMCMC:
     """Sample from the posterior defined by mi.
 
     :param mi: a MaudInput object
@@ -75,21 +74,23 @@ def sample(mi: MaudInput, output_dir: str) -> cmdstanpy.CmdStanMCMC:
         **mi.config.cmdstanpy_config,
         **{"output_dir": output_dir},
     }
-    return _sample_given_config(mi, output_dir, config)
+    return _sample_given_config(mi, output_dir, config, updated_means)
 
 
-def simulate(mi: MaudInput, output_dir: str, n: int) -> cmdstanpy.CmdStanMCMC:
+def simulate(mi: MaudInput, output_dir: str, n: int, updated_means: dict = None) -> cmdstanpy.CmdStanMCMC:
     """Generate simulations from the prior mean.
 
     :param mi: a MaudInput object
     :param output_dir: a string specifying where to save the output.
     """
+    inits = os.path.join(output_dir, "../user_input/inits.json")
     config = {**SIM_CONFIG, **{"output_dir": output_dir, "iter_sampling": n}}
-    return _sample_given_config(mi, output_dir, config)
+    config["inits"] = inits
+    return _sample_given_config(mi, output_dir, config, updated_means)
 
 
 def _sample_given_config(
-    mi: MaudInput, output_dir: str, config: dict
+    mi: MaudInput, output_dir: str, config: dict, updated_means: dict
 ) -> cmdstanpy.CmdStanMCMC:
     """Call CmdStanModel.sample, having already specified all arguments.
 
@@ -100,6 +101,9 @@ def _sample_given_config(
 
     input_filepath = os.path.join(output_dir, "input_data.json")
     input_data = get_input_data(mi)
+    if updated_means is not None:
+        for mean_id, mean_value in updated_means.items():
+            input_data[mean_id] = mean_value
     cmdstanpy.utils.jsondump(input_filepath, input_data)
     stan_program_filepath = os.path.join(HERE, STAN_PROGRAM_RELATIVE_PATH)
     include_path = os.path.join(HERE, INCLUDE_PATH)

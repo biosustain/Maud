@@ -42,7 +42,7 @@ def cli():
     pass
 
 
-def sample(data_path, output_dir):
+def sample(data_path, output_dir, updated_means: dict = None):
     """Generate MCMC samples given a user input directory.
 
     This function creates a new directory in output_dir with a name starting
@@ -63,7 +63,7 @@ def sample(data_path, output_dir):
     os.mkdir(samples_path)
     print(f"Copying user input from {data_path} to {ui_dir}")
     shutil.copytree(data_path, ui_dir)
-    stanfit = sampling.sample(mi, samples_path)
+    stanfit = sampling.sample(mi, samples_path, updated_means)
     print(stanfit.diagnose())
     print(stanfit.summary())
     return output_path

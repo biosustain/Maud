@@ -63,6 +63,43 @@ def get_null_space(a, rtol=1e-5):
     return v[rank:].T.copy()
 
 
+def export_input_from_draws(infd, chain, draw):
+    list_of_input_inits = ["log_km_z",
+                           "drain_z",
+                           "log_ki_z",
+                           "log_dissociation_constant_t_z",
+                           "log_dissociation_constant_r_z",
+                           "log_transfer_constant_z",
+                           "log_kcat_z",
+                           "log_conc_unbalanced_z",
+                           "log_enzyme_z",
+                           "formation_energy_z"]
+
+    input_dict = {
+        par_name: infd.posterior[par_name][chain,draw].values.tolist()
+        for par_name in list_of_input_inits
+    }
+    return input_dict
+
+def export_means_from_draw(infd, chain, draw):
+    list_of_input_inits = ["km",
+                           "drain",
+                           "ki",
+                           "dissociation_constant_t",
+                           "dissociation_constant_r",
+                           "transfer_constant",
+                           "kcat",
+                           "conc_unbalanced",
+                           "enzyme",
+                           "formation_energy"]
+
+    input_dict = {
+        par_name: infd.posterior[par_name][chain,draw].values.tolist()
+        for par_name in list_of_input_inits
+    }
+    return input_dict
+
+
 def get_rref(mat):
     """Return reduced row echelon form of a matrix."""
     return sp.Matrix(mat).rref(iszerofunc=lambda x: abs(x) < 1e-10)[0]
