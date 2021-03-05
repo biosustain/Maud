@@ -66,3 +66,47 @@ def get_null_space(a, rtol=1e-5):
 def get_rref(mat):
     """Return reduced row echelon form of a matrix."""
     return sp.Matrix(mat).rref(iszerofunc=lambda x: abs(x) < 1e-10)[0]
+
+def export_scaled_params_from_draws(infd, chain, draw):
+    """Export log centered parameters from an infd object"""
+    list_of_input_inits = ["log_km_z",
+                           "drain_z",
+                           "log_ki_z",
+                           "log_dissociation_constant_t_z",
+                           "log_dissociation_constant_r_z",
+                           "log_transfer_constant_z",
+                           "log_kcat_z",
+                           "log_phos_kcat_z"
+                           "log_conc_unbalanced_z",
+                           "log_enzyme_z",
+                           "log_phos_conc_z",
+                           "formation_energy_z",]
+
+    input_dict = {
+        par_name: infd.posterior[par_name][chain,draw].values.tolist()
+        for par_name in list_of_input_inits
+        if par_name in infd.posterior.variables.keys()
+    }
+    return input_dict
+
+def export_params_from_draw(infd, chain, draw):
+    """Export parameters from an infd object"""
+    list_of_input_inits = ["km",
+                           "drain",
+                           "ki",
+                           "dissociation_constant_t",
+                           "dissociation_constant_r",
+                           "transfer_constant",
+                           "kcat",
+                           "phos_enzyme_kcat",
+                           "conc_unbalanced",
+                           "enzyme",
+                           "phos_enzyme_conc",
+                           "formation_energy",]
+
+    input_dict = {
+        par_name: infd.posterior[par_name][chain,draw].values.tolist()
+        for par_name in list_of_input_inits
+        if par_name in infd.posterior.variables.keys()
+    }
+    return input_dict
