@@ -69,7 +69,7 @@ def get_rref(mat):
 
 
 def export_scaled_params_from_draws(infd, chain, draw):
-    """Export log centered parameters from an infd object"""
+    """Export log centered parameters from an infd object."""
     list_of_input_inits = [
         "log_km_z",
         "drain_z",
@@ -93,7 +93,7 @@ def export_scaled_params_from_draws(infd, chain, draw):
 
 
 def export_params_from_draw(infd, chain, draw):
-    """Export parameters from an infd object"""
+    """Export parameters from an infd object."""
     list_of_input_inits = [
         "km",
         "drain",
