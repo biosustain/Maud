@@ -12,7 +12,7 @@ from maud.cli import sample, simulate
 from maud.io import load_maud_input_from_toml
 
 
-INPUT_DATA = "../tests/data/ecoli_small"
+INPUT_DATA = "../../Models/data/march-2021/methionine_cycle"
 
 
 def get_experiment_table_from_sim(sim_dir: str) -> pd.DataFrame:
@@ -46,14 +46,14 @@ def get_experiment_table_from_sim(sim_dir: str) -> pd.DataFrame:
     )
     flux_sim = pd.DataFrame(
         {
-            "measurement_type": "mic",
+            "measurement_type": "flux",
             "target_id": map(code_to_rxn.get, stan_input["reaction_yflux"]),
             "experiment_id": map(code_to_exp.get, stan_input["experiment_yflux"]),
             "measurement": infd.posterior["yflux_sim"].to_series().values,
             "error_scale": stan_input["sigma_flux"],
         }
     )
-    enz_og = pd.read_csv(mi.config.experiments_file).loc[
+    enz_og = pd.read_csv(os.path.join(ui_path, mi.config.experiments_file)).loc[
         lambda df: df["measurement_type"] == "enz"
     ]
     return pd.concat([conc_sim, flux_sim, enz_og], ignore_index=True)
@@ -77,7 +77,7 @@ def main():
     sim_dir = simulate(sim_input_dir, output_dir=sim_study_folder, n=1)
     # overwrite the measurements in the sample input based on the simulation
     new_experiments = get_experiment_table_from_sim(sim_dir)
-    csv_target = load_maud_input_from_toml(sample_input_dir).config.experiments_file
+    csv_target = os.path.join(sample_input_dir, load_maud_input_from_toml(sample_input_dir).config.experiments_file)
     new_experiments.to_csv(csv_target)
     # run maud sample against the doctored input
     sample(sample_input_dir, output_dir=sim_study_folder)
