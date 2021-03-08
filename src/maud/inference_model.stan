@@ -61,8 +61,8 @@ data {
   matrix[N_reaction, N_enzyme] S_to_flux_map;
   matrix<lower=0,upper=1>[N_experiment, N_enzyme] is_knockout;
   matrix<lower=0,upper=1>[N_experiment, N_phosphorylation_enzymes] is_phos_knockout;
-  matrix<lower=0,upper=1>[N_phosphorylation_enzymes, N_enzyme] S_phos_act;
-  matrix<lower=0,upper=1>[N_phosphorylation_enzymes, N_enzyme] S_phos_inh;
+  matrix[N_phosphorylation_enzymes, N_enzyme] S_phos_act;
+  matrix[N_phosphorylation_enzymes, N_enzyme] S_phos_inh;
   int<lower=0,upper=N_km> km_lookup[N_mic, N_enzyme];
   int<lower=0,upper=N_mic> n_ci[N_enzyme];
   int<lower=0,upper=N_mic> n_ai[N_enzyme];

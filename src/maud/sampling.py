@@ -370,8 +370,8 @@ def get_input_data(mi: MaudInput) -> dict:
         "sigma_conc": [m.error for m in mi.measurements if m.target_type == "mic"],
         "yflux": [m.value for m in mi.measurements if m.target_type == "flux"],
         "sigma_flux": [m.error for m in mi.measurements if m.target_type == "flux"],
-        "yenz": [m.value for m in mi.measurements if m.target_type == "enz"],
-        "sigma_enz": [m.error for m in mi.measurements if m.target_type == "enz"],
+        "yenz": [m.value for m in mi.measurements if m.target_type == "enzyme"],
+        "sigma_enz": [m.error for m in mi.measurements if m.target_type == "enzyme"],
         # priors
         "fe_priors": tabulate_priors_1d(mi.priors.formation_energy_priors),
         "kcat_priors": tabulate_priors_1d(mi.priors.kcat_priors),
