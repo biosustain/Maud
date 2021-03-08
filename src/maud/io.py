@@ -86,8 +86,9 @@ def parse_toml_kinetic_model(raw: dict) -> KineticModel:
         Compartment(id=c["id"], name=c["name"], volume=c["volume"])
         for c in raw["compartments"]
     ]
+    raw_mets = {m["id"]: m for m in raw["metabolites"]}
     metabolites = [
-        Metabolite(id=m["id"], name=m["name"]) for m in raw["metabolites"]
+        Metabolite(id=m["id"], name=m["name"]) for m in raw_mets.values()
     ]
     mics = [
         MetaboliteInCompartment(

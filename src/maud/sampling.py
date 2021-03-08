@@ -259,6 +259,8 @@ def get_km_lookup(mi: MaudInput) -> List[List[int]]:
 
 
 def tabulate_priors_1d(priors: List[Prior]) -> List[List[float]]:
+    if len(priors) == 0:
+        return [[]]
     return [[p.location, p.scale] for p in priors]
 
 def tabulate_priors_2d(priors: List[Prior], exp_codes, target_codes, defaults):
