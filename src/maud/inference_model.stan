@@ -153,7 +153,7 @@ transformed parameters {
     vector[N_enzyme] experiment_enzyme = enzyme[e]' .* knockout[e]';
     vector[N_phosphorylation_enzymes] experiment_phos_conc = 
       phos_enzyme_conc[e]' .* phos_knockout[e]';
-    vector[N_mic-N_unbalanced] conc_balanced[2] = ode_bdf_tol(dbalanced_dt,
+    vector[N_mic-N_unbalanced] conc_balanced[2] = ode_adjoint_tol(dbalanced_dt,
                                                               conc_init[e, balanced_mic_ix],
                                                               initial_time,
                                                               {timepoint, timepoint + 10},
