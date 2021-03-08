@@ -309,4 +309,5 @@ def parse_config(raw):
         likelihood=raw["likelihood"],
         ode_config=raw["ode_config"],
         cmdstanpy_config=raw["cmdstanpy_config"],
+        inits=raw["inits"]
     )

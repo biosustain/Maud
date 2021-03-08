@@ -439,6 +439,7 @@ class MaudConfig:
     :param likelihood: Whether or not to take measurements into account.
     :param ode_config: Configuration for Stan's ode solver.
     :param cmdstanpy_config: Arguments to cmdstanpy.CmdStanModel.sample.
+    :param inits: path to a valid inits file.
     """
 
     def __init__(
@@ -450,6 +451,7 @@ class MaudConfig:
         likelihood: bool,
         ode_config: dict,
         cmdstanpy_config: dict,
+        inits: str = None,
     ):
         self.name = name
         self.kinetic_model_file = kinetic_model_file
@@ -458,6 +460,7 @@ class MaudConfig:
         self.likelihood = likelihood
         self.ode_config = ode_config
         self.cmdstanpy_config = cmdstanpy_config
+        self.inits = inits
 
 
 class MaudInput:

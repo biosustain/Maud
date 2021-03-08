@@ -105,8 +105,8 @@ def _sample_given_config(
     include_path = os.path.join(HERE, INCLUDE_PATH)
     cpp_options = {}
     stanc_options = {"include_paths": [include_path]}
-    if type(config["inits"]) is str:
-        config["inits"] = os.path.join(output_dir, "../user_input", config["inits"])
+    if mi.config.inits is not None:
+        config["inits"] = os.path.join(output_dir, "../user_input", mi.config.inits)
     if config["threads_per_chain"] != 1:
         cpp_options["STAN_THREADS"] = True
         os.environ["STAN_NUM_THREADS"] = str(config["threads_per_chain"])
