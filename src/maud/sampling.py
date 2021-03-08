@@ -350,10 +350,10 @@ def get_input_data(mi: MaudInput) -> dict:
         "ai_ix": mi.stan_codes.ai_mic_codes,
         "aa_ix": mi.stan_codes.aa_mic_codes,
         # network properties
-        "S_enz": S_enz.values,
+        "S_enz": S_enz.T.values,
         "S_to_flux_map": S_to_flux.values,
         "S_drain": S_drain.values,
-        "S_full": S_full.values,
+        "S_full": S_full.T.values,
         "S_phos_act": S_phos_act,
         "S_phos_inh": S_phos_inh,
         "water_stoichiometry": water_stoichiometry,
