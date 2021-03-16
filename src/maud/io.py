@@ -128,7 +128,7 @@ def get_stan_codes(
     km_codes = [
         f"{m}_{e.id}" for r in km.reactions for e in r.enzymes for m in r.stoichiometry
     ]
-    experiment_codes = list(set([m.experiment_id for m in ms]))
+    experiment_codes = sorted(list(set(m.experiment_id for m in ms)))
     mic_codes = [m.id for m in km.mics]
     reaction_codes = [r.id for r in km.reactions]
     enzyme_codes = [e.id for r in km.reactions for e in r.enzymes]

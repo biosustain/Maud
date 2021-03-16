@@ -22,28 +22,25 @@ from maud import data_model
 def validate_maud_input(mi: data_model.MaudInput):
     """Check that priors, experiments and kinetic model are consistent."""
     model = mi.kinetic_model
-    model_unb_mics = [mic.id for mic in model.mics.values() if not mic.balanced]
-    model_balanced_mics = [mic.id for mic in model.mics.values() if mic.balanced]
-    model_metabolites = list(set([met.id for met in model.metabolites.values()]))
-    model_rxns = [rxn.id for rxn in model.reactions.values()]
+    model_unb_mics = [mic.id for mic in model.mics if not mic.balanced]
+    model_balanced_mics = [mic.id for mic in model.mics if mic.balanced]
+    model_metabolites = list(set(met.id for met in model.metabolites))
+    model_rxns = [rxn.id for rxn in model.reactions]
     model_kms = [
         f"km_{mic_id}_{enz.id}"
-        for rxn in model.reactions.values()
-        for enz in rxn.enzymes.values()
+        for rxn in model.reactions
+        for enz in rxn.enzymes
         for mic_id in rxn.stoichiometry.keys()
     ]
-    model_kcats = [
-        f"kcat_{enz.id}"
-        for rxn in model.reactions.values()
-        for enz in rxn.enzymes.values()
-    ]
+    experiment_ids = list(set(m.experiment_id for m in mi.measurements))
+    model_kcats = [f"kcat_{enz.id}" for rxn in model.reactions for enz in rxn.enzymes]
     model_formation_energies = [
         f"formation_energy_{met_id}" for met_id in model_metabolites
     ]
     model_kis = [
         f"inhibition_constant_{modifier.mic_id}_{enz.id}"
-        for rxn in model.reactions.values()
-        for enz in rxn.enzymes.values()
+        for rxn in model.reactions
+        for enz in rxn.enzymes
         for modifier in enz.modifiers["competitive_inhibitor"]
     ]
     prior_kms = [p.id for p in mi.priors.km_priors]
@@ -63,28 +60,27 @@ def validate_maud_input(mi: data_model.MaudInput):
             msg = f"{model_par} is in the kinetic model but not the priors."
             if model_par not in prior_pars:
                 raise ValueError(msg)
-    for exp in mi.experiments.experiments:
-        for meas in exp.measurements["mic"].values():
+    for meas in mi.measurements:
+        if meas.target_type == "mic":
             if meas.target_id not in model_unb_mics + model_balanced_mics:
                 raise ValueError(
-                    f"metabolite {meas.target_id} is measured in experiment {exp.id}"
-                    "but is not in the kinetic model {mi.kinetic_model.model_id}."
+                    f"metabolite {meas.target_id} is measured in experiment"
+                    "{meas.experiment_id} but is not in the kinetic model "
+                    "{mi.kinetic_model.model_id}."
                 )
-        for meas in exp.measurements["flux"].values():
+        elif meas.target_type == "flux":
             if meas.target_id not in model_rxns:
                 raise ValueError(
-                    f"reaction {meas.target_id} is measured in experiment {exp.id}"
-                    "but is not in the kinetic model {mi.kinetic_model.model_id}."
+                    f"reaction {meas.target_id} is measured in experiment"
+                    "{meas.experiment_id} but is not in the kinetic model"
+                    "{mi.kinetic_model.model_id}."
                 )
-        if mi.kinetic_model.drains is not None:
-            for drain_id in mi.kinetic_model.drains:
-                for drain in mi.priors.drain_priors:
-                    if drain.experiment_id == exp.id:
-                        if (drain_id != drain.drain_id) & (
-                            exp.id != drain.experiment_id
-                        ):
-                            raise ValueError(
-                                f"drain {drain_id} was not included in "
-                                "experiment {exp.id}. "
-                                "Required for each experiment and drain."
-                            )
+    for drain in mi.kinetic_model.drains:
+        for experiment_id in experiment_ids:
+            if not any(
+                p.drain_id == drain.id and p.experiment_id == experiment_id
+                for p in mi.priors.drain_priors
+            ):
+                raise ValueError(
+                    f"Drain {drain.id} has no prior for experiment {experiment_id}."
+                )
