@@ -236,16 +236,16 @@ class KineticModel:
         reactions: List[Reaction],
         compartments: List[Compartment],
         mics: List[MetaboliteInCompartment],
-        drains: List[Drain] = [],
-        phosphorylation: List[Phosphorylation] = [],
+        drains: List[Drain] = None,
+        phosphorylation: List[Phosphorylation] = None,
     ):
         self.model_id = model_id
         self.metabolites = metabolites
         self.reactions = reactions
-        self.drains = drains
+        self.drains = drains if drains is not None else []
         self.compartments = compartments
         self.mics = mics
-        self.phosphorylation = phosphorylation
+        self.phosphorylation = phosphorylation if phosphorylation is not None else []
 
 
 class Measurement:
@@ -281,6 +281,7 @@ class Knockout:
     :target_id: id of the thing that was knocked out
     :knockout_type: either "enz" or "phos"
     """
+
     def __init__(
         self,
         experiment_id: str,
@@ -344,9 +345,10 @@ class Prior:
                 )
                 self.location = np.exp(mu)
             else:
-                self.location, self.scale = get_normal_parameters_from_quantiles(
-                    pct1, 0.01, pct99, 0.99
-                )
+                (
+                    self.location,
+                    self.scale,
+                ) = get_normal_parameters_from_quantiles(pct1, 0.01, pct99, 0.99)
         else:
             self.location = location
             self.scale = scale
@@ -430,7 +432,6 @@ class StanCodeSet:
         self.aa_mic_codes = aa_mic_codes
 
 
-
 class MaudConfig:
     """User's configuration for a Maud input.
 
@@ -489,7 +490,6 @@ class MaudInput:
         self.stan_codes = stan_codes
         self.measurements = measurements
         self.knockouts = knockouts
-
 
 
 class SimulationStudyOutput:

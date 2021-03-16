@@ -21,6 +21,7 @@
 """
 
 import os
+from typing import List, Tuple
 
 import pandas as pd
 import toml
@@ -45,7 +46,6 @@ from maud.data_model import (
     StanCodeSet,
 )
 from maud.utils import codify
-from typing import List, Tuple
 
 
 def load_maud_input_from_toml(data_path: str) -> MaudInput:
@@ -71,7 +71,7 @@ def load_maud_input_from_toml(data_path: str) -> MaudInput:
         measurements=measurements,
         knockouts=knockouts,
     )
-    # validation.validate_maud_input(mi)
+    validation.validate_maud_input(mi)
     return mi
 
 
@@ -87,9 +87,7 @@ def parse_toml_kinetic_model(raw: dict) -> KineticModel:
         for c in raw["compartments"]
     ]
     raw_mets = {m["id"]: m for m in raw["metabolites"]}
-    metabolites = [
-        Metabolite(id=m["id"], name=m["name"]) for m in raw_mets.values()
-    ]
+    metabolites = [Metabolite(id=m["id"], name=m["name"]) for m in raw_mets.values()]
     mics = [
         MetaboliteInCompartment(
             id=f"{m['id']}_{m['compartment']}",
@@ -101,12 +99,12 @@ def parse_toml_kinetic_model(raw: dict) -> KineticModel:
     ]
     reactions = [parse_toml_reaction(r) for r in raw["reactions"]]
     drains = (
-        [parse_toml_drain(d) for d in raw["drains"]]
-        if "drains" in raw.keys() else []
+        [parse_toml_drain(d) for d in raw["drains"]] if "drains" in raw.keys() else []
     )
     phosphorylation = (
         [parse_toml_phosphorylation(d) for d in raw["phosphorylation"]]
-        if "phosphorylation" in raw.keys() else []
+        if "phosphorylation" in raw.keys()
+        else []
     )
     return KineticModel(
         model_id=model_id,
@@ -119,38 +117,31 @@ def parse_toml_kinetic_model(raw: dict) -> KineticModel:
     )
 
 
-def get_stan_codes(km: KineticModel, ms: List[Measurement], ps: PriorSet) -> StanCodeSet:
+def get_stan_codes(
+    km: KineticModel, ms: List[Measurement], ps: PriorSet
+) -> StanCodeSet:
     """Get the stan codes for a Maud input.
 
     :param km: KineticModel object
     :param ms: MeasurementSet object
     """
     km_codes = [
-        f"{m}_{e.id}"
-        for r in km.reactions
-        for e in r.enzymes
-        for m in r.stoichiometry
+        f"{m}_{e.id}" for r in km.reactions for e in r.enzymes for m in r.stoichiometry
     ]
     experiment_codes = list(set([m.experiment_id for m in ms]))
     mic_codes = [m.id for m in km.mics]
     reaction_codes = [r.id for r in km.reactions]
     enzyme_codes = [e.id for r in km.reactions for e in r.enzymes]
     yconc_exp_codes, yflux_exp_codes, yenz_exp_codes = (
-        [
-            codify(experiment_codes)[m.experiment_id]
-            for m in ms if m.target_type == t
-        ]
+        [codify(experiment_codes)[m.experiment_id] for m in ms if m.target_type == t]
         for t in ["mic", "flux", "enzyme"]
     )
     yconc_mic_codes, yflux_reaction_codes, yenz_enz_codes = (
-        [
-            codify(codes)[m.target_id]
-            for m in ms if m.target_type == t
-        ]
+        [codify(codes)[m.target_id] for m in ms if m.target_type == t]
         for t, codes in [
             ("mic", mic_codes),
             ("flux", reaction_codes),
-            ("enzyme", enzyme_codes)
+            ("enzyme", enzyme_codes),
         ]
     )
     ci_mic_codes, ai_mic_codes, aa_mic_codes = (
@@ -158,7 +149,7 @@ def get_stan_codes(km: KineticModel, ms: List[Measurement], ps: PriorSet) -> Sta
         for mod_priors in (
             ps.inhibition_constant_priors,
             ps.tense_dissociation_constant_priors,
-            ps.relaxed_dissociation_constant_priors
+            ps.relaxed_dissociation_constant_priors,
         )
     )
     return StanCodeSet(
@@ -263,7 +254,9 @@ def parse_toml_reaction(raw: dict) -> Reaction:
     )
 
 
-def parse_measurements(raw: pd.DataFrame) -> Tuple[List[Measurement], List[Knockout]]:
+def parse_measurements(
+    raw: pd.DataFrame,
+) -> Tuple[List[Measurement], List[Knockout]]:
     """Parse a measurements dataframe.
 
     :param raw: result of running pd.read_csv on a suitable file
@@ -276,7 +269,7 @@ def parse_measurements(raw: pd.DataFrame) -> Tuple[List[Measurement], List[Knock
                 Knockout(
                     experiment_id=row["experiment_id"],
                     target_id=row["target_id"],
-                    knockout_type=row["measurement_type"]
+                    knockout_type=row["measurement_type"],
                 )
             )
         else:
@@ -286,7 +279,7 @@ def parse_measurements(raw: pd.DataFrame) -> Tuple[List[Measurement], List[Knock
                     experiment_id=row["experiment_id"],
                     target_type=row["measurement_type"],
                     value=row["measurement"],
-                    error=row["error_scale"]
+                    error=row["error_scale"],
                 )
             )
     return measurements, knockouts
