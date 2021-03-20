@@ -30,6 +30,7 @@ def load_infd(csvs: List[str], mi: MaudInput) -> az.InferenceData:
             "kcat": ["enzyme_name"],
             "km": ["km_id"],
         },
+        save_warmup=True,
     )
 
 
