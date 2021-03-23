@@ -35,8 +35,8 @@ def test_linear():
         "n_leapfrog__": [31.0, 31.0],
         "divergent__": [0.0, 0.0],
         "energy__": [26.507623, 44.448424],
-        "formation_energy_z[1]": [-1.6088815, 1.7438237],
-        "formation_energy_z[2]": [-1.9428797, 1.8600326],
+        "fe_z[1]": [-1.6088815, 1.7438237],
+        "fe_z[2]": [-1.9428797, 1.8600326],
         "kcat[1]": [0.7354878399999999, 3.3920119],
         "kcat[2]": [0.7169074799999999, 3.5383422],
         "kcat[3]": [0.5103703599999999, 2.3251939000000004],
@@ -57,8 +57,8 @@ def test_linear():
         "conc_unbalanced[1,2]": [0.92532526, 1.0731987],
         "conc_unbalanced[2,2]": [0.9100531199999999, 1.0846023999999999],
         "ki[1]": [0.35249536, 2.0479711000000003],
-        "dissociation_constant_t[1]": [0.39240253999999997, 2.9900479000000004],
-        "dissociation_constant_r[1]": [0.3673301, 2.4169647000000003],
+        "diss_t[1]": [0.39240253999999997, 2.9900479000000004],
+        "diss_r[1]": [0.3673301, 2.4169647000000003],
         "transfer_constant[1]": [0.26424406999999994, 2.6506271],
         "transfer_constant[2]": [0.27446419000000005, 2.8339571],
         "formation_energy[1]": [-1.0804408, -0.9128092999999999],
@@ -96,7 +96,12 @@ def test_linear():
     temp_directory = tempfile.mkdtemp(dir=data_path)
     mi = load_maud_input_from_toml(linear_input)
     mi.config.cmdstanpy_config.update(
-        {"chains": 1, "iter_sampling": 50, "iter_warmup": 50, "save_warmup": False}
+        {
+            "chains": 1,
+            "iter_sampling": 50,
+            "iter_warmup": 50,
+            "save_warmup": False,
+        }
     )
     fit = sample(mi, output_dir=temp_directory)
     samples_test = fit.draws_pd()

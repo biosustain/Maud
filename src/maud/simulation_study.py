@@ -19,10 +19,10 @@ def add_measurements_to_maud_input(
 ) -> MaudInput:
     """Replace the measurements in a maud input with simulated ones."""
     out = deepcopy(mi)
-    code_to_exp = {v: k for k, v in mi.stan_codes.experiment_codes.items()}
-    code_to_enz = {v: k for k, v in mi.stan_codes.enzyme_codes.items()}
-    code_to_mic = {v: k for k, v in mi.stan_codes.mic_codes.items()}
-    code_to_rxn = {v: k for k, v in mi.stan_codes.reaction_codes.items()}
+    code_to_exp = {i + 1: c for i, c in enumerate(mi.stan_codes.experiment_codes)}
+    code_to_enz = {i + 1: c for i, c in enumerate(mi.stan_codes.enzyme_codes)}
+    code_to_mic = {i + 1: c for i, c in enumerate(mi.stan_codes.mic_codes)}
+    code_to_rxn = {i + 1: c for i, c in enumerate(mi.stan_codes.reaction_codes)}
     var_ids = {
         "yenz_sim": [code_to_enz[i] for i in input_data["enzyme_yenz"]],
         "yconc_sim": [code_to_mic[i] for i in input_data["mic_ix_yconc"]],
@@ -33,16 +33,19 @@ def add_measurements_to_maud_input(
         "yconc_sim": [code_to_exp[i] for i in input_data["experiment_yconc"]],
         "yflux_sim": [code_to_exp[i] for i in input_data["experiment_yflux"]],
     }
-    for var, measurement_type in zip(
+    for var, target_type in zip(
         ["yenz_sim", "yconc_sim", "yflux_sim"], ["enzyme", "mic", "flux"]
     ):
-        if var in sim.stan_variable_dims.keys():
-            for i, y in enumerate(sim.stan_variable(var).values[0]):
+        if var in sim.stan_variables().keys():
+            for i, y in enumerate(sim.stan_variable(var)[0]):
                 exp_id, var_id = exp_ids[var][i], var_ids[var][i]
-                experiment = [e for e in out.experiments.experiments if e.id == exp_id][
-                    0
-                ]
-                measurement = experiment.measurements[measurement_type][var_id]
+                measurement = [
+                    m
+                    for m in mi.measurements
+                    if m.experiment_id == exp_id
+                    and m.target_type == target_type
+                    and m.target_id == var_id
+                ][0]
                 measurement.value = y
     return out
 
@@ -50,93 +53,69 @@ def add_measurements_to_maud_input(
 def enrich_true_values(tvin, input_data):
     """Add true values for auxiliary parameters."""
 
-    def logz_for_vec(truth, loc, scale):
+    def logz_for_vec(truth, priors):
+        if len(truth) == 0:
+            return []
         t = np.array(truth)
-        lc = np.array(loc)
-        s = np.array(scale)
+        lc = np.array(priors[0])
+        s = np.array(priors[1])
         return (np.log(t) - np.log(lc)) / s
 
-    def z_for_vec(truth, loc, scale):
+    def z_for_vec(truth, priors):
+        if len(truth) == 0:
+            return []
         t = np.array(truth)
-        lc = np.array(loc)
-        s = np.array(scale)
+        lc = np.array(priors[0])
+        s = np.array(priors[1])
         return (t - lc) / s
 
-    def logz_for_mat(truth, loc, scale):
-        return np.array(
-            [
-                (np.log(np.array(truth[i])) - np.log(np.array(loc[i])))
-                / np.array(scale[i])
-                for i, _ in enumerate(truth)
-            ]
-        )
+    def logz_for_mat(truth, priors):
+        if len(truth) == 0:
+            return np.array([[] for ex in priors])
+        out = []
+        for i, ex_priors in enumerate(priors):
+            t = np.array(truth[i])
+            lc = np.array(ex_priors[0])
+            s = np.array(ex_priors[1])
+            out.append((np.log(t) - np.log(lc)) / s)
+        return np.array(out)
 
-    def z_for_mat(truth, loc, scale):
-        return np.array(
-            [
-                (np.array(truth[i]) - np.array(loc[i])) / np.array(scale[i])
-                for i, _ in enumerate(truth)
-            ]
-        )
+    def z_for_mat(truth, priors):
+        if len(truth) == 0:
+            return np.array([[] for ex in priors])
+        out = []
+        for i, ex_priors in enumerate(priors):
+            t = np.array(truth[i])
+            lc = np.array(ex_priors[0])
+            s = np.array(ex_priors[1])
+            out.append((t - lc) / s)
+        return np.array(out)
 
     return {
         **tvin,
         **{
-            "drain_z": z_for_vec(
-                tvin["drain"],
-                input_data["prior_loc_drain"],
-                input_data["prior_scale_drain"],
-            ),
-            "log_km_z": logz_for_vec(
-                tvin["km"], input_data["prior_loc_km"], input_data["prior_scale_km"]
-            ),
-            "log_kcat_z": logz_for_vec(
-                tvin["kcat"],
-                input_data["prior_loc_kcat"],
-                input_data["prior_scale_kcat"],
-            ),
-            "log_ki_z": logz_for_vec(
-                tvin["ki"], input_data["prior_loc_ki"], input_data["prior_scale_ki"]
-            ),
+            "log_km_z": logz_for_vec(tvin["km"], input_data["km_priors"]),
+            "log_kcat_z": logz_for_vec(tvin["kcat"], input_data["kcat_priors"]),
+            "log_ki_z": logz_for_vec(tvin["ki"], input_data["ki_priors"]),
             "log_dissociation_constant_t_z": logz_for_vec(
-                tvin["dissociation_constant_t"],
-                input_data["prior_loc_diss_t"],
-                input_data["prior_scale_diss_t"],
+                tvin["dissociation_constant_t"], input_data["diss_t_priors"]
             ),
             "log_dissociation_constant_r_z": logz_for_vec(
-                tvin["dissociation_constant_r"],
-                input_data["prior_loc_diss_r"],
-                input_data["prior_scale_diss_r"],
+                tvin["dissociation_constant_r"], input_data["diss_r_priors"]
             ),
             "log_transfer_constant_z": logz_for_vec(
-                tvin["transfer_constant"],
-                input_data["prior_loc_tc"],
-                input_data["prior_scale_tc"],
+                tvin["transfer_constant"], input_data["tc_priors"]
             ),
-            "log_enzyme_z": logz_for_mat(
-                tvin["enzyme"],
-                input_data["prior_loc_enzyme"],
-                input_data["prior_scale_enzyme"],
-            ),
+            "log_enzyme_z": logz_for_mat(tvin["enzyme"], input_data["enzyme_priors"]),
             "log_conc_unbalanced_z": logz_for_mat(
-                tvin["conc_unbalanced"],
-                input_data["prior_loc_unbalanced"],
-                input_data["prior_scale_unbalanced"],
+                tvin["conc_unbalanced"], input_data["unbalanced_priors"]
             ),
-            "log_drain_z": z_for_mat(
-                tvin["drain"],
-                input_data["prior_loc_drain"],
-                input_data["prior_scale_drain"],
-            ),
+            "drain_z": logz_for_mat(tvin["drain"], input_data["drain_priors"]),
             "log_phos_kcat_z": logz_for_vec(
-                tvin["phos_kcat"],
-                input_data["prior_loc_phos_kcat"],
-                input_data["prior_scale_phos_kcat"],
+                tvin["phos_kcat"], input_data["phos_kcat_priors"]
             ),
             "log_phos_conc_z": logz_for_vec(
-                tvin["phos_enzyme_conc"],
-                input_data["prior_loc_phos_conc"],
-                input_data["prior_scale_phos_conc"],
+                tvin["phos_enzyme_conc"], input_data["phos_conc_priors"]
             ),
         },
     }
