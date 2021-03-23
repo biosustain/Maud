@@ -245,24 +245,29 @@ def _get_km_lookup(mi: MaudInput) -> List[List[int]]:
 
 def _tabulate_priors_1d(priors: List[Prior]) -> List[List[float]]:
     if len(priors) == 0:
-        return [[]]
-    return [[p.location, p.scale] for p in priors]
+        return [[], []]
+    return [[p.location for p in priors], [p.scale for p in priors]]
 
 
 def _tabulate_priors_2d(priors: List[Prior], exp_codes, target_codes, defaults):
     out = []
     for exp in exp_codes:
-        row = []
+        locs = []
+        scales = []
         for target in target_codes:
             match = [
-                p for p in priors if p.experiment_id == exp and p.target_id == target
+                p
+                for p in priors
+                if p.experiment_id == exp and target in p.__dict__.values()
             ]
             if any(match):
                 p = match[0]
-                row.append([p.location, p.scale])
+                locs.append(p.location)
+                scales.append(p.scale)
             else:
-                row.append(defaults)
-        out.append(row)
+                locs.append(defaults[0])
+                scales.append(defaults[1])
+        out.append([locs, scales])
     return out
 
 
