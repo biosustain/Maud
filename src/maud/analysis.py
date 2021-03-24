@@ -15,11 +15,11 @@ def load_infd(csvs: List[str], mi: MaudInput) -> az.InferenceData:
     return az.from_cmdstan(
         csvs,
         coords={
-            "enzyme_name": list(mi.stan_codes.enzyme_codes.keys()),
-            "mic_name": list(mi.stan_codes.mic_codes.keys()),
-            "reaction": list(mi.stan_codes.reaction_codes.keys()),
-            "metabolite": list(mi.stan_codes.metabolite_codes.keys()),
-            "experiment": list(mi.stan_codes.experiment_codes.keys()),
+            "enzyme_name": mi.stan_codes.enzyme_codes,
+            "mic_name": mi.stan_codes.mic_codes,
+            "reaction": mi.stan_codes.reaction_codes,
+            "metabolite": mi.stan_codes.metabolite_codes,
+            "experiment": mi.stan_codes.experiment_codes,
             "km_id": [p.id[3:] for p in mi.priors.km_priors],
         },
         dims={
@@ -36,12 +36,12 @@ def load_infd(csvs: List[str], mi: MaudInput) -> az.InferenceData:
 def plot_1d_var(
     infd: az.InferenceData,
     varname: str,
-    codes: dict,
+    codes: List[str],
     true_values: Union[List[float], None] = None,
     logscale: bool = False,
 ) -> tuple:
     """Plot a 1 dimensional variable."""
-    tv = dict(zip(codes.keys(), true_values))
+    tv = dict(zip(codes, true_values))
     samples = infd.posterior[varname].to_series().unstack()
     nrow = int(len(samples.columns) ** 0.5 // 1)
     ncol = ceil(len(samples.columns) / nrow)
@@ -72,8 +72,6 @@ def plot_1d_var(
 def plot_experiment_var(
     infd: az.InferenceData,
     varname: str,
-    var_codes: dict,
-    exp_codes: dict,
     true_values: Union[Dict[str, Dict[str, float]], None] = None,
     meas_values: Union[Dict[str, Dict[str, float]], None] = None,
     logscale: bool = False,
@@ -88,18 +86,24 @@ def plot_experiment_var(
             hist, bins = np.histogram(x, bins=30)
             xscale = "linear"
             if logscale:
-                bins = np.logspace(np.log10(bins[0]), np.log10(bins[-1]), len(bins))
+                bins = np.logspace(
+                    np.log10(bins[0]), np.log10(bins[-1]), len(bins)
+                )
                 xscale = "log"
             _, _, hist_patches = ax.hist(x, bins=bins)
             ax.set_xscale(xscale)
             if true_values is not None:
                 if exp in true_values.keys():
                     if var in true_values[exp].keys():
-                        vline_truth = ax.axvline(true_values[exp][var], color="red")
+                        vline_truth = ax.axvline(
+                            true_values[exp][var], color="red"
+                        )
             if meas_values is not None:
                 if exp in meas_values.keys():
                     if var in meas_values[exp].keys():
-                        vline_meas = ax.axvline(meas_values[exp][var], color="orange")
+                        vline_meas = ax.axvline(
+                            meas_values[exp][var], color="orange"
+                        )
             ax.set_title(var)
         axrow[0].set_ylabel(exp)
     leg_handles = [hist_patches[0]]

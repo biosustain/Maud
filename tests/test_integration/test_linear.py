@@ -38,10 +38,13 @@ def test_linear(input_dirname):
         true_params = json.load(f)
     study = run_simulation_study(mi_in, true_params)
     infd = load_infd(study.samples.runset.csv_files, study.mi)
+    print("Hi")
     for param_name, param_vals in true_params.items():
         if any(param_vals):
             dimnames = [
-                d for d in infd.posterior[param_name].dims if d not in ["chain", "draw"]
+                d
+                for d in infd.posterior[param_name].dims
+                if d not in ["chain", "draw"]
             ]
             q = (
                 infd.posterior[param_name]
@@ -58,4 +61,6 @@ def test_linear(input_dirname):
                     f"\t2.5% posterior quantile: {str(row['low'])}\n"
                     f"\t97.5% posterior quantile: {str(row['high'])}\n"
                 )
-                assert row["true"] >= row["low"] and row["true"] <= row["high"], msg
+                assert (
+                    row["true"] >= row["low"] and row["true"] <= row["high"]
+                ), msg
