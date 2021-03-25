@@ -7,7 +7,7 @@ likelihood = true
 [cmdstanpy_config]
 iter_warmup = 200
 iter_sampling = 200
-chains = 4
+chains = 1
 save_warmup = true
 
 [ode_config]
