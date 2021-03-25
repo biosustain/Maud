@@ -86,24 +86,18 @@ def plot_experiment_var(
             hist, bins = np.histogram(x, bins=30)
             xscale = "linear"
             if logscale:
-                bins = np.logspace(
-                    np.log10(bins[0]), np.log10(bins[-1]), len(bins)
-                )
+                bins = np.logspace(np.log10(bins[0]), np.log10(bins[-1]), len(bins))
                 xscale = "log"
             _, _, hist_patches = ax.hist(x, bins=bins)
             ax.set_xscale(xscale)
             if true_values is not None:
                 if exp in true_values.keys():
                     if var in true_values[exp].keys():
-                        vline_truth = ax.axvline(
-                            true_values[exp][var], color="red"
-                        )
+                        vline_truth = ax.axvline(true_values[exp][var], color="red")
             if meas_values is not None:
                 if exp in meas_values.keys():
                     if var in meas_values[exp].keys():
-                        vline_meas = ax.axvline(
-                            meas_values[exp][var], color="orange"
-                        )
+                        vline_meas = ax.axvline(meas_values[exp][var], color="orange")
             ax.set_title(var)
         axrow[0].set_ylabel(exp)
     leg_handles = [hist_patches[0]]

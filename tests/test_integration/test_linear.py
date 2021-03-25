@@ -18,10 +18,10 @@ CASES = map(
     lambda f: os.path.join(CASES_DIR, f),
     [
         "michaelis_menten",
-        "drain",
-        "phosphorylation",
-        "one_allosteric_modifier",
-        "two_allosteric_modifiers",
+        # "drain",
+        # "phosphorylation",
+        # "one_allosteric_modifier",
+        # "two_allosteric_modifiers",
     ],
 )
 TRUE_PARAMS_FILENAME = "true_params.json"
@@ -42,9 +42,7 @@ def test_linear(input_dirname):
     for param_name, param_vals in true_params.items():
         if any(param_vals):
             dimnames = [
-                d
-                for d in infd.posterior[param_name].dims
-                if d not in ["chain", "draw"]
+                d for d in infd.posterior[param_name].dims if d not in ["chain", "draw"]
             ]
             q = (
                 infd.posterior[param_name]
@@ -61,6 +59,4 @@ def test_linear(input_dirname):
                     f"\t2.5% posterior quantile: {str(row['low'])}\n"
                     f"\t97.5% posterior quantile: {str(row['high'])}\n"
                 )
-                assert (
-                    row["true"] >= row["low"] and row["true"] <= row["high"]
-                ), msg
+                assert row["true"] >= row["low"] and row["true"] <= row["high"], msg

@@ -98,10 +98,10 @@ def enrich_true_values(tvin, input_data):
             "log_kcat_z": logz_for_vec(tvin["kcat"], input_data["kcat_priors"]),
             "log_ki_z": logz_for_vec(tvin["ki"], input_data["ki_priors"]),
             "log_dissociation_constant_t_z": logz_for_vec(
-                tvin["dissociation_constant_t"], input_data["diss_t_priors"]
+                tvin["diss_t"], input_data["diss_t_priors"]
             ),
             "log_dissociation_constant_r_z": logz_for_vec(
-                tvin["dissociation_constant_r"], input_data["diss_r_priors"]
+                tvin["diss_r"], input_data["diss_r_priors"]
             ),
             "log_transfer_constant_z": logz_for_vec(
                 tvin["transfer_constant"], input_data["tc_priors"]

@@ -14,4 +14,4 @@ save_warmup = true
 abs_tol = 1e-4
 rel_tol = 1e-4
 max_num_steps = 1e9
-timepoint = 50
+timepoint = 100
