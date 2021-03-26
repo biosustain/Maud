@@ -107,7 +107,7 @@ transformed parameters {
   vector[N_ki] ki = exp(log(ki_priors[1]) + log_ki_z .* ki_priors[2]);
   vector[N_enzyme] kcat = exp(log(kcat_priors[1]) + log_kcat_z .* kcat_priors[2]);
   vector[N_ai] diss_t = exp(log(diss_t_priors[1]) + log_dt_z .* diss_t_priors[2]);
-  vector[N_aa] diss_r = exp(log(diss_r_priors[1]) + log_dt_z .* diss_r_priors[2]);
+  vector[N_aa] diss_r = exp(log(diss_r_priors[1]) + log_dr_z .* diss_r_priors[2]);
   vector[N_ae] transfer_constant =
     exp(log(tc_priors[1]) + log_tc_z .* tc_priors[2]);
   vector[N_phosphorylation_enzymes] phos_enzyme_kcat =
