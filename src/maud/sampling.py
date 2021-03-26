@@ -338,7 +338,7 @@ def get_input_data(mi: MaudInput) -> dict:
         # network properties
         "S_enz": S_enz.T.values,
         "S_to_flux_map": S_to_flux.values,
-        "S_drain": S_drain.values,
+        "S_drain": S_drain.T.values,
         "S_full": S_full.T.values,
         "S_phos_act": S_phos_act,
         "S_phos_inh": S_phos_inh,
