@@ -18,27 +18,25 @@ CASES = map(
     lambda f: os.path.join(CASES_DIR, f),
     [
         "michaelis_menten",
-        # "drain",
-        # "phosphorylation",
-        # "one_allosteric_modifier",
-        # "two_allosteric_modifiers",
+        "drain",
+        "phosphorylation",
+        "one_allosteric_modifier",
+        "two_allosteric_modifiers",
     ],
 )
 TRUE_PARAMS_FILENAME = "true_params.json"
 
 
-@pytest.mark.parametrize("input_dirname", CASES)
-def test_linear(input_dirname):
+@pytest.mark.parametrize("input_dir_path", CASES)
+def test_linear(input_dir_path):
     """Test that the linear model works."""
 
-    input_dir_path = os.path.join(HERE, input_dirname)
     mi_in = load_maud_input_from_toml(input_dir_path)
     true_params_path = os.path.join(input_dir_path, TRUE_PARAMS_FILENAME)
     with open(true_params_path, "r") as f:
         true_params = json.load(f)
     study = run_simulation_study(mi_in, true_params)
     infd = load_infd(study.samples.runset.csv_files, study.mi)
-    print("Hi")
     for param_name, param_vals in true_params.items():
         if any(param_vals):
             dimnames = [
