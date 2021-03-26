@@ -226,7 +226,7 @@ def get_phos_act_inh_matrix(mi: MaudInput):
             S_phos_act[i, j] = 1
         elif phos.inhbiting:
             S_phos_inh[i, j] = 1
-    return S_phos_act.tolist(), S_phos_inh.tolist()
+    return S_phos_act.T.tolist(), S_phos_inh.T.tolist()
 
 
 def _get_km_lookup(mi: MaudInput) -> List[List[int]]:
