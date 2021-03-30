@@ -34,6 +34,8 @@ DEFAULT_PRIOR_LOC_UNBALANCED = 0.1
 DEFAULT_PRIOR_SCALE_UNBALANCED = 2.0
 DEFAULT_PRIOR_LOC_ENZYME = 0.1
 DEFAULT_PRIOR_SCALE_ENZYME = 2.0
+DEFAULT_PRIOR_LOC_DRAIN = None
+DEFAULT_PRIOR_SCALE_DRAIN = None
 STAN_PROGRAM_RELATIVE_PATH = "inference_model.stan"
 
 DEFAULT_SAMPLE_CONFIG = {
@@ -393,7 +395,7 @@ def get_input_data(mi: MaudInput) -> dict:
             mi.priors.drain_priors,
             mi.stan_codes.experiment_codes,
             mi.stan_codes.drain_codes,
-            [0, 1],
+            [DEFAULT_PRIOR_LOC_DRAIN, DEFAULT_PRIOR_SCALE_DRAIN],
         ),
         # config
         "rel_tol": mi.config.ode_config["rel_tol"],
