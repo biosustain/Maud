@@ -290,7 +290,7 @@ def get_input_data(mi: MaudInput) -> dict:
         [e for r in mi.kinetic_model.reactions for e in r.enzymes],
         key=lambda e: codify(mi.stan_codes.enzyme_codes)[e.id],
     )
-    water_stoichiometry = [r.water_stoichiometry for r in mi.kinetic_model.reactions]
+    water_stoichiometry = [e.water_stoichiometry for e in sorted_enzymes]
     mic_to_met = [
         codify(mi.stan_codes.metabolite_codes)[mic.metabolite_id]
         for mic in mi.kinetic_model.mics
