@@ -61,8 +61,8 @@ def load_maud_input_from_toml(data_path: str) -> MaudInput:
     priors_path = os.path.join(data_path, config.priors_file)
     kinetic_model = parse_toml_kinetic_model(toml.load(kinetic_model_path))
     measurements, knockouts = parse_measurements(pd.read_csv(experiments_path))
-    prior_set = parse_prior_set_df(pd.read_csv(priors_path))
-    stan_codes = get_stan_codes(kinetic_model, measurements, prior_set)
+    stan_codes = get_stan_codes(kinetic_model, measurements)
+    prior_set = parse_prior_set_df(pd.read_csv(priors_path), stan_codes)
     mi = MaudInput(
         config=config,
         kinetic_model=kinetic_model,
@@ -117,9 +117,7 @@ def parse_toml_kinetic_model(raw: dict) -> KineticModel:
     )
 
 
-def get_stan_codes(
-    km: KineticModel, ms: List[Measurement], ps: PriorSet
-) -> StanCodeSet:
+def get_stan_codes(km: KineticModel, ms: List[Measurement]) -> StanCodeSet:
     """Get the stan codes for a Maud input.
 
     :param km: KineticModel object
@@ -145,12 +143,17 @@ def get_stan_codes(
         ]
     )
     ci_mic_codes, ai_mic_codes, aa_mic_codes = (
-        [codify(mic_codes)[p.mic_id] for p in mod_priors]
-        for mod_priors in (
-            ps.inhibition_constant_priors,
-            ps.tense_dissociation_constant_priors,
-            ps.relaxed_dissociation_constant_priors,
-        )
+        [
+            m.mic_id
+            for r in km.reactions
+            for e in r.enzymes
+            for m in e.modifiers[modifier_type]
+        ]
+        for modifier_type in [
+            "competitive_inhibitor",
+            "allosteric_inhibitor",
+            "allosteric_activator",
+        ]
     )
     return StanCodeSet(
         metabolite_codes=[m.id for m in km.metabolites],
@@ -285,7 +288,7 @@ def parse_measurements(
     return measurements, knockouts
 
 
-def parse_prior_set_df(raw: pd.DataFrame) -> PriorSet:
+def parse_prior_set_df(raw: pd.DataFrame, codes: StanCodeSet) -> PriorSet:
     """Get a PriorSet object from a dataframe.
 
     :param raw: result of running pd.read_csv on a suitable file
@@ -304,6 +307,39 @@ def parse_prior_set_df(raw: pd.DataFrame) -> PriorSet:
         "phos_kcat_priors": [],
         "phos_enz_concentration_priors": [],
     }
+    order_keys = {
+        # ensure that priors are in the right order wrt the stan codes
+        "kcat_priors": lambda p: codify(codes.enzyme_codes)[p.enzyme_id],
+        "km_priors": lambda p: codify(codes.km_codes)[f"{p.mic_id}_{p.enzyme_id}"],
+        "formation_energy_priors": lambda p: codify(codes.metabolite_codes)[
+            p.metabolite_id
+        ],
+        "unbalanced_metabolite_priors": lambda p: (
+            codify(codes.mic_codes)[p.mic_id],
+            codify(codes.experiment_codes)[p.experiment_id],
+        ),
+        "inhibition_constant_priors": lambda p: (
+            codify(codes.enzyme_codes)[p.enzyme_id],
+            codify(codes.ci_mic_codes)[p.mic_id],
+        ),
+        "tense_dissociation_constant_priors": lambda p: (
+            codify(codes.enzyme_codes)[p.enzyme_id],
+            codify(codes.ai_mic_codes)[p.mic_id],
+        ),
+        "relaxed_dissociation_constant_priors": lambda p: (
+            codify(codes.enzyme_codes)[p.enzyme_id],
+            codify(codes.aa_mic_codes)[p.mic_id],
+        ),
+        "transfer_constant_priors": lambda p: codify(codes.enzyme_codes)[p.enzyme_id],
+        "drain_priors": lambda p: codify(codes.drain_codes)[p.drain_id],
+        "enzyme_concentration_priors": lambda p: codify(codes.enzyme_codes)[
+            p.enzyme_id
+        ],
+        "phos_kcat_priors": lambda p: codify(codes.phos_enz_codes)[p.phos_enz_id],
+        "phos_enz_concentration_priors": lambda p: codify(codes.phos_enz_codes)[
+            p.phos_enz_id
+        ],
+    }
     negative_param_types = ["formation_energy", "drain"]
     for _, row in raw.iterrows():
         id = "_".join(row.loc[lambda s: [isinstance(x, str) for x in s]].values)
@@ -313,6 +349,8 @@ def parse_prior_set_df(raw: pd.DataFrame) -> PriorSet:
         priors[parameter_type + "_priors"].append(
             Prior(id=id, is_non_negative=is_non_negative, **prior_dict)
         )
+    for k, v in priors.items():
+        priors[k] = sorted(v, key=order_keys[k])
     return PriorSet(**priors)
 
 

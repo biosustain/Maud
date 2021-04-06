@@ -350,9 +350,9 @@ def get_input_data(mi: MaudInput) -> dict:
         "reaction_yflux": mi.stan_codes.yflux_reaction_codes,
         "experiment_yenz": mi.stan_codes.yenz_exp_codes,
         "enzyme_yenz": mi.stan_codes.yenz_enz_codes,
-        "ci_ix": mi.stan_codes.ci_mic_codes,
-        "ai_ix": mi.stan_codes.ai_mic_codes,
-        "aa_ix": mi.stan_codes.aa_mic_codes,
+        "ci_ix": list(codify(mi.stan_codes.ci_mic_codes).values()),
+        "ai_ix": list(codify(mi.stan_codes.ai_mic_codes).values()),
+        "aa_ix": list(codify(mi.stan_codes.aa_mic_codes).values()),
         # network properties
         "S_enz": S_enz.T.values,
         "S_to_flux_map": S_to_flux.values,
