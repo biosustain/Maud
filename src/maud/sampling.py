@@ -282,10 +282,6 @@ def _get_conc_init(mi):
     conc_init = [
         [0.01 for mic in mi.kinetic_model.mics] for _ in mi.stan_codes.experiment_codes
     ]
-    for prior_unb in mi.priors.unbalanced_metabolite_priors:
-        mic_idx = codify(mi.stan_codes.mic_codes)[prior_unb.mic_id] - 1
-        exp_idx = codify(mi.stan_codes.experiment_codes)[prior_unb.experiment_id] - 1
-        conc_init[exp_idx][mic_idx] = prior_unb.location
     for row in mi.measurements:
         if row.target_type == "mic":
             if row.target_id in mi.stan_codes.balanced_mic_codes:
