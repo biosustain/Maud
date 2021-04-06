@@ -274,6 +274,11 @@ def _tabulate_priors_2d(priors: List[Prior], exp_codes, target_codes, defaults):
 
 
 def _get_conc_init(mi):
+    """Get the initial concentrations for ODE solver from MaudInput object
+
+    :param mi: a MaudInput object
+
+    """
     conc_init = [
         [0.01 for mic in mi.kinetic_model.mics] for _ in mi.stan_codes.experiment_codes
     ]
