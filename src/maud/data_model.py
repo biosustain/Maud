@@ -222,11 +222,11 @@ class KineticModel:
     """Constructor for representation of a system of metabolic reactions.
 
     :param model_id: id of the kinetic model
-    :param metabolites: dictionary mapping strings to metabolite objects
-    :param reactions: dictionary mapping strings to reaction objects
-    :param drains: dictionary mapping strings to drain objects
-    :param compartments: dictionary mapping strings to compartment objects
-    :param mic: dictionary mapping strings to MetaboliteInCompartment objects
+    :param metabolites: list of metabolite objects
+    :param reactions: list of reaction objects
+    :param drains: list of drain objects
+    :param compartments: list of compartment objects
+    :param mic: list of MetaboliteInCompartment objects
     """
 
     def __init__(
