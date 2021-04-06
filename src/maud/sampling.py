@@ -274,7 +274,7 @@ def _tabulate_priors_2d(priors: List[Prior], exp_codes, target_codes, defaults):
 
 
 def _get_conc_init(mi):
-    """Get the initial concentrations for ODE solver from MaudInput object
+    """Get the initial concentrations for ODE solver from MaudInput object.
 
     :param mi: a MaudInput object
 
