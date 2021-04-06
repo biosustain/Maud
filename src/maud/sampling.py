@@ -274,7 +274,7 @@ def _tabulate_priors_2d(priors: List[Prior], exp_codes, target_codes, defaults):
 
 
 def _get_conc_init(mi):
-    """Get the initial concentrations for ODE solver from MaudInput object
+    """Get the initial concentrations for ODE solver from MaudInput object.
 
     :param mi: a MaudInput object
 
@@ -288,6 +288,10 @@ def _get_conc_init(mi):
                 mic_idx = codify(mi.stan_codes.mic_codes)[row.target_id] - 1
                 exp_idx = codify(mi.stan_codes.experiment_codes)[row.experiment_id] - 1
                 conc_init[exp_idx][mic_idx] = row.value
+    for p in mi.priors.unbalanced_metabolite_priors:
+        mic_idx = codify(mi.stan_codes.mic_codes)[p.mic_id] - 1
+        exp_idx = codify(mi.stan_codes.experiment_codes)[p.experiment_id] - 1
+        conc_init[exp_idx][mic_idx] = p.location
     return conc_init
 
 
