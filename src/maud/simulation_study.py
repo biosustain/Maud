@@ -19,10 +19,10 @@ def add_measurements_to_maud_input(
 ) -> MaudInput:
     """Replace the measurements in a maud input with simulated ones."""
     out = deepcopy(mi)
-    code_to_exp = {i + 1: c for i, c in enumerate(mi.stan_codes.experiment_codes)}
-    code_to_enz = {i + 1: c for i, c in enumerate(mi.stan_codes.enzyme_codes)}
-    code_to_mic = {i + 1: c for i, c in enumerate(mi.stan_codes.mic_codes)}
-    code_to_rxn = {i + 1: c for i, c in enumerate(mi.stan_codes.reaction_codes)}
+    code_to_exp = {i + 1: c for i, c in enumerate(mi.stan_coords.experiments)}
+    code_to_enz = {i + 1: c for i, c in enumerate(mi.stan_coords.enzymes)}
+    code_to_mic = {i + 1: c for i, c in enumerate(mi.stan_coords.mics)}
+    code_to_rxn = {i + 1: c for i, c in enumerate(mi.stan_coords.reactions)}
     var_ids = {
         "yenz_sim": [code_to_enz[i] for i in input_data["enzyme_yenz"]],
         "yconc_sim": [code_to_mic[i] for i in input_data["mic_ix_yconc"]],
@@ -106,7 +106,9 @@ def enrich_true_values(tvin, input_data):
             "log_transfer_constant_z": logz_for_vec(
                 tvin["transfer_constant"], input_data["tc_priors"]
             ),
-            "log_enzyme_z": logz_for_mat(tvin["enzyme"], input_data["enzyme_priors"]),
+            "log_enzyme_z": logz_for_mat(
+                tvin["enzyme"], input_data["enzyme_priors"]
+            ),
             "log_conc_unbalanced_z": logz_for_mat(
                 tvin["conc_unbalanced"], input_data["unbalanced_priors"]
             ),

@@ -15,11 +15,11 @@ def load_infd(csvs: List[str], mi: MaudInput) -> az.InferenceData:
     return az.from_cmdstan(
         csvs,
         coords={
-            "enzyme_name": mi.stan_codes.enzyme_codes,
-            "mic_name": mi.stan_codes.mic_codes,
-            "reaction": mi.stan_codes.reaction_codes,
-            "metabolite": mi.stan_codes.metabolite_codes,
-            "experiment": mi.stan_codes.experiment_codes,
+            "enzyme_name": mi.stan_coords.enzymes,
+            "mic_name": mi.stan_coords.mics,
+            "reaction": mi.stan_coords.reactions,
+            "metabolite": mi.stan_coords.metabolites,
+            "experiment": mi.stan_coords.experiments,
             "km_id": [p.id[3:] for p in mi.priors.km_priors],
         },
         dims={
@@ -86,18 +86,24 @@ def plot_experiment_var(
             hist, bins = np.histogram(x, bins=30)
             xscale = "linear"
             if logscale:
-                bins = np.logspace(np.log10(bins[0]), np.log10(bins[-1]), len(bins))
+                bins = np.logspace(
+                    np.log10(bins[0]), np.log10(bins[-1]), len(bins)
+                )
                 xscale = "log"
             _, _, hist_patches = ax.hist(x, bins=bins)
             ax.set_xscale(xscale)
             if true_values is not None:
                 if exp in true_values.keys():
                     if var in true_values[exp].keys():
-                        vline_truth = ax.axvline(true_values[exp][var], color="red")
+                        vline_truth = ax.axvline(
+                            true_values[exp][var], color="red"
+                        )
             if meas_values is not None:
                 if exp in meas_values.keys():
                     if var in meas_values[exp].keys():
-                        vline_meas = ax.axvline(meas_values[exp][var], color="orange")
+                        vline_meas = ax.axvline(
+                            meas_values[exp][var], color="orange"
+                        )
             ax.set_title(var)
         axrow[0].set_ylabel(exp)
     leg_handles = [hist_patches[0]]

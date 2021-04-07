@@ -17,6 +17,7 @@
 """Definitions of Maud-specific objects."""
 
 from collections import defaultdict
+from dataclasses import dataclass
 from typing import Dict, List
 
 import numpy as np
@@ -245,7 +246,9 @@ class KineticModel:
         self.drains = drains if drains is not None else []
         self.compartments = compartments
         self.mics = mics
-        self.phosphorylation = phosphorylation if phosphorylation is not None else []
+        self.phosphorylation = (
+            phosphorylation if phosphorylation is not None else []
+        )
 
 
 class Measurement:
@@ -348,7 +351,9 @@ class Prior:
                 (
                     self.location,
                     self.scale,
-                ) = get_normal_parameters_from_quantiles(pct1, 0.01, pct99, 0.99)
+                ) = get_normal_parameters_from_quantiles(
+                    pct1, 0.01, pct99, 0.99
+                )
         else:
             self.location = location
             self.scale = scale
@@ -378,58 +383,45 @@ class PriorSet:
         self.formation_energy_priors = formation_energy_priors
         self.unbalanced_metabolite_priors = unbalanced_metabolite_priors
         self.inhibition_constant_priors = inhibition_constant_priors
-        self.tense_dissociation_constant_priors = tense_dissociation_constant_priors
-        self.relaxed_dissociation_constant_priors = relaxed_dissociation_constant_priors
+        self.tense_dissociation_constant_priors = (
+            tense_dissociation_constant_priors
+        )
+        self.relaxed_dissociation_constant_priors = (
+            relaxed_dissociation_constant_priors
+        )
         self.transfer_constant_priors = transfer_constant_priors
         self.drain_priors = drain_priors
         self.enzyme_concentration_priors = enzyme_concentration_priors
         self.phos_enz_concentration_priors = phos_enz_concentration_priors
 
 
-class StanCodeSet:
-    """Object containing all stan codes for a MaudInput."""
+@dataclass
+class StanCoordSet:
+    """Object containing human-readable indexes for Maud's parameters.
 
-    def __init__(
-        self,
-        metabolite_codes: List[str],
-        mic_codes: List[str],
-        balanced_mic_codes: List[str],
-        unbalanced_mic_codes: List[str],
-        km_codes: List[str],
-        reaction_codes: List[str],
-        experiment_codes: List[str],
-        enzyme_codes: List[str],
-        drain_codes: List[str],
-        phos_enz_codes: List[str],
-        yconc_exp_codes: List[str],
-        yconc_mic_codes: List[str],
-        yflux_exp_codes: List[str],
-        yflux_reaction_codes: List[str],
-        yenz_exp_codes: List[str],
-        yenz_enz_codes: List[str],
-        ci_mic_codes: List[str],
-        ai_mic_codes: List[str],
-        aa_mic_codes: List[str],
-    ):
-        self.metabolite_codes = metabolite_codes
-        self.mic_codes = mic_codes
-        self.balanced_mic_codes = balanced_mic_codes
-        self.unbalanced_mic_codes = unbalanced_mic_codes
-        self.km_codes = km_codes
-        self.reaction_codes = reaction_codes
-        self.experiment_codes = experiment_codes
-        self.enzyme_codes = enzyme_codes
-        self.drain_codes = drain_codes
-        self.phos_enz_codes = phos_enz_codes
-        self.yconc_exp_codes = yconc_exp_codes
-        self.yconc_mic_codes = yconc_mic_codes
-        self.yflux_exp_codes = yflux_exp_codes
-        self.yflux_reaction_codes = yflux_reaction_codes
-        self.yenz_exp_codes = yenz_exp_codes
-        self.yenz_enz_codes = yenz_enz_codes
-        self.ci_mic_codes = ci_mic_codes
-        self.ai_mic_codes = ai_mic_codes
-        self.aa_mic_codes = aa_mic_codes
+    These are "coordinates" in the sense of xarray
+
+    """
+
+    metabolites: List[str]
+    mics: List[str]
+    balanced_mics: List[str]
+    unbalanced_mics: List[str]
+    kms: List[str]
+    reactions: List[str]
+    experiments: List[str]
+    enzymes: List[str]
+    drains: List[str]
+    phos_enzs: List[str]
+    yconc_exps: List[str]
+    yconc_mics: List[str]
+    yflux_exps: List[str]
+    yflux_rxns: List[str]
+    yenz_exps: List[str]
+    yenz_enzs: List[str]
+    ci_mics: List[str]
+    ai_mics: List[str]
+    aa_mics: List[str]
 
 
 class MaudConfig:
@@ -480,14 +472,14 @@ class MaudInput:
         config: MaudConfig,
         kinetic_model: KineticModel,
         priors: PriorSet,
-        stan_codes: StanCodeSet,
+        stan_coords: StanCoordSet,
         measurements: List[Measurement],
         knockouts: List[Knockout],
     ):
         self.config = config
         self.kinetic_model = kinetic_model
         self.priors = priors
-        self.stan_codes = stan_codes
+        self.stan_coords = stan_coords
         self.measurements = measurements
         self.knockouts = knockouts
 

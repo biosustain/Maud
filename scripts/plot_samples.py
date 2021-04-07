@@ -105,12 +105,12 @@ def main():
     infd = az.from_cmdstan(
         csvs,
         coords={
-            "mics": list(mi.stan_codes.mic_codes.keys()),
-            "mets": list(mi.stan_codes.metabolite_codes.keys()),
+            "mics": list(mi.stan_coords.mics.keys()),
+            "mets": list(mi.stan_coords.metabolites.keys()),
             "kms": [f"{p.enzyme_id}_{p.mic_id}" for p in mi.priors.km_priors],
-            "enzymes": list(mi.stan_codes.enzyme_codes.keys()),
-            "reactions": list(mi.stan_codes.reaction_codes.keys()),
-            "experiments": list(mi.stan_codes.experiment_codes.keys()),
+            "enzymes": list(mi.stan_coords.enzymes.keys()),
+            "reactions": list(mi.stan_coords.reactions.keys()),
+            "experiments": list(mi.stan_coords.experiments.keys()),
         },
         dims={
             "conc": ["experiments", "mics"],

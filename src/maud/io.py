@@ -43,7 +43,7 @@ from maud.data_model import (
     Prior,
     PriorSet,
     Reaction,
-    StanCodeSet,
+    StanCoordSet,
 )
 from maud.utils import codify
 
@@ -61,13 +61,13 @@ def load_maud_input_from_toml(data_path: str) -> MaudInput:
     priors_path = os.path.join(data_path, config.priors_file)
     kinetic_model = parse_toml_kinetic_model(toml.load(kinetic_model_path))
     measurements, knockouts = parse_measurements(pd.read_csv(experiments_path))
-    stan_codes = get_stan_codes(kinetic_model, measurements)
-    prior_set = parse_prior_set_df(pd.read_csv(priors_path), stan_codes)
+    stan_coords = get_stan_coords(kinetic_model, measurements)
+    prior_set = parse_prior_set_df(pd.read_csv(priors_path), stan_coords)
     mi = MaudInput(
         config=config,
         kinetic_model=kinetic_model,
         priors=prior_set,
-        stan_codes=stan_codes,
+        stan_coords=stan_coords,
         measurements=measurements,
         knockouts=knockouts,
     )
@@ -87,7 +87,9 @@ def parse_toml_kinetic_model(raw: dict) -> KineticModel:
         for c in raw["compartments"]
     ]
     raw_mets = {m["id"]: m for m in raw["metabolites"]}
-    metabolites = [Metabolite(id=m["id"], name=m["name"]) for m in raw_mets.values()]
+    metabolites = [
+        Metabolite(id=m["id"], name=m["name"]) for m in raw_mets.values()
+    ]
     mics = [
         MetaboliteInCompartment(
             id=f"{m['id']}_{m['compartment']}",
@@ -99,7 +101,9 @@ def parse_toml_kinetic_model(raw: dict) -> KineticModel:
     ]
     reactions = [parse_toml_reaction(r) for r in raw["reactions"]]
     drains = (
-        [parse_toml_drain(d) for d in raw["drains"]] if "drains" in raw.keys() else []
+        [parse_toml_drain(d) for d in raw["drains"]]
+        if "drains" in raw.keys()
+        else []
     )
     phosphorylation = (
         [parse_toml_phosphorylation(d) for d in raw["phosphorylation"]]
@@ -117,32 +121,31 @@ def parse_toml_kinetic_model(raw: dict) -> KineticModel:
     )
 
 
-def get_stan_codes(km: KineticModel, ms: List[Measurement]) -> StanCodeSet:
+def get_stan_coords(km: KineticModel, ms: List[Measurement]) -> StanCoordSet:
     """Get the stan codes for a Maud input.
 
     :param km: KineticModel object
     :param ms: MeasurementSet object
     """
-    km_codes = [
-        f"{m}_{e.id}" for r in km.reactions for e in r.enzymes for m in r.stoichiometry
+    kms = [
+        f"{e.id}_{m}"
+        for r in km.reactions
+        for e in r.enzymes
+        for m in r.stoichiometry
     ]
-    experiment_codes = sorted(list(set(m.experiment_id for m in ms)))
-    mic_codes = [m.id for m in km.mics]
-    reaction_codes = [r.id for r in km.reactions]
-    enzyme_codes = [e.id for r in km.reactions for e in r.enzymes]
-    yconc_exp_codes, yflux_exp_codes, yenz_exp_codes = (
+    experiments = list(set(m.experiment_id for m in ms))
+    mics = [m.id for m in km.mics]
+    reactions = [r.id for r in km.reactions]
+    enzymes = [e.id for r in km.reactions for e in r.enzymes]
+    yconc_exps, yflux_exps, yenz_exps = (
         [m.experiment_id for m in ms if m.target_type == t]
         for t in ["mic", "flux", "enzyme"]
     )
-    yconc_mic_codes, yflux_reaction_codes, yenz_enz_codes = (
+    yconc_mics, yflux_rxns, yenz_enzs = (
         [m.target_id for m in ms if m.target_type == t]
-        for t, codes in [
-            ("mic", mic_codes),
-            ("flux", reaction_codes),
-            ("enzyme", enzyme_codes),
-        ]
+        for t in ["mic", "flux", "enzyme"]
     )
-    ci_mic_codes, ai_mic_codes, aa_mic_codes = (
+    ci_mics, ai_mics, aa_mics = (
         [
             m.mic_id
             for r in km.reactions
@@ -155,26 +158,26 @@ def get_stan_codes(km: KineticModel, ms: List[Measurement]) -> StanCodeSet:
             "allosteric_activator",
         ]
     )
-    return StanCodeSet(
-        metabolite_codes=[m.id for m in km.metabolites],
-        mic_codes=mic_codes,
-        km_codes=km_codes,
-        balanced_mic_codes=[m.id for m in km.mics if m.balanced],
-        unbalanced_mic_codes=[m.id for m in km.mics if not m.balanced],
-        reaction_codes=reaction_codes,
-        experiment_codes=experiment_codes,
-        enzyme_codes=enzyme_codes,
-        phos_enz_codes=[e.id for e in km.phosphorylation],
-        drain_codes=[d.id for d in km.drains],
-        yconc_exp_codes=yconc_exp_codes,
-        yconc_mic_codes=yconc_mic_codes,
-        yflux_exp_codes=yflux_exp_codes,
-        yflux_reaction_codes=yflux_reaction_codes,
-        yenz_exp_codes=yenz_exp_codes,
-        yenz_enz_codes=yenz_enz_codes,
-        ci_mic_codes=ci_mic_codes,
-        ai_mic_codes=ai_mic_codes,
-        aa_mic_codes=aa_mic_codes,
+    return StanCoordSet(
+        metabolites=[m.id for m in km.metabolites],
+        mics=mics,
+        kms=kms,
+        balanced_mics=[m.id for m in km.mics if m.balanced],
+        unbalanced_mics=[m.id for m in km.mics if not m.balanced],
+        reactions=reactions,
+        experiments=experiments,
+        enzymes=enzymes,
+        phos_enzs=[e.id for e in km.phosphorylation],
+        drains=[d.id for d in km.drains],
+        yconc_exps=yconc_exps,
+        yconc_mics=yconc_mics,
+        yflux_exps=yflux_exps,
+        yflux_rxns=yflux_rxns,
+        yenz_exps=yenz_exps,
+        yenz_enzs=yenz_enzs,
+        ci_mics=ci_mics,
+        ai_mics=ai_mics,
+        aa_mics=aa_mics,
     )
 
 
@@ -186,7 +189,9 @@ def parse_toml_drain(raw: dict) -> Drain:
 
     """
 
-    return Drain(id=raw["id"], name=raw["name"], stoichiometry=raw["stoichiometry"])
+    return Drain(
+        id=raw["id"], name=raw["name"], stoichiometry=raw["stoichiometry"]
+    )
 
 
 def parse_toml_phosphorylation(raw: dict) -> Phosphorylation:
@@ -288,7 +293,7 @@ def parse_measurements(
     return measurements, knockouts
 
 
-def parse_prior_set_df(raw: pd.DataFrame, codes: StanCodeSet) -> PriorSet:
+def parse_prior_set_df(raw: pd.DataFrame, cs: StanCoordSet) -> PriorSet:
     """Get a PriorSet object from a dataframe.
 
     :param raw: result of running pd.read_csv on a suitable file
@@ -309,34 +314,34 @@ def parse_prior_set_df(raw: pd.DataFrame, codes: StanCodeSet) -> PriorSet:
     }
     order_keys = {
         # ensure that priors are in the right order wrt the stan codes
-        "kcat_priors": lambda p: codify(codes.enzyme_codes)[p.enzyme_id],
-        "km_priors": lambda p: codify(codes.km_codes)[f"{p.mic_id}_{p.enzyme_id}"],
-        "formation_energy_priors": lambda p: codify(codes.metabolite_codes)[
+        "kcat_priors": lambda p: codify(cs.enzymes)[p.enzyme_id],
+        "km_priors": lambda p: codify(cs.kms)[f"{p.enzyme_id}_{p.mic_id}"],
+        "formation_energy_priors": lambda p: codify(cs.metabolites)[
             p.metabolite_id
         ],
         "unbalanced_metabolite_priors": lambda p: (
-            codify(codes.mic_codes)[p.mic_id],
-            codify(codes.experiment_codes)[p.experiment_id],
+            codify(cs.experiments)[p.experiment_id],
+            codify(cs.mics)[p.mic_id],
         ),
         "inhibition_constant_priors": lambda p: (
-            codify(codes.enzyme_codes)[p.enzyme_id],
-            codify(codes.ci_mic_codes)[p.mic_id],
+            codify(cs.enzymes)[p.enzyme_id],
+            codify(cs.ci_mics)[p.mic_id],
         ),
         "tense_dissociation_constant_priors": lambda p: (
-            codify(codes.enzyme_codes)[p.enzyme_id],
-            codify(codes.ai_mic_codes)[p.mic_id],
+            codify(cs.enzymes)[p.enzyme_id],
+            codify(cs.ai_mics)[p.mic_id],
         ),
         "relaxed_dissociation_constant_priors": lambda p: (
-            codify(codes.enzyme_codes)[p.enzyme_id],
-            codify(codes.aa_mic_codes)[p.mic_id],
+            codify(cs.enzymes)[p.enzyme_id],
+            codify(cs.aa_mics)[p.mic_id],
         ),
-        "transfer_constant_priors": lambda p: codify(codes.enzyme_codes)[p.enzyme_id],
-        "drain_priors": lambda p: codify(codes.drain_codes)[p.drain_id],
-        "enzyme_concentration_priors": lambda p: codify(codes.enzyme_codes)[
+        "transfer_constant_priors": lambda p: codify(cs.enzymes)[p.enzyme_id],
+        "drain_priors": lambda p: codify(cs.drains)[p.drain_id],
+        "enzyme_concentration_priors": lambda p: codify(cs.enzymes)[
             p.enzyme_id
         ],
-        "phos_kcat_priors": lambda p: codify(codes.phos_enz_codes)[p.phos_enz_id],
-        "phos_enz_concentration_priors": lambda p: codify(codes.phos_enz_codes)[
+        "phos_kcat_priors": lambda p: codify(cs.phos_enzs)[p.phos_enz_id],
+        "phos_enz_concentration_priors": lambda p: codify(cs.phos_enzs)[
             p.phos_enz_id
         ],
     }
