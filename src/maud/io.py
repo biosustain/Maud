@@ -126,7 +126,9 @@ def get_stan_coords(km: KineticModel, ms: List[Measurement]) -> StanCoordSet:
     kms = [
         f"{e.id}_{m}" for r in km.reactions for e in r.enzymes for m in r.stoichiometry
     ]
-    experiments = list(set(m.experiment_id for m in ms))
+    experiments = sorted(
+        list(set(m.experiment_id for m in ms))
+    )  # sorted because set has non-deterministic order
     mics = [m.id for m in km.mics]
     reactions = [r.id for r in km.reactions]
     enzymes = [e.id for r in km.reactions for e in r.enzymes]
