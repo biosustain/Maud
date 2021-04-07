@@ -131,11 +131,11 @@ def get_stan_codes(km: KineticModel, ms: List[Measurement]) -> StanCodeSet:
     reaction_codes = [r.id for r in km.reactions]
     enzyme_codes = [e.id for r in km.reactions for e in r.enzymes]
     yconc_exp_codes, yflux_exp_codes, yenz_exp_codes = (
-        [codify(experiment_codes)[m.experiment_id] for m in ms if m.target_type == t]
+        [m.experiment_id for m in ms if m.target_type == t]
         for t in ["mic", "flux", "enzyme"]
     )
     yconc_mic_codes, yflux_reaction_codes, yenz_enz_codes = (
-        [codify(codes)[m.target_id] for m in ms if m.target_type == t]
+        [m.target_id for m in ms if m.target_type == t]
         for t, codes in [
             ("mic", mic_codes),
             ("flux", reaction_codes),

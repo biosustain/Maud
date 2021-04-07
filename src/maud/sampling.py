@@ -322,7 +322,18 @@ def get_input_data(mi: MaudInput) -> dict:
             mi.stan_codes.balanced_mic_codes,
         )
     )
-
+    allosteric_enzymes = [
+        e
+        for e in sorted_enzymes
+        if (
+            len(e.modifiers["allosteric_inhibitor"]) > 0
+            or len(e.modifiers["allosteric_activator"]) > 0
+        )
+    ]
+    exp_to_ix = codify(mi.stan_codes.experiment_codes)
+    mic_to_ix = codify(mi.stan_codes.mic_codes)
+    rxn_to_ix = codify(mi.stan_codes.reaction_codes)
+    enz_to_ix = codify(mi.stan_codes.enzyme_codes)
     return {
         # sizes
         "N_mic": len(mi.kinetic_model.mics),
@@ -336,23 +347,23 @@ def get_input_data(mi: MaudInput) -> dict:
         "N_flux_measurement": len(mi.stan_codes.yflux_reaction_codes),
         "N_enzyme_measurement": len(mi.stan_codes.yenz_enz_codes),
         "N_conc_measurement": len(mi.stan_codes.yconc_mic_codes),
-        "N_ki": len(mi.priors.inhibition_constant_priors),
-        "N_ai": len(mi.priors.tense_dissociation_constant_priors),
-        "N_aa": len(mi.priors.relaxed_dissociation_constant_priors),
-        "N_ae": len(mi.priors.transfer_constant_priors),
+        "N_ki": len(mi.stan_codes.ci_mic_codes),
+        "N_ai": len(mi.stan_codes.ai_mic_codes),
+        "N_aa": len(mi.stan_codes.aa_mic_codes),
+        "N_ae": len(allosteric_enzymes),
         "N_drain": len(mi.stan_codes.drain_codes),
         # codes
         "unbalanced_mic_ix": unbalanced_mic_ix,
         "balanced_mic_ix": balanced_mic_ix,
-        "experiment_yconc": mi.stan_codes.yconc_exp_codes,
-        "mic_ix_yconc": mi.stan_codes.yconc_mic_codes,
-        "experiment_yflux": mi.stan_codes.yflux_exp_codes,
-        "reaction_yflux": mi.stan_codes.yflux_reaction_codes,
-        "experiment_yenz": mi.stan_codes.yenz_exp_codes,
-        "enzyme_yenz": mi.stan_codes.yenz_enz_codes,
-        "ci_ix": list(codify(mi.stan_codes.ci_mic_codes).values()),
-        "ai_ix": list(codify(mi.stan_codes.ai_mic_codes).values()),
-        "aa_ix": list(codify(mi.stan_codes.aa_mic_codes).values()),
+        "experiment_yconc": [exp_to_ix[e] for e in mi.stan_codes.yconc_exp_codes],
+        "mic_ix_yconc": [mic_to_ix[m] for m in mi.stan_codes.yconc_mic_codes],
+        "experiment_yflux": [exp_to_ix[e] for e in mi.stan_codes.yflux_exp_codes],
+        "reaction_yflux": [rxn_to_ix[r] for r in mi.stan_codes.yflux_reaction_codes],
+        "experiment_yenz": [exp_to_ix[e] for e in mi.stan_codes.yenz_exp_codes],
+        "enzyme_yenz": [enz_to_ix[e] for e in mi.stan_codes.yenz_enz_codes],
+        "ci_ix": [mic_to_ix[m] for m in mi.stan_codes.ci_mic_codes],
+        "ai_ix": [mic_to_ix[m] for m in mi.stan_codes.ai_mic_codes],
+        "aa_ix": [mic_to_ix[m] for m in mi.stan_codes.aa_mic_codes],
         # network properties
         "S_enz": S_enz.T.values,
         "S_to_flux_map": S_to_flux.values,
