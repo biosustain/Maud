@@ -246,9 +246,7 @@ class KineticModel:
         self.drains = drains if drains is not None else []
         self.compartments = compartments
         self.mics = mics
-        self.phosphorylation = (
-            phosphorylation if phosphorylation is not None else []
-        )
+        self.phosphorylation = phosphorylation if phosphorylation is not None else []
 
 
 class Measurement:
@@ -351,9 +349,7 @@ class Prior:
                 (
                     self.location,
                     self.scale,
-                ) = get_normal_parameters_from_quantiles(
-                    pct1, 0.01, pct99, 0.99
-                )
+                ) = get_normal_parameters_from_quantiles(pct1, 0.01, pct99, 0.99)
         else:
             self.location = location
             self.scale = scale
@@ -383,12 +379,8 @@ class PriorSet:
         self.formation_energy_priors = formation_energy_priors
         self.unbalanced_metabolite_priors = unbalanced_metabolite_priors
         self.inhibition_constant_priors = inhibition_constant_priors
-        self.tense_dissociation_constant_priors = (
-            tense_dissociation_constant_priors
-        )
-        self.relaxed_dissociation_constant_priors = (
-            relaxed_dissociation_constant_priors
-        )
+        self.tense_dissociation_constant_priors = tense_dissociation_constant_priors
+        self.relaxed_dissociation_constant_priors = relaxed_dissociation_constant_priors
         self.transfer_constant_priors = transfer_constant_priors
         self.drain_priors = drain_priors
         self.enzyme_concentration_priors = enzyme_concentration_priors

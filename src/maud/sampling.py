@@ -163,9 +163,7 @@ def validate_specified_fluxes(mi: MaudInput):
         _, n_dof = np.shape(flux_paths)
         rref_flux_paths = np.matrix(get_rref(flux_paths.T))
         rref_flux_paths[np.abs(rref_flux_paths) < 1e-10] = 0
-        flux_paths_df = pd.DataFrame(
-            rref_flux_paths, columns=complete_reactions
-        )
+        flux_paths_df = pd.DataFrame(rref_flux_paths, columns=complete_reactions)
         for _, flux_path in flux_paths_df.iterrows():
             if any(flux_path[measured_rxns]) != 0:
                 pass
@@ -201,9 +199,7 @@ def get_knockout_matrix(mi: MaudInput, knockout_type: str):
         raise ValueError("knockout_type must be either 'enz' or 'phos'.")
     experiment_ix = mi.stan_coords.experiments
     col_ix = (
-        mi.stan_coords.enzymes
-        if knockout_type == "enz"
-        else mi.stan_coords.phos_enzs
+        mi.stan_coords.enzymes if knockout_type == "enz" else mi.stan_coords.phos_enzs
     )
     knockout_matrix = np.zeros([len(experiment_ix), len(col_ix)])
     for knockout in mi.knockouts:
@@ -282,16 +278,13 @@ def _get_conc_init(mi):
 
     """
     conc_init = [
-        [0.01 for mic in mi.kinetic_model.mics]
-        for _ in mi.stan_coords.experiments
+        [0.01 for mic in mi.kinetic_model.mics] for _ in mi.stan_coords.experiments
     ]
     for row in mi.measurements:
         if row.target_type == "mic":
             if row.target_id in mi.stan_coords.balanced_mics:
                 mic_idx = codify(mi.stan_coords.mics)[row.target_id] - 1
-                exp_idx = (
-                    codify(mi.stan_coords.experiments)[row.experiment_id] - 1
-                )
+                exp_idx = codify(mi.stan_coords.experiments)[row.experiment_id] - 1
                 conc_init[exp_idx][mic_idx] = row.value
     for p in mi.priors.unbalanced_metabolite_priors:
         mic_idx = codify(mi.stan_coords.mics)[p.mic_id] - 1
@@ -382,28 +375,16 @@ def get_input_data(mi: MaudInput) -> dict:
         "is_knockout": knockout_matrix_enzyme,
         "is_phos_knockout": knockout_matrix_phos,
         "subunits": [e.subunits for e in sorted_enzymes],
-        "n_ci": [
-            len(e.modifiers["competitive_inhibitor"]) for e in sorted_enzymes
-        ],
-        "n_ai": [
-            len(e.modifiers["allosteric_inhibitor"]) for e in sorted_enzymes
-        ],
-        "n_aa": [
-            len(e.modifiers["allosteric_activator"]) for e in sorted_enzymes
-        ],
+        "n_ci": [len(e.modifiers["competitive_inhibitor"]) for e in sorted_enzymes],
+        "n_ai": [len(e.modifiers["allosteric_inhibitor"]) for e in sorted_enzymes],
+        "n_aa": [len(e.modifiers["allosteric_activator"]) for e in sorted_enzymes],
         # measurements
         "yconc": [m.value for m in mi.measurements if m.target_type == "mic"],
-        "sigma_conc": [
-            m.error for m in mi.measurements if m.target_type == "mic"
-        ],
+        "sigma_conc": [m.error for m in mi.measurements if m.target_type == "mic"],
         "yflux": [m.value for m in mi.measurements if m.target_type == "flux"],
-        "sigma_flux": [
-            m.error for m in mi.measurements if m.target_type == "flux"
-        ],
+        "sigma_flux": [m.error for m in mi.measurements if m.target_type == "flux"],
         "yenz": [m.value for m in mi.measurements if m.target_type == "enzyme"],
-        "sigma_enz": [
-            m.error for m in mi.measurements if m.target_type == "enzyme"
-        ],
+        "sigma_enz": [m.error for m in mi.measurements if m.target_type == "enzyme"],
         # priors
         "fe_priors": _tabulate_priors_1d(mi.priors.formation_energy_priors),
         "kcat_priors": _tabulate_priors_1d(mi.priors.kcat_priors),

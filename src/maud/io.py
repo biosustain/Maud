@@ -87,9 +87,7 @@ def parse_toml_kinetic_model(raw: dict) -> KineticModel:
         for c in raw["compartments"]
     ]
     raw_mets = {m["id"]: m for m in raw["metabolites"]}
-    metabolites = [
-        Metabolite(id=m["id"], name=m["name"]) for m in raw_mets.values()
-    ]
+    metabolites = [Metabolite(id=m["id"], name=m["name"]) for m in raw_mets.values()]
     mics = [
         MetaboliteInCompartment(
             id=f"{m['id']}_{m['compartment']}",
@@ -101,9 +99,7 @@ def parse_toml_kinetic_model(raw: dict) -> KineticModel:
     ]
     reactions = [parse_toml_reaction(r) for r in raw["reactions"]]
     drains = (
-        [parse_toml_drain(d) for d in raw["drains"]]
-        if "drains" in raw.keys()
-        else []
+        [parse_toml_drain(d) for d in raw["drains"]] if "drains" in raw.keys() else []
     )
     phosphorylation = (
         [parse_toml_phosphorylation(d) for d in raw["phosphorylation"]]
@@ -128,10 +124,7 @@ def get_stan_coords(km: KineticModel, ms: List[Measurement]) -> StanCoordSet:
     :param ms: MeasurementSet object
     """
     kms = [
-        f"{e.id}_{m}"
-        for r in km.reactions
-        for e in r.enzymes
-        for m in r.stoichiometry
+        f"{e.id}_{m}" for r in km.reactions for e in r.enzymes for m in r.stoichiometry
     ]
     experiments = list(set(m.experiment_id for m in ms))
     mics = [m.id for m in km.mics]
@@ -189,9 +182,7 @@ def parse_toml_drain(raw: dict) -> Drain:
 
     """
 
-    return Drain(
-        id=raw["id"], name=raw["name"], stoichiometry=raw["stoichiometry"]
-    )
+    return Drain(id=raw["id"], name=raw["name"], stoichiometry=raw["stoichiometry"])
 
 
 def parse_toml_phosphorylation(raw: dict) -> Phosphorylation:
@@ -316,9 +307,7 @@ def parse_prior_set_df(raw: pd.DataFrame, cs: StanCoordSet) -> PriorSet:
         # ensure that priors are in the right order wrt the stan codes
         "kcat_priors": lambda p: codify(cs.enzymes)[p.enzyme_id],
         "km_priors": lambda p: codify(cs.kms)[f"{p.enzyme_id}_{p.mic_id}"],
-        "formation_energy_priors": lambda p: codify(cs.metabolites)[
-            p.metabolite_id
-        ],
+        "formation_energy_priors": lambda p: codify(cs.metabolites)[p.metabolite_id],
         "unbalanced_metabolite_priors": lambda p: (
             codify(cs.experiments)[p.experiment_id],
             codify(cs.mics)[p.mic_id],
@@ -337,13 +326,9 @@ def parse_prior_set_df(raw: pd.DataFrame, cs: StanCoordSet) -> PriorSet:
         ),
         "transfer_constant_priors": lambda p: codify(cs.enzymes)[p.enzyme_id],
         "drain_priors": lambda p: codify(cs.drains)[p.drain_id],
-        "enzyme_concentration_priors": lambda p: codify(cs.enzymes)[
-            p.enzyme_id
-        ],
+        "enzyme_concentration_priors": lambda p: codify(cs.enzymes)[p.enzyme_id],
         "phos_kcat_priors": lambda p: codify(cs.phos_enzs)[p.phos_enz_id],
-        "phos_enz_concentration_priors": lambda p: codify(cs.phos_enzs)[
-            p.phos_enz_id
-        ],
+        "phos_enz_concentration_priors": lambda p: codify(cs.phos_enzs)[p.phos_enz_id],
     }
     negative_param_types = ["formation_energy", "drain"]
     for _, row in raw.iterrows():

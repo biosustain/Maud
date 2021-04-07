@@ -106,9 +106,7 @@ def enrich_true_values(tvin, input_data):
             "log_transfer_constant_z": logz_for_vec(
                 tvin["transfer_constant"], input_data["tc_priors"]
             ),
-            "log_enzyme_z": logz_for_mat(
-                tvin["enzyme"], input_data["enzyme_priors"]
-            ),
+            "log_enzyme_z": logz_for_mat(tvin["enzyme"], input_data["enzyme_priors"]),
             "log_conc_unbalanced_z": logz_for_mat(
                 tvin["conc_unbalanced"], input_data["unbalanced_priors"]
             ),
