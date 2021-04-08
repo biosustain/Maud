@@ -330,20 +330,16 @@ def parse_measurements(raw: pd.DataFrame, cs: StanCoordSet) -> MeasurementSet:
         )
         for t in ["mic", "flux", "enzyme"]
     )
-    enz_knockouts, phos_knockouts = (
-        pd.Series(
-            True,
-            index=pd.MultiIndex.from_frame(
-                raw.loc[
-                    lambda df: df["measurement_type"] == t,
-                    ["experiment_id", "target_id"],
-                ]
-            ),
-        )
-        .reindex(pd.MultiIndex.from_arrays(type_to_coords[t]))
-        .fillna(False)
-        for t in ["knockout_enz", "knockout_phos"]
-    )
+    enz_knockouts = pd.DataFrame(False, index=cs.experiments, columns=cs.enzymes)
+    phos_knockouts = pd.DataFrame(False, index=cs.experiments, columns=cs.phos_enzs)
+    for _, row in raw.loc[
+        lambda df: df["measurement_type"] == "knockout_enz"
+    ].iterrows():
+        enz_knockouts.loc[row["experiment_id"], row["target_id"]] = True
+    for _, row in raw.loc[
+        lambda df: df["measurement_type"] == "knockout_phos"
+    ].iterrows():
+        phos_knockouts.loc[row["experiment_id"], row["target_id"]] = True
     return MeasurementSet(
         yconc=yconc,
         yflux=yflux,
