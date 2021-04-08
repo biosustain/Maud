@@ -20,13 +20,8 @@ from collections import defaultdict
 from dataclasses import dataclass
 from typing import Dict, List
 
-import numpy as np
+import pandas as pd
 from cmdstanpy import CmdStanMCMC
-
-from maud.utils import (
-    get_lognormal_parameters_from_quantiles,
-    get_normal_parameters_from_quantiles,
-)
 
 
 class Compartment:
@@ -143,6 +138,10 @@ class Enzyme:
         self.modifiers = modifiers
         self.subunits = subunits
         self.water_stoichiometry = water_stoichiometry
+        self.allosteric = (
+            len(self.modifiers["allosteric_activator"]) > 0
+            or len(self.modifiers["allosteric_inhibitor"]) > 0
+        )
 
 
 class Reaction:
@@ -275,116 +274,59 @@ class Measurement:
         self.error = error
 
 
-class Knockout:
-    """Constructor for knockout object.
-
-    :param experiment_id: id of the experiment where the thing was knocked out
-    :target_id: id of the thing that was knocked out
-    :knockout_type: either "enz" or "phos"
-    """
-
-    def __init__(
-        self,
-        experiment_id: str,
-        target_id: str,
-        knockout_type: str,
-    ):
-        self.experiment_id = experiment_id
-        self.target_id = target_id
-        self.knockout_type = knockout_type
+@dataclass
+class MeasurementSet:
+    yconc: pd.DataFrame
+    yflux: pd.DataFrame
+    yenz: pd.DataFrame
+    enz_knockouts: pd.DataFrame
+    phos_knockouts: pd.DataFrame
 
 
-class Prior:
-    """A prior distribuition.
+@dataclass
+class IndPrior1d:
+    """Independent location/scale prior for a 1-dimentional parameter."""
 
-    As currently implemented, the target must be a single parameter and the
-    distribution must have a location and a scale.
+    parameter_name: str
+    location: pd.Series
+    scale: pd.Series
 
-    :param id: a string identifying the prior object
-    :param target_id: a string identifying the thing that has a prior distribution
-    :param location: a number specifying the location of the distribution
-    :param scale: a number specifying the scale of the distribution
-    :param experiment_id: id of the relevant experiment (for enzymes or unbalanced
-    metabolites)
-    :param mic_id: id of relevant metabolite-in-compartment
-    :param metabolite_id: id of relevant metabolite
-    :param enzyme_id: id of relevant enzyme
-    :param phos_enz_id: id of enzyme involved with phosphorylation reaction
-    :param drain_id: id of relevant drain
-    """
-
-    def __init__(
-        self,
-        id: str,
-        is_non_negative: bool,
-        experiment_id: str = None,
-        mic_id: str = None,
-        metabolite_id: str = None,
-        enzyme_id: str = None,
-        phos_enz_id: str = None,
-        drain_id: str = None,
-        pct1: float = None,
-        pct99: float = None,
-        location: float = None,
-        scale: float = None,
-    ):
-        self.id = id
-        self.is_non_negative = is_non_negative
-        self.experiment_id = experiment_id
-        self.mic_id = mic_id
-        self.metabolite_id = metabolite_id
-        self.enzyme_id = enzyme_id
-        self.phos_enz_id = phos_enz_id
-        self.drain_id = drain_id
-
-        self.pct1 = pct1
-        self.pct99 = pct99
-        if pct1 is not None and pct99 is not None:
-            if is_non_negative:
-                mu, self.scale = get_lognormal_parameters_from_quantiles(
-                    pct1, 0.01, pct99, 0.99
-                )
-                self.location = np.exp(mu)
-            else:
-                (
-                    self.location,
-                    self.scale,
-                ) = get_normal_parameters_from_quantiles(pct1, 0.01, pct99, 0.99)
-        else:
-            self.location = location
-            self.scale = scale
+    def __post_init__(self):
+        if not self.location.index.equals(self.scale.index):
+            raise ValueError(f"Location index doesn't match scale index.")
 
 
+@dataclass
+class IndPrior2d:
+    """Independent location/scale prior for a 2-dimensional parameter."""
+
+    parameter_name: str
+    location: pd.DataFrame
+    scale: pd.DataFrame
+
+    def __post_init__(self):
+        if not self.location.index.equals(self.scale.index):
+            raise ValueError(f"Location index doesn't match scale index.")
+        if not self.location.columns.equals(self.scale.columns):
+            raise ValueError(f"Location columns don't match scale columns.")
+
+
+@dataclass
 class PriorSet:
     """Object containing all priors for a MaudInput."""
 
-    def __init__(
-        self,
-        kcat_priors: List[Prior],
-        phos_kcat_priors: List[Prior],
-        km_priors: List[Prior],
-        formation_energy_priors: List[Prior],
-        unbalanced_metabolite_priors: List[Prior],
-        inhibition_constant_priors: List[Prior],
-        tense_dissociation_constant_priors: List[Prior],
-        relaxed_dissociation_constant_priors: List[Prior],
-        transfer_constant_priors: List[Prior],
-        drain_priors: List[Prior],
-        enzyme_concentration_priors: List[Prior],
-        phos_enz_concentration_priors: List[Prior],
-    ):
-        self.kcat_priors = kcat_priors
-        self.phos_kcat_priors = phos_kcat_priors
-        self.km_priors = km_priors
-        self.formation_energy_priors = formation_energy_priors
-        self.unbalanced_metabolite_priors = unbalanced_metabolite_priors
-        self.inhibition_constant_priors = inhibition_constant_priors
-        self.tense_dissociation_constant_priors = tense_dissociation_constant_priors
-        self.relaxed_dissociation_constant_priors = relaxed_dissociation_constant_priors
-        self.transfer_constant_priors = transfer_constant_priors
-        self.drain_priors = drain_priors
-        self.enzyme_concentration_priors = enzyme_concentration_priors
-        self.phos_enz_concentration_priors = phos_enz_concentration_priors
+    kcat_priors: IndPrior1d
+    phos_kcat_priors: IndPrior1d
+    km_priors: IndPrior1d
+    formation_energy_priors: IndPrior1d
+    inhibition_constant_priors: IndPrior1d
+    tense_dissociation_constant_priors: IndPrior1d
+    relaxed_dissociation_constant_priors: IndPrior1d
+    transfer_constant_priors: IndPrior1d
+    unbalanced_metabolite_priors: IndPrior2d
+    drain_priors: IndPrior2d
+    enzyme_concentration_priors: IndPrior2d
+    phos_enz_concentration_priors: IndPrior2d
 
 
 @dataclass
@@ -399,10 +341,12 @@ class StanCoordSet:
     mics: List[str]
     balanced_mics: List[str]
     unbalanced_mics: List[str]
-    kms: List[str]
+    km_enzs: List[str]
+    km_mics: List[str]
     reactions: List[str]
     experiments: List[str]
     enzymes: List[str]
+    allosteric_enzymes: List[str]
     drains: List[str]
     phos_enzs: List[str]
     yconc_exps: List[str]
@@ -411,9 +355,16 @@ class StanCoordSet:
     yflux_rxns: List[str]
     yenz_exps: List[str]
     yenz_enzs: List[str]
+    ci_enzs: List[str]
     ci_mics: List[str]
+    ai_enzs: List[str]
     ai_mics: List[str]
+    aa_enzs: List[str]
     aa_mics: List[str]
+    enz_ko_exps: List[str]
+    enz_ko_enzs: List[str]
+    phos_ko_exps: List[str]
+    phos_ko_enzs: List[str]
 
 
 class MaudConfig:
@@ -452,11 +403,8 @@ class MaudInput:
 
     :param kinetic_system: a KineticSystem object
     :param priors: a dictionary mapping prior types to lists of Prior objects
-    :param stan codes: a dictionary with keys 'metabolite', 'reaction', 'mic',
-    'experiment', 'balanced_mic', 'unbalanced_mic' and 'kinetic_parameter', whose
-    values are dictionaries mapping ids of the relevant objects to integer codes
+    :param stan_coords: a StanCoordSet object
     :param measurement_set: a list of Measurement objects
-    :param knockout_set: a list of Knockout objects
     """
 
     def __init__(
@@ -465,15 +413,13 @@ class MaudInput:
         kinetic_model: KineticModel,
         priors: PriorSet,
         stan_coords: StanCoordSet,
-        measurements: List[Measurement],
-        knockouts: List[Knockout],
+        measurements: MeasurementSet,
     ):
         self.config = config
         self.kinetic_model = kinetic_model
         self.priors = priors
         self.stan_coords = stan_coords
         self.measurements = measurements
-        self.knockouts = knockouts
 
 
 class SimulationStudyOutput:

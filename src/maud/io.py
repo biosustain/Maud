@@ -21,8 +21,9 @@
 """
 
 import os
-from typing import List, Tuple
+from typing import List
 
+import numpy as np
 import pandas as pd
 import toml
 
@@ -31,21 +32,30 @@ from maud.data_model import (
     Compartment,
     Drain,
     Enzyme,
+    IndPrior1d,
+    IndPrior2d,
     KineticModel,
-    Knockout,
     MaudConfig,
     MaudInput,
-    Measurement,
+    MeasurementSet,
     Metabolite,
     MetaboliteInCompartment,
     Modifier,
     Phosphorylation,
-    Prior,
     PriorSet,
     Reaction,
     StanCoordSet,
 )
-from maud.utils import codify
+from maud.utils import (
+    get_lognormal_parameters_from_quantiles,
+    get_normal_parameters_from_quantiles,
+)
+
+
+DEFAULT_PRIOR_LOC_UNBALANCED = 0.1
+DEFAULT_PRIOR_SCALE_UNBALANCED = 2.0
+DEFAULT_PRIOR_LOC_ENZYME = 0.1
+DEFAULT_PRIOR_SCALE_ENZYME = 2.0
 
 
 def load_maud_input_from_toml(data_path: str) -> MaudInput:
@@ -60,18 +70,19 @@ def load_maud_input_from_toml(data_path: str) -> MaudInput:
     experiments_path = os.path.join(data_path, config.experiments_file)
     priors_path = os.path.join(data_path, config.priors_file)
     kinetic_model = parse_toml_kinetic_model(toml.load(kinetic_model_path))
-    measurements, knockouts = parse_measurements(pd.read_csv(experiments_path))
-    stan_coords = get_stan_coords(kinetic_model, measurements)
-    prior_set = parse_prior_set_df(pd.read_csv(priors_path), stan_coords)
+    raw_measurements = pd.read_csv(experiments_path)
+    raw_priors = pd.read_csv(priors_path)
+    stan_coords = get_stan_coords(kinetic_model, raw_measurements)
+    measurement_set = parse_measurements(raw_measurements, stan_coords)
+    prior_set = parse_priors(raw_priors, stan_coords)
     mi = MaudInput(
         config=config,
         kinetic_model=kinetic_model,
         priors=prior_set,
         stan_coords=stan_coords,
-        measurements=measurements,
-        knockouts=knockouts,
+        measurements=measurement_set,
     )
-    validation.validate_maud_input(mi)
+    # validation.validate_maud_input(mi)
     return mi
 
 
@@ -117,62 +128,104 @@ def parse_toml_kinetic_model(raw: dict) -> KineticModel:
     )
 
 
-def get_stan_coords(km: KineticModel, ms: List[Measurement]) -> StanCoordSet:
-    """Get the stan codes for a Maud input.
+def get_stan_coords(km: KineticModel, raw_measurements: pd.DataFrame) -> StanCoordSet:
+    """Get all the coordinates that Maud needs.
+
+    This function is responsible for setting the order of each parameter.
 
     :param km: KineticModel object
     :param ms: MeasurementSet object
     """
-    kms = [
-        f"{e.id}_{m}" for r in km.reactions for e in r.enzymes for m in r.stoichiometry
+
+    def unpack(packed):
+        return zip(*packed) if len(packed) > 0 else ([], [])
+
+    measurement_types = [
+        "mic",
+        "flux",
+        "enzyme",
+        "knockout_enz",
+        "knockout_phos",
     ]
-    experiments = sorted(
-        list(set(m.experiment_id for m in ms))
-    )  # sorted because set has non-deterministic order
-    mics = [m.id for m in km.mics]
-    reactions = [r.id for r in km.reactions]
-    enzymes = [e.id for r in km.reactions for e in r.enzymes]
-    yconc_exps, yflux_exps, yenz_exps = (
-        [m.experiment_id for m in ms if m.target_type == t]
-        for t in ["mic", "flux", "enzyme"]
+    modifier_types = [
+        "competitive_inhibitor",
+        "allosteric_inhibitor",
+        "allosteric_activator",
+    ]
+    metabolites = sorted([m.id for m in km.metabolites])
+    mics = sorted([m.id for m in km.mics])
+    balanced_mics = sorted([m.id for m in km.mics if m.balanced])
+    unbalanced_mics = sorted([m.id for m in km.mics if not m.balanced])
+    reactions = sorted([r.id for r in km.reactions])
+    enzymes = sorted([e.id for r in km.reactions for e in r.enzymes])
+    allosteric_enzymes = sorted(
+        [e.id for r in km.reactions for e in r.enzymes if e.allosteric]
     )
-    yconc_mics, yflux_rxns, yenz_enzs = (
-        [m.target_id for m in ms if m.target_type == t]
-        for t in ["mic", "flux", "enzyme"]
+    phos_enzs = sorted([e.id for e in km.phosphorylation])
+    drains = sorted([d.id for d in km.drains])
+    experiments = sorted(raw_measurements["experiment_id"].unique().tolist())
+    ci_coords, ai_coords, aa_coords = (
+        sorted(
+            [
+                (m.enzyme_id, m.mic_id)
+                for r in km.reactions
+                for e in r.enzymes
+                for m in e.modifiers[modifier_type]
+            ]
+        )
+        for modifier_type in modifier_types
     )
-    ci_mics, ai_mics, aa_mics = (
-        [
-            m.mic_id
-            for r in km.reactions
-            for e in r.enzymes
-            for m in e.modifiers[modifier_type]
-        ]
-        for modifier_type in [
-            "competitive_inhibitor",
-            "allosteric_inhibitor",
-            "allosteric_activator",
-        ]
+    ci_enzs, ci_mics = unpack(ci_coords)
+    ai_enzs, ai_mics = unpack(ai_coords)
+    aa_enzs, aa_mics = unpack(aa_coords)
+    km_coords = sorted(
+        [(e.id, m) for r in km.reactions for e in r.enzymes for m in r.stoichiometry]
     )
+    km_enzs, km_mics = list(zip(*km_coords))
+    yc_coords, yf_coords, ye_coords, enz_ko_coords, phos_ko_coords = (
+        sorted(
+            [
+                (row["experiment_id"], row["target_id"])
+                for _, row in raw_measurements.iterrows()
+                if row["measurement_type"] == measurement_type
+            ]
+        )
+        for measurement_type in measurement_types
+    )
+    yconc_exps, yconc_mics = unpack(yc_coords)
+    yflux_exps, yflux_rxns = unpack(yf_coords)
+    yenz_exps, yenz_enzs = unpack(ye_coords)
+    enz_ko_exps, enz_ko_enzs = unpack(enz_ko_coords)
+    phos_ko_exps, phos_ko_enzs = unpack(phos_ko_coords)
     return StanCoordSet(
-        metabolites=[m.id for m in km.metabolites],
+        metabolites=metabolites,
         mics=mics,
-        kms=kms,
-        balanced_mics=[m.id for m in km.mics if m.balanced],
-        unbalanced_mics=[m.id for m in km.mics if not m.balanced],
+        km_enzs=km_enzs,
+        km_mics=km_mics,
+        balanced_mics=balanced_mics,
+        unbalanced_mics=unbalanced_mics,
         reactions=reactions,
         experiments=experiments,
         enzymes=enzymes,
-        phos_enzs=[e.id for e in km.phosphorylation],
-        drains=[d.id for d in km.drains],
+        allosteric_enzymes=allosteric_enzymes,
+        phos_enzs=phos_enzs,
+        drains=drains,
         yconc_exps=yconc_exps,
         yconc_mics=yconc_mics,
         yflux_exps=yflux_exps,
         yflux_rxns=yflux_rxns,
         yenz_exps=yenz_exps,
         yenz_enzs=yenz_enzs,
+        ci_enzs=ci_enzs,
         ci_mics=ci_mics,
+        ai_enzs=ai_enzs,
         ai_mics=ai_mics,
+        aa_enzs=aa_enzs,
         aa_mics=aa_mics,
+        enz_ko_exps=enz_ko_exps,
+        enz_ko_enzs=enz_ko_enzs,
+        phos_ko_exps=phos_ko_exps,
+        phos_ko_enzs=phos_ko_enzs,
     )
 
 
@@ -255,95 +308,204 @@ def parse_toml_reaction(raw: dict) -> Reaction:
     )
 
 
-def parse_measurements(
-    raw: pd.DataFrame,
-) -> Tuple[List[Measurement], List[Knockout]]:
+def parse_measurements(raw: pd.DataFrame, cs: StanCoordSet) -> MeasurementSet:
     """Parse a measurements dataframe.
 
     :param raw: result of running pd.read_csv on a suitable file
     """
-    measurements = []
-    knockouts = []
-    for _, row in raw.iterrows():
-        if row["measurement_type"] in ["knockout_enz", "knockout_phos"]:
-            knockouts.append(
-                Knockout(
-                    experiment_id=row["experiment_id"],
-                    target_id=row["target_id"],
-                    knockout_type=row["measurement_type"],
-                )
+    type_to_coords = {
+        "mic": [cs.yconc_exps, cs.yconc_mics],
+        "flux": [cs.yflux_exps, cs.yflux_rxns],
+        "enzyme": [cs.yenz_exps, cs.yenz_enzs],
+        "knockout_enz": [cs.enz_ko_exps, cs.enz_ko_enzs],
+        "knockout_phos": [cs.phos_ko_exps, cs.phos_ko_enzs],
+    }
+    yconc, yflux, yenz = (
+        raw.loc[lambda df: df["measurement_type"] == t]
+        .set_index(["experiment_id", "target_id"])
+        .reindex(
+            pd.MultiIndex.from_arrays(
+                type_to_coords[t], names=["experiment_id", "target_id"]
             )
-        else:
-            measurements.append(
-                Measurement(
-                    target_id=row["target_id"],
-                    experiment_id=row["experiment_id"],
-                    target_type=row["measurement_type"],
-                    value=row["measurement"],
-                    error=row["error_scale"],
-                )
-            )
-    return measurements, knockouts
+        )
+        for t in ["mic", "flux", "enzyme"]
+    )
+    enz_knockouts, phos_knockouts = (
+        pd.Series(
+            True,
+            index=pd.MultiIndex.from_frame(
+                raw.loc[
+                    lambda df: df["measurement_type"] == t,
+                    ["experiment_id", "target_id"],
+                ]
+            ),
+        )
+        .reindex(pd.MultiIndex.from_arrays(type_to_coords[t]))
+        .fillna(False)
+        for t in ["knockout_enz", "knockout_phos"]
+    )
+    return MeasurementSet(
+        yconc=yconc,
+        yflux=yflux,
+        yenz=yenz,
+        enz_knockouts=enz_knockouts,
+        phos_knockouts=phos_knockouts,
+    )
 
 
-def parse_prior_set_df(raw: pd.DataFrame, cs: StanCoordSet) -> PriorSet:
-    """Get a PriorSet object from a dataframe.
+def extract_1d_prior(
+    raw: pd.DataFrame,
+    parameter_name: str,
+    coords: List[List[str]],
+    default_loc: float = np.nan,
+    default_scale: float = np.nan,
+) -> IndPrior1d:
+    parameter_name_to_id_cols = {
+        "kcat": ["enzyme_id"],
+        "km": ["enzyme_id", "mic_id"],
+        "formation_energy": ["metabolite_id"],
+        "tense_dissociation_constant": ["enzyme_id", "mic_id"],
+        "relaxed_dissociation_constant": ["enzyme_id", "mic_id"],
+        "inhibition_constant": ["enzyme_id", "mic_id"],
+        "transfer_constant": ["enzyme_id"],
+        "phos_kcat": ["phos_enz_id"],
+    }
+    if any(len(c) == 0 for c in coords):
+        return IndPrior1d(
+            parameter_name=parameter_name,
+            location=pd.Series([]),
+            scale=pd.Series([]),
+        )
+    non_negative = parameter_name not in ["formation_energy"]
+    qfunc = (
+        get_lognormal_parameters_from_quantiles
+        if non_negative
+        else get_normal_parameters_from_quantiles
+    )
+    id_cols = parameter_name_to_id_cols[parameter_name]
+    if len(id_cols) == 1:
+        ix = pd.Index(coords[0], name=id_cols[0])
+    else:
+        ix = pd.MultiIndex.from_arrays(coords, names=id_cols)
+    out = (
+        raw.loc[lambda df: df["parameter_type"] == parameter_name]
+        .set_index(id_cols)
+        .reindex(ix)
+    )
+    pct_params = (
+        out[["pct1", "pct99"]]
+        .apply(
+            lambda row: qfunc(row["pct1"], 0.01, row["pct99"], 0.99),
+            axis=1,
+            result_type="expand",
+        )
+        .rename(columns={0: "location", 1: "scale"})
+    )
+    out[["location", "scale"]] = out[["location", "scale"]].fillna(pct_params)
+    return IndPrior1d(
+        parameter_name=parameter_name,
+        location=out["location"].fillna(default_loc),
+        scale=out["scale"].fillna(default_scale),
+    )
+
+
+def extract_2d_prior(
+    raw: pd.DataFrame,
+    parameter_name: str,
+    row_coords: List[str],
+    col_coords: List[str],
+    default_loc: float = np.nan,
+    default_scale: float = np.nan,
+) -> IndPrior1d:
+    parameter_name_to_id_cols = {
+        "unbalanced_metabolite": ["experiment_id", "mic_id"],
+        "enzyme_concentration": ["experiment_id", "enzyme_id"],
+        "drain": ["experiment_id", "drain_id"],
+        "phos_enz_concentration": ["experiment_id", "phos_enz_id"],
+    }
+    if len(col_coords) == 0:
+        return IndPrior1d(
+            parameter_name=parameter_name,
+            location=pd.Series([]),
+            scale=pd.Series([]),
+        )
+    non_negative = parameter_name not in ["drain"]
+    qfunc = (
+        get_lognormal_parameters_from_quantiles
+        if non_negative
+        else get_normal_parameters_from_quantiles
+    )
+    out = raw.loc[lambda df: df["parameter_type"] == parameter_name].set_index(
+        parameter_name_to_id_cols[parameter_name]
+    )
+    pct_params = (
+        out[["pct1", "pct99"]]
+        .apply(
+            lambda row: qfunc(row["pct1"], 0.01, row["pct99"], 0.99),
+            axis=1,
+            result_type="expand",
+        )
+        .rename(columns={0: "location", 1: "scale"})
+    )
+    out[["location", "scale"]] = out[["location", "scale"]].fillna(pct_params)
+    location, scale = (
+        out[col].unstack().reindex(row_coords, columns=col_coords)
+        for col in ["location", "scale"]
+    )
+    return IndPrior2d(
+        parameter_name=parameter_name,
+        location=location.fillna(default_loc),
+        scale=scale.fillna(default_scale),
+    )
+
+
+def parse_priors(raw: pd.DataFrame, cs: StanCoordSet) -> PriorSet:
+    """Get a PriorSet object from a dataframe of raw priors.
 
     :param raw: result of running pd.read_csv on a suitable file
     """
-    priors = {
-        "kcat_priors": [],
-        "km_priors": [],
-        "formation_energy_priors": [],
-        "unbalanced_metabolite_priors": [],
-        "inhibition_constant_priors": [],
-        "tense_dissociation_constant_priors": [],
-        "relaxed_dissociation_constant_priors": [],
-        "transfer_constant_priors": [],
-        "drain_priors": [],
-        "enzyme_concentration_priors": [],
-        "phos_kcat_priors": [],
-        "phos_enz_concentration_priors": [],
-    }
-    order_keys = {
-        # ensure that priors are in the right order wrt the stan codes
-        "kcat_priors": lambda p: codify(cs.enzymes)[p.enzyme_id],
-        "km_priors": lambda p: codify(cs.kms)[f"{p.enzyme_id}_{p.mic_id}"],
-        "formation_energy_priors": lambda p: codify(cs.metabolites)[p.metabolite_id],
-        "unbalanced_metabolite_priors": lambda p: (
-            codify(cs.experiments)[p.experiment_id],
-            codify(cs.mics)[p.mic_id],
+    return PriorSet(
+        # 1d priors
+        kcat_priors=extract_1d_prior(raw, "kcat", [cs.enzymes]),
+        km_priors=extract_1d_prior(raw, "km", [cs.km_enzs, cs.km_mics]),
+        formation_energy_priors=extract_1d_prior(
+            raw, "formation_energy", [cs.metabolites]
         ),
-        "inhibition_constant_priors": lambda p: (
-            codify(cs.enzymes)[p.enzyme_id],
-            codify(cs.ci_mics)[p.mic_id],
+        tense_dissociation_constant_priors=extract_1d_prior(
+            raw, "tense_dissociation_constant", [cs.ai_enzs, cs.ai_mics]
         ),
-        "tense_dissociation_constant_priors": lambda p: (
-            codify(cs.enzymes)[p.enzyme_id],
-            codify(cs.ai_mics)[p.mic_id],
+        relaxed_dissociation_constant_priors=extract_1d_prior(
+            raw, "relaxed_dissociation_constant", [cs.aa_enzs, cs.aa_mics]
         ),
-        "relaxed_dissociation_constant_priors": lambda p: (
-            codify(cs.enzymes)[p.enzyme_id],
-            codify(cs.aa_mics)[p.mic_id],
+        inhibition_constant_priors=extract_1d_prior(
+            raw, "inhibition_constant", [cs.ci_enzs, cs.ci_mics]
         ),
-        "transfer_constant_priors": lambda p: codify(cs.enzymes)[p.enzyme_id],
-        "drain_priors": lambda p: codify(cs.drains)[p.drain_id],
-        "enzyme_concentration_priors": lambda p: codify(cs.enzymes)[p.enzyme_id],
-        "phos_kcat_priors": lambda p: codify(cs.phos_enzs)[p.phos_enz_id],
-        "phos_enz_concentration_priors": lambda p: codify(cs.phos_enzs)[p.phos_enz_id],
-    }
-    negative_param_types = ["formation_energy", "drain"]
-    for _, row in raw.iterrows():
-        id = "_".join(row.loc[lambda s: [isinstance(x, str) for x in s]].values)
-        parameter_type = row["parameter_type"]
-        prior_dict = row.dropna().drop("parameter_type").to_dict()
-        is_non_negative = parameter_type not in negative_param_types
-        priors[parameter_type + "_priors"].append(
-            Prior(id=id, is_non_negative=is_non_negative, **prior_dict)
-        )
-    for k, v in priors.items():
-        priors[k] = sorted(v, key=order_keys[k])
-    return PriorSet(**priors)
+        transfer_constant_priors=extract_1d_prior(
+            raw, "transfer_constant", [cs.allosteric_enzymes]
+        ),
+        phos_kcat_priors=extract_1d_prior(raw, "phos_kcat", [cs.phos_enzs]),
+        # 2d priors
+        drain_priors=extract_2d_prior(raw, "drain", cs.experiments, cs.drains),
+        enzyme_concentration_priors=extract_2d_prior(
+            raw,
+            "enzyme_concentration",
+            cs.experiments,
+            cs.enzymes,
+            default_loc=DEFAULT_PRIOR_LOC_ENZYME,
+            default_scale=DEFAULT_PRIOR_SCALE_ENZYME,
+        ),
+        unbalanced_metabolite_priors=extract_2d_prior(
+            raw,
+            "unbalanced_metabolite",
+            cs.experiments,
+            cs.unbalanced_mics,
+            default_loc=DEFAULT_PRIOR_LOC_UNBALANCED,
+            default_scale=DEFAULT_PRIOR_SCALE_UNBALANCED,
+        ),
+        phos_enz_concentration_priors=extract_2d_prior(
+            raw, "phos_enz_concentration", cs.experiments, cs.phos_enzs
+        ),
+    )
 
 
 def parse_config(raw):
