@@ -12,24 +12,45 @@ from maud.data_model import MaudInput
 
 def load_infd(csvs: List[str], mi: MaudInput) -> az.InferenceData:
     """Get an arviz InferenceData object from Maud csvs."""
+
+    def join_list_of_strings(l1, l2, sep="-"):
+        return list(map(lambda a: f"{a[0]}{sep}{a[1]}", zip(l1, l2)))
+
+    coords = {
+        **mi.stan_coords.__dict__,
+        **{
+            "kms": join_list_of_strings(
+                mi.stan_coords.km_enzs, mi.stan_coords.km_mics
+            ),
+            "yconcs": join_list_of_strings(
+                mi.stan_coords.yconc_exps, mi.stan_coords.yconc_mics
+            ),
+            "yfluxs": join_list_of_strings(
+                mi.stan_coords.yflux_exps, mi.stan_coords.yflux_rxns
+            ),
+            "yenzs": join_list_of_strings(
+                mi.stan_coords.yenz_exps, mi.stan_coords.yenz_enzs
+            ),
+        },
+    }
     return az.from_cmdstan(
         csvs,
-        coords={
-            "enzyme_name": mi.stan_coords.enzymes,
-            "mic_name": mi.stan_coords.mics,
-            "reaction": mi.stan_coords.reactions,
-            "metabolite": mi.stan_coords.metabolites,
-            "experiment": mi.stan_coords.experiments,
-            "km_id": [p.id[3:] for p in mi.priors.km_priors],
-        },
+        coords=coords,
         dims={
-            "enzyme": ["experiment", "enzyme_name"],
-            "conc": ["experiment", "mic_name"],
-            "flux": ["experiment", "reaction"],
-            "formation_energy": ["metabolite"],
-            "kcat": ["enzyme_name"],
-            "km": ["km_id"],
+            "enzyme": ["experiments", "enzymes"],
+            "conc": ["experiments", "mics"],
+            "flux": ["experiments", "reactions"],
+            "formation_energy": ["metabolites"],
+            "kcat": ["enzymes"],
+            "km": ["kms"],
+            "yconc_sim": ["yconcs"],
+            "yflux_sim": ["yfluxs"],
+            "yenz_sim": ["yenzs"],
+            "log_lik_conc": ["yconcs"],
+            "log_lik_flux": ["yfluxs"],
+            "log_lik_enz": ["yenzs"],
         },
+        save_warmup=True,
     )
 
 
@@ -86,18 +107,24 @@ def plot_experiment_var(
             hist, bins = np.histogram(x, bins=30)
             xscale = "linear"
             if logscale:
-                bins = np.logspace(np.log10(bins[0]), np.log10(bins[-1]), len(bins))
+                bins = np.logspace(
+                    np.log10(bins[0]), np.log10(bins[-1]), len(bins)
+                )
                 xscale = "log"
             _, _, hist_patches = ax.hist(x, bins=bins)
             ax.set_xscale(xscale)
             if true_values is not None:
                 if exp in true_values.keys():
                     if var in true_values[exp].keys():
-                        vline_truth = ax.axvline(true_values[exp][var], color="red")
+                        vline_truth = ax.axvline(
+                            true_values[exp][var], color="red"
+                        )
             if meas_values is not None:
                 if exp in meas_values.keys():
                     if var in meas_values[exp].keys():
-                        vline_meas = ax.axvline(meas_values[exp][var], color="orange")
+                        vline_meas = ax.axvline(
+                            meas_values[exp][var], color="orange"
+                        )
             ax.set_title(var)
         axrow[0].set_ylabel(exp)
     leg_handles = [hist_patches[0]]
