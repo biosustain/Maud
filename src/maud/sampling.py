@@ -315,10 +315,14 @@ def get_input_data(mi: MaudInput) -> dict:
         [e for r in mi.kinetic_model.reactions for e in r.enzymes],
         key=lambda e: codify(mi.stan_coords.enzymes)[e.id],
     )
+    sorted_mics = sorted(
+        mi.kinetic_model.mics,
+        key=lambda m: codify(mi.stan_coords.mics)[m.id],
+    )
+
     water_stoichiometry = [e.water_stoichiometry for e in sorted_enzymes]
     mic_to_met = [
-        codify(mi.stan_coords.metabolites)[mic.metabolite_id]
-        for mic in mi.kinetic_model.mics
+        codify(mi.stan_coords.metabolites)[mic.metabolite_id] for mic in sorted_mics
     ]
     S_enz, S_to_flux, S_full, S_drain, _ = get_stoics(mi)
     knockout_matrix_enzyme = mi.measurements.enz_knockouts.astype(int)
