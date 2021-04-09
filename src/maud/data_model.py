@@ -248,34 +248,10 @@ class KineticModel:
         self.phosphorylation = phosphorylation if phosphorylation is not None else []
 
 
-class Measurement:
-    """Constructor for measurement object.
-
-    :param target_id: id of the thing being measured
-    :param experiment_id: id of the experiment where the measurement was done
-    :param value: measured value
-    :param error: error associated to the measurent
-    :param target_type: type of thing being measured, e.g. 'metabolite', 'reaction',
-    'enzyme'.
-    """
-
-    def __init__(
-        self,
-        target_id: str,
-        experiment_id: str,
-        target_type: str,
-        value: float,
-        error: float,
-    ):
-        self.target_id = target_id
-        self.experiment_id = experiment_id
-        self.target_type = target_type
-        self.value = value
-        self.error = error
-
-
 @dataclass
 class MeasurementSet:
+    """A container for a complete set of measurements, including knockouts."""
+
     yconc: pd.DataFrame
     yflux: pd.DataFrame
     yenz: pd.DataFrame
@@ -292,8 +268,9 @@ class IndPrior1d:
     scale: pd.Series
 
     def __post_init__(self):
+        """Check that location and scale indexes match."""
         if not self.location.index.equals(self.scale.index):
-            raise ValueError(f"Location index doesn't match scale index.")
+            raise ValueError("Location index doesn't match scale index.")
 
 
 @dataclass
@@ -305,10 +282,11 @@ class IndPrior2d:
     scale: pd.DataFrame
 
     def __post_init__(self):
+        """Check that location and scale indexes and columns match."""
         if not self.location.index.equals(self.scale.index):
-            raise ValueError(f"Location index doesn't match scale index.")
+            raise ValueError("Location index doesn't match scale index.")
         if not self.location.columns.equals(self.scale.columns):
-            raise ValueError(f"Location columns don't match scale columns.")
+            raise ValueError("Location columns don't match scale columns.")
 
 
 @dataclass

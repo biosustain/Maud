@@ -82,7 +82,7 @@ def load_maud_input_from_toml(data_path: str) -> MaudInput:
         stan_coords=stan_coords,
         measurements=measurement_set,
     )
-    # validation.validate_maud_input(mi)
+    validation.validate_maud_input(mi)
     return mi
 
 
@@ -356,6 +356,21 @@ def extract_1d_prior(
     default_loc: float = np.nan,
     default_scale: float = np.nan,
 ) -> IndPrior1d:
+    """Get an IndPrior1d object from a csv, with optional defaults.
+
+    :param raw: a pandas dataframe that comes from a priors csv
+
+    :param parameter_name: name of the parameter being extracted. Must match
+    the parameter_name column of the csv
+
+    :param coords: a list of id columns that can be used to identify the rows
+    in the csv.
+
+    :param default_loc: default value for prior location.
+
+    :param default_scale: default value for prior scale.
+
+    """
     parameter_name_to_id_cols = {
         "kcat": ["enzyme_id"],
         "km": ["enzyme_id", "mic_id"],
@@ -397,6 +412,7 @@ def extract_1d_prior(
         )
         .rename(columns={0: "location", 1: "scale"})
     )
+    pct_params["location"] = np.exp(pct_params["location"])
     out[["location", "scale"]] = out[["location", "scale"]].fillna(pct_params)
     return IndPrior1d(
         parameter_name=parameter_name,
@@ -412,7 +428,25 @@ def extract_2d_prior(
     col_coords: List[str],
     default_loc: float = np.nan,
     default_scale: float = np.nan,
-) -> IndPrior1d:
+) -> IndPrior2d:
+    """Get an IndPrior2d object from a csv, with optional defaults.
+
+    :param raw: a pandas dataframe that comes from a priors csv
+
+    :param parameter_name: name of the parameter being extracted. Must match
+    the parameter_name column of the csv
+
+    :param row_coords: a list of strings corresponding to the rows of the
+    output, usually experiment_id.
+
+    :param col_coords: a list of strings corresponding to the columns of the
+    output.
+
+    :param default_loc: default value for prior location.
+
+    :param default_scale: default value for prior scale.
+
+    """
     parameter_name_to_id_cols = {
         "unbalanced_metabolite": ["experiment_id", "mic_id"],
         "enzyme_concentration": ["experiment_id", "enzyme_id"],
@@ -422,8 +456,8 @@ def extract_2d_prior(
     if len(col_coords) == 0:
         return IndPrior1d(
             parameter_name=parameter_name,
-            location=pd.Series([]),
-            scale=pd.Series([]),
+            location=pd.DataFrame([]),
+            scale=pd.DataFrame([]),
         )
     non_negative = parameter_name not in ["drain"]
     qfunc = (
@@ -445,7 +479,11 @@ def extract_2d_prior(
     )
     out[["location", "scale"]] = out[["location", "scale"]].fillna(pct_params)
     location, scale = (
-        out[col].unstack().reindex(row_coords, columns=col_coords)
+        out[col]
+        .unstack()
+        .reindex(row_coords, columns=col_coords)
+        .rename_axis(parameter_name_to_id_cols[parameter_name][0])
+        .rename_axis(parameter_name_to_id_cols[parameter_name][1], axis="columns")
         for col in ["location", "scale"]
     )
     return IndPrior2d(

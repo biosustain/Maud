@@ -19,7 +19,6 @@ import os
 import shutil
 from datetime import datetime
 
-import arviz as az
 import click
 
 from maud import sampling

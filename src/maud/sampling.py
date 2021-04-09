@@ -234,7 +234,7 @@ def _get_conc_init(mi: MaudInput) -> pd.DataFrame:
     out = mi.priors.unbalanced_metabolite_priors.location.reindex(
         columns=cs.mics
     ).fillna(0.01)
-    for (exp_id, mic_id), value in mi.measurements.yconc["measurement"].iteritems():
+    for (exp_id, mic_id), value in mi.measurements.yconc["measurement"].items():
         out.loc[exp_id, mic_id] = value
     return out
 
@@ -274,6 +274,7 @@ def get_config_dict(mi: MaudInput) -> dict:
 
 
 def get_measurements_dict(ms: MeasurementSet, cs: StanCoordSet) -> dict:
+    """Get a dictionary of measurements and their indexes."""
     mic_ix = codify(cs.mics)
     rxn_ix = codify(cs.reactions)
     enz_ix = codify(cs.enzymes)
