@@ -48,10 +48,10 @@ data {
   array[2] vector[N_aa] diss_r_priors;
   array[2] vector[N_ae] tc_priors;
   array[2] vector[N_phosphorylation_enzymes] phos_kcat_priors;
-  array[N_experiment, 2] vector[N_phosphorylation_enzymes] phos_conc_priors;
-  array[N_experiment, 2] vector[N_unbalanced] unbalanced_priors;
-  array[N_experiment, 2] vector[N_enzyme] enzyme_priors;
-  array[N_experiment, 2] vector[N_drain] drain_priors;
+  array[2, N_experiment] vector[N_phosphorylation_enzymes] phos_conc_priors;
+  array[2, N_experiment] vector[N_unbalanced] unbalanced_priors;
+  array[2, N_experiment] vector[N_enzyme] enzyme_priors;
+  array[2, N_experiment] vector[N_drain] drain_priors;
   // network properties
   matrix[N_mic, N_enzyme] S_enz;
   matrix[N_mic, N_drain] S_drain;
@@ -117,14 +117,14 @@ transformed parameters {
   array[N_experiment] vector[N_unbalanced] conc_unbalanced;
   array[N_experiment] vector[N_phosphorylation_enzymes] phos_enzyme_conc;
   for (ex in 1:N_experiment){
-    drain[ex] = drain_priors[ex,1] + drain_z[ex] .* drain_priors[ex,2];
+    drain[ex] = drain_priors[1,ex] + drain_z[ex] .* drain_priors[2,ex];
     enzyme[ex] =
-      exp(log(enzyme_priors[ex,1]) + log_enzyme_z[ex] .* enzyme_priors[ex,2]);
+      exp(log(enzyme_priors[1,ex]) + log_enzyme_z[ex] .* enzyme_priors[2,ex]);
     conc_unbalanced[ex] =
-      exp(log(unbalanced_priors[ex,1])
-          + log_conc_unbalanced_z[ex] .* unbalanced_priors[ex,2]);
+      exp(log(unbalanced_priors[1,ex])
+          + log_conc_unbalanced_z[ex] .* unbalanced_priors[2,ex]);
     phos_enzyme_conc[ex] = 
-      exp(log(phos_conc_priors[ex,1]) + log_phos_conc_z[ex] .* phos_conc_priors[ex,2]);
+      exp(log(phos_conc_priors[1,ex]) + log_phos_conc_z[ex] .* phos_conc_priors[2,ex]);
   }
   // transform
   array[N_experiment] vector<lower=0>[N_mic] conc;
