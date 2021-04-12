@@ -22,6 +22,7 @@ from datetime import datetime
 import click
 
 from maud import sampling
+from maud.analysis import load_infd
 from maud.io import load_maud_input_from_toml
 
 
@@ -96,12 +97,17 @@ def simulate(data_path, output_dir, n):
     print(f"Copying user input from {data_path} to {ui_dir}")
     shutil.copytree(data_path, ui_dir)
     stanfit = sampling.simulate(mi, samples_path, n)
+    infd = load_infd(stanfit.runset.csv_files, mi)
     print("\nSimulated concentrations and fluxes:")
-    print(stanfit.draws_pd(params=["conc", "flux"]).T)
+    print(infd.posterior["conc"].mean(dim=["chain", "draw"]).to_series())
+    print(infd.posterior["flux"].mean(dim=["chain", "draw"]).to_series())
+    print(infd.posterior["enzyme"].mean(dim=["chain", "draw"]).to_series())
     print("\nSimulated measurements:")
-    print(stanfit.draws_pd(params=["yconc_sim", "yflux_sim"]).T)
+    print(infd.posterior["yconc_sim"].mean(dim=["chain", "draw"]).to_series())
+    print(infd.posterior["yflux_sim"].mean(dim=["chain", "draw"]).to_series())
     print("\nSimulated log likelihoods:")
-    print(stanfit.draws_pd(params=["log_lik_conc", "log_lik_flux"]).T)
+    print(infd.posterior["log_lik_conc"].mean(dim=["chain", "draw"]).to_series())
+    print(infd.posterior["log_lik_flux"].mean(dim=["chain", "draw"]).to_series())
     return output_path
 
 

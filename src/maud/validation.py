@@ -16,75 +16,66 @@
 
 """Functions for validating Maud objects."""
 
+import warnings
+
 from maud import data_model
 
 
 def validate_maud_input(mi: data_model.MaudInput):
     """Check that priors, experiments and kinetic model are consistent."""
-    model = mi.kinetic_model
-    model_unb_mics = [mic.id for mic in model.mics.values() if not mic.balanced]
-    model_balanced_mics = [mic.id for mic in model.mics.values() if mic.balanced]
-    model_metabolites = list(set([met.id for met in model.metabolites.values()]))
-    model_rxns = [rxn.id for rxn in model.reactions.values()]
-    model_kms = [
-        f"km_{mic_id}_{enz.id}"
-        for rxn in model.reactions.values()
-        for enz in rxn.enzymes.values()
-        for mic_id in rxn.stoichiometry.keys()
+
+    def missing_coords_message(level, missing_coords):
+        return f"{level} labels in coords but not priors: {missing_coords}"
+
+    def missing_priors_message(level, param, missing):
+        return f"{level} labels in {param} priors but not coords: {missing}"
+
+    ps = mi.priors
+    cs = mi.stan_coords
+    should_match_1d = [
+        (ps.km_priors, "mic_id", cs.km_mics),
+        (ps.km_priors, "enzyme_id", cs.km_enzs),
+        (ps.kcat_priors, "enzyme_id", cs.enzymes),
     ]
-    model_kcats = [
-        f"kcat_{enz.id}"
-        for rxn in model.reactions.values()
-        for enz in rxn.enzymes.values()
+    should_match_2d = [
+        (
+            ps.drain_priors,
+            ["experiment_id", "drain_id"],
+            [cs.experiments, cs.drains],
+        ),
+        (
+            ps.unbalanced_metabolite_priors,
+            ["experiment_id", "mic_id"],
+            [cs.experiments, cs.unbalanced_mics],
+        ),
     ]
-    model_formation_energies = [
-        f"formation_energy_{met_id}" for met_id in model_metabolites
-    ]
-    model_kis = [
-        f"inhibition_constant_{modifier.mic_id}_{enz.id}"
-        for rxn in model.reactions.values()
-        for enz in rxn.enzymes.values()
-        for modifier in enz.modifiers["competitive_inhibitor"]
-    ]
-    prior_kms = [p.id for p in mi.priors.km_priors]
-    prior_kcats = [p.id for p in mi.priors.kcat_priors]
-    prior_kis = [p.id for p in mi.priors.inhibition_constant_priors]
-    prior_formation_energies = [p.id for p in mi.priors.formation_energy_priors]
-    for model_pars, prior_pars in zip(
-        [model_kms, model_kcats, model_formation_energies, model_kis],
-        [prior_kms, prior_kcats, prior_formation_energies, prior_kis],
-    ):
-        for prior_par in prior_pars:
-            msg = f"{prior_par} is in the priors but not the kinetic model."
-            if prior_par not in model_pars:
-                print(model_pars)
-                raise ValueError(msg)
-        for model_par in model_pars:
-            msg = f"{model_par} is in the kinetic model but not the priors."
-            if model_par not in prior_pars:
-                raise ValueError(msg)
-    for exp in mi.experiments.experiments:
-        for meas in exp.measurements["mic"].values():
-            if meas.target_id not in model_unb_mics + model_balanced_mics:
-                raise ValueError(
-                    f"metabolite {meas.target_id} is measured in experiment {exp.id}"
-                    "but is not in the kinetic model {mi.kinetic_model.model_id}."
-                )
-        for meas in exp.measurements["flux"].values():
-            if meas.target_id not in model_rxns:
-                raise ValueError(
-                    f"reaction {meas.target_id} is measured in experiment {exp.id}"
-                    "but is not in the kinetic model {mi.kinetic_model.model_id}."
-                )
-        if mi.kinetic_model.drains is not None:
-            for drain_id in mi.kinetic_model.drains:
-                for drain in mi.priors.drain_priors:
-                    if drain.experiment_id == exp.id:
-                        if (drain_id != drain.drain_id) & (
-                            exp.id != drain.experiment_id
-                        ):
-                            raise ValueError(
-                                f"drain {drain_id} was not included in "
-                                "experiment {exp.id}. "
-                                "Required for each experiment and drain."
-                            )
+    for p, level, c in should_match_1d:
+        param = p.parameter_name
+        if len(p.location) == 0:
+            assert len(c) == 0, missing_coords_message(level, c)
+            continue
+        if len(c) == 0:
+            ix_ps = p.location.index
+            assert len(ix_ps) == 0, missing_priors_message(level, param, ix_ps)
+            continue
+        ix_ps = set(p.location.index.get_level_values(level))
+        ix_cs = set(c)
+        assert ix_ps.issubset(ix_cs), missing_coords_message(level, ix_ps - ix_cs)
+        assert ix_cs.issubset(ix_ps), missing_priors_message(
+            level, param, ix_cs - ix_ps
+        )
+    for p, levels, cs in should_match_2d:
+        param = p.parameter_name
+        ix_ps_row = set(p.location.index.values)
+        ix_ps_col = set(p.location.columns.values)
+        ix_cs_row = set(cs[0])
+        ix_cs_col = set(cs[1])
+        if not ix_ps_row.issubset(ix_cs_row):
+            msg = missing_coords_message(levels[0], ix_ps_row - ix_cs_row)
+            warnings.warn(msg)
+        if not ix_ps_col.issubset(ix_cs_col):
+            msg = missing_coords_message(levels[1], ix_ps_col - ix_cs_col)
+            warnings.warn(msg)
+        if not ix_cs_col.issubset(ix_ps_col):
+            msg = missing_priors_message(levels[1], param, ix_cs_col - ix_ps_col)
+            warnings.warn(msg)

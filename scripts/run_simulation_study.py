@@ -32,9 +32,9 @@ def get_experiment_table_from_sim(sim_dir: str) -> pd.DataFrame:
         stan_input = json.load(f)
     mi = load_maud_input_from_toml(ui_path)
     infd = az.from_cmdstan(csv_file)
-    code_to_exp = {v: k for k, v in mi.stan_codes.experiment_codes.items()}
-    code_to_mic = {v: k for k, v in mi.stan_codes.mic_codes.items()}
-    code_to_rxn = {v: k for k, v in mi.stan_codes.reaction_codes.items()}
+    code_to_exp = {v: k for k, v in mi.stan_coords.experiments.items()}
+    code_to_mic = {v: k for k, v in mi.stan_coords.mics.items()}
+    code_to_rxn = {v: k for k, v in mi.stan_coords.reactions.items()}
     conc_sim = pd.DataFrame(
         {
             "measurement_type": "mic",

@@ -12,23 +12,41 @@ from maud.data_model import MaudInput
 
 def load_infd(csvs: List[str], mi: MaudInput) -> az.InferenceData:
     """Get an arviz InferenceData object from Maud csvs."""
+
+    def join_list_of_strings(l1, l2, sep="-"):
+        return list(map(lambda a: f"{a[0]}{sep}{a[1]}", zip(l1, l2)))
+
+    coords = {
+        **mi.stan_coords.__dict__,
+        **{
+            "kms": join_list_of_strings(mi.stan_coords.km_enzs, mi.stan_coords.km_mics),
+            "yconcs": join_list_of_strings(
+                mi.stan_coords.yconc_exps, mi.stan_coords.yconc_mics
+            ),
+            "yfluxs": join_list_of_strings(
+                mi.stan_coords.yflux_exps, mi.stan_coords.yflux_rxns
+            ),
+            "yenzs": join_list_of_strings(
+                mi.stan_coords.yenz_exps, mi.stan_coords.yenz_enzs
+            ),
+        },
+    }
     return az.from_cmdstan(
         csvs,
-        coords={
-            "enzyme_name": list(mi.stan_codes.enzyme_codes.keys()),
-            "mic_name": list(mi.stan_codes.mic_codes.keys()),
-            "reaction": list(mi.stan_codes.reaction_codes.keys()),
-            "metabolite": list(mi.stan_codes.metabolite_codes.keys()),
-            "experiment": list(mi.stan_codes.experiment_codes.keys()),
-            "km_id": [p.id[3:] for p in mi.priors.km_priors],
-        },
+        coords=coords,
         dims={
-            "enzyme": ["experiment", "enzyme_name"],
-            "conc": ["experiment", "mic_name"],
-            "flux": ["experiment", "reaction"],
-            "formation_energy": ["metabolite"],
-            "kcat": ["enzyme_name"],
-            "km": ["km_id"],
+            "enzyme": ["experiments", "enzymes"],
+            "conc": ["experiments", "mics"],
+            "flux": ["experiments", "reactions"],
+            "formation_energy": ["metabolites"],
+            "kcat": ["enzymes"],
+            "km": ["kms"],
+            "yconc_sim": ["yconcs"],
+            "yflux_sim": ["yfluxs"],
+            "yenz_sim": ["yenzs"],
+            "log_lik_conc": ["yconcs"],
+            "log_lik_flux": ["yfluxs"],
+            "log_lik_enz": ["yenzs"],
         },
         save_warmup=True,
     )
@@ -37,12 +55,12 @@ def load_infd(csvs: List[str], mi: MaudInput) -> az.InferenceData:
 def plot_1d_var(
     infd: az.InferenceData,
     varname: str,
-    codes: dict,
+    codes: List[str],
     true_values: Union[List[float], None] = None,
     logscale: bool = False,
 ) -> tuple:
     """Plot a 1 dimensional variable."""
-    tv = dict(zip(codes.keys(), true_values))
+    tv = dict(zip(codes, true_values))
     samples = infd.posterior[varname].to_series().unstack()
     nrow = int(len(samples.columns) ** 0.5 // 1)
     ncol = ceil(len(samples.columns) / nrow)
@@ -73,8 +91,6 @@ def plot_1d_var(
 def plot_experiment_var(
     infd: az.InferenceData,
     varname: str,
-    var_codes: dict,
-    exp_codes: dict,
     true_values: Union[Dict[str, Dict[str, float]], None] = None,
     meas_values: Union[Dict[str, Dict[str, float]], None] = None,
     logscale: bool = False,
