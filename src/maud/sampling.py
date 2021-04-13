@@ -46,7 +46,7 @@ DEFAULT_SAMPLE_CONFIG = {
     "iter_sampling": 5,
     "chains": 2,
     "max_treedepth": 11,
-    "inits": 0,
+    "inits": "inits_z.json",
     "show_progress": True,
     "step_size": 0.025,
     "adapt_delta": 0.99,
@@ -62,7 +62,7 @@ DEFAULT_ODE_CONFIG = {
 SIM_CONFIG = {
     "chains": 1,
     "fixed_param": True,
-    "inits": 0,
+    "inits": "inits_z.json",
     "iter_warmup": 0,
     "show_progress": False,
     "threads_per_chain": 1,
@@ -110,6 +110,9 @@ def _sample_given_config(
     include_path = os.path.join(HERE, INCLUDE_PATH)
     cpp_options = {}
     stanc_options = {"include_paths": [include_path]}
+    print(config["inits"])
+    if config["inits"] != 0:
+        config["inits"] = os.path.join(output_dir, "..", "user_input", config["inits"])
     if config["threads_per_chain"] != 1:
         cpp_options["STAN_THREADS"] = True
         os.environ["STAN_NUM_THREADS"] = str(config["threads_per_chain"])
@@ -382,6 +385,10 @@ def get_input_data(mi: MaudInput) -> dict:
             "n_ci": [len(e.modifiers["competitive_inhibitor"]) for e in sorted_enzymes],
             "n_ai": [len(e.modifiers["allosteric_inhibitor"]) for e in sorted_enzymes],
             "n_aa": [len(e.modifiers["allosteric_activator"]) for e in sorted_enzymes],
+            "max_num_checkpoints": 200,
+            "interpolation_polynomial": 1,
+            "solver_f": 2,
+            "solver_b": 2,
         },
         **prior_dict,
         **measurements_dict,

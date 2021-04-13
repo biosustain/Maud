@@ -75,7 +75,11 @@ data {
   vector<lower=0>[N_mic] conc_init[N_experiment];
   real rel_tol;
   real abs_tol;
-  int max_num_steps;
+  int<lower=1> max_num_steps;
+  int<lower=1> max_num_checkpoints;
+  int<lower=1,upper=2> interpolation_polynomial;
+  int<lower=1,upper=2> solver_f;
+  int<lower=1,upper=2> solver_b;
   int<lower=0,upper=1> LIKELIHOOD;  // set to 0 for priors-only mode
   real<lower=0> timepoint;
 }
@@ -137,11 +141,18 @@ transformed parameters {
     vector[N_enzyme] experiment_enzyme = enzyme[e] .* knockout[e]';
     vector[N_phosphorylation_enzymes] experiment_phos_conc = 
       phos_enzyme_conc[e] .* phos_knockout[e]';
-    vector[N_mic-N_unbalanced] conc_balanced[2] = ode_bdf_tol(dbalanced_dt,
+    vector[N_mic-N_unbalanced] conc_balanced[2] = ode_adjoint_tol_ctl(dbalanced_dt,
                                                               conc_init[e, balanced_mic_ix],
                                                               initial_time,
                                                               {timepoint, timepoint + 10},
-                                                              rel_tol, abs_tol, max_num_steps,
+                                                              rel_tol, rep_vector(abs_tol/100.0, N_mic-N_unbalanced), // forward
+                                                              rel_tol, rep_vector(abs_tol/10.0, N_mic-N_unbalanced), // backward
+                                                              rel_tol, abs_tol, // quadrature
+                                                              max_num_steps,
+                                                              max_num_checkpoints, // number of steps between checkpoints
+                                                              interpolation_polynomial,  // polynomials
+                                                              solver_f,  // bdf forward
+                                                              solver_b,  // bdf backward
                                                               conc_unbalanced[e],
                                                               balanced_mic_ix,
                                                               unbalanced_mic_ix,
