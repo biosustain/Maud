@@ -4,13 +4,14 @@ from math import ceil
 from typing import Dict, List, Union
 
 import arviz as az
+import cmdstanpy
 import numpy as np
 from matplotlib import pyplot as plt
 
 from maud.data_model import MaudInput
 
 
-def load_infd(csvs: List[str], mi: MaudInput) -> az.InferenceData:
+def load_infd(stanfit: cmdstanpy.CmdStanMCMC, mi: MaudInput) -> az.InferenceData:
     """Get an arviz InferenceData object from Maud csvs."""
 
     def join_list_of_strings(l1, l2, sep="-"):
@@ -32,7 +33,7 @@ def load_infd(csvs: List[str], mi: MaudInput) -> az.InferenceData:
         },
     }
     return az.from_cmdstan(
-        csvs,
+        stanfit.runset.csv_files,
         coords=coords,
         dims={
             "enzyme": ["experiments", "enzymes"],
@@ -43,10 +44,8 @@ def load_infd(csvs: List[str], mi: MaudInput) -> az.InferenceData:
             "km": ["kms"],
             "yconc_sim": ["yconcs"],
             "yflux_sim": ["yfluxs"],
-            "yenz_sim": ["yenzs"],
             "log_lik_conc": ["yconcs"],
             "log_lik_flux": ["yfluxs"],
-            "log_lik_enz": ["yenzs"],
         },
         save_warmup=True,
     )

@@ -64,7 +64,7 @@ def sample(data_path, output_dir):
     os.mkdir(samples_path)
     print(f"Copying user input from {data_path} to {ui_dir}")
     shutil.copytree(data_path, ui_dir)
-    stanfit = sampling.sample(mi, samples_path)
+    stanfit, infd = sampling.sample(mi, samples_path)
     print(stanfit.diagnose())
     print(stanfit.summary())
     return output_path
@@ -96,8 +96,7 @@ def simulate(data_path, output_dir, n):
     os.mkdir(samples_path)
     print(f"Copying user input from {data_path} to {ui_dir}")
     shutil.copytree(data_path, ui_dir)
-    stanfit = sampling.simulate(mi, samples_path, n)
-    infd = load_infd(stanfit.runset.csv_files, mi)
+    stanfit, infd = sampling.simulate(mi, samples_path, n)
     print("\nSimulated concentrations and fluxes:")
     print(infd.posterior["conc"].mean(dim=["chain", "draw"]).to_series())
     print(infd.posterior["flux"].mean(dim=["chain", "draw"]).to_series())

@@ -18,12 +18,14 @@
 
 import os
 import warnings
-from typing import List, Union
+from typing import List, Tuple, Union
 
+import arviz
 import cmdstanpy
 import numpy as np
 import pandas as pd
 
+from maud.analysis import load_infd
 from maud.data_model import (
     IndPrior1d,
     IndPrior2d,
@@ -69,7 +71,9 @@ SIM_CONFIG = {
 }
 
 
-def sample(mi: MaudInput, output_dir: str) -> cmdstanpy.CmdStanMCMC:
+def sample(
+    mi: MaudInput, output_dir: str
+) -> Tuple[cmdstanpy.CmdStanMCMC, arviz.InferenceData]:
     """Sample from the posterior defined by mi.
 
     :param mi: a MaudInput object
@@ -83,7 +87,9 @@ def sample(mi: MaudInput, output_dir: str) -> cmdstanpy.CmdStanMCMC:
     return _sample_given_config(mi, output_dir, config)
 
 
-def simulate(mi: MaudInput, output_dir: str, n: int) -> cmdstanpy.CmdStanMCMC:
+def simulate(
+    mi: MaudInput, output_dir: str, n: int
+) -> Tuple[cmdstanpy.CmdStanMCMC, arviz.InferenceData]:
     """Generate simulations from the prior mean.
 
     :param mi: a MaudInput object
@@ -95,7 +101,7 @@ def simulate(mi: MaudInput, output_dir: str, n: int) -> cmdstanpy.CmdStanMCMC:
 
 def _sample_given_config(
     mi: MaudInput, output_dir: str, config: dict
-) -> cmdstanpy.CmdStanMCMC:
+) -> Tuple[cmdstanpy.CmdStanMCMC, arviz.InferenceData]:
     """Call CmdStanModel.sample, having already specified all arguments.
 
     :param mi: a MaudInput object
@@ -118,7 +124,10 @@ def _sample_given_config(
         stanc_options=stanc_options,
         cpp_options=cpp_options,
     )
-    return model.sample(data=input_filepath, **config)
+    stanfit = model.sample(data=input_filepath, **config)
+    infd = load_infd(stanfit, mi)
+    infd.to_netcdf(os.path.join(output_dir, "..", "infd.ncdf"))
+    return stanfit, infd
 
 
 def get_stoics(mi: MaudInput):
