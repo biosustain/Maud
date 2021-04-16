@@ -46,7 +46,7 @@ DEFAULT_SAMPLE_CONFIG = {
     "iter_sampling": 5,
     "chains": 2,
     "max_treedepth": 11,
-    "inits": "inits_z.json",
+    "inits": 0,
     "show_progress": True,
     "step_size": 0.025,
     "adapt_delta": 0.99,
@@ -62,7 +62,7 @@ DEFAULT_ODE_CONFIG = {
 SIM_CONFIG = {
     "chains": 1,
     "fixed_param": True,
-    "inits": "inits_z.json",
+    "inits": 0,
     "iter_warmup": 0,
     "show_progress": False,
     "threads_per_chain": 1,
