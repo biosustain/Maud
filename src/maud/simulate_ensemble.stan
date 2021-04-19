@@ -8,7 +8,6 @@ functions{
 }
 data {
   // dimensions
-  int<lower=1> N_samples;
   int<lower=1> N_mic;
   int<lower=1> N_unbalanced;
   int<lower=1> N_metabolite;
@@ -18,13 +17,10 @@ data {
   int<lower=0> N_drain;
   int<lower=0> N_phosphorylation_enzymes;
   int<lower=1> N_experiment;
-  int<lower=1> N_flux_measurement;
-  int<lower=1> N_conc_measurement;
   int<lower=0> N_ki;
   int<lower=0> N_ai;
   int<lower=0> N_aa;
   int<lower=0> N_ae;
-  int<lower=0> N_enzyme_measurement;
   // hardcoded priors
   vector[N_metabolite] formation_energy;
   vector[N_enzyme] kcat;
@@ -35,10 +31,12 @@ data {
   vector[N_ae] tc;
   vector[N_phosphorylation_enzymes] phos_kcat;
   array[N_experiment] vector[N_phosphorylation_enzymes] phos_conc;
-  array[N_experiment] vector[N_unbalanced] unbalanced;
+  array[N_experiment] vector[N_unbalanced] conc_unbalanced;
   array[N_experiment] vector[N_enzyme] enzyme;
   array[N_experiment] vector[N_drain] drain;
   // network properties
+  int<lower=1,upper=N_mic> unbalanced_mic_ix[N_unbalanced];
+  int<lower=1,upper=N_mic> balanced_mic_ix[N_mic-N_unbalanced];
   matrix[N_mic, N_enzyme] S_enz;
   matrix[N_mic, N_drain] S_drain;
   matrix[N_mic, N_drain+N_enzyme] S_full;
@@ -71,21 +69,19 @@ transformed data {
   matrix[N_experiment, N_phosphorylation_enzymes] phos_knockout =
     rep_matrix(1, N_experiment, N_phosphorylation_enzymes) - is_phos_knockout;
 }
-transformed parameters {
-}
 model {
 }
 generated quantities {
   array[N_experiment] vector<lower=0>[N_mic] conc;
   array[N_experiment] vector[N_reaction] flux;
-  vector[N_enzyme] keq = get_keq(S_enz,
-                                 formation_energy,
-                                 mic_to_met,
-                                 water_stoichiometry);
+    vector[N_enzyme] keq = get_keq(S_enz,
+                                   formation_energy,
+                                   mic_to_met,
+                                   water_stoichiometry);
   for (e in 1:N_experiment){
     vector[N_enzyme] experiment_enzyme = enzyme[e] .* knockout[e]';
     vector[N_phosphorylation_enzymes] experiment_phos_conc = 
-      phos_enzyme_conc[e] .* phos_knockout[e]';
+      phos_conc[e] .* phos_knockout[e]';
     vector[N_mic-N_unbalanced] conc_balanced = ode_bdf_tol(dbalanced_dt,
                                                               conc_init[e, balanced_mic_ix],
                                                               initial_time,
@@ -111,13 +107,13 @@ generated quantities {
                                                               ki,
                                                               diss_t,
                                                               diss_r,
-                                                              transfer_constant,
+                                                              tc,
                                                               subunits,
                                                               experiment_phos_conc,
-                                                              phos_enzyme_kcat,
+                                                              phos_kcat,
                                                               S_phos_act,
                                                               S_phos_inh,
-                                                              drain[e]);
+                                                              drain[e])[1];
     conc[e, balanced_mic_ix] = conc_balanced;
     conc[e, unbalanced_mic_ix] = conc_unbalanced[e];
     flux[e] = (S_to_flux_map * get_flux_enz(conc[e],
@@ -136,10 +132,11 @@ generated quantities {
                               ki,
                               diss_t,
                               diss_r,
-                              transfer_constant,
+                              tc,
                               subunits,
-                              phos_enzyme_conc[e],
-                              phos_enzyme_kcat,
+                              phos_conc[e],
+                              phos_kcat,
                               S_phos_act,
                               S_phos_inh));
   }
+}
