@@ -18,6 +18,7 @@
 
 from typing import Dict, Iterable
 
+import pandas as pd
 import numpy as np
 import sympy as sp
 from scipy.stats import norm
@@ -99,8 +100,8 @@ def export_params_from_draw(infd, chain, draw):
         "km",
         "drain",
         "ki",
-        "dissociation_constant_t",
-        "dissociation_constant_r",
+        "diss_t",
+        "diss_r",
         "transfer_constant",
         "kcat",
         "phos_enzyme_kcat",
@@ -116,3 +117,48 @@ def export_params_from_draw(infd, chain, draw):
         if par_name in infd.posterior.variables.keys()
     }
     return input_dict
+
+
+def extract_inits_from_infd(mi, infd):
+    input_data = pd.read_csv(infd)
+    list_of_ind_input_inits = [
+        "km",
+        "ki",
+        "diss_t",
+        "diss_r",
+        "tc",
+        "kcat",
+        "phos_kcat",
+        "formation_energy",
+    ]
+    list_of_dep_input_inits = [
+        "conc_unbalanced",
+        "enzyme",
+        "phos_conc",
+        "drain",
+        ]
+    list_of_experiments = input_data["experiment_id"].unique()
+    included_experiments = [exp 
+                           for exp in sorted(mi.stan_coords.experiments)
+                           if exp in list_of_experiments]
+    exluded_experiments = [exp
+                          for exp in sorted(mi.stan_coords.experiments)
+                          if exp not in list_of_experiments]
+
+    input_dict_ind = {
+        par_name: input_data.loc[input_data["parameter_name"] == par_name]["value"].tolist()
+        for par_name in list_of_ind_input_inits
+    }
+    input_dict_dep = {
+        par_name: [
+            input_data.loc[input_data["parameter_name"] == par_name]\
+            [input_data["experiment_id"] == exp]["value"].tolist()
+            for exp in included_experiments
+        ]
+        for par_name in list_of_dep_input_inits
+    }
+
+    return {**input_dict_ind, **input_dict_dep}
+
+
+
