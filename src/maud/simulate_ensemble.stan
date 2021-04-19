@@ -28,9 +28,9 @@ data {
   vector[N_ki] ki;
   vector[N_ai] diss_t;
   vector[N_aa] diss_r;
-  vector[N_ae] tc;
-  vector[N_phosphorylation_enzymes] phos_kcat;
-  array[N_experiment] vector[N_phosphorylation_enzymes] phos_conc;
+  vector[N_ae] transer_constant;
+  vector[N_phosphorylation_enzymes] phos_enzyme_kcat;
+  array[N_experiment] vector[N_phosphorylation_enzymes] phos_enzyme_conc;
   array[N_experiment] vector[N_unbalanced] conc_unbalanced;
   array[N_experiment] vector[N_enzyme] enzyme;
   array[N_experiment] vector[N_drain] drain;
@@ -81,7 +81,7 @@ generated quantities {
   for (e in 1:N_experiment){
     vector[N_enzyme] experiment_enzyme = enzyme[e] .* knockout[e]';
     vector[N_phosphorylation_enzymes] experiment_phos_conc = 
-      phos_conc[e] .* phos_knockout[e]';
+      phos_enzyme_conc[e] .* phos_knockout[e]';
     vector[N_mic-N_unbalanced] conc_balanced = ode_bdf_tol(dbalanced_dt,
                                                               conc_init[e, balanced_mic_ix],
                                                               initial_time,
@@ -107,10 +107,10 @@ generated quantities {
                                                               ki,
                                                               diss_t,
                                                               diss_r,
-                                                              tc,
+                                                              transfer_constant,
                                                               subunits,
                                                               experiment_phos_conc,
-                                                              phos_kcat,
+                                                              phos_enzyme_kcat,
                                                               S_phos_act,
                                                               S_phos_inh,
                                                               drain[e])[1];
