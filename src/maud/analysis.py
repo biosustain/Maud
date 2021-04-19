@@ -11,7 +11,7 @@ from matplotlib import pyplot as plt
 from maud.data_model import MaudInput
 
 
-def load_infd(stanfit: cmdstanpy.CmdStanMCMC, mi: MaudInput) -> az.InferenceData:
+def load_infd(csvs, mi: MaudInput) -> az.InferenceData:
     """Get an arviz InferenceData object from Maud csvs."""
 
     def join_list_of_strings(l1, l2, sep="-"):
@@ -21,6 +21,9 @@ def load_infd(stanfit: cmdstanpy.CmdStanMCMC, mi: MaudInput) -> az.InferenceData
         **mi.stan_coords.__dict__,
         **{
             "kms": join_list_of_strings(mi.stan_coords.km_enzs, mi.stan_coords.km_mics),
+            "inhibition_constants": join_list_of_strings(mi.stan_coords.ci_enzs, mi.stan_coords.ci_mics),
+            "dissociation_constants_t": join_list_of_strings(mi.stan_coords.ai_enzs, mi.stan_coords.ai_mics),
+            "dissociation_constants_r": join_list_of_strings(mi.stan_coords.aa_enzs, mi.stan_coords.aa_mics),
             "yconcs": join_list_of_strings(
                 mi.stan_coords.yconc_exps, mi.stan_coords.yconc_mics
             ),
@@ -33,15 +36,23 @@ def load_infd(stanfit: cmdstanpy.CmdStanMCMC, mi: MaudInput) -> az.InferenceData
         },
     }
     return az.from_cmdstan(
-        stanfit.runset.csv_files,
+        csvs,
         coords=coords,
         dims={
             "enzyme": ["experiments", "enzymes"],
+            "drain": ["experiments", "drains"],
             "conc": ["experiments", "mics"],
+            "conc_unbalanced": ["experiments", "unbalanced_mics"],
             "flux": ["experiments", "reactions"],
             "formation_energy": ["metabolites"],
             "kcat": ["enzymes"],
             "km": ["kms"],
+            "ki": ["inhibition_constants"],
+            "transfer_constant": ["allosteric_enzymes"],
+            "diss_t": ["dissociation_constants_t"],
+            "diss_r": ["dissociation_constants_r"],
+            "phos_enzyme_conc": ["experiments", "phos_enzs"],
+            "phos_enzyme_kcat": ['phos_enzs'],
             "yconc_sim": ["yconcs"],
             "yflux_sim": ["yfluxs"],
             "log_lik_conc": ["yconcs"],
