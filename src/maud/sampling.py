@@ -125,7 +125,7 @@ def _sample_given_config(
         cpp_options=cpp_options,
     )
     stanfit = model.sample(data=input_filepath, **config)
-    infd = load_infd(stanfit, mi)
+    infd = load_infd(stanfit.runset.csv_files, mi)
     infd.to_netcdf(os.path.join(output_dir, "..", "infd.ncdf"))
     return stanfit, infd
 
