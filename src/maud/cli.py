@@ -22,6 +22,7 @@ from datetime import datetime
 import click
 
 from maud import sampling
+from maud import simulating
 from maud.analysis import load_infd
 from maud.io import load_maud_input_from_toml
 
@@ -121,3 +122,34 @@ def simulate(data_path, output_dir, n):
 def simulate_command(data_path, output_dir, n):
     """Run the simulate function as a click command."""
     click.echo(simulate(data_path, output_dir, n))
+
+
+def simulate_from_init(data_path, output_dir, n):
+    """Generate draws from the prior mean."""
+
+    mi = load_maud_input_from_toml(data_path)
+    now = datetime.now().strftime("%Y%m%d%H%M%S")
+    output_name = f"maud_output_sim-{mi.config.name}-{now}"
+    output_path = os.path.join(output_dir, output_name)
+    samples_path = os.path.join(output_path, "samples")
+    ui_dir = os.path.join(output_path, "user_input")
+    print("Creating output directory: " + output_path)
+    os.mkdir(output_path)
+    os.mkdir(samples_path)
+    print(f"Copying user input from {data_path} to {ui_dir}")
+    shutil.copytree(data_path, ui_dir)
+    stanfit, infd = simulating.simulate(mi, samples_path)
+    return output_path
+
+
+@cli.command("simulate_from_init")
+@click.option("--output_dir", default=".", help="Where to save the output")
+@click.option("-n", default=1, type=int, help="Number of simulations")
+@click.argument(
+    "data_path",
+    type=click.Path(exists=True, dir_okay=True, file_okay=False),
+    default=get_example_path(RELATIVE_PATH_EXAMPLE),
+)
+def simulate_from_init_command(data_path, output_dir, n):
+    """Run the simulate function as a click command."""
+    click.echo(simulate_from_init(data_path, output_dir, n))
