@@ -163,6 +163,6 @@ def _simulate_given_input(mi: MaudInput, output_dir: str, config: dict, infd_in:
         cpp_options=cpp_options,
     )
     stanfit = model.sample(data=input_filepath, **config)
-    infd = load_infd(stanfit, mi)
+    infd = load_infd(stanfit.runset.csv_files, mi)
     infd.to_netcdf(os.path.join(output_dir, "..", "infd.ncdf"))
     return stanfit, infd
