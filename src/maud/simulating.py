@@ -3,6 +3,7 @@ import warnings
 from typing import List, Union
 
 import cmdstanpy
+import arviz
 import numpy as np
 import pandas as pd
 
@@ -21,9 +22,6 @@ from maud.sampling import get_stoics, get_phos_act_inh_matrix, \
                           validate_specified_fluxes
 
 HERE = os.path.dirname(os.path.abspath(__file__))
-INPUT_NAME = "../../methionine_input"
-INPUT_FOLDER = os.path.join(HERE, INPUT_NAME)
-INPUT_CSV = os.path.join(INPUT_FOLDER, "simulation_input_values.csv")
 INCLUDE_PATH = ""
 DEFAULT_PRIOR_LOC_DRAIN = None
 DEFAULT_PRIOR_SCALE_DRAIN = None
@@ -50,7 +48,7 @@ SIM_CONFIG = {
 def simulate(mi: MaudInput, output_dir: str, infd_in: arviz.InferenceData):
     """Generate simulations from the defined values.
 
-    :param mi: a MaudInput object
+    :param mi: a MaudInput object.
     :param output_dir: a string specifying where to save the output.
     :param infd_in: an inference data object which contains parameter values.
     """

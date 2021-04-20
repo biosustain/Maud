@@ -22,7 +22,7 @@ from datetime import datetime
 import click
 
 from maud import sampling
-from maud import simulating
+from maud import simulation
 from maud.analysis import load_infd
 from maud.io import load_maud_input_from_toml
 
@@ -125,7 +125,13 @@ def simulate_command(data_path, output_dir, n):
 
 
 def simulate_from_draw(data_path, output_dir):
-    """Generate draws from prior simulation"""
+    """Generate draws from prior simulation.
+    
+    Currently this function only accepts a single simulation
+    run for a single csv. The "data_path" should be directed
+    at the folder containing the samples and the user_input
+    from the simulation run.
+    """
 
     mi = load_maud_input_from_toml(os.path.join(data_path, "user_input"))
     print("Reading inference data: " + data_path)
@@ -145,18 +151,16 @@ def simulate_from_draw(data_path, output_dir):
     os.mkdir(samples_path)
     print(f"Copying user input from {data_path} to {ui_dir}")
     shutil.copytree(data_path, ui_dir)
-    stanfit, infd = simulating.simulate(mi, samples_path)
+    stanfit, infd = simulation.simulate(mi, samples_path, infd_in)
     return output_path
 
 
-@cli.command("simulate_from_init")
+@cli.command("simulate_from_draw")
 @click.option("--output_dir", default=".", help="Where to save the output")
-@click.option("-n", default=1, type=int, help="Number of simulations")
 @click.argument(
     "data_path",
-    type=click.Path(exists=True, dir_okay=True, file_okay=False),
-    default=get_example_path(RELATIVE_PATH_EXAMPLE),
+    type=click.Path(exists=True, dir_okay=True, file_okay=False)
 )
-def simulate_from_init_command(data_path, output_dir, n):
+def simulate_from_init_command(data_path, output_dir):
     """Run the simulate function as a click command."""
-    click.echo(simulate_from_init(data_path, output_dir, n))
+    click.echo(simulate_from_draw(data_path, output_dir))
