@@ -47,16 +47,17 @@ SIM_CONFIG = {
 }
 
 
-def simulate(mi: MaudInput, output_dir: str):
-    """Generate simulations from the prior mean.
+def simulate(mi: MaudInput, output_dir: str, infd_in: arviz.InferenceData):
+    """Generate simulations from the defined values.
 
     :param mi: a MaudInput object
     :param output_dir: a string specifying where to save the output.
+    :param infd_in: an inference data object which contains parameter values.
     """
     config = {**SIM_CONFIG, **{"output_dir": output_dir}}
-    return _simulate_given_input(mi, output_dir, config)
+    return _simulate_given_input(mi, output_dir, config, infd_in)
 
-def get_simulation_input_data(mi: MaudInput, csv) -> dict:
+def get_simulation_input_data(mi: MaudInput, infd_in) -> dict:
     """Get the input to inference_model.stan from a MaudInput object.
 
     :param mi: a MaudInput object
@@ -133,20 +134,21 @@ def get_simulation_input_data(mi: MaudInput, csv) -> dict:
             "n_ai": [len(e.modifiers["allosteric_inhibitor"]) for e in sorted_enzymes],
             "n_aa": [len(e.modifiers["allosteric_activator"]) for e in sorted_enzymes],
         },
-        **extract_inits_from_infd(mi, csv),
+        **extract_inits_from_infd(mi, infd_in),
         **config_dict,
     }
 
-def _simulate_given_input(mi: MaudInput, output_dir: str, config: dict):
-    """Call CmdStanModel.sample, having already specified all arguments.
+def _simulate_given_input(mi: MaudInput, output_dir: str, config: dict, infd_in: arviz.InferenceData):
+    """Call CmdStanModel.sample, having already defined parameters.
 
     :param mi: a MaudInput object
     :param output_dir: a string specifying where to save the output.
     :param config: a dictionary of keyword arguments to CmdStanModel.sample.
+    :param infd_in: an inference data object which contains parameter values.
     """
 
     input_filepath = os.path.join(output_dir, "input_data.json")
-    input_data = get_simulation_input_data(mi, INPUT_CSV)
+    input_data = get_simulation_input_data(mi, infd_in)
     cmdstanpy.utils.jsondump(input_filepath, input_data)
     stan_program_filepath = os.path.join(HERE, STAN_PROGRAM_RELATIVE_PATH)
     include_path = os.path.join(HERE, INCLUDE_PATH)

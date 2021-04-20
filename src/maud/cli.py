@@ -124,10 +124,17 @@ def simulate_command(data_path, output_dir, n):
     click.echo(simulate(data_path, output_dir, n))
 
 
-def simulate_from_init(data_path, output_dir, n):
-    """Generate draws from the prior mean."""
+def simulate_from_draw(data_path, output_dir):
+    """Generate draws from prior simulation"""
 
-    mi = load_maud_input_from_toml(data_path)
+    mi = load_maud_input_from_toml(os.path.join(data_path, "user_input"))
+    print("Reading inference data: " + data_path)
+    csvs = [
+        os.path.join(data_path, "samples", f)
+        for f in os.listdir(os.path.join(data_path, "samples"))
+        if f.endswith(".csv")
+    ]
+    infd_in = load_infd(csvs, mi)
     now = datetime.now().strftime("%Y%m%d%H%M%S")
     output_name = f"maud_output_sim-{mi.config.name}-{now}"
     output_path = os.path.join(output_dir, output_name)
