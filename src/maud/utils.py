@@ -22,6 +22,7 @@ import pandas as pd
 import numpy as np
 import sympy as sp
 from scipy.stats import norm
+from maud.analysis import load_infd
 
 
 def codify(lx: Iterable[str]) -> Dict[str, int]:
