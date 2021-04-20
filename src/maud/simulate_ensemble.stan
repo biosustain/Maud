@@ -28,7 +28,7 @@ data {
   vector[N_ki] ki;
   vector[N_ai] diss_t;
   vector[N_aa] diss_r;
-  vector[N_ae] transer_constant;
+  vector[N_ae] transfer_constant;
   vector[N_phosphorylation_enzymes] phos_enzyme_kcat;
   array[N_experiment] vector[N_phosphorylation_enzymes] phos_enzyme_conc;
   array[N_experiment] vector[N_unbalanced] conc_unbalanced;
@@ -132,10 +132,10 @@ generated quantities {
                               ki,
                               diss_t,
                               diss_r,
-                              tc,
+                              transfer_constant,
                               subunits,
-                              phos_conc[e],
-                              phos_kcat,
+                              experiment_phos_conc,
+                              phos_enzyme_kcat,
                               S_phos_act,
                               S_phos_inh));
   }
