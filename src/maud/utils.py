@@ -131,18 +131,18 @@ def extract_inits_from_infd(mi, infd):
         "ki",
         "diss_t",
         "diss_r",
-        "tc",
+        "transfer_constant",
         "kcat",
-        "phos_kcat",
+        "phos_enzyme_kcat",
         "formation_energy",
     ]
     list_of_dep_input_inits = [
         "conc_unbalanced",
         "enzyme",
-        "phos_conc",
+        "phos_enzyme_conc",
         "drain",
         ]
-    list_of_experiments = input_data["experiment_id"].unique()
+    list_of_experiments = list(input_data.coords["experiments"].values)
     included_experiments = [exp 
                            for exp in sorted(mi.stan_coords.experiments)
                            if exp in list_of_experiments]
@@ -151,16 +151,19 @@ def extract_inits_from_infd(mi, infd):
                           if exp not in list_of_experiments]
 
     input_dict_ind = {
-        par_name: input_data.loc[input_data["parameter_name"] == par_name]["value"].tolist()
-        for par_name in list_of_ind_input_inits
+        par_name: (input_data[par_name].to_dataframe().reset_index()[par_name].tolist()
+            if par_name in list(infd.posterior.keys()) else [])
+        for par_name in list_of_ind_input_inits 
     }
     input_dict_dep = {
-        par_name: [
-            input_data.loc[input_data["parameter_name"] == par_name]\
-            [input_data["experiment_id"] == exp]["value"].tolist()
+        par_name: ([
+            input_data[par_name].to_dataframe().reset_index().loc\
+            [input_data[par_name].to_dataframe().reset_index()["experiments"] == exp]\
+            [par_name].tolist()
             for exp in included_experiments
-        ]
-        for par_name in list_of_dep_input_inits
+        ] if par_name in list(infd.posterior.keys())\
+        else [[] for exp in included_experiments])
+        for par_name in list_of_dep_input_inits 
     }
 
     return {**input_dict_ind, **input_dict_dep}
