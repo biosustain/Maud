@@ -120,7 +120,12 @@ def export_params_from_draw(infd, chain, draw):
 
 
 def extract_inits_from_infd(mi, infd):
-    input_data = pd.read_csv(infd)
+    """Return dictionary of input values given inference data object.
+    
+    :param mi: a MaudInput object.
+    :param infd_in: an inference data object which contains parameter values.
+    """
+    input_data = infd.posterior
     list_of_ind_input_inits = [
         "km",
         "ki",
