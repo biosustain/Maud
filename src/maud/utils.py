@@ -17,6 +17,7 @@
 """General purpose utility functions."""
 
 from typing import Dict, Iterable
+import collections
 
 import numpy as np
 import sympy as sp
@@ -99,8 +100,8 @@ def export_params_from_draw(infd, chain, draw):
         "km",
         "drain",
         "ki",
-        "dissociation_constant_t",
-        "dissociation_constant_r",
+        "diss_t",
+        "diss_r",
         "transfer_constant",
         "kcat",
         "phos_enzyme_kcat",
@@ -116,3 +117,80 @@ def export_params_from_draw(infd, chain, draw):
         if par_name in infd.posterior.variables.keys()
     }
     return input_dict
+
+def convert_normal_to_scaled_values(input_dict, priors):
+    """Converts values on normal scale to the scaled values.
+    
+    :input_dict: dictionary of parameter values.
+    :priors: dictionary of priors.
+    """
+    Init_variable = collections.namedtuple("Init_variable", "in_id out_id p_id norm_scale exp_dep")
+    
+    list_of_input_inits = [
+        Init_variable(in_id="km", out_id = "log_km_z", p_id="km_priors", norm_scale=False, exp_dep=False),
+        Init_variable(in_id="drain", out_id = "drain_z", p_id="drain_priors", norm_scale=True, exp_dep=True),
+        Init_variable(in_id="ki", out_id = "log_ki_z", p_id="ki_priors", norm_scale=False, exp_dep=False),
+        Init_variable(in_id="diss_t", out_id = "log_dt_z", p_id="diss_t_priors", norm_scale=False, exp_dep=False),
+        Init_variable(in_id="diss_r", out_id = "log_dr_z", p_id="diss_r_priors", norm_scale=False, exp_dep=False),
+        Init_variable(in_id="transfer_constant", out_id = "log_tc_z", p_id="tc_priors", norm_scale=False, exp_dep=False),
+        Init_variable(in_id="kcat", out_id = "log_kcat_z", p_id="kcat_priors", norm_scale=False, exp_dep=False),
+        Init_variable(in_id="phos_enzyme_kcat", out_id = "log_phos_kcat_z", p_id="phos_kcat_priors", norm_scale=False, exp_dep=False),
+        Init_variable(in_id="conc_unbalanced", out_id = "log_conc_unbalanced_z", p_id="unbalanced_priors", norm_scale=False, exp_dep=True),
+        Init_variable(in_id="enzyme", out_id = "log_enzyme_z", p_id="enzyme_priors", norm_scale=False, exp_dep=True),
+        Init_variable(in_id="phos_enzyme_conc", out_id = "log_phos_conc_z", p_id="phos_enzyme_concentration_priors", norm_scale=False, exp_dep=True),
+        Init_variable(in_id="formation_energy", out_id = "fe_z", p_id="fe_priors", norm_scale=True, exp_dep=False),
+    ]
+
+    inits = {}
+
+    for init in list_of_input_inits:
+        if init.in_id in input_dict.keys():
+            if init.exp_dep:
+                if init.norm_scale:
+                    inits[init.out_id] = z_for_mat(input_dict[init.in_id], priors[init.p_id])
+                else:
+                    inits[init.out_id] = logz_for_mat(input_dict[init.in_id], priors[init.p_id])
+            else:
+                if init.norm_scale:
+                    inits[init.out_id] = z_for_vec(input_dict[init.in_id], priors[init.p_id])
+                else:
+                    inits[init.out_id] = logz_for_vec(input_dict[init.in_id], priors[init.p_id])
+    return inits
+
+def logz_for_vec(input_value, priors):
+    if len(input_value) == 0:
+        return []
+    iv = np.array(input_value)
+    lc = np.array(priors[0])
+    s = np.array(priors[1])
+    return (np.log(iv) - np.log(lc)) / s
+
+def z_for_vec(input_value, priors):
+    if len(input_value) == 0:
+        return []
+    iv = np.array(input_value)
+    lc = np.array(priors[0])
+    s = np.array(priors[1])
+    return (iv - lc) / s
+
+def logz_for_mat(input_value, priors):
+    if len(input_value) == 0:
+        return np.array([[] for ex in priors])
+    out = []
+    for i, [lc_v, s_v] in enumerate(zip(priors[0], priors[1])):
+        iv = np.array(input_value[i])
+        lc = np.array(lc_v)
+        s = np.array(s_v)
+        out.append((np.log(iv) - np.log(lc)) / s)
+    return np.array(out)
+
+def z_for_mat(input_value, priors):
+    if len(input_value) == 0:
+        return np.array([[] for ex in priors])
+    out = []
+    for i, [lc_v, s_v] in enumerate(zip(priors[0], priors[1])):
+        iv = np.array(input_value[i])
+        lc = np.array(lc_v)
+        s = np.array(s_v)
+        out.append((iv - lc) / s)
+    return np.array(out)
