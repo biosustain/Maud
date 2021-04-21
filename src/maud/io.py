@@ -547,6 +547,10 @@ def parse_config(raw):
 
     :param raw: result of running toml.load on a suitable file
     """
+    if "user_inits_file" in raw.keys():
+        user_inits_file = raw["user_inits_file"]
+    else:
+        user_inits_file = None
     return MaudConfig(
         name=raw["name"],
         kinetic_model_file=raw["kinetic_model"],
@@ -555,4 +559,5 @@ def parse_config(raw):
         likelihood=raw["likelihood"],
         ode_config=raw["ode_config"],
         cmdstanpy_config=raw["cmdstanpy_config"],
+        user_inits_file=user_inits_file,
     )

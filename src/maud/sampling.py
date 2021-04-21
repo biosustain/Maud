@@ -21,6 +21,7 @@ import warnings
 from typing import List, Union
 
 import cmdstanpy
+import json
 import numpy as np
 import pandas as pd
 
@@ -32,7 +33,12 @@ from maud.data_model import (
     PriorSet,
     StanCoordSet,
 )
-from maud.utils import codify, get_null_space, get_rref
+from maud.utils import (
+    codify,
+    get_null_space,
+    get_rref,
+    convert_normal_to_scaled_values,
+)
 
 
 HERE = os.path.dirname(os.path.abspath(__file__))
@@ -89,7 +95,8 @@ def simulate(mi: MaudInput, output_dir: str, n: int) -> cmdstanpy.CmdStanMCMC:
     :param mi: a MaudInput object
     :param output_dir: a string specifying where to save the output.
     """
-    config = {**SIM_CONFIG, **{"output_dir": output_dir, "iter_sampling": n}}
+    config = {**SIM_CONFIG, 
+              **{"output_dir": output_dir, "iter_sampling": n}}
     return _sample_given_config(mi, output_dir, config)
 
 
@@ -105,6 +112,12 @@ def _sample_given_config(
 
     input_filepath = os.path.join(output_dir, "input_data.json")
     input_data = get_input_data(mi)
+    if mi.config.user_inits_file is not None:
+        inits_file_user = os.path.join(output_dir, "..", "user_input", mi.config.user_inits_file)
+        inits_file_stan = os.path.join(output_dir, "inits.json")
+        inits = get_inits(mi, inits_file_user)
+        cmdstanpy.utils.jsondump(inits_file_stan, inits)
+        config["inits"] = inits_file_stan
     cmdstanpy.utils.jsondump(input_filepath, input_data)
     stan_program_filepath = os.path.join(HERE, STAN_PROGRAM_RELATIVE_PATH)
     include_path = os.path.join(HERE, INCLUDE_PATH)
@@ -118,7 +131,8 @@ def _sample_given_config(
         stanc_options=stanc_options,
         cpp_options=cpp_options,
     )
-    return model.sample(data=input_filepath, **config)
+    return model.sample(data=input_filepath, 
+                        **config)
 
 
 def get_stoics(mi: MaudInput):
@@ -148,6 +162,12 @@ def get_stoics(mi: MaudInput):
     S_full = pd.concat([S_enz, S_drain], ignore_index=True)
     return S_enz, S_enz_to_flux_map, S_full, S_drain, S_reactions
 
+def get_inits(mi: MaudInput, init_dict_path):
+    priors = get_prior_dict(mi.priors)
+    with open(init_dict_path, 'r') as init_file:
+        init_dict = json.load(init_file)
+
+    return convert_normal_to_scaled_values(init_dict, priors)
 
 def validate_specified_fluxes(mi: MaudInput):
     """Check that appropriate fluxes have been measured.

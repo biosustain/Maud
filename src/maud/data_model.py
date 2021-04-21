@@ -18,7 +18,7 @@
 
 from collections import defaultdict
 from dataclasses import dataclass
-from typing import Dict, List
+from typing import Dict, List, Optional
 
 import pandas as pd
 from cmdstanpy import CmdStanMCMC
@@ -366,6 +366,7 @@ class MaudConfig:
         likelihood: bool,
         ode_config: dict,
         cmdstanpy_config: dict,
+        user_inits_file: Optional[str],
     ):
         self.name = name
         self.kinetic_model_file = kinetic_model_file
@@ -374,6 +375,7 @@ class MaudConfig:
         self.likelihood = likelihood
         self.ode_config = ode_config
         self.cmdstanpy_config = cmdstanpy_config
+        self.user_inits_file = user_inits_file
 
 
 class MaudInput:
