@@ -22,6 +22,7 @@ import arviz as az
 import plotnine as p9
 
 from maud import io
+from maud.analysis import load_infd
 
 
 MAUD_OUTPUT = os.path.join(
@@ -102,26 +103,7 @@ def main():
         if f.endswith(".csv")
     ]
     mi = io.load_maud_input_from_toml(os.path.join(MAUD_OUTPUT, "user_input"))
-    infd = az.from_cmdstan(
-        csvs,
-        coords={
-            "mics": list(mi.stan_coords.mics.keys()),
-            "mets": list(mi.stan_coords.metabolites.keys()),
-            "kms": [f"{p.enzyme_id}_{p.mic_id}" for p in mi.priors.km_priors],
-            "enzymes": list(mi.stan_coords.enzymes.keys()),
-            "reactions": list(mi.stan_coords.reactions.keys()),
-            "experiments": list(mi.stan_coords.experiments.keys()),
-        },
-        dims={
-            "conc": ["experiments", "mics"],
-            "flux": ["experiments", "reactions"],
-            "keq": ["enzymes"],
-            "kcat": ["enzymes"],
-            "formation_energy": ["mets"],
-            "km": ["kms"],
-            "enzyme": ["experiments", "enzymes"],
-        },
-    )
+    infd = load_infd(csvs, mi)
     var_to_dims = {
         var: list(infd.posterior[var].dims[2:]) for var in VARIABLES_TO_ANALYSE
     }
