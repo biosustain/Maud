@@ -18,7 +18,6 @@
 import os
 from typing import Dict, List
 
-import arviz as az
 import plotnine as p9
 
 from maud import io
