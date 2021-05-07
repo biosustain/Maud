@@ -163,11 +163,9 @@ def get_stoics(mi: MaudInput):
     return S_enz, S_enz_to_flux_map, S_full, S_drain, S_reactions
 
 def get_inits(mi: MaudInput, init_dict_path):
-    priors = get_prior_dict(mi.priors)
-    with open(init_dict_path, 'r') as init_file:
-        init_dict = json.load(init_file)
+    init_dict = pd.read_csv(init_dict_path)
 
-    return convert_normal_to_scaled_values(init_dict, priors)
+    return convert_normal_to_scaled_values(init_dict, mi.priors, mi.stan_coords)
 
 def validate_specified_fluxes(mi: MaudInput):
     """Check that appropriate fluxes have been measured.
