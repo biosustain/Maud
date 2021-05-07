@@ -592,7 +592,7 @@ def get_inits(priors: PriorSet, user_inits_path) -> Dict[str, np.array]:
 
     def user_inits_for_param(
         u: pd.DataFrame, p: Union[IndPrior1d, IndPrior2d]
-    ) -> Union[pd.Series, pd.DataFrame]:
+    ) -> pd.Series:
         if len(p.location) == 0:
             return p.location
         elif isinstance(p, IndPrior1d):
