@@ -35,7 +35,7 @@
       0.1
     ]
   ],
-  "enzyme": [
+  "conc_enzyme": [
     [
       1.0,
       1.0,
@@ -47,12 +47,12 @@
       1.5
     ]
   ],
-  "formation_energy": [
+  "dgf": [
     -1,
     -2
   ],
   "drain": [],
-  "phos_enzyme_conc": [
+  "conc_phos": [
     [
       1.0
     ],
@@ -60,7 +60,7 @@
       1.0
     ]
   ],
-  "phos_kcat": [
+  "kcat_phos": [
     1
   ]
 }

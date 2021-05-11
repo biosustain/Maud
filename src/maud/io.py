@@ -388,12 +388,12 @@ def extract_1d_prior(
     parameter_name_to_id_cols = {
         "kcat": ["enzyme_id"],
         "km": ["enzyme_id", "mic_id"],
-        "formation_energy": ["metabolite_id"],
-        "tense_dissociation_constant": ["enzyme_id", "mic_id"],
-        "relaxed_dissociation_constant": ["enzyme_id", "mic_id"],
-        "inhibition_constant": ["enzyme_id", "mic_id"],
+        "dgf": ["metabolite_id"],
+        "diss_t": ["enzyme_id", "mic_id"],
+        "diss_r": ["enzyme_id", "mic_id"],
+        "ki": ["enzyme_id", "mic_id"],
         "transfer_constant": ["enzyme_id"],
-        "phos_kcat": ["phos_enz_id"],
+        "kcat_phos": ["phos_enz_id"],
     }
     if any(len(c) == 0 for c in coords):
         return IndPrior1d(
@@ -401,7 +401,7 @@ def extract_1d_prior(
             location=pd.Series([]),
             scale=pd.Series([]),
         )
-    non_negative = parameter_name not in ["formation_energy"]
+    non_negative = parameter_name not in ["dgf"]
     qfunc = (
         get_lognormal_parameters_from_quantiles
         if non_negative
@@ -464,10 +464,10 @@ def extract_2d_prior(
 
     """
     parameter_name_to_id_cols = {
-        "unbalanced_metabolite": ["experiment_id", "mic_id"],
-        "enzyme_concentration": ["experiment_id", "enzyme_id"],
+        "conc_unbalanced": ["experiment_id", "mic_id"],
+        "conc_enzyme": ["experiment_id", "enzyme_id"],
         "drain": ["experiment_id", "drain_id"],
-        "phos_enz_concentration": ["experiment_id", "phos_enz_id"],
+        "conc_phos": ["experiment_id", "phos_enz_id"],
     }
     if len(col_coords) == 0:
         return IndPrior1d(
@@ -518,44 +518,36 @@ def parse_priors(raw: pd.DataFrame, cs: StanCoordSet) -> PriorSet:
     """
     return PriorSet(
         # 1d priors
-        kcat_priors=extract_1d_prior(raw, "kcat", [cs.enzymes]),
-        km_priors=extract_1d_prior(raw, "km", [cs.km_enzs, cs.km_mics]),
-        formation_energy_priors=extract_1d_prior(
-            raw, "formation_energy", [cs.metabolites]
-        ),
-        tense_dissociation_constant_priors=extract_1d_prior(
-            raw, "tense_dissociation_constant", [cs.ai_enzs, cs.ai_mics]
-        ),
-        relaxed_dissociation_constant_priors=extract_1d_prior(
-            raw, "relaxed_dissociation_constant", [cs.aa_enzs, cs.aa_mics]
-        ),
-        inhibition_constant_priors=extract_1d_prior(
-            raw, "inhibition_constant", [cs.ci_enzs, cs.ci_mics]
-        ),
-        transfer_constant_priors=extract_1d_prior(
+        priors_kcat=extract_1d_prior(raw, "kcat", [cs.enzymes]),
+        priors_km=extract_1d_prior(raw, "km", [cs.km_enzs, cs.km_mics]),
+        priors_dgf=extract_1d_prior(raw, "dgf", [cs.metabolites]),
+        priors_diss_t=extract_1d_prior(raw, "diss_t", [cs.ai_enzs, cs.ai_mics]),
+        priors_diss_r=extract_1d_prior(raw, "diss_r", [cs.aa_enzs, cs.aa_mics]),
+        priors_ki=extract_1d_prior(raw, "ki", [cs.ci_enzs, cs.ci_mics]),
+        priors_transfer_constant=extract_1d_prior(
             raw, "transfer_constant", [cs.allosteric_enzymes]
         ),
-        phos_kcat_priors=extract_1d_prior(raw, "phos_kcat", [cs.phos_enzs]),
+        priors_kcat_phos=extract_1d_prior(raw, "kcat_phos", [cs.phos_enzs]),
         # 2d priors
-        drain_priors=extract_2d_prior(raw, "drain", cs.experiments, cs.drains),
-        enzyme_concentration_priors=extract_2d_prior(
+        priors_drain=extract_2d_prior(raw, "drain", cs.experiments, cs.drains),
+        priors_conc_enzyme=extract_2d_prior(
             raw,
-            "enzyme_concentration",
+            "conc_enzyme",
             cs.experiments,
             cs.enzymes,
             default_loc=DEFAULT_PRIOR_LOC_ENZYME,
             default_scale=DEFAULT_PRIOR_SCALE_ENZYME,
         ),
-        unbalanced_metabolite_priors=extract_2d_prior(
+        priors_conc_unbalanced=extract_2d_prior(
             raw,
-            "unbalanced_metabolite",
+            "conc_unbalanced",
             cs.experiments,
             cs.unbalanced_mics,
             default_loc=DEFAULT_PRIOR_LOC_UNBALANCED,
             default_scale=DEFAULT_PRIOR_SCALE_UNBALANCED,
         ),
-        phos_enz_concentration_priors=extract_2d_prior(
-            raw, "phos_enz_concentration", cs.experiments, cs.phos_enzs
+        priors_conc_phos=extract_2d_prior(
+            raw, "conc_phos", cs.experiments, cs.phos_enzs
         ),
     )
 

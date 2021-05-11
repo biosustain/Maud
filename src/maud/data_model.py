@@ -294,18 +294,18 @@ class IndPrior2d:
 class PriorSet:
     """Object containing all priors for a MaudInput."""
 
-    kcat_priors: IndPrior1d
-    phos_kcat_priors: IndPrior1d
-    km_priors: IndPrior1d
-    formation_energy_priors: IndPrior1d
-    inhibition_constant_priors: IndPrior1d
-    tense_dissociation_constant_priors: IndPrior1d
-    relaxed_dissociation_constant_priors: IndPrior1d
-    transfer_constant_priors: IndPrior1d
-    unbalanced_metabolite_priors: IndPrior2d
-    drain_priors: IndPrior2d
-    enzyme_concentration_priors: IndPrior2d
-    phos_enz_concentration_priors: IndPrior2d
+    priors_kcat: IndPrior1d
+    priors_kcat_phos: IndPrior1d
+    priors_km: IndPrior1d
+    priors_dgf: IndPrior1d
+    priors_ki: IndPrior1d
+    priors_diss_t: IndPrior1d
+    priors_diss_r: IndPrior1d
+    priors_transfer_constant: IndPrior1d
+    priors_conc_unbalanced: IndPrior2d
+    priors_drain: IndPrior2d
+    priors_conc_enzyme: IndPrior2d
+    priors_conc_phos: IndPrior2d
 
 
 @dataclass
