@@ -56,14 +56,7 @@ DEFAULT_PRIOR_LOC_UNBALANCED = 0.1
 DEFAULT_PRIOR_SCALE_UNBALANCED = 2.0
 DEFAULT_PRIOR_LOC_ENZYME = 0.1
 DEFAULT_PRIOR_SCALE_ENZYME = 2.0
-NON_LN_SCALE_PARAMS = ["formation_energy", "drain"]
-USER_PARAM_NAMES = {
-    "unbalanced_metabolite": "conc_unbalanced",
-    "inhibition_constant": "ki",
-    "tense_dissociation_constant": "diss_t",
-    "relaxed_dissociation_constant": "diss_r",
-    "enzyme_concentration": "enzyme",
-}
+NON_LN_SCALE_PARAMS = ["dgf", "drain"]
 
 
 def load_maud_input_from_toml(data_path: str) -> MaudInput:
@@ -428,8 +421,6 @@ def extract_1d_prior(
     )
     pct_params["location"] = np.exp(pct_params["location"])
     out[["location", "scale"]] = out[["location", "scale"]].fillna(pct_params)
-    if parameter_name in USER_PARAM_NAMES.keys():
-        parameter_name = USER_PARAM_NAMES[parameter_name]
     return IndPrior1d(
         parameter_name=parameter_name,
         location=out["location"].fillna(default_loc),
@@ -502,8 +493,6 @@ def extract_2d_prior(
         .rename_axis(parameter_name_to_id_cols[parameter_name][1], axis="columns")
         for col in ["location", "scale"]
     )
-    if parameter_name in USER_PARAM_NAMES.keys():
-        parameter_name = USER_PARAM_NAMES[parameter_name]
     return IndPrior2d(
         parameter_name=parameter_name,
         location=location.fillna(default_loc),
