@@ -35,10 +35,10 @@ def load_infd(csvs: List[str], mi: MaudInput) -> az.InferenceData:
         csvs,
         coords=coords,
         dims={
-            "enzyme": ["experiments", "enzymes"],
+            "conc_enzyme": ["experiments", "enzymes"],
             "conc": ["experiments", "mics"],
             "flux": ["experiments", "reactions"],
-            "formation_energy": ["metabolites"],
+            "dgf": ["metabolites"],
             "kcat": ["enzymes"],
             "km": ["kms"],
             "yconc_sim": ["yconcs"],
