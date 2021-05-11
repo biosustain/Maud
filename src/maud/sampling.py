@@ -231,9 +231,9 @@ def _get_conc_init(mi: MaudInput) -> pd.DataFrame:
 
     """
     cs = mi.stan_coords
-    out = mi.priors.unbalanced_metabolite_priors.location.reindex(
-        columns=cs.mics
-    ).fillna(0.01)
+    out = mi.priors.priors_conc_unbalanced.location.reindex(columns=cs.mics).fillna(
+        0.01
+    )
     for (exp_id, mic_id), value in mi.measurements.yconc["measurement"].items():
         out.loc[exp_id, mic_id] = value
     return out

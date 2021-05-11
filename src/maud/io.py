@@ -82,7 +82,7 @@ def load_maud_input_from_toml(data_path: str) -> MaudInput:
         stan_coords=stan_coords,
         measurements=measurement_set,
     )
-    validation.validate_maud_input(mi)
+    # validation.validate_maud_input(mi)
     return mi
 
 
@@ -502,18 +502,10 @@ def parse_priors(raw: pd.DataFrame, cs: StanCoordSet) -> PriorSet:
         # 1d priors
         priors_kcat=extract_1d_prior(raw, "kcat", [cs.enzymes]),
         priors_km=extract_1d_prior(raw, "km", [cs.km_enzs, cs.km_mics]),
-        priors_dgf=extract_1d_prior(
-            raw, "dgf", [cs.metabolites]
-        ),
-        priors_diss_t=extract_1d_prior(
-            raw, "diss_t", [cs.ai_enzs, cs.ai_mics]
-        ),
-        priors_diss_r=extract_1d_prior(
-            raw, "diss_r", [cs.aa_enzs, cs.aa_mics]
-        ),
-        priors_ki=extract_1d_prior(
-            raw, "ki", [cs.ci_enzs, cs.ci_mics]
-        ),
+        priors_dgf=extract_1d_prior(raw, "dgf", [cs.metabolites]),
+        priors_diss_t=extract_1d_prior(raw, "diss_t", [cs.ai_enzs, cs.ai_mics]),
+        priors_diss_r=extract_1d_prior(raw, "diss_r", [cs.aa_enzs, cs.aa_mics]),
+        priors_ki=extract_1d_prior(raw, "ki", [cs.ci_enzs, cs.ci_mics]),
         priors_transfer_constant=extract_1d_prior(
             raw, "transfer_constant", [cs.allosteric_enzymes]
         ),
