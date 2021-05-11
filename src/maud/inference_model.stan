@@ -131,7 +131,7 @@ transformed parameters {
   vector[N_ae] transfer_constant = unz_log_1d(priors_transfer_constant, log_transfer_constant_z);
   vector[N_phosphorylation_enzymes] kcat_phos = unz_log_1d(priors_kcat_phos, log_kcat_phos_z);
   array[N_experiment] vector[N_drain] drain = unz_2d(priors_drain, drain_z);
-  array[N_experiment] vector[N_enzyme] enzyme = unz_log_2d(priors_conc_enzyme, log_conc_enzyme_z);
+  array[N_experiment] vector[N_enzyme] conc_enzyme = unz_log_2d(priors_conc_enzyme, log_conc_enzyme_z);
   array[N_experiment] vector[N_unbalanced] conc_unbalanced = unz_log_2d(priors_conc_unbalanced, log_conc_unbalanced_z);
   array[N_experiment] vector[N_phosphorylation_enzymes] conc_phos = unz_log_2d(priors_conc_phos, log_conc_phos_z);
   // transform
@@ -139,7 +139,7 @@ transformed parameters {
   array[N_experiment] vector[N_reaction] flux;
   vector[N_enzyme] keq = get_keq(S_enz, dgf, mic_to_met, water_stoichiometry);
   for (e in 1:N_experiment){
-    vector[N_enzyme] conc_enzyme_experiment = enzyme[e] .* knockout[e]';
+    vector[N_enzyme] conc_enzyme_experiment = conc_enzyme[e] .* knockout[e]';
     vector[N_phosphorylation_enzymes] conc_phos_experiment = conc_phos[e] .* phos_knockout[e]';
     vector[N_mic-N_unbalanced] conc_balanced[2] = ode_bdf_tol(dbalanced_dt,
                                                               conc_init[e, balanced_mic_ix],
@@ -236,7 +236,7 @@ model {
     target += reduce_sum(partial_sum_conc, yconc, 1,
                          conc, experiment_yconc, mic_ix_yconc, sigma_conc);
     target += reduce_sum(partial_sum_enz, yenz, 1,
-                         enzyme, experiment_yenz, enzyme_yenz, sigma_enz);
+                         conc_enzyme, experiment_yenz, enzyme_yenz, sigma_enz);
     target += reduce_sum(partial_sum_flux, yflux, 1,
                          flux, experiment_yflux, reaction_yflux, sigma_flux);
   }
