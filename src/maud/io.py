@@ -82,7 +82,7 @@ def load_maud_input_from_toml(data_path: str) -> MaudInput:
         stan_coords=stan_coords,
         measurements=measurement_set,
     )
-    # validation.validate_maud_input(mi)
+    validation.validate_maud_input(mi)
     return mi
 
 
