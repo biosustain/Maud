@@ -101,7 +101,7 @@ def simulate(data_path, output_dir, n):
     print("\nSimulated concentrations and fluxes:")
     print(infd.posterior["conc"].mean(dim=["chain", "draw"]).to_series())
     print(infd.posterior["flux"].mean(dim=["chain", "draw"]).to_series())
-    print(infd.posterior["enzyme"].mean(dim=["chain", "draw"]).to_series())
+    print(infd.posterior["conc_enzyme"].mean(dim=["chain", "draw"]).to_series())
     print("\nSimulated measurements:")
     print(infd.posterior["yconc_sim"].mean(dim=["chain", "draw"]).to_series())
     print(infd.posterior["yflux_sim"].mean(dim=["chain", "draw"]).to_series())
