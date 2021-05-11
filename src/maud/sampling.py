@@ -222,9 +222,9 @@ def _get_conc_init(mi: MaudInput) -> pd.DataFrame:
 
     """
     cs = mi.stan_coords
-    out = mi.priors.unbalanced_metabolite_priors.location.reindex(
-        columns=cs.mics
-    ).fillna(0.01)
+    out = mi.priors.priors_conc_unbalanced.location.reindex(columns=cs.mics).fillna(
+        0.01
+    )
     for (exp_id, mic_id), value in mi.measurements.yconc["measurement"].items():
         out.loc[exp_id, mic_id] = value
     return out
@@ -237,18 +237,18 @@ def get_prior_dict(ps: PriorSet) -> dict:
         return [p.location.values.tolist(), p.scale.values.tolist()]
 
     return {
-        "fe_priors": unpack(ps.formation_energy_priors),
-        "kcat_priors": unpack(ps.kcat_priors),
-        "km_priors": unpack(ps.km_priors),
-        "ki_priors": unpack(ps.inhibition_constant_priors),
-        "diss_t_priors": unpack(ps.tense_dissociation_constant_priors),
-        "diss_r_priors": unpack(ps.relaxed_dissociation_constant_priors),
-        "phos_kcat_priors": unpack(ps.phos_kcat_priors),
-        "tc_priors": unpack(ps.transfer_constant_priors),
-        "unbalanced_priors": unpack(ps.unbalanced_metabolite_priors),
-        "enzyme_priors": unpack(ps.enzyme_concentration_priors),
-        "phos_conc_priors": unpack(ps.phos_enz_concentration_priors),
-        "drain_priors": unpack(ps.drain_priors),
+        "priors_dgf": unpack(ps.priors_dgf),
+        "priors_kcat": unpack(ps.priors_kcat),
+        "priors_km": unpack(ps.priors_km),
+        "priors_ki": unpack(ps.priors_ki),
+        "priors_diss_t": unpack(ps.priors_diss_t),
+        "priors_diss_r": unpack(ps.priors_diss_r),
+        "priors_kcat_phos": unpack(ps.priors_kcat_phos),
+        "priors_transfer_constant": unpack(ps.priors_transfer_constant),
+        "priors_conc_unbalanced": unpack(ps.priors_conc_unbalanced),
+        "priors_conc_enzyme": unpack(ps.priors_conc_enzyme),
+        "priors_conc_phos": unpack(ps.priors_conc_phos),
+        "priors_drain": unpack(ps.priors_drain),
     }
 
 
