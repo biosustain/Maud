@@ -205,7 +205,7 @@ def get_phos_act_inh_matrix(mi: MaudInput):
         j = codify(phos_enz_ix)[phos.id] - 1
         if phos.activating:
             S_phos_act[i, j] = 1
-        elif phos.inhbiting:
+        elif phos.inhibiting:
             S_phos_inh[i, j] = 1
     return S_phos_act.T.tolist(), S_phos_inh.T.tolist()
 
