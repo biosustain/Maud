@@ -33,18 +33,18 @@ def validate_maud_input(mi: data_model.MaudInput):
     ps = mi.priors
     cs = mi.stan_coords
     should_match_1d = [
-        (ps.km_priors, "mic_id", cs.km_mics),
-        (ps.km_priors, "enzyme_id", cs.km_enzs),
-        (ps.kcat_priors, "enzyme_id", cs.enzymes),
+        (ps.priors_km, "mic_id", cs.km_mics),
+        (ps.priors_km, "enzyme_id", cs.km_enzs),
+        (ps.priors_kcat, "enzyme_id", cs.enzymes),
     ]
     should_match_2d = [
         (
-            ps.drain_priors,
+            ps.priors_drain,
             ["experiment_id", "drain_id"],
             [cs.experiments, cs.drains],
         ),
         (
-            ps.unbalanced_metabolite_priors,
+            ps.priors_conc_unbalanced,
             ["experiment_id", "mic_id"],
             [cs.experiments, cs.unbalanced_mics],
         ),

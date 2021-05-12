@@ -182,16 +182,16 @@ Each parameter type has specific required id fields, which are as follows:
 
 - :code:`kcat`: :code:`enzyme_id`
 - :code:`km`: :code:`enzyme_id` and :code:`mic_id`
-- :code:`formation_energy`: :code:`metabolite_id`
-- :code:`inhibition_constant`: :code:`enzyme_id`
-- :code:`enzyme_concentration`: :code:`enzyme_id` and :code:`experiment_id`
-- :code:`unbalanced_metabolite`: :code:`mic_id` and :code:`experiment_id`
+- :code:`dgf`: :code:`metabolite_id`
+- :code:`ki`: :code:`enzyme_id`
+- :code:`conc_enzyme`: :code:`enzyme_id` and :code:`experiment_id`
+- :code:`conc_unbalanced`: :code:`mic_id` and :code:`experiment_id`
 - :code:`drain`: :code:`drain_id` and :code:`experiment_id`
 - :code:`transfer_constant`: :code:`enzyme_id`
-- :code:`relaxed_dissociation_constant`: :code:`enzyme_id` and :code:`mic_id`
-- :code:`tense_dissociation_constant`: :code:`enzyme_id` and :code:`mic_id`
-- :code:`phos_kcat`: :code:`phos_enz_id`
-- :code:`phos_enz_concentration`: :code:`phos_enz_id` and :code:`experiment_id`
+- :code:`diss_r`: :code:`enzyme_id` and :code:`mic_id`
+- :code:`diss_t`: :code:`enzyme_id` and :code:`mic_id`
+- :code:`kcat_phos`: :code:`phos_enz_id`
+- :code:`conc_phos`: :code:`phos_enz_id` and :code:`experiment_id`
 
 Information in id fields other than the required ones will be ignored: for
 clarity it is best to leave these empty, as in the example below.
@@ -229,29 +229,29 @@ Below is an example priors file.
     km,,dhap_c,FBA,,,,0.13,0.2,,
     km,,dhap_c,TPI,,,,2.16,1.5,,
     km,,g3p_c,TPI,,,,200.0,0.2,,
-    formation_energy,g6p,,,,,,-1336.3,1.3,,
-    formation_energy,f6p,,,,,,-1333.8,1.3,,
-    formation_energy,pi,,,,,,-1073.3,1.5,,
-    formation_energy,adp,,,,,,-1440.8,2.4,,
-    formation_energy,atp,,,,,,-2313.0,3.0,,
-    formation_energy,fdp,,,,,,-2220.9,2.1,,
-    formation_energy,g3p,,,,,,-1106.4,1.3,,
-    formation_energy,dhap,,,,,,-1111.9,1.1,,
-    enzyme_concentration,,,PGI,,,Evo04ptsHIcrrEvo01EP,0.033875912,0.06,,
-    enzyme_concentration,,,FBP,,,Evo04ptsHIcrrEvo01EP,0.00592291,0.047,,
-    enzyme_concentration,,,FBA,,,Evo04ptsHIcrrEvo01EP,0.0702922488972023,0.19,,
-    enzyme_concentration,,,TPI,,,Evo04ptsHIcrrEvo01EP,0.020866941,0.13,,
-    enzyme_concentration,,,PFK,,,Evo04ptsHIcrrEvo01EP,0.018055101,0.13,,
-    enzyme_concentration,,,FBP,,,Evo04Evo01EP,0.00592291,0.047,,
-    enzyme_concentration,,,FBA,,,Evo04Evo01EP,0.0702922488972023,0.19,,
-    enzyme_concentration,,,TPI,,,Evo04Evo01EP,0.0198,0.1,,
-    enzyme_concentration,,,PFK,,,Evo04Evo01EP,0.0185,0.05,,
-    unbalanced_metabolite,,g6p_c,,,,Evo04ptsHIcrrEvo01EP,2.0804108,0.188651,,
-    unbalanced_metabolite,,adp_c,,,,Evo04ptsHIcrrEvo01EP,0.6113649,0.038811,,
-    unbalanced_metabolite,,atp_c,,,,Evo04ptsHIcrrEvo01EP,5.4080032,0.186962,,
-    unbalanced_metabolite,,g6p_c,,,,Evo04Evo01EP,2.0804108,0.188651,,
-    unbalanced_metabolite,,adp_c,,,,Evo04Evo01EP,0.6113649,0.038811,,
-    unbalanced_metabolite,,atp_c,,,,Evo04Evo01EP,5.4080032,0.186962,,
+    dgf,g6p,,,,,,-1336.3,1.3,,
+    dgf,f6p,,,,,,-1333.8,1.3,,
+    dgf,pi,,,,,,-1073.3,1.5,,
+    dgf,adp,,,,,,-1440.8,2.4,,
+    dgf,atp,,,,,,-2313.0,3.0,,
+    dgf,fdp,,,,,,-2220.9,2.1,,
+    dgf,g3p,,,,,,-1106.4,1.3,,
+    dgf,dhap,,,,,,-1111.9,1.1,,
+    conc_enzyme,,,PGI,,,Evo04ptsHIcrrEvo01EP,0.033875912,0.06,,
+    conc_enzyme,,,FBP,,,Evo04ptsHIcrrEvo01EP,0.00592291,0.047,,
+    conc_enzyme,,,FBA,,,Evo04ptsHIcrrEvo01EP,0.0702922488972023,0.19,,
+    conc_enzyme,,,TPI,,,Evo04ptsHIcrrEvo01EP,0.020866941,0.13,,
+    conc_enzyme,,,PFK,,,Evo04ptsHIcrrEvo01EP,0.018055101,0.13,,
+    conc_enzyme,,,FBP,,,Evo04Evo01EP,0.00592291,0.047,,
+    conc_enzyme,,,FBA,,,Evo04Evo01EP,0.0702922488972023,0.19,,
+    conc_enzyme,,,TPI,,,Evo04Evo01EP,0.0198,0.1,,
+    conc_enzyme,,,PFK,,,Evo04Evo01EP,0.0185,0.05,,
+    conc_unbalanced,,g6p_c,,,,Evo04ptsHIcrrEvo01EP,2.0804108,0.188651,,
+    conc_unbalanced,,adp_c,,,,Evo04ptsHIcrrEvo01EP,0.6113649,0.038811,,
+    conc_unbalanced,,atp_c,,,,Evo04ptsHIcrrEvo01EP,5.4080032,0.186962,,
+    conc_unbalanced,,g6p_c,,,,Evo04Evo01EP,2.0804108,0.188651,,
+    conc_unbalanced,,adp_c,,,,Evo04Evo01EP,0.6113649,0.038811,,
+    conc_unbalanced,,atp_c,,,,Evo04Evo01EP,5.4080032,0.186962,,
     drain,,,,g3p_drain,,Evo04ptsHIcrrEvo01EP,,,0.3,1.2
     drain,,,,g3p_drain,,Evo04Evo01EP,,,0.3,1.2
 
