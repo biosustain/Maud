@@ -255,3 +255,64 @@ Below is an example priors file.
     drain,,,,g3p_drain,,Evo04ptsHIcrrEvo01EP,,,0.3,1.2
     drain,,,,g3p_drain,,Evo04Evo01EP,,,0.3,1.2
 
+
+Specifying initial parameter values
+===================================
+
+Setting initial parameter values is mainly intended for generating samples from
+known inputs using :code:`maud simulate`. It can be useful with :code:`maud
+sample` when the posterior distribution concentrates in a hard-to-find region.
+
+Initial parameter values should be entered in a csv file, which should in turn
+be specified the :code:`config.toml` file of a Maud input directory, using the
+field :code:`user_inits_file`. For example:
+
+.. code:: toml
+
+    name = "methionine_cycle"
+    kinetic_model = "methionine_cycle.toml"
+    priors = "priors.csv"
+    experiments = "experiments.csv"
+    likelihood = true
+    user_inits_file = "simulation_input_values.csv"
+
+The csv file indicated by :code:`user_inits_file` must have the following
+fields:
+
+- :code:`parameter_name`
+- :code:`experiment_id`
+- :code:`mic_id`
+- :code:`enzyme_id`
+- :code:`drain_id`
+- :code:`metabolite_id`
+- :code:`value`
+
+Parameters not specified in the csv will be initialised at their prior mean
+value, as would happen if no user-specified initial values were provided.
+
+For example, a file with the following contents would set initial values for
+the parameter :code:`enzyme` in the experiments :code:`dataset_1` and
+:code:`dataset_2`:
+
+.. code:: csv
+
+    parameter_name,experiment_id,mic_id,enzyme_id,drain_id,metabolite_id,value
+    enzyme,dataset_1,,AHC1,,,1
+    enzyme,dataset_1,,BHMT1,,,1
+    enzyme,dataset_1,,CBS1,,,1.5
+    enzyme,dataset_1,,GNMT1,,,1
+    enzyme,dataset_1,,MAT1,,,1
+    enzyme,dataset_1,,MAT3,,,1
+    enzyme,dataset_1,,METH_Gen,,,1
+    enzyme,dataset_1,,MS1,,,1
+    enzyme,dataset_1,,MTHFR1,,,1
+    enzyme,dataset_2,,AHC1,,,1
+    enzyme,dataset_2,,BHMT1,,,1
+    enzyme,dataset_2,,CBS1,,,1
+    enzyme,dataset_2,,GNMT1,,,1
+    enzyme,dataset_2,,MAT1,,,1
+    enzyme,dataset_2,,MAT3,,,1
+    enzyme,dataset_2,,METH_Gen,,,1
+    enzyme,dataset_2,,MS1,,,1
+    enzyme,dataset_2,,MTHFR1,,,1
+

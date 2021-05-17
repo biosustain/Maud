@@ -46,7 +46,6 @@ DEFAULT_SAMPLE_CONFIG = {
     "iter_sampling": 5,
     "chains": 2,
     "max_treedepth": 11,
-    "inits": 0,
     "show_progress": True,
     "step_size": 0.025,
     "adapt_delta": 0.99,
@@ -62,7 +61,6 @@ DEFAULT_ODE_CONFIG = {
 SIM_CONFIG = {
     "chains": 1,
     "fixed_param": True,
-    "inits": 0,
     "iter_warmup": 0,
     "show_progress": False,
     "threads_per_chain": 1,
@@ -104,8 +102,12 @@ def _sample_given_config(
     """
 
     input_filepath = os.path.join(output_dir, "input_data.json")
+    inits_filepath = os.path.join(output_dir, "inits.json")
     input_data = get_input_data(mi)
+    inits = {k: v.values for k, v in mi.inits.items()}
     cmdstanpy.utils.jsondump(input_filepath, input_data)
+    cmdstanpy.utils.jsondump(inits_filepath, inits)
+    config["inits"] = inits_filepath
     stan_program_filepath = os.path.join(HERE, STAN_PROGRAM_RELATIVE_PATH)
     include_path = os.path.join(HERE, INCLUDE_PATH)
     cpp_options = {}
@@ -203,7 +205,7 @@ def get_phos_act_inh_matrix(mi: MaudInput):
         j = codify(phos_enz_ix)[phos.id] - 1
         if phos.activating:
             S_phos_act[i, j] = 1
-        elif phos.inhbiting:
+        elif phos.inhibiting:
             S_phos_inh[i, j] = 1
     return S_phos_act.T.tolist(), S_phos_inh.T.tolist()
 

@@ -21,7 +21,7 @@
 """
 
 import os
-from typing import List
+from typing import Dict, List, Union
 
 import numpy as np
 import pandas as pd
@@ -56,6 +56,7 @@ DEFAULT_PRIOR_LOC_UNBALANCED = 0.1
 DEFAULT_PRIOR_SCALE_UNBALANCED = 2.0
 DEFAULT_PRIOR_LOC_ENZYME = 0.1
 DEFAULT_PRIOR_SCALE_ENZYME = 2.0
+NON_LN_SCALE_PARAMS = ["dgf", "drain"]
 
 
 def load_maud_input_from_toml(data_path: str) -> MaudInput:
@@ -75,12 +76,18 @@ def load_maud_input_from_toml(data_path: str) -> MaudInput:
     stan_coords = get_stan_coords(kinetic_model, raw_measurements)
     measurement_set = parse_measurements(raw_measurements, stan_coords)
     prior_set = parse_priors(raw_priors, stan_coords)
+    if config.user_inits_file is not None:
+        user_inits_path = os.path.join(data_path, config.user_inits_file)
+    else:
+        user_inits_path = None
+    inits = get_inits(prior_set, user_inits_path)
     mi = MaudInput(
         config=config,
         kinetic_model=kinetic_model,
         priors=prior_set,
         stan_coords=stan_coords,
         measurements=measurement_set,
+        inits=inits,
     )
     validation.validate_maud_input(mi)
     return mi
@@ -539,6 +546,9 @@ def parse_config(raw):
 
     :param raw: result of running toml.load on a suitable file
     """
+    user_inits_file = (
+        raw["user_inits_file"] if "user_inits_file" in raw.keys() else None
+    )
     return MaudConfig(
         name=raw["name"],
         kinetic_model_file=raw["kinetic_model"],
@@ -547,4 +557,71 @@ def parse_config(raw):
         likelihood=raw["likelihood"],
         ode_config=raw["ode_config"],
         cmdstanpy_config=raw["cmdstanpy_config"],
+        user_inits_file=user_inits_file,
     )
+
+
+def get_inits(priors: PriorSet, user_inits_path) -> Dict[str, np.array]:
+    """Get a dictionary of initial values.
+
+    :param priors: Priorset object
+
+    :param user_inits_path: path to a csv of user-specified initial parameter
+    values
+
+    """
+
+    def user_inits_for_param(
+        u: pd.DataFrame, p: Union[IndPrior1d, IndPrior2d]
+    ) -> pd.Series:
+        if len(p.location) == 0:
+            return p.location
+        elif isinstance(p, IndPrior1d):
+            return u.loc[lambda df: df["parameter_name"] == p.parameter_name].set_index(
+                p.location.index.names
+            )["value"]
+        elif isinstance(p, IndPrior2d):
+            return u.loc[lambda df: df["parameter_name"] == p.parameter_name].set_index(
+                [p.location.index.name, p.location.columns.name]
+            )["value"]
+        else:
+            raise ValueError("Unrecognised prior type: " + str(type(p)))
+
+    inits = {p.parameter_name: p.location for p in priors.__dict__.values()}
+    if user_inits_path is not None:
+        user_inits_all = pd.read_csv(user_inits_path)
+        for p in priors.__dict__.values():
+            if p.location.empty:
+                continue
+            user = user_inits_for_param(user_inits_all, p)
+            default = inits[p.parameter_name]
+            if isinstance(inits[p.parameter_name], pd.DataFrame):
+                default = default.stack()
+            combined = pd.Series(
+                np.where(
+                    user.reindex(default.index).notnull(),
+                    user.reindex(default.index),
+                    default,
+                ),
+                index=default.index,
+            )
+            if isinstance(inits[p.parameter_name], pd.DataFrame):
+                combined = combined.unstack()
+            inits[p.parameter_name] = combined
+    return rescale_inits(inits, priors)
+
+
+def rescale_inits(inits: dict, priors: PriorSet) -> Dict[str, np.array]:
+    """Augment a dictionary of inits with equivalent normalised values.
+
+    :param inits: original inits
+
+    :param priors: PriorSet object used to do the normalising
+    """
+    rescaled = {}
+    for (n, i), prior in zip(inits.items(), priors.__dict__.values()):
+        if n in NON_LN_SCALE_PARAMS:
+            rescaled[n + "_z"] = (i - prior.location) / prior.scale
+        else:
+            rescaled[f"log_{n}_z"] = (np.log(i) - np.log(prior.location)) / prior.scale
+    return {**inits, **rescaled}
