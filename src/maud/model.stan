@@ -1,151 +1,5 @@
 functions{
-  vector unz_1d(vector[] priors, vector z){
-    return priors[1] + priors[2] .* z;
-  }
-  vector unz_log_1d(vector[] priors, vector z){
-    return exp(log(priors[1]) + priors[2] .* z);
-  }
-  vector[] unz_2d(vector[,] priors, vector[] z){
-    array[size(z)] vector [rows(z[1])] out;
-    for (ex in 1:size(z)){
-      out[ex] = unz_1d(priors[:,ex], z[ex]);
-    }
-    return out;
-  }
-  vector[] unz_log_2d(vector[,] priors, vector[] z){
-    array[size(z)] vector [rows(z[1])] out;
-    for (ex in 1:size(z)){
-      out[ex] = unz_log_1d(priors[:,ex], z[ex]);
-    }
-    return out;
-  }
-  real get_allostery(vector activator_concentration,    // metabolite
-                     vector inhibitor_concentration,    // metabolite
-                     real free_enzyme_ratio,            // derived from rate equation
-                     vector dissociation_constant_r,    // parameter
-                     vector dissociation_constant_t,    // parameter
-                     real transfer_constant,            // parameter
-                     int subunits){                     // defined by enzyme structure
-    if ((rows(activator_concentration) == 0) && (rows(inhibitor_concentration) == 0)){
-      return 1;
-    }
-    else {
-      real Q_num = 1 + sum(inhibitor_concentration ./ dissociation_constant_t);
-      real Q_denom = 1 + sum(activator_concentration ./ dissociation_constant_r);
-      return inv(1 + transfer_constant * pow(free_enzyme_ratio * Q_num / Q_denom, subunits));
-    }
-  }
-  vector get_keq(matrix S, vector dgf, int[] mic_to_met, vector water_stoichiometry){
-    /*
-       Calculate keqs from metabolite formation energies, assuming water's
-       formation energy is known exactly.
-    */
-    real minus_RT = -0.008314 * 298.15;
-    real dgf_water = -157.6;  // From http://equilibrator.weizmann.ac.il/metabolite?compoundId=C00001
-    vector[rows(S)] delta_g = S' * dgf[mic_to_met] + water_stoichiometry * dgf_water;
-    return exp(delta_g / minus_RT);
-  }
-  real get_Tr(vector metabolite,
-              vector km,
-              vector stoichiometry,
-              real kcat,
-              real keq){
-    real plus_product = 1;
-    real minus_product = 1;
-    real k_minus = (kcat / keq);
-    for (m in 1:rows(metabolite)){
-      real multiplicand = (metabolite[m] / km[m]) ^ abs(stoichiometry[m]);
-      k_minus *= km[m] ^ stoichiometry[m];
-      if (stoichiometry[m] < 0)
-        plus_product *= multiplicand;
-      else
-        minus_product *= multiplicand;
-    }
-    return kcat * plus_product - k_minus * minus_product;
-  }
-  real get_Dr_common_rate_law(vector metabolite, vector km, vector stoichiometry){
-    real psi_plus = 1;
-    real psi_minus = 1;
-    for (m in 1:rows(metabolite)){
-      real multiplicand = (1 + metabolite[m] / km[m]) ^ abs(stoichiometry[m]);
-      if (stoichiometry[m] < 0)
-        psi_plus *= multiplicand;
-      else
-        psi_minus *= multiplicand;
-    }
-    return psi_plus + psi_minus - 1;
-  }
-  real get_Dr_reg(vector conc_ci, vector ki){
-    if (rows(conc_ci) < 1){
-      return 0;
-    }
-    else {
-      return sum(conc_ci ./ ki);
-    }
-  }
-  real get_free_enzyme_ratio(vector metabolite,
-                             vector km,
-                             vector stoichiometry,
-                             vector conc_ci,
-                             vector ki){
-    real Dr = get_Dr_common_rate_law(metabolite, km, stoichiometry);
-    real Dr_reg = get_Dr_reg(conc_ci, ki);
-    return 1 / (Dr + Dr_reg);
-  }
-  int get_n_mic_for_edge(matrix S, int j){
-    int out = 0;
-    for (s in S[,j]){
-      if (s != 0){
-        out += 1;
-      }
-    }
-    return out;
-  }
-  int[] get_mics_for_edge(matrix S, int j){
-    int N_mic = get_n_mic_for_edge(S, j);
-    int out[N_mic];
-    int pos = 1;
-    for (i in 1:rows(S)){
-      if (S[i, j] != 0){
-        out[pos] = i;
-        pos += 1;
-      }
-    }
-    return out;
-  }
-  real get_flux_for_edge_rev(real enz,
-                             real kcat,
-                             real keq,
-                             real tc,
-                             vector conc,
-                             vector km,
-                             vector s,
-                             vector ci,
-                             vector ki,
-                             vector ai,
-                             vector dt,
-                             vector aa,
-                             vector dr,
-                             int subunits,
-                             vector phos_conc_act,
-                             vector phos_conc_inh,
-                             vector phos_kcat_act,
-                             vector phos_kcat_inh){
-    real free_enzyme_ratio = 1 / (get_Dr_common_rate_law(conc, km, s) + get_Dr_reg(ci, ki));
-    real active_enzyme_fraction =
-      rows(phos_conc_inh) + rows(phos_conc_act) == 0 ?
-      1 :
-      1 / (1 + (sum(phos_kcat_inh .* phos_conc_inh) /
-                sum(phos_kcat_act .* phos_conc_act) ^ subunits));
-    return enz
-      * free_enzyme_ratio
-      * get_Tr(conc, km, s, kcat, keq)
-      * get_allostery(aa, ai, free_enzyme_ratio, dr, dt, tc, subunits)
-      * active_enzyme_fraction;
-  }
-  real get_flux_for_edge_drain(real drain, vector conc_j){
-    return drain * prod(conc_j ./ (conc_j + 1e-6));
-  }
+#include functions.stan
   vector get_flux(vector conc,
                   vector enz,
                   vector km,
@@ -191,7 +45,7 @@ functions{
         if (n_ci[j] > 0){  // competitive inhibition
           int comp_inhs_j[n_ci[j]] = segment(ix_ci, pos_ci, n_ci[j]);
           vector[n_ci[j]] ki_j = segment(ki, pos_ci, n_ci[j]);
-          free_enzyme_ratio_denom += get_Dr_reg(conc[comp_inhs_j], ki_j);
+          free_enzyme_ratio_denom += sum(conc[comp_inhs_j] ./ ki_j);
           pos_ci += n_ci[j];
         }
         real free_enzyme_ratio = inv(free_enzyme_ratio_denom);
@@ -216,7 +70,7 @@ functions{
         }
         if ((n_pi[j] > 0) || (n_pa[j] > 0)){  // phosphorylation
           real alpha = 0;
-          real beta = 0;  // TODO: what if beta is zero and alpha is non-zero?
+          real beta = 0;
           if (n_pa[j] > 0){
             int phos_acts_j[n_pa[j]] = segment(ix_pa, pos_pa, n_pa[j]);
             beta = sum(phos_kcat[phos_acts_j] .* phos_conc[phos_acts_j]);
@@ -227,11 +81,11 @@ functions{
             alpha = sum(phos_kcat[phos_inhs_j] .* phos_conc[phos_inhs_j]);
             pos_pi += n_pi[j];
           }
-          out[j] *= 1 / (1 + (alpha / beta) ^ subunits[j]);
+          out[j] *= 1 / (1 + (alpha / beta) ^ subunits[j]);  // TODO: what if beta is zero and alpha is non-zero?
         }
       }
       else if (edge_type[j] == 2){  // drain...
-        out[j] = get_flux_for_edge_drain(edge_to_drain[j], conc[mics_j]);
+        out[j] = drain[edge_to_drain[j]] * prod(conc[mics_j] ./ (conc[mics_j] + 1e-6));
       }
       else reject("Unknown edge type ", edge_type[j]);
     }
@@ -333,10 +187,8 @@ data {
   int<lower=1,upper=2> edge_type[N_edge];  // 1 = reversible modular rate law, 2 = drain
   int<lower=0,upper=N_enzyme> edge_to_enzyme[N_edge];  // 0 if drain
   int<lower=0,upper=N_drain> edge_to_drain[N_edge];  // 0 if enzyme
-  // int<lower=0,upper=N_edge> enzyme_to_edge[N_enzyme];
-  // int<lower=0,upper=N_edge> drain_to_edge[N_drain];
   int<lower=1,upper=N_metabolite> mic_to_met[N_mic];
-  vector[N_enzyme] water_stoichiometry;
+  vector[N_edge] water_stoichiometry;
   matrix<lower=0,upper=1>[N_experiment, N_enzyme] is_knockout;
   matrix<lower=0,upper=1>[N_experiment, N_phosphorylation_enzymes] is_phos_knockout;
   int<lower=0,upper=N_km> km_lookup[N_mic, N_edge];
@@ -364,12 +216,6 @@ transformed data {
   matrix[N_experiment, N_enzyme] knockout = rep_matrix(1, N_experiment, N_enzyme) - is_knockout;
   matrix[N_experiment, N_phosphorylation_enzymes] phos_knockout =
     rep_matrix(1, N_experiment, N_phosphorylation_enzymes) - is_phos_knockout;
-  matrix[N_mic, N_enzyme] S_enz;
-  for (j in 1:N_edge){
-    if (edge_to_enzyme[j] != 0){
-      S_enz[,edge_to_enzyme[j]] = S[,j];
-    }
-  }
 }
 parameters {
   vector[N_metabolite] dgf_z;
@@ -402,7 +248,7 @@ transformed parameters {
   // transform
   array[N_experiment] vector<lower=0>[N_mic] conc;
   array[N_experiment] vector[N_edge] flux;
-  vector[N_edge] keq = get_keq(S_enz, dgf, mic_to_met, water_stoichiometry);
+  vector[N_edge] keq = get_keq(S, dgf, mic_to_met, water_stoichiometry);
   for (e in 1:N_experiment){
     vector[N_enzyme] conc_enzyme_experiment = conc_enzyme[e] .* knockout[e]';
     vector[N_phosphorylation_enzymes] conc_phos_experiment = conc_phos[e] .* phos_knockout[e]';
