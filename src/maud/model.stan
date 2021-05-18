@@ -184,53 +184,51 @@ functions{
     for (j in 1:cols(S)){
       int n_mic_j = get_n_mic_for_edge(S, j);
       int mics_j[n_mic_j] = get_mics_for_edge(S, j);
-      int phos_acts_j[n_pa[j]]; if (n_pa[j] > 0) phos_acts_j = segment(ix_pa, pos_pa, n_pa[j]);
-      int phos_inhs_j[n_pi[j]]; if (n_pi[j] > 0) phos_inhs_j = segment(ix_pi, pos_pi, n_pi[j]);
-      int comp_inhs_j[n_ci[j]];
-      int allo_inhs_j[n_ai[j]];
-      int allo_acts_j[n_ai[j]];
-      vector[n_ci[j]] ki_j;
-      vector[n_ai[j]] diss_t_j;
-      vector[n_aa[j]] diss_r_j;
-      if (n_ci[j] > 0){
-        comp_inhs_j = segment(ix_ci, pos_ci, n_ci[j]);
-        ki_j = segment(ki, pos_ci, n_ci[j]);
-      }
-      if (n_ai[j] > 0){
-        allo_inhs_j = segment(ix_ai, pos_ai, n_ai[j]);
-        diss_t_j = segment(diss_t, pos_ai, n_ai[j]);
-      }
-      if (n_aa[j] > 0){
-        allo_acts_j = segment(ix_aa, pos_aa, n_aa[j]);
-        diss_r_j = segment(diss_r, pos_aa, n_aa[j]);
-      }
-      int is_allosteric = ((n_ai[j] > 0) || (n_aa[j] > 0));
-      real tc = is_allosteric ? transfer_constant[pos_tc] : 0;
       if (edge_type[j] == 1){  // reversible enzyme...
-        out[j] = get_flux_for_edge_rev(enz[edge_to_enzyme[j]],
-                                       kcat[edge_to_enzyme[j]],
-                                       keq[j],
-                                       tc,
-                                       conc[mics_j],
-                                       km[km_lookup[mics_j, j]],
-                                       S[mics_j, j],
-                                       conc[comp_inhs_j],
-                                       ki_j,
-                                       conc[allo_inhs_j],
-                                       diss_t_j,
-                                       conc[allo_acts_j],
-                                       diss_r_j,
-                                       subunits[j],
-                                       phos_kcat[phos_acts_j],
-                                       phos_kcat[phos_inhs_j],
-                                       phos_conc[phos_acts_j],
-                                       phos_conc[phos_inhs_j]);
-        pos_pa += n_pa[j];
-        pos_pi += n_pi[j];
-        pos_ci += n_ci[j];
-        pos_ai += n_ai[j];
-        pos_aa += n_aa[j];
-        pos_tc += is_allosteric;
+        vector[n_mic_j] km_j = km[km_lookup[mics_j, j]];
+        real kcat_j = kcat[edge_to_enzyme[j]];
+        real free_enzyme_ratio_denom = get_Dr_common_rate_law(conc[mics_j], km_j, S[mics_j, j]);
+        if (n_ci[j] > 0){  // competitive inhibition
+          int comp_inhs_j[n_ci[j]] = segment(ix_ci, pos_ci, n_ci[j]);
+          vector[n_ci[j]] ki_j = segment(ki, pos_ci, n_ci[j]);
+          free_enzyme_ratio_denom += get_Dr_reg(conc[comp_inhs_j], ki_j);
+          pos_ci += n_ci[j];
+        }
+        real free_enzyme_ratio = inv(free_enzyme_ratio_denom);
+        out[j] = free_enzyme_ratio * get_Tr(conc[mics_j], km_j, S[mics_j, j], kcat_j, keq[j]);
+        if ((n_ai[j] > 0) || (n_aa[j] > 0)){  // allosteric regulation
+          real Q_num = 1;
+          real Q_denom = 1;
+          if (n_ai[j] > 0){
+            int allo_inhs_j[n_ai[j]] = segment(ix_ai, pos_ai, n_ai[j]);
+            vector[n_ai[j]] diss_t_j = segment(diss_t, pos_ai, n_ai[j]);
+            Q_num += sum(conc[allo_inhs_j] ./ diss_t_j);
+            pos_ai += n_ai[j];
+          }
+          if (n_aa[j] > 0){
+            int allo_acts_j[n_aa[j]] = segment(ix_aa, pos_aa, n_aa[j]);
+            vector[n_aa[j]] diss_r_j = segment(diss_r, pos_aa, n_aa[j]);
+            Q_denom += sum(conc[allo_acts_j] ./ diss_r_j);
+            pos_aa += n_aa[j];
+          }
+          out[j] *= inv(1 + transfer_constant[pos_tc] * (free_enzyme_ratio * Q_num / Q_denom) ^ subunits[j]);
+          pos_tc += 1;
+        }
+        if ((n_pi[j] > 0) || (n_pa[j] > 0)){  // phosphorylation
+          real alpha = 0;
+          real beta = 0;  // TODO: what if beta is zero and alpha is non-zero?
+          if (n_pa[j] > 0){
+            int phos_acts_j[n_pa[j]] = segment(ix_pa, pos_pa, n_pa[j]);
+            beta = sum(phos_kcat[phos_acts_j] .* phos_conc[phos_acts_j]);
+            pos_pa += n_pa[j];
+          }
+          if (n_pi[j] > 0){
+            int phos_inhs_j[n_pi[j]] = segment(ix_pi, pos_pi, n_pi[j]);
+            alpha = sum(phos_kcat[phos_inhs_j] .* phos_conc[phos_inhs_j]);
+            pos_pi += n_pi[j];
+          }
+          out[j] *= 1 / (1 + (alpha / beta) ^ subunits[j]);
+        }
       }
       else if (edge_type[j] == 2){  // drain...
         out[j] = get_flux_for_edge_drain(edge_to_drain[j], conc[mics_j]);
@@ -274,10 +272,11 @@ functions{
     vector[rows(current_balanced)+rows(unbalanced)] current_concentration;
     current_concentration[balanced_ix] = current_balanced;
     current_concentration[unbalanced_ix] = unbalanced;
-    return (S * get_flux(current_concentration,
+    vector[rows(S)] flux = get_flux(current_concentration,
                          enz, km, drain, km_lookup, S, edge_type, edge_to_drain, edge_to_enzyme, kcat, keq,
                          ix_ci, ix_ai, ix_aa, ix_pa, ix_pi, n_ci, n_ai, n_aa, n_pa, n_pi,
-                         ki, diss_t, diss_r, transfer_constant, subunits, kcat_phos, conc_phos))[balanced_ix];
+                                    ki, diss_t, diss_r, transfer_constant, subunits, kcat_phos, conc_phos);
+    return (S * flux)[balanced_ix];
   }
 }
 data {
@@ -293,6 +292,7 @@ data {
   int<lower=0> N_phosphorylation_enzymes;
   int<lower=1> N_experiment;
   int<lower=1> N_flux_measurement;
+  int<lower=0> N_enzyme_measurement;
   int<lower=1> N_conc_measurement;
   int<lower=0> N_ki;
   int<lower=0> N_ai;
@@ -300,7 +300,6 @@ data {
   int<lower=0> N_ae;
   int<lower=0> N_pa;
   int<lower=0> N_pi;
-  int<lower=0> N_enzyme_measurement;
   // measurements
   int<lower=1,upper=N_mic> unbalanced_mic_ix[N_unbalanced];
   int<lower=1,upper=N_mic> balanced_mic_ix[N_mic-N_unbalanced];
@@ -445,7 +444,6 @@ transformed parameters {
                   conc_phos_experiment);
     conc[e, balanced_mic_ix] = conc_balanced[1];
     conc[e, unbalanced_mic_ix] = conc_unbalanced[e];
-    flux[e] = rep_vector(0, cols(S));
     flux[e] = get_flux(conc[e],
                        conc_enzyme_experiment,
                        km,
@@ -512,9 +510,9 @@ model {
   if (LIKELIHOOD == 1){
     for (c in 1:N_conc_measurement)
       yconc[c] ~ lognormal(log(conc[experiment_yconc[c], mic_ix_yconc[c]]), sigma_conc[c]);
-    for (e in 1:N_conc_measurement)
+    for (e in 1:N_enzyme_measurement)
       yenz[e] ~ lognormal(log(conc_enzyme[experiment_yconc[e], enzyme_yenz[e]]), sigma_enz[e]);
-    for (f in 1:N_conc_measurement)
+    for (f in 1:N_flux_measurement)
       yflux[f] ~ normal(flux[experiment_yflux[f], reaction_yflux[f]], sigma_flux[f]);
   }
 }
