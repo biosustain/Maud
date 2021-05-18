@@ -8,6 +8,7 @@ import numpy as np
 from matplotlib import pyplot as plt
 
 from maud.data_model import MaudInput
+from maud.sampling import get_stoichiometry
 
 
 def load_infd(csvs: List[str], mi: MaudInput) -> az.InferenceData:
@@ -16,9 +17,11 @@ def load_infd(csvs: List[str], mi: MaudInput) -> az.InferenceData:
     def join_list_of_strings(l1, l2, sep="-"):
         return list(map(lambda a: f"{a[0]}{sep}{a[1]}", zip(l1, l2)))
 
+    S = get_stoichiometry(mi)
     coords = {
         **mi.stan_coords.__dict__,
         **{
+            "edges": S.columns,
             "kms": join_list_of_strings(mi.stan_coords.km_enzs, mi.stan_coords.km_mics),
             "yconcs": join_list_of_strings(
                 mi.stan_coords.yconc_exps, mi.stan_coords.yconc_mics
@@ -37,7 +40,7 @@ def load_infd(csvs: List[str], mi: MaudInput) -> az.InferenceData:
         dims={
             "conc_enzyme": ["experiments", "enzymes"],
             "conc": ["experiments", "mics"],
-            "flux": ["experiments", "reactions"],
+            "flux": ["experiments", "edges"],
             "dgf": ["metabolites"],
             "kcat": ["enzymes"],
             "km": ["kms"],
