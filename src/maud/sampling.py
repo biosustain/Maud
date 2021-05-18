@@ -386,7 +386,8 @@ def get_input_data(mi: MaudInput) -> dict:
     ]
     phos_info = get_phos_info(mi)
     mod_info = get_modifier_info(mi)
-    water_stoichiometry = [e.water_stoichiometry for e in sorted_enzymes]
+    water_stoichiometry_enzyme = {e.id: e.water_stoichiometry for e in sorted_enzymes}
+    water_stoichiometry = pd.Series(water_stoichiometry_enzyme, index=S.columns).fillna(0)
     mic_to_met = [
         codify(mi.stan_coords.metabolites)[mic.metabolite_id] for mic in sorted_mics
     ]
@@ -464,7 +465,7 @@ def get_input_data(mi: MaudInput) -> dict:
             "edge_type": edge_type,
             "edge_to_enzyme": edge_to_enzyme,
             "edge_to_drain": edge_to_drain,
-            "water_stoichiometry": water_stoichiometry,
+            "water_stoichiometry": water_stoichiometry.values,
             "mic_to_met": mic_to_met,
             "km_lookup": _get_km_lookup(mi),
             "is_knockout": knockout_matrix_enzyme.values.tolist(),
