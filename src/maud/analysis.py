@@ -8,7 +8,6 @@ import numpy as np
 from matplotlib import pyplot as plt
 
 from maud.data_model import MaudInput
-from maud.sampling import get_stoichiometry
 
 
 def load_infd(csvs: List[str], mi: MaudInput) -> az.InferenceData:
