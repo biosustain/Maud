@@ -28,10 +28,8 @@ import pandas as pd
 from maud.data_model import (
     IndPrior1d,
     IndPrior2d,
-    KineticModel,
     MaudInput,
     MeasurementSet,
-    Phosphorylation,
     PriorSet,
     StanCoordSet,
 )
@@ -305,6 +303,22 @@ def get_measurements_dict(ms: MeasurementSet, cs: StanCoordSet) -> dict:
 
 
 def get_modifier_info(mi: MaudInput) -> Dict[str, pd.Series]:
+    """Get a dictionary of modifier info from a MaudInput.
+
+    The output dictionary has the form modifier type -> pandas series indexed
+    by edges, whose values are lists of mic ids of the respective modifier.
+
+    For example:
+
+    {
+        "competitive_inhibitor": pd.Series({"r2": ["m2"]}, index=["r1", "r2"]),
+        "allosteric"_inhibitor: pd.Series({}, index=["r1", "r2"]),
+        "allosteric"_activator: pd.Series({"r1": ["m1"]}, index=["r1", "r2"])
+    }
+
+    :param mi: A MaudInput object.
+
+    """
     out = {}
     S = get_stoichiometry(mi)
     mods = list(
@@ -322,7 +336,7 @@ def get_modifier_info(mi: MaudInput) -> Dict[str, pd.Series]:
         "allosteric_inhibitor",
         "allosteric_activator",
     ]:
-        mod_mics = {edge: [] for edge in S.columns}
+        mod_mics: dict = {edge: [] for edge in S.columns}
         for m in mods:
             if m.modifier_type == modifier_type:
                 mod_mics[m.enzyme_id].append(m.mic_id)
@@ -331,9 +345,25 @@ def get_modifier_info(mi: MaudInput) -> Dict[str, pd.Series]:
 
 
 def get_phos_info(mi: MaudInput):
+    """Get a dictionary of phosphorylation info from a MaudInput.
+
+    The output dictionary has the form phosphorylation type -> pandas series
+    indexed by edges, whose values are lists of mic ids of the respective
+    modifier.
+
+    For example:
+
+    {
+        "activators": pd.Series({"r2": ["m2"]}, index=["r1", "r2"]),
+        "inhibitors": pd.Series({"r1": ["m1"]}, index=["r1", "r2"])
+    }
+
+    :param mi: A MaudInput object.
+
+    """
     S = get_stoichiometry(mi)
-    acts = {edge: [] for edge in S.columns}
-    inhs = {edge: [] for edge in S.columns}
+    acts: dict = {edge: [] for edge in S.columns}
+    inhs: dict = {edge: [] for edge in S.columns}
     for p in mi.kinetic_model.phosphorylation:
         if p.activating:
             acts[p.enzyme_id].append(p.id)
@@ -349,7 +379,12 @@ def get_phos_info(mi: MaudInput):
     }
 
 
-def get_edge_type(edge_id, mi):
+def get_edge_type(edge_id: str, mi: MaudInput):
+    """Find the type of an edge, given the id and a MaudInput.
+
+    :param edge_id: string identifying the edge
+    :param mi: a MaudInput object
+    """
     if edge_id in mi.stan_coords.enzymes:
         return 1
     elif edge_id in mi.stan_coords.drains:
@@ -387,7 +422,9 @@ def get_input_data(mi: MaudInput) -> dict:
     phos_info = get_phos_info(mi)
     mod_info = get_modifier_info(mi)
     water_stoichiometry_enzyme = {e.id: e.water_stoichiometry for e in sorted_enzymes}
-    water_stoichiometry = pd.Series(water_stoichiometry_enzyme, index=S.columns).fillna(0)
+    water_stoichiometry = pd.Series(water_stoichiometry_enzyme, index=S.columns).fillna(
+        0
+    )
     mic_to_met = [
         codify(mi.stan_coords.metabolites)[mic.metabolite_id] for mic in sorted_mics
     ]
