@@ -17,11 +17,10 @@ def load_infd(csvs: List[str], mi: MaudInput) -> az.InferenceData:
     def join_list_of_strings(l1, l2, sep="-"):
         return list(map(lambda a: f"{a[0]}{sep}{a[1]}", zip(l1, l2)))
 
-    S = get_stoichiometry(mi)
     coords = {
         **mi.stan_coords.__dict__,
         **{
-            "edges": S.columns,
+            "reactions": mi.stan_coords.reactions,
             "kms": join_list_of_strings(mi.stan_coords.km_enzs, mi.stan_coords.km_mics),
             "yconcs": join_list_of_strings(
                 mi.stan_coords.yconc_exps, mi.stan_coords.yconc_mics
@@ -40,7 +39,7 @@ def load_infd(csvs: List[str], mi: MaudInput) -> az.InferenceData:
         dims={
             "conc_enzyme": ["experiments", "enzymes"],
             "conc": ["experiments", "mics"],
-            "flux": ["experiments", "edges"],
+            "flux": ["experiments", "reactions"],
             "dgf": ["metabolites"],
             "kcat": ["enzymes"],
             "km": ["kms"],

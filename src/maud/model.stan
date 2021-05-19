@@ -127,7 +127,7 @@ functions{
     current_concentration[balanced_ix] = current_balanced;
     current_concentration[unbalanced_ix] = unbalanced;
     vector[rows(S)] flux = get_flux(current_concentration,
-                         enz, km, drain, km_lookup, S, edge_type, edge_to_drain, edge_to_enzyme, kcat, keq,
+                                    enz, km, drain, km_lookup, S, edge_type, edge_to_drain, edge_to_enzyme, kcat, keq,
                          ix_ci, ix_ai, ix_aa, ix_pa, ix_pi, n_ci, n_ai, n_aa, n_pa, n_pi,
                                     ki, diss_t, diss_r, transfer_constant, subunits, kcat_phos, conc_phos);
     return (S * flux)[balanced_ix];
@@ -187,6 +187,7 @@ data {
   int<lower=1,upper=2> edge_type[N_edge];  // 1 = reversible modular rate law, 2 = drain
   int<lower=0,upper=N_enzyme> edge_to_enzyme[N_edge];  // 0 if drain
   int<lower=0,upper=N_drain> edge_to_drain[N_edge];  // 0 if enzyme
+  int<lower=0,upper=N_reaction> edge_to_reaction[N_edge];
   int<lower=1,upper=N_metabolite> mic_to_met[N_mic];
   vector[N_edge] water_stoichiometry;
   matrix<lower=0,upper=1>[N_experiment, N_enzyme] is_knockout;
@@ -247,9 +248,10 @@ transformed parameters {
   array[N_experiment] vector[N_phosphorylation_enzymes] conc_phos = unz_log_2d(priors_conc_phos, log_conc_phos_z);
   // transform
   array[N_experiment] vector<lower=0>[N_mic] conc;
-  array[N_experiment] vector[N_edge] flux;
+  array[N_experiment] vector[N_reaction] flux;
   vector[N_edge] keq = get_keq(S, dgf, mic_to_met, water_stoichiometry);
   for (e in 1:N_experiment){
+    flux[e] = rep_vector(0, N_reaction);
     vector[N_enzyme] conc_enzyme_experiment = conc_enzyme[e] .* knockout[e]';
     vector[N_phosphorylation_enzymes] conc_phos_experiment = conc_phos[e] .* phos_knockout[e]';
     vector[N_mic-N_unbalanced] conc_balanced[2] =
@@ -290,34 +292,38 @@ transformed parameters {
                   conc_phos_experiment);
     conc[e, balanced_mic_ix] = conc_balanced[1];
     conc[e, unbalanced_mic_ix] = conc_unbalanced[e];
-    flux[e] = get_flux(conc[e],
-                       conc_enzyme_experiment,
-                       km,
-                       drain[e],
-                       km_lookup,
-                       S,
-                       edge_type,
-                       edge_to_drain,
-                       edge_to_enzyme,
-                       kcat,
-                       keq,
-                       ix_ci,
-                       ix_ai,
-                       ix_aa,
-                       ix_pa,
-                       ix_pi,
-                       n_ci,
-                       n_ai,
-                       n_aa,
-                       n_pa,
-                       n_pi,
-                       ki,
-                       diss_t,
-                       diss_r,
-                       transfer_constant,
-                       subunits,
-                       kcat_phos,
-                       conc_phos_experiment);
+    {
+    vector[N_edge] flux_edge = get_flux(conc[e],
+                                        conc_enzyme_experiment,
+                                        km,
+                                        drain[e],
+                                        km_lookup,
+                                        S,
+                                        edge_type,
+                                        edge_to_drain,
+                                        edge_to_enzyme,
+                                        kcat,
+                                        keq,
+                                        ix_ci,
+                                        ix_ai,
+                                        ix_aa,
+                                        ix_pa,
+                                        ix_pi,
+                                        n_ci,
+                                        n_ai,
+                                        n_aa,
+                                        n_pa,
+                                        n_pi,
+                                        ki,
+                                        diss_t,
+                                        diss_r,
+                                        transfer_constant,
+                                        subunits,
+                                        kcat_phos,
+                                        conc_phos_experiment);
+    for (j in 1:N_edge)
+      flux[e, edge_to_reaction[j]] += flux_edge[j];
+    }
     if (squared_distance(conc_balanced[1], conc_balanced[2]) > 1){
       print("Balanced metabolite concentration at ", timepoint, " seconds is not steady.");
       print("Found ", conc_balanced[1], " at ", timepoint, " seconds and ",

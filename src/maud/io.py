@@ -30,7 +30,6 @@ import toml
 from maud import validation
 from maud.data_model import (
     Compartment,
-    Drain,
     Enzyme,
     IndPrior1d,
     IndPrior2d,
@@ -116,9 +115,8 @@ def parse_toml_kinetic_model(raw: dict) -> KineticModel:
         for m in raw["metabolites"]
     ]
     reactions = [parse_toml_reaction(r) for r in raw["reactions"]]
-    drains = (
-        [parse_toml_drain(d) for d in raw["drains"]] if "drains" in raw.keys() else []
-    )
+    if "drains" in raw.keys():
+        reactions += [parse_toml_drain(d) for d in raw["drains"]]
     phosphorylation = (
         [parse_toml_phosphorylation(d) for d in raw["phosphorylation"]]
         if "phosphorylation" in raw.keys()
@@ -130,7 +128,6 @@ def parse_toml_kinetic_model(raw: dict) -> KineticModel:
         compartments=compartments,
         mics=mics,
         reactions=reactions,
-        drains=drains,
         phosphorylation=phosphorylation,
     )
 
@@ -169,7 +166,8 @@ def get_stan_coords(km: KineticModel, raw_measurements: pd.DataFrame) -> StanCoo
         [e.id for r in km.reactions for e in r.enzymes if e.allosteric]
     )
     phos_enzs = sorted([e.id for e in km.phosphorylation])
-    drains = sorted([d.id for d in km.drains])
+    drains = sorted([r.id for r in km.reactions if r.reaction_type == "drain"])
+    edges = enzymes + drains
     experiments = sorted(raw_measurements["experiment_id"].unique().tolist())
     ci_coords, ai_coords, aa_coords = (
         sorted(
@@ -212,6 +210,7 @@ def get_stan_coords(km: KineticModel, raw_measurements: pd.DataFrame) -> StanCoo
         balanced_mics=balanced_mics,
         unbalanced_mics=unbalanced_mics,
         reactions=reactions,
+        edges=edges,
         experiments=experiments,
         enzymes=enzymes,
         allosteric_enzymes=allosteric_enzymes,
@@ -236,15 +235,21 @@ def get_stan_coords(km: KineticModel, raw_measurements: pd.DataFrame) -> StanCoo
     )
 
 
-def parse_toml_drain(raw: dict) -> Drain:
-    """Turn a dictionary representing a drain into a Drain object.
+def parse_toml_drain(raw: dict) -> Reaction:
+    """Turn a dictionary representing a drain into a Reaction object.
 
     :param raw: Dictionary representing a drain, typically one of
     the values of the 'drains' field in the output of toml.load.
 
     """
 
-    return Drain(id=raw["id"], name=raw["name"], stoichiometry=raw["stoichiometry"])
+    return Reaction(
+        id=raw["id"],
+        name=raw["name"],
+        reaction_type="drain",
+        stoichiometry=raw["stoichiometry"],
+        enzymes=[],
+    )
 
 
 def parse_toml_phosphorylation(raw: dict) -> Phosphorylation:
@@ -310,6 +315,7 @@ def parse_toml_reaction(raw: dict) -> Reaction:
     return Reaction(
         id=raw["id"],
         name=raw["name"],
+        reaction_type="reversible",
         stoichiometry=raw["stoichiometry"],
         enzymes=enzymes,
     )

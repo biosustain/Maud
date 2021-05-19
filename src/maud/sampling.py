@@ -129,17 +129,16 @@ def get_stoichiometry(mi: MaudInput) -> pd.DataFrame:
 
     :param mi: A MaudInput object
     """
-    S_enz = pd.DataFrame(0, index=mi.stan_coords.enzymes, columns=mi.stan_coords.mics)
-    S_drain = pd.DataFrame(0, index=mi.stan_coords.drains, columns=mi.stan_coords.mics)
+    S = pd.DataFrame(0, index=mi.stan_coords.edges, columns=mi.stan_coords.mics)
     for rxn in mi.kinetic_model.reactions:
-        for enz in rxn.enzymes:
+        if rxn.reaction_type == "drain":
             for met, stoic in rxn.stoichiometry.items():
-                S_enz.loc[enz.id, met] = stoic
-    if S_drain.shape[0] > 0:
-        for drain in mi.kinetic_model.drains:
-            for met, stoic in drain.stoichiometry.items():
-                S_drain.loc[drain.id, met] = stoic
-    return pd.concat([S_enz, S_drain], ignore_index=False).T
+                S.loc[rxn.id, met] = stoic
+        else:
+            for enz in rxn.enzymes:
+                for met, stoic in rxn.stoichiometry.items():
+                    S.loc[enz.id, met] = stoic
+    return S.T
 
 
 def validate_specified_fluxes(mi: MaudInput):
@@ -149,14 +148,14 @@ def validate_specified_fluxes(mi: MaudInput):
     """
     S = get_stoichiometry(mi)
     balanced_mic_ix = mi.stan_coords.balanced_mics
-    complete_reactions = mi.stan_coords.reactions + mi.stan_coords.drains
+    reactions = mi.stan_coords.reactions
     for exp in mi.stan_coords.experiments:
         measured_rxns = mi.measurements.yflux.reset_index()["target_id"].unique()
         flux_paths = get_null_space(S.loc[balanced_mic_ix].values)
         _, n_dof = np.shape(flux_paths)
         rref_flux_paths = np.matrix(get_rref(flux_paths.T))
         rref_flux_paths[np.abs(rref_flux_paths) < 1e-10] = 0
-        flux_paths_df = pd.DataFrame(rref_flux_paths, columns=complete_reactions)
+        flux_paths_df = pd.DataFrame(rref_flux_paths, columns=reactions)
         for _, flux_path in flux_paths_df.iterrows():
             if any(flux_paths[measured_rxns]) != 0:
                 pass
@@ -411,14 +410,32 @@ def get_input_data(mi: MaudInput) -> dict:
     phos_enz_ix = codify(mi.stan_coords.phos_enzs)
     S = get_stoichiometry(mi)
     edge_type = [get_edge_type(eid, mi) for eid in S.columns]
-    edge_to_enzyme = [
-        codify(mi.stan_coords.enzymes)[eid] if eid in mi.stan_coords.enzymes else 0
-        for eid in S.columns
-    ]
-    edge_to_drain = [
-        codify(mi.stan_coords.drains)[eid] if eid in mi.stan_coords.drains else 0
-        for eid in S.columns
-    ]
+    edge_to_enzyme = (
+        pd.Series(
+            {e: codify(mi.stan_coords.enzymes)[e] for e in mi.stan_coords.enzymes},
+            index=mi.stan_coords.edges,
+        )
+        .fillna(0)
+        .astype(int)
+    )
+    edge_to_drain = (
+        pd.Series(
+            {d: codify(mi.stan_coords.drains)[d] for d in mi.stan_coords.drains},
+            index=mi.stan_coords.edges,
+        )
+        .fillna(0)
+        .astype(int)
+    )
+    edge_to_reaction = pd.Series(
+        {
+            **{
+                e.id: codify(mi.stan_coords.reactions)[e.reaction_id]
+                for e in sorted_enzymes
+            },
+            **{d: codify(mi.stan_coords.reactions)[d] for d in mi.stan_coords.drains},
+        },
+        index=mi.stan_coords.edges,
+    ).astype(int)
     phos_info = get_phos_info(mi)
     mod_info = get_modifier_info(mi)
     water_stoichiometry_enzyme = {e.id: e.water_stoichiometry for e in sorted_enzymes}
@@ -500,8 +517,9 @@ def get_input_data(mi: MaudInput) -> dict:
             # network properties
             "S": S.values,
             "edge_type": edge_type,
-            "edge_to_enzyme": edge_to_enzyme,
-            "edge_to_drain": edge_to_drain,
+            "edge_to_enzyme": edge_to_enzyme.values,
+            "edge_to_drain": edge_to_drain.values,
+            "edge_to_reaction": edge_to_reaction.values,
             "water_stoichiometry": water_stoichiometry.values,
             "mic_to_met": mic_to_met,
             "km_lookup": _get_km_lookup(mi),
