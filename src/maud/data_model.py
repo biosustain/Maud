@@ -176,20 +176,6 @@ class Reaction:
         self.enzymes = enzymes
 
 
-class Drain:
-    """Constructor for the reaction object.
-
-    :param id: drain id, use a BiGG id if possible.
-    :param name: drain name.
-    :param stoichiometry: reaction stoichiometry,
-    """
-
-    def __init__(self, id: str, stoichiometry: Dict[str, float], name: str = None):
-        self.id = id
-        self.name = name if name is not None else id
-        self.stoichiometry = stoichiometry
-
-
 class Phosphorylation:
     """Constructor for the phosphorylation object.
 
