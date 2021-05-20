@@ -49,7 +49,7 @@ functions{
           pos_ci += n_ci[j];
         }
         real free_enzyme_ratio = inv(free_enzyme_ratio_denom);
-        out[j] = free_enzyme_ratio * get_Tr(conc[mics_j], km_j, S[mics_j, j], kcat_j, keq[j]);
+        out[j] = enz[edge_to_enzyme[j]] * free_enzyme_ratio * get_Tr(conc[mics_j], km_j, S[mics_j, j], kcat_j, keq[j]);
         if ((n_ai[j] > 0) || (n_aa[j] > 0)){  // allosteric regulation
           real Q_num = 1;
           real Q_denom = 1;
