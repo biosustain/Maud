@@ -19,6 +19,7 @@ def load_infd(csvs: List[str], mi: MaudInput) -> az.InferenceData:
     coords = {
         **mi.stan_coords.__dict__,
         **{
+            "reactions": mi.stan_coords.reactions,
             "kms": join_list_of_strings(mi.stan_coords.km_enzs, mi.stan_coords.km_mics),
             "yconcs": join_list_of_strings(
                 mi.stan_coords.yconc_exps, mi.stan_coords.yconc_mics

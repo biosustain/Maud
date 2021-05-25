@@ -135,6 +135,7 @@ class Enzyme:
         if modifiers is None:
             modifiers = defaultdict()
         self.id = id
+        self.reaction_id = reaction_id
         self.name = name
         self.modifiers = modifiers
         self.subunits = subunits
@@ -150,8 +151,7 @@ class Reaction:
 
     :param id: reaction id, use a BiGG id if possible.
     :param name: reaction name.
-    :param reversible: whether or not reaction is reversible.
-    :param is_exchange: whether or not reaction is an exchange reaction.
+    :param reaction_type: either "reversible_modular_rate_law" or "drain".
     :param stoichiometry: reaction stoichiometry,
     e.g. for the reaction: 1.5 f6p <-> fdp we have {'f6p'; -1.5, 'fdp': 1}
     :param enzymes: Dictionary mapping enzyme ids to Enzyme objects
@@ -161,6 +161,7 @@ class Reaction:
         self,
         id: str,
         name: str,
+        reaction_type: str,
         stoichiometry: Dict[str, float],
         enzymes: List[Enzyme],
     ):
@@ -170,26 +171,9 @@ class Reaction:
             enzymes = defaultdict()
         self.id = id
         self.name = name if name is not None else id
+        self.reaction_type = reaction_type
         self.stoichiometry = stoichiometry
         self.enzymes = enzymes
-
-
-class Drain:
-    """Constructor for the reaction object.
-
-    :param id: drain id, use a BiGG id if possible.
-    :param name: drain name.
-    :param stoichiometry: reaction stoichiometry,
-    """
-
-    def __init__(
-        self, id: str, name: str = None, stoichiometry: Dict[str, float] = None
-    ):
-        if stoichiometry is None:
-            stoichiometry = defaultdict()
-        self.id = id
-        self.name = name if name is not None else id
-        self.stoichiometry = stoichiometry
 
 
 class Phosphorylation:
@@ -225,7 +209,6 @@ class KineticModel:
     :param model_id: id of the kinetic model
     :param metabolites: list of metabolite objects
     :param reactions: list of reaction objects
-    :param drains: list of drain objects
     :param compartments: list of compartment objects
     :param mic: list of MetaboliteInCompartment objects
     """
@@ -237,13 +220,11 @@ class KineticModel:
         reactions: List[Reaction],
         compartments: List[Compartment],
         mics: List[MetaboliteInCompartment],
-        drains: List[Drain] = None,
         phosphorylation: List[Phosphorylation] = None,
     ):
         self.model_id = model_id
         self.metabolites = metabolites
         self.reactions = reactions
-        self.drains = drains if drains is not None else []
         self.compartments = compartments
         self.mics = mics
         self.phosphorylation = phosphorylation if phosphorylation is not None else []
@@ -325,6 +306,7 @@ class StanCoordSet:
     reactions: List[str]
     experiments: List[str]
     enzymes: List[str]
+    edges: List[str]
     allosteric_enzymes: List[str]
     drains: List[str]
     phos_enzs: List[str]

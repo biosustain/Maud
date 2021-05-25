@@ -16,9 +16,10 @@
 
 """Code for sampling from a posterior distribution."""
 
+import itertools
 import os
 import warnings
-from typing import List, Union
+from typing import Dict, List, Union
 
 import cmdstanpy
 import numpy as np
@@ -39,7 +40,7 @@ HERE = os.path.dirname(os.path.abspath(__file__))
 INCLUDE_PATH = ""
 DEFAULT_PRIOR_LOC_DRAIN = None
 DEFAULT_PRIOR_SCALE_DRAIN = None
-STAN_PROGRAM_RELATIVE_PATH = "inference_model.stan"
+STAN_PROGRAM_RELATIVE_PATH = "model.stan"
 
 DEFAULT_SAMPLE_CONFIG = {
     "iter_warmup": 5,
@@ -123,32 +124,21 @@ def _sample_given_config(
     return model.sample(data=input_filepath, **config)
 
 
-def get_stoics(mi: MaudInput):
-    """Get full stoichiometric matrix for each isoenzyme.
+def get_stoichiometry(mi: MaudInput) -> pd.DataFrame:
+    """Get a stoichiometric matrix dataframe from a MaudInput.
 
     :param mi: A MaudInput object
     """
-    enzyme_ix = mi.stan_coords.enzymes
-    mic_ix = mi.stan_coords.mics
-    drain_ix = mi.stan_coords.drains
-    reaction_ix = mi.stan_coords.reactions
-    S_enz = pd.DataFrame(0, index=enzyme_ix, columns=mic_ix)
-    S_drain = pd.DataFrame(0, index=drain_ix, columns=mic_ix)
-    S_reactions = pd.DataFrame(0, index=mic_ix, columns=reaction_ix + drain_ix)
-    S_enz_to_flux_map = pd.DataFrame(0, index=reaction_ix, columns=enzyme_ix)
+    S = pd.DataFrame(0, index=mi.stan_coords.edges, columns=mi.stan_coords.mics)
     for rxn in mi.kinetic_model.reactions:
-        for enz in rxn.enzymes:
+        if rxn.reaction_type == "drain":
             for met, stoic in rxn.stoichiometry.items():
-                S_enz_to_flux_map.loc[rxn.id, enz.id] = 1
-                S_enz.loc[enz.id, met] = stoic
-                S_reactions.loc[met, rxn.id] = stoic
-    if S_drain.shape[0] > 0:
-        for drain in mi.kinetic_model.drains:
-            for met, stoic in drain.stoichiometry.items():
-                S_drain.loc[drain.id, met] = stoic
-                S_reactions.loc[met, drain.id] = stoic
-    S_full = pd.concat([S_enz, S_drain], ignore_index=True)
-    return S_enz, S_enz_to_flux_map, S_full, S_drain, S_reactions
+                S.loc[rxn.id, met] = stoic
+        else:
+            for enz in rxn.enzymes:
+                for met, stoic in rxn.stoichiometry.items():
+                    S.loc[enz.id, met] = stoic
+    return S.T
 
 
 def validate_specified_fluxes(mi: MaudInput):
@@ -156,18 +146,18 @@ def validate_specified_fluxes(mi: MaudInput):
 
     :param mi: A MaudInput object
     """
-    _, _, _, _, rxn_stoic = get_stoics(mi)
+    S = get_stoichiometry(mi)
     balanced_mic_ix = mi.stan_coords.balanced_mics
-    complete_reactions = mi.stan_coords.reactions + mi.stan_coords.drains
+    reactions = mi.stan_coords.reactions
     for exp in mi.stan_coords.experiments:
         measured_rxns = mi.measurements.yflux.reset_index()["target_id"].unique()
-        flux_paths = get_null_space(rxn_stoic.loc[balanced_mic_ix].values)
+        flux_paths = get_null_space(S.loc[balanced_mic_ix].values)
         _, n_dof = np.shape(flux_paths)
         rref_flux_paths = np.matrix(get_rref(flux_paths.T))
         rref_flux_paths[np.abs(rref_flux_paths) < 1e-10] = 0
-        flux_paths_df = pd.DataFrame(rref_flux_paths, columns=complete_reactions)
+        flux_paths_df = pd.DataFrame(rref_flux_paths, columns=reactions)
         for _, flux_path in flux_paths_df.iterrows():
-            if any(flux_path[measured_rxns]) != 0:
+            if any(flux_paths[measured_rxns]) != 0:
                 pass
             else:
                 possible_measurements = []
@@ -211,7 +201,11 @@ def get_phos_act_inh_matrix(mi: MaudInput):
 
 
 def _get_km_lookup(mi: MaudInput) -> List[List[int]]:
-    out = pd.DataFrame(0, index=mi.stan_coords.mics, columns=mi.stan_coords.enzymes)
+    out = pd.DataFrame(
+        0,
+        index=mi.stan_coords.mics,
+        columns=mi.stan_coords.enzymes + mi.stan_coords.drains,
+    )
     for i, (mic_id, enz_id) in enumerate(
         zip(mi.stan_coords.km_mics, mi.stan_coords.km_enzs)
     ):
@@ -307,13 +301,104 @@ def get_measurements_dict(ms: MeasurementSet, cs: StanCoordSet) -> dict:
     }
 
 
+def get_modifier_info(mi: MaudInput) -> Dict[str, pd.Series]:
+    """Get a dictionary of modifier info from a MaudInput.
+
+    The output dictionary has the form modifier type -> pandas series indexed
+    by edges, whose values are lists of mic ids of the respective modifier.
+
+    For example:
+
+    {
+        "competitive_inhibitor": pd.Series({"r2": ["m2"]}, index=["r1", "r2"]),
+        "allosteric"_inhibitor: pd.Series({}, index=["r1", "r2"]),
+        "allosteric"_activator: pd.Series({"r1": ["m1"]}, index=["r1", "r2"])
+    }
+
+    :param mi: A MaudInput object.
+
+    """
+    out = {}
+    S = get_stoichiometry(mi)
+    mods = list(
+        itertools.chain(
+            *[
+                m
+                for r in mi.kinetic_model.reactions
+                for e in r.enzymes
+                for m in e.modifiers.values()
+            ]
+        )
+    )
+    for modifier_type in [
+        "competitive_inhibitor",
+        "allosteric_inhibitor",
+        "allosteric_activator",
+    ]:
+        mod_mics: dict = {edge: [] for edge in S.columns}
+        for m in mods:
+            if m.modifier_type == modifier_type:
+                mod_mics[m.enzyme_id].append(m.mic_id)
+        out[modifier_type] = pd.Series(mod_mics).reindex(S.columns)
+    return out
+
+
+def get_phos_info(mi: MaudInput):
+    """Get a dictionary of phosphorylation info from a MaudInput.
+
+    The output dictionary has the form phosphorylation type -> pandas series
+    indexed by edges, whose values are lists of mic ids of the respective
+    modifier.
+
+    For example:
+
+    {
+        "activators": pd.Series({"r2": ["m2"]}, index=["r1", "r2"]),
+        "inhibitors": pd.Series({"r1": ["m1"]}, index=["r1", "r2"])
+    }
+
+    :param mi: A MaudInput object.
+
+    """
+    S = get_stoichiometry(mi)
+    acts: dict = {edge: [] for edge in S.columns}
+    inhs: dict = {edge: [] for edge in S.columns}
+    for p in mi.kinetic_model.phosphorylation:
+        if p.activating:
+            acts[p.enzyme_id].append(p.id)
+        elif p.inhibiting:
+            inhs[p.enzyme_id].append(p.id)
+        else:
+            raise ValueError(
+                f"Phosphorylation {p.id} is neither inhibiting nor activating."
+            )
+    return {
+        "activators": pd.Series(acts).reindex(S.columns),
+        "inhibitors": pd.Series(inhs).reindex(S.columns),
+    }
+
+
+def get_edge_type(edge_id: str, mi: MaudInput):
+    """Find the type of an edge, given the id and a MaudInput.
+
+    :param edge_id: string identifying the edge
+    :param mi: a MaudInput object
+    """
+    if edge_id in mi.stan_coords.enzymes:
+        return 1
+    elif edge_id in mi.stan_coords.drains:
+        return 2
+    else:
+        raise ValueError(f"Edge {edge_id} is of unknown type.")
+
+
 def get_input_data(mi: MaudInput) -> dict:
     """Get the input to inference_model.stan from a MaudInput object.
 
     :param mi: a MaudInput object
 
     """
-    validate_specified_fluxes(mi)
+    # validate_specified_fluxes(mi)
     sorted_enzymes = sorted(
         [e for r in mi.kinetic_model.reactions for e in r.enzymes],
         key=lambda e: codify(mi.stan_coords.enzymes)[e.id],
@@ -322,15 +407,46 @@ def get_input_data(mi: MaudInput) -> dict:
         mi.kinetic_model.mics,
         key=lambda m: codify(mi.stan_coords.mics)[m.id],
     )
-
-    water_stoichiometry = [e.water_stoichiometry for e in sorted_enzymes]
+    phos_enz_ix = codify(mi.stan_coords.phos_enzs)
+    S = get_stoichiometry(mi)
+    edge_type = [get_edge_type(eid, mi) for eid in S.columns]
+    edge_to_enzyme = (
+        pd.Series(
+            {e: codify(mi.stan_coords.enzymes)[e] for e in mi.stan_coords.enzymes},
+            index=mi.stan_coords.edges,
+        )
+        .fillna(0)
+        .astype(int)
+    )
+    edge_to_drain = (
+        pd.Series(
+            {d: codify(mi.stan_coords.drains)[d] for d in mi.stan_coords.drains},
+            index=mi.stan_coords.edges,
+        )
+        .fillna(0)
+        .astype(int)
+    )
+    edge_to_reaction = pd.Series(
+        {
+            **{
+                e.id: codify(mi.stan_coords.reactions)[e.reaction_id]
+                for e in sorted_enzymes
+            },
+            **{d: codify(mi.stan_coords.reactions)[d] for d in mi.stan_coords.drains},
+        },
+        index=mi.stan_coords.edges,
+    ).astype(int)
+    phos_info = get_phos_info(mi)
+    mod_info = get_modifier_info(mi)
+    water_stoichiometry_enzyme = {e.id: e.water_stoichiometry for e in sorted_enzymes}
+    water_stoichiometry = pd.Series(water_stoichiometry_enzyme, index=S.columns).fillna(
+        0
+    )
     mic_to_met = [
         codify(mi.stan_coords.metabolites)[mic.metabolite_id] for mic in sorted_mics
     ]
-    S_enz, S_to_flux, S_full, S_drain, _ = get_stoics(mi)
     knockout_matrix_enzyme = mi.measurements.enz_knockouts.astype(int)
     knockout_matrix_phos = mi.measurements.phos_knockouts.astype(int)
-    S_phos_act, S_phos_inh = get_phos_act_inh_matrix(mi)
     unbalanced_mic_ix, balanced_mic_ix = (
         [codify(mi.stan_coords.mics)[mic_id] for mic_id in ix]
         for ix in (
@@ -352,6 +468,7 @@ def get_input_data(mi: MaudInput) -> dict:
             "N_km": len(mi.stan_coords.km_mics),
             "N_reaction": len(mi.stan_coords.reactions),
             "N_enzyme": len(mi.stan_coords.enzymes),
+            "N_edge": S.shape[1],
             "N_phosphorylation_enzymes": len(mi.stan_coords.phos_enzs),
             "N_experiment": len(mi.stan_coords.experiments),
             "N_flux_measurement": len(mi.stan_coords.yflux_rxns),
@@ -361,29 +478,59 @@ def get_input_data(mi: MaudInput) -> dict:
             "N_ai": len(mi.stan_coords.ai_mics),
             "N_aa": len(mi.stan_coords.aa_mics),
             "N_ae": len(allosteric_enzymes),
+            "N_pa": phos_info["activators"].apply(lambda l: len(l) > 0).sum(),
+            "N_pi": phos_info["inhibitors"].apply(lambda l: len(l) > 0).sum(),
             "N_drain": len(mi.stan_coords.drains),
             # indexes
             "unbalanced_mic_ix": unbalanced_mic_ix,
             "balanced_mic_ix": balanced_mic_ix,
-            "ci_ix": [mic_ix[m] for m in mi.stan_coords.ci_mics],
-            "ai_ix": [mic_ix[m] for m in mi.stan_coords.ai_mics],
-            "aa_ix": [mic_ix[m] for m in mi.stan_coords.aa_mics],
+            "ix_ci": mod_info["competitive_inhibitor"]
+            .explode()
+            .map(mic_ix)
+            .dropna()
+            .astype(int)
+            .values,
+            "ix_ai": mod_info["allosteric_inhibitor"]
+            .explode()
+            .map(mic_ix)
+            .dropna()
+            .astype(int)
+            .values,
+            "ix_aa": mod_info["allosteric_activator"]
+            .explode()
+            .map(mic_ix)
+            .dropna()
+            .astype(int)
+            .values,
+            "ix_pa": phos_info["activators"]
+            .explode()
+            .map(phos_enz_ix)
+            .dropna()
+            .astype(int)
+            .values,
+            "ix_pi": phos_info["inhibitors"]
+            .explode()
+            .map(phos_enz_ix)
+            .dropna()
+            .astype(int)
+            .values,
             # network properties
-            "S_enz": S_enz.T.values,
-            "S_to_flux_map": S_to_flux.values,
-            "S_drain": S_drain.T.values,
-            "S_full": S_full.T.values,
-            "S_phos_act": S_phos_act,
-            "S_phos_inh": S_phos_inh,
-            "water_stoichiometry": water_stoichiometry,
+            "S": S.values,
+            "edge_type": edge_type,
+            "edge_to_enzyme": edge_to_enzyme.values,
+            "edge_to_drain": edge_to_drain.values,
+            "edge_to_reaction": edge_to_reaction.values,
+            "water_stoichiometry": water_stoichiometry.values,
             "mic_to_met": mic_to_met,
             "km_lookup": _get_km_lookup(mi),
             "is_knockout": knockout_matrix_enzyme.values.tolist(),
             "is_phos_knockout": knockout_matrix_phos.values.tolist(),
             "subunits": [e.subunits for e in sorted_enzymes],
-            "n_ci": [len(e.modifiers["competitive_inhibitor"]) for e in sorted_enzymes],
-            "n_ai": [len(e.modifiers["allosteric_inhibitor"]) for e in sorted_enzymes],
-            "n_aa": [len(e.modifiers["allosteric_activator"]) for e in sorted_enzymes],
+            "n_ci": mod_info["competitive_inhibitor"].map(len).values,
+            "n_ai": mod_info["allosteric_inhibitor"].map(len).values,
+            "n_aa": mod_info["allosteric_activator"].map(len).values,
+            "n_pa": phos_info["activators"].map(len).values,
+            "n_pi": phos_info["inhibitors"].map(len).values,
         },
         **prior_dict,
         **measurements_dict,
