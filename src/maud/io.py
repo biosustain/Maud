@@ -315,7 +315,7 @@ def parse_toml_reaction(raw: dict) -> Reaction:
     return Reaction(
         id=raw["id"],
         name=raw["name"],
-        reaction_type="reversible",
+        reaction_type="reversible_modular_rate_law",
         stoichiometry=raw["stoichiometry"],
         enzymes=enzymes,
     )
