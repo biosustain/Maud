@@ -151,7 +151,8 @@ class Reaction:
 
     :param id: reaction id, use a BiGG id if possible.
     :param name: reaction name.
-    :param reaction_type: either "reversible" or "drain".
+    :param reaction_mechanism: either "reversible_modular_rate_law", "drain", or,
+    "irreversible_modular_rate_law".
     :param stoichiometry: reaction stoichiometry,
     e.g. for the reaction: 2pg <-> 3pg we have {'2pg'; -1, '3pg': 1}
     :param enzymes: Dictionary mapping enzyme ids to Enzyme objects
@@ -161,7 +162,7 @@ class Reaction:
         self,
         id: str,
         name: str,
-        reaction_type: str,
+        reaction_mechanism: str,
         stoichiometry: Dict[str, float],
         enzymes: List[Enzyme],
     ):
@@ -171,7 +172,7 @@ class Reaction:
             enzymes = defaultdict()
         self.id = id
         self.name = name if name is not None else id
-        self.reaction_type = reaction_type
+        self.reaction_mechanism = reaction_mechanism
         self.stoichiometry = stoichiometry
         self.enzymes = enzymes
 
