@@ -153,7 +153,7 @@ class Reaction:
     :param name: reaction name.
     :param reaction_type: either "reversible" or "drain".
     :param stoichiometry: reaction stoichiometry,
-    e.g. for the reaction: 1.5 f6p <-> fdp we have {'f6p'; -1.5, 'fdp': 1}
+    e.g. for the reaction: 2pg <-> 3pg we have {'2pg'; -1, '3pg': 1}
     :param enzymes: Dictionary mapping enzyme ids to Enzyme objects
     """
 
