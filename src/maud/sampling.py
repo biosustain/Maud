@@ -131,7 +131,7 @@ def get_stoichiometry(mi: MaudInput) -> pd.DataFrame:
     """
     S = pd.DataFrame(0, index=mi.stan_coords.edges, columns=mi.stan_coords.mics)
     for rxn in mi.kinetic_model.reactions:
-        if rxn.reaction_type == "drain":
+        if rxn.reaction_mechanism == "drain":
             for met, stoic in rxn.stoichiometry.items():
                 S.loc[rxn.id, met] = stoic
         else:
@@ -382,14 +382,24 @@ def get_edge_type(edge_id: str, mi: MaudInput):
     """Find the type of an edge, given the id and a MaudInput.
 
     :param edge_id: string identifying the edge
-    :param mi: a MaudInput object
     """
-    if edge_id in mi.stan_coords.enzymes:
+    reaction_mechanism = [rxn.reaction_mechanism
+                          for rxn in mi.kinetic_model.reactions
+                          for enz in rxn.enzymes
+                          if edge_id in enz.id]
+    if reaction_mechanism == []:
+        reaction_mechanism = [rxn.reaction_mechanism
+                              for rxn in mi.kinetic_model.reactions
+                              if edge_id in rxn.id]
+    reaction_mechanism = reaction_mechanism[0]
+    if reaction_mechanism == "reversible_modular_rate_law":
         return 1
-    elif edge_id in mi.stan_coords.drains:
+    elif reaction_mechanism == "drain":
         return 2
+    elif reaction_mechanism == "irreversible_modular_rate_law":
+        return 3
     else:
-        raise ValueError(f"Edge {edge_id} is of unknown type.")
+        raise ValueError(f"Edge {reaction_mechanism} is of unknown type.")
 
 
 def get_input_data(mi: MaudInput) -> dict:
