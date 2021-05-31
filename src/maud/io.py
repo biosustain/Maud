@@ -131,6 +131,17 @@ def parse_toml_kinetic_model(raw: dict) -> KineticModel:
         phosphorylation=phosphorylation,
     )
 
+def get_km_coords(rxns: Reaction):
+    coords = []
+    for r in rxns:
+        for e in r.enzymes:
+            if r.reaction_mechanism == "irreversible_modular_rate_law":
+                coords += [(e.id, m[0]) for m in r.stoichiometry.items() if m[1] < 0]
+            elif r.reaction_mechanism == "reversible_modular_rate_law":
+                coords += [(e.id, m[0]) for m in r.stoichiometry.items()]
+    return sorted(coords)
+
+
 
 def get_stan_coords(km: KineticModel, raw_measurements: pd.DataFrame) -> StanCoordSet:
     """Get all the coordinates that Maud needs.
@@ -166,7 +177,7 @@ def get_stan_coords(km: KineticModel, raw_measurements: pd.DataFrame) -> StanCoo
         [e.id for r in km.reactions for e in r.enzymes if e.allosteric]
     )
     phos_enzs = sorted([e.id for e in km.phosphorylation])
-    drains = sorted([r.id for r in km.reactions if r.reaction_type == "drain"])
+    drains = sorted([r.id for r in km.reactions if r.reaction_mechanism == "drain"])
     edges = enzymes + drains
     experiments = sorted(raw_measurements["experiment_id"].unique().tolist())
     ci_coords, ai_coords, aa_coords = (
@@ -183,9 +194,7 @@ def get_stan_coords(km: KineticModel, raw_measurements: pd.DataFrame) -> StanCoo
     ci_enzs, ci_mics = unpack(ci_coords)
     ai_enzs, ai_mics = unpack(ai_coords)
     aa_enzs, aa_mics = unpack(aa_coords)
-    km_coords = sorted(
-        [(e.id, m) for r in km.reactions for e in r.enzymes for m in r.stoichiometry]
-    )
+    km_coords = get_km_coords(km.reactions)
     km_enzs, km_mics = list(zip(*km_coords))
     yc_coords, yf_coords, ye_coords, enz_ko_coords, phos_ko_coords = (
         sorted(
@@ -246,7 +255,7 @@ def parse_toml_drain(raw: dict) -> Reaction:
     return Reaction(
         id=raw["id"],
         name=raw["name"],
-        reaction_type="drain",
+        reaction_mechanism="drain",
         stoichiometry=raw["stoichiometry"],
         enzymes=[],
     )
@@ -315,7 +324,7 @@ def parse_toml_reaction(raw: dict) -> Reaction:
     return Reaction(
         id=raw["id"],
         name=raw["name"],
-        reaction_type="reversible",
+        reaction_mechanism=raw["mechanism"],
         stoichiometry=raw["stoichiometry"],
         enzymes=enzymes,
     )
