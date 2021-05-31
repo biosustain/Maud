@@ -383,14 +383,18 @@ def get_edge_type(edge_id: str, mi: MaudInput):
 
     :param edge_id: string identifying the edge
     """
-    reaction_mechanism = [rxn.reaction_mechanism
-                          for rxn in mi.kinetic_model.reactions
-                          for enz in rxn.enzymes
-                          if edge_id in enz.id]
+    reaction_mechanism = [
+        rxn.reaction_mechanism
+        for rxn in mi.kinetic_model.reactions
+        for enz in rxn.enzymes
+        if edge_id in enz.id
+    ]
     if reaction_mechanism == []:
-        reaction_mechanism = [rxn.reaction_mechanism
-                              for rxn in mi.kinetic_model.reactions
-                              if edge_id in rxn.id]
+        reaction_mechanism = [
+            rxn.reaction_mechanism
+            for rxn in mi.kinetic_model.reactions
+            if edge_id in rxn.id
+        ]
     reaction_mechanism = reaction_mechanism[0]
     if reaction_mechanism == "reversible_modular_rate_law":
         return 1

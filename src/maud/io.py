@@ -131,6 +131,7 @@ def parse_toml_kinetic_model(raw: dict) -> KineticModel:
         phosphorylation=phosphorylation,
     )
 
+
 def get_km_coords(rxns: Reaction):
     coords = []
     for r in rxns:
@@ -140,7 +141,6 @@ def get_km_coords(rxns: Reaction):
             elif r.reaction_mechanism == "reversible_modular_rate_law":
                 coords += [(e.id, m[0]) for m in r.stoichiometry.items()]
     return sorted(coords)
-
 
 
 def get_stan_coords(km: KineticModel, raw_measurements: pd.DataFrame) -> StanCoordSet:
