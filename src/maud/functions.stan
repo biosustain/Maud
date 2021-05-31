@@ -67,6 +67,20 @@ real get_Tr(vector metabolite,
   }
   return kcat * plus_product - k_minus * minus_product;
 }
+real get_Tr_irreversible(vector metabolite,
+                         vector km,
+                         vector stoichiometry,
+                         real kcat){
+  /* Tr coefficient in the irreversible modular rate law. */
+  real plus_product = 1;
+  for (m in 1:rows(metabolite)){
+    if (stoichiometry[m] < 0){
+      real multiplicand = (metabolite[m] / km[m]) ^ abs(stoichiometry[m]);
+      plus_product *= multiplicand;
+    }
+  }
+  return kcat * plus_product;
+}
 real get_Dr_common_rate_law(vector metabolite, vector km, vector stoichiometry){
   /* Dr coefficient in the modular rate law. */
   real psi_plus = 1;
@@ -80,31 +94,58 @@ real get_Dr_common_rate_law(vector metabolite, vector km, vector stoichiometry){
   }
   return psi_plus + psi_minus - 1;
 }
-int get_n_mic_for_edge(matrix S, int j){
+real get_Dr_common_rate_law_irreversible(vector metabolite, vector km, vector stoichiometry){
+  /* Dr coefficient in the modular rate law negating products. */
+  real psi_plus = 1;
+  real psi_minus = 1;
+  for (m in 1:rows(metabolite)){
+    if (stoichiometry[m] < 0){
+      real multiplicand = (1 + metabolite[m] / km[m]) ^ abs(stoichiometry[m]);
+      psi_plus *= multiplicand;
+    }
+  }
+  return psi_plus;
+}
+int get_n_mic_for_edge(matrix S, int j, int edge_type){
   /*
-    Get the number of metabolites-in-compartment for a reaction or drain j,
+    Get the number of active metabolites-in-compartment for a reaction or drain j,
     given stoichiometric matrix S.
   */
   int out = 0;
   for (s in S[,j]){
-    if (s != 0){
-      out += 1;
+    if (edge_type != 3){ // not irreversible
+      if (s != 0){
+        out += 1;
+      }
+    }
+    else {
+      if (s < 0){
+        out += 1;
+      }
     }
   }
   return out;
 }
-int[] get_mics_for_edge(matrix S, int j){
+int[] get_mics_for_edge(matrix S, int j, int edge_type){
   /*
-    Get an array of metabolites-in-compartment for a reaction or drain j, given
+    Get an array of active metabolites-in-compartment for a reaction or drain j, given
     stoichiometric matrix S.
   */
-  int N_mic = get_n_mic_for_edge(S, j);
+  int N_mic = get_n_mic_for_edge(S, j, edge_type);
   int out[N_mic];
   int pos = 1;
   for (i in 1:rows(S)){
-    if (S[i, j] != 0){
-      out[pos] = i;
-      pos += 1;
+    if (edge_type != 3){ // not irreversible
+      if (S[i, j] != 0){
+        out[pos] = i;
+        pos += 1;
+      }
+    }
+    else{
+      if (S[i, j] < 0){
+        out[pos] = i;
+        pos += 1;
+      }
     }
   }
   return out;
