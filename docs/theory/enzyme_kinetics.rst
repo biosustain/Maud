@@ -44,6 +44,27 @@ The assumptions used in the modular rate law are listed below:
     - metabolite binding affinity is independent of order.
 
 
+Irreversible Modular Rate Law
+-----------------------------
+
+When the Gibbs energy of the reaction becomes highly irreversible (e.g. :math:`\Delta G_r = -10 kJ/mol`) the reverse
+rate becomes insignificant. This insignificant rate is not a problem to calculate, however, it can become detrimental
+to the sampling algorithm as it is essentially unresolvable. We can approximate the kinetics of these essentially
+irreversible mechanisms bu removing the reverse rate from the rate law. This is dangerous however, as it can lead to
+free energy cycles if used indiscriminately. For example, including this mechanism where a reaction is operating close 
+to equilibrium and is part of a cycle could easily result in an infinite loop for energy production.
+
+The one caveat is the product saturation of the enzyme is not natively captured. This can be fixed by including competitive
+inhibition from the product, which will result in the same mechanism.
+
+Assumptions
+^^^^^^^^^^^
+
+Additional assumptions with the irreversible modular rate law formulation are as follows:
+    - product binding is insignificant and saturation of enzyme from products is neglected,
+    - the reaction has a very negative :math:`\Delta G_r`, which will remove the reverse rate from the mechanism
+
+
 Example: 2 products and 2 substrate network
 -------------------------------------------
 
