@@ -39,7 +39,7 @@ stoichiometry = { M1_e = -1, M1_c = 1}
 [[reactions.enzymes]]
 id = 'r1'
 name = 'the enzyme that catalyses reaction r1'
-mechanism = 'modular_rate_law'
+mechanism = "reversible_modular_rate_law"
 subunits=4
 [[reactions.enzymes.modifiers]]
 modifier_type = 'allosteric_inhibitor'
@@ -52,7 +52,7 @@ stoichiometry = { M1_c = -1, M2_c = 1 }
 [[reactions.enzymes]]
 id = 'r2'
 name = 'the enzyme that catalyses reaction r2'
-mechanism = 'modular_rate_law'
+mechanism = "reversible_modular_rate_law"
 
 [[reactions]]
 id = 'r3'
@@ -61,4 +61,4 @@ stoichiometry = { M2_c = -1, M2_e = 1}
 [[reactions.enzymes]]
 id = 'r3'
 name = 'the enzyme that catalyses reaction r3'
-mechanism = 'modular_rate_law'
+mechanism = "reversible_modular_rate_law"
