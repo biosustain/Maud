@@ -133,6 +133,11 @@ def parse_toml_kinetic_model(raw: dict) -> KineticModel:
 
 
 def get_km_coords(rxns: Reaction):
+    """Get coordinates for km parameters.
+
+    The returned coordinate set for kms is dependent on if it's reversible.
+    :param rxns: Reaction object
+    """
     coords = []
     for r in rxns:
         for e in r.enzymes:
