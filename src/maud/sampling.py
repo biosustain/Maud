@@ -492,8 +492,8 @@ def get_input_data(mi: MaudInput) -> dict:
             "N_ai": len(mi.stan_coords.ai_mics),
             "N_aa": len(mi.stan_coords.aa_mics),
             "N_ae": len(allosteric_enzymes),
-            "N_pa": phos_info["activators"].apply(lambda l: len(l) > 0).sum(),
-            "N_pi": phos_info["inhibitors"].apply(lambda l: len(l) > 0).sum(),
+            "N_pa": int(phos_info["activators"].apply(lambda l: len(l) > 0).sum()),
+            "N_pi": int(phos_info["inhibitors"].apply(lambda l: len(l) > 0).sum()),
             "N_drain": len(mi.stan_coords.drains),
             # indexes
             "unbalanced_mic_ix": unbalanced_mic_ix,
