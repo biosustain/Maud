@@ -53,22 +53,7 @@ DEFAULT_SAMPLE_CONFIG = {
     "save_warmup": True,
     "threads_per_chain": 1,
 }
-DEFAULT_ODE_CONFIG = {
-    "rel_tol": 1e-9,
-    "abs_tol": 1e-9,
-    "rel_tol_forward,": 1e-9,
-    "abs_tol_forward": 1e-9,
-    "rel_tol_backward,": 1e-9,
-    "abs_tol_backward,": 1e-9,
-    "rel_tol_quadrature": 1e-9,
-    "abs_tol_quadrature": 1e-9,
-    "max_num_steps": int(1e9),
-    "num_steps_between_checkpoints": 150,
-    "interpolation_polynomial": 1, # Hermite or change to 2 for polynomial
-    "solver_forward": 2, # BDF or change to 1 for adams 
-    "solver_backward": 2, # BDF or change to 1 for adams 
-    "timepoint": 500,
-}
+
 SIM_CONFIG = {
     "chains": 1,
     "fixed_param": True,
@@ -115,6 +100,7 @@ def _sample_given_config(
     input_filepath = os.path.join(output_dir, "input_data.json")
     inits_filepath = os.path.join(output_dir, "inits.json")
     input_data = get_input_data(mi)
+    print(input_data)
     inits = {k: v.values for k, v in mi.inits.items()}
     cmdstanpy.utils.jsondump(input_filepath, input_data)
     cmdstanpy.utils.jsondump(inits_filepath, inits)
@@ -269,14 +255,18 @@ def get_prior_dict(ps: PriorSet) -> dict:
 
 def get_config_dict(mi: MaudInput) -> dict:
     """Get a dictionary of Stan configuration."""
-    return {
-        "rel_tol": mi.config.ode_config["rel_tol"],
-        "abs_tol": mi.config.ode_config["abs_tol"],
-        "max_num_steps": int(mi.config.ode_config["max_num_steps"]),
-        "LIKELIHOOD": int(mi.config.likelihood),
-        "timepoint": mi.config.ode_config["timepoint"],
-        "conc_init": _get_conc_init(mi).values,
+    config = {
+        **{
+            "LIKELIHOOD": int(mi.config.likelihood),
+            "conc_init": _get_conc_init(mi).values
+        },
+        **mi.config.ode_config
     }
+    config["max_num_steps"] = int(config["max_num_steps"])
+    config["abs_tol_forward"] = [config["abs_tol_forward"]] * len(mi.stan_coords.balanced_mics)
+    config["abs_tol_backward"] = [config["abs_tol_backward"]] * len(mi.stan_coords.balanced_mics)
+    return config
+
 
 
 def get_measurements_dict(ms: MeasurementSet, cs: StanCoordSet) -> dict:
