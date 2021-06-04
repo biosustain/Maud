@@ -252,9 +252,17 @@ data {
   int<lower=1> subunits[N_enzyme];
   // configuration
   vector<lower=0>[N_mic] conc_init[N_experiment];
-  real rel_tol;
-  real abs_tol;
+  real rel_tol_forward; 
+  vector[N_mic - N_unbalanced] abs_tol_forward;
+  real rel_tol_backward; 
+  vector[N_mic - N_unbalanced] abs_tol_backward; 
+  real rel_tol_quadrature;
+  real abs_tol_quadrature;
   int max_num_steps;
+  int num_steps_between_checkpoints;
+  int interpolation_polynomial;
+  int solver_forward;
+  int solver_backward;
   int<lower=0,upper=1> LIKELIHOOD;  // set to 0 for priors-only mode
   real<lower=0> timepoint;
 }
@@ -301,11 +309,21 @@ transformed parameters {
     vector[N_enzyme] conc_enzyme_experiment = conc_enzyme[e] .* knockout[e]';
     vector[N_phosphorylation_enzymes] conc_phos_experiment = conc_phos[e] .* phos_knockout[e]';
     vector[N_mic-N_unbalanced] conc_balanced[2] =
-      ode_bdf_tol(dbalanced_dt,
+      ode_adjoint_tol_ctr(dbalanced_dt,
                   conc_init[e, balanced_mic_ix],
                   initial_time,
                   {timepoint, timepoint + 10},
-                  rel_tol, abs_tol, max_num_steps,
+                  rel_tol_forward, 
+                  abs_tol_forward,
+                  rel_tol_backward, 
+                  abs_tol_backward, 
+                  rel_tol_quadrature,
+                  abs_tol_quadrature,
+                  max_num_steps,
+                  num_steps_between_checkpoints,
+                  interpolation_polynomial,
+                  solver_forward,
+                  solver_backward,
                   conc_unbalanced[e],
                   balanced_mic_ix,
                   unbalanced_mic_ix,
