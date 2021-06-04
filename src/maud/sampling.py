@@ -100,7 +100,6 @@ def _sample_given_config(
     input_filepath = os.path.join(output_dir, "input_data.json")
     inits_filepath = os.path.join(output_dir, "inits.json")
     input_data = get_input_data(mi)
-    print(input_data)
     inits = {k: v.values for k, v in mi.inits.items()}
     cmdstanpy.utils.jsondump(input_filepath, input_data)
     cmdstanpy.utils.jsondump(inits_filepath, inits)
