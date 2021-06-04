@@ -67,11 +67,12 @@ DEFAULT_ODE_CONFIG = {
     "abs_tol_quadrature": 1e-9,
     "max_num_steps": int(1e9),
     "num_steps_between_checkpoints": 150,
-    "interpolation_polynomial": 1, # Hermite or change to 2 for polynomial
-    "solver_forward": 2, # BDF or change to 1 for adams 
-    "solver_backward": 2, # BDF or change to 1 for adams 
+    "interpolation_polynomial": 1,  # Hermite or change to 2 for polynomial
+    "solver_forward": 2,  # BDF or change to 1 for adams
+    "solver_backward": 2,  # BDF or change to 1 for adams
     "timepoint": 500,
 }
+
 
 def load_maud_input_from_toml(data_path: str) -> MaudInput:
     """

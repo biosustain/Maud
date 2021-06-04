@@ -257,15 +257,18 @@ def get_config_dict(mi: MaudInput) -> dict:
     config = {
         **{
             "LIKELIHOOD": int(mi.config.likelihood),
-            "conc_init": _get_conc_init(mi).values
+            "conc_init": _get_conc_init(mi).values,
         },
-        **mi.config.ode_config
+        **mi.config.ode_config,
     }
     config["max_num_steps"] = int(config["max_num_steps"])
-    config["abs_tol_forward"] = [config["abs_tol_forward"]] * len(mi.stan_coords.balanced_mics)
-    config["abs_tol_backward"] = [config["abs_tol_backward"]] * len(mi.stan_coords.balanced_mics)
+    config["abs_tol_forward"] = [config["abs_tol_forward"]] * len(
+        mi.stan_coords.balanced_mics
+    )
+    config["abs_tol_backward"] = [config["abs_tol_backward"]] * len(
+        mi.stan_coords.balanced_mics
+    )
     return config
-
 
 
 def get_measurements_dict(ms: MeasurementSet, cs: StanCoordSet) -> dict:
