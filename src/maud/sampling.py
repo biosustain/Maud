@@ -53,12 +53,7 @@ DEFAULT_SAMPLE_CONFIG = {
     "save_warmup": True,
     "threads_per_chain": 1,
 }
-DEFAULT_ODE_CONFIG = {
-    "rel_tol": 1e-9,
-    "abs_tol": 1e-9,
-    "max_num_steps": int(1e9),
-    "timepoint": 500,
-}
+
 SIM_CONFIG = {
     "chains": 1,
     "fixed_param": True,
@@ -259,14 +254,21 @@ def get_prior_dict(ps: PriorSet) -> dict:
 
 def get_config_dict(mi: MaudInput) -> dict:
     """Get a dictionary of Stan configuration."""
-    return {
-        "rel_tol": mi.config.ode_config["rel_tol"],
-        "abs_tol": mi.config.ode_config["abs_tol"],
-        "max_num_steps": int(mi.config.ode_config["max_num_steps"]),
-        "LIKELIHOOD": int(mi.config.likelihood),
-        "timepoint": mi.config.ode_config["timepoint"],
-        "conc_init": _get_conc_init(mi).values,
+    config = {
+        **{
+            "LIKELIHOOD": int(mi.config.likelihood),
+            "conc_init": _get_conc_init(mi).values,
+        },
+        **mi.config.ode_config,
     }
+    config["max_num_steps"] = int(config["max_num_steps"])
+    config["abs_tol_forward"] = [config["abs_tol_forward"]] * len(
+        mi.stan_coords.balanced_mics
+    )
+    config["abs_tol_backward"] = [config["abs_tol_backward"]] * len(
+        mi.stan_coords.balanced_mics
+    )
+    return config
 
 
 def get_measurements_dict(ms: MeasurementSet, cs: StanCoordSet) -> dict:

@@ -56,6 +56,22 @@ DEFAULT_PRIOR_SCALE_UNBALANCED = 2.0
 DEFAULT_PRIOR_LOC_ENZYME = 0.1
 DEFAULT_PRIOR_SCALE_ENZYME = 2.0
 NON_LN_SCALE_PARAMS = ["dgf", "drain"]
+DEFAULT_ODE_CONFIG = {
+    "rel_tol": 1e-9,
+    "abs_tol": 1e-9,
+    "rel_tol_forward": 1e-9,
+    "abs_tol_forward": 1e-9,
+    "rel_tol_backward": 1e-9,
+    "abs_tol_backward": 1e-9,
+    "rel_tol_quadrature": 1e-9,
+    "abs_tol_quadrature": 1e-9,
+    "max_num_steps": int(1e9),
+    "num_steps_between_checkpoints": 150,
+    "interpolation_polynomial": 1,  # Hermite or change to 2 for polynomial
+    "solver_forward": 2,  # BDF or change to 1 for adams
+    "solver_backward": 2,  # BDF or change to 1 for adams
+    "timepoint": 500,
+}
 
 
 def load_maud_input_from_toml(data_path: str) -> MaudInput:
@@ -575,7 +591,7 @@ def parse_config(raw):
         priors_file=raw["priors"],
         experiments_file=raw["experiments"],
         likelihood=raw["likelihood"],
-        ode_config=raw["ode_config"],
+        ode_config={**DEFAULT_ODE_CONFIG, **raw["ode_config"]},
         cmdstanpy_config=raw["cmdstanpy_config"],
         user_inits_file=user_inits_file,
     )
