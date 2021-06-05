@@ -20,8 +20,8 @@ import shutil
 from datetime import datetime
 
 import click
-import toml
 import pandas as pd
+import toml
 
 from maud import sampling
 from maud.analysis import load_infd
