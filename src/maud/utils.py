@@ -16,12 +16,12 @@
 
 """General purpose utility functions."""
 
-from typing import Dict, Iterable
+from typing import Dict, Iterable, List
 
 import numpy as np
+import pandas as pd
 import sympy as sp
 from scipy.stats import norm
-
 
 def codify(lx: Iterable[str]) -> Dict[str, int]:
     """Turn an iterable of strings into a dictionary mapping them to integer indexes."""
@@ -68,46 +68,21 @@ def get_rref(mat):
     return sp.Matrix(mat).rref(iszerofunc=lambda x: abs(x) < 1e-10)[0]
 
 
-def export_scaled_params_from_draws(infd, chain, draw):
-    """Extact log centered parameters from an infd object."""
-    list_of_input_inits = [
-        "log_km_z",
-        "drain_z",
-        "log_ki_z",
-        "log_dissociation_constant_t_z",
-        "log_dissociation_constant_r_z",
-        "log_transfer_constant_z",
-        "log_kcat_z",
-        "log_phos_kcat_z",
-        "log_conc_unbalanced_z",
-        "log_enzyme_z",
-        "log_phos_conc_z",
-        "formation_energy_z",
-    ]
-
-    input_dict = {
-        par_name: infd.posterior[par_name][chain, draw].values.tolist()
-        for par_name in list_of_input_inits
-        if par_name in infd.posterior.variables.keys()
-    }
-    return input_dict
-
-
 def export_params_from_draw(infd, chain, draw):
     """Extact parameters from an infd object."""
     list_of_input_inits = [
         "km",
         "drain",
         "ki",
-        "dissociation_constant_t",
-        "dissociation_constant_r",
+        "diss_t",
+        "diss_r",
         "transfer_constant",
         "kcat",
-        "phos_enzyme_kcat",
+        "kcat_phos",
         "conc_unbalanced",
-        "enzyme",
-        "phos_enzyme_conc",
-        "formation_energy",
+        "conc_enzyme",
+        "conc_phos",
+        "dgf",
     ]
 
     input_dict = {
@@ -115,4 +90,101 @@ def export_params_from_draw(infd, chain, draw):
         for par_name in list_of_input_inits
         if par_name in infd.posterior.variables.keys()
     }
+
     return input_dict
+
+def get_input_template(km, raw_measurements):
+    """Extact parameters from an infd object."""
+
+    from maud.io import get_stan_coords
+
+    class Input_Coords:
+        """Defines parameters with associated coordinate sets.
+
+        :param id: id of the parameter
+        :param coords: dictionary"""
+        def __init__(self,
+                     id: str,
+                     coords: Dict[str, List[str]]):
+            self.id = id
+            self.coords = coords
+
+
+
+    def get_2d_coords(coords_1, coords_2):
+        """Return unpacked coordinates for 2-D indexing."""
+        set_of_coords = []
+        for c1 in coords_1:
+            for c2 in coords_2:
+                set_of_coords.append((c1, c2))
+        return list(zip(*set_of_coords)) if len(set_of_coords) > 0 else ([], [])
+
+
+    scs = get_stan_coords(km, raw_measurements)
+
+    list_of_input_inits = [
+        Input_Coords(id="km", 
+                     coords={"enzyme_id": scs.km_enzs,
+                             "mic_id": scs.km_mics},
+                    ),
+        Input_Coords(id="drain",
+                     coords={"drain_id":get_2d_coords(scs.drains, scs.experiments)[0],
+                             "experiment_id":get_2d_coords(scs.drains, scs.experiments)[1]}
+                    ),
+        Input_Coords(id="ki",
+                     coords={"enzyme_id": scs.ci_enzs,
+                             "mic_id": scs.ci_mics}
+                    ),
+        Input_Coords(id="diss_t",
+                     coords={"enzyme_id": scs.ai_enzs,
+                             "mic_id": scs.ai_mics}
+                    ),
+        Input_Coords(id="diss_r",
+                     coords={"enzyme_id": scs.aa_enzs,
+                             "mic_id": scs.aa_mics}
+                    ),
+        Input_Coords(id="transfer_constant",
+                     coords={"enzyme_id": scs.allosteric_enzymes}
+                    ),
+        Input_Coords(id="kcat",
+                     coords={"enzyme_id": scs.enzymes}
+                    ),
+        Input_Coords(id="kcat_phos",
+                     coords={"phos_enz_id": scs.phos_enzs}
+                    ),
+        Input_Coords(id="conc_unbalanced",
+                     coords={"mic_id":get_2d_coords(scs.unbalanced_mics, scs.experiments)[0],
+                             "experiment_id":get_2d_coords(scs.unbalanced_mics, scs.experiments)[1]}
+                    ),
+        Input_Coords(id="conc_enzyme",
+                     coords={"enzyme_id":get_2d_coords(scs.enzymes, scs.experiments)[0],
+                             "experiment_id":get_2d_coords(scs.enzymes, scs.experiments)[1]}
+                    ),
+        Input_Coords(id="conc_phos",
+                     coords={"phos_enz_id":get_2d_coords(scs.phos_enzs, scs.experiments)[0],
+                             "experiment_id":get_2d_coords(scs.phos_enzs, scs.experiments)[1]}
+                    ),
+        Input_Coords(id="dgf",
+                     coords={"metabolite_id": scs.metabolites}
+                    ),
+    ]
+
+    init_dataframe = pd.DataFrame(columns=["parameter_name",
+                                           "experiment_id",
+                                           "metabolite_id",
+                                           "mic_id",
+                                           "enzyme_id",
+                                           "phos_enz_id",
+                                           "drain_id",
+                                           "location",
+                                           "scale",
+                                           "pct1",
+                                           "pct99"])
+
+    for par in list_of_input_inits:
+        par_dataframe = pd.DataFrame.from_dict(par.coords)
+        par_dataframe["parameter_name"] = par.id
+        init_dataframe = init_dataframe.append(par_dataframe, ignore_index=True)
+
+    
+    return init_dataframe
