@@ -128,7 +128,10 @@ def simulate_command(data_path, output_dir, n):
 
 
 def generate_prior_template(data_path):
-    """Generate draws from the prior mean."""
+    """Generate draws from the prior mean.
+    
+    :params data_path: a path to a maud input folder with a kinetic model
+    and optionally experimental input file."""
 
     config = parse_config(toml.load(os.path.join(data_path, "config.toml")))
     kinetic_model_path = os.path.join(data_path, config.kinetic_model_file)
