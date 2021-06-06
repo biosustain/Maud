@@ -103,8 +103,9 @@ def get_input_template(km, raw_measurements):
     class Input_Coords:
         """Defines parameters with associated coordinate sets.
 
-        :param id: id of the parameter
-        :param coords: dictionary"""
+        :param id: id of the parameter.
+        :param coords: dictionary.
+        """
 
         def __init__(self, id: str, coords: Dict[str, List[str]]):
             self.id = id

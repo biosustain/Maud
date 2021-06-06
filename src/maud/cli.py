@@ -129,16 +129,17 @@ def simulate_command(data_path, output_dir, n):
 
 def generate_prior_template(data_path):
     """Generate draws from the prior mean.
-    
+
     :params data_path: a path to a maud input folder with a kinetic model
-    and optionally experimental input file."""
+    and optionally experimental input file.
+    """
 
     config = parse_config(toml.load(os.path.join(data_path, "config.toml")))
     kinetic_model_path = os.path.join(data_path, config.kinetic_model_file)
     kinetic_model = parse_toml_kinetic_model(toml.load(kinetic_model_path))
     experiments_path = os.path.join(data_path, config.experiments_file)
     raw_measurements = pd.read_csv(experiments_path)
-    output_name = f"prior_template.csv"
+    output_name = "prior_template.csv"
     output_path = os.path.join(data_path, output_name)
     print("Creating template: " + output_path)
     prior_dataframe = get_input_template(kinetic_model, raw_measurements)
