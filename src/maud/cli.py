@@ -25,8 +25,8 @@ import toml
 
 from maud import sampling
 from maud.analysis import load_infd
-from maud.io import load_maud_input_from_toml, parse_config, parse_toml_kinetic_model
 from maud.get_prior_template import get_prior_template
+from maud.io import load_maud_input_from_toml, parse_config, parse_toml_kinetic_model
 
 
 RELATIVE_PATH_EXAMPLE = "../../tests/data/linear"
@@ -141,12 +141,11 @@ def generate_prior_template(data_path):
     raw_measurements = pd.read_csv(experiments_path)
     output_name = "prior_template.csv"
     output_path = os.path.join(data_path, output_name)
-    print("Creating template: " + output_path)
+    print("Creating template")
     prior_dataframe = get_prior_template(kinetic_model, raw_measurements)
-    print(f"Saving template to: " + output_path)
+    print(f"Saving template to: {output_path}")
     prior_dataframe.to_csv(output_path)
-    print("Generated CSV")
-    return output_path
+    return "Successfully generated prior template"
 
 
 @cli.command("generate-prior-template")
