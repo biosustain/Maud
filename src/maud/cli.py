@@ -128,7 +128,7 @@ def simulate_command(data_path, output_dir, n):
 
 
 def generate_prior_template(data_path):
-    """Generate draws from the prior mean.
+    """Generate template for prior definitions.
 
     :params data_path: a path to a maud input folder with a kinetic model
     and optionally experimental input file.
@@ -143,7 +143,7 @@ def generate_prior_template(data_path):
     output_path = os.path.join(data_path, output_name)
     print("Creating template: " + output_path)
     prior_dataframe = get_input_template(kinetic_model, raw_measurements)
-    print("Saving template")
+    print(f"Saving template to: " + output_path)
     prior_dataframe.to_csv(output_path)
     print("Generated CSV")
     return output_path
