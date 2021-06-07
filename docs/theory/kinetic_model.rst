@@ -82,9 +82,11 @@ and varied protein concentrations. Common rate laws include: mass action kinetic
 is a scaled-product of the reactant concentrations, or Michaelis-Menten kinetics which reproduce enzyme 
 saturation behavior.
 
-The current supported mechanisms are `reversible_modular_rate_law` and `irreversible_modular_rate_law` 
-<../theory/enzyme_kinetics>`, which is augmented using the Generalised Monod-Wyman-Changeux formalism for 
-allostery. Additional rate laws can be easily implemented by the user.
+The current supported mechanisms are `reversible_modular_rate_law` and `irreversible_modular_rate_law`, 
+which is augmented using the Generalised Monod-Wyman-Changeux formalism for allostery
+(see the documentation page about `enzyme kinetics <../theory/enzyme_kinetics.html>`_ for details). 
+Additional rate laws can be easily implemented by the user and assigning them flags in the corresponding
+"sampling.py" and "model.stan" files.
 
 
 Out of Scope
@@ -118,7 +120,7 @@ To determine :math:`Sv = 0` we evaluate the system of ODEs as an initial value p
 integrating the system over an arbitrary period of time that is defined by the user. Tolerances for steady
 state evaluation can be altered in the source code under - src/maud/model.stan. This acts as an 
 indicator which will prompt the user if the timepoint selected is insufficient, or may be a result of Limit Cycles.
-The principle assumption of this method is that there is a unique solution for every initial point, assuming
+The principal assumption of this method is that there is a unique solution for every initial point, assuming
 every :math:`x_0 \gt 0`. By initialising the concentrations as close to the measured values as possible: simulation 
 time is minimised; and of the possible non-unique solutions, the solution that is closest to the initial value and
-hence measurement will ideally be selected. There is no current implementation in Maud to account for multiple solutions.
+hence measurement will ideally be selected. There is no other implementation in Maud to account for multiple solutions.
