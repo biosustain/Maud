@@ -69,30 +69,6 @@ def get_rref(mat):
     return sp.Matrix(mat).rref(iszerofunc=lambda x: abs(x) < 1e-10)[0]
 
 
-def export_params_from_draw(infd, chain, draw):
-    """Extact parameters from an infd object."""
-    list_of_input_inits = [
-        "km",
-        "drain",
-        "ki",
-        "diss_t",
-        "diss_r",
-        "transfer_constant",
-        "kcat",
-        "kcat_phos",
-        "conc_unbalanced",
-        "conc_enzyme",
-        "conc_phos",
-        "dgf",
-    ]
-
-    input_dict = {
-        par_name: infd.posterior[par_name][chain, draw].values.tolist()
-        for par_name in list_of_input_inits
-        if par_name in infd.posterior.variables.keys()
-    }
-
-    return input_dict
 
 
 def get_input_template(km, raw_measurements):
