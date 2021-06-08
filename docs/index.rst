@@ -28,6 +28,7 @@ experiments and the existing literature.
    :caption: Theoretical background:
 
    theory/enzyme_kinetics
+   theory/kinetic_model
    theory/statistics
    theory/thermodynamics
    theory/drains
