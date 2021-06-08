@@ -20,10 +20,13 @@ import shutil
 from datetime import datetime
 
 import click
+import pandas as pd
+import toml
 
 from maud import sampling
 from maud.analysis import load_infd
-from maud.io import load_maud_input_from_toml
+from maud.get_prior_template import get_prior_template
+from maud.io import load_maud_input_from_toml, parse_config, parse_toml_kinetic_model
 
 
 RELATIVE_PATH_EXAMPLE = "../../tests/data/linear"
@@ -122,3 +125,35 @@ def simulate(data_path, output_dir, n):
 def simulate_command(data_path, output_dir, n):
     """Run the simulate function as a click command."""
     click.echo(simulate(data_path, output_dir, n))
+
+
+def generate_prior_template(data_path):
+    """Generate template for prior definitions.
+
+    :params data_path: a path to a maud input folder with a kinetic model
+    and optionally experimental input file.
+    """
+
+    config = parse_config(toml.load(os.path.join(data_path, "config.toml")))
+    kinetic_model_path = os.path.join(data_path, config.kinetic_model_file)
+    kinetic_model = parse_toml_kinetic_model(toml.load(kinetic_model_path))
+    experiments_path = os.path.join(data_path, config.experiments_file)
+    raw_measurements = pd.read_csv(experiments_path)
+    output_name = "prior_template.csv"
+    output_path = os.path.join(data_path, output_name)
+    print("Creating template")
+    prior_dataframe = get_prior_template(kinetic_model, raw_measurements)
+    print(f"Saving template to: {output_path}")
+    prior_dataframe.to_csv(output_path)
+    return "Successfully generated prior template"
+
+
+@cli.command("generate-prior-template")
+@click.argument(
+    "data_path",
+    type=click.Path(exists=True, dir_okay=True, file_okay=False),
+    default=get_example_path(RELATIVE_PATH_EXAMPLE),
+)
+def generate_prior_template_command(data_path):
+    """Run the simulate function as a click command."""
+    click.echo(generate_prior_template(data_path))
