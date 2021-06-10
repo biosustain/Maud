@@ -16,7 +16,7 @@
 
 """Functions and classes to generate prior template stored here."""
 
-from typing import Dict, List
+from typing import Dict, List, Optional
 
 import pandas as pd
 
@@ -37,6 +37,17 @@ PRIOR_FILE_COLUMNS = [
     "pct99",
 ]
 
+INIT_FILE_COLUMNS = [
+    "parameter_name",
+    "experiment_id",
+    "metabolite_id",
+    "mic_id",
+    "enzyme_id",
+    "phos_enz_id",
+    "drain_id",
+    "value",
+]
+
 
 class Input_Coords:
     """Defines parameters with associated coordinate sets.
@@ -45,9 +56,21 @@ class Input_Coords:
     :param coords: dictionary.
     """
 
-    def __init__(self, id: str, coords: Dict[str, List[str]]):
+    def __init__(
+        self,
+        id: str,
+        coords: Dict[str, List[str]],
+        infd_coord_list: List[str],
+        linking_list: Optional[Dict[str, List[str]]] = None,
+    ):
         self.id = id
         self.coords = coords
+        self.infd_coord_list = infd_coord_list
+        self.linking_list = linking_list
+
+
+def join_list_of_strings(l1, l2, sep="-"):
+    return list(map(lambda a: f"{a[0]}{sep}{a[1]}", zip(l1, l2)))
 
 
 def get_2d_coords(coords_1, coords_2):
@@ -59,15 +82,13 @@ def get_2d_coords(coords_1, coords_2):
     return list(zip(*set_of_coords)) if len(set_of_coords) > 0 else ([], [])
 
 
-def get_prior_template(km, raw_measurements):
-    """Extact parameters from an infd object."""
-
-    scs = get_stan_coords(km, raw_measurements)
-
-    list_of_input_inits = [
+def get_parameter_coords(scs):
+    return [
         Input_Coords(
             id="km",
             coords={"enzyme_id": scs.km_enzs, "mic_id": scs.km_mics},
+            infd_coord_list=["kms"],
+            linking_list={"kms": join_list_of_strings(scs.km_enzs, scs.km_mics)},
         ),
         Input_Coords(
             id="drain",
@@ -75,25 +96,48 @@ def get_prior_template(km, raw_measurements):
                 "drain_id": get_2d_coords(scs.drains, scs.experiments)[0],
                 "experiment_id": get_2d_coords(scs.drains, scs.experiments)[1],
             },
-        ),
-        Input_Coords(id="ki", coords={"enzyme_id": scs.ci_enzs, "mic_id": scs.ci_mics}),
-        Input_Coords(
-            id="diss_t", coords={"enzyme_id": scs.ai_enzs, "mic_id": scs.ai_mics}
+            infd_coord_list=["drains", "experiments"],
         ),
         Input_Coords(
-            id="diss_r", coords={"enzyme_id": scs.aa_enzs, "mic_id": scs.aa_mics}
+            id="ki",
+            coords={"enzyme_id": scs.ci_enzs, "mic_id": scs.ci_mics},
+            infd_coord_list=["kis"],
+            linking_list={"kis": join_list_of_strings(scs.ci_enzs, scs.ci_mics)},
         ),
         Input_Coords(
-            id="transfer_constant", coords={"enzyme_id": scs.allosteric_enzymes}
+            id="diss_t",
+            coords={"enzyme_id": scs.ai_enzs, "mic_id": scs.ai_mics},
+            infd_coord_list=["diss_ts"],
+            linking_list={"diss_ts": join_list_of_strings(scs.ai_enzs, scs.ai_mics)},
         ),
-        Input_Coords(id="kcat", coords={"enzyme_id": scs.enzymes}),
-        Input_Coords(id="kcat_phos", coords={"phos_enz_id": scs.phos_enzs}),
+        Input_Coords(
+            id="diss_r",
+            coords={"enzyme_id": scs.aa_enzs, "mic_id": scs.aa_mics},
+            infd_coord_list=["diss_rs"],
+            linking_list={"diss_rs": join_list_of_strings(scs.aa_enzs, scs.aa_mics)},
+        ),
+        Input_Coords(
+            id="transfer_constant",
+            coords={"enzyme_id": scs.allosteric_enzymes},
+            infd_coord_list=["allosteric_enzymes"],
+        ),
+        Input_Coords(
+            id="kcat",
+            coords={"enzyme_id": scs.enzymes},
+            infd_coord_list=["enzymes"],
+        ),
+        Input_Coords(
+            id="kcat_phos",
+            coords={"phos_enz_id": scs.phos_enzs},
+            infd_coord_list=["phos_enzs"],
+        ),
         Input_Coords(
             id="conc_unbalanced",
             coords={
                 "mic_id": get_2d_coords(scs.unbalanced_mics, scs.experiments)[0],
                 "experiment_id": get_2d_coords(scs.unbalanced_mics, scs.experiments)[1],
             },
+            infd_coord_list=["unbalanced_mics", "experiments"],
         ),
         Input_Coords(
             id="conc_enzyme",
@@ -101,6 +145,7 @@ def get_prior_template(km, raw_measurements):
                 "enzyme_id": get_2d_coords(scs.enzymes, scs.experiments)[0],
                 "experiment_id": get_2d_coords(scs.enzymes, scs.experiments)[1],
             },
+            infd_coord_list=["enzymes", "experiments"],
         ),
         Input_Coords(
             id="conc_phos",
@@ -108,15 +153,56 @@ def get_prior_template(km, raw_measurements):
                 "phos_enz_id": get_2d_coords(scs.phos_enzs, scs.experiments)[0],
                 "experiment_id": get_2d_coords(scs.phos_enzs, scs.experiments)[1],
             },
+            infd_coord_list=["phos_enzs", "experiments"],
         ),
-        Input_Coords(id="dgf", coords={"metabolite_id": scs.metabolites}),
+        Input_Coords(
+            id="dgf",
+            coords={"metabolite_id": scs.metabolites},
+            infd_coord_list=["metabolites"],
+        ),
     ]
 
-    init_dataframe = pd.DataFrame(columns=PRIOR_FILE_COLUMNS)
 
+def get_prior_template(km, raw_measurements):
+    """Extact parameters from an infd object."""
+
+    scs = get_stan_coords(km, raw_measurements)
+    list_of_input_inits = get_parameter_coords(scs)
+    prior_dataframe = pd.DataFrame(columns=PRIOR_FILE_COLUMNS)
     for par in list_of_input_inits:
         par_dataframe = pd.DataFrame.from_dict(par.coords)
         par_dataframe["parameter_name"] = par.id
-        init_dataframe = init_dataframe.append(par_dataframe, ignore_index=True)
+        prior_dataframe = prior_dataframe.append(par_dataframe, ignore_index=True)
 
+    return prior_dataframe
+
+
+def get_init_descriptor(infd, mi, chain, draw):
+
+    scs = mi.stan_coords
+    list_of_input_inits = get_parameter_coords(scs)
+    init_dataframe = pd.DataFrame(columns=INIT_FILE_COLUMNS)
+    for par in list_of_input_inits:
+        if par.id in list(infd.posterior.variables.keys()):
+            par_dataframe = pd.DataFrame.from_dict(par.coords)
+            value_dataframe = (
+                infd.posterior[par.id][chain][draw].to_dataframe().reset_index()
+            )
+            if par.linking_list:
+                par_dataframe["linking_list"] = list(par.linking_list.values())[0]
+                par_dataframe = par_dataframe.merge(
+                    value_dataframe,
+                    left_on="linking_list",
+                    right_on=par.infd_coord_list,
+                )
+            else:
+                par_dataframe = par_dataframe.merge(
+                    value_dataframe,
+                    left_on=list(par.coords.keys()),
+                    right_on=par.infd_coord_list,
+                )
+            par_dataframe["parameter_name"] = par.id
+            par_dataframe["value"] = par_dataframe[par.id]
+            init_column_list = ["parameter_name"] + list(par.coords.keys()) + ["value"]
+            init_dataframe = init_dataframe.append(par_dataframe[init_column_list])
     return init_dataframe
