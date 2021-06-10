@@ -80,6 +80,7 @@ def get_2d_coords(coords_1, coords_2):
 
 
 def get_parameter_coords(scs):
+    """Define parameter coordinates for stan and infd objects."""
     return [
         Input_Coords(
             id="km",
@@ -161,7 +162,7 @@ def get_parameter_coords(scs):
 
 
 def get_prior_template(km, raw_measurements):
-    """Gets prior dataframe from KineticModel and Measurements."""
+    """Get prior dataframe from KineticModel and Measurements."""
 
     scs = get_stan_coords(km, raw_measurements)
     list_of_input_inits = get_parameter_coords(scs)
