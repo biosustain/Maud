@@ -10,11 +10,12 @@ from matplotlib import pyplot as plt
 from maud.data_model import MaudInput
 
 
+def join_list_of_strings(l1, l2, sep="-"):
+        return list(map(lambda a: f"{a[0]}{sep}{a[1]}", zip(l1, l2)))
+
+
 def load_infd(csvs: List[str], mi: MaudInput) -> az.InferenceData:
     """Get an arviz InferenceData object from Maud csvs."""
-
-    def join_list_of_strings(l1, l2, sep="-"):
-        return list(map(lambda a: f"{a[0]}{sep}{a[1]}", zip(l1, l2)))
 
     coords = {
         **mi.stan_coords.__dict__,

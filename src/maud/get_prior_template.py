@@ -21,6 +21,7 @@ from typing import Dict, List, Optional
 import pandas as pd
 
 from maud.io import get_stan_coords
+from maud.analysis import join_list_of_strings
 
 
 PRIOR_FILE_COLUMNS = [
@@ -67,10 +68,6 @@ class Input_Coords:
         self.coords = coords
         self.infd_coord_list = infd_coord_list
         self.linking_list = linking_list
-
-
-def join_list_of_strings(l1, l2, sep="-"):
-    return list(map(lambda a: f"{a[0]}{sep}{a[1]}", zip(l1, l2)))
 
 
 def get_2d_coords(coords_1, coords_2):
