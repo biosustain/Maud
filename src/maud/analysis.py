@@ -21,6 +21,13 @@ def load_infd(csvs: List[str], mi: MaudInput) -> az.InferenceData:
         **{
             "reactions": mi.stan_coords.reactions,
             "kms": join_list_of_strings(mi.stan_coords.km_enzs, mi.stan_coords.km_mics),
+            "kis": join_list_of_strings(mi.stan_coords.ci_enzs, mi.stan_coords.ci_mics),
+            "diss_ts": join_list_of_strings(
+                mi.stan_coords.ai_enzs, mi.stan_coords.ai_mics
+            ),
+            "diss_rs": join_list_of_strings(
+                mi.stan_coords.aa_enzs, mi.stan_coords.aa_mics
+            ),
             "yconcs": join_list_of_strings(
                 mi.stan_coords.yconc_exps, mi.stan_coords.yconc_mics
             ),
@@ -36,12 +43,21 @@ def load_infd(csvs: List[str], mi: MaudInput) -> az.InferenceData:
         csvs,
         coords=coords,
         dims={
-            "conc_enzyme": ["experiments", "enzymes"],
-            "conc": ["experiments", "mics"],
             "flux": ["experiments", "reactions"],
+            "conc": ["experiments", "mics"],
+            "conc_enzyme": ["experiments", "enzymes"],
+            "conc_unbalanced": ["experiments", "unbalanced_mics"],
+            "conc_phos": ["experiments", "phos_enzs"],
+            "drain": ["experiments", "drains"],
+            "diss_t": ["diss_ts"],
+            "diss_r": ["diss_rs"],
+            "transfer_constant": ["allosteric_enzymes"],
             "dgf": ["metabolites"],
+            "keq": ["edges"],
             "kcat": ["enzymes"],
+            "kcat_phos": ["phos_enzs"],
             "km": ["kms"],
+            "ki": ["kis"],
             "yconc_sim": ["yconcs"],
             "yflux_sim": ["yfluxs"],
             "yenz_sim": ["yenzs"],
