@@ -188,12 +188,14 @@ def get_init_descriptor(infd, mi, chain, draw, warmup):
         if par.id in infd_parameters:
             if warmup == 1:
                 value_dataframe = (
-                infd.warmup_posterior[par.id][chain][draw].to_dataframe().reset_index()
+                    infd.warmup_posterior[par.id][chain][draw]
+                    .to_dataframe()
+                    .reset_index()
                 )
 
             else:
                 value_dataframe = (
-                infd.posterior[par.id][chain][draw].to_dataframe().reset_index()
+                    infd.posterior[par.id][chain][draw].to_dataframe().reset_index()
                 )
             par_dataframe = pd.DataFrame.from_dict(par.coords)
             if par.linking_list:

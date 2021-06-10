@@ -194,9 +194,10 @@ def generate_inits(data_path, chain, draw, warmup):
     type=click.Path(exists=True, dir_okay=True, file_okay=False),
 )
 @click.option("--chain", default=0, help="Sampling chain using python indexing")
-@click.option("--draw", default=0, help="Sampling draw using python indexing from start of phase")
+@click.option(
+    "--draw", default=0, help="Sampling draw using python indexing from start of phase"
+)
 @click.option("--warmup", default=0, help="0 if in sampling, 1 if in warmup phase")
-
 def generate_inits_command(data_path, chain, draw, warmup):
     """Run the generate_inits function as a click command."""
     click.echo(generate_inits(data_path, chain, draw, warmup))
