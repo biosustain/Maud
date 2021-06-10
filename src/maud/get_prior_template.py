@@ -164,7 +164,7 @@ def get_parameter_coords(scs):
 
 
 def get_prior_template(km, raw_measurements):
-    """Extact parameters from an infd object."""
+    """Gets prior dataframe from KineticModel and Measurements."""
 
     scs = get_stan_coords(km, raw_measurements)
     list_of_input_inits = get_parameter_coords(scs)
@@ -177,17 +177,28 @@ def get_prior_template(km, raw_measurements):
     return prior_dataframe
 
 
-def get_init_descriptor(infd, mi, chain, draw):
+def get_init_descriptor(infd, mi, chain, draw, warmup):
+    """Extact parameters from an infd object."""
 
     scs = mi.stan_coords
     list_of_input_inits = get_parameter_coords(scs)
     init_dataframe = pd.DataFrame(columns=INIT_FILE_COLUMNS)
+    if warmup == 1:
+        infd_parameters = list(infd.warmup_posterior.variables.keys())
+    else:
+        infd_parameters = list(infd.posterior.variables.keys())
     for par in list_of_input_inits:
-        if par.id in list(infd.posterior.variables.keys()):
-            par_dataframe = pd.DataFrame.from_dict(par.coords)
-            value_dataframe = (
+        if par.id in infd_parameters:
+            if warmup == 1:
+                value_dataframe = (
+                infd.warmup_posterior[par.id][chain][draw].to_dataframe().reset_index()
+                )
+
+            else:
+                value_dataframe = (
                 infd.posterior[par.id][chain][draw].to_dataframe().reset_index()
-            )
+                )
+            par_dataframe = pd.DataFrame.from_dict(par.coords)
             if par.linking_list:
                 par_dataframe["linking_list"] = list(par.linking_list.values())[0]
                 par_dataframe = par_dataframe.merge(

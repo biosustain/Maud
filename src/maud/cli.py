@@ -159,12 +159,17 @@ def generate_prior_template_command(data_path):
     click.echo(generate_prior_template(data_path))
 
 
-def generate_inits(data_path, chain, draw):
+def generate_inits(data_path, chain, draw, warmup):
     """Generate template for init definitions.
 
-    :params data_path: a path to a maud output folder with both a samples
-    and
-    :params chain: the sampling chain of the stan sampler
+    :params data_path: a path to a maud output folder with both samples
+    and user_input folders
+    :params chain: the sampling chain of the stan sampler you want to
+    export
+    :params draw: the sampling draw of the sampling chain you want to
+    export from the start of the sampling or warmup phase
+    :params warmup: indicator variable of if it is for the warmup
+    or sampling phase
     """
 
     csvs = [
@@ -177,7 +182,7 @@ def generate_inits(data_path, chain, draw):
     output_name = "generated_inits.csv"
     output_path = os.path.join(data_path, output_name)
     print("Creating init")
-    init_dataframe = get_init_descriptor(infd, mi, chain, draw)
+    init_dataframe = get_init_descriptor(infd, mi, chain, draw, warmup)
     print(f"Saving inits to: {output_path}")
     init_dataframe.to_csv(output_path)
     return "Successfully generated prior template"
@@ -189,7 +194,9 @@ def generate_inits(data_path, chain, draw):
     type=click.Path(exists=True, dir_okay=True, file_okay=False),
 )
 @click.option("--chain", default=0, help="Sampling chain using python indexing")
-@click.option("--draw", default=0, help="Sampling draw using python indexing")
-def generate_inits_command(data_path, chain, draw):
+@click.option("--draw", default=0, help="Sampling draw using python indexing from start of phase")
+@click.option("--warmup", default=0, help="0 if in sampling, 1 if in warmup phase")
+
+def generate_inits_command(data_path, chain, draw, warmup):
     """Run the generate_inits function as a click command."""
-    click.echo(generate_inits(data_path, chain, draw))
+    click.echo(generate_inits(data_path, chain, draw, warmup))
