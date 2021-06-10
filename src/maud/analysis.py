@@ -11,7 +11,7 @@ from maud.data_model import MaudInput
 
 
 def join_list_of_strings(l1, l2, sep="-"):
-        return list(map(lambda a: f"{a[0]}{sep}{a[1]}", zip(l1, l2)))
+    return list(map(lambda a: f"{a[0]}{sep}{a[1]}", zip(l1, l2)))
 
 
 def load_infd(csvs: List[str], mi: MaudInput) -> az.InferenceData:
