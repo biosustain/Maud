@@ -132,14 +132,17 @@ def main():
     ]
     mi = io.load_maud_input_from_toml(os.path.join(MAUD_OUTPUT, "user_input"))
     infd = load_infd(csvs, mi)
+    list_of_model_variables = list(infd.warmup_posterior.variables.keys())
     var_to_dims = {
         var: list(infd.posterior[var].dims[2:]) for var in VARIABLES_TO_ANALYSE
+        if var in list_of_model_variables
     }
     var_to_draws = {
         var: infd.posterior[var].to_dataframe().reset_index()
         for var in VARIABLES_TO_ANALYSE
+        if var in list_of_model_variables
     }
-    for var in VARIABLES_TO_ANALYSE:
+    for var in list(var_to_dims.keys()):
         dims = var_to_dims[var]
         draws = var_to_draws[var]
         plot = plot_violin_plots(var, dims, draws, LOG_SCALE_VARIABLES, UNITS)
