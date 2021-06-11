@@ -29,23 +29,52 @@ MAUD_OUTPUT = os.path.join(
 )
 PLOT_DIR = "."
 VARIABLES_TO_ANALYSE = [
+    "kcat",
+    "kcat_phos",
+    "km",
+    "drain",
+    "ki",
+    "diss_t",
+    "diss_r",
+    "transfer_constant",
+    "conc_unbalanced",
+    "conc_enzyme",
+    "conc_phos",
     "conc",
     "flux",
     "keq",
-    "kcat",
-    "formation_energy",
-    "km",
-    "enzyme",
+    "dgf",
 ]
-LOG_SCALE_VARIABLES = ["conc", "keq", "kcat", "km", "enzyme"]
+
+LOG_SCALE_VARIABLES = [
+    "kcat",
+    "kcat_phos",
+    "km",
+    "ki",
+    "diss_t",
+    "diss_r",
+    "transfer_constant",
+    "conc_unbalanced",
+    "conc_enzyme",
+    "conc_phos",
+    "conc",
+]
 UNITS = {
+    "kcat": "1/s",
+    "kcat_phos": "1/s",
+    "km": "mM",
+    "drain": "mM/s",
+    "ki": "mM",
+    "diss_t": "mM",
+    "diss_r": "mM",
+    "transfer_constant": "",
+    "conc_unbalanced": "mM",
+    "conc_enzyme": "mM",
+    "conc_phos": "mM",
     "conc": "mM",
     "flux": "mM/s",
     "keq": "",
-    "kcat": "1/s",
-    "formation_energy": "kJ/mol",
-    "km": "mM",
-    "enzyme": "mM",
+    "dgf": "kJ/mmol",
 }
 
 
