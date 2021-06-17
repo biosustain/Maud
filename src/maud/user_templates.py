@@ -54,7 +54,9 @@ class Input_Coords:
     """Defines parameters with associated coordinate sets.
 
     :param id: id of the parameter.
-    :param coords: dictionary.
+    :param coords: dictionary of user input keys with corresponding list of ordered ids.
+    :param infd_coord_list: ordered list that matches the coords to the infd object.
+    :param linking_list: matches composite strings to the infd coords.
     """
 
     def __init__(
@@ -175,7 +177,7 @@ def get_prior_template(km, raw_measurements):
     return prior_dataframe
 
 
-def get_init_descriptor(infd, mi, chain, draw, warmup):
+def get_inits_from_draw(infd, mi, chain, draw, warmup):
     """Extact parameters from an infd object."""
 
     scs = mi.stan_coords

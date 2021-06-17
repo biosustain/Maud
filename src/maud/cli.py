@@ -25,7 +25,7 @@ import toml
 
 from maud import sampling
 from maud.analysis import load_infd
-from maud.get_prior_template import get_init_descriptor, get_prior_template
+from maud.user_templates import get_inits_from_draw, get_prior_template
 from maud.io import load_maud_input_from_toml, parse_config, parse_toml_kinetic_model
 
 
@@ -182,7 +182,7 @@ def generate_inits(data_path, chain, draw, warmup):
     output_name = "generated_inits.csv"
     output_path = os.path.join(data_path, output_name)
     print("Creating init")
-    init_dataframe = get_init_descriptor(infd, mi, chain, draw, warmup)
+    init_dataframe = get_inits_from_draw(infd, mi, chain, draw, warmup)
     print(f"Saving inits to: {output_path}")
     init_dataframe.to_csv(output_path)
     return "Successfully generated prior template"
