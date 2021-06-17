@@ -25,8 +25,8 @@ import toml
 
 from maud import sampling
 from maud.analysis import load_infd
-from maud.get_prior_template import get_prior_template
 from maud.io import load_maud_input_from_toml, parse_config, parse_toml_kinetic_model
+from maud.user_templates import get_inits_from_draw, get_prior_template
 
 
 RELATIVE_PATH_EXAMPLE = "../../tests/data/linear"
@@ -155,5 +155,49 @@ def generate_prior_template(data_path):
     default=get_example_path(RELATIVE_PATH_EXAMPLE),
 )
 def generate_prior_template_command(data_path):
-    """Run the simulate function as a click command."""
+    """Run the generate_prior_template function as a click command."""
     click.echo(generate_prior_template(data_path))
+
+
+def generate_inits(data_path, chain, draw, warmup):
+    """Generate template for init definitions.
+
+    :params data_path: a path to a maud output folder with both samples
+    and user_input folders
+    :params chain: the sampling chain of the stan sampler you want to
+    export
+    :params draw: the sampling draw of the sampling chain you want to
+    export from the start of the sampling or warmup phase
+    :params warmup: indicator variable of if it is for the warmup
+    or sampling phase
+    """
+
+    csvs = [
+        os.path.join(data_path, "samples", f)
+        for f in os.listdir(os.path.join(data_path, "samples"))
+        if f.endswith(".csv")
+    ]
+    mi = load_maud_input_from_toml(os.path.join(data_path, "user_input"))
+    infd = load_infd(csvs, mi)
+    output_name = "generated_inits.csv"
+    output_path = os.path.join(data_path, output_name)
+    print("Creating init")
+    init_dataframe = get_inits_from_draw(infd, mi, chain, draw, warmup)
+    print(f"Saving inits to: {output_path}")
+    init_dataframe.to_csv(output_path)
+    return "Successfully generated prior template"
+
+
+@cli.command("generate-inits")
+@click.argument(
+    "data_path",
+    type=click.Path(exists=True, dir_okay=True, file_okay=False),
+)
+@click.option("--chain", default=0, help="Sampling chain using python indexing")
+@click.option(
+    "--draw", default=0, help="Sampling draw using python indexing from start of phase"
+)
+@click.option("--warmup", default=0, help="0 if in sampling, 1 if in warmup phase")
+def generate_inits_command(data_path, chain, draw, warmup):
+    """Run the generate_inits function as a click command."""
+    click.echo(generate_inits(data_path, chain, draw, warmup))
