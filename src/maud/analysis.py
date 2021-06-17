@@ -71,7 +71,6 @@ def load_infd(csvs: List[str], mi: MaudInput) -> az.InferenceData:
     )
 
 
-
 def plot_1d_var(
     infd: az.InferenceData,
     varname: str,
