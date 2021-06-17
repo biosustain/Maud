@@ -25,8 +25,8 @@ import toml
 
 from maud import sampling
 from maud.analysis import load_infd
-from maud.user_templates import get_inits_from_draw, get_prior_template
 from maud.io import load_maud_input_from_toml, parse_config, parse_toml_kinetic_model
+from maud.user_templates import get_inits_from_draw, get_prior_template
 
 
 RELATIVE_PATH_EXAMPLE = "../../tests/data/linear"
