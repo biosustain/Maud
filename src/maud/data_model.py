@@ -17,15 +17,12 @@
 """Definitions of Maud-specific objects."""
 
 from collections import defaultdict
-from typing import Dict, List
+from dataclasses import dataclass
+from typing import Dict, List, Optional
 
 import numpy as np
+import pandas as pd
 from cmdstanpy import CmdStanMCMC
-
-from maud.utils import (
-    get_lognormal_parameters_from_quantiles,
-    get_normal_parameters_from_quantiles,
-)
 
 
 class Compartment:
@@ -123,6 +120,7 @@ class Enzyme:
     :param name: human-understandable name for the enzyme
     :param modifiers: modifiers, given as {'modifier_id': modifier_object}
     :param subunits: number of subunits in enzymes
+    :param water_stroichiometry: Reaction's stoichiometric coefficient for water
     """
 
     def __init__(
@@ -132,13 +130,20 @@ class Enzyme:
         name: str,
         modifiers: Dict[str, List[Modifier]] = None,
         subunits: int = 1,
+        water_stoichiometry: float = 0,
     ):
         if modifiers is None:
             modifiers = defaultdict()
         self.id = id
+        self.reaction_id = reaction_id
         self.name = name
         self.modifiers = modifiers
         self.subunits = subunits
+        self.water_stoichiometry = water_stoichiometry
+        self.allosteric = (
+            len(self.modifiers["allosteric_activator"]) > 0
+            or len(self.modifiers["allosteric_inhibitor"]) > 0
+        )
 
 
 class Reaction:
@@ -146,23 +151,20 @@ class Reaction:
 
     :param id: reaction id, use a BiGG id if possible.
     :param name: reaction name.
-    :param reversible: whether or not reaction is reversible.
-    :param is_exchange: whether or not reaction is an exchange reaction.
+    :param reaction_mechanism: either "reversible_modular_rate_law", "drain", or,
+    "irreversible_modular_rate_law".
     :param stoichiometry: reaction stoichiometry,
-    e.g. for the reaction: 1.5 f6p <-> fdp we have {'f6p'; -1.5, 'fdp': 1}
+    e.g. for the reaction: 2pg <-> 3pg we have {'2pg'; -1, '3pg': 1}
     :param enzymes: Dictionary mapping enzyme ids to Enzyme objects
-    :param water_stroichiometry: Reaction's stoichiometric coefficient for water
     """
 
     def __init__(
         self,
         id: str,
-        name: str = None,
-        reversible: bool = True,
-        is_exchange: bool = None,
-        stoichiometry: Dict[str, float] = None,
-        enzymes: Dict[str, Enzyme] = None,
-        water_stoichiometry: float = 0,
+        name: str,
+        reaction_mechanism: str,
+        stoichiometry: Dict[str, float],
+        enzymes: List[Enzyme],
     ):
         if stoichiometry is None:
             stoichiometry = defaultdict()
@@ -170,29 +172,9 @@ class Reaction:
             enzymes = defaultdict()
         self.id = id
         self.name = name if name is not None else id
-        self.reversible = reversible
-        self.is_exchange = is_exchange
+        self.reaction_mechanism = reaction_mechanism
         self.stoichiometry = stoichiometry
         self.enzymes = enzymes
-        self.water_stoichiometry = water_stoichiometry
-
-
-class Drain:
-    """Constructor for the reaction object.
-
-    :param id: drain id, use a BiGG id if possible.
-    :param name: drain name.
-    :param stoichiometry: reaction stoichiometry,
-    """
-
-    def __init__(
-        self, id: str, name: str = None, stoichiometry: Dict[str, float] = None
-    ):
-        if stoichiometry is None:
-            stoichiometry = defaultdict()
-        self.id = id
-        self.name = name if name is not None else id
-        self.stoichiometry = stoichiometry
 
 
 class Phosphorylation:
@@ -226,207 +208,125 @@ class KineticModel:
     """Constructor for representation of a system of metabolic reactions.
 
     :param model_id: id of the kinetic model
-    :param metabolites: dictionary mapping strings to metabolite objects
-    :param reactions: dictionary mapping strings to reaction objects
-    :param drains: dictionary mapping strings to drain objects
-    :param compartments: dictionary mapping strings to compartment objects
-    :param mic: dictionary mapping strings to MetaboliteInCompartment objects
+    :param metabolites: list of metabolite objects
+    :param reactions: list of reaction objects
+    :param compartments: list of compartment objects
+    :param mic: list of MetaboliteInCompartment objects
     """
 
     def __init__(
         self,
         model_id: str,
-        metabolites: Dict[str, Metabolite],
-        reactions: Dict[str, Reaction],
-        compartments: Dict[str, Compartment],
-        mics: Dict[str, MetaboliteInCompartment],
-        drains: Dict[str, Drain] = None,
-        phosphorylation: Dict[str, Phosphorylation] = None,
+        metabolites: List[Metabolite],
+        reactions: List[Reaction],
+        compartments: List[Compartment],
+        mics: List[MetaboliteInCompartment],
+        phosphorylation: List[Phosphorylation] = None,
     ):
         self.model_id = model_id
         self.metabolites = metabolites
         self.reactions = reactions
-        self.drains = drains
         self.compartments = compartments
         self.mics = mics
-        self.phosphorylation = phosphorylation
+        self.phosphorylation = phosphorylation if phosphorylation is not None else []
 
 
-class Measurement:
-    """Constructor for measurement object.
+@dataclass
+class MeasurementSet:
+    """A container for a complete set of measurements, including knockouts."""
 
-    :param target_id: id of the thing being measured
-    :param value: value for the measurement
-    :param uncertainty: uncertainty associated to the measurent
-    :param target_type: type of thing being measured, e.g. 'metabolite', 'reaction',
-    'enzyme'.
-    """
-
-    def __init__(
-        self,
-        target_id: str,
-        value: float,
-        uncertainty: float = None,
-        target_type: str = None,
-    ):
-        target_type_to_error_scale = {"mic": "ln", "flux": "linear", "enzyme": "ln"}
-        self.target_id = target_id
-        self.value = value
-        self.uncertainty = uncertainty
-        self.target_type = target_type
-        self.scale = target_type_to_error_scale[target_type]
+    yconc: pd.DataFrame
+    yflux: pd.DataFrame
+    yenz: pd.DataFrame
+    enz_knockouts: pd.DataFrame
+    phos_knockouts: pd.DataFrame
 
 
-class Experiment:
-    """Constructor for condition object.
+@dataclass
+class IndPrior1d:
+    """Independent location/scale prior for a 1-dimentional parameter."""
 
-    :param id: condition id
-    :param measurements: dictionary mapping keys 'metabolite' and 'reaction'
-    to dictionaries with the form {target id: measurement}
-    :param metadata: any info about the condition
-    :param knockouts: a list of enzymes knocked out, if any
-    """
+    parameter_name: str
+    location: pd.Series
+    scale: pd.Series
 
-    def __init__(
-        self,
-        id: str,
-        measurements: Dict[str, Dict[str, Measurement]] = None,
-        metadata: str = None,
-        knockouts: List[str] = None,
-        phos_knockouts: List[str] = None,
-    ):
-        if measurements is None:
-            measurements = defaultdict()
-        self.id = id
-        self.measurements = measurements
-        self.metadata = metadata
-        self.knockouts = knockouts
-        self.phos_knockouts = phos_knockouts
+    def __post_init__(self):
+        """Check that location and scale indexes match."""
+        if not self.location.index.equals(self.scale.index):
+            raise ValueError("Location index doesn't match scale index.")
 
 
-class Prior:
-    """A prior distribuition.
+@dataclass
+class IndPrior2d:
+    """Independent location/scale prior for a 2-dimensional parameter."""
 
-    As currently implemented, the target must be a single parameter and the
-    distribution must have a location and a scale.
+    parameter_name: str
+    location: pd.DataFrame
+    scale: pd.DataFrame
 
-    :param id: a string identifying the prior object
-    :param target_id: a string identifying the thing that has a prior distribution
-    :param location: a number specifying the location of the distribution
-    :param scale: a number specifying the scale of the distribution
-    :param experiment_id: id of the relevant experiment (for enzymes or unbalanced
-    metabolites)
-    :param mic_id: id of relevant metabolite-in-compartment
-    :param metabolite_id: id of relevant metabolite
-    :param enzyme_id: id of relevant enzyme
-    :param phos_enz_id: id of enzyme involved with phosphorylation reaction
-    :param drain_id: id of relevant drain
-    """
-
-    def __init__(
-        self,
-        id: str,
-        is_non_negative: bool,
-        experiment_id: str = None,
-        mic_id: str = None,
-        metabolite_id: str = None,
-        enzyme_id: str = None,
-        phos_enz_id: str = None,
-        drain_id: str = None,
-        pct1: float = None,
-        pct99: float = None,
-        location: float = None,
-        scale: float = None,
-    ):
-        self.id = id
-        self.is_non_negative = is_non_negative
-        self.experiment_id = experiment_id
-        self.mic_id = mic_id
-        self.metabolite_id = metabolite_id
-        self.enzyme_id = enzyme_id
-        self.phos_enz_id = phos_enz_id
-        self.drain_id = drain_id
-
-        self.pct1 = pct1
-        self.pct99 = pct99
-        if pct1 is not None and pct99 is not None:
-            if is_non_negative:
-                mu, self.scale = get_lognormal_parameters_from_quantiles(
-                    pct1, 0.01, pct99, 0.99
-                )
-                self.location = np.exp(mu)
-            else:
-                self.location, self.scale = get_normal_parameters_from_quantiles(
-                    pct1, 0.01, pct99, 0.99
-                )
-        else:
-            self.location = location
-            self.scale = scale
+    def __post_init__(self):
+        """Check that location and scale indexes and columns match."""
+        if not self.location.index.equals(self.scale.index):
+            raise ValueError("Location index doesn't match scale index.")
+        if not self.location.columns.equals(self.scale.columns):
+            raise ValueError("Location columns don't match scale columns.")
 
 
+@dataclass
 class PriorSet:
     """Object containing all priors for a MaudInput."""
 
-    def __init__(
-        self,
-        kcat_priors: List[Prior],
-        phos_kcat_priors: List[Prior],
-        km_priors: List[Prior],
-        formation_energy_priors: List[Prior],
-        unbalanced_metabolite_priors: List[Prior],
-        inhibition_constant_priors: List[Prior],
-        tense_dissociation_constant_priors: List[Prior],
-        relaxed_dissociation_constant_priors: List[Prior],
-        transfer_constant_priors: List[Prior],
-        drain_priors: List[Prior],
-        enzyme_concentration_priors: List[Prior],
-        phos_enz_concentration_priors: List[Prior],
-    ):
-        self.kcat_priors = kcat_priors
-        self.phos_kcat_priors = phos_kcat_priors
-        self.km_priors = km_priors
-        self.formation_energy_priors = formation_energy_priors
-        self.unbalanced_metabolite_priors = unbalanced_metabolite_priors
-        self.inhibition_constant_priors = inhibition_constant_priors
-        self.tense_dissociation_constant_priors = tense_dissociation_constant_priors
-        self.relaxed_dissociation_constant_priors = relaxed_dissociation_constant_priors
-        self.transfer_constant_priors = transfer_constant_priors
-        self.drain_priors = drain_priors
-        self.enzyme_concentration_priors = enzyme_concentration_priors
-        self.phos_enz_concentration_priors = phos_enz_concentration_priors
+    priors_kcat: IndPrior1d
+    priors_kcat_phos: IndPrior1d
+    priors_km: IndPrior1d
+    priors_dgf: IndPrior1d
+    priors_ki: IndPrior1d
+    priors_diss_t: IndPrior1d
+    priors_diss_r: IndPrior1d
+    priors_transfer_constant: IndPrior1d
+    priors_conc_unbalanced: IndPrior2d
+    priors_drain: IndPrior2d
+    priors_conc_enzyme: IndPrior2d
+    priors_conc_phos: IndPrior2d
 
 
-class StanCodeSet:
-    """Object containing all stan codes for a MaudInput."""
+@dataclass
+class StanCoordSet:
+    """Object containing human-readable indexes for Maud's parameters.
 
-    def __init__(
-        self,
-        metabolite_codes: Dict[str, int],
-        mic_codes: Dict[str, int],
-        balanced_mic_codes: Dict[str, int],
-        unbalanced_mic_codes: Dict[str, int],
-        reaction_codes: Dict[str, int],
-        experiment_codes: Dict[str, int],
-        enzyme_codes: Dict[str, int],
-        drain_codes: Dict[str, int],
-        phos_enz_codes: Dict[str, int],
-    ):
-        self.metabolite_codes = metabolite_codes
-        self.mic_codes = mic_codes
-        self.balanced_mic_codes = balanced_mic_codes
-        self.unbalanced_mic_codes = unbalanced_mic_codes
-        self.reaction_codes = reaction_codes
-        self.experiment_codes = experiment_codes
-        self.enzyme_codes = enzyme_codes
-        self.drain_codes = drain_codes
-        self.phos_enz_codes = phos_enz_codes
+    These are "coordinates" in the sense of xarray
 
+    """
 
-class ExperimentSet:
-    """Object containing all experiments for a MaudInput."""
-
-    def __init__(self, experiments: List[Experiment]):
-        self.experiments = experiments
+    metabolites: List[str]
+    mics: List[str]
+    balanced_mics: List[str]
+    unbalanced_mics: List[str]
+    km_enzs: List[str]
+    km_mics: List[str]
+    reactions: List[str]
+    experiments: List[str]
+    enzymes: List[str]
+    edges: List[str]
+    allosteric_enzymes: List[str]
+    drains: List[str]
+    phos_enzs: List[str]
+    yconc_exps: List[str]
+    yconc_mics: List[str]
+    yflux_exps: List[str]
+    yflux_rxns: List[str]
+    yenz_exps: List[str]
+    yenz_enzs: List[str]
+    ci_enzs: List[str]
+    ci_mics: List[str]
+    ai_enzs: List[str]
+    ai_mics: List[str]
+    aa_enzs: List[str]
+    aa_mics: List[str]
+    enz_ko_exps: List[str]
+    enz_ko_enzs: List[str]
+    phos_ko_exps: List[str]
+    phos_ko_enzs: List[str]
 
 
 class MaudConfig:
@@ -439,6 +339,7 @@ class MaudConfig:
     :param likelihood: Whether or not to take measurements into account.
     :param ode_config: Configuration for Stan's ode solver.
     :param cmdstanpy_config: Arguments to cmdstanpy.CmdStanModel.sample.
+    :param user_inits_file: path to a csv file of initial values.
     """
 
     def __init__(
@@ -450,6 +351,7 @@ class MaudConfig:
         likelihood: bool,
         ode_config: dict,
         cmdstanpy_config: dict,
+        user_inits_file: Optional[str],
     ):
         self.name = name
         self.kinetic_model_file = kinetic_model_file
@@ -458,6 +360,7 @@ class MaudConfig:
         self.likelihood = likelihood
         self.ode_config = ode_config
         self.cmdstanpy_config = cmdstanpy_config
+        self.user_inits_file = user_inits_file
 
 
 class MaudInput:
@@ -465,10 +368,9 @@ class MaudInput:
 
     :param kinetic_system: a KineticSystem object
     :param priors: a dictionary mapping prior types to lists of Prior objects
-    :param stan codes: a dictionary with keys 'metabolite', 'reaction', 'mic',
-    'experiment', 'balanced_mic', 'unbalanced_mic' and 'kinetic_parameter', whose
-    values are dictionaries mapping ids of the relevant objects to integer codes
-    :param experiments: a dictionary mapping experiment ids to Experiment objects
+    :param stan_coords: a StanCoordSet object
+    :param measurement_set: a list of Measurement objects
+    :param inits: a dictionary of initial parameter values
     """
 
     def __init__(
@@ -476,14 +378,16 @@ class MaudInput:
         config: MaudConfig,
         kinetic_model: KineticModel,
         priors: PriorSet,
-        stan_codes: StanCodeSet,
-        experiments: ExperimentSet,
+        stan_coords: StanCoordSet,
+        measurements: MeasurementSet,
+        inits: Dict[str, np.array],
     ):
         self.config = config
         self.kinetic_model = kinetic_model
         self.priors = priors
-        self.stan_codes = stan_codes
-        self.experiments = experiments
+        self.stan_coords = stan_coords
+        self.measurements = measurements
+        self.inits = inits
 
 
 class SimulationStudyOutput:

@@ -1,23 +1,21 @@
-name = "linear"
+name = "ecoli_small"
+description = """
+    The biggest model of e coli central carbon metabolism that can conveniently
+    be run on a laptop.
+"""
 kinetic_model = "kinetic_model.toml"
 priors = "priors.csv"
 experiments = "experiments.csv"
 likelihood = true
 
 [cmdstanpy_config]
-refresh = 1
 iter_warmup = 200
 iter_sampling = 200
 chains = 4
 save_warmup = true
 
 [ode_config]
-abs_tol_forward = 1e-4
-rel_tol_forward = 1e-4
-abs_tol_backward = 1e-4
-rel_tol_backward = 1e-4
-abs_tol_quadrature = 1e-4
-rel_tol_quadrature = 1e-4
-max_num_steps = 1e6
+abs_tol = 1e-8
+rel_tol = 1e-8
+max_num_steps = 1e9
 timepoint = 50
-

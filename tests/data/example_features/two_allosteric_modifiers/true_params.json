@@ -8,10 +8,10 @@
     1
   ],
   "ki": [],
-  "dissociation_constant_t": [
+  "diss_t": [
     0.5
   ],
-  "dissociation_constant_r": [
+  "diss_r": [
     1
   ],
   "transfer_constant": [
@@ -32,7 +32,7 @@
       1.0
     ]
   ],
-  "enzyme": [
+  "conc_enzyme": [
     [
       1.0,
       1.0,
@@ -44,11 +44,11 @@
       1.5
     ]
   ],
-  "formation_energy": [
+  "dgf": [
     -1,
     -2
   ],
   "drain": [],
-  "phos_enzyme_conc": [],
-  "phos_kcat": []
+  "conc_phos": [],
+  "kcat_phos": []
 }

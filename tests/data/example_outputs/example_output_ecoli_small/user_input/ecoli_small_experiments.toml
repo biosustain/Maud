@@ -21,7 +21,6 @@ id = "PGI"
 name = "Glucose-6-phosphate isomerase"
 enzymes = [{id = "PGI", name = "Glucose-6-phosphate isomerase", gene = "pgi"}]
 stoichiometry = {g6p_c = -1, f6p_c = 1}
-mechanism = "reversible_modular_rate_law"
 [[reactions.enzymes.modifiers]]
 modifier_type = 'competitive_inhibitor'
 mic_id = 'pep_c'
@@ -31,7 +30,6 @@ mic_id = 'pep_c'
 id = "PFK"
 name = "Phosphofructokinase"
 stoichiometry = {atp_c = -1, f6p_c = -1, adp_c = 1, fdp_c = 1}
-mechanism = "reversible_modular_rate_law"
 [[reactions.enzymes]]
 id = "PFKA"
 name = "Phosphofructokinase"
@@ -58,7 +56,6 @@ name = "Fructose-bisphosphatase"
 water_stoichiometry = -1
 enzymes = [{id = "FBP", name = "Fructose-bisphosphatase", gene = "fbp"}]
 stoichiometry = {f6p_c = 1, fdp_c = -1, pi_c = 1}
-mechanism = "reversible_modular_rate_law"
 
 [[reactions]]
 id = "FBA"
@@ -66,14 +63,12 @@ name = "Fructose-bisphosphate aldolase"
 enzymes = [{id = "FBAA", name = "Fructose-bisphosphate aldolase", gene = "fbaA"},
            {id = "FBAB", name = "Fructose-bisphosphate aldolase", gene = "fbaB"}]
 stoichiometry = {dhap_c = 1, fdp_c = -1, g3p_c = 1}
-mechanism = "reversible_modular_rate_law"
 
 [[reactions]]
 id = "TPI"
 name = "Triose-phosphate isomerase"
 enzymes = [{id = "TPIA", name = "Triose-phosphate isomerase", gene = "tpiA"}]
 stoichiometry = {dhap_c = -1, g3p_c = 1}
-mechanism = "reversible_modular_rate_law"
 
 [[drains]]
 id = "f6p_drain"

@@ -18,46 +18,63 @@
 import os
 from typing import Dict, List
 
-import arviz as az
 import plotnine as p9
 
 from maud import io
+from maud.analysis import load_infd
 
 
-HERE = os.path.dirname(os.path.abspath(__file__))
-HOME = os.path.join(HERE, "..")
-model_name = ""  # Toml name of file
-run_number = ""  # Number specific to each run, found between "-"
-PATHS = {
-    "data": os.path.join(
-        HOME, ""
-    ),  # Where the input toml file is stored, relative to the Maud folder
-    "results": os.path.join(
-        HOME, ""
-    ),  # The output directory, relative toe the Maud folder
-}
-CMDSTAN_FILE_TEMPLATE = os.path.join(
-    PATHS["results"], "inference_model-{run_number}-{i}.csv"
+MAUD_OUTPUT = os.path.join(
+    "..", "tests", "data", "example_outputs", "example_output_ecoli_small"
 )
-N_CHAINS = 4
+PLOT_DIR = "."
 VARIABLES_TO_ANALYSE = [
+    "kcat",
+    "kcat_phos",
+    "km",
+    "drain",
+    "ki",
+    "diss_t",
+    "diss_r",
+    "transfer_constant",
+    "conc_unbalanced",
+    "conc_enzyme",
+    "conc_phos",
     "conc",
     "flux",
     "keq",
-    "kcat",
-    "formation_energy",
-    "km",
-    "enzyme",
+    "dgf",
 ]
-LOG_SCALE_VARIABLES = ["conc", "keq", "kcat", "km", "enzyme"]
+
+LOG_SCALE_VARIABLES = [
+    "kcat",
+    "kcat_phos",
+    "km",
+    "ki",
+    "diss_t",
+    "diss_r",
+    "transfer_constant",
+    "conc_unbalanced",
+    "conc_enzyme",
+    "conc_phos",
+    "conc",
+]
 UNITS = {
+    "kcat": "1/s",
+    "kcat_phos": "1/s",
+    "km": "mM",
+    "drain": "mM/s",
+    "ki": "mM",
+    "diss_t": "mM",
+    "diss_r": "mM",
+    "transfer_constant": "",
+    "conc_unbalanced": "mM",
+    "conc_enzyme": "mM",
+    "conc_phos": "mM",
     "conc": "mM",
     "flux": "mM/s",
     "keq": "",
-    "kcat": "1/s",
-    "formation_energy": "kJ/mol",
-    "km": "mM",
-    "enzyme": "mM",
+    "dgf": "kJ/mmol",
 }
 
 
@@ -108,44 +125,30 @@ def plot_violin_plots(
 
 def main():
     """Plot posterior distributions of Maud model."""
-    files = [
-        CMDSTAN_FILE_TEMPLATE.format(run_number=run_number, i=str(i))
-        for i in range(1, N_CHAINS + 1)
+    csvs = [
+        os.path.join(MAUD_OUTPUT, "samples", f)
+        for f in os.listdir(os.path.join(MAUD_OUTPUT, "samples"))
+        if f.endswith(".csv")
     ]
-    mi = io.load_maud_input_from_toml(os.path.join(PATHS["data"], f"{model_name}.toml"))
-    infd = az.from_cmdstan(
-        files,
-        coords={
-            "mics": list(mi.stan_codes["metabolite_in_compartment"].keys()),
-            "mets": list(mi.stan_codes["metabolite"].keys()),
-            "kms": [f"{p.enzyme_id}_{p.mic_id}" for p in mi.priors["kms"]],
-            "enzymes": list(mi.stan_codes["enzyme"].keys()),
-            "reactions": list(mi.stan_codes["reaction"].keys()),
-            "experiments": list(mi.stan_codes["experiment"].keys()),
-        },
-        dims={
-            "conc": ["experiments", "mics"],
-            "flux": ["experiments", "reactions"],
-            "keq": ["enzymes"],
-            "kcat": ["enzymes"],
-            "formation_energy": ["mets"],
-            "km": ["kms"],
-            "enzyme": ["experiments", "enzymes"],
-        },
-    )
+    mi = io.load_maud_input_from_toml(os.path.join(MAUD_OUTPUT, "user_input"))
+    infd = load_infd(csvs, mi)
+    list_of_model_variables = list(infd.posterior.variables.keys())
     var_to_dims = {
-        var: list(infd.posterior[var].dims[2:]) for var in VARIABLES_TO_ANALYSE
+        var: list(infd.posterior[var].dims[2:])
+        for var in VARIABLES_TO_ANALYSE
+        if var in list_of_model_variables
     }
     var_to_draws = {
         var: infd.posterior[var].to_dataframe().reset_index()
         for var in VARIABLES_TO_ANALYSE
+        if var in list_of_model_variables
     }
-    for var in VARIABLES_TO_ANALYSE:
+    for var in list(var_to_dims.keys()):
         dims = var_to_dims[var]
         draws = var_to_draws[var]
         plot = plot_violin_plots(var, dims, draws, LOG_SCALE_VARIABLES, UNITS)
         plot.save(
-            filename=os.path.join(PATHS["results"], f"{var}_posterior.png"),
+            filename=os.path.join(PLOT_DIR, f"{var}_posterior.png"),
             verbose=False,
             dpi=300,
         )
