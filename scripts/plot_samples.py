@@ -51,6 +51,7 @@ LOG_SCALE_VARIABLES = [
     "kcat_phos",
     "km",
     "ki",
+    "keq",
     "diss_t",
     "diss_r",
     "transfer_constant",
