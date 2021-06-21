@@ -388,7 +388,7 @@ transformed parameters {
     for (j in 1:N_edge)
       flux[e, edge_to_reaction[j]] += flux_edge[j];
     }
-    if (squared_distance(conc_balanced[1], conc_balanced[2]) > 1){
+    if (sum((conc_balanced[1]-conc_balanced[2])./conc_balanced[2]) > 0.001){
       print("Balanced metabolite concentration at ", timepoint, " seconds is not steady.");
       print("Found ", conc_balanced[1], " at ", timepoint, " seconds and ",
             conc_balanced[2], " at ", timepoint + 10, " seconds.");
