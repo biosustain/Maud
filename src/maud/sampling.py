@@ -99,10 +99,12 @@ def _sample_given_config(
 
     input_filepath = os.path.join(output_dir, "input_data.json")
     inits_filepath = os.path.join(output_dir, "inits.json")
+    coords_filepath = os.path.join(output_dir, "coords.json")
     input_data = get_input_data(mi)
     inits = {k: v.values for k, v in mi.inits.items()}
     cmdstanpy.utils.jsondump(input_filepath, input_data)
     cmdstanpy.utils.jsondump(inits_filepath, inits)
+    cmdstanpy.utils.jsondump(coords_filepath, mi.stan_coords.__dict__)
     config["inits"] = inits_filepath
     stan_program_filepath = os.path.join(HERE, STAN_PROGRAM_RELATIVE_PATH)
     include_path = os.path.join(HERE, INCLUDE_PATH)
@@ -257,6 +259,7 @@ def get_config_dict(mi: MaudInput) -> dict:
     config = {
         **{
             "LIKELIHOOD": int(mi.config.likelihood),
+            "reject_non_steady": int(mi.config.reject_non_steady),
             "conc_init": _get_conc_init(mi).values,
         },
         **mi.config.ode_config,
