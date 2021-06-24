@@ -337,6 +337,7 @@ class MaudConfig:
     :param priors_file: path to a valid priors file.
     :param experiments_file: path to a valid experiments file.
     :param likelihood: Whether or not to take measurements into account.
+    :param reject_non_steady: Reject draws if a non-steady state is encountered.
     :param ode_config: Configuration for Stan's ode solver.
     :param cmdstanpy_config: Arguments to cmdstanpy.CmdStanModel.sample.
     :param user_inits_file: path to a csv file of initial values.
@@ -349,6 +350,7 @@ class MaudConfig:
         priors_file: str,
         experiments_file: str,
         likelihood: bool,
+        reject_non_steady: Optional[bool],
         ode_config: dict,
         cmdstanpy_config: dict,
         user_inits_file: Optional[str],
@@ -358,6 +360,7 @@ class MaudConfig:
         self.priors_file = priors_file
         self.experiments_file = experiments_file
         self.likelihood = likelihood
+        self.reject_non_steady = reject_non_steady
         self.ode_config = ode_config
         self.cmdstanpy_config = cmdstanpy_config
         self.user_inits_file = user_inits_file

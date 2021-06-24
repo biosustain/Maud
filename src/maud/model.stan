@@ -265,6 +265,7 @@ data {
   int solver_backward;
   int<lower=0,upper=1> LIKELIHOOD;  // set to 0 for priors-only mode
   real<lower=0> timepoint;
+  int<lower=0,upper=1> reject_non_steady;
 }
 transformed data {
   real initial_time = 0;
@@ -389,23 +390,23 @@ transformed parameters {
     for (j in 1:N_edge)
       flux[e, edge_to_reaction[j]] += flux_edge[j];
     }
-    if (check_steady_state(conc_balanced,
-                           e,
-                           flux[e],
-                           conc_init[e],
-                           timepoints,
-                           conc_unbalanced[e],
-                           conc_enzyme_experiment,
-                           km,
-                           drain[e],
-                           kcat,
-                           keq,
-                           ki,
-                           diss_t,
-                           diss_r,
-                           transfer_constant,
-                           kcat_phos,
-                           conc_phos_experiment) == 0) {
+    if (reject_non_steady == 1 && check_steady_state(conc_balanced,
+                                                     e,
+                                                     flux[e],
+                                                     conc_init[e],
+                                                     timepoints,
+                                                     conc_unbalanced[e],
+                                                     conc_enzyme_experiment,
+                                                     km,
+                                                     drain[e],
+                                                     kcat,
+                                                     keq,
+                                                     ki,
+                                                     diss_t,
+                                                     diss_r,
+                                                     transfer_constant,
+                                                     kcat_phos,
+                                                     conc_phos_experiment) == 0) {
       reject("Non-steady state in experiment ", e);
     }
   }

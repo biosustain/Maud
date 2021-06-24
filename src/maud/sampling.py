@@ -259,6 +259,7 @@ def get_config_dict(mi: MaudInput) -> dict:
     config = {
         **{
             "LIKELIHOOD": int(mi.config.likelihood),
+            "reject_non_steady": int(mi.config.reject_non_steady),
             "conc_init": _get_conc_init(mi).values,
         },
         **mi.config.ode_config,
