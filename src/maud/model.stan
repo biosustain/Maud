@@ -174,7 +174,7 @@ functions{
     current_concentration[unbalanced_ix] = unbalanced;
     vector[rows(S)] flux = get_flux(current_concentration,
                                     enz, km, drain, km_lookup, S, edge_type, edge_to_drain, edge_to_enzyme, kcat, keq,
-                         ix_ci, ix_ai, ix_aa, ix_pa, ix_pi, n_ci, n_ai, n_aa, n_pa, n_pi,
+                                    ix_ci, ix_ai, ix_aa, ix_pa, ix_pi, n_ci, n_ai, n_aa, n_pa, n_pi,
                                     ki, diss_t, diss_r, transfer_constant, subunits, kcat_phos, conc_phos);
     return (S * flux)[balanced_ix];
   }
@@ -306,13 +306,14 @@ transformed parameters {
   vector[N_edge] keq = get_keq(S, dgf, mic_to_met, water_stoichiometry);
   for (e in 1:N_experiment){
     flux[e] = rep_vector(0, N_reaction);
+    real timepoints[2] = {timepoint, timepoint + 10};
     vector[N_enzyme] conc_enzyme_experiment = conc_enzyme[e] .* knockout[e]';
     vector[N_phosphorylation_enzymes] conc_phos_experiment = conc_phos[e] .* phos_knockout[e]';
     vector[N_mic-N_unbalanced] conc_balanced[2] =
       ode_adjoint_tol_ctl(dbalanced_dt,
                   conc_init[e, balanced_mic_ix],
                   initial_time,
-                  {timepoint, timepoint + 10},
+                  timepoints,
                   rel_tol_forward, 
                   abs_tol_forward,
                   rel_tol_backward, 
@@ -388,23 +389,24 @@ transformed parameters {
     for (j in 1:N_edge)
       flux[e, edge_to_reaction[j]] += flux_edge[j];
     }
-    if (squared_distance(conc_balanced[1], conc_balanced[2]) > 1){
-      print("Balanced metabolite concentration at ", timepoint, " seconds is not steady.");
-      print("Found ", conc_balanced[1], " at ", timepoint, " seconds and ",
-            conc_balanced[2], " at ", timepoint + 10, " seconds.");
-    }
-    if (sum(conc[e]) > 100){
-      print("Metabolite concentration is really high in experiment ", e, ".");
-      print("metabolite concentration: ", conc[e]);
-      print("kcat: ", kcat);
-      print("km: ", km);
-      print("keq: ", keq);
-      print("flux: ", flux[e]);
-      print("enzyme concentration: ", conc_enzyme_experiment);
-      print("ki: ", ki);
-      print("tense dissociation constants: ", diss_t);
-      print("relaxed dissociation constants: ", diss_r);
-      print("transfer constants: ", transfer_constant);
+    if (check_steady_state(conc_balanced,
+                           e,
+                           flux[e],
+                           conc_init[e],
+                           timepoints,
+                           conc_unbalanced[e],
+                           conc_enzyme_experiment,
+                           km,
+                           drain[e],
+                           kcat,
+                           keq,
+                           ki,
+                           diss_t,
+                           diss_r,
+                           transfer_constant,
+                           kcat_phos,
+                           conc_phos_experiment) == 0) {
+      reject("Non-steady state in experiment ", e);
     }
   }
 }
