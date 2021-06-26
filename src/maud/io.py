@@ -95,7 +95,17 @@ def load_maud_input_from_toml(data_path: str) -> MaudInput:
         user_inits_path = os.path.join(data_path, config.user_inits_file)
     else:
         user_inits_path = None
+    if config.user_ode_state_inits_file is not None:
+        user_ode_state_inits = pd.read_csv(
+            os.path.join(data_path, config.user_ode_state_inits_file),
+            index_col="experiments",
+        )
+    else:
+        user_ode_state_inits = None
     inits = get_inits(prior_set, user_inits_path)
+    ode_state_inits = get_ode_state_inits(
+        stan_coords, prior_set, measurement_set, user_ode_state_inits
+    )
     mi = MaudInput(
         config=config,
         kinetic_model=kinetic_model,
@@ -103,9 +113,34 @@ def load_maud_input_from_toml(data_path: str) -> MaudInput:
         stan_coords=stan_coords,
         measurements=measurement_set,
         inits=inits,
+        ode_state_inits=ode_state_inits,
     )
     validation.validate_maud_input(mi)
     return mi
+
+
+def get_ode_state_inits(coords, priors, measurements, user_inits) -> pd.DataFrame:
+    """Get the initial mic concentrations for the ODE solver.
+
+    The initial concentration for a measured mic is the measured value.
+
+    The initial concentration for an unmeasured unbalanced mic in each
+    experiment is its prior mean.
+
+    The initial concentration for an unmeasured balanced mics is 0.01
+
+    :param mi: a MaudInput object
+
+    """
+    out = priors.priors_conc_unbalanced.location.reindex(columns=coords.mics).fillna(
+        0.01
+    )
+    for (exp_id, mic_id), value in measurements.yconc["measurement"].items():
+        out.loc[exp_id, mic_id] = value
+    if user_inits is not None:
+        for (exp_id, mic_id), value in user_inits.stack().items():
+            out.loc[exp_id, mic_id] = value
+    return out
 
 
 def parse_toml_kinetic_model(raw: dict) -> KineticModel:
@@ -588,6 +623,16 @@ def parse_config(raw):
     reject_non_steady: bool = (
         raw["reject_non_steady"] if "reject_non_steady" in raw.keys() else True
     )
+    steady_state_max_pct_change: float = (
+        raw["steady_state_max_pct_change"]
+        if "steady_state_max_pct_change" in raw.keys()
+        else 0.01
+    )
+    user_ode_state_inits_file = (
+        raw["user_ode_state_inits_file"]
+        if "user_ode_state_inits_file" in raw.keys()
+        else None
+    )
     return MaudConfig(
         name=raw["name"],
         kinetic_model_file=raw["kinetic_model"],
@@ -595,9 +640,11 @@ def parse_config(raw):
         experiments_file=raw["experiments"],
         likelihood=raw["likelihood"],
         reject_non_steady=reject_non_steady,
+        steady_state_max_pct_change=steady_state_max_pct_change,
         ode_config={**DEFAULT_ODE_CONFIG, **raw["ode_config"]},
         cmdstanpy_config=raw["cmdstanpy_config"],
         user_inits_file=user_inits_file,
+        user_ode_state_inits_file=user_ode_state_inits_file,
     )
 
 

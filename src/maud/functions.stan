@@ -151,7 +151,8 @@ int[] get_mics_for_edge(matrix S, int j, int edge_type){
   return out;
 }
 
-int check_steady_state(vector[] conc_balanced,
+int check_steady_state(real steady_state_max_pct_change,
+                       vector[] conc_balanced,
                        int e,
                        vector flux,
                        vector conc_init,
@@ -168,7 +169,7 @@ int check_steady_state(vector[] conc_balanced,
                        vector transfer_constant,
                        vector kcat_phos,
                        vector conc_phos_experiment){
-  if ((sum((conc_balanced[1]-conc_balanced[2])./conc_balanced[2]) > 0.001)){
+  if ((max(fabs(conc_balanced[1]-conc_balanced[2])./conc_balanced[2]) > steady_state_max_pct_change)){
     print("");
     print("Non-steady state in experiment ", e, ".");
     print("Balanced metabolite concentration at ", timepoints[1], " seconds: ", conc_balanced[1]);

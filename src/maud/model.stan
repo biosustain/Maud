@@ -266,6 +266,7 @@ data {
   int<lower=0,upper=1> LIKELIHOOD;  // set to 0 for priors-only mode
   real<lower=0> timepoint;
   int<lower=0,upper=1> reject_non_steady;
+  real<lower=0> steady_state_max_pct_change;
 }
 transformed data {
   real initial_time = 0;
@@ -390,7 +391,8 @@ transformed parameters {
     for (j in 1:N_edge)
       flux[e, edge_to_reaction[j]] += flux_edge[j];
     }
-    if (reject_non_steady == 1 && check_steady_state(conc_balanced,
+    if (reject_non_steady == 1 && check_steady_state(steady_state_max_pct_change,
+                                                     conc_balanced,
                                                      e,
                                                      flux[e],
                                                      conc_init[e],

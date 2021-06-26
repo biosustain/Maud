@@ -19,9 +19,11 @@
 from typing import Dict, List, Optional
 
 import pandas as pd
+from arviz.data.inference_data import InferenceData
 
 from maud.analysis import join_list_of_strings
-from maud.io import get_stan_coords
+from maud.data_model import MaudInput
+from maud.io import get_stan_coords, load_maud_input_from_toml
 
 
 PRIOR_FILE_COLUMNS = [
@@ -219,3 +221,17 @@ def get_inits_from_draw(infd, mi, chain, draw, warmup):
             init_column_list = ["parameter_name"] + list(par.coords.keys()) + ["value"]
             init_dataframe = init_dataframe.append(par_dataframe[init_column_list])
     return init_dataframe
+
+
+def get_ode_state_from_draw(
+    infd: InferenceData, mi: MaudInput, chain: int, draw: int, warmup: int
+):
+    ix_balanced = mi.stan_coords.balanced_mics
+    infd_group = infd.warmup_posterior if warmup == 1 else infd.posterior
+    return (
+        infd_group["conc"]
+        .sel(chain=chain, draw=draw)
+        .to_series()
+        .unstack("mics")
+        .loc[:, ix_balanced]
+    )

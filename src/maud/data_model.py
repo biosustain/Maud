@@ -329,6 +329,7 @@ class StanCoordSet:
     phos_ko_enzs: List[str]
 
 
+@dataclass
 class MaudConfig:
     """User's configuration for a Maud input.
 
@@ -338,32 +339,24 @@ class MaudConfig:
     :param experiments_file: path to a valid experiments file.
     :param likelihood: Whether or not to take measurements into account.
     :param reject_non_steady: Reject draws if a non-steady state is encountered.
+    :param steady_state_max_pct_change: Definition of non-steady state.
     :param ode_config: Configuration for Stan's ode solver.
     :param cmdstanpy_config: Arguments to cmdstanpy.CmdStanModel.sample.
     :param user_inits_file: path to a csv file of initial values.
+    :param user_ode_state_inits_file: path to a csv file of initial ode states.
     """
 
-    def __init__(
-        self,
-        name: str,
-        kinetic_model_file: str,
-        priors_file: str,
-        experiments_file: str,
-        likelihood: bool,
-        reject_non_steady: Optional[bool],
-        ode_config: dict,
-        cmdstanpy_config: dict,
-        user_inits_file: Optional[str],
-    ):
-        self.name = name
-        self.kinetic_model_file = kinetic_model_file
-        self.priors_file = priors_file
-        self.experiments_file = experiments_file
-        self.likelihood = likelihood
-        self.reject_non_steady = reject_non_steady
-        self.ode_config = ode_config
-        self.cmdstanpy_config = cmdstanpy_config
-        self.user_inits_file = user_inits_file
+    name: str
+    kinetic_model_file: str
+    priors_file: str
+    experiments_file: str
+    likelihood: bool
+    reject_non_steady: bool
+    steady_state_max_pct_change: float
+    ode_config: dict
+    cmdstanpy_config: dict
+    user_inits_file: Optional[str]
+    user_ode_state_inits_file: Optional[str]
 
 
 class MaudInput:
@@ -374,6 +367,7 @@ class MaudInput:
     :param stan_coords: a StanCoordSet object
     :param measurement_set: a list of Measurement objects
     :param inits: a dictionary of initial parameter values
+    :param ode_state_inits: a dataframe of initial ode state values
     """
 
     def __init__(
@@ -384,6 +378,7 @@ class MaudInput:
         stan_coords: StanCoordSet,
         measurements: MeasurementSet,
         inits: Dict[str, np.array],
+        ode_state_inits: Optional[pd.DataFrame],
     ):
         self.config = config
         self.kinetic_model = kinetic_model
@@ -391,6 +386,7 @@ class MaudInput:
         self.stan_coords = stan_coords
         self.measurements = measurements
         self.inits = inits
+        self.ode_state_inits = ode_state_inits
 
 
 class SimulationStudyOutput:

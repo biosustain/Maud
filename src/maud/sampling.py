@@ -210,7 +210,7 @@ def _get_km_lookup(mi: MaudInput) -> List[List[int]]:
     return out.values
 
 
-def _get_conc_init(mi: MaudInput) -> pd.DataFrame:
+def _get_ode_state_init(coords, priors, measurements, user_inits) -> pd.DataFrame:
     """Get the initial mic concentrations for the ODE solver.
 
     The initial concentration for a measured mic is the measured value.
@@ -223,12 +223,14 @@ def _get_conc_init(mi: MaudInput) -> pd.DataFrame:
     :param mi: a MaudInput object
 
     """
-    cs = mi.stan_coords
-    out = mi.priors.priors_conc_unbalanced.location.reindex(columns=cs.mics).fillna(
+    out = priors.priors_conc_unbalanced.location.reindex(columns=coords.mics).fillna(
         0.01
     )
-    for (exp_id, mic_id), value in mi.measurements.yconc["measurement"].items():
+    for (exp_id, mic_id), value in measurements.yconc["measurement"].items():
         out.loc[exp_id, mic_id] = value
+    if user_inits is not None:
+        for (exp_id, mic_id), value in user_inits.stack().items():
+            out.loc[exp_id, mic_id] = value
     return out
 
 
@@ -260,7 +262,8 @@ def get_config_dict(mi: MaudInput) -> dict:
         **{
             "LIKELIHOOD": int(mi.config.likelihood),
             "reject_non_steady": int(mi.config.reject_non_steady),
-            "conc_init": _get_conc_init(mi).values,
+            "steady_state_max_pct_change": float(mi.config.steady_state_max_pct_change),
+            "conc_init": mi.ode_state_inits.values,
         },
         **mi.config.ode_config,
     }
