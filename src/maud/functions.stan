@@ -168,7 +168,7 @@ int check_steady_state(vector[] conc_balanced,
                        vector transfer_constant,
                        vector kcat_phos,
                        vector conc_phos_experiment){
-  if ((sum((conc_balanced[1]-conc_balanced[2])./conc_balanced[2]) > 0.001)){
+  if ((max(fabs(conc_balanced[1]-conc_balanced[2])./conc_balanced[2]) > 0.001)){
     print("");
     print("Non-steady state in experiment ", e, ".");
     print("Balanced metabolite concentration at ", timepoints[1], " seconds: ", conc_balanced[1]);
