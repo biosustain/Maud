@@ -95,6 +95,7 @@ UNITS = {
 
 
 def get_dims_enz(par, parameter_coords, var_to_dims):
+    """Return dataframe with enzyme_id and parameter_ids."""
     par_dataframe = pd.DataFrame()
     for p in parameter_coords:
         if p.id == par:
