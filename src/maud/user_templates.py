@@ -160,6 +160,7 @@ def get_parameter_coords(scs):
             coords={"metabolite_id": scs.metabolites},
             infd_coord_list=["metabolites"],
         ),
+        Input_Coords(id="keq", coords={"edges": scs.edges}, infd_coord_list=["edges"]),
     ]
 
 
