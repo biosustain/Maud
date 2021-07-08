@@ -18,11 +18,11 @@
 import os
 from typing import Dict, List
 
+import matplotlib.pyplot as plt
+import numpy as np
 import pandas as pd
 import plotnine as p9
 import seaborn as sns
-import matplotlib.pyplot as plt
-import numpy as np
 
 from maud import io
 from maud.analysis import load_infd
@@ -195,14 +195,16 @@ def main():
         enz_par_df = pd.DataFrame()
         for par, par_df in enzyme_dims.items():
             par_draws = var_to_draws[par]
-            enz_dims = par_df[par_df["enzyme_id"] == enz][
-                "par_id"
-            ].to_list()
+            enz_dims = par_df[par_df["enzyme_id"] == enz]["par_id"].to_list()
             if len(enz_dims) > 0:
                 for par_ind in enz_dims:
                     tmp_enz_par_df = pd.DataFrame()
-                    tmp_enz_par_df = par_draws.loc[par_draws[var_to_dims[par][0]] == par_ind].copy()
-                    enz_par_df[par + "-" + par_ind] = np.log(tmp_enz_par_df[par].to_list())
+                    tmp_enz_par_df = par_draws.loc[
+                        par_draws[var_to_dims[par][0]] == par_ind
+                    ].copy()
+                    enz_par_df[par + "-" + par_ind] = np.log(
+                        tmp_enz_par_df[par].to_list()
+                    )
         sns.pairplot(enz_par_df)
         plt.savefig(f"{enz}_pairplot.png")
 
