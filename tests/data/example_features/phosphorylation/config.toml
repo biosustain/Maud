@@ -12,4 +12,4 @@ save_warmup = true
 
 [ode_config]
 max_num_steps = 1e9
-timepoint = 100
+timepoint = 1e3
