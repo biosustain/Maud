@@ -23,7 +23,7 @@ Constructing a suitable input
 
 In order to model this system with Maud, we first need to decide how to
 represent it, and some information about it, in `Maud's input format
-<usage/inputting.html>`.
+<usage/inputting.html>`_.
 
 The full input folder can be found in `Maud's GitHub repository
 <https://github.com/biosustain/Maud/blob/master/tests/data/ecoli_small>`_. The
@@ -200,7 +200,7 @@ Fitting the model
 
 We can fit the model from Maud's root directory by running the following
 command in a suitable python environment (see `here
-<usage/post_installation_usage.html>` for full details about how to run Maud).
+<usage/post_installation_usage.html>`_ for full details about how to run Maud).
 
 .. code-block:: bash
 
