@@ -18,10 +18,15 @@
 import os
 from typing import Dict, List
 
+import matplotlib.pyplot as plt
+import numpy as np
+import pandas as pd
 import plotnine as p9
+import seaborn as sns
 
 from maud import io
 from maud.analysis import load_infd
+from maud.user_templates import get_parameter_coords
 
 
 MAUD_OUTPUT = os.path.join(
@@ -44,6 +49,16 @@ VARIABLES_TO_ANALYSE = [
     "flux",
     "keq",
     "dgf",
+]
+
+ENZYME_GROUP = [
+    "kcat",
+    "keq",
+    "km",
+    "ki",
+    "transfer_constant",
+    "diss_t",
+    "diss_r",
 ]
 
 LOG_SCALE_VARIABLES = [
@@ -77,6 +92,24 @@ UNITS = {
     "keq": "",
     "dgf": "kJ/mmol",
 }
+
+
+def get_dims_enz(par, parameter_coords, var_to_dims):
+    """Return dataframe with enzyme_id and parameter_ids."""
+    par_dataframe = pd.DataFrame()
+    for p in parameter_coords:
+        if p.id == par:
+            if p.linking_list:
+                par_dataframe["par_id"] = list(p.linking_list.values())[0]
+                par_dataframe["enzyme_id"] = list(p.coords["enzyme_id"])
+            else:
+                if "enzyme_id" in p.coords.keys():
+                    par_dataframe["par_id"] = list(p.coords["enzyme_id"])
+                    par_dataframe["enzyme_id"] = list(p.coords["enzyme_id"])
+                elif "edges" in p.coords.keys():
+                    par_dataframe["par_id"] = list(p.coords["edges"])
+                    par_dataframe["enzyme_id"] = list(p.coords["edges"])
+    return par_dataframe
 
 
 def plot_violin_plots(
@@ -132,6 +165,7 @@ def main():
         if f.endswith(".csv")
     ]
     mi = io.load_maud_input_from_toml(os.path.join(MAUD_OUTPUT, "user_input"))
+    parameter_coords = get_parameter_coords(mi.stan_coords)
     infd = load_infd(csvs, mi)
     list_of_model_variables = list(infd.posterior.variables.keys())
     var_to_dims = {
@@ -144,6 +178,11 @@ def main():
         for var in VARIABLES_TO_ANALYSE
         if var in list_of_model_variables
     }
+    enzyme_dims = {
+        par: get_dims_enz(par, parameter_coords, var_to_dims)
+        for par in ENZYME_GROUP
+        if par in list_of_model_variables
+    }
     for var in list(var_to_dims.keys()):
         dims = var_to_dims[var]
         draws = var_to_draws[var]
@@ -153,6 +192,22 @@ def main():
             verbose=False,
             dpi=300,
         )
+    for enz in mi.stan_coords.enzymes:
+        enz_par_df = pd.DataFrame()
+        for par, par_df in enzyme_dims.items():
+            par_draws = var_to_draws[par]
+            enz_dims = par_df[par_df["enzyme_id"] == enz]["par_id"].to_list()
+            if len(enz_dims) > 0:
+                for par_ind in enz_dims:
+                    tmp_enz_par_df = pd.DataFrame()
+                    tmp_enz_par_df = par_draws.loc[
+                        par_draws[var_to_dims[par][0]] == par_ind
+                    ].copy()
+                    enz_par_df[par + "-" + par_ind] = np.log(
+                        tmp_enz_par_df[par].to_list()
+                    )
+        sns.pairplot(enz_par_df)
+        plt.savefig(f"{enz}_pairplot.png")
 
 
 if __name__ == "__main__":
