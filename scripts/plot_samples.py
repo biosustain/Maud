@@ -135,6 +135,7 @@ def plot_violin_plots(
     log_scale_variables: List[str],
     units: Dict[str, str],
     confidence_intervals,
+    measurements,
 ):
     """Plot and save violin plots of parsed distributions.
 
@@ -152,6 +153,7 @@ def plot_violin_plots(
         + p9.geom_violin(
             p9.aes(y=f"{par_id}", x=x, fill=fill),
             position="identity",
+            color="None",
             size=0.5,
             alpha=0.7,
             weight=0.7,
@@ -159,6 +161,21 @@ def plot_violin_plots(
         )
         + p9.labels.ylab(f"{par_id} {par_units}")
     )
+    if par_id in confidence_intervals.keys():
+        plot += p9.geoms.geom_errorbar(
+            p9.aes(x=x, ymin="lower_ci", ymax="upper_ci"), 
+            data=confidence_intervals[par_id],
+            width=0.1)
+    if par_id in measurements.keys():
+        if len(measurements[par_id])>0:
+            plot += p9.geoms.geom_point(
+                p9.aes(y="measurement", x=x),
+                data=measurements[par_id],
+                )
+    if len(dims) == 1:
+        plot += p9.themes.theme(
+            axis_text_x=p9.element_text(angle=70),
+            )
     if len(dims) > 1:
         plot += p9.facet_wrap(f"~{dims[1]}") + p9.themes.theme(
             panel_spacing_y=0.05,
@@ -169,12 +186,9 @@ def plot_violin_plots(
             axis_title_x=p9.element_blank(),
             axis_text_x=p9.element_blank(),
         )
-    if par_id in confidence_intervals.keys():
-        plot += p9.geoms.geom_errorbar(
-            p9.aes(x=x, ymin="lower_ci", ymax="upper_ci"), 
-            data=confidence_intervals[par_id])
     if par_id in log_scale_variables:
-        plot = plot + p9.scale_y_log10()
+        plot += p9.scale_y_log10()
+
     return plot
 
 
@@ -206,6 +220,7 @@ def main():
     }
     priors = mi.priors
     confidence_intervals = dict()
+    measurements = dict()
     for par in parameter_coords:
         if par.id in list_of_model_variables:
             if f"priors_{par.id}" in dir(priors):
@@ -240,12 +255,17 @@ def main():
                         par_dataframe["lower_ci"] = par_dataframe.apply(lambda x: x["location"] - 2 * x["scale"], axis=1)
                         par_dataframe["upper_ci"] = par_dataframe.apply(lambda x: x["location"] + 2 * x["scale"], axis=1)
                     confidence_intervals[par.id] = par_dataframe
+    for measurement_id, measurement_type in zip(["yconc", "yflux", "yenz"], ["conc", "flux", "conc_enzyme"]):
+        rename_columns = {"conc": "mics", "flux": "edges", "conc_enzyme": "enzymes"}
+        tmp_measurements = getattr(mi.measurements, measurement_id).reset_index()
+        tmp_measurements = tmp_measurements.rename(columns=({"experiment_id": "experiments", "target_id": measurement_type}))
+        tmp_measurements = tmp_measurements.rename(columns=(rename_columns))
+        measurements[measurement_type] = tmp_measurements
 
-    print(confidence_intervals)
     for var in list(var_to_dims.keys()):
         dims = var_to_dims[var]
         draws = var_to_draws[var]
-        plot = plot_violin_plots(var, dims, draws, LOG_SCALE_VARIABLES, UNITS, confidence_intervals)
+        plot = plot_violin_plots(var, dims, draws, LOG_SCALE_VARIABLES, UNITS, confidence_intervals, measurements)
         plot.save(
             filename=os.path.join(PLOT_DIR, f"{var}_posterior.png"),
             verbose=False,
