@@ -41,6 +41,7 @@ INCLUDE_PATH = ""
 DEFAULT_PRIOR_LOC_DRAIN = None
 DEFAULT_PRIOR_SCALE_DRAIN = None
 STAN_PROGRAM_RELATIVE_PATH = "model.stan"
+PPC_PROGRAM_RELATIVE_PATH = "posterior_predictive_model.stan"
 
 DEFAULT_SAMPLE_CONFIG = {
     "iter_warmup": 5,
@@ -107,6 +108,7 @@ def _sample_given_config(
     cmdstanpy.utils.jsondump(coords_filepath, mi.stan_coords.__dict__)
     config["inits"] = inits_filepath
     stan_program_filepath = os.path.join(HERE, STAN_PROGRAM_RELATIVE_PATH)
+    ppc_program_filepath = os.path.join(HERE, PPC_PROGRAM_RELATIVE_PATH)
     include_path = os.path.join(HERE, INCLUDE_PATH)
     cpp_options = {}
     stanc_options = {"include_paths": [include_path]}
@@ -118,7 +120,18 @@ def _sample_given_config(
         stanc_options=stanc_options,
         cpp_options=cpp_options,
     )
-    return model.sample(data=input_filepath, **config)
+    fit_model = model.sample(data=input_filepath, **config)
+    gq_model = cmdstanpy.CmdStanModel(
+        stan_file=ppc_program_filepath,
+        stanc_options=stanc_options,
+        cpp_options=cpp_options,
+        )
+    gq_samples = gq_model.generate_quantities(
+        data=input_filepath,
+        mcmc_sample=fit_model,
+        gq_output_dir="."
+        )
+    return fit_model
 
 
 def get_stoichiometry(mi: MaudInput) -> pd.DataFrame:
