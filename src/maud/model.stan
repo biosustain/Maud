@@ -275,17 +275,17 @@ transformed data {
 }
 parameters {
   vector[N_metabolite] dgf_z;
-  array[N_experiment] vector[N_drain] drain_z;
   vector[N_enzyme] log_kcat_z;
   vector[N_km] log_km_z;
   vector[N_phosphorylation_enzymes] log_kcat_phos_z;
-  array[N_experiment] vector[N_enzyme] log_conc_enzyme_z;
-  array[N_experiment] vector[N_phosphorylation_enzymes] log_conc_phos_z;
-  array[N_experiment] vector[N_unbalanced] log_conc_unbalanced_z;
   vector[N_ki] log_ki_z;
   vector[N_ai] log_diss_t_z;
   vector[N_aa] log_diss_r_z;
   vector[N_ae] log_transfer_constant_z;
+  array[N_experiment] vector[N_drain] drain_z;
+  array[N_experiment] vector[N_enzyme] log_conc_enzyme_z;
+  array[N_experiment] vector[N_phosphorylation_enzymes] log_conc_phos_z;
+  array[N_experiment] vector[N_unbalanced] log_conc_unbalanced_z;
 }
 transformed parameters {
   // rescale
