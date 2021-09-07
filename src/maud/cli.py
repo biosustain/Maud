@@ -84,6 +84,57 @@ def sample_command(data_path, output_dir):
     """Run the sample function as a click command."""
     click.echo(sample(data_path, output_dir))
 
+def ppc(samples_path, ppc_path, output_dir):
+    """Generate MCMC samples given a user input directory.
+
+    This function creates a new directory in output_dir with a name starting
+    with "maud_output". It first copies the directory at data_path into the new
+    this directory at new_dir/user_input, then runs the sampling.sample
+    function to write samples in new_dir/samples. Finally it prints the results
+    of cmdstanpy's diagnose and summary methods.
+
+    """
+    csvs = [
+        os.path.join(samples_path, "samples", f)
+        for f in os.listdir(os.path.join(samples_path, "samples"))
+        if f.endswith(".csv")
+    ]
+    mi = load_maud_input_from_toml(ppc_path)
+    now = datetime.now().strftime("%Y%m%d%H%M%S")
+    output_name = f"maud-ppc_output-{mi.config.name}-{now}"
+    output_path = os.path.join(output_dir, output_name)
+    ppc_samples_path = os.path.join(output_path, "samples")
+    ui_dir = os.path.join(output_path, "user_input")
+    posterior_draws_path = os.path.join(output_path, "posterior_draws")
+    print("Creating output directory: " + output_path)
+    os.mkdir(output_path)
+    os.mkdir(ppc_samples_path)
+    print(f"Copying user input from {ppc_path} to {ui_dir}")
+    shutil.copytree(ppc_path, ui_dir)
+    print(f"Copying posterior_draws from {samples_path} to {ui_dir}")
+    shutil.copytree(samples_path, posterior_draws_path)
+    stanfit = sampling.ppc(mi, csvs, ppc_samples_path)
+    return output_path
+
+
+@cli.command("ppc")
+@click.option("--output_dir", default=".", help="Where to save Maud's output")
+@click.option(
+    "--ppc_path",
+    type=click.Path(exists=True, dir_okay=True, file_okay=False),
+    help="Posterior samples from same model definition",
+)
+@click.argument(
+    "samples_path",
+    type=click.Path(exists=True, dir_okay=True, file_okay=False),
+    default=get_example_path(RELATIVE_PATH_EXAMPLE),
+)
+
+def ppc_command(samples_path, ppc_path, output_dir):
+    """Run the sample function as a click command."""
+    click.echo(ppc(samples_path, ppc_path, output_dir))
+
+
 
 def simulate(data_path, output_dir, n):
     """Generate draws from the prior mean."""
