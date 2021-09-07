@@ -77,6 +77,18 @@ def sample(mi: MaudInput, output_dir: str) -> cmdstanpy.CmdStanMCMC:
     }
     return _sample_given_config(mi, output_dir, config)
 
+def ppc(mi: MaudInput, csvs: List[str], output_dir: str) -> cmdstanpy.CmdStanMCMC:
+    """Sample from the posterior defined by mi.
+
+    :param mi: a MaudInput object
+    :param output_dir: a string specifying where to save the output.
+    """
+    config = {
+        **DEFAULT_SAMPLE_CONFIG,
+        **mi.config.cmdstanpy_config,
+        **{"output_dir": output_dir},
+    }
+    return _ppc_given_config(mi, csvs, output_dir, config)
 
 def simulate(mi: MaudInput, output_dir: str, n: int) -> cmdstanpy.CmdStanMCMC:
     """Generate simulations from the prior mean.
@@ -119,8 +131,29 @@ def _sample_given_config(
         stan_file=stan_program_filepath,
         stanc_options=stanc_options,
         cpp_options=cpp_options,
-    )
-    fit_model = model.sample(data=input_filepath, **config)
+        )
+    return model.sample(data=input_filepath, **config)
+
+def _ppc_given_config(
+    mi: MaudInput, csvs: List[str], output_dir: str, config: dict
+):
+    input_filepath = os.path.join(output_dir, "input_data.json")
+    inits_filepath = os.path.join(output_dir, "inits.json")
+    coords_filepath = os.path.join(output_dir, "coords.json")
+    input_data = get_input_data(mi)
+    inits = {k: v.values for k, v in mi.inits.items()}
+    cmdstanpy.utils.jsondump(input_filepath, input_data)
+    cmdstanpy.utils.jsondump(inits_filepath, inits)
+    cmdstanpy.utils.jsondump(coords_filepath, mi.stan_coords.__dict__)
+    config["inits"] = inits_filepath
+    ppc_program_filepath = os.path.join(HERE, PPC_PROGRAM_RELATIVE_PATH)
+    include_path = os.path.join(HERE, INCLUDE_PATH)
+    cpp_options = {}
+    stanc_options = {"include_paths": [include_path]}
+    print(input_filepath)
+    if config["threads_per_chain"] != 1:
+        cpp_options["STAN_THREADS"] = True
+        os.environ["STAN_NUM_THREADS"] = str(config["threads_per_chain"])
     gq_model = cmdstanpy.CmdStanModel(
         stan_file=ppc_program_filepath,
         stanc_options=stanc_options,
@@ -128,10 +161,11 @@ def _sample_given_config(
         )
     gq_samples = gq_model.generate_quantities(
         data=input_filepath,
-        mcmc_sample=fit_model,
-        gq_output_dir="."
+        mcmc_sample=csvs,
+        gq_output_dir=output_dir
         )
-    return fit_model
+    return
+
 
 
 def get_stoichiometry(mi: MaudInput) -> pd.DataFrame:
