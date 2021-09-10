@@ -260,11 +260,11 @@ parameters {
   vector[N_metabolite] dgf_z;
   vector[N_enzyme] log_kcat_z;
   vector[N_km] log_km_z;
-  vector[N_phosphorylation_enzymes] log_kcat_phos_z;
   vector[N_ki] log_ki_z;
   vector[N_ai] log_diss_t_z;
   vector[N_aa] log_diss_r_z;
   vector[N_ae] log_transfer_constant_z;
+  vector[N_phosphorylation_enzymes] log_kcat_phos_z;
 }
 transformed parameters {
   // rescale
