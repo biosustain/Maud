@@ -256,7 +256,7 @@ def main():
                         par_dataframe["upper_ci"] = par_dataframe.apply(lambda x: x["location"] + 2 * x["scale"], axis=1)
                     confidence_intervals[par.id] = par_dataframe
     for measurement_id, measurement_type in zip(["yconc", "yflux", "yenz"], ["conc", "flux", "conc_enzyme"]):
-        rename_columns = {"conc": "mics", "flux": "edges", "conc_enzyme": "enzymes"}
+        rename_columns = {"conc": "mics", "flux": "reactions", "conc_enzyme": "enzymes"}
         tmp_measurements = getattr(mi.measurements, measurement_id).reset_index()
         tmp_measurements = tmp_measurements.rename(columns=({"experiment_id": "experiments", "target_id": measurement_type}))
         tmp_measurements = tmp_measurements.rename(columns=(rename_columns))
