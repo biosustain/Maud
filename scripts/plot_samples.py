@@ -30,9 +30,7 @@ from maud.data_model import IndPrior1d
 from maud.user_templates import get_parameter_coords
 
 
-MAUD_OUTPUT = os.path.join(
-    "..", "maud_output-ecoli_small-20210811104019"
-)
+MAUD_OUTPUT = os.path.join("..", "maud_output-ecoli_small-20210811104019")
 PLOT_DIR = "."
 VARIABLES_TO_ANALYSE = [
     "kcat",
