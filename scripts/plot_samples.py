@@ -26,8 +26,8 @@ import seaborn as sns
 
 from maud import io
 from maud.analysis import load_infd
-from maud.user_templates import get_parameter_coords
 from maud.data_model import IndPrior1d
+from maud.user_templates import get_parameter_coords
 
 
 MAUD_OUTPUT = os.path.join(
@@ -112,6 +112,7 @@ def get_dims_enz(par, parameter_coords, var_to_dims):
                     par_dataframe["enzyme_id"] = list(p.coords["edges"])
     return par_dataframe
 
+
 def get_ci_1d(p):
     if p.parameter_name in LOG_SCALE_VARIABLES:
         mean = np.log(p.location.reset_index()["location"].values)
@@ -124,7 +125,6 @@ def get_ci_1d(p):
         lower_ci = mean - 2 * std
         upper_ci = mean + 2 * std
 
-    
     return lower_ci, upper_ci
 
 
@@ -163,19 +163,20 @@ def plot_violin_plots(
     )
     if par_id in confidence_intervals.keys():
         plot += p9.geoms.geom_errorbar(
-            p9.aes(x=x, ymin="lower_ci", ymax="upper_ci"), 
+            p9.aes(x=x, ymin="lower_ci", ymax="upper_ci"),
             data=confidence_intervals[par_id],
-            width=0.1)
+            width=0.1,
+        )
     if par_id in measurements.keys():
-        if len(measurements[par_id])>0:
+        if len(measurements[par_id]) > 0:
             plot += p9.geoms.geom_point(
                 p9.aes(y="measurement", x=x),
                 data=measurements[par_id],
-                )
+            )
     if len(dims) == 1:
         plot += p9.themes.theme(
             axis_text_x=p9.element_text(angle=70),
-            )
+        )
     if len(dims) > 1:
         plot += p9.facet_wrap(f"~{dims[1]}") + p9.themes.theme(
             panel_spacing_y=0.05,
@@ -226,14 +227,17 @@ def main():
             if f"priors_{par.id}" in dir(priors):
                 par_dataframe = pd.DataFrame.from_dict(par.coords)
                 if par.linking_list == None:
-                    coords_rename = {scs: infd_coord
-                                     for scs, infd_coord
-                                     in zip(list(par.coords.keys()),par.infd_coord_list)}
-                    par_dataframe = par_dataframe.rename(
-                        columns=(coords_rename)
-                    )
+                    coords_rename = {
+                        scs: infd_coord
+                        for scs, infd_coord in zip(
+                            list(par.coords.keys()), par.infd_coord_list
+                        )
+                    }
+                    par_dataframe = par_dataframe.rename(columns=(coords_rename))
                 else:
-                    par_dataframe[par.infd_coord_list[0]] = list(par.linking_list.values())[0]
+                    par_dataframe[par.infd_coord_list[0]] = list(
+                        par.linking_list.values()
+                    )[0]
                 par_dataframe["parameter_name"] = par.id
                 p = getattr(priors, f"priors_{par.id}")
                 if isinstance(p, IndPrior1d):
@@ -242,30 +246,66 @@ def main():
                     par_dataframe["upper_ci"] = upper_ci
                     confidence_intervals[par.id] = par_dataframe
                 else:
-                    location_df = p.location.unstack().reset_index().rename(columns=({0:"location"}))
-                    scale_df = p.scale.unstack().reset_index().rename(columns=({0:"scale"}))
-                    par_dataframe = par_dataframe.merge(location_df, left_on=par.infd_coord_list, right_on=list(par.coords.keys()))
+                    location_df = (
+                        p.location.unstack()
+                        .reset_index()
+                        .rename(columns=({0: "location"}))
+                    )
+                    scale_df = (
+                        p.scale.unstack().reset_index().rename(columns=({0: "scale"}))
+                    )
+                    par_dataframe = par_dataframe.merge(
+                        location_df,
+                        left_on=par.infd_coord_list,
+                        right_on=list(par.coords.keys()),
+                    )
                     par_dataframe = par_dataframe.drop(list(par.coords.keys()), axis=1)
-                    par_dataframe = par_dataframe.merge(scale_df, left_on=par.infd_coord_list, right_on=list(par.coords.keys()))
+                    par_dataframe = par_dataframe.merge(
+                        scale_df,
+                        left_on=par.infd_coord_list,
+                        right_on=list(par.coords.keys()),
+                    )
                     par_dataframe = par_dataframe.drop(list(par.coords.keys()), axis=1)
                     if par in LOG_SCALE_VARIABLES:
-                        par_dataframe["lower_ci"] = par_dataframe.apply(lambda x: np.exp(np.log(x["location"]) - 2 * x["scale"]), axis=1)
-                        par_dataframe["upper_ci"] = par_dataframe.apply(lambda x: np.exp(np.log(x["location"]) + 2 * x["scale"]), axis=1)
+                        par_dataframe["lower_ci"] = par_dataframe.apply(
+                            lambda x: np.exp(np.log(x["location"]) - 2 * x["scale"]),
+                            axis=1,
+                        )
+                        par_dataframe["upper_ci"] = par_dataframe.apply(
+                            lambda x: np.exp(np.log(x["location"]) + 2 * x["scale"]),
+                            axis=1,
+                        )
                     else:
-                        par_dataframe["lower_ci"] = par_dataframe.apply(lambda x: x["location"] - 2 * x["scale"], axis=1)
-                        par_dataframe["upper_ci"] = par_dataframe.apply(lambda x: x["location"] + 2 * x["scale"], axis=1)
+                        par_dataframe["lower_ci"] = par_dataframe.apply(
+                            lambda x: x["location"] - 2 * x["scale"], axis=1
+                        )
+                        par_dataframe["upper_ci"] = par_dataframe.apply(
+                            lambda x: x["location"] + 2 * x["scale"], axis=1
+                        )
                     confidence_intervals[par.id] = par_dataframe
-    for measurement_id, measurement_type in zip(["yconc", "yflux", "yenz"], ["conc", "flux", "conc_enzyme"]):
+    for measurement_id, measurement_type in zip(
+        ["yconc", "yflux", "yenz"], ["conc", "flux", "conc_enzyme"]
+    ):
         rename_columns = {"conc": "mics", "flux": "reactions", "conc_enzyme": "enzymes"}
         tmp_measurements = getattr(mi.measurements, measurement_id).reset_index()
-        tmp_measurements = tmp_measurements.rename(columns=({"experiment_id": "experiments", "target_id": measurement_type}))
+        tmp_measurements = tmp_measurements.rename(
+            columns=({"experiment_id": "experiments", "target_id": measurement_type})
+        )
         tmp_measurements = tmp_measurements.rename(columns=(rename_columns))
         measurements[measurement_type] = tmp_measurements
 
     for var in list(var_to_dims.keys()):
         dims = var_to_dims[var]
         draws = var_to_draws[var]
-        plot = plot_violin_plots(var, dims, draws, LOG_SCALE_VARIABLES, UNITS, confidence_intervals, measurements)
+        plot = plot_violin_plots(
+            var,
+            dims,
+            draws,
+            LOG_SCALE_VARIABLES,
+            UNITS,
+            confidence_intervals,
+            measurements,
+        )
         plot.save(
             filename=os.path.join(PLOT_DIR, f"{var}_posterior.png"),
             verbose=False,
