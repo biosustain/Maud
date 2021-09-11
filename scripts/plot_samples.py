@@ -30,7 +30,9 @@ from maud.data_model import IndPrior1d
 from maud.user_templates import get_parameter_coords
 
 
-MAUD_OUTPUT = os.path.join("..", "maud_output-ecoli_small-20210811104019")
+MAUD_OUTPUT = os.path.join(
+    "..", "tests", "data", "example_outputs", "example_output_ecoli_small"
+)
 PLOT_DIR = "."
 VARIABLES_TO_ANALYSE = [
     "kcat",
@@ -112,6 +114,7 @@ def get_dims_enz(par, parameter_coords, var_to_dims):
 
 
 def get_ci_1d(p):
+    """Return lower and upper CI given 1d prior."""
     if p.parameter_name in LOG_SCALE_VARIABLES:
         mean = np.log(p.location.reset_index()["location"].values)
         std = p.scale.reset_index()["scale"].values
@@ -193,6 +196,7 @@ def plot_violin_plots(
 
 def main():
     """Plot posterior distributions of Maud model."""
+    # Collecting information from draws and maud input
     csvs = [
         os.path.join(MAUD_OUTPUT, "samples", f)
         for f in os.listdir(os.path.join(MAUD_OUTPUT, "samples"))
@@ -220,11 +224,12 @@ def main():
     priors = mi.priors
     confidence_intervals = dict()
     measurements = dict()
+    # Retriving priors with confidence intervals (CIs)
     for par in parameter_coords:
         if par.id in list_of_model_variables:
             if f"priors_{par.id}" in dir(priors):
                 par_dataframe = pd.DataFrame.from_dict(par.coords)
-                if par.linking_list == None:
+                if par.linking_list is None:
                     coords_rename = {
                         scs: infd_coord
                         for scs, infd_coord in zip(
@@ -281,6 +286,7 @@ def main():
                             lambda x: x["location"] + 2 * x["scale"], axis=1
                         )
                     confidence_intervals[par.id] = par_dataframe
+    # Retriving mean of measurement
     for measurement_id, measurement_type in zip(
         ["yconc", "yflux", "yenz"], ["conc", "flux", "conc_enzyme"]
     ):
@@ -291,7 +297,7 @@ def main():
         )
         tmp_measurements = tmp_measurements.rename(columns=(rename_columns))
         measurements[measurement_type] = tmp_measurements
-
+    # Plotting violin plots from parameter distributions
     for var in list(var_to_dims.keys()):
         dims = var_to_dims[var]
         draws = var_to_draws[var]
@@ -309,6 +315,7 @@ def main():
             verbose=False,
             dpi=300,
         )
+    # plotting pairplots of enzyme parameters
     for enz in mi.stan_coords.enzymes:
         enz_par_df = pd.DataFrame()
         for par, par_df in enzyme_dims.items():
