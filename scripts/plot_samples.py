@@ -326,7 +326,6 @@ def main():
                         tmp_enz_par_df[par].to_list()
                     )
         sns.pairplot(enz_par_df)
-
         plt.savefig(f"{enz}_pairplot.png")
 
 
