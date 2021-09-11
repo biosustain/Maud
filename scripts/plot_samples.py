@@ -311,23 +311,23 @@ def main():
             verbose=False,
             dpi=300,
         )
-    # for enz in mi.stan_coords.enzymes:
-    #     enz_par_df = pd.DataFrame()
-    #     for par, par_df in enzyme_dims.items():
-    #         par_draws = var_to_draws[par]
-    #         enz_dims = par_df[par_df["enzyme_id"] == enz]["par_id"].to_list()
-    #         if len(enz_dims) > 0:
-    #             for par_ind in enz_dims:
-    #                 tmp_enz_par_df = pd.DataFrame()
-    #                 tmp_enz_par_df = par_draws.loc[
-    #                     par_draws[var_to_dims[par][0]] == par_ind
-    #                 ].copy()
-    #                 enz_par_df[par + "-" + par_ind] = np.log(
-    #                     tmp_enz_par_df[par].to_list()
-    #                 )
-    #     sns.pairplot(enz_par_df)
+    for enz in mi.stan_coords.enzymes:
+        enz_par_df = pd.DataFrame()
+        for par, par_df in enzyme_dims.items():
+            par_draws = var_to_draws[par]
+            enz_dims = par_df[par_df["enzyme_id"] == enz]["par_id"].to_list()
+            if len(enz_dims) > 0:
+                for par_ind in enz_dims:
+                    tmp_enz_par_df = pd.DataFrame()
+                    tmp_enz_par_df = par_draws.loc[
+                        par_draws[var_to_dims[par][0]] == par_ind
+                    ].copy()
+                    enz_par_df[par + "-" + par_ind] = np.log(
+                        tmp_enz_par_df[par].to_list()
+                    )
+        sns.pairplot(enz_par_df)
 
-    #     plt.savefig(f"{enz}_pairplot.png")
+        plt.savefig(f"{enz}_pairplot.png")
 
 
 if __name__ == "__main__":
