@@ -17,6 +17,7 @@
 """Code for sampling from a posterior distribution."""
 
 import itertools
+import json
 import os
 import warnings
 from typing import Dict, List, Union
@@ -115,9 +116,10 @@ def _sample_given_config(
     coords_filepath = os.path.join(output_dir, "coords.json")
     input_data = get_input_data(mi)
     inits = {k: v.values for k, v in mi.inits.items()}
-    cmdstanpy.utils.jsondump(input_filepath, input_data)
-    cmdstanpy.utils.jsondump(inits_filepath, inits)
-    cmdstanpy.utils.jsondump(coords_filepath, mi.stan_coords.__dict__)
+    cmdstanpy.utils.write_stan_json(input_filepath, input_data)
+    cmdstanpy.utils.write_stan_json(inits_filepath, inits)
+    with open(coords_filepath, "w") as f:
+        json.dump(mi.stan_coords.__dict__, f)
     config["inits"] = inits_filepath
     stan_program_filepath = os.path.join(HERE, STAN_PROGRAM_RELATIVE_PATH)
     ppc_program_filepath = os.path.join(HERE, PPC_PROGRAM_RELATIVE_PATH)
