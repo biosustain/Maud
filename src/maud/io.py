@@ -520,6 +520,7 @@ def extract_2d_prior(
         )
         .rename(columns={0: "location", 1: "scale"})
     )
+    pct_params["location"] = np.exp(pct_params["location"])
     out[["location", "scale"]] = out[["location", "scale"]].fillna(pct_params)
     location, scale = (
         out[col]
