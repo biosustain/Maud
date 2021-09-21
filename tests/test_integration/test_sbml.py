@@ -1,6 +1,6 @@
 from pathlib import Path
 
-from maud.sbml_compat import SBMLModelParser, MaudModelBuilder
+from maud.sbml_compat import MaudModelBuilder, SBMLModelParser
 
 
 data_dir = Path(__file__).parent.parent / "data"
