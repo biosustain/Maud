@@ -25,7 +25,7 @@ import toml
 
 from maud import sampling
 from maud.analysis import load_infd
-from maud.io import load_maud_input_from_toml, parse_config, parse_toml_kinetic_model
+from maud.io import load_maud_input, parse_config, parse_toml_kinetic_model
 from maud.user_templates import get_inits_from_draw, get_prior_template
 
 
@@ -56,7 +56,7 @@ def sample(data_path, output_dir):
     of cmdstanpy's diagnose and summary methods.
 
     """
-    mi = load_maud_input_from_toml(data_path)
+    mi = load_maud_input(data_path)
     now = datetime.now().strftime("%Y%m%d%H%M%S")
     output_name = f"maud_output-{mi.config.name}-{now}"
     output_path = os.path.join(output_dir, output_name)
@@ -90,7 +90,7 @@ def sample_command(data_path, output_dir):
 def simulate(data_path, output_dir, n):
     """Generate draws from the prior mean."""
 
-    mi = load_maud_input_from_toml(data_path)
+    mi = load_maud_input(data_path)
     now = datetime.now().strftime("%Y%m%d%H%M%S")
     output_name = f"maud_output_sim-{mi.config.name}-{now}"
     output_path = os.path.join(output_dir, output_name)
@@ -180,7 +180,7 @@ def generate_inits(data_path, chain, draw, warmup):
         for f in os.listdir(os.path.join(data_path, "samples"))
         if f.endswith(".csv")
     ]
-    mi = load_maud_input_from_toml(os.path.join(data_path, "user_input"))
+    mi = load_maud_input(os.path.join(data_path, "user_input"))
     infd = load_infd(csvs, mi)
     output_name = "generated_inits.csv"
     output_path = os.path.join(data_path, output_name)

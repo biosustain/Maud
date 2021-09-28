@@ -1,0 +1,89 @@
+import argparse
+import os
+from typing import Tuple
+
+import numpy as np
+import pandas as pd
+from equilibrator_api import ComponentContribution
+from equilibrator_cache.models.compound import Compound
+
+from maud.data_model import MaudInput
+from maud.io import load_maud_input
+
+
+HELP_MSG = """
+
+    Use equilibrator to get a mean vector and covariance matrix for
+    the formation energies of the metabolites of the kinetic model defined at
+    maud_input_dir.
+
+    Make sure that the metabolites-in-compartments in the kinetic model file
+    have values in the field "metabolite_id" that equilibrator can recognise -
+    otherwise this script will raise an error.
+
+"""
+
+
+def get_dgf_priors(mi: MaudInput) -> Tuple[pd.Series, pd.DataFrame]:
+    cc = ComponentContribution()
+    mu = []
+    sigmas_fin = []
+    sigmas_inf = []
+    met_ids = [m.id for m in mi.kinetic_model.metabolites]
+    external_ids = {m.id: m.external_id for m in mi.kinetic_model.metabolites}
+    met_ix = pd.Index(met_ids, name="metabolite")
+    for met_id in met_ids:
+        external_id = external_ids[met_id]
+        if external_id is None:
+            raise ValueError(f"metabolite {met_id} has no external id.")
+        c = cc.get_compound(external_id)
+        if type(c) is Compound:
+            mu_c, sigma_fin_c, sigma_inf_c = cc.standard_dg_formation(c)
+            mu.append(mu_c)
+            sigmas_fin.append(sigma_fin_c)
+            sigmas_inf.append(sigma_inf_c)
+        else:
+            raise ValueError(
+                f"cannot find compound for metabolite {met_id}"
+                f" with external id {external_id}."
+            )
+    sigmas_fin = np.array(sigmas_fin)
+    sigmas_inf = np.array(sigmas_inf)
+    cov = sigmas_fin @ sigmas_fin.T + 1e6 * sigmas_inf @ sigmas_inf.T
+    return (
+        pd.Series(mu, index=met_ix, name="prior_mean_dgf").round(10),
+        pd.DataFrame(cov, index=met_ix, columns=met_ix).round(10),
+    )
+
+
+def main():
+    parser = argparse.ArgumentParser(description="Get the input directory")
+    parser.add_argument("maud_input_dir", type=str, nargs=1, help=HELP_MSG)
+    maud_input_dir = parser.parse_args().maud_input_dir[0]
+    if os.path.exists(maud_input_dir):
+        mi = load_maud_input(maud_input_dir)
+        mu, cov = get_dgf_priors(mi)
+        print("Prior mean vector:")
+        print(mu)
+        print("Prior covariance:")
+        print(cov)
+        mu.to_csv(os.path.join(maud_input_dir, "dgf_prior_mean_equilibrator.csv"))
+        cov.to_csv(os.path.join(maud_input_dir, "dgf_prior_cov_equilibrator.csv"))
+    else:
+        raise ValueError(f"{maud_input_dir} is not a valid path.")
+
+
+if __name__ == "__main__":
+    main()
+
+
+# cids = ["kegg:C01182", "kegg:C00011", "kegg:C00001", "kegg:C00197"]
+
+# mus, sigmas_fin, sigmas_inf = map(
+#     np.array, zip(*[cc.standard_dg_formation(cc.get_compound(cid)) for cid in cids])
+# )
+# cov_dgf = sigmas_fin @ sigmas_fin.T + 1e6 * sigmas_inf @ sigmas_inf.T
+
+# print(cov_dgf)
+
+# print(np.random.multivariate_normal(mus, cov_dgf, 10))

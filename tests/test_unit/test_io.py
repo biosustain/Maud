@@ -9,7 +9,7 @@ here = os.path.dirname(__file__)
 data_path = os.path.join(here, "../data")
 
 
-def test_load_maud_input_from_toml():
+def test_load_maud_input():
     """Test that the function load_maud_input_from_toml behaves as expected."""
     expected_stan_coords = {
         "metabolites": ["M1", "M2"],
@@ -22,7 +22,7 @@ def test_load_maud_input_from_toml():
         "phos_enzs": [],
         "drains": [],
     }
-    mi = io.load_maud_input_from_toml(os.path.join(data_path, "linear"))
+    mi = io.load_maud_input(os.path.join(data_path, "linear"))
     r1 = [r for r in mi.kinetic_model.reactions if r.id == "r1"][0]
     assert r1.stoichiometry == {"M1_e": -1, "M1_c": 1}
     assert "r1" in mi.priors.priors_kcat.location.reset_index()["enzyme_id"].values

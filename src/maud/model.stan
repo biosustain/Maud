@@ -216,7 +216,8 @@ data {
   real yenz[N_enzyme_measurement];
   vector<lower=0>[N_enzyme_measurement] sigma_enz;
   // hardcoded priors
-  array[2] vector[N_metabolite] priors_dgf;
+  vector[N_metabolite] prior_loc_dgf;
+  cov_matrix[N_metabolite] prior_cov_dgf;
   array[2] vector[N_enzyme] priors_kcat;
   array[2] vector[N_km] priors_km;
   array[2] vector[N_ki] priors_ki;
@@ -274,7 +275,7 @@ transformed data {
     rep_matrix(1, N_experiment, N_phosphorylation_enzymes) - is_phos_knockout;
 }
 parameters {
-  vector[N_metabolite] dgf_z;
+  vector[N_metabolite] dgf;
   array[N_experiment] vector[N_drain] drain_z;
   vector[N_enzyme] log_kcat_z;
   vector[N_km] log_km_z;
@@ -289,7 +290,6 @@ parameters {
 }
 transformed parameters {
   // rescale
-  vector[N_metabolite] dgf = unz_1d(priors_dgf, dgf_z);
   vector[N_km] km = unz_log_1d(priors_km, log_km_z);
   vector[N_ki] ki = unz_log_1d(priors_ki, log_ki_z);
   vector[N_enzyme] kcat = unz_log_1d(priors_kcat, log_kcat_z);
@@ -418,7 +418,7 @@ model {
   log_diss_t_z ~ std_normal();
   log_diss_r_z ~ std_normal();
   log_transfer_constant_z ~ std_normal();
-  dgf_z ~ std_normal();
+  dgf ~ multi_normal(prior_loc_dgf, prior_cov_dgf);
   log_kcat_phos_z ~ std_normal();
   for (ex in 1:N_experiment){
     log_conc_unbalanced_z[ex] ~ std_normal();

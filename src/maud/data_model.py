@@ -23,6 +23,7 @@ from typing import Dict, List, Optional
 import numpy as np
 import pandas as pd
 from cmdstanpy import CmdStanMCMC
+from numpy.linalg.linalg import LinAlgError
 
 
 class Compartment:
@@ -44,11 +45,13 @@ class Metabolite:
 
     :param id: metabolite id, use a BiGG id if possible.
     :param name: metabolite name.
+    :param external_id: metabolite name.
     """
 
-    def __init__(self, id: str, name: str = None):
+    def __init__(self, id: str, name: str = None, external_id: str = None):
         self.id = id
         self.name = name if name is not None else id
+        self.external_id = external_id if external_id is not None else None
 
 
 class MetaboliteInCompartment:
@@ -273,13 +276,33 @@ class IndPrior2d:
 
 
 @dataclass
+class MultiVariateNormalPrior1d:
+    """a location vector and covariance matrix prior for a 1-dimensional parameter."""
+
+    parameter_name: str
+    location: pd.Series
+    covariance_matrix: pd.DataFrame
+
+    def __post_init__(self):
+        """Check that indexes match, and that covariance matrix is valid."""
+        if not self.location.index.equals(self.covariance_matrix.index):
+            raise ValueError("Location index doesn't match scale index.")
+        if not self.location.index.equals(self.covariance_matrix.columns):
+            raise ValueError("Location columns don't match scale columns.")
+        try:
+            np.linalg.cholesky(self.covariance_matrix.values)
+        except LinAlgError as e:
+            raise ValueError("Covariance matrix is not positive definite") from e
+
+
+@dataclass
 class PriorSet:
     """Object containing all priors for a MaudInput."""
 
     priors_kcat: IndPrior1d
     priors_kcat_phos: IndPrior1d
     priors_km: IndPrior1d
-    priors_dgf: IndPrior1d
+    priors_dgf: MultiVariateNormalPrior1d
     priors_ki: IndPrior1d
     priors_diss_t: IndPrior1d
     priors_diss_r: IndPrior1d
@@ -341,6 +364,8 @@ class MaudConfig:
     :param ode_config: Configuration for Stan's ode solver.
     :param cmdstanpy_config: Arguments to cmdstanpy.CmdStanModel.sample.
     :param user_inits_file: path to a csv file of initial values.
+    :param dgf_mean_file: path to a csv file of formation energy means.
+    :param dgf_covariance_file: path to a csv file of formation energy covariances.
     """
 
     def __init__(
@@ -354,6 +379,8 @@ class MaudConfig:
         ode_config: dict,
         cmdstanpy_config: dict,
         user_inits_file: Optional[str],
+        dgf_mean_file: Optional[str],
+        dgf_covariance_file: Optional[str],
     ):
         self.name = name
         self.kinetic_model_file = kinetic_model_file
@@ -364,6 +391,8 @@ class MaudConfig:
         self.ode_config = ode_config
         self.cmdstanpy_config = cmdstanpy_config
         self.user_inits_file = user_inits_file
+        self.dgf_mean_file = dgf_mean_file
+        self.dgf_covariance_file = dgf_covariance_file
 
 
 class MaudInput:
