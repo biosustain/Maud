@@ -21,7 +21,7 @@
 """
 
 import os
-from typing import Dict, List, Optional, Tuple, Union
+from typing import Dict, List, Optional, Union
 
 import numpy as np
 import pandas as pd
@@ -568,16 +568,16 @@ def parse_priors(
 
     :param raw: result of running pd.read_csv on a suitable file
     """
-    met_ix = pd.Index(cs.metabolites)
+    met_ix = pd.Index(cs.metabolites, name="metabolite")
     if len(dgf_loc) > 0 and len(dgf_cov) > 0:
-        l = pd.Series(dgf_loc.reindex(met_ix))
-        c = dgf_cov.reindex(met_ix, axis=0).reindex(met_ix, axis=1)
+        loc = pd.Series(dgf_loc.reindex(met_ix))
+        cov = dgf_cov.reindex(met_ix, axis=0).reindex(met_ix, axis=1)
     else:
         dgf_prior_1d = extract_1d_prior(raw, "dgf", [cs.metabolites])
-        l = dgf_prior_1d.location
-        c = pd.DataFrame(np.diag(dgf_prior_1d.scale), index=met_ix, columns=met_ix)
+        loc = dgf_prior_1d.location
+        cov = pd.DataFrame(np.diag(dgf_prior_1d.scale), index=met_ix, columns=met_ix)
     priors_dgf = MultiVariateNormalPrior1d(
-        parameter_name="dgf", location=l, covariance_matrix=c
+        parameter_name="dgf", location=loc, covariance_matrix=cov
     )
     return PriorSet(
         # 1d priors

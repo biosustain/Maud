@@ -1,3 +1,5 @@
+"""Fetch multivariate formation energy priors from equilibrator."""
+
 import argparse
 import os
 from typing import Tuple
@@ -25,14 +27,21 @@ HELP_MSG = """
 
 
 def get_dgf_priors(mi: MaudInput) -> Tuple[pd.Series, pd.DataFrame]:
+    """Given a Maud input, get a multivariate prior from equilibrator.
+
+    Returns a pandas Series of prior means and a pandas DataFrame of
+    covariances. Both are indexed by metabolite ids.
+
+    :param mi: A MaudInput object
+
+    """
     cc = ComponentContribution()
     mu = []
     sigmas_fin = []
     sigmas_inf = []
-    met_ids = [m.id for m in mi.kinetic_model.metabolites]
     external_ids = {m.id: m.external_id for m in mi.kinetic_model.metabolites}
-    met_ix = pd.Index(met_ids, name="metabolite")
-    for met_id in met_ids:
+    met_ix = pd.Index(mi.stan_coords.metabolites, name="metabolite")
+    for met_id in met_ix:
         external_id = external_ids[met_id]
         if external_id is None:
             raise ValueError(f"metabolite {met_id} has no external id.")
@@ -57,6 +66,7 @@ def get_dgf_priors(mi: MaudInput) -> Tuple[pd.Series, pd.DataFrame]:
 
 
 def main():
+    """Run the script."""
     parser = argparse.ArgumentParser(description="Get the input directory")
     parser.add_argument("maud_input_dir", type=str, nargs=1, help=HELP_MSG)
     maud_input_dir = parser.parse_args().maud_input_dir[0]
@@ -75,15 +85,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-
-
-# cids = ["kegg:C01182", "kegg:C00011", "kegg:C00001", "kegg:C00197"]
-
-# mus, sigmas_fin, sigmas_inf = map(
-#     np.array, zip(*[cc.standard_dg_formation(cc.get_compound(cid)) for cid in cids])
-# )
-# cov_dgf = sigmas_fin @ sigmas_fin.T + 1e6 * sigmas_inf @ sigmas_inf.T
-
-# print(cov_dgf)
-
-# print(np.random.multivariate_normal(mus, cov_dgf, 10))
