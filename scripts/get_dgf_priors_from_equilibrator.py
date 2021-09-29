@@ -46,7 +46,7 @@ def get_dgf_priors(mi: MaudInput) -> Tuple[pd.Series, pd.DataFrame]:
         if external_id is None:
             raise ValueError(f"metabolite {met_id} has no external id.")
         c = cc.get_compound(external_id)
-        if type(c) is Compound:
+        if isinstance(c, Compound):
             mu_c, sigma_fin_c, sigma_inf_c = cc.standard_dg_formation(c)
             mu.append(mu_c)
             sigmas_fin.append(sigma_fin_c)
