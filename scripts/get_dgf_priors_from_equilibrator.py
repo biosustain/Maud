@@ -1,4 +1,10 @@
-"""Fetch multivariate formation energy priors from equilibrator."""
+"""Fetch multivariate formation energy priors from equilibrator.
+
+NB: This script depends on the python packages equilibrator_api and
+equilibrator_cache: make sure you have those installed in your python
+environment!
+
+"""
 
 import argparse
 import os
@@ -20,8 +26,12 @@ HELP_MSG = """
     maud_input_dir.
 
     Make sure that the metabolites-in-compartments in the kinetic model file
-    have values in the field "metabolite_id" that equilibrator can recognise -
-    otherwise this script will raise an error.
+    have values in the field "metabolite_external_id" that equilibrator can
+    recognise - otherwise this script will raise an error.
+
+    NB: This script depends on the python packages equilibrator_api and
+    equilibrator_cache: make sure you have those installed in your python
+    environment!
 
 """
 
@@ -67,8 +77,10 @@ def get_dgf_priors(mi: MaudInput) -> Tuple[pd.Series, pd.DataFrame]:
 
 def main():
     """Run the script."""
-    parser = argparse.ArgumentParser(description="Get the input directory")
-    parser.add_argument("maud_input_dir", type=str, nargs=1, help=HELP_MSG)
+    parser = argparse.ArgumentParser(description=HELP_MSG)
+    parser.add_argument(
+        "maud_input_dir", type=str, nargs=1, help="A path to a Maud input directory"
+    )
     maud_input_dir = parser.parse_args().maud_input_dir[0]
     if os.path.exists(maud_input_dir):
         mi = load_maud_input(maud_input_dir)
