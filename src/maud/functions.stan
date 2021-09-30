@@ -150,3 +150,46 @@ int[] get_mics_for_edge(matrix S, int j, int edge_type){
   }
   return out;
 }
+
+int check_steady_state(vector[] conc_balanced,
+                       int e,
+                       vector flux,
+                       vector conc_init,
+                       real[] timepoints,
+                       vector conc_unbalanced,
+                       vector conc_enzyme_experiment,
+                       vector km,
+                       vector drain,
+                       vector kcat,
+                       vector keq,
+                       vector ki,
+                       vector diss_t,
+                       vector diss_r,
+                       vector transfer_constant,
+                       vector kcat_phos,
+                       vector conc_phos_experiment){
+  if ((max(fabs(conc_balanced[1]-conc_balanced[2])./conc_balanced[2]) > 0.001)){
+    print("");
+    print("Non-steady state in experiment ", e, ".");
+    print("Balanced metabolite concentration at ", timepoints[1], " seconds: ", conc_balanced[1]);
+    print("Balanced metabolite concentration at ", timepoints[2], " seconds: ", conc_balanced[2]);
+    print("flux: ", flux);
+    print("conc_init: ", conc_init);
+    print("conc_unbalanced: ", conc_unbalanced);
+    print("conc_enzyme_experiment: ", conc_enzyme_experiment);
+    print("km: ", km);
+    print("drain: ", drain);
+    print("kcat: ", kcat);
+    print("keq: ", keq);
+    print("ki: ", ki);
+    print("diss_t: ", diss_t);
+    print("diss_r: ", diss_r);
+    print("transfer_constant: ", transfer_constant);
+    print("kcat_phos: ", kcat_phos);
+    print("conc_phos_experiment: ", conc_phos_experiment);
+    return 0;
+  }
+  else {
+    return 1;
+  }
+}

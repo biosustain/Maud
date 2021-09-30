@@ -70,6 +70,8 @@ def sample(data_path, output_dir):
     stanfit = sampling.sample(mi, samples_path)
     print(stanfit.diagnose())
     print(stanfit.summary())
+    infd = load_infd(stanfit.runset.csv_files, mi)
+    infd.to_netcdf(os.path.join(output_path, "infd.nc"))
     return output_path
 
 
@@ -101,6 +103,7 @@ def simulate(data_path, output_dir, n):
     shutil.copytree(data_path, ui_dir)
     stanfit = sampling.simulate(mi, samples_path, n)
     infd = load_infd(stanfit.runset.csv_files, mi)
+    infd.to_netcdf(os.path.join(output_path, "infd.nc"))
     print("\nSimulated concentrations and fluxes:")
     print(infd.posterior["conc"].mean(dim=["chain", "draw"]).to_series())
     print(infd.posterior["flux"].mean(dim=["chain", "draw"]).to_series())

@@ -18,19 +18,15 @@ phosphofructokinase reaction, which is thought to be highly regulated and
 instrumental for alleviating `redox stress <http://linkinghub.elsevier.com/retrieve/pii/S2405471218301492>`_. The reactions are part of the glycolysis
 pathway, which converts glucose into pyruvate and some ATP.
 
-Constructing a suitable toml input
-==================================
+Constructing a suitable input
+=============================
 
 In order to model this system with Maud, we first need to decide how to
-represent it, and some information about it, in Maud's input format.
+represent it, and some information about it, in `Maud's input format
+<usage/inputting.html>`_.
 
-Maud's input format consists of three sections: a kinetic model that describes
-how the system works, a prior model describing the pre-experimental information
-about the system's formation energies and kinetic parameters, and an
-experiments section describing some test data and its information content.
-
-The full toml input can be found in `Maud's GitHub repository
-<https://github.com/biosustain/Maud/blob/master/tests/data/ecoli_small.toml>`_. The
+The full input folder can be found in `Maud's GitHub repository
+<https://github.com/biosustain/Maud/blob/master/tests/data/ecoli_small>`_. The
 following section explains how it was constructed.
 
 
@@ -58,7 +54,7 @@ adding a non-empty `water_stoichiometry` field to the FBP reaciton.
 Finally, for the sake of simplicity this case study ignores all regulation,
 even though this is not realistic as the PFK reaction is highly regulated.
 
-The kinetic model section of the Maud input therefore looks as follows:
+The kinetic model file therefore looks as follows:
 
 .. code-block:: toml
 
@@ -70,7 +66,7 @@ The kinetic model section of the Maud input therefore looks as follows:
       {id="atp", name="ATP C10H12N5O13P3", compartment="c", balanced=false},
       {id="pi", name="Phosphate", compartment="c", balanced=false},
       {id="dhap", name="Dihydroxyacetone phosphate", compartment="c", balanced=true},
-      {id="g3p", name="Glyceraldehyde 3-phosphate", compartment="c", balanced=false}
+      {id="g3p", name="Glyceraldehyde 3-phosphate", compartment="c", balanced=true},
     ]
 
     [[compartments]]
@@ -83,12 +79,14 @@ The kinetic model section of the Maud input therefore looks as follows:
     name = "Glucose-6-phosphate isomerase"
     enzymes = [{id = "PGI", name = "Glucose-6-phosphate isomerase"}]
     stoichiometry = {g6p_c = -1, f6p_c = 1}
+    mechanism = "reversible_modular_rate_law"
 
     [[reactions]]
     id = "PFK"
     name = "Phosphofructokinase"
     enzymes = [{id = "PFK", name = "Phosphofructokinase"}]
     stoichiometry = {atp_c = -1, f6p_c = -1, adp_c = 1, fdp_c = 1}
+    mechanism = "irreversible_modular_rate_law"
 
     [[reactions]]
     id = "FBP"
@@ -96,18 +94,26 @@ The kinetic model section of the Maud input therefore looks as follows:
     water_stoichiometry = 1
     enzymes = [{id = "FBP", name = "Fructose-bisphosphatase"}]
     stoichiometry = {f6p_c = -1, fdp_c = 1, pi_c = -1}
+    mechanism = "reversible_modular_rate_law"
 
     [[reactions]]
     id = "FBA"
     name = "Fructose-bisphosphate aldolase"
     enzymes = [{id = "FBA", name = "Fructose-bisphosphate aldolase"}]
     stoichiometry = {dhap_c = 1, fdp_c = -1, g3p_c = 1}
+    mechanism = "reversible_modular_rate_law"
 
     [[reactions]]
     id = "TPI"
     name = "Triose-phosphate isomerase"
     enzymes = [{id = "TPI", name = "Triose-phosphate isomerase"}]
     stoichiometry = {dhap_c = -1, g3p_c = 1}
+    mechanism = "reversible_modular_rate_law"
+
+    [[drains]]
+    id = "g3p_drain"
+    name = "g3p_drain"
+    stoichiometry = { g3p_c = -1 }
 
 
 Priors
@@ -116,18 +122,17 @@ Priors
 Priors for the 8 metabolites' formation energies were found using `equilibrator
 <http://equilibrator.weizmann.ac.il/>`_, and are as follows:
 
-.. code-block:: toml
+.. csv-table:: Formation energy priors
 
-  formation_energies = [
-    {metabolite_id = "g6p", location = -1336.3, scale = 1.3},
-    {metabolite_id = "f6p", location = -1333.8, scale = 1.3},
-    {metabolite_id = "pi", location = -1073.3, scale = 1.5},
-    {metabolite_id = "adp", location = -1440.8, scale = 2.4},
-    {metabolite_id = "atp", location = -2313.0, scale = 3.0},
-    {metabolite_id = "fdp", location = -2220.9, scale = 2.1},
-    {metabolite_id = "g3p", location = -1106.4, scale = 1.3},
-    {metabolite_id = "dhap", location = -1111.9, scale = 1.1},
-  ]
+    parameter_type,metabolite_id,mic_id,enzyme_id,drain_id,phos_enz_id,experiment_id,location,scale,pct1,pct99
+    dgf,g6p,,,,,,-1336.3,1.3,,
+    dgf,f6p,,,,,,-1333.8,1.3,,
+    dgf,pi,,,,,,-1073.3,1.5,,
+    dgf,adp,,,,,,-1440.8,2.4,,
+    dgf,atp,,,,,,-2313.0,3.0,,
+    dgf,fdp,,,,,,-2220.9,2.1,,
+    dgf,g3p,,,,,,-1106.4,1.3,,
+    dgf,dhap,,,,,,-1111.9,1.1,,
 
 This specification highlights a limitation of Maud's prior model: currently
 Maud can only specify priors for formation energies as independent normal
@@ -144,35 +149,31 @@ Maud's prior model assigns weight to formation energy configurations that are
 very unlikely given the underlying information, something that should be fixed
 in a future implementation.
 
-Priors for reaction $k_{cat}$ and $k_m$ parameters are taken from the `sabio
-<http://sabio.h-its.org/>`_ database, and are specified in the toml input as
-follows:
+Priors for reaction :math:`k_{cat}` and :math:`k_m` parameters are taken from
+the `sabio <http://sabio.h-its.org/>`_ database, and are specified in the toml
+input as follows:
 
-.. code-block:: toml
+.. csv-table:: :math:`k_{cat}` and :math:`km` priors
 
-  kcats = [
-    {enzyme_id = "PGI", location = 126.0, scale = 0.2},
-    {enzyme_id = "PFK", location = 110.0, scale = 0.2},
-    {enzyme_id = "FBP", location = 24.0, scale = 0.2},
-    {enzyme_id = "FBA", location = 7.0, scale = 0.2},
-    {enzyme_id = "TPI", location = 9000.0, scale = 0.2},
-  ]
+    parameter_type,metabolite_id,mic_id,enzyme_id,drain_id,phos_enz_id,experiment_id,location,scale,pct1,pct99
+    kcat,,,PGI,,,,126.0,0.2,,
+    kcat,,,PFK,,,,110.0,0.2,,
+    kcat,,,FBP,,,,24.0,0.2,,
+    kcat,,,FBA,,,,7.0,0.2,,
+    kcat,,,TPI,,,,9000.0,0.2,,
+    km,,g6p_c,PGI,,,,3.0,0.2,,
+    km,,f6p_c,PGI,,,,0.16,0.2,,
+    km,,f6p_c,PFK,,,,0.04,0.2,,
+    km,,atp_c,PFK,,,,0.06,0.2,,
+    km,,fdp_c,FBP,,,,16.0,0.2,,
+    km,,f6p_c,FBP,,,,0.689,1.5,,
+    km,,pi_c,FBP,,,,1.0,1.5,,
+    km,,fdp_c,FBA,,,,0.02,0.2,,
+    km,,g3p_c,FBA,,,,0.03,0.2,,
+    km,,dhap_c,FBA,,,,0.13,0.2,,
+    km,,dhap_c,TPI,,,,2.16,1.5,,
+    km,,g3p_c,TPI,,,,200.0,0.2,,
 
-  kms = [
-    {enzyme_id = "PGI", mic_id = "g6p_c", location = 3.0, scale = 0.2},
-    {enzyme_id = "PGI", mic_id = "f6p_c", location = 0.16, scale = 0.2},
-    {enzyme_id = "PFK", mic_id = "f6p_c", location = 0.03, scale = 0.2},
-    {enzyme_id = "PFK", mic_id = "atp_c", location = 0.06, scale = 0.2},
-    {enzyme_id = "PFK", mic_id = "fdp_c", location = 15, scale = 1.5},
-    {enzyme_id = "PFK", mic_id = "adp_c", location = 0.55, scale = 1.5},
-    {enzyme_id = "FBP", mic_id = "fdp_c", location = 16.0, scale = 0.2},
-    {enzyme_id = "FBP", mic_id = "f6p_c", location = 0.6899, scale = 1.5},
-    {enzyme_id = "FBP", mic_id = "pi_c", location = 1.0, scale = 1.5},
-    {enzyme_id = "FBA", mic_id = "fdp_c", location = 0.02, scale = 0.2},
-    {enzyme_id = "FBA", mic_id = "g3p_c", location = 0.03, scale = 0.2},
-    {enzyme_id = "FBA", mic_id = "dhap_c", location = 0.13, scale = 0.2},
-    {enzyme_id = "TPI", mic_id = "dhap_c", location = 2.16, scale = 1.5},
-    {enzyme_id = "TPI", mic_id = "g3p_c", location = 200.0, scale = 0.2},
 
 Experimental data
 -----------------
@@ -181,51 +182,36 @@ For this case study we pretend that one experiment was carried out, with the
 following artificial but approximately realistic results:
 
 
-.. code-block:: toml
-                
-  [[experiments]]
-  id = 'condition_1'
-  metabolite_measurements = [
-    {target_id='g6p_c', value=2.0804108, uncertainty=0.188651},
-    {target_id='f6p_c', value=0.6410029, uncertainty=0.146145},
-    {target_id='adp_c', value=0.6113649, uncertainty=0.038811},
-    {target_id='atp_c', value=5.4080032, uncertainty=0.186962},
-    {target_id='fdp_c', value=4.5428601, uncertainty=0.237197},
-    {target_id='dhap_c', value=1.895018, uncertainty=0.078636},
-  ]
-  reaction_measurements = [
-    {target_id='PGI', value=4.087673533555556, uncertainty=0.1},
-    {target_id='FBP', value=-0.5, uncertainty=0.1},  # made up
-  ]
-  enzyme_measurements = [
-    {target_id='PGI', value=0.03338748587758992, uncertainty=0.06406406775305307},
-    {target_id='FBP', value=0.005712846258143446, uncertainty=0.1513769774104986},
-    {target_id='FBA', value=0.0704592675242211, uncertainty=0.2078269607533649},
-  ]
+.. csv-table:: Experiments
+
+    measurement_type,target_id,experiment_id,measurement,error_scale
+    mic,f6p_c,Evo04ptsHIcrrEvo01EP,0.6410029,0.146145
+    mic,fdp_c,Evo04ptsHIcrrEvo01EP,4.5428601,0.237197
+    mic,dhap_c,Evo04ptsHIcrrEvo01EP,1.895018,0.078636
+    mic,f6p_c,Evo04Evo01EP,0.6410029,0.146145
+    mic,fdp_c,Evo04Evo01EP,4.5428601,0.237197
+    mic,dhap_c,Evo04Evo01EP,1.895018,0.078636
+    flux,PGI,Evo04ptsHIcrrEvo01EP,4.08767353555,1
+    flux,PGI,Evo04Evo01EP,4.08767353555,1
 
 
 Fitting the model
 =================
 
-To download the input from GitHub using `curl <https://curl.haxx.se/>`_ we can use the following command:
+We can fit the model from Maud's root directory by running the following
+command in a suitable python environment (see `here
+<usage/post_installation_usage.html>`_ for full details about how to run Maud).
 
 .. code-block:: bash
 
-    curl -LJO https://raw.githubusercontent.com/biosustain/Maud/ecoli_small/tests/data/ecoli_small.toml
-
-Next, we can use Maud to generate posterior draws as follows:
-
-.. code-block:: bash
-
-    maud sample ecoli_small.toml --n_warmup 200 --n_samples 200
+    maud sample tests/data/ecoli_small
 
 
 Analysing the results
 =====================
 
-After a little while, Stan's sampler has finished, some csv files starting
-`inference_model` have been populated and Maud has printed the following
-diagnostic information:
+After a little while, Stan's sampler has finished, an output directory has been
+created and populated and Maud has printed the following diagnostic information:
 
 .. code-block:: bash
 

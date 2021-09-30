@@ -21,7 +21,7 @@
 """
 
 import os
-from typing import Dict, List, Union
+from typing import Dict, List, Optional, Union
 
 import numpy as np
 import pandas as pd
@@ -511,15 +511,13 @@ def extract_2d_prior(
     out = raw.loc[lambda df: df["parameter_type"] == parameter_name].set_index(
         parameter_name_to_id_cols[parameter_name]
     )
-    pct_params = (
-        out[["pct1", "pct99"]]
-        .apply(
-            lambda row: qfunc(row["pct1"], 0.01, row["pct99"], 0.99),
-            axis=1,
-            result_type="expand",
-        )
-        .rename(columns={0: "location", 1: "scale"})
+    pct_params = out[["pct1", "pct99"]].apply(
+        lambda row: qfunc(row["pct1"], 0.01, row["pct99"], 0.99),
+        axis=1,
+        result_type="expand",
     )
+    pct_params.columns = ["location", "scale"]
+    pct_params["location"] = np.exp(pct_params["location"])
     out[["location", "scale"]] = out[["location", "scale"]].fillna(pct_params)
     location, scale = (
         out[col]
@@ -582,8 +580,11 @@ def parse_config(raw):
 
     :param raw: result of running toml.load on a suitable file
     """
-    user_inits_file = (
+    user_inits_file: Optional[str] = (
         raw["user_inits_file"] if "user_inits_file" in raw.keys() else None
+    )
+    reject_non_steady: bool = (
+        raw["reject_non_steady"] if "reject_non_steady" in raw.keys() else True
     )
     return MaudConfig(
         name=raw["name"],
@@ -591,6 +592,7 @@ def parse_config(raw):
         priors_file=raw["priors"],
         experiments_file=raw["experiments"],
         likelihood=raw["likelihood"],
+        reject_non_steady=reject_non_steady,
         ode_config={**DEFAULT_ODE_CONFIG, **raw["ode_config"]},
         cmdstanpy_config=raw["cmdstanpy_config"],
         user_inits_file=user_inits_file,
