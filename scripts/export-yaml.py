@@ -188,7 +188,10 @@ def main():
     for mic in mi.kinetic_model.mics:
         if mic.balanced is False:
             par_input.append(
-                [f"m{mic.id}", list(conc_values[conc_values["mic_id"] == mic.id]["value"])[0]]
+                [
+                    f"m{mic.id}",
+                    list(conc_values[conc_values["mic_id"] == mic.id]["value"])[0],
+                ]
             )
     for rxn in mi.kinetic_model.reactions:
         for enz in rxn.enzymes:
@@ -298,11 +301,17 @@ def main():
             allosteric_activators = []
 
             for mod in enz.modifiers["competitive_inhibitor"]:
-                competitive_entry.append([f"m{mod.mic_id}", f"ki_{enz.id}_{mod.mic_id}"])
+                competitive_entry.append(
+                    [f"m{mod.mic_id}", f"ki_{enz.id}_{mod.mic_id}"]
+                )
             for mod in enz.modifiers["allosteric_activator"]:
-                allosteric_activators.append([f"m{mod.mic_id}", f"aa_{enz.id}_{mod.mic_id}"])
+                allosteric_activators.append(
+                    [f"m{mod.mic_id}", f"aa_{enz.id}_{mod.mic_id}"]
+                )
             for mod in enz.modifiers["allosteric_inhibitor"]:
-                allosteric_inhibitors.append([f"m{mod.mic_id}", f"ai_{enz.id}_{mod.mic_id}"])
+                allosteric_inhibitors.append(
+                    [f"m{mod.mic_id}", f"ai_{enz.id}_{mod.mic_id}"]
+                )
 
             if rxn.reaction_mechanism == "reversible_modular_rate_law":
                 Trf = Template_T_met.render(met_array=substrate_entry)
@@ -317,7 +326,9 @@ def main():
 
             elif rxn.reaction_mechanism == "irreversible_modular_rate_law":
                 Trf = Template_T_met.render(met_array=substrate_entry)
-                Tr = Template_Tr_irr.render(enz=f"e{enz.id}", kcat=f"kcat_{enz.id}", Trf=Trf)
+                Tr = Template_Tr_irr.render(
+                    enz=f"e{enz.id}", kcat=f"kcat_{enz.id}", Trf=Trf
+                )
                 Dr = Template_Dr_irr.render(sub_array=substrate_entry)
 
             Drreg = Template_Drreg.render(sub_array=substrate_entry)
