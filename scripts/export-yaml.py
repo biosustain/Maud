@@ -42,6 +42,9 @@ multiple experiments simultaneously.
 
 For further information on the workflow please refer to:
 `https://github.com/yaml2sbml-dev/yaml2sbml`.
+
+Prior to converting to sbml you will need to use the cmd:
+`pip install yaml2sbml`
 """
 
 HERE = os.path.dirname(os.path.abspath(__file__))
