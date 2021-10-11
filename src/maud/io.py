@@ -339,7 +339,6 @@ def parse_toml_reaction(raw: dict) -> Reaction:
                 reaction_id=raw["id"],
                 modifiers=modifiers,
                 subunits=subunits,
-                water_stoichiometry=water_stoichiometry,
             )
         )
     return Reaction(
@@ -348,6 +347,7 @@ def parse_toml_reaction(raw: dict) -> Reaction:
         reaction_mechanism=raw["mechanism"],
         stoichiometry=raw["stoichiometry"],
         enzymes=enzymes,
+        water_stoichiometry=water_stoichiometry,
     )
 
 
