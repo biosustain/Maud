@@ -20,10 +20,8 @@ import argparse
 import os
 
 import numpy as np
-import pandas as pd
 from jinja2 import Template
 
-from maud import io
 from maud.analysis import load_infd
 from maud.cli import get_inits_from_draw
 from maud.io import load_maud_input_from_toml
@@ -42,7 +40,7 @@ If you are interested in a specific experiment please define this as well,
 otherwise it will take the first one defined, as it's not set up to do
 multiple experiments simultaneously.
 
-For further information on the workflow please refer to: 
+For further information on the workflow please refer to:
 `https://github.com/yaml2sbml-dev/yaml2sbml`.
 """
 
@@ -121,6 +119,7 @@ odes:
 
 
 def get_csvs(data_path):
+    """Return list of csv files in maud_output samples folder."""
     return [
         os.path.join(data_path, "samples", f)
         for f in os.listdir(os.path.join(data_path, "samples"))
@@ -184,7 +183,7 @@ def main():
     enz_values = exp_values[exp_values["parameter_name"] == "conc_enzyme"]
     drain_values = exp_values[exp_values["parameter_name"] == "drain"]
     for mic in mi.kinetic_model.mics:
-        if mic.balanced == False:
+        if mic.balanced is False:
             par_input.append(
                 [mic.id, list(conc_values[conc_values["mic_id"] == mic.id]["value"])[0]]
             )
@@ -349,7 +348,7 @@ def main():
 
     system_odes = {}
     for mic in mi.kinetic_model.mics:
-        if mic.balanced == True:
+        if mic.balanced is True:
             tmp_met_ode = ""
             first = 0
             for edge in mi.stan_coords.edges:
@@ -363,7 +362,7 @@ def main():
     ode_input = [
         [mic.id, system_odes[mic.id], balanced_mic_values[mic.id]]
         for mic in mi.kinetic_model.mics
-        if mic.balanced == True
+        if mic.balanced is True
     ]
     yaml_input = Template_yaml.render(parameters=par_input, odes=ode_input)
     with open(yaml_output, "w") as file:
