@@ -120,7 +120,6 @@ class Enzyme:
     :param name: human-understandable name for the enzyme
     :param modifiers: modifiers, given as {'modifier_id': modifier_object}
     :param subunits: number of subunits in enzymes
-    :param water_stroichiometry: Reaction's stoichiometric coefficient for water
     """
 
     def __init__(
@@ -130,7 +129,6 @@ class Enzyme:
         name: str,
         modifiers: Dict[str, List[Modifier]] = None,
         subunits: int = 1,
-        water_stoichiometry: float = 0,
     ):
         if modifiers is None:
             modifiers = defaultdict()
@@ -139,7 +137,6 @@ class Enzyme:
         self.name = name
         self.modifiers = modifiers
         self.subunits = subunits
-        self.water_stoichiometry = water_stoichiometry
         self.allosteric = (
             len(self.modifiers["allosteric_activator"]) > 0
             or len(self.modifiers["allosteric_inhibitor"]) > 0
@@ -156,6 +153,7 @@ class Reaction:
     :param stoichiometry: reaction stoichiometry,
     e.g. for the reaction: 2pg <-> 3pg we have {'2pg'; -1, '3pg': 1}
     :param enzymes: Dictionary mapping enzyme ids to Enzyme objects
+    :param water_stroichiometry: Reaction's stoichiometric coefficient for water
     """
 
     def __init__(
@@ -165,6 +163,7 @@ class Reaction:
         reaction_mechanism: str,
         stoichiometry: Dict[str, float],
         enzymes: List[Enzyme],
+        water_stoichiometry: float = 0,
     ):
         if stoichiometry is None:
             stoichiometry = defaultdict()
@@ -175,6 +174,7 @@ class Reaction:
         self.reaction_mechanism = reaction_mechanism
         self.stoichiometry = stoichiometry
         self.enzymes = enzymes
+        self.water_stoichiometry = water_stoichiometry
 
 
 class Phosphorylation:
