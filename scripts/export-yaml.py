@@ -188,13 +188,13 @@ def main():
     for mic in mi.kinetic_model.mics:
         if mic.balanced is False:
             par_input.append(
-                [mic.id, list(conc_values[conc_values["mic_id"] == mic.id]["value"])[0]]
+                [f"m{mic.id}", list(conc_values[conc_values["mic_id"] == mic.id]["value"])[0]]
             )
     for rxn in mi.kinetic_model.reactions:
         for enz in rxn.enzymes:
             par_input.append(
                 [
-                    enz.id,
+                    f"e{enz.id}",
                     list(enz_values[enz_values["enzyme_id"] == enz.id]["value"])[0],
                 ]
             )
@@ -202,7 +202,7 @@ def main():
         if rxn.reaction_mechanism == "drain":
             par_input.append(
                 [
-                    rxn.id,
+                    f"r{rxn.id}",
                     list(drain_values[drain_values["drain_id"] == rxn.id]["value"])[0],
                 ]
             )
@@ -263,33 +263,33 @@ def main():
             ]
 
             substrate_list = [
-                mic for mic, stoic in rxn.stoichiometry.items() if stoic < 0
+                f"m{mic}" for mic, stoic in rxn.stoichiometry.items() if stoic < 0
             ]
             product_list = [
-                mic for mic, stoic in rxn.stoichiometry.items() if stoic > 0
+                f"m{mic}" for mic, stoic in rxn.stoichiometry.items() if stoic > 0
             ]
-            mic_list = [mic for mic, _ in rxn.stoichiometry.items()]
+            mic_list = [f"m{mic}" for mic, _ in rxn.stoichiometry.items()]
 
             substrate_entry = list(
                 zip(
                     substrate_list,
-                    [f"km_{enz.id}_{mic}" for mic in substrate_list],
-                    [np.abs(rxn.stoichiometry[mic]) for mic in substrate_list],
+                    [f"km_{enz.id}_{mic[1:]}" for mic in substrate_list],
+                    [np.abs(rxn.stoichiometry[mic[1:]]) for mic in substrate_list],
                 )
             )
 
             product_entry = list(
                 zip(
                     product_list,
-                    [f"km_{enz.id}_{mic}" for mic in product_list],
-                    [np.abs(rxn.stoichiometry[mic]) for mic in product_list],
+                    [f"km_{enz.id}_{mic[1:]}" for mic in product_list],
+                    [np.abs(rxn.stoichiometry[mic[1:]]) for mic in product_list],
                 )
             )
 
             haldane_entry = list(
                 zip(
-                    [f"km_{enz.id}_{mic}" for mic in mic_list],
-                    [rxn.stoichiometry[mic] for mic in mic_list],
+                    [f"km_{enz.id}_{mic[1:]}" for mic in mic_list],
+                    [rxn.stoichiometry[mic[1:]] for mic in mic_list],
                 )
             )
 
@@ -298,18 +298,18 @@ def main():
             allosteric_activators = []
 
             for mod in enz.modifiers["competitive_inhibitor"]:
-                competitive_entry.append([mod.mic_id, f"ki_{enz.id}_{mod.mic_id}"])
+                competitive_entry.append([f"m{mod.mic_id}", f"ki_{enz.id}_{mod.mic_id}"])
             for mod in enz.modifiers["allosteric_activator"]:
-                allosteric_activators.append([mod.mic_id, f"aa_{enz.id}_{mod.mic_id}"])
+                allosteric_activators.append([f"m{mod.mic_id}", f"aa_{enz.id}_{mod.mic_id}"])
             for mod in enz.modifiers["allosteric_inhibitor"]:
-                allosteric_inhibitors.append([mod.mic_id, f"ai_{enz.id}_{mod.mic_id}"])
+                allosteric_inhibitors.append([f"m{mod.mic_id}", f"ai_{enz.id}_{mod.mic_id}"])
 
             if rxn.reaction_mechanism == "reversible_modular_rate_law":
                 Trf = Template_T_met.render(met_array=substrate_entry)
                 Trr = Template_T_met.render(met_array=product_entry)
                 Hal = Template_Haldane.render(Km_array=haldane_entry, Keq=tmp_Keq)
                 Tr = Template_Tr.render(
-                    enz=enz.id, kcat=f"kcat_{enz.id}", Trf=Trf, Trr=Trr, Hal=Hal
+                    enz=f"e{enz.id}", kcat=f"kcat_{enz.id}", Trf=Trf, Trr=Trr, Hal=Hal
                 )
                 Dr = Template_Dr.render(
                     sub_array=substrate_entry, prod_array=product_entry
@@ -317,7 +317,7 @@ def main():
 
             elif rxn.reaction_mechanism == "irreversible_modular_rate_law":
                 Trf = Template_T_met.render(met_array=substrate_entry)
-                Tr = Template_Tr_irr.render(enz=enz.id, kcat=f"kcat_{enz.id}", Trf=Trf)
+                Tr = Template_Tr_irr.render(enz=f"e{enz.id}", kcat=f"kcat_{enz.id}", Trf=Trf)
                 Dr = Template_Dr_irr.render(sub_array=substrate_entry)
 
             Drreg = Template_Drreg.render(sub_array=substrate_entry)
@@ -344,9 +344,9 @@ def main():
             flux_dict[enz.id] = flux
         if rxn.reaction_mechanism == "drain":
             substrate_list = [
-                mic for mic, stoic in rxn.stoichiometry.items() if stoic < 0
+                f"m{mic}" for mic, stoic in rxn.stoichiometry.items() if stoic < 0
             ]
-            flux = Template_drain.render(drain=rxn.id, sub_array=substrate_list)
+            flux = Template_drain.render(drain=f"r{rxn.id}", sub_array=substrate_list)
             flux_dict[rxn.id] = flux
 
     system_odes = {}
@@ -363,7 +363,7 @@ def main():
                         tmp_met_ode += f"+({S.loc[mic.id, edge]}*{flux_dict[edge]})"
             system_odes[mic.id] = tmp_met_ode
     ode_input = [
-        [mic.id, system_odes[mic.id], balanced_mic_values[mic.id]]
+        [f"m{mic.id}", system_odes[mic.id], balanced_mic_values[mic.id]]
         for mic in mi.kinetic_model.mics
         if mic.balanced is True
     ]
