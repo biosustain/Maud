@@ -101,9 +101,10 @@ def ppc(samples_path, ppc_path, output_dir):
         for f in os.listdir(os.path.join(samples_path, "samples"))
         if f.endswith(".csv")
     ]
-    mi = load_maud_input_from_toml(ppc_path)
+    mi_oos = load_maud_input_from_toml(ppc_path)
+    mi_train = load_maud_input_from_toml(os.path.join(samples_path, "user_input"))
     now = datetime.now().strftime("%Y%m%d%H%M%S")
-    output_name = f"maud-ppc_output-{mi.config.name}-{now}"
+    output_name = f"maud-ppc_output-{mi_oos.config.name}-{now}"
     output_path = os.path.join(output_dir, output_name)
     ppc_samples_path = os.path.join(output_path, "samples")
     ui_dir = os.path.join(output_path, "user_input")
@@ -115,7 +116,7 @@ def ppc(samples_path, ppc_path, output_dir):
     shutil.copytree(ppc_path, ui_dir)
     print(f"Copying posterior_draws from {samples_path} to {ui_dir}")
     shutil.copytree(samples_path, posterior_draws_path)
-    stanfit = sampling.ppc(mi, csvs, ppc_samples_path)
+    stanfit = sampling.ppc(mi_oos, mi_train, csvs, ppc_samples_path)
     return output_path
 
 

@@ -257,48 +257,36 @@ transformed data {
     rep_matrix(1, N_experiment, N_phosphorylation_enzymes) - is_phos_knockout;
 }
 parameters {
-  vector[N_metabolite] dgf_z;
-  vector[N_enzyme] log_kcat_z;
-  vector[N_km] log_km_z;
-  vector[N_ki] log_ki_z;
-  vector[N_ai] log_diss_t_z;
-  vector[N_aa] log_diss_r_z;
-  vector[N_ae] log_transfer_constant_z;
-  vector[N_phosphorylation_enzymes] log_kcat_phos_z;
-}
-transformed parameters {
-  // rescale
-  vector[N_metabolite] dgf = unz_1d(priors_dgf, dgf_z);
-  vector[N_km] km = unz_log_1d(priors_km, log_km_z);
-  vector[N_ki] ki = unz_log_1d(priors_ki, log_ki_z);
-  vector[N_enzyme] kcat = unz_log_1d(priors_kcat, log_kcat_z);
-  vector[N_ai] diss_t = unz_log_1d(priors_diss_t, log_diss_t_z);
-  vector[N_aa] diss_r = unz_log_1d(priors_diss_r, log_diss_r_z);
-  vector[N_ae] transfer_constant = unz_log_1d(priors_transfer_constant, log_transfer_constant_z);
-  vector[N_phosphorylation_enzymes] kcat_phos = unz_log_1d(priors_kcat_phos, log_kcat_phos_z);
-  vector[N_edge] keq = get_keq(S, dgf, mic_to_met, water_stoichiometry);
+  vector[N_km] km;
+  vector[N_ki] ki;
+  vector[N_enzyme] kcat;
+  vector[N_ai] diss_t;
+  vector[N_aa] diss_r;
+  vector[N_ae] transfer_constant;
+  vector[N_phosphorylation_enzymes] kcat_phos;
+  vector[N_edge] keq;
 }
 
 generated quantities {
   array[N_experiment] vector<lower=0>[N_mic] conc;
   array[N_experiment] vector[N_reaction] flux;
-  array[N_experiment] vector[N_phosphorylation_enzymes] conc_phos_draw;
-  array[N_experiment] vector[N_unbalanced] conc_unbalanced_draw;
-  array[N_experiment] vector[N_enzyme] conc_enzyme_draw;
-  array[N_experiment] vector[N_drain] drain_draw;
+  array[N_experiment] vector[N_phosphorylation_enzymes] conc_phos;
+  array[N_experiment] vector[N_unbalanced] conc_unbalanced;
+  array[N_experiment] vector[N_enzyme] conc_enzyme;
+  array[N_experiment] vector[N_drain] drain;
   // Sampling experiment boundary conditions from priors
   for (e in 1:N_experiment){
-    drain_draw[e] = to_vector(normal_rng(priors_drain[1,e], priors_drain[2,e]));
-    conc_phos_draw[e] = to_vector(lognormal_rng(log(priors_conc_phos[1,e]), priors_conc_phos[2,e]));
-    conc_unbalanced_draw[e] = to_vector(lognormal_rng(log(priors_conc_unbalanced[1,e]), priors_conc_unbalanced[2,e]));
-    conc_enzyme_draw[e] = to_vector(lognormal_rng(log(priors_conc_enzyme[1,e]), priors_conc_enzyme[2,e]));
+    drain[e] = to_vector(normal_rng(priors_drain[1,e], priors_drain[2,e]));
+    conc_phos[e] = to_vector(lognormal_rng(log(priors_conc_phos[1,e]), priors_conc_phos[2,e]));
+    conc_unbalanced[e] = to_vector(lognormal_rng(log(priors_conc_unbalanced[1,e]), priors_conc_unbalanced[2,e]));
+    conc_enzyme[e] = to_vector(lognormal_rng(log(priors_conc_enzyme[1,e]), priors_conc_enzyme[2,e]));
   }
   // Simulation of experiments
   for (e in 1:N_experiment){
     flux[e] = rep_vector(0, N_reaction);
     real timepoints[2] = {timepoint, timepoint + 10};
-    vector[N_enzyme] conc_enzyme_experiment = conc_enzyme_draw[e] .* knockout[e]';
-    vector[N_phosphorylation_enzymes] conc_phos_experiment = conc_phos_draw[e] .* phos_knockout[e]';
+    vector[N_enzyme] conc_enzyme_experiment = conc_enzyme[e] .* knockout[e]';
+    vector[N_phosphorylation_enzymes] conc_phos_experiment = conc_phos[e] .* phos_knockout[e]';
     vector[N_mic-N_unbalanced] conc_balanced[2] =
       ode_adjoint_tol_ctl(dbalanced_dt,
                   conc_init[e, balanced_mic_ix],
@@ -315,12 +303,12 @@ generated quantities {
                   interpolation_polynomial,
                   solver_forward,
                   solver_backward,
-                  conc_unbalanced_draw[e,:],
+                  conc_unbalanced[e,:],
                   balanced_mic_ix,
                   unbalanced_mic_ix,
                   conc_enzyme_experiment,
                   km,
-                  drain_draw[e,:],
+                  drain[e,:],
                   km_lookup,
                   S,
                   edge_type,
@@ -346,12 +334,12 @@ generated quantities {
                   kcat_phos,
                   conc_phos_experiment);
     conc[e, balanced_mic_ix] = conc_balanced[1];
-    conc[e, unbalanced_mic_ix] = conc_unbalanced_draw[e,:];
+    conc[e, unbalanced_mic_ix] = conc_unbalanced[e,:];
     {
     vector[N_edge] flux_edge = get_flux(conc[e],
                                         conc_enzyme_experiment,
                                         km,
-                                        drain_draw[e,:],
+                                        drain[e,:],
                                         km_lookup,
                                         S,
                                         edge_type,

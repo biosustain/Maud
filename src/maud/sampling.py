@@ -25,6 +25,7 @@ from typing import Dict, List, Union
 import cmdstanpy
 import numpy as np
 import pandas as pd
+import arviz as az
 
 from maud.data_model import (
     IndPrior1d,
@@ -35,6 +36,7 @@ from maud.data_model import (
     StanCoordSet,
 )
 from maud.utils import codify, get_null_space, get_rref
+from maud.analysis import load_infd, load_infd_fit
 
 
 HERE = os.path.dirname(os.path.abspath(__file__))
@@ -78,7 +80,7 @@ def sample(mi: MaudInput, output_dir: str) -> cmdstanpy.CmdStanMCMC:
     }
     return _sample_given_config(mi, output_dir, config)
 
-def ppc(mi: MaudInput, csvs: List[str], output_dir: str) -> cmdstanpy.CmdStanMCMC:
+def ppc(mi_oos: MaudInput, mi_train, csvs: List[str], output_dir: str) -> cmdstanpy.CmdStanMCMC:
     """Sample from the posterior defined by mi.
 
     :param mi: a MaudInput object
@@ -86,10 +88,10 @@ def ppc(mi: MaudInput, csvs: List[str], output_dir: str) -> cmdstanpy.CmdStanMCM
     """
     config = {
         **DEFAULT_SAMPLE_CONFIG,
-        **mi.config.cmdstanpy_config,
+        **mi_oos.config.cmdstanpy_config,
         **{"output_dir": output_dir},
     }
-    return _ppc_given_config(mi, csvs, output_dir, config)
+    return _ppc_given_config(mi_oos, mi_train, csvs, output_dir, config)
 
 def simulate(mi: MaudInput, output_dir: str, n: int) -> cmdstanpy.CmdStanMCMC:
     """Generate simulations from the prior mean.
@@ -137,36 +139,79 @@ def _sample_given_config(
     return model.sample(data=input_filepath, **config)
 
 def _ppc_given_config(
-    mi: MaudInput, csvs: List[str], output_dir: str, config: dict
+    mi_oos: MaudInput, mi_train: MaudInput, csvs: List[str], output_dir: str, config: dict
 ):
     input_filepath = os.path.join(output_dir, "input_data.json")
     inits_filepath = os.path.join(output_dir, "inits.json")
     coords_filepath = os.path.join(output_dir, "coords.json")
-    input_data = get_input_data(mi)
-    inits = {k: v.values for k, v in mi.inits.items()}
+    input_data = get_input_data(mi_oos)
     cmdstanpy.utils.write_stan_json(input_filepath, input_data)
-    cmdstanpy.utils.write_stan_json(inits_filepath, inits)
     with open(coords_filepath, "w") as f:
-        json.dump(mi.stan_coords.__dict__, f)
-    config["inits"] = inits_filepath
+        json.dump(mi_oos.stan_coords.__dict__, f)
     ppc_program_filepath = os.path.join(HERE, PPC_PROGRAM_RELATIVE_PATH)
     include_path = os.path.join(HERE, INCLUDE_PATH)
     cpp_options = {}
     stanc_options = {"include_paths": [include_path]}
-    print(input_filepath)
+    infd = load_infd(csvs, mi_train)
+    posterior_draws = infd.posterior["keq"]
+    kinetic_parameters = ["keq", "km", "kcat", "diss_t", "diss_r", "transfer_constant", "kcat_phos", "ki"]
     if config["threads_per_chain"] != 1:
         cpp_options["STAN_THREADS"] = True
         os.environ["STAN_NUM_THREADS"] = str(config["threads_per_chain"])
+    chains = infd.posterior.chain.to_series().values
+    draws = infd.posterior.draw.to_series().values
     gq_model = cmdstanpy.CmdStanModel(
         stan_file=ppc_program_filepath,
         stanc_options=stanc_options,
         cpp_options=cpp_options,
         )
-    gq_samples = gq_model.generate_quantities(
-        data=input_filepath,
-        mcmc_sample=csvs,
-        gq_output_dir=output_dir
+    all_conc = []
+    all_conc_enz = []
+    all_flux = []
+    for measurement_id, measurement_type in zip(
+        ["yconc", "yflux", "yenz"], ["conc", "flux", "conc_enzyme"]
+    ):
+        rename_columns = {"conc": "mics", "flux": "reactions", "conc_enzyme": "enzymes"}
+        tmp_measurements = getattr(mi.measurements, measurement_id).reset_index()
+        tmp_measurements = tmp_measurements.rename(
+            columns=({"experiment_id": "experiments", "target_id": measurement_type})
         )
+        tmp_measurements = tmp_measurements.rename(columns=(rename_columns))
+        measurements[measurement_type] = tmp_measurements
+    for chain in chains:
+        for draw in draws:
+            inits = {
+                par: infd.posterior[par][chain][draw].to_series().values
+                for par in kinetic_parameters
+                if par in infd.posterior.variables.keys()
+            }
+            gq_samples = gq_model.sample(
+                inits=inits,
+                iter_warmup=0,
+                iter_sampling=1,
+                data=input_filepath,
+                fixed_param=True,
+                )
+            infd_fit = load_infd_fit(gq_samples.runset.csv_files, mi_oos)
+            tmp_conc = infd_fit.posterior.conc.to_dataframe().reset_index()
+            tmp_conc["chain"] = chain
+            tmp_conc["draw"] = draw
+            tmp_conc_enz = infd_fit.posterior.conc_enzyme.to_dataframe().reset_index()
+            tmp_conc_enz["chain"] = chain
+            tmp_conc_enz["draw"] = draw
+            tmp_flux = infd_fit.posterior.flux.to_dataframe().reset_index()
+            tmp_flux["chain"] = chain
+            tmp_flux["draw"] = draw
+            all_conc.append(tmp_conc)
+            all_conc_enz.append(tmp_conc_enz)
+            all_flux.append(tmp_flux)
+
+    flux_df = pd.concat(all_flux)
+    conc_df = pd.concat(all_conc)
+    conc_enz_df = pd.concat(all_conc_enz)
+    print(flux_df)
+    print(conc_df)
+    print(conc_enz_df)
     return
 
 
