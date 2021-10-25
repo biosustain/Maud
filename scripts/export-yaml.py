@@ -362,6 +362,8 @@ def main():
             substrate_list = [
                 f"m{mic}" for mic, stoic in rxn.stoichiometry.items() if stoic < 0
             ]
+            if substrate_list == []:
+                substrate_list = [1]
             flux = Template_drain.render(drain=f"r{rxn.id}", sub_array=substrate_list)
             flux_dict[rxn.id] = flux
 
