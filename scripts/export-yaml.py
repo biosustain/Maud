@@ -92,6 +92,8 @@ Template_Allo_Act_Inh = Template(
 
 Template_flux = Template("""({{Tr}})/({{Dr}} + {{Drreg}} - 1)*{{Allo}}""")
 
+Template_flux_irr = Template("""({{Tr}})/({{Dr}} + {{Drreg}})*{{Allo}}""")
+
 Template_drain = Template(
     """{{drain}}*{%- for met in sub_array -%} ({{met}} /({{met}} + 0.000001)) \
     {%- if not loop.last %} * {% endif %} {%- endfor -%}"""
@@ -351,7 +353,10 @@ def main():
                 )
             else:
                 Allo = "1"
-            flux = Template_flux.render(Tr=Tr, Dr=Dr, Drreg=Drreg, Allo=Allo)
+            if rxn.reaction_mechanism == "irreversible_modular_rate_law":
+                flux = Template_flux_irr.render(Tr=Tr, Dr=Dr, Drreg=Drreg, Allo=Allo)
+            elif rxn.reaction_mechanism == "reversible_modular_rate_law":
+                flux = Template_flux.render(Tr=Tr, Dr=Dr, Drreg=Drreg, Allo=Allo)
             flux_dict[enz.id] = flux
         if rxn.reaction_mechanism == "drain":
             substrate_list = [
