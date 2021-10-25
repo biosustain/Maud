@@ -26,6 +26,7 @@ import cmdstanpy
 import numpy as np
 import pandas as pd
 import arviz as az
+import plotnine as p9
 
 from maud.data_model import (
     IndPrior1d,
@@ -138,6 +139,29 @@ def _sample_given_config(
         )
     return model.sample(data=input_filepath, **config)
 
+# def plot_box_plots(
+#         var, draws, measurements
+#     ):
+#     plot = (
+#         p9.ggplot(data=draws[var])
+#         + p9.geom_boxplot(p9.aes(x="catagory", y="value", fill="catagory"), outlier_shape='')
+
+#         )
+#     if measurements[var].empty is False:
+#         plot += p9.geoms.geom_point(
+#             p9.aes(y="measurement", x="catagory"),
+#             data=measurements[var]
+#             )
+#     if var != "flux":
+#         plot += p9.scale_y_log10()
+#     plot += p9.facet_wrap("~experiments") + p9.themes.theme(
+#             panel_spacing_y=0.05,
+#             panel_spacing_x=0.35,
+#             axis_title=p9.element_text(size=10),
+#             axis_text=p9.themes.element_text(size=11),
+#         )
+#     plot += p9.theme(axis_text_x = p9.themes.element_text(rotation=90, size=6))
+#     return plot
 def _ppc_given_config(
     mi_oos: MaudInput, mi_train: MaudInput, csvs: List[str], output_dir: str, config: dict
 ):
@@ -168,18 +192,19 @@ def _ppc_given_config(
     all_conc = []
     all_conc_enz = []
     all_flux = []
+    measurements = {}
     for measurement_id, measurement_type in zip(
         ["yconc", "yflux", "yenz"], ["conc", "flux", "conc_enzyme"]
     ):
-        rename_columns = {"conc": "mics", "flux": "reactions", "conc_enzyme": "enzymes"}
-        tmp_measurements = getattr(mi.measurements, measurement_id).reset_index()
+        rename_columns = {"conc": "catagory", "flux": "catagory", "conc_enzyme": "catagory"}
+        tmp_measurements = getattr(mi_oos.measurements, measurement_id).reset_index()
         tmp_measurements = tmp_measurements.rename(
             columns=({"experiment_id": "experiments", "target_id": measurement_type})
         )
         tmp_measurements = tmp_measurements.rename(columns=(rename_columns))
         measurements[measurement_type] = tmp_measurements
-    for chain in chains:
-        for draw in draws:
+    for chain in [0, 1]:
+        for draw in [0, 1]:
             inits = {
                 par: infd.posterior[par][chain][draw].to_series().values
                 for par in kinetic_parameters
@@ -205,13 +230,27 @@ def _ppc_given_config(
             all_conc.append(tmp_conc)
             all_conc_enz.append(tmp_conc_enz)
             all_flux.append(tmp_flux)
-
+    draws = {}
     flux_df = pd.concat(all_flux)
+    flux_df = flux_df.rename(columns={"flux": "value", "reactions": "catagory"})
+    draws["flux"] = flux_df
     conc_df = pd.concat(all_conc)
+    conc_df = conc_df.rename(columns={"conc": "value", "mics": "catagory"})
+    draws["conc"] = conc_df
     conc_enz_df = pd.concat(all_conc_enz)
-    print(flux_df)
-    print(conc_df)
-    print(conc_enz_df)
+    conc_enz_df = conc_enz_df.rename(columns={"conc_enzyme": "value", "enzymes": "catagory"})
+    draws["conc_enzyme"] = conc_enz_df
+    for var in ["flux", "conc", "conc_enzyme"]:
+        plot = plot_box_plots(
+            var,
+            draws,
+            measurements
+            )
+        plot.save(
+            filename=os.path.join(".", f"{var}_posterior.png"),
+            verbose=False,
+            dpi=300,
+        )
     return
 
 
