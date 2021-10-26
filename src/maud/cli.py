@@ -108,15 +108,16 @@ def ppc(samples_path, ppc_path, output_dir):
     output_path = os.path.join(output_dir, output_name)
     ppc_samples_path = os.path.join(output_path, "samples")
     ui_dir = os.path.join(output_path, "user_input")
-    posterior_draws_path = os.path.join(output_path, "posterior_draws")
+    posterior_draws_path = os.path.join(output_path, "out_of_sample_draws")
     print("Creating output directory: " + output_path)
     os.mkdir(output_path)
-    os.mkdir(ppc_samples_path)
+    os.mkdir(posterior_draws_path)
     print(f"Copying user input from {ppc_path} to {ui_dir}")
     shutil.copytree(ppc_path, ui_dir)
     print(f"Copying posterior_draws from {samples_path} to {ui_dir}")
-    shutil.copytree(samples_path, posterior_draws_path)
-    stanfit = sampling.ppc(mi_oos, mi_train, csvs, ppc_samples_path)
+    shutil.copytree(samples_path, ppc_samples_path)
+    print(f"Sampling {ui_dir} using samples from {samples_path}")
+    sampling.ppc(mi_oos, mi_train, csvs, posterior_draws_path)
     return output_path
 
 
