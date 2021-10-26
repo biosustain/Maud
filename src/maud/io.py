@@ -339,7 +339,6 @@ def parse_toml_reaction(raw: dict) -> Reaction:
                 reaction_id=raw["id"],
                 modifiers=modifiers,
                 subunits=subunits,
-                water_stoichiometry=water_stoichiometry,
             )
         )
     return Reaction(
@@ -348,6 +347,7 @@ def parse_toml_reaction(raw: dict) -> Reaction:
         reaction_mechanism=raw["mechanism"],
         stoichiometry=raw["stoichiometry"],
         enzymes=enzymes,
+        water_stoichiometry=water_stoichiometry,
     )
 
 
@@ -511,15 +511,13 @@ def extract_2d_prior(
     out = raw.loc[lambda df: df["parameter_type"] == parameter_name].set_index(
         parameter_name_to_id_cols[parameter_name]
     )
-    pct_params = (
-        out[["pct1", "pct99"]]
-        .apply(
-            lambda row: qfunc(row["pct1"], 0.01, row["pct99"], 0.99),
-            axis=1,
-            result_type="expand",
-        )
-        .rename(columns={0: "location", 1: "scale"})
+    pct_params = out[["pct1", "pct99"]].apply(
+        lambda row: qfunc(row["pct1"], 0.01, row["pct99"], 0.99),
+        axis=1,
+        result_type="expand",
     )
+    pct_params.columns = ["location", "scale"]
+    pct_params["location"] = np.exp(pct_params["location"])
     out[["location", "scale"]] = out[["location", "scale"]].fillna(pct_params)
     location, scale = (
         out[col]

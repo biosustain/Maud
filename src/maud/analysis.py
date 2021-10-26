@@ -5,6 +5,7 @@ from typing import Dict, List, Union
 
 import arviz as az
 import numpy as np
+from arviz.utils import Numba
 from matplotlib import pyplot as plt
 
 from maud.data_model import MaudInput
@@ -49,6 +50,7 @@ def load_infd_fit(fit, mi: MaudInput) -> az.InferenceData:
 def load_infd(csvs: List[str], mi: MaudInput) -> az.InferenceData:
     """Get an arviz InferenceData object from Maud csvs."""
 
+    Numba.disable_numba()
     coords = {
         **mi.stan_coords.__dict__,
         **{

@@ -555,7 +555,12 @@ def get_input_data(mi: MaudInput) -> dict:
     ).astype(int)
     phos_info = get_phos_info(mi)
     mod_info = get_modifier_info(mi)
-    water_stoichiometry_enzyme = {e.id: e.water_stoichiometry for e in sorted_enzymes}
+    water_stoichiometry_enzyme = {
+        e.id: next(
+            filter(lambda r: e in r.enzymes, mi.kinetic_model.reactions)
+        ).water_stoichiometry
+        for e in sorted_enzymes
+    }
     water_stoichiometry = pd.Series(water_stoichiometry_enzyme, index=S.columns).fillna(
         0
     )
