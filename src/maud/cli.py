@@ -86,6 +86,7 @@ def sample_command(data_path, output_dir):
     """Run the sample function as a click command."""
     click.echo(sample(data_path, output_dir))
 
+
 def ppc(samples_path, ppc_path, output_dir):
     """Generate MCMC samples given a user input directory.
 
@@ -133,11 +134,9 @@ def ppc(samples_path, ppc_path, output_dir):
     type=click.Path(exists=True, dir_okay=True, file_okay=False),
     default=get_example_path(RELATIVE_PATH_EXAMPLE),
 )
-
 def ppc_command(samples_path, ppc_path, output_dir):
     """Run the sample function as a click command."""
     click.echo(ppc(samples_path, ppc_path, output_dir))
-
 
 
 def simulate(data_path, output_dir, n):

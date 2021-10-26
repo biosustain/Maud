@@ -14,6 +14,7 @@ def join_list_of_strings(l1, l2, sep="-"):
     """Join strings for use in infd coordinates."""
     return list(map(lambda a: f"{a[0]}{sep}{a[1]}", zip(l1, l2)))
 
+
 def load_infd_fit(fit, mi: MaudInput) -> az.InferenceData:
     """Get an arviz InferenceData object from Maud csvs."""
 

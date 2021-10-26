@@ -22,12 +22,13 @@ import os
 import warnings
 from typing import Dict, List, Union
 
+import arviz as az
 import cmdstanpy
 import numpy as np
 import pandas as pd
-import arviz as az
 import plotnine as p9
 
+from maud.analysis import load_infd, load_infd_fit
 from maud.data_model import (
     IndPrior1d,
     IndPrior2d,
@@ -37,7 +38,6 @@ from maud.data_model import (
     StanCoordSet,
 )
 from maud.utils import codify, get_null_space, get_rref
-from maud.analysis import load_infd, load_infd_fit
 
 
 HERE = os.path.dirname(os.path.abspath(__file__))
@@ -81,7 +81,10 @@ def sample(mi: MaudInput, output_dir: str) -> cmdstanpy.CmdStanMCMC:
     }
     return _sample_given_config(mi, output_dir, config)
 
-def ppc(mi_oos: MaudInput, mi_train, csvs: List[str], output_dir: str) -> cmdstanpy.CmdStanMCMC:
+
+def ppc(
+    mi_oos: MaudInput, mi_train, csvs: List[str], output_dir: str
+) -> cmdstanpy.CmdStanMCMC:
     """Sample from the posterior defined by mi.
 
     :param mi: a MaudInput object
@@ -93,6 +96,7 @@ def ppc(mi_oos: MaudInput, mi_train, csvs: List[str], output_dir: str) -> cmdsta
         **{"output_dir": output_dir},
     }
     return _ppc_given_config(mi_oos, mi_train, csvs, output_dir, config)
+
 
 def simulate(mi: MaudInput, output_dir: str, n: int) -> cmdstanpy.CmdStanMCMC:
     """Generate simulations from the prior mean.
@@ -136,12 +140,16 @@ def _sample_given_config(
         stan_file=stan_program_filepath,
         stanc_options=stanc_options,
         cpp_options=cpp_options,
-        )
+    )
     return model.sample(data=input_filepath, **config)
 
 
 def _ppc_given_config(
-    mi_oos: MaudInput, mi_train: MaudInput, csvs: List[str], output_dir: str, config: dict
+    mi_oos: MaudInput,
+    mi_train: MaudInput,
+    csvs: List[str],
+    output_dir: str,
+    config: dict,
 ):
     input_filepath = os.path.join(output_dir, "input_data.json")
     inits_filepath = os.path.join(output_dir, "inits.json")
@@ -156,7 +164,16 @@ def _ppc_given_config(
     stanc_options = {"include_paths": [include_path]}
     infd = load_infd(csvs, mi_train)
     posterior_draws = infd.posterior["keq"]
-    kinetic_parameters = ["keq", "km", "kcat", "diss_t", "diss_r", "transfer_constant", "kcat_phos", "ki"]
+    kinetic_parameters = [
+        "keq",
+        "km",
+        "kcat",
+        "diss_t",
+        "diss_r",
+        "transfer_constant",
+        "kcat_phos",
+        "ki",
+    ]
     if config["threads_per_chain"] != 1:
         cpp_options["STAN_THREADS"] = True
         os.environ["STAN_NUM_THREADS"] = str(config["threads_per_chain"])
@@ -166,7 +183,7 @@ def _ppc_given_config(
         stan_file=ppc_program_filepath,
         stanc_options=stanc_options,
         cpp_options=cpp_options,
-        )
+    )
     all_conc = []
     all_conc_enz = []
     all_flux = []
@@ -183,7 +200,7 @@ def _ppc_given_config(
                 iter_sampling=1,
                 data=input_filepath,
                 fixed_param=True,
-                )
+            )
             infd_fit = load_infd_fit(gq_samples.runset.csv_files, mi_oos)
             tmp_conc = infd_fit.posterior.conc.to_dataframe().reset_index()
             tmp_conc["chain"] = chain
@@ -205,7 +222,6 @@ def _ppc_given_config(
     conc_df.to_csv(os.path.join(output_dir, "conc.csv"))
     conc_enz_df.to_csv(os.path.join(output_dir, "conc_enzyme.csv"))
     return
-
 
 
 def get_stoichiometry(mi: MaudInput) -> pd.DataFrame:
