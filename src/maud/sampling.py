@@ -22,11 +22,9 @@ import os
 import warnings
 from typing import Dict, List, Union
 
-import arviz as az
 import cmdstanpy
 import numpy as np
 import pandas as pd
-import plotnine as p9
 
 from maud.analysis import load_infd, load_infd_fit
 from maud.data_model import (
@@ -129,7 +127,6 @@ def _sample_given_config(
         json.dump(mi.stan_coords.__dict__, f)
     config["inits"] = inits_filepath
     stan_program_filepath = os.path.join(HERE, STAN_PROGRAM_RELATIVE_PATH)
-    ppc_program_filepath = os.path.join(HERE, PPC_PROGRAM_RELATIVE_PATH)
     include_path = os.path.join(HERE, INCLUDE_PATH)
     cpp_options = {}
     stanc_options = {"include_paths": [include_path]}
@@ -152,7 +149,6 @@ def _ppc_given_config(
     config: dict,
 ):
     input_filepath = os.path.join(output_dir, "input_data.json")
-    inits_filepath = os.path.join(output_dir, "inits.json")
     coords_filepath = os.path.join(output_dir, "coords.json")
     input_data = get_input_data(mi_oos)
     cmdstanpy.utils.write_stan_json(input_filepath, input_data)
@@ -163,7 +159,6 @@ def _ppc_given_config(
     cpp_options = {}
     stanc_options = {"include_paths": [include_path]}
     infd = load_infd(csvs, mi_train)
-    posterior_draws = infd.posterior["keq"]
     kinetic_parameters = [
         "keq",
         "km",
