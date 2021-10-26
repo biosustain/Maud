@@ -9,8 +9,8 @@ experiments = "experiments.csv"
 likelihood = true
 
 [cmdstanpy_config]
-iter_warmup = 2
-iter_sampling = 2
+iter_warmup = 200
+iter_sampling = 200
 chains = 4
 save_warmup = true
 
