@@ -67,7 +67,7 @@ Template_Dr = Template(
     """{%- for met in sub_array -%} (1 + {{met[0]}}/{{met[1]}})^({{met[2]}}) \
     {%- if not loop.last %} * {% endif %} {%- endfor -%} + \
     {%- for met in prod_array -%} (1 + {{met[0]}}/{{met[1]}})^({{met[2]}}) \
-    {%- if not loop.last %} * {% endif %} {%- endfor -%}"""
+    {%- if not loop.last %} * {% endif %} {%- endfor -%} - 1"""
 )
 
 Template_Dr_irr = Template(
@@ -81,7 +81,7 @@ Template_Drreg = Template(
 )
 
 Template_Allo = Template(
-    """1/(1 + {{L0}}*(({{Dr}} + {{Drreg}} - 1)*\
+    """1/(1 + {{L0}}*(1/({{Dr}} + {{Drreg}})*\
     {{Allo_Inh}}/{{Allo_Act}})^{{Subunits}})"""
 )
 
@@ -90,7 +90,7 @@ Template_Allo_Act_Inh = Template(
     {%- if not loop.last %} * {% endif %} {%- endfor -%}"""
 )
 
-Template_flux = Template("""({{Tr}})/({{Dr}} + {{Drreg}} - 1)*{{Allo}}""")
+Template_flux = Template("""({{Tr}})/({{Dr}} + {{Drreg}})*{{Allo}}""")
 
 Template_drain = Template(
     """{{drain}}*{%- for met in sub_array -%} ({{met}} /({{met}} + 0.000001)) \
@@ -331,7 +331,7 @@ def main():
                 )
                 Dr = Template_Dr_irr.render(sub_array=substrate_entry)
 
-            Drreg = Template_Drreg.render(sub_array=substrate_entry)
+            Drreg = Template_Drreg.render(met_array=competitive_entry)
             if competitive_entry == []:
                 Drreg = "0"
             Allo_Act = Template_Allo_Act_Inh.render(met_array=allosteric_activators)
@@ -357,6 +357,8 @@ def main():
             substrate_list = [
                 f"m{mic}" for mic, stoic in rxn.stoichiometry.items() if stoic < 0
             ]
+            if substrate_list == []:
+                substrate_list = [1]
             flux = Template_drain.render(drain=f"r{rxn.id}", sub_array=substrate_list)
             flux_dict[rxn.id] = flux
 
