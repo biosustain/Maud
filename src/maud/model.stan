@@ -252,7 +252,7 @@ model {
     for (c in 1:N_conc_measurement)
       yconc[c] ~ lognormal(log(conc[experiment_yconc[c], mic_ix_yconc[c]]), sigma_conc[c]);
     for (e in 1:N_enzyme_measurement)
-      yenz[e] ~ lognormal(log(conc_enzyme[experiment_yconc[e], enzyme_yenz[e]]), sigma_enz[e]);
+      yenz[e] ~ lognormal(log(conc_enzyme[experiment_yenz[e], enzyme_yenz[e]]), sigma_enz[e]);
     for (f in 1:N_flux_measurement)
       yflux[f] ~ normal(flux[experiment_yflux[f], reaction_yflux[f]], sigma_flux[f]);
   }

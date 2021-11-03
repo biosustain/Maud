@@ -13,3 +13,7 @@ exclude = '''
     | _version.py
 )
 '''
+
+[tool.pyright]
+venvPath = "./venv_maud"
+venv = "venv_maud"
