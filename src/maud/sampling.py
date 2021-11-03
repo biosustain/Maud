@@ -43,7 +43,7 @@ INCLUDE_PATH = ""
 DEFAULT_PRIOR_LOC_DRAIN = None
 DEFAULT_PRIOR_SCALE_DRAIN = None
 STAN_PROGRAM_RELATIVE_PATH = "model.stan"
-PPC_PROGRAM_RELATIVE_PATH = "posterior_predictive_model.stan"
+PPC_PROGRAM_RELATIVE_PATH = "out_of_sample_model.stan"
 
 DEFAULT_SAMPLE_CONFIG = {
     "iter_warmup": 5,
@@ -80,8 +80,8 @@ def sample(mi: MaudInput, output_dir: str) -> cmdstanpy.CmdStanMCMC:
     return _sample_given_config(mi, output_dir, config)
 
 
-def ppc(
-    mi_oos: MaudInput, mi_train, csvs: List[str], output_dir: str
+def generate_predictions(
+    mi_oos: MaudInput, mi_train: MaudInput, csvs: List[str], output_dir: str
 ) -> cmdstanpy.CmdStanMCMC:
     """Sample from the posterior defined by mi.
 
@@ -93,7 +93,7 @@ def ppc(
         **mi_oos.config.cmdstanpy_config,
         **{"output_dir": output_dir},
     }
-    return _ppc_given_config(mi_oos, mi_train, csvs, output_dir, config)
+    return _generate_predictions(mi_oos, mi_train, csvs, output_dir, config)
 
 
 def simulate(mi: MaudInput, output_dir: str, n: int) -> cmdstanpy.CmdStanMCMC:
@@ -141,13 +141,20 @@ def _sample_given_config(
     return model.sample(data=input_filepath, **config)
 
 
-def _ppc_given_config(
+def _generate_predictions(
     mi_oos: MaudInput,
     mi_train: MaudInput,
     csvs: List[str],
     output_dir: str,
     config: dict,
 ):
+    """Call CmdStanModel.out_of_sample, having already specified all arguments.
+
+    :param mi_oos: a MaudInput object defining the 
+    :param mi_train: a
+    :param output_dir: a string specifying where to save the output.
+    :param config: a dictionary of keyword arguments to CmdStanModel.sample.
+    """
     input_filepath = os.path.join(output_dir, "input_data.json")
     coords_filepath = os.path.join(output_dir, "coords.json")
     input_data = get_input_data(mi_oos)

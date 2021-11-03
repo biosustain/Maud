@@ -87,7 +87,7 @@ def sample_command(data_path, output_dir):
     click.echo(sample(data_path, output_dir))
 
 
-def ppc(samples_path, ppc_path, output_dir):
+def generate_predictions(samples_path, oos_path, output_dir):
     """Generate MCMC samples given a user input directory.
 
     This function creates a new directory in output_dir with a name starting
@@ -102,41 +102,41 @@ def ppc(samples_path, ppc_path, output_dir):
         for f in os.listdir(os.path.join(samples_path, "samples"))
         if f.endswith(".csv")
     ]
-    mi_oos = load_maud_input_from_toml(ppc_path)
+    mi_oos = load_maud_input_from_toml(oos_path)
     mi_train = load_maud_input_from_toml(os.path.join(samples_path, "user_input"))
     now = datetime.now().strftime("%Y%m%d%H%M%S")
-    output_name = f"maud-ppc_output-{mi_oos.config.name}-{now}"
+    output_name = f"maud-oos_output-{mi_oos.config.name}-{now}"
     output_path = os.path.join(output_dir, output_name)
-    ppc_samples_path = os.path.join(output_path, "samples")
+    trained_samples_path = os.path.join(output_path, "samples")
     ui_dir = os.path.join(output_path, "user_input")
-    posterior_draws_path = os.path.join(output_path, "out_of_sample_draws")
+    oos_samples_path = os.path.join(output_path, "out_of_sample_draws")
     print("Creating output directory: " + output_path)
     os.mkdir(output_path)
-    os.mkdir(posterior_draws_path)
-    print(f"Copying user input from {ppc_path} to {ui_dir}")
-    shutil.copytree(ppc_path, ui_dir)
+    os.mkdir(oos_samples_path)
+    print(f"Copying user input from {oos_path} to {ui_dir}")
+    shutil.copytree(oos_path, ui_dir)
     print(f"Copying posterior_draws from {samples_path} to {ui_dir}")
-    shutil.copytree(samples_path, ppc_samples_path)
+    shutil.copytree(samples_path, trained_samples_path)
     print(f"Sampling {ui_dir} using samples from {samples_path}")
-    sampling.ppc(mi_oos, mi_train, csvs, posterior_draws_path)
+    sampling.generate_predictions(mi_oos, mi_train, csvs, oos_samples_path)
     return output_path
 
 
-@cli.command("ppc")
+@cli.command("generate-predictions")
 @click.option("--output_dir", default=".", help="Where to save Maud's output")
 @click.option(
-    "--ppc_path",
+    "--oos_path",
     type=click.Path(exists=True, dir_okay=True, file_okay=False),
-    help="Posterior samples from same model definition",
+    help="Out of sample predictions from same model definition",
 )
 @click.argument(
     "samples_path",
     type=click.Path(exists=True, dir_okay=True, file_okay=False),
     default=get_example_path(RELATIVE_PATH_EXAMPLE),
 )
-def ppc_command(samples_path, ppc_path, output_dir):
+def generate_predictions_command(samples_path, oos_path, output_dir):
     """Run the sample function as a click command."""
-    click.echo(ppc(samples_path, ppc_path, output_dir))
+    click.echo(generate_predictions(samples_path, oos_path, output_dir))
 
 
 def simulate(data_path, output_dir, n):
