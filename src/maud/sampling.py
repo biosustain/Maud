@@ -150,8 +150,8 @@ def _generate_predictions(
 ):
     """Call CmdStanModel.out_of_sample, having already specified all arguments.
 
-    :param mi_oos: a MaudInput object defining the 
-    :param mi_train: a
+    :param mi_oos: a MaudInput object defining the out-of-sample experiments
+    :param mi_train: a MaudInput object defining the training experiments
     :param output_dir: a string specifying where to save the output.
     :param config: a dictionary of keyword arguments to CmdStanModel.sample.
     """
