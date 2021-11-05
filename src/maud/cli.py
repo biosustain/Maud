@@ -88,14 +88,14 @@ def sample_command(data_path, output_dir):
 
 
 def generate_predictions(samples_path, oos_path, output_dir):
-    """Generate MCMC samples given a user input directory.
+    """Generate MCMC samples given a Maud output folder.
 
     This function creates a new directory in output_dir with a name starting
-    with "maud_output". It first copies the directory at data_path into the new
-    this directory at new_dir/user_input, then runs the sampling.sample
-    function to write samples in new_dir/samples. Finally it prints the results
-    of cmdstanpy's diagnose and summary methods.
-
+    with "maud-oos_output". It first copies the testing directory at oos_path into the new
+    this directory at new_dir/user_input, then runs the sampling.generate_predictions
+    function to write samples in new_dir/oos_samples. The trained output is stored in
+    the new_dir/trained_samples folder along with the user input required to generate
+    the trained samples.
     """
     csvs = [
         os.path.join(samples_path, "samples", f)
@@ -107,9 +107,9 @@ def generate_predictions(samples_path, oos_path, output_dir):
     now = datetime.now().strftime("%Y%m%d%H%M%S")
     output_name = f"maud-oos_output-{mi_oos.config.name}-{now}"
     output_path = os.path.join(output_dir, output_name)
-    trained_samples_path = os.path.join(output_path, "samples")
+    trained_samples_path = os.path.join(output_path, "trained_samples")
     ui_dir = os.path.join(output_path, "user_input")
-    oos_samples_path = os.path.join(output_path, "out_of_sample_draws")
+    oos_samples_path = os.path.join(output_path, "oos_samples")
     print("Creating output directory: " + output_path)
     os.mkdir(output_path)
     os.mkdir(oos_samples_path)
@@ -132,7 +132,6 @@ def generate_predictions(samples_path, oos_path, output_dir):
 @click.argument(
     "samples_path",
     type=click.Path(exists=True, dir_okay=True, file_okay=False),
-    default=get_example_path(RELATIVE_PATH_EXAMPLE),
 )
 def generate_predictions_command(samples_path, oos_path, output_dir):
     """Run the sample function as a click command."""
