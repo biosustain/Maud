@@ -53,7 +53,7 @@ def test_model_ode():
     sim_values = model.sample(data=input_data, **SIM_CONFIG).draws_pd()
     sim_values = sim_values.rename(columns=remap)
     for value_id, value in true_values.items():
-        assert isclose(sim_values[value_id][0] == value)
+        assert isclose(sim_values[value_id][0], value)
 
 
 if __name__ == "__main__":
