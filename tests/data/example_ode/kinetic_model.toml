@@ -1,0 +1,79 @@
+[[compartments]]
+id = 'c'
+name = 'cytosol'
+volume = 1
+
+[[metabolites]]
+id = 'A'
+name = 'Metabolite A'
+balanced = false
+compartment = 'c'
+
+[[metabolites]]
+id = 'B'
+name = 'Metabolite B'
+balanced = true
+compartment = 'c'
+
+[[metabolites]]
+id = 'C'
+name = 'Metabolite C'
+balanced = true
+compartment = 'c'
+
+[[metabolites]]
+id = 'D'
+name = 'Metabolite D'
+balanced = false
+compartment = 'c'
+
+
+[[reactions]]
+id = 'r1'
+name = 'reaction number 1'
+stoichiometry = { A_c = -1, B_c = 1}
+mechanism = "reversible_modular_rate_law"
+[[reactions.enzymes]]
+id = 'r1'
+name = 'the enzyme that catalyses reaction r1'
+[[reactions.enzymes.modifiers]]
+modifier_type = 'competitive_inhibitor'
+mic_id = 'D_c'
+
+[[reactions]]
+id = 'r2'
+name = 'reaction number 2'
+stoichiometry = { A_c = -1, C_c = 1 }
+mechanism = "reversible_modular_rate_law"
+[[reactions.enzymes]]
+id = 'r2A'
+name = 'Isoenzyme A that catalyses reaction r2'
+[[reactions.enzymes.modifiers]]
+modifier_type = 'allosteric_activator'
+mic_id = 'C_c'
+[[reactions.enzymes]]
+id = 'r2B'
+name = 'Isoenzyme B that catalyses reaction r2'
+[[reactions.enzymes.modifiers]]
+modifier_type = 'allosteric_inhibitor'
+mic_id = 'C_c'
+
+
+
+[[reactions]]
+id = 'r3'
+name = 'reaction number 3'
+stoichiometry = { B_c = -1, D_c = 1}
+mechanism = "reversible_modular_rate_law"
+[[reactions.enzymes]]
+id = 'r3'
+name = 'the enzyme that catalyses reaction r3'
+
+[[reactions]]
+id = "r4"
+name = "reaction number 4"
+stoichiometry = { C_c = -1, D_c = 1 }
+mechanism = "reversible_modular_rate_law"
+[[reactions.enzymes]]
+id = 'r4'
+name = 'the enzyme that catalyses reaction r4'
