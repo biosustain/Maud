@@ -90,12 +90,12 @@ def sample_command(data_path, output_dir):
 def generate_predictions(samples_path, oos_path, output_dir):
     """Generate MCMC samples given a Maud output folder.
 
-    This function creates a new directory in output_dir with a name starting
-    with "maud-oos_output". It first copies the testing directory at oos_path into the new
-    this directory at new_dir/user_input, then runs the sampling.generate_predictions
-    function to write samples in new_dir/oos_samples. The trained output is stored in
-    the new_dir/trained_samples folder along with the user input required to generate
-    the trained samples.
+    This function creates a new directory in output_dir with a name starting with
+    "maud-oos_output". It first copies the testing directory at oos_path into the
+    new this directory at new_dir/user_input, then runs the sampling.
+    generate_predictions function to write samples in new_dir/oos_samples.
+    The trained output is stored in the new_dir/trained_samples folder along with
+    the user input required to generate the trained samples.
     """
     csvs = [
         os.path.join(samples_path, "samples", f)
