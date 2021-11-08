@@ -158,7 +158,7 @@ def parse_toml_kinetic_model(raw: dict) -> KineticModel:
         for m in raw["metabolite-in-compartment"]
     ]
     reactions = [parse_toml_reaction(r) for r in raw["reaction"]]
-    if "drains" in raw.keys():
+    if "drain" in raw.keys():
         reactions += [parse_toml_drain(d) for d in raw["drain"]]
     phosphorylation = (
         [parse_toml_phosphorylation(d) for d in raw["phosphorylation"]]
