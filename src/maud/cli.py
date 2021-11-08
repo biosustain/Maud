@@ -87,6 +87,57 @@ def sample_command(data_path, output_dir):
     click.echo(sample(data_path, output_dir))
 
 
+def generate_predictions(samples_path, oos_path, output_dir):
+    """Generate MCMC samples given a Maud output folder.
+
+    This function creates a new directory in output_dir with a name starting with
+    "maud-oos_output". It first copies the testing directory at oos_path into the
+    new this directory at new_dir/user_input, then runs the sampling.
+    generate_predictions function to write samples in new_dir/oos_samples.
+    The trained output is stored in the new_dir/trained_samples folder along with
+    the user input required to generate the trained samples.
+    """
+    csvs = [
+        os.path.join(samples_path, "samples", f)
+        for f in os.listdir(os.path.join(samples_path, "samples"))
+        if f.endswith(".csv")
+    ]
+    mi_oos = load_maud_input_from_toml(oos_path)
+    mi_train = load_maud_input_from_toml(os.path.join(samples_path, "user_input"))
+    now = datetime.now().strftime("%Y%m%d%H%M%S")
+    output_name = f"maud-oos_output-{mi_oos.config.name}-{now}"
+    output_path = os.path.join(output_dir, output_name)
+    trained_samples_path = os.path.join(output_path, "trained_samples")
+    ui_dir = os.path.join(output_path, "user_input")
+    oos_samples_path = os.path.join(output_path, "oos_samples")
+    print("Creating output directory: " + output_path)
+    os.mkdir(output_path)
+    os.mkdir(oos_samples_path)
+    print(f"Copying user input from {oos_path} to {ui_dir}")
+    shutil.copytree(oos_path, ui_dir)
+    print(f"Copying posterior_draws from {samples_path} to {ui_dir}")
+    shutil.copytree(samples_path, trained_samples_path)
+    print(f"Sampling {ui_dir} using samples from {samples_path}")
+    sampling.generate_predictions(mi_oos, mi_train, csvs, oos_samples_path)
+    return output_path
+
+
+@cli.command("generate-predictions")
+@click.option("--output_dir", default=".", help="Where to save Maud's output")
+@click.option(
+    "--oos_path",
+    type=click.Path(exists=True, dir_okay=True, file_okay=False),
+    help="Out of sample predictions from same model definition",
+)
+@click.argument(
+    "samples_path",
+    type=click.Path(exists=True, dir_okay=True, file_okay=False),
+)
+def generate_predictions_command(samples_path, oos_path, output_dir):
+    """Run the sample function as a click command."""
+    click.echo(generate_predictions(samples_path, oos_path, output_dir))
+
+
 def simulate(data_path, output_dir, n):
     """Generate draws from the prior mean."""
 

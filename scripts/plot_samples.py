@@ -269,7 +269,7 @@ def main():
                         right_on=list(par.coords.keys()),
                     )
                     par_dataframe = par_dataframe.drop(list(par.coords.keys()), axis=1)
-                    if par in LOG_SCALE_VARIABLES:
+                    if par.id in LOG_SCALE_VARIABLES:
                         par_dataframe["lower_ci"] = par_dataframe.apply(
                             lambda x: np.exp(np.log(x["location"]) - 2 * x["scale"]),
                             axis=1,

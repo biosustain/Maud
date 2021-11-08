@@ -26,6 +26,7 @@ import cmdstanpy
 import numpy as np
 import pandas as pd
 
+from maud.analysis import load_infd, load_infd_fit
 from maud.data_model import (
     IndPrior1d,
     IndPrior2d,
@@ -42,6 +43,7 @@ INCLUDE_PATH = ""
 DEFAULT_PRIOR_LOC_DRAIN = None
 DEFAULT_PRIOR_SCALE_DRAIN = None
 STAN_PROGRAM_RELATIVE_PATH = "model.stan"
+PPC_PROGRAM_RELATIVE_PATH = "out_of_sample_model.stan"
 
 DEFAULT_SAMPLE_CONFIG = {
     "iter_warmup": 5,
@@ -76,6 +78,22 @@ def sample(mi: MaudInput, output_dir: str) -> cmdstanpy.CmdStanMCMC:
         **{"output_dir": output_dir},
     }
     return _sample_given_config(mi, output_dir, config)
+
+
+def generate_predictions(
+    mi_oos: MaudInput, mi_train: MaudInput, csvs: List[str], output_dir: str
+) -> cmdstanpy.CmdStanMCMC:
+    """Sample from the posterior defined by mi.
+
+    :param mi: a MaudInput object
+    :param output_dir: a string specifying where to save the output.
+    """
+    config = {
+        **DEFAULT_SAMPLE_CONFIG,
+        **mi_oos.config.cmdstanpy_config,
+        **{"output_dir": output_dir},
+    }
+    return _generate_predictions(mi_oos, mi_train, csvs, output_dir, config)
 
 
 def simulate(mi: MaudInput, output_dir: str, n: int) -> cmdstanpy.CmdStanMCMC:
@@ -121,6 +139,91 @@ def _sample_given_config(
         cpp_options=cpp_options,
     )
     return model.sample(data=input_filepath, **config)
+
+
+def _generate_predictions(
+    mi_oos: MaudInput,
+    mi_train: MaudInput,
+    csvs: List[str],
+    output_dir: str,
+    config: dict,
+):
+    """Call CmdStanModel.out_of_sample, having already specified all arguments.
+
+    :param mi_oos: a MaudInput object defining the out-of-sample experiments
+    :param mi_train: a MaudInput object defining the training experiments
+    :param output_dir: a string specifying where to save the output.
+    :param config: a dictionary of keyword arguments to CmdStanModel.sample.
+    """
+    input_filepath = os.path.join(output_dir, "input_data.json")
+    coords_filepath = os.path.join(output_dir, "coords.json")
+    input_data = get_input_data(mi_oos)
+    cmdstanpy.utils.write_stan_json(input_filepath, input_data)
+    with open(coords_filepath, "w") as f:
+        json.dump(mi_oos.stan_coords.__dict__, f)
+    ppc_program_filepath = os.path.join(HERE, PPC_PROGRAM_RELATIVE_PATH)
+    include_path = os.path.join(HERE, INCLUDE_PATH)
+    cpp_options = {}
+    stanc_options = {"include_paths": [include_path]}
+    infd = load_infd(csvs, mi_train)
+    kinetic_parameters = [
+        "keq",
+        "km",
+        "kcat",
+        "diss_t",
+        "diss_r",
+        "transfer_constant",
+        "kcat_phos",
+        "ki",
+    ]
+    if config["threads_per_chain"] != 1:
+        cpp_options["STAN_THREADS"] = True
+        os.environ["STAN_NUM_THREADS"] = str(config["threads_per_chain"])
+    chains = infd.posterior.chain.to_series().values
+    draws = infd.posterior.draw.to_series().values
+    gq_model = cmdstanpy.CmdStanModel(
+        stan_file=ppc_program_filepath,
+        stanc_options=stanc_options,
+        cpp_options=cpp_options,
+    )
+    all_conc = []
+    all_conc_enz = []
+    all_flux = []
+    for chain in chains:
+        for draw in draws:
+            inits = {
+                par: infd.posterior[par][chain][draw].to_series().values
+                for par in kinetic_parameters
+                if par in infd.posterior.variables.keys()
+            }
+            gq_samples = gq_model.sample(
+                inits=inits,
+                iter_warmup=0,
+                iter_sampling=1,
+                data=input_filepath,
+                fixed_param=True,
+            )
+            infd_fit = load_infd_fit(gq_samples.runset.csv_files, mi_oos)
+            tmp_conc = infd_fit.posterior.conc.to_dataframe().reset_index()
+            tmp_conc["chain"] = chain
+            tmp_conc["draw"] = draw
+            tmp_conc_enz = infd_fit.posterior.conc_enzyme.to_dataframe().reset_index()
+            tmp_conc_enz["chain"] = chain
+            tmp_conc_enz["draw"] = draw
+            tmp_flux = infd_fit.posterior.flux.to_dataframe().reset_index()
+            tmp_flux["chain"] = chain
+            tmp_flux["draw"] = draw
+            all_conc.append(tmp_conc)
+            all_conc_enz.append(tmp_conc_enz)
+            all_flux.append(tmp_flux)
+    draws = {}
+    flux_df = pd.concat(all_flux)
+    conc_df = pd.concat(all_conc)
+    conc_enz_df = pd.concat(all_conc_enz)
+    flux_df.to_csv(os.path.join(output_dir, "flux.csv"))
+    conc_df.to_csv(os.path.join(output_dir, "conc.csv"))
+    conc_enz_df.to_csv(os.path.join(output_dir, "conc_enzyme.csv"))
+    return
 
 
 def get_stoichiometry(mi: MaudInput) -> pd.DataFrame:
@@ -460,7 +563,12 @@ def get_input_data(mi: MaudInput) -> dict:
     ).astype(int)
     phos_info = get_phos_info(mi)
     mod_info = get_modifier_info(mi)
-    water_stoichiometry_enzyme = {e.id: e.water_stoichiometry for e in sorted_enzymes}
+    water_stoichiometry_enzyme = {
+        e.id: next(
+            filter(lambda r: e in r.enzymes, mi.kinetic_model.reactions)
+        ).water_stoichiometry
+        for e in sorted_enzymes
+    }
     water_stoichiometry = pd.Series(water_stoichiometry_enzyme, index=S.columns).fillna(
         0
     )

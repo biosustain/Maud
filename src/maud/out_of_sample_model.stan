@@ -13,33 +13,14 @@ data {
   int<lower=1> N_edge;
   int<lower=0> N_phosphorylation_enzymes;
   int<lower=1> N_experiment;
-  int<lower=1> N_flux_measurement;
-  int<lower=0> N_enzyme_measurement;
-  int<lower=1> N_conc_measurement;
   int<lower=0> N_ki;
   int<lower=0> N_ai;
   int<lower=0> N_aa;
   int<lower=0> N_ae;
   int<lower=0> N_pa;
   int<lower=0> N_pi;
-  // measurements
-  int<lower=1,upper=N_mic> unbalanced_mic_ix[N_unbalanced];
-  int<lower=1,upper=N_mic> balanced_mic_ix[N_mic-N_unbalanced];
-  int<lower=1,upper=N_experiment> experiment_yconc[N_conc_measurement];
-  int<lower=1,upper=N_mic> mic_ix_yconc[N_conc_measurement];
-  real yconc[N_conc_measurement];
-  vector<lower=0>[N_conc_measurement] sigma_conc;
-  int<lower=1,upper=N_experiment> experiment_yflux[N_flux_measurement];
-  int<lower=1,upper=N_reaction> reaction_yflux[N_flux_measurement];
-  real yflux[N_flux_measurement];
-  vector<lower=0>[N_flux_measurement] sigma_flux;
-  int<lower=0,upper=N_experiment> experiment_yenz[N_enzyme_measurement];
-  int<lower=0,upper=N_enzyme> enzyme_yenz[N_enzyme_measurement];
-  real yenz[N_enzyme_measurement];
-  vector<lower=0>[N_enzyme_measurement] sigma_enz;
   // hardcoded priors
-  vector[N_metabolite] prior_loc_dgf;
-  cov_matrix[N_metabolite] prior_cov_dgf;
+  array[2] vector[N_metabolite] priors_dgf;
   array[2] vector[N_enzyme] priors_kcat;
   array[2] vector[N_km] priors_km;
   array[2] vector[N_ki] priors_ki;
@@ -52,6 +33,8 @@ data {
   array[2, N_experiment] vector[N_enzyme] priors_conc_enzyme;
   array[2, N_experiment] vector[N_drain] priors_drain;
   // network properties
+  int<lower=1,upper=N_mic> unbalanced_mic_ix[N_unbalanced];
+  int<lower=1,upper=N_mic> balanced_mic_ix[N_mic-N_unbalanced];
   matrix[N_mic, N_edge] S;
   int<lower=1,upper=3> edge_type[N_edge];  // 1 = reversible modular rate law, 2 = drain
   int<lower=0,upper=N_enzyme> edge_to_enzyme[N_edge];  // 0 if drain
@@ -88,7 +71,6 @@ data {
   int solver_backward;
   int<lower=0,upper=1> LIKELIHOOD;  // set to 0 for priors-only mode
   real<lower=0> timepoint;
-  int<lower=0,upper=1> reject_non_steady;
 }
 transformed data {
   real initial_time = 0;
@@ -97,37 +79,31 @@ transformed data {
     rep_matrix(1, N_experiment, N_phosphorylation_enzymes) - is_phos_knockout;
 }
 parameters {
-  vector[N_metabolite] dgf;
-  array[N_experiment] vector[N_drain] drain_z;
-  vector[N_enzyme] log_kcat_z;
-  vector[N_km] log_km_z;
-  vector[N_phosphorylation_enzymes] log_kcat_phos_z;
-  vector[N_ki] log_ki_z;
-  vector[N_ai] log_diss_t_z;
-  vector[N_aa] log_diss_r_z;
-  vector[N_ae] log_transfer_constant_z;
-  array[N_experiment] vector[N_drain] drain_z;
-  array[N_experiment] vector[N_enzyme] log_conc_enzyme_z;
-  array[N_experiment] vector[N_phosphorylation_enzymes] log_conc_phos_z;
-  array[N_experiment] vector[N_unbalanced] log_conc_unbalanced_z;
+  vector[N_km] km;
+  vector[N_ki] ki;
+  vector[N_enzyme] kcat;
+  vector[N_ai] diss_t;
+  vector[N_aa] diss_r;
+  vector[N_ae] transfer_constant;
+  vector[N_phosphorylation_enzymes] kcat_phos;
+  vector[N_edge] keq;
 }
-transformed parameters {
-  // rescale
-  vector[N_km] km = unz_log_1d(priors_km, log_km_z);
-  vector[N_ki] ki = unz_log_1d(priors_ki, log_ki_z);
-  vector[N_enzyme] kcat = unz_log_1d(priors_kcat, log_kcat_z);
-  vector[N_ai] diss_t = unz_log_1d(priors_diss_t, log_diss_t_z);
-  vector[N_aa] diss_r = unz_log_1d(priors_diss_r, log_diss_r_z);
-  vector[N_ae] transfer_constant = unz_log_1d(priors_transfer_constant, log_transfer_constant_z);
-  vector[N_phosphorylation_enzymes] kcat_phos = unz_log_1d(priors_kcat_phos, log_kcat_phos_z);
-  array[N_experiment] vector[N_drain] drain = unz_2d(priors_drain, drain_z);
-  array[N_experiment] vector[N_enzyme] conc_enzyme = unz_log_2d(priors_conc_enzyme, log_conc_enzyme_z);
-  array[N_experiment] vector[N_unbalanced] conc_unbalanced = unz_log_2d(priors_conc_unbalanced, log_conc_unbalanced_z);
-  array[N_experiment] vector[N_phosphorylation_enzymes] conc_phos = unz_log_2d(priors_conc_phos, log_conc_phos_z);
-  // transform
+
+generated quantities {
   array[N_experiment] vector<lower=0>[N_mic] conc;
   array[N_experiment] vector[N_reaction] flux;
-  vector[N_edge] keq = get_keq(S, dgf, mic_to_met, water_stoichiometry);
+  array[N_experiment] vector[N_phosphorylation_enzymes] conc_phos;
+  array[N_experiment] vector[N_unbalanced] conc_unbalanced;
+  array[N_experiment] vector[N_enzyme] conc_enzyme;
+  array[N_experiment] vector[N_drain] drain;
+  // Sampling experiment boundary conditions from priors
+  for (e in 1:N_experiment){
+    drain[e] = to_vector(normal_rng(priors_drain[1,e], priors_drain[2,e]));
+    conc_phos[e] = to_vector(lognormal_rng(log(priors_conc_phos[1,e]), priors_conc_phos[2,e]));
+    conc_unbalanced[e] = to_vector(lognormal_rng(log(priors_conc_unbalanced[1,e]), priors_conc_unbalanced[2,e]));
+    conc_enzyme[e] = to_vector(lognormal_rng(log(priors_conc_enzyme[1,e]), priors_conc_enzyme[2,e]));
+  }
+  // Simulation of experiments
   for (e in 1:N_experiment){
     flux[e] = rep_vector(0, N_reaction);
     real timepoints[2] = {timepoint, timepoint + 10};
@@ -149,12 +125,12 @@ transformed parameters {
                   interpolation_polynomial,
                   solver_forward,
                   solver_backward,
-                  conc_unbalanced[e],
+                  conc_unbalanced[e,:],
                   balanced_mic_ix,
                   unbalanced_mic_ix,
                   conc_enzyme_experiment,
                   km,
-                  drain[e],
+                  drain[e,:],
                   km_lookup,
                   S,
                   edge_type,
@@ -180,12 +156,12 @@ transformed parameters {
                   kcat_phos,
                   conc_phos_experiment);
     conc[e, balanced_mic_ix] = conc_balanced[1];
-    conc[e, unbalanced_mic_ix] = conc_unbalanced[e];
+    conc[e, unbalanced_mic_ix] = conc_unbalanced[e,:];
     {
     vector[N_edge] flux_edge = get_flux(conc[e],
                                         conc_enzyme_experiment,
                                         km,
-                                        drain[e],
+                                        drain[e,:],
                                         km_lookup,
                                         S,
                                         edge_type,
@@ -213,62 +189,5 @@ transformed parameters {
     for (j in 1:N_edge)
       flux[e, edge_to_reaction[j]] += flux_edge[j];
     }
-    if (reject_non_steady == 1 && check_steady_state(conc_balanced,
-                                                     e,
-                                                     flux[e],
-                                                     conc_init[e],
-                                                     timepoints,
-                                                     conc_unbalanced[e],
-                                                     conc_enzyme_experiment,
-                                                     km,
-                                                     drain[e],
-                                                     kcat,
-                                                     keq,
-                                                     ki,
-                                                     diss_t,
-                                                     diss_r,
-                                                     transfer_constant,
-                                                     kcat_phos,
-                                                     conc_phos_experiment) == 0) {
-      reject("Non-steady state in experiment ", e);
-    }
-  }
-}
-model {
-  log_kcat_z ~ std_normal();
-  log_km_z ~ std_normal();
-  log_ki_z ~ std_normal();
-  log_diss_t_z ~ std_normal();
-  log_diss_r_z ~ std_normal();
-  log_transfer_constant_z ~ std_normal();
-  dgf ~ multi_normal(prior_loc_dgf, prior_cov_dgf);
-  log_kcat_phos_z ~ std_normal();
-  for (ex in 1:N_experiment){
-    log_conc_unbalanced_z[ex] ~ std_normal();
-    log_conc_enzyme_z[ex] ~ std_normal();
-    log_conc_phos_z[ex] ~ std_normal();
-    drain_z[ex] ~ std_normal();
-  }
-  if (LIKELIHOOD == 1){
-    for (c in 1:N_conc_measurement)
-      yconc[c] ~ lognormal(log(conc[experiment_yconc[c], mic_ix_yconc[c]]), sigma_conc[c]);
-    for (e in 1:N_enzyme_measurement)
-      yenz[e] ~ lognormal(log(conc_enzyme[experiment_yenz[e], enzyme_yenz[e]]), sigma_enz[e]);
-    for (f in 1:N_flux_measurement)
-      yflux[f] ~ normal(flux[experiment_yflux[f], reaction_yflux[f]], sigma_flux[f]);
-  }
-}
-generated quantities {
-  vector[N_conc_measurement] yconc_sim;
-  vector[N_flux_measurement] yflux_sim;
-  vector[N_conc_measurement] log_lik_conc;
-  vector[N_flux_measurement] log_lik_flux;
-  for (c in 1:N_conc_measurement){
-    yconc_sim[c] = lognormal_rng(log(conc[experiment_yconc[c], mic_ix_yconc[c]]), sigma_conc[c]);
-    log_lik_conc[c] = lognormal_lpdf(yconc[c] | log(conc[experiment_yconc[c], mic_ix_yconc[c]]), sigma_conc[c]);
-  }
-  for (f in 1:N_flux_measurement){
-    yflux_sim[f] = normal_rng(flux[experiment_yflux[f], reaction_yflux[f]], sigma_flux[f]);
-    log_lik_flux[f] = normal_lpdf(yflux[f] | flux[experiment_yflux[f], reaction_yflux[f]], sigma_flux[f]);
   }
 }
