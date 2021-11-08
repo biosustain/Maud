@@ -16,6 +16,37 @@ def join_list_of_strings(l1, l2, sep="-"):
     return list(map(lambda a: f"{a[0]}{sep}{a[1]}", zip(l1, l2)))
 
 
+def load_infd_fit(fit, mi: MaudInput) -> az.InferenceData:
+    """Get an arviz InferenceData object from out-of-sample tmp generated csvs."""
+
+    coords = {
+        **mi.stan_coords.__dict__,
+        **{
+            "reactions": mi.stan_coords.reactions,
+            "kms": join_list_of_strings(mi.stan_coords.km_enzs, mi.stan_coords.km_mics),
+            "kis": join_list_of_strings(mi.stan_coords.ci_enzs, mi.stan_coords.ci_mics),
+            "diss_ts": join_list_of_strings(
+                mi.stan_coords.ai_enzs, mi.stan_coords.ai_mics
+            ),
+            "diss_rs": join_list_of_strings(
+                mi.stan_coords.aa_enzs, mi.stan_coords.aa_mics
+            ),
+        },
+    }
+    return az.from_cmdstan(
+        fit,
+        coords=coords,
+        dims={
+            "flux": ["experiments", "reactions"],
+            "conc": ["experiments", "mics"],
+            "conc_enzyme": ["experiments", "enzymes"],
+            "conc_unbalanced": ["experiments", "unbalanced_mics"],
+            "conc_phos": ["experiments", "phos_enzs"],
+        },
+        save_warmup=True,
+    )
+
+
 def load_infd(csvs: List[str], mi: MaudInput) -> az.InferenceData:
     """Get an arviz InferenceData object from Maud csvs."""
 
