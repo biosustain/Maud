@@ -98,7 +98,6 @@ transformed data {
 }
 parameters {
   vector[N_metabolite] dgf;
-  array[N_experiment] vector[N_drain] drain_z;
   vector[N_enzyme] log_kcat_z;
   vector[N_km] log_km_z;
   vector[N_phosphorylation_enzymes] log_kcat_phos_z;
