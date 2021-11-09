@@ -345,8 +345,8 @@ def parse_toml_reaction(raw: dict) -> Reaction:
             "allosteric_inhibitor": [],
             "allosteric_activator": [],
         }
-        if "modifiers" in e.keys():
-            for modifier_dict in e["modifiers"]:
+        if "modifier" in e.keys():
+            for modifier_dict in e["modifier"]:
                 modifier_type = modifier_dict["modifier_type"]
                 modifiers[modifier_type].append(
                     Modifier(
@@ -356,8 +356,8 @@ def parse_toml_reaction(raw: dict) -> Reaction:
                     )
                 )
 
-        if "subunits" in e.keys():
-            subunits = e["subunits"]
+        if "subunit" in e.keys():
+            subunits = e["subunit"]
 
         enzymes.append(
             Enzyme(
