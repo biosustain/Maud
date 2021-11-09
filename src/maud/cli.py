@@ -102,8 +102,8 @@ def generate_predictions(samples_path, oos_path, output_dir):
         for f in os.listdir(os.path.join(samples_path, "samples"))
         if f.endswith(".csv")
     ]
-    mi_oos = load_maud_input_from_toml(oos_path)
-    mi_train = load_maud_input_from_toml(os.path.join(samples_path, "user_input"))
+    mi_oos = load_maud_input(oos_path)
+    mi_train = load_maud_input(os.path.join(samples_path, "user_input"))
     now = datetime.now().strftime("%Y%m%d%H%M%S")
     output_name = f"maud-oos_output-{mi_oos.config.name}-{now}"
     output_path = os.path.join(output_dir, output_name)
