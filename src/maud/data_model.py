@@ -67,11 +67,13 @@ class MetaboliteInCompartment:
     def __init__(
         self,
         id: str,
+        name: str = None,
         metabolite_id: str = None,
         compartment_id: str = None,
         balanced: bool = None,
     ):
         self.id = id
+        self.name = name
         self.metabolite_id = metabolite_id
         self.compartment_id = compartment_id
         self.balanced = balanced
