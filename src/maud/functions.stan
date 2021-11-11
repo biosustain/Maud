@@ -97,7 +97,6 @@ real get_Dr_common_rate_law(vector metabolite, vector km, vector stoichiometry){
 real get_Dr_common_rate_law_irreversible(vector metabolite, vector km, vector stoichiometry){
   /* Dr coefficient in the modular rate law negating products. */
   real psi_plus = 1;
-  real psi_minus = 1;
   for (m in 1:rows(metabolite)){
     if (stoichiometry[m] < 0){
       real multiplicand = (1 + metabolite[m] / km[m]) ^ abs(stoichiometry[m]);
