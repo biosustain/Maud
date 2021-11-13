@@ -127,6 +127,7 @@ transformed parameters {
   array[N_experiment] vector<lower=0>[N_mic] conc;
   array[N_experiment] vector[N_reaction] flux;
   vector[N_edge] keq = get_keq(S, dgf, mic_to_met, water_stoichiometry);
+  vector[N_edge] dgrs = get_dgrs(S, dgf, mic_to_met, water_stoichiometry);
   for (e in 1:N_experiment){
     flux[e] = rep_vector(0, N_reaction);
     real timepoints[2] = {timepoint, timepoint + 10};
@@ -160,7 +161,7 @@ transformed parameters {
                   edge_to_drain,
                   edge_to_enzyme,
                   kcat,
-                  keq,
+                  dgrs,
                   ix_ci,
                   ix_ai,
                   ix_aa,
@@ -191,7 +192,7 @@ transformed parameters {
                                         edge_to_drain,
                                         edge_to_enzyme,
                                         kcat,
-                                        keq,
+                                        dgrs,
                                         ix_ci,
                                         ix_ai,
                                         ix_aa,
@@ -222,7 +223,7 @@ transformed parameters {
                                                      km,
                                                      drain[e],
                                                      kcat,
-                                                     keq,
+                                                     dgrs,
                                                      ki,
                                                      diss_t,
                                                      diss_r,
