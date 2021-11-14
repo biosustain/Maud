@@ -265,7 +265,7 @@ int check_steady_state(vector[] conc_balanced,
 }
 
 vector get_reaction_quotient(matrix S, vector conc){
-  return exp(S' * log(conc));
+  return S' * log(conc);
 }
 
 vector get_flux(vector conc,
