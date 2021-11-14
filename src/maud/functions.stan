@@ -98,6 +98,7 @@ real get_Tr_irreversible(vector metabolite,
   }
   return kcat * plus_product;
 }
+
 real get_Dr_common_rate_law(vector metabolite, vector km, vector stoichiometry){
   /* Dr coefficient in the modular rate law. */
   real psi_plus = 1;
@@ -111,6 +112,7 @@ real get_Dr_common_rate_law(vector metabolite, vector km, vector stoichiometry){
   }
   return psi_plus + psi_minus - 1;
 }
+
 real get_Dr_common_rate_law_irreversible(vector metabolite, vector km, vector stoichiometry){
   /* Dr coefficient in the modular rate law negating products. */
   real psi_plus = 1;
@@ -122,6 +124,7 @@ real get_Dr_common_rate_law_irreversible(vector metabolite, vector km, vector st
   }
   return psi_plus;
 }
+
 int get_n_mic_for_edge(matrix S, int j, int edge_type){
   /*
     Get the number of active metabolites-in-compartment for a reaction or drain j,
@@ -150,8 +153,9 @@ int get_n_sub_for_edge(matrix S, int j){
   */
   int out = 0;
   for (s in S[,j]){
-  if (s < 0){
-    out += 1;
+    if (s < 0){
+      out += 1;
+    }
   }
   return out;
 }
@@ -181,7 +185,7 @@ int[] get_mics_for_edge(matrix S, int j, int edge_type){
   return out;
 }
 
-int[] get_substrate_for_edge(matrix S, int j, int edge_type){
+int[] get_substrate_for_edge(matrix S, int j){
   /*
     Get an array of active metabolites-in-compartment for a reaction or drain j, given
     stoichiometric matrix S.
@@ -189,21 +193,23 @@ int[] get_substrate_for_edge(matrix S, int j, int edge_type){
   int N_mic = get_n_sub_for_edge(S, j);
   int out[N_mic];
   int pos = 1;
+  for (i in 1:rows(S)){
     if (S[i, j] < 0){
-    out[pos] = i;
-    pos += 1;
+      out[pos] = i;
+      pos += 1;
+    }
   }
   return out;
 }
 
-real get_reversibility(vector dgrs, real reaction_quotient){
+real get_reversibility(real dgrs, real reaction_quotient){
   /*
     Get a reversibility for single reaction given a standard gibbs energy
     and a reaction quotion.
   */
   real RT = 0.008314 * 298.15;
   real dgr = dgrs + RT*reaction_quotient;
-  return 1-exp(dgr);
+  return 1-exp(dgr/RT);
 }
 real substrate_km_product(
   /*
@@ -213,7 +219,7 @@ real substrate_km_product(
   vector substrate_concs,
   vector substrate_kms
 ){
-  return product(substrate_concs./substrate_kms);
+  return prod(substrate_concs./substrate_kms);
 }
 int check_steady_state(vector[] conc_balanced,
                        int e,
@@ -258,6 +264,10 @@ int check_steady_state(vector[] conc_balanced,
   }
 }
 
+vector get_reaction_quotient(matrix S, vector conc){
+  return exp(S' * log(conc));
+}
+
 vector get_flux(vector conc,
                 vector enz,
                 vector km,
@@ -293,15 +303,15 @@ vector get_flux(vector conc,
   int pos_tc = 1;
   int pos_pa = 1;
   int pos_pi = 1;
-  vector[rows(S)] reaction_quotient = exp(S * log(conc));
+  vector[cols(S)] reaction_quotient = get_reaction_quotient(S, conc);
   for (j in 1:cols(S)){
     int n_mic_j = get_n_mic_for_edge(S, j, edge_type[j]);
-    int n_sub_j = get_n_sub_for_edge(S, j, edge_type[j]);
+    int n_sub_j = get_n_sub_for_edge(S, j);
     int mics_j[n_mic_j] = get_mics_for_edge(S, j, edge_type[j]);
-    int sub_j[n_sub_j] = get_substrate_for_edge(S, j, edge_type[j]);
+    int sub_j[n_sub_j] = get_substrate_for_edge(S, j);
     if (edge_type[j] == 1){  // reversible enzyme...
       vector[n_mic_j] km_j = km[km_lookup[mics_j, j]];
-      vector[n_mic_j] km_j_substrate = km[km_lookup[sub_j, j]];
+      vector[n_sub_j] km_j_substrate = km[km_lookup[sub_j, j]];
       real kcat_j = kcat[edge_to_enzyme[j]];
       real free_enzyme_ratio_denom = get_Dr_common_rate_law(conc[mics_j], km_j, S[mics_j, j]);
       if (n_ci[j] > 0){  // competitive inhibition
@@ -311,8 +321,8 @@ vector get_flux(vector conc,
         pos_ci += n_ci[j];
       }
       real free_enzyme_ratio = inv(free_enzyme_ratio_denom);
-      real saturation_term = exp(log(substrate_km_product(conc[sub_j], km_j_substrate)) - log(free_enzyme_ratio));
-      real reversible_term = get_reversibility(dgrs, reaction_quotient[j]);
+      real saturation_term = exp(log(substrate_km_product(conc[sub_j], km_j_substrate)) - log(free_enzyme_ratio_denom));
+      real reversible_term = get_reversibility(dgrs[j], reaction_quotient[j]);
       out[j] = enz[edge_to_enzyme[j]] * kcat[j] * saturation_term * reversible_term;
       if ((n_ai[j] > 0) || (n_aa[j] > 0)){  // allosteric regulation
         real Q_num = 1;
@@ -349,13 +359,14 @@ vector get_flux(vector conc,
       }
     }
     else if (edge_type[j] == 2){  // drain...
-      out[j] = drain[edge_to_drain[j]] * prod(conc[mics_j] ./ (conc[mics_j] + 1e-6);
+      out[j] = drain[edge_to_drain[j]] * prod(conc[mics_j] ./ (conc[mics_j] + 1e-6));
     }
     else if (edge_type[j] == 3){  // irreversible modular rate law...
       vector[n_mic_j] km_j = km[km_lookup[mics_j, j]];
+      vector[n_sub_j] km_j_substrate = km[km_lookup[sub_j, j]];
       real kcat_j = kcat[edge_to_enzyme[j]];
       real free_enzyme_ratio_denom = get_Dr_common_rate_law_irreversible(conc[mics_j], km_j, S[mics_j, j]);
-      real saturation_term = exp(og(substrate_km_product(conc[sub_j], km_j_substrate)) - log(free_enzyme_ratio));
+      
       if (n_ci[j] > 0){  // competitive inhibition
         int comp_inhs_j[n_ci[j]] = segment(ix_ci, pos_ci, n_ci[j]);
         vector[n_ci[j]] ki_j = segment(ki, pos_ci, n_ci[j]);
@@ -363,6 +374,7 @@ vector get_flux(vector conc,
         pos_ci += n_ci[j];
       }
       real free_enzyme_ratio = inv(free_enzyme_ratio_denom);
+      real saturation_term = exp(log(substrate_km_product(conc[sub_j], km_j_substrate)) - log(free_enzyme_ratio_denom));
       out[j] = enz[edge_to_enzyme[j]] * kcat[j] * saturation_term;
       if ((n_ai[j] > 0) || (n_aa[j] > 0)){  // allosteric regulation
         real Q_num = 1;
