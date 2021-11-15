@@ -142,12 +142,12 @@ def parse_toml_kinetic_model(raw: dict) -> KineticModel:
     metabolites = []
     for r in raw["metabolite-in-compartment"]:
         if not any(r["metabolite"] == m.id for m in metabolites):
-            external_id = (
-                r["metabolite_external_id"]
-                if "metabolite_external_id" in r.keys()
+            inchi_key = (
+                r["metabolite_inchi_key"]
+                if "metabolite_inchi_key" in r.keys()
                 else None
             )
-            metabolites.append(Metabolite(id=r["metabolite"], external_id=external_id))
+            metabolites.append(Metabolite(id=r["metabolite"], inchi_key=inchi_key))
     mics = [
         MetaboliteInCompartment(
             id=f"{m['metabolite']}_{m['compartment']}",

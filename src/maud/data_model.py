@@ -36,7 +36,7 @@ class Compartment:
 
     def __init__(self, id: str, name: str = None, volume: float = 1.0):
         self.id = id
-        self.name = name if name is not None else id
+        self.name = name
         self.volume = volume
 
 
@@ -48,10 +48,10 @@ class Metabolite:
     :param external_id: metabolite name.
     """
 
-    def __init__(self, id: str, name: str = None, external_id: str = None):
+    def __init__(self, id: str, name: str = None, inchi_key: str = None):
         self.id = id
-        self.name = name if name is not None else id
-        self.external_id = external_id if external_id is not None else None
+        self.name = name
+        self.inchi_key = inchi_key
 
 
 class MetaboliteInCompartment:

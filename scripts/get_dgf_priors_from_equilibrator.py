@@ -49,7 +49,7 @@ def get_dgf_priors(mi: MaudInput) -> Tuple[pd.Series, pd.DataFrame]:
     mu = []
     sigmas_fin = []
     sigmas_inf = []
-    external_ids = {m.id: m.external_id for m in mi.kinetic_model.metabolites}
+    external_ids = {m.id: m.inchi_key for m in mi.kinetic_model.metabolites}
     met_ix = pd.Index(mi.stan_coords.metabolites, name="metabolite")
     for met_id in met_ix:
         external_id = external_ids[met_id]
