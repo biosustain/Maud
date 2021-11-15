@@ -72,54 +72,64 @@ Specifying a kinetic model
 
 Kinetic models files are specified in `toml
 <https://github.com/toml-lang/toml>`_ files, which have three obligatory top
-level tables, namely compartments, metabolites and reactions. In addition,
-kinetic models can include tables representing drains and phosphorylation
-reactions.
+level tables, namely :code:`compartment`, :code:`metabolite-in-compartment` and
+:code:`reaction`. In addition, kinetic models can include tables representing
+drains and phosphorylation reactions.
 
 A compartment must have an id, a name and a volume. Here is an example
 compartment specification:
 
 .. code:: toml
 
-    [[compartments]]
+    [[compartment]]
     id = 'c'
     name = 'cytosol'
     volume = 1
 
 The units for the :code:`volume` field are arbitrary.
 
-A metabolite must have an id, a name, compartment (this should be the id of a
-compartment) and a property 'balanced' specifying whether its concentration
-should be constant at steady state. Here is an example:
+A metabolite-in-compartment must have a metabolite, a compartment (this should
+be the id of a compartment) and a property 'balanced' specifying whether its
+concentration should be constant at steady state.
+
+The id of a metabolite-in-compartment is the metabolite and its compartment,
+separated by an underscore - for example :code:`amp_c`.
+
+It is also possible to specify the `inchi key
+<http://inchi.info/inchikey_overview_en.html>`_ of the metabolite using the
+field :code:`metabolite_inchi_key`.
+
+Here is an example specification of a metabolite-in-compartment:
 
 .. code:: toml
 
-    [[metabolites]]
-    id = 'amp'
+    [[metabolite-in-compartment]]
     name = 'adenosine monophosphate'
-    balanced = false
+    metabolite = 'amp'
     compartment = 'c'
+    balanced = false
+    metabolite_inchi_key = 'UDMBCSSLTHHNCD-KQYNXXCUSA-L'
 
 A reaction can be specified as follows:
 
 .. code:: toml
 
-    [[reactions]]
+    [[reaction]]
     id = 'FBA'
     name = 'FBA'
     stoichiometry = { f16p_c = -1, dhap_c = 1, g3p_c = 1 }
-    [[reactions.enzymes]]
+    [[reaction.enzyme]]
     id = 'FBA'
     name = 'FBA'
-    [[reactions.enzymes.modifiers]]
+    [[reaction.enzyme.modifier]]
     modifier_type = 'allosteric_activator'
     mic_id = 'amp_c'
 
-Reaction level information is specified under :code:`[[reactions]]`, and
-enzyme-specific information goes under :code:`[[reactions]]`. The stoichiometry
-property should map metabolite ids to numerical stoichiometries with arbitrary
-units. The mechanism property must be one of the mechanisms that Maud
-supports - these can be found in the source code file
+Reaction level information is specified under :code:`[[reaction]]`, and
+enzyme-specific information goes under :code:`[[reaction.enzyme]]`. The
+stoichiometry property should map metabolite-in-compartment ids to numerical
+stoichiometries with arbitrary units. The mechanism property must be one of the
+mechanisms that Maud supports - these can be found in the source code file
 `big_k_rate_equations.stan
 <https://github.com/biosustain/Maud/blob/master/src/maud/stan_code/big_k_rate_equations.stan>`_. The
 optional property allosteric_inhibitors must be a list containing ids of
@@ -335,11 +345,13 @@ follows, given a maud input directory at the path :code:`input_dir`:
 .. code:: bash
           python scripts/get_dgf_priors_from_equilibrator.py input_dir
 
-The script extracts metabolite ids from the input directory and searches for
+The script extracts metabolites from the input directory and searches for
 matching thermodynamic data using the the package `equilibrator-api
-<https://pypi.org/project/equilibrator-api/>`. It uses this data to create
-appropriate files `dgf_prior_mean_equilibrator.csv` and
-`dgf_prior_cov_equilibrator.csv` in the target directory.
+<https://pypi.org/project/equilibrator-api/>`_. It uses this data to create
+appropriate files `dgf_prior_mean_equilibrator.csv`_ and
+`dgf_prior_cov_equilibrator.csv`_ in the target directory. Note that in order to
+use this script the field :code:`metabolite_inchi_key` must be filled in for all
+metabolites in the kinetic model file.
 
 
 Specifying initial parameter values
