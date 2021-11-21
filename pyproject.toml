@@ -15,5 +15,9 @@ exclude = '''
 '''
 
 [tool.pyright]
-venvPath = "./venv_maud"
-venv = "venv_maud"
+reportMissingImports = true
+reportMissingTypeStubs = false
+disableOrganizeImports = false
+useLibraryCodeForTypes = true
+venv = "maud"
+pythonPlatform = "Darwin"

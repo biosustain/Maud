@@ -344,7 +344,8 @@ def get_prior_dict(ps: PriorSet) -> dict:
         return [p.location.values.tolist(), p.scale.values.tolist()]
 
     return {
-        "priors_dgf": unpack(ps.priors_dgf),
+        "prior_loc_dgf": ps.priors_dgf.location.values.tolist(),
+        "prior_cov_dgf": ps.priors_dgf.covariance_matrix.values.tolist(),
         "priors_kcat": unpack(ps.priors_kcat),
         "priors_km": unpack(ps.priors_km),
         "priors_ki": unpack(ps.priors_ki),
