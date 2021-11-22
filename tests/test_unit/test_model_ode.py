@@ -43,17 +43,24 @@ def test_model_ode():
         "flux[1,4]": "r4",
     }
     true_values = {
-        "A": 5,
+        "A": 5.0,
         "B": 0.323117,
         "C": 3.02187,
         "D": 0.5,
         "r1": 0.421816,
         "r4": 2.11674,
     }
-    sim_values = model.sample(data=input_data, **SIM_CONFIG).draws_pd()
-    sim_values = sim_values.rename(columns=remap)
-    for value_id, value in true_values.items():
-        assert isclose(sim_values[value_id][0], value)
+    sim_values = (
+        model.sample(data=input_data, **SIM_CONFIG)
+        .draws_pd()
+        .rename(columns=remap)
+        .T.loc[true_values.keys(), 0]
+        .to_dict()
+    )
+    print(sim_values)
+    msg = f"\nTrue values:\n {true_values}\nSimulated values:\n {sim_values}"
+    for true_value, sim_value in zip(true_values.values(), sim_values.values()):
+        assert isclose(true_value, sim_value), msg
 
 
 if __name__ == "__main__":

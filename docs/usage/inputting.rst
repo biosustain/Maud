@@ -72,54 +72,64 @@ Specifying a kinetic model
 
 Kinetic models files are specified in `toml
 <https://github.com/toml-lang/toml>`_ files, which have three obligatory top
-level tables, namely compartments, metabolites and reactions. In addition,
-kinetic models can include tables representing drains and phosphorylation
-reactions.
+level tables, namely :code:`compartment`, :code:`metabolite-in-compartment` and
+:code:`reaction`. In addition, kinetic models can include tables representing
+drains and phosphorylation reactions.
 
 A compartment must have an id, a name and a volume. Here is an example
 compartment specification:
 
 .. code:: toml
 
-    [[compartments]]
+    [[compartment]]
     id = 'c'
     name = 'cytosol'
     volume = 1
 
 The units for the :code:`volume` field are arbitrary.
 
-A metabolite must have an id, a name, compartment (this should be the id of a
-compartment) and a property 'balanced' specifying whether its concentration
-should be constant at steady state. Here is an example:
+A metabolite-in-compartment must have a metabolite, a compartment (this should
+be the id of a compartment) and a property 'balanced' specifying whether its
+concentration should be constant at steady state.
+
+The id of a metabolite-in-compartment is the metabolite and its compartment,
+separated by an underscore - for example :code:`amp_c`.
+
+It is also possible to specify the `inchi key
+<http://inchi.info/inchikey_overview_en.html>`_ of the metabolite using the
+field :code:`metabolite_inchi_key`.
+
+Here is an example specification of a metabolite-in-compartment:
 
 .. code:: toml
 
-    [[metabolites]]
-    id = 'amp'
+    [[metabolite-in-compartment]]
     name = 'adenosine monophosphate'
-    balanced = false
+    metabolite = 'amp'
     compartment = 'c'
+    balanced = false
+    metabolite_inchi_key = 'UDMBCSSLTHHNCD-KQYNXXCUSA-L'
 
 A reaction can be specified as follows:
 
 .. code:: toml
 
-    [[reactions]]
+    [[reaction]]
     id = 'FBA'
     name = 'FBA'
     stoichiometry = { f16p_c = -1, dhap_c = 1, g3p_c = 1 }
-    [[reactions.enzymes]]
+    [[reaction.enzyme]]
     id = 'FBA'
     name = 'FBA'
-    [[reactions.enzymes.modifiers]]
+    [[reaction.enzyme.modifier]]
     modifier_type = 'allosteric_activator'
     mic_id = 'amp_c'
 
-Reaction level information is specified under :code:`[[reactions]]`, and
-enzyme-specific information goes under :code:`[[reactions]]`. The stoichiometry
-property should map metabolite ids to numerical stoichiometries with arbitrary
-units. The mechanism property must be one of the mechanisms that Maud
-supports - these can be found in the source code file
+Reaction level information is specified under :code:`[[reaction]]`, and
+enzyme-specific information goes under :code:`[[reaction.enzyme]]`. The
+stoichiometry property should map metabolite-in-compartment ids to numerical
+stoichiometries with arbitrary units. The mechanism property must be one of the
+mechanisms that Maud supports - these can be found in the source code file
 `big_k_rate_equations.stan
 <https://github.com/biosustain/Maud/blob/master/src/maud/stan_code/big_k_rate_equations.stan>`_. The
 optional property allosteric_inhibitors must be a list containing ids of
@@ -147,7 +157,7 @@ always non-negative.
 
 Here is an example experiment file:
 
-.. code:: csv
+.. csv-table::
 
     measurement_type,target_id,experiment_id,measurement,error_scale
     mic,f6p_c,Evo04ptsHIcrrEvo01EP,0.6410029,0.146145
@@ -207,7 +217,7 @@ relationships linking :math:`keq` parameters with other kinetic parameters.
 
 Below is an example priors file.
 
-.. code:: csv
+.. csv-table::
 
     parameter_type,metabolite_id,mic_id,enzyme_id,drain_id,phos_enz_id,experiment_id,location,scale,pct1,pct99
     kcat,,,PGI,,,,126.0,0.2,,
@@ -255,6 +265,94 @@ Below is an example priors file.
     drain,,,,g3p_drain,,Evo04ptsHIcrrEvo01EP,,,0.3,1.2
     drain,,,,g3p_drain,,Evo04Evo01EP,,,0.3,1.2
 
+Multivariate priors for formation energy parameters
+===================================================
+
+The use of a single csv file for priors was motivated by the fact that, for
+most model parameters, it is safe to model the pre-experimental information as
+independent. For example, knowing the value of one enzyme's :math:`kcat`
+parameter does not significantly narrow down another enzyme's :math:`kcat`
+parameter. Thus in this case, and most others, specifying each parameter's
+marginal prior distribution is practically equivalent to specifying the full
+joint distribution.
+
+However, the available information about formation energy parameters is
+typically not independent. In this case the available information is mostly
+derived from measurements of the equilibrium constants of chemical
+reactions. Knowing the formation energy of one metabolite is often highly
+informative as to the formation energy of another metabolite which produced or
+destroyed by the same measured chemical reaction. Metabolites with common
+chemical groups are also likely to have similar formation energies, introducing
+further non-independence.
+
+In some cases this dependence is not practically important, and Maud will work
+well enough with independent priors in a csv file as above. For other cases,
+Maud allows non-independent prior information to be specified in the form of
+the mean vector and covariance matrix of a multivariate normal
+distribution. This information is specified as follows.
+
+First, to indicate where to find the required vector and matrix, the fields
+:code:`dgf_mean_file` and :code:`dgf_covariance_file` should be added to the
+top level of the file :code:`config.toml` in the input folder. For example:
+
+.. code:: toml
+
+    name = "methionine_cycle"
+    kinetic_model = "methionine_cycle.toml"
+    priors = "priors.csv"
+    experiments = "experiments.csv"
+    dgf_mean_file = "dgf_prior_mean.csv"
+    dgf_covariance_file = "dgf_prior_covariance.csv"
+
+These fields should be paths from the root of the input folder to csv
+files. The :code:`dgf_mean_file` should have columns caled :code:`metabolite`
+and :code:`prior_mean_dgf`, with the former consisting of ids that agree with
+the rest of the input folder (in particular the kinetic model file) and the
+latter of non-null real numbers. For example
+
+.. csv-table::
+
+    metabolite,prior_mean_dgf
+    5mthf,-778.2999561
+    adn,-190.9913035
+    ahcys,-330.3885785
+    amet,-347.1029509
+    atp,-2811.578332
+    cyst-L,-656.8334114
+    ...
+
+The :code:`dgf_covariance_file` should be a valid covariance matrix surrounded
+by metabolite ids. The first column should be called :code:`metabolite` and
+populated with ids that are consistent with the other inputs. Subsequent
+columns should have names that match the first column. Here is (the start of)
+an example:
+
+.. csv-table::
+
+    metabolite,5mthf,adn,ahcys,amet,atp,cyst-L
+    5mthf,457895.226,0.023993053,2.911539829,38.09225442,0.023892737,0.610913519
+    adn,0.023993053,2.081489779,1.034504533,1.00E-10,0.444288943,0
+    ahcys,2.911539829,1.034504533,16.2459485,4.297104388,0.341195482,13.08072127
+    amet,38.09225442,1.00E-10,4.297104388,1000025.576,-1.00E-10,2.066261457
+    atp,0.023892737,0.444288943,0.341195482,-1.00E-10,2.22005692,0
+    cyst-L,0.610913519,0,13.08072127,2.066261457,0,16.61784088
+    ...
+
+To make it easier to generate the required csv files, Maud provides a script
+:code:`get_dgf_priors_from_equilibrator.py`. This script can be used as
+follows, given a maud input directory at the path :code:`input_dir`:
+
+.. code:: bash
+          python scripts/get_dgf_priors_from_equilibrator.py input_dir
+
+The script extracts metabolites from the input directory and searches for
+matching thermodynamic data using the the package `equilibrator-api
+<https://pypi.org/project/equilibrator-api/>`_. It uses this data to create
+appropriate files `dgf_prior_mean_equilibrator.csv`_ and
+`dgf_prior_cov_equilibrator.csv`_ in the target directory. Note that in order to
+use this script the field :code:`metabolite_inchi_key` must be filled in for all
+metabolites in the kinetic model file.
+
 
 Specifying initial parameter values
 ===================================
@@ -294,7 +392,7 @@ For example, a file with the following contents would set initial values for
 the parameter :code:`enzyme` in the experiments :code:`dataset_1` and
 :code:`dataset_2`:
 
-.. code:: csv
+.. csv-table::
 
     parameter_name,experiment_id,mic_id,enzyme_id,drain_id,metabolite_id,value
     enzyme,dataset_1,,AHC1,,,1
@@ -315,4 +413,5 @@ the parameter :code:`enzyme` in the experiments :code:`dataset_1` and
     enzyme,dataset_2,,METH_Gen,,,1
     enzyme,dataset_2,,MS1,,,1
     enzyme,dataset_2,,MTHFR1,,,1
+
 

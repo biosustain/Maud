@@ -202,7 +202,7 @@ def main():
         for f in os.listdir(os.path.join(MAUD_OUTPUT, "samples"))
         if f.endswith(".csv")
     ]
-    mi = io.load_maud_input_from_toml(os.path.join(MAUD_OUTPUT, "user_input"))
+    mi = io.load_maud_input(os.path.join(MAUD_OUTPUT, "user_input"))
     parameter_coords = get_parameter_coords(mi.stan_coords)
     infd = load_infd(csvs, mi)
     list_of_model_variables = list(infd.posterior.variables.keys())

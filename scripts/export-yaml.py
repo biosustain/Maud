@@ -24,7 +24,7 @@ from jinja2 import Template
 
 from maud.analysis import load_infd
 from maud.cli import get_inits_from_draw
-from maud.io import load_maud_input_from_toml
+from maud.io import load_maud_input
 from maud.sampling import get_stoichiometry
 
 
@@ -156,7 +156,7 @@ def main():
     warmup = args.warmup
     yaml_output = os.path.join(HERE, args.yaml_output)
     csvs = get_csvs(maud_output_dir)
-    mi = load_maud_input_from_toml(os.path.join(maud_output_dir, "user_input"))
+    mi = load_maud_input(os.path.join(maud_output_dir, "user_input"))
     infd = load_infd(csvs, mi)
     selected_experiment = None
     if selected_experiment is None:

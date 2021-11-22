@@ -16,7 +16,7 @@ data_path = os.path.join(here, "..", "data")
 def test_get_input_data():
     """Test that the function get_input_data behaves as expected."""
     input_path = os.path.join(data_path, "linear")
-    mi = io.load_maud_input_from_toml(input_path)
+    mi = io.load_maud_input(input_path)
     with open(os.path.join(input_path, "linear.json"), "r") as f:
         expected_input_data = json.load(f)
     actual_input_data = sampling.get_input_data(mi)
