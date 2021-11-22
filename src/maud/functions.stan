@@ -323,7 +323,7 @@ vector get_flux(vector conc,
       real free_enzyme_ratio = inv(free_enzyme_ratio_denom);
       real saturation_term = exp(log(substrate_km_product(conc[sub_j], km_j_substrate)) - log(free_enzyme_ratio_denom));
       real reversible_term = get_reversibility(dgrs[j], reaction_quotient[j]);
-      out[j] = enz[edge_to_enzyme[j]] * kcat[j] * saturation_term * reversible_term;
+      out[j] = enz[edge_to_enzyme[j]] * kcat[edge_to_enzyme[j]] * saturation_term * reversible_term;
       if ((n_ai[j] > 0) || (n_aa[j] > 0)){  // allosteric regulation
         real Q_num = 1;
         real Q_denom = 1;
@@ -375,7 +375,7 @@ vector get_flux(vector conc,
       }
       real free_enzyme_ratio = inv(free_enzyme_ratio_denom);
       real saturation_term = exp(log(substrate_km_product(conc[sub_j], km_j_substrate)) - log(free_enzyme_ratio_denom));
-      out[j] = enz[edge_to_enzyme[j]] * kcat[j] * saturation_term;
+      out[j] = enz[edge_to_enzyme[j]] * kcat[edge_to_enzyme[j]] * saturation_term;
       if ((n_ai[j] > 0) || (n_aa[j] > 0)){  // allosteric regulation
         real Q_num = 1;
         real Q_denom = 1;
