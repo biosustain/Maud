@@ -662,7 +662,7 @@ def get_inits(priors: PriorSet, user_inits_path) -> Dict[str, np.array]:
     ) -> pd.Series:
         if len(p.location) == 0:
             return p.location
-        elif isinstance(p, IndPrior1d):
+        elif isinstance(p, IndPrior1d) or isinstance(p, MultiVariateNormalPrior1d):
             return u.loc[lambda df: df["parameter_name"] == p.parameter_name].set_index(
                 p.location.index.names
             )["value"]
