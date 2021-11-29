@@ -247,6 +247,9 @@ generated quantities {
   vector[N_flux_measurement] yflux_sim;
   vector[N_conc_measurement] log_lik_conc;
   vector[N_flux_measurement] log_lik_flux;
+  array[N_experiment] vector[N_enzyme] saturation;
+  array[N_experiment] vector[N_enzyme] allostery;
+  array[N_experiment] vector[N_enzyme] reversibility;
   for (c in 1:N_conc_measurement){
     yconc_sim[c] = lognormal_rng(log(conc[experiment_yconc[c], mic_ix_yconc[c]]), sigma_conc[c]);
     log_lik_conc[c] = lognormal_lpdf(yconc[c] | log(conc[experiment_yconc[c], mic_ix_yconc[c]]), sigma_conc[c]);
@@ -254,5 +257,92 @@ generated quantities {
   for (f in 1:N_flux_measurement){
     yflux_sim[f] = normal_rng(flux[experiment_yflux[f], reaction_yflux[f]], sigma_flux[f]);
     log_lik_flux[f] = normal_lpdf(yflux[f] | flux[experiment_yflux[f], reaction_yflux[f]], sigma_flux[f]);
+  }
+  for (e in 1:N_experiment){
+    int pos_ci = 1;
+    int pos_ai = 1;
+    int pos_aa = 1;
+    int pos_tc = 1;
+    int pos_pa = 1;
+    int pos_pi = 1;
+    vector[N_mic] conc_e = conc[e];
+    vector[N_enzyme] reaction_quotient = get_reaction_quotient(S, conc_e);
+    for (j in 1:N_enzyme){
+      int n_mic_j = get_n_mic_for_edge(S, j, edge_type[j]);
+      int n_sub_j = get_n_sub_for_edge(S, j);
+      int mics_j[n_mic_j] = get_mics_for_edge(S, j, edge_type[j]);
+      int sub_j[n_sub_j] = get_substrate_for_edge(S, j);
+      if (edge_type[j] == 1){  // reversible enzyme...
+        vector[n_mic_j] km_j = km[km_lookup[mics_j, j]];
+        vector[n_sub_j] km_j_substrate = km[km_lookup[sub_j, j]];
+        real free_enzyme_ratio_denom = get_Dr_common_rate_law(conc_e[mics_j], km_j, S[mics_j, j]);
+        if (n_ci[j] > 0){  // competitive inhibition
+          int comp_inhs_j[n_ci[j]] = segment(ix_ci, pos_ci, n_ci[j]);
+          vector[n_ci[j]] ki_j = segment(ki, pos_ci, n_ci[j]);
+          free_enzyme_ratio_denom += sum(conc_e[comp_inhs_j] ./ ki_j);
+          pos_ci += n_ci[j];
+        }
+        real free_enzyme_ratio = inv(free_enzyme_ratio_denom);
+        allostery[e][j] = 0;
+        if ((n_ai[j] > 0) || (n_aa[j] > 0)){  // allosteric regulation
+          real Q_num = 1;
+          real Q_denom = 1;
+          if (n_ai[j] > 0){
+            int allo_inhs_j[n_ai[j]] = segment(ix_ai, pos_ai, n_ai[j]);
+            vector[n_ai[j]] diss_t_j = segment(diss_t, pos_ai, n_ai[j]);
+            Q_num += sum(conc_e[allo_inhs_j] ./ diss_t_j);
+            pos_ai += n_ai[j];
+          }
+          if (n_aa[j] > 0){
+            int allo_acts_j[n_aa[j]] = segment(ix_aa, pos_aa, n_aa[j]);
+            vector[n_aa[j]] diss_r_j = segment(diss_r, pos_aa, n_aa[j]);
+            Q_denom += sum(conc_e[allo_acts_j] ./ diss_r_j);
+            pos_aa += n_aa[j];
+          }
+          pos_tc += 1;
+          allostery[e][j] = inv(1 + transfer_constant[pos_tc] * (free_enzyme_ratio * Q_num / Q_denom) ^ subunits[j]);
+        }
+        saturation[e][j] = exp(log(substrate_km_product(conc_e[sub_j], km_j_substrate)) - log(free_enzyme_ratio_denom));
+        reversibility[e][j] = get_reversibility(dgrs[j], reaction_quotient[j]);
+      }
+      else if (edge_type[j] == 2){  // drain...
+        saturation[e][j] = 1;
+        reversibility[e][j] = 1;
+        allostery[e][j] = 0;
+      }
+      else if (edge_type[j] == 3){  // irreversible enzyme...
+        vector[n_mic_j] km_j = km[km_lookup[mics_j, j]];
+        vector[n_sub_j] km_j_substrate = km[km_lookup[sub_j, j]];
+        real free_enzyme_ratio_denom = get_Dr_common_rate_law_irreversible(conc_e[mics_j], km_j, S[mics_j, j]);
+        if (n_ci[j] > 0){  // competitive inhibition
+          int comp_inhs_j[n_ci[j]] = segment(ix_ci, pos_ci, n_ci[j]);
+          vector[n_ci[j]] ki_j = segment(ki, pos_ci, n_ci[j]);
+          free_enzyme_ratio_denom += sum(conc_e[comp_inhs_j] ./ ki_j);
+          pos_ci += n_ci[j];
+        }
+        real free_enzyme_ratio = inv(free_enzyme_ratio_denom);
+        allostery[e][j] = 0;
+        if ((n_ai[j] > 0) || (n_aa[j] > 0)){  // allosteric regulation
+          real Q_num = 1;
+          real Q_denom = 1;
+          if (n_ai[j] > 0){
+            int allo_inhs_j[n_ai[j]] = segment(ix_ai, pos_ai, n_ai[j]);
+            vector[n_ai[j]] diss_t_j = segment(diss_t, pos_ai, n_ai[j]);
+            Q_num += sum(conc_e[allo_inhs_j] ./ diss_t_j);
+            pos_ai += n_ai[j];
+          }
+          if (n_aa[j] > 0){
+            int allo_acts_j[n_aa[j]] = segment(ix_aa, pos_aa, n_aa[j]);
+            vector[n_aa[j]] diss_r_j = segment(diss_r, pos_aa, n_aa[j]);
+            Q_denom += sum(conc_e[allo_acts_j] ./ diss_r_j);
+            pos_aa += n_aa[j];
+          }
+          allostery[e][j] = inv(1 + transfer_constant[pos_tc] * (free_enzyme_ratio * Q_num / Q_denom) ^ subunits[j]);
+          pos_tc += 1;
+        }
+        saturation[e][j] = exp(log(substrate_km_product(conc_e[sub_j], km_j_substrate)) - log(free_enzyme_ratio_denom));
+        reversibility[e][j] = 1;
+      }
+    }
   }
 }
