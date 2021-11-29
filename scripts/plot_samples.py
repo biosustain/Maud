@@ -26,7 +26,7 @@ import seaborn as sns
 
 from maud import io
 from maud.analysis import load_infd
-from maud.data_model import IndPrior1d
+from maud.data_model import IndPrior1d, IndPrior2d
 from maud.user_templates import get_parameter_coords
 
 
@@ -248,7 +248,7 @@ def main():
                     par_dataframe["lower_ci"] = lower_ci
                     par_dataframe["upper_ci"] = upper_ci
                     confidence_intervals[par.id] = par_dataframe
-                else:
+                elif isinstance(p, IndPrior2d):
                     location_df = (
                         p.location.unstack()
                         .reset_index()
