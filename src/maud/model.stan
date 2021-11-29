@@ -247,9 +247,9 @@ generated quantities {
   vector[N_flux_measurement] yflux_sim;
   vector[N_conc_measurement] log_lik_conc;
   vector[N_flux_measurement] log_lik_flux;
-  array[N_experiment] vector[N_enzyme] saturation;
-  array[N_experiment] vector[N_enzyme] allostery;
-  array[N_experiment] vector[N_enzyme] reversibility;
+  array[N_experiment] vector[N_edge] saturation;
+  array[N_experiment] vector[N_edge] allostery;
+  array[N_experiment] vector[N_edge] reversibility;
   for (c in 1:N_conc_measurement){
     yconc_sim[c] = lognormal_rng(log(conc[experiment_yconc[c], mic_ix_yconc[c]]), sigma_conc[c]);
     log_lik_conc[c] = lognormal_lpdf(yconc[c] | log(conc[experiment_yconc[c], mic_ix_yconc[c]]), sigma_conc[c]);
@@ -267,7 +267,7 @@ generated quantities {
     int pos_pi = 1;
     vector[N_mic] conc_e = conc[e];
     vector[N_enzyme] reaction_quotient = get_reaction_quotient(S, conc_e);
-    for (j in 1:N_enzyme){
+    for (j in 1:N_edge){
       int n_mic_j = get_n_mic_for_edge(S, j, edge_type[j]);
       int n_sub_j = get_n_sub_for_edge(S, j);
       int mics_j[n_mic_j] = get_mics_for_edge(S, j, edge_type[j]);
