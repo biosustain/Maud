@@ -50,13 +50,13 @@ vector get_keq(matrix S, vector dgf, int[] mic_to_met, vector water_stoichiometr
 }
 vector get_dgrs(matrix S, vector dgf, int[] mic_to_met, vector water_stoichiometry){
   /*
-      Calculate dgrs from metabolite formation energies, assuming water's
+      Calculate dgr standard from metabolite formation energies, assuming water's
       formation energy is known exactly.
   */
   real minus_RT = -0.008314 * 298.15;
   real dgf_water = -157.6;  // From http://equilibrator.weizmann.ac.il/metabolite?compoundId=C00001
-  vector[cols(S)] delta_g = S' * dgf[mic_to_met] + water_stoichiometry * dgf_water;
-  return delta_g;
+  vector[cols(S)] dgrs = S' * dgf[mic_to_met] + water_stoichiometry * dgf_water;
+  return dgrs;
 }
 real get_Tr(vector metabolite,
             vector km,

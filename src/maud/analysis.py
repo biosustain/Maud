@@ -88,6 +88,7 @@ def load_infd(csvs: List[str], mi: MaudInput) -> az.InferenceData:
             "diss_r": ["diss_rs"],
             "transfer_constant": ["allosteric_enzymes"],
             "dgf": ["metabolites"],
+            "dgrs": ["edges"],
             "keq": ["edges"],
             "kcat": ["enzymes"],
             "kcat_phos": ["phos_enzs"],

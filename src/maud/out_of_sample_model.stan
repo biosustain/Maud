@@ -86,7 +86,7 @@ parameters {
   vector[N_aa] diss_r;
   vector[N_ae] transfer_constant;
   vector[N_phosphorylation_enzymes] kcat_phos;
-  vector[N_edge] keq;
+  vector[N_edge] dgrs;
 }
 
 generated quantities {
@@ -137,7 +137,7 @@ generated quantities {
                   edge_to_drain,
                   edge_to_enzyme,
                   kcat,
-                  keq,
+                  dgrs,
                   ix_ci,
                   ix_ai,
                   ix_aa,
@@ -168,7 +168,7 @@ generated quantities {
                                         edge_to_drain,
                                         edge_to_enzyme,
                                         kcat,
-                                        keq,
+                                        dgrs,
                                         ix_ci,
                                         ix_ai,
                                         ix_aa,
