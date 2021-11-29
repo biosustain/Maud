@@ -15,8 +15,10 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 """Code for plotting posterior distribution."""
+import argparse
 import os
 from typing import Dict, List
+from pathlib import Path
 
 import matplotlib.pyplot as plt
 import numpy as np
@@ -29,11 +31,15 @@ from maud.analysis import load_infd
 from maud.data_model import IndPrior1d, IndPrior2d
 from maud.user_templates import get_parameter_coords
 
+HELP_MSG = """
+This script plots violin plots of all parameters.
+If there were priors for these parameters it will
+plot them with the 95% CI, except for multivariate
+parameters. If there are measurements they will be
+plotted as a single point. This script also generates
+pair plots of parameters within an enzyme.
+"""
 
-MAUD_OUTPUT = os.path.join(
-    "..", "tests", "data", "example_outputs", "example_output_ecoli_small"
-)
-PLOT_DIR = "."
 VARIABLES_TO_ANALYSE = [
     "kcat",
     "kcat_phos",
@@ -194,15 +200,11 @@ def plot_violin_plots(
     return plot
 
 
-def main():
+def plot_posteriors(maud_output_dir, output_dir):
     """Plot posterior distributions of Maud model."""
     # Collecting information from draws and maud input
-    csvs = [
-        os.path.join(MAUD_OUTPUT, "samples", f)
-        for f in os.listdir(os.path.join(MAUD_OUTPUT, "samples"))
-        if f.endswith(".csv")
-    ]
-    mi = io.load_maud_input(os.path.join(MAUD_OUTPUT, "user_input"))
+    csvs = list(Path(maud_output_dir / "samples").rglob("*.csv"))
+    mi = io.load_maud_input(maud_output_dir / "user_input")
     parameter_coords = get_parameter_coords(mi.stan_coords)
     infd = load_infd(csvs, mi)
     list_of_model_variables = list(infd.posterior.variables.keys())
@@ -311,7 +313,7 @@ def main():
             measurements,
         )
         plot.save(
-            filename=os.path.join(PLOT_DIR, f"{var}_posterior.png"),
+            filename=output_dir / f"{var}_posterior.png",
             verbose=False,
             dpi=300,
         )
@@ -331,8 +333,22 @@ def main():
                         tmp_enz_par_df[par].to_list()
                     )
         sns.pairplot(enz_par_df)
-        plt.savefig(f"{enz}_pairplot.png")
+        plt.savefig(output_dir / f"{enz}_pairplot.png")
 
+
+def main():
+    """Run the script."""
+    parser = argparse.ArgumentParser(description=HELP_MSG)
+    parser.add_argument(
+        "maud_output_dir", type=str, nargs=1, help="A path to a Maud output directory"
+    )
+    parser.add_argument(
+        "--output_dir", default=".", help="Path to output directory"
+    )
+    args = parser.parse_args()
+    maud_output_dir = Path.cwd() / args.maud_output_dir[0]
+    output_dir = Path.cwd() / args.output_dir
+    plot_posteriors(maud_output_dir, output_dir)
 
 if __name__ == "__main__":
     main()
