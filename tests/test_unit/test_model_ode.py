@@ -57,11 +57,6 @@ def test_model_ode():
         .T.loc[true_values.keys(), 0]
         .to_dict()
     )
-    print(sim_values)
     msg = f"\nTrue values:\n {true_values}\nSimulated values:\n {sim_values}"
     for true_value, sim_value in zip(true_values.values(), sim_values.values()):
         assert isclose(true_value, sim_value), msg
-
-
-if __name__ == "__main__":
-    test_model_ode()
