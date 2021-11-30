@@ -100,6 +100,10 @@ def load_infd(csvs: List[str], mi: MaudInput) -> az.InferenceData:
             "log_lik_conc": ["yconcs"],
             "log_lik_flux": ["yfluxs"],
             "log_lik_enz": ["yenzs"],
+            "saturation": ["experiments", "edges"],
+            "allostery": ["experiments", "edges"],
+            "phosphorylation": ["experiments", "edges"],
+            "reversibility": ["experiments", "edges"],
         },
         save_warmup=True,
     )
