@@ -16,7 +16,6 @@
 
 """Code for plotting posterior distribution."""
 import argparse
-import os
 from pathlib import Path
 from typing import Dict, List
 
