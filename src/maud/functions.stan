@@ -294,8 +294,8 @@ vector get_flux(vector conc,
                 vector diss_r,
                 vector transfer_constant,
                 int[] subunits,
-                vector phos_kcat,
-                vector phos_conc){
+                vector kcat_phos,
+                vector conc_phos){
   vector[cols(S)] out;
   int pos_ci = 1;
   int pos_ai = 1;
@@ -347,12 +347,12 @@ vector get_flux(vector conc,
         real beta = 0;
         if (n_pa[j] > 0){
           int phos_acts_j[n_pa[j]] = segment(ix_pa, pos_pa, n_pa[j]);
-          beta = sum(phos_kcat[phos_acts_j] .* phos_conc[phos_acts_j]);
+          beta = sum(kcat_phos[phos_acts_j] .* conc_phos[phos_acts_j]);
           pos_pa += n_pa[j];
         }
         if (n_pi[j] > 0){
           int phos_inhs_j[n_pi[j]] = segment(ix_pi, pos_pi, n_pi[j]);
-          alpha = sum(phos_kcat[phos_inhs_j] .* phos_conc[phos_inhs_j]);
+          alpha = sum(kcat_phos[phos_inhs_j] .* conc_phos[phos_inhs_j]);
           pos_pi += n_pi[j];
         }
         out[j] *= 1 / (1 + (alpha / beta) ^ subunits[j]);  // TODO: what if beta is zero and alpha is non-zero?
@@ -399,12 +399,12 @@ vector get_flux(vector conc,
         real beta = 0;
         if (n_pa[j] > 0){
           int phos_acts_j[n_pa[j]] = segment(ix_pa, pos_pa, n_pa[j]);
-          beta = sum(phos_kcat[phos_acts_j] .* phos_conc[phos_acts_j]);
+          beta = sum(kcat_phos[phos_acts_j] .* conc_phos[phos_acts_j]);
           pos_pa += n_pa[j];
         }
         if (n_pi[j] > 0){
           int phos_inhs_j[n_pi[j]] = segment(ix_pi, pos_pi, n_pi[j]);
-          alpha = sum(phos_kcat[phos_inhs_j] .* phos_conc[phos_inhs_j]);
+          alpha = sum(kcat_phos[phos_inhs_j] .* conc_phos[phos_inhs_j]);
           pos_pi += n_pi[j];
         }
         out[j] *= 1 / (1 + (alpha / beta) ^ subunits[j]);  // TODO: what if beta is zero and alpha is non-zero?

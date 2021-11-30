@@ -249,6 +249,7 @@ generated quantities {
   vector[N_flux_measurement] log_lik_flux;
   array[N_experiment] vector[N_edge] saturation;
   array[N_experiment] vector[N_edge] allostery;
+  array[N_experiment] vector[N_edge] phosphorylation;
   array[N_experiment] vector[N_edge] reversibility;
   for (c in 1:N_conc_measurement){
     yconc_sim[c] = lognormal_rng(log(conc[experiment_yconc[c], mic_ix_yconc[c]]), sigma_conc[c]);
@@ -266,12 +267,15 @@ generated quantities {
     int pos_pa = 1;
     int pos_pi = 1;
     vector[N_mic] conc_e = conc[e];
+    vector[N_phosphorylation_enzymes] conc_phos_e = conc_phos[e];
     vector[N_enzyme] reaction_quotient = get_reaction_quotient(S, conc_e);
     for (j in 1:N_edge){
       int n_mic_j = get_n_mic_for_edge(S, j, edge_type[j]);
       int n_sub_j = get_n_sub_for_edge(S, j);
       int mics_j[n_mic_j] = get_mics_for_edge(S, j, edge_type[j]);
       int sub_j[n_sub_j] = get_substrate_for_edge(S, j);
+      allostery[e][j] = 0;
+      phosphorylation[e][j] = 0;
       if (edge_type[j] == 1){  // reversible enzyme...
         vector[n_mic_j] km_j = km[km_lookup[mics_j, j]];
         vector[n_sub_j] km_j_substrate = km[km_lookup[sub_j, j]];
@@ -283,7 +287,6 @@ generated quantities {
           pos_ci += n_ci[j];
         }
         real free_enzyme_ratio = inv(free_enzyme_ratio_denom);
-        allostery[e][j] = 0;
         if ((n_ai[j] > 0) || (n_aa[j] > 0)){  // allosteric regulation
           real Q_num = 1;
           real Q_denom = 1;
@@ -301,6 +304,21 @@ generated quantities {
           }
           pos_tc += 1;
           allostery[e][j] = inv(1 + transfer_constant[pos_tc] * (free_enzyme_ratio * Q_num / Q_denom) ^ subunits[j]);
+        }
+        if ((n_pi[j] > 0) || (n_pa[j] > 0)){  // phosphorylation
+          real alpha = 0;
+          real beta = 0;
+          if (n_pa[j] > 0){
+            int phos_acts_j[n_pa[j]] = segment(ix_pa, pos_pa, n_pa[j]);
+            beta = sum(kcat_phos[phos_acts_j] .* conc_phos_e[phos_acts_j]);
+            pos_pa += n_pa[j];
+          }
+          if (n_pi[j] > 0){
+            int phos_inhs_j[n_pi[j]] = segment(ix_pi, pos_pi, n_pi[j]);
+            alpha = sum(kcat_phos[phos_inhs_j] .* conc_phos_e[phos_inhs_j]);
+            pos_pi += n_pi[j];
+          }
+          phosphorylation[e][j] = 1 / (1 + (alpha / beta) ^ subunits[j]);  // TODO: what if beta is zero and alpha is non-zero?
         }
         saturation[e][j] = exp(log(substrate_km_product(conc_e[sub_j], km_j_substrate)) - log(free_enzyme_ratio_denom));
         reversibility[e][j] = get_reversibility(dgrs[j], reaction_quotient[j]);
@@ -336,6 +354,21 @@ generated quantities {
             vector[n_aa[j]] diss_r_j = segment(diss_r, pos_aa, n_aa[j]);
             Q_denom += sum(conc_e[allo_acts_j] ./ diss_r_j);
             pos_aa += n_aa[j];
+          }
+          if ((n_pi[j] > 0) || (n_pa[j] > 0)){  // phosphorylation
+            real alpha = 0;
+            real beta = 0;
+            if (n_pa[j] > 0){
+              int phos_acts_j[n_pa[j]] = segment(ix_pa, pos_pa, n_pa[j]);
+              beta = sum(kcat_phos[phos_acts_j] .* conc_phos_e[phos_acts_j]);
+              pos_pa += n_pa[j];
+            }
+            if (n_pi[j] > 0){
+              int phos_inhs_j[n_pi[j]] = segment(ix_pi, pos_pi, n_pi[j]);
+              alpha = sum(kcat_phos[phos_inhs_j] .* conc_phos_e[phos_inhs_j]);
+              pos_pi += n_pi[j];
+            }
+            phosphorylation[e][j] = 1 / (1 + (alpha / beta) ^ subunits[j]);  // TODO: what if beta is zero and alpha is non-zero?
           }
           allostery[e][j] = inv(1 + transfer_constant[pos_tc] * (free_enzyme_ratio * Q_num / Q_denom) ^ subunits[j]);
           pos_tc += 1;
