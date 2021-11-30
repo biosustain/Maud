@@ -18,12 +18,13 @@
 import argparse
 import os
 
+import numpy as np
 import pandas as pd
 import plotnine as p9
 from plotnine import *
-import numpy as np
 
 from maud import io
+
 
 def plot_box_plots(
         var, draws, measurements, variable_id_map

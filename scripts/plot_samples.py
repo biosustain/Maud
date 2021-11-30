@@ -17,8 +17,8 @@
 """Code for plotting posterior distribution."""
 import argparse
 import os
-from typing import Dict, List
 from pathlib import Path
+from typing import Dict, List
 
 import matplotlib.pyplot as plt
 import numpy as np
@@ -30,6 +30,7 @@ from maud import io
 from maud.analysis import load_infd
 from maud.data_model import IndPrior1d, IndPrior2d
 from maud.user_templates import get_parameter_coords
+
 
 HELP_MSG = """
 This script plots violin plots of all parameters.
@@ -342,13 +343,12 @@ def main():
     parser.add_argument(
         "maud_output_dir", type=str, nargs=1, help="A path to a Maud output directory"
     )
-    parser.add_argument(
-        "--output_dir", default=".", help="Path to output directory"
-    )
+    parser.add_argument("--output_dir", default=".", help="Path to output directory")
     args = parser.parse_args()
     maud_output_dir = Path.cwd() / args.maud_output_dir[0]
     output_dir = Path.cwd() / args.output_dir
     plot_posteriors(maud_output_dir, output_dir)
+
 
 if __name__ == "__main__":
     main()
