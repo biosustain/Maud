@@ -21,7 +21,7 @@ from pathlib import Path
 import numpy as np
 import pandas as pd
 import plotnine as p9
-from plotnine import *
+from plotnine import ggplot aes geom_point labs
 
 from maud import io
 
@@ -61,7 +61,7 @@ def plot_box_plots(var, draws, measurements, variable_id_map):
 
 
 def plot_oos(maud_oos_dir, output_dir):
-    """Saves boxplots given maud oos predictions and ourput dir."""
+    """Save boxplots given maud oos predictions and ourput_dir."""
     mi = io.load_maud_input(maud_oos_dir / "user_input")
     flux_df = pd.read_csv(maud_oos_dir / "oos_samples" / "flux.csv")
     conc_df = pd.read_csv(maud_oos_dir / "oos_samples" / "conc.csv")
