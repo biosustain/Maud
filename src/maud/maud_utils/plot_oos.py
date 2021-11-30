@@ -21,7 +21,7 @@ from pathlib import Path
 import numpy as np
 import pandas as pd
 import plotnine as p9
-from plotnine import ggplot aes geom_point labs
+from plotnine import ggplot, aes, geom_point, labs
 
 from maud import io
 
