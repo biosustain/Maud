@@ -302,8 +302,8 @@ generated quantities {
             Q_denom += sum(conc_e[allo_acts_j] ./ diss_r_j);
             pos_aa += n_aa[j];
           }
-          pos_tc += 1;
           allostery[e][j] = inv(1 + transfer_constant[pos_tc] * (free_enzyme_ratio * Q_num / Q_denom) ^ subunits[j]);
+          pos_tc += 1;
         }
         if ((n_pi[j] > 0) || (n_pa[j] > 0)){  // phosphorylation
           real alpha = 0;
