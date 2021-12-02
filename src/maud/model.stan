@@ -118,7 +118,6 @@ transformed parameters {
   // transform
   array[N_experiment] vector<lower=0>[N_mic] conc;
   array[N_experiment] vector[N_reaction] flux;
-  vector[N_edge] keq = get_keq(S, dgf, mic_to_met, water_stoichiometry);
   vector[N_edge] dgrs = get_dgrs(S, dgf, mic_to_met, water_stoichiometry);
   for (e in 1:N_experiment){
     flux[e] = rep_vector(0, N_reaction);
@@ -251,6 +250,7 @@ generated quantities {
   array[N_experiment] vector[N_edge] allostery;
   array[N_experiment] vector[N_edge] phosphorylation;
   array[N_experiment] vector[N_edge] reversibility;
+  vector[N_edge] keq = get_keq(S, dgf, mic_to_met, water_stoichiometry);
   for (c in 1:N_conc_measurement){
     yconc_sim[c] = lognormal_rng(log(conc[experiment_yconc[c], mic_ix_yconc[c]]), sigma_conc[c]);
     log_lik_conc[c] = lognormal_lpdf(yconc[c] | log(conc[experiment_yconc[c], mic_ix_yconc[c]]), sigma_conc[c]);
