@@ -175,7 +175,7 @@ several components:
     - Allostery - changes due to the equilibrium between active and inactive states.
     - Phosphorylation - changes due to actively phosphorylated enzymes.
     - Saturation - how much of the enzyme is saturated by the substrates.
-    - Reversability - what is the thermodynamic driving force of this reaction.
+    - Reversibility - what is the thermodynamic driving force of this reaction.
 
 .. math::
     v &= Enzyme * Allostery * Phosphorylation * Saturation * Reversibility \\
@@ -183,7 +183,7 @@ several components:
     Allostery &= \frac{1}{1 + L_0 (\theta \bullet \frac{\prod{(1 + \frac{[e_T]}{Km_T})}}{\prod{(1 + \frac{[e_R]}{Km_R})}})^{subunits}} \\
     Phosphorylation &= \frac{1}{1 + (\frac{v_{kinase}}{v_{phosphatase}})^{subunits}} \\
     Saturation &= \frac{\prod{\frac{[substrate]}{K_{substrate}}}}{\theta} \\
-    Reversability &= (1 - exp(\frac{\Delta_{r}G}{RT})
+    Reversibility &= (1 - exp(\frac{\Delta_{r}G}{RT})
 
 
 References
