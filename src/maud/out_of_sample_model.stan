@@ -20,14 +20,6 @@ data {
   int<lower=0> N_pa;
   int<lower=0> N_pi;
   // hardcoded priors
-  array[2] vector[N_metabolite] priors_dgf;
-  array[2] vector[N_enzyme] priors_kcat;
-  array[2] vector[N_km] priors_km;
-  array[2] vector[N_ki] priors_ki;
-  array[2] vector[N_ai] priors_diss_t;
-  array[2] vector[N_aa] priors_diss_r;
-  array[2] vector[N_ae] priors_transfer_constant;
-  array[2] vector[N_phosphorylation_enzymes] priors_kcat_phos;
   array[2, N_experiment] vector[N_phosphorylation_enzymes] priors_conc_phos;
   array[2, N_experiment] vector[N_unbalanced] priors_conc_unbalanced;
   array[2, N_experiment] vector[N_enzyme] priors_conc_enzyme;
@@ -58,15 +50,9 @@ data {
   int<lower=1> subunits[N_enzyme];
   // configuration
   vector<lower=0>[N_mic] conc_init[N_experiment];
-  real rel_tol_forward; 
-  vector[N_mic - N_unbalanced] abs_tol_forward;
-  real rel_tol_backward; 
-  vector[N_mic - N_unbalanced] abs_tol_backward; 
-  real rel_tol_quadrature;
-  real abs_tol_quadrature;
+  real rel_tol; 
+  real abs_tol;
   int max_num_steps;
-  int num_steps_between_checkpoints;
-  int interpolation_polynomial;
   int solver_forward;
   int solver_backward;
   int<lower=0,upper=1> LIKELIHOOD;  // set to 0 for priors-only mode
@@ -86,7 +72,7 @@ parameters {
   vector[N_aa] diss_r;
   vector[N_ae] transfer_constant;
   vector[N_phosphorylation_enzymes] kcat_phos;
-  vector[N_edge] keq;
+  vector[N_edge] dgrs;
 }
 
 generated quantities {
@@ -109,22 +95,13 @@ generated quantities {
     real timepoints[2] = {timepoint, timepoint + 10};
     vector[N_enzyme] conc_enzyme_experiment = conc_enzyme[e] .* knockout[e]';
     vector[N_phosphorylation_enzymes] conc_phos_experiment = conc_phos[e] .* phos_knockout[e]';
-    vector[N_mic-N_unbalanced] conc_balanced[2] =
-      ode_adjoint_tol_ctl(dbalanced_dt,
+    vector[N_mic-N_unbalanced] conc_balanced[2] = ode_bdf_tol(dbalanced_dt,
                   conc_init[e, balanced_mic_ix],
                   initial_time,
                   timepoints,
-                  rel_tol_forward, 
-                  abs_tol_forward,
-                  rel_tol_backward, 
-                  abs_tol_backward, 
-                  rel_tol_quadrature,
-                  abs_tol_quadrature,
+                  rel_tol, 
+                  abs_tol,
                   max_num_steps,
-                  num_steps_between_checkpoints,
-                  interpolation_polynomial,
-                  solver_forward,
-                  solver_backward,
                   conc_unbalanced[e,:],
                   balanced_mic_ix,
                   unbalanced_mic_ix,
@@ -137,7 +114,7 @@ generated quantities {
                   edge_to_drain,
                   edge_to_enzyme,
                   kcat,
-                  keq,
+                  dgrs,
                   ix_ci,
                   ix_ai,
                   ix_aa,
@@ -157,7 +134,6 @@ generated quantities {
                   conc_phos_experiment);
     conc[e, balanced_mic_ix] = conc_balanced[1];
     conc[e, unbalanced_mic_ix] = conc_unbalanced[e,:];
-    {
     vector[N_edge] flux_edge = get_flux(conc[e],
                                         conc_enzyme_experiment,
                                         km,
@@ -168,7 +144,7 @@ generated quantities {
                                         edge_to_drain,
                                         edge_to_enzyme,
                                         kcat,
-                                        keq,
+                                        dgrs,
                                         ix_ci,
                                         ix_ai,
                                         ix_aa,
@@ -186,7 +162,7 @@ generated quantities {
                                         subunits,
                                         kcat_phos,
                                         conc_phos_experiment);
-    for (j in 1:N_edge)
+    for (j in 1:N_edge){
       flux[e, edge_to_reaction[j]] += flux_edge[j];
     }
   }

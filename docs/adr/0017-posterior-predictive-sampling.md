@@ -1,10 +1,10 @@
-# 16. checking that appropriate fluxes are measured
+# 17. conducting out of sampling 
 
 Date: 2021-08-31
 
 ## Status
 
-In Review
+partially implemented
 
 ## Context
 After sampling from the posterior distribution users may want the option
