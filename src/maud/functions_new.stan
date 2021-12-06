@@ -109,7 +109,7 @@ functions {
   }
 
   int measure_ragged(int[,] bounds, int i){
-    return bounds[i, 2] - bounds[i, 1];
+    return bounds[i, 2] - bounds[i, 1] + 1;
   }
 
   int[] extract_ragged(int[] ix_long, int[,] bounds, int i){
@@ -334,45 +334,45 @@ functions {
     vector[N_edge] vmax = get_vmax_by_edge(enzyme, kcat, edge_to_enzyme, edge_type);
     vector[N_edge] reversibility = get_reversibility(dgr, S, conc, edge_type);
     vector[N_edge] free_enzyme_ratio = get_free_enzyme_ratio(conc,
-                                                            S,
-                                                            km,
-                                                            ki,
-                                                            edge_type,
-                                                            km_lookup,
-                                                            ki_lookup,
-                                                            sub_by_edge_long,
-                                                            sub_by_edge_bounds,
-                                                            prod_by_edge_long,
-                                                            prod_by_edge_bounds,
-                                                            ci_by_edge_long,
-                                                            ci_by_edge_bounds);
+                                                             S,
+                                                             km,
+                                                             ki,
+                                                             edge_type,
+                                                             km_lookup,
+                                                             ki_lookup,
+                                                             sub_by_edge_long,
+                                                             sub_by_edge_bounds,
+                                                             prod_by_edge_long,
+                                                             prod_by_edge_bounds,
+                                                             ci_by_edge_long,
+                                                             ci_by_edge_bounds);
     vector[N_edge] saturation = get_saturation(conc,
-                                              km,
-                                              free_enzyme_ratio,
-                                              km_lookup,
-                                              sub_by_edge_long,
-                                              sub_by_edge_bounds,
-                                              edge_type);
+                                               km,
+                                               free_enzyme_ratio,
+                                               km_lookup,
+                                               sub_by_edge_long,
+                                               sub_by_edge_bounds,
+                                               edge_type);
     vector[N_edge] allostery = get_allostery(conc,
-                                            free_enzyme_ratio,
-                                            tc,
-                                            dt,
-                                            dr,
-                                            subunits,
-                                            dt_lookup,
-                                            dr_lookup,
-                                            edge_to_tc,
-                                            ai_ix_long,
-                                            ai_ix_bounds,
-                                            aa_ix_long,
-                                            aa_ix_bounds);
+                                             free_enzyme_ratio,
+                                             tc,
+                                             dt,
+                                             dr,
+                                             subunits,
+                                             dt_lookup,
+                                             dr_lookup,
+                                             edge_to_tc,
+                                             ai_ix_long,
+                                             ai_ix_bounds,
+                                             aa_ix_long,
+                                             aa_ix_bounds);
     vector[N_edge] phosphorylation = get_phosphorylation(kcat_phos,
-                                                        conc_phos,
-                                                        pa_ix_long,
-                                                        pa_ix_bounds,
-                                                        pi_ix_long,
-                                                        pi_ix_bounds,
-                                                        subunits);
+                                                         conc_phos,
+                                                         pa_ix_long,
+                                                         pa_ix_bounds,
+                                                         pi_ix_long,
+                                                         pi_ix_bounds,
+                                                         subunits);
     vector[N_edge] drain_by_edge = get_drain_by_edge(drain,
                                                      conc,
                                                      edge_to_drain,

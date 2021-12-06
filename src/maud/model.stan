@@ -82,7 +82,7 @@ data {
   vector[N_edge] water_stoichiometry;
   matrix<lower=0,upper=1>[N_experiment, N_enzyme] is_knockout;
   matrix<lower=0,upper=1>[N_experiment, N_phosphorylation_enzymes] is_phos_knockout;
-  vector[N_enzyme]<lower=1> subunits;
+  vector<lower=1>[N_enzyme] subunits;
   // configuration
   vector<lower=0>[N_mic] conc_init[N_experiment];
   real rel_tol; 
@@ -320,7 +320,7 @@ generated quantities {
                                  aa_ix_long,
                                  aa_ix_bounds);
     phosphorylation[e] = get_phosphorylation(kcat_phos,
-                                             conc_phos_experiment,
+                                             conc_phos[e] .* phos_knockout[e]',
                                              pa_ix_long,
                                              pa_ix_bounds,
                                              pi_ix_long,
