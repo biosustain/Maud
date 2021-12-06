@@ -127,18 +127,18 @@ functions {
                         vector km,
                         vector free_enzyme_ratio,
                         int[,] km_lookup,
-                        int[] sub_by_flux_long,
-                        int[,] sub_by_flux_bounds,
-                        int[] flux_type){
-    int N_flux = size(sub_by_flux_bounds);
-    vector[N_flux] prod_conc_over_km;
-    for (f in 1:N_flux){
-      if (flux_type[f] == 2){
+                        int[] sub_by_edge_long,
+                        int[,] sub_by_edge_bounds,
+                        int[] edge_type){
+    int N_edge = size(sub_by_edge_bounds);
+    vector[N_edge] prod_conc_over_km;
+    for (f in 1:N_edge){
+      if (edge_type[f] == 2){
         prod_conc_over_km[f] = 1;
         continue;
       }
-      int N_sub = measure_ragged(sub_by_flux_bounds, f);
-      array[N_sub] int sub_ix = extract_ragged(sub_by_flux_long, sub_by_flux_bounds, f);
+      int N_sub = measure_ragged(sub_by_edge_bounds, f);
+      array[N_sub] int sub_ix = extract_ragged(sub_by_edge_long, sub_by_edge_bounds, f);
       prod_conc_over_km[f] = prod(conc[sub_ix] ./ km[km_lookup[sub_ix, f]]);
     }
     return prod_conc_over_km .* free_enzyme_ratio;
@@ -148,50 +148,50 @@ functions {
                                matrix S,
                                vector km,
                                vector ki,
-                               int[] flux_type,
+                               int[] edge_type,
                                int[,] km_lookup,
                                int[,] ki_lookup,
-                               int[] sub_by_flux_long,
-                               int[,] sub_by_flux_bounds,
-                               int[] prod_by_flux_long,
-                               int[,] prod_by_flux_bounds,
-                               int[] ci_by_flux_long,
-                               int[,] ci_by_flux_bounds){
-    /* Find the proportion of enzyme that is free, for each flux. */
+                               int[] sub_by_edge_long,
+                               int[,] sub_by_edge_bounds,
+                               int[] prod_by_edge_long,
+                               int[,] prod_by_edge_bounds,
+                               int[] ci_by_edge_long,
+                               int[,] ci_by_edge_bounds){
+    /* Find the proportion of enzyme that is free, for each edge. */
     int N_km = rows(km);
-    int N_flux = cols(S);
-    vector[N_flux] out;
-    for (f in 1:N_flux){
-      if (flux_type[f] == 2){
+    int N_edge = cols(S);
+    vector[N_edge] out;
+    for (f in 1:N_edge){
+      if (edge_type[f] == 2){
         out[f] = 1;
         continue;
       }
-      int N_sub = measure_ragged(sub_by_flux_bounds, f);
-      int N_prod = measure_ragged(prod_by_flux_bounds, f);
-      int N_ci = measure_ragged(ci_by_flux_bounds, f);
-      array[N_sub] int sub_ix = extract_ragged(sub_by_flux_long, sub_by_flux_bounds, f);
-      array[N_prod] int prod_ix = extract_ragged(prod_by_flux_long, prod_by_flux_bounds, f);
+      int N_sub = measure_ragged(sub_by_edge_bounds, f);
+      int N_prod = measure_ragged(prod_by_edge_bounds, f);
+      int N_ci = measure_ragged(ci_by_edge_bounds, f);
+      array[N_sub] int sub_ix = extract_ragged(sub_by_edge_long, sub_by_edge_bounds, f);
+      array[N_prod] int prod_ix = extract_ragged(prod_by_edge_long, prod_by_edge_bounds, f);
       vector[N_sub] sub_over_km = conc[sub_ix] ./ km[km_lookup[sub_ix, f]];
       vector[N_prod] prod_over_km = conc[prod_ix] ./ km[km_lookup[prod_ix, f]];
       out[f] = prod((rep_vector(1, N_sub) + sub_over_km) ^ fabs(S[sub_ix, f]));
-      if (flux_type[f] == 1){
+      if (edge_type[f] == 1){
         out[f] += prod((rep_vector(1, N_prod) + prod_over_km) ^ fabs(S[prod_ix, f])) - 1;
       }
       if (N_ci > 0){
-        array[N_ci] int ci_ix = extract_ragged(ci_by_flux_long, ci_by_flux_bounds, f);
+        array[N_ci] int ci_ix = extract_ragged(ci_by_edge_long, ci_by_edge_bounds, f);
         out[f] += sum(conc[ci_ix] ./ ki[ki_lookup[ci_ix, f]]);
       }
     }
     return out;
   }
 
-  vector get_reversibility(vector dgr, matrix S, vector conc, int[] flux_type){
+  vector get_reversibility(vector dgr, matrix S, vector conc, int[] edge_type){
     real RT = 0.008314 * 298.15;
-    int N_flux = cols(S);
-    vector[N_flux] reaction_quotient = S' * conc;
-    vector[N_flux] out;
-    for (f in 1:N_flux){
-      if (flux_type[f] == 1)
+    int N_edge = cols(S);
+    vector[N_edge] reaction_quotient = S' * conc;
+    vector[N_edge] out;
+    for (f in 1:N_edge){
+      if (edge_type[f] == 1)
         out[f] = 1 - exp(dgr[f] + RT * reaction_quotient[f]);
       else
         out[f] = 1;
@@ -207,15 +207,15 @@ functions {
                        vector subunits,
                        int[,] dt_lookup,
                        int[,] dr_lookup,
-                       int[] flux_to_tc,
+                       int[] edge_to_tc,
                        int[] ai_ix_long,
                        int[,] ai_ix_bounds,
                        int[] aa_ix_long,
                        int[,] aa_ix_bounds
   ){
-    int N_flux = size(aa_ix_bounds);
-    vector[N_flux] out = rep_vector(1, N_flux);
-    for (f in 1:N_flux){
+    int N_edge = size(aa_ix_bounds);
+    vector[N_edge] out = rep_vector(1, N_edge);
+    for (f in 1:N_edge){
       int N_ai = measure_ragged(ai_ix_bounds, f);
       int N_aa = measure_ragged(aa_ix_bounds, f);
       real Q_num = 1;
@@ -229,7 +229,7 @@ functions {
         Q_denom = 1 + sum(conc[aas] ./ dr[dr_lookup[aas, f]]);
       }
       if ((N_ai > 0) || (N_aa > 0)){
-        real tc_f = flux_to_tc[f];
+        real tc_f = edge_to_tc[f];
         out[f] = inv(1 + tc_f * free_enzyme_ratio[f] * Q_num / Q_denom) ^ subunits[f];
       }
     }
@@ -243,9 +243,9 @@ functions {
                              int[] pi_ix_long,
                              int[,] pi_ix_bounds,
                              vector subunits){
-    int N_flux = size(pa_ix_bounds);
-    vector[N_flux] out = rep_vector(1, N_flux);
-    for (f in 1:N_flux){
+    int N_edge = size(pa_ix_bounds);
+    vector[N_edge] out = rep_vector(1, N_edge);
+    for (f in 1:N_edge){
       real alpha = 0;
       real beta = 0;
       int N_pa = measure_ragged(pa_ix_bounds, f);
@@ -265,95 +265,95 @@ functions {
     return out;
   }
 
-  vector get_drain_flux(vector drain,
-                        vector conc,
-                        int[] flux_to_drain,
-                        int[] sub_by_flux_long,
-                        int[,] sub_by_flux_bounds,
-                        int[] flux_type){
-    int N_flux = size(flux_type);
-    vector[N_flux] out = rep_vector(1, N_flux);
-    for (f in 1:N_flux){
-      if (flux_type[f] == 2){
-        int N_sub = measure_ragged(sub_by_flux_bounds, f);
-        int subs[N_sub] = extract_ragged(sub_by_flux_long, sub_by_flux_bounds, f);
-        out[f] = drain[flux_to_drain[f]] * prod(conc[subs] ./ (conc[subs] + 1e-6));
+  vector get_drain_by_edge(vector drain,
+                           vector conc,
+                           int[] edge_to_drain,
+                           int[] sub_by_edge_long,
+                           int[,] sub_by_edge_bounds,
+                           int[] edge_type){
+    int N_edge = size(edge_type);
+    vector[N_edge] out = rep_vector(1, N_edge);
+    for (f in 1:N_edge){
+      if (edge_type[f] == 2){
+        int N_sub = measure_ragged(sub_by_edge_bounds, f);
+        int subs[N_sub] = extract_ragged(sub_by_edge_long, sub_by_edge_bounds, f);
+        out[f] = drain[edge_to_drain[f]] * prod(conc[subs] ./ (conc[subs] + 1e-6));
       }
     }
     return out;
   }
 
-  vector get_vmax_by_flux(vector enzyme, vector kcat, int[] flux_to_enzyme, int[] flux_type){
-    int N_flux = size(flux_to_enzyme);
-    vector[N_flux] out = rep_vector(1, N_flux);
-    for (f in 1:N_flux){
-      if (flux_type[f] != 2){
-        out[f] = enzyme[flux_to_enzyme[f]] * kcat[flux_to_enzyme[f]];
+  vector get_vmax_by_edge(vector enzyme, vector kcat, int[] edge_to_enzyme, int[] edge_type){
+    int N_edge = size(edge_to_enzyme);
+    vector[N_edge] out = rep_vector(1, N_edge);
+    for (f in 1:N_edge){
+      if (edge_type[f] != 2){
+        out[f] = enzyme[edge_to_enzyme[f]] * kcat[edge_to_enzyme[f]];
       }
     }
     return out;
   }
 
-  vector get_flux(vector conc,
-                  vector enzyme,
-                  vector dgr,
-                  vector kcat,
-                  vector km,
-                  vector ki,
-                  vector tc,
-                  vector dt,
-                  vector dr,
-                  vector kcat_phos,
-                  vector conc_phos,
-                  vector drain,
-                  matrix S,
-                  vector subunits,
-                  int[] flux_type,
-                  int[] flux_to_enzyme,
-                  int[] flux_to_tc,
-                  int[] flux_to_drain,
-                  int[,] km_lookup,
-                  int[,] ki_lookup,
-                  int[,] dt_lookup,
-                  int[,] dr_lookup,
-                  int[] sub_by_flux_long,
-                  int[,] sub_by_flux_bounds,
-                  int[] prod_by_flux_long,
-                  int[,] prod_by_flux_bounds,
-                  int[] ci_by_flux_long,
-                  int[,] ci_by_flux_bounds,
-                  int[] ai_ix_long,
-                  int[,] ai_ix_bounds,
-                  int[] aa_ix_long,
-                  int[,] aa_ix_bounds,
-                  int[] pa_ix_long,
-                  int[,] pa_ix_bounds,
-                  int[] pi_ix_long,
-                  int[,] pi_ix_bounds){
-    int N_flux = cols(S);
-    vector[N_flux] vmax = get_vmax_by_flux(enzyme, kcat, flux_to_enzyme, flux_type);
-    vector[N_flux] reversibility = get_reversibility(dgr, S, conc, flux_type);
-    vector[N_flux] free_enzyme_ratio = get_free_enzyme_ratio(conc,
+  vector get_edge_flux(vector conc,
+                       vector enzyme,
+                       vector dgr,
+                       vector kcat,
+                       vector km,
+                       vector ki,
+                       vector tc,
+                       vector dt,
+                       vector dr,
+                       vector kcat_phos,
+                       vector conc_phos,
+                       vector drain,
+                       matrix S,
+                       vector subunits,
+                       int[] edge_type,
+                       int[] edge_to_enzyme,
+                       int[] edge_to_tc,
+                       int[] edge_to_drain,
+                       int[,] km_lookup,
+                       int[,] ki_lookup,
+                       int[,] dt_lookup,
+                       int[,] dr_lookup,
+                       int[] sub_by_edge_long,
+                       int[,] sub_by_edge_bounds,
+                       int[] prod_by_edge_long,
+                       int[,] prod_by_edge_bounds,
+                       int[] ci_by_edge_long,
+                       int[,] ci_by_edge_bounds,
+                       int[] ai_ix_long,
+                       int[,] ai_ix_bounds,
+                       int[] aa_ix_long,
+                       int[,] aa_ix_bounds,
+                       int[] pa_ix_long,
+                       int[,] pa_ix_bounds,
+                       int[] pi_ix_long,
+                       int[,] pi_ix_bounds){
+    int N_edge = cols(S);
+    vector[N_edge] vmax = get_vmax_by_edge(enzyme, kcat, edge_to_enzyme, edge_type);
+    vector[N_edge] reversibility = get_reversibility(dgr, S, conc, edge_type);
+    vector[N_edge] free_enzyme_ratio = get_free_enzyme_ratio(conc,
                                                             S,
                                                             km,
                                                             ki,
-                                                            flux_type,
+                                                            edge_type,
                                                             km_lookup,
                                                             ki_lookup,
-                                                            sub_by_flux_long,
-                                                            sub_by_flux_bounds,
-                                                            prod_by_flux_long,
-                                                            prod_by_flux_bounds,
-                                                            ci_by_flux_long,
-                                                            ci_by_flux_bounds);
-    vector[N_flux] saturation = get_saturation(conc,
+                                                            sub_by_edge_long,
+                                                            sub_by_edge_bounds,
+                                                            prod_by_edge_long,
+                                                            prod_by_edge_bounds,
+                                                            ci_by_edge_long,
+                                                            ci_by_edge_bounds);
+    vector[N_edge] saturation = get_saturation(conc,
                                               km,
                                               free_enzyme_ratio,
                                               km_lookup,
-                                              sub_by_flux_long,
-                                              sub_by_flux_bounds,
-                                              flux_type);
-    vector[N_flux] allostery = get_allostery(conc,
+                                              sub_by_edge_long,
+                                              sub_by_edge_bounds,
+                                              edge_type);
+    vector[N_edge] allostery = get_allostery(conc,
                                             free_enzyme_ratio,
                                             tc,
                                             dt,
@@ -361,25 +361,25 @@ functions {
                                             subunits,
                                             dt_lookup,
                                             dr_lookup,
-                                            flux_to_tc,
+                                            edge_to_tc,
                                             ai_ix_long,
                                             ai_ix_bounds,
                                             aa_ix_long,
                                             aa_ix_bounds);
-    vector[N_flux] phosphorylation = get_phosphorylation(kcat_phos,
+    vector[N_edge] phosphorylation = get_phosphorylation(kcat_phos,
                                                         conc_phos,
                                                         pa_ix_long,
                                                         pa_ix_bounds,
                                                         pi_ix_long,
                                                         pi_ix_bounds,
                                                         subunits);
-    vector[N_flux] drain_flux = get_drain_flux(drain,
-                                              conc,
-                                              flux_to_drain,
-                                              sub_by_flux_long,
-                                              sub_by_flux_bounds,
-                                              flux_type);
-    return vmax .* saturation .* reversibility .* allostery .* phosphorylation .* drain_flux;
+    vector[N_edge] drain_by_edge = get_drain_by_edge(drain,
+                                                     conc,
+                                                     edge_to_drain,
+                                                     sub_by_edge_long,
+                                                     sub_by_edge_bounds,
+                                                     edge_type);
+    return vmax .* saturation .* reversibility .* allostery .* phosphorylation .* drain_by_edge;
   }
 
   vector dbalanced_dt(real time,
@@ -400,20 +400,20 @@ functions {
                       vector drain,
                       matrix S,
                       vector subunits,
-                      int[] flux_type,
-                      int[] flux_to_enzyme,
-                      int[] flux_to_tc,
-                      int[] flux_to_drain,
+                      int[] edge_type,
+                      int[] edge_to_enzyme,
+                      int[] edge_to_tc,
+                      int[] edge_to_drain,
                       int[,] km_lookup,
                       int[,] ki_lookup,
                       int[,] dt_lookup,
                       int[,] dr_lookup,
-                      int[] sub_by_flux_long,
-                      int[,] sub_by_flux_bounds,
-                      int[] prod_by_flux_long,
-                      int[,] prod_by_flux_bounds,
-                      int[] ci_by_flux_long,
-                      int[,] ci_by_flux_bounds,
+                      int[] sub_by_edge_long,
+                      int[,] sub_by_edge_bounds,
+                      int[] prod_by_edge_long,
+                      int[,] prod_by_edge_bounds,
+                      int[] ci_by_edge_long,
+                      int[,] ci_by_edge_bounds,
                       int[] ai_ix_long,
                       int[,] ai_ix_bounds,
                       int[] aa_ix_long,
@@ -425,42 +425,42 @@ functions {
     vector[rows(current_balanced)+rows(unbalanced)] current_concentration;
     current_concentration[balanced_ix] = current_balanced;
     current_concentration[unbalanced_ix] = unbalanced;
-    vector[rows(S)] flux = get_flux(current_concentration,
-                                    enzyme,
-                                    dgr,
-                                    kcat,
-                                    km,
-                                    ki,
-                                    tc,
-                                    dt,
-                                    dr,
-                                    kcat_phos,
-                                    conc_phos,
-                                    drain,
-                                    S,
-                                    subunits,
-                                    flux_type,
-                                    flux_to_enzyme,
-                                    flux_to_tc,
-                                    flux_to_drain,
-                                    km_lookup,
-                                    ki_lookup,
-                                    dt_lookup,
-                                    dr_lookup,
-                                    sub_by_flux_long,
-                                    sub_by_flux_bounds,
-                                    prod_by_flux_long,
-                                    prod_by_flux_bounds,
-                                    ci_by_flux_long,
-                                    ci_by_flux_bounds,
-                                    ai_ix_long,
-                                    ai_ix_bounds,
-                                    aa_ix_long,
-                                    aa_ix_bounds,
-                                    pa_ix_long,
-                                    pa_ix_bounds,
-                                    pi_ix_long,
-                                    pi_ix_bounds);
-    return (S * flux)[balanced_ix];
+    vector[rows(S)] edge_flux = get_edge_flux(current_concentration,
+                                              enzyme,
+                                              dgr,
+                                              kcat,
+                                              km,
+                                              ki,
+                                              tc,
+                                              dt,
+                                              dr,
+                                              kcat_phos,
+                                              conc_phos,
+                                              drain,
+                                              S,
+                                              subunits,
+                                              edge_type,
+                                              edge_to_enzyme,
+                                              edge_to_tc,
+                                              edge_to_drain,
+                                              km_lookup,
+                                              ki_lookup,
+                                              dt_lookup,
+                                              dr_lookup,
+                                              sub_by_edge_long,
+                                              sub_by_edge_bounds,
+                                              prod_by_edge_long,
+                                              prod_by_edge_bounds,
+                                              ci_by_edge_long,
+                                              ci_by_edge_bounds,
+                                              ai_ix_long,
+                                              ai_ix_bounds,
+                                              aa_ix_long,
+                                              aa_ix_bounds,
+                                              pa_ix_long,
+                                              pa_ix_bounds,
+                                              pi_ix_long,
+                                              pi_ix_bounds);
+    return (S * edge_flux)[balanced_ix];
   }
 }
