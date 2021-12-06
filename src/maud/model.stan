@@ -76,8 +76,6 @@ data {
   array[N_edge, 2] int pa_ix_bounds;
   array[N_pi] int pi_ix_long;
   array[N_edge, 2] int pi_ix_bounds;
-
-
   int<lower=1,upper=N_metabolite> mic_to_met[N_mic];
   vector[N_edge] water_stoichiometry;
   matrix<lower=0,upper=1>[N_experiment, N_enzyme] is_knockout;

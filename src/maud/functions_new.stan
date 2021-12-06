@@ -172,9 +172,9 @@ functions {
       array[N_sub] int sub_ix = extract_ragged(sub_by_edge_long, sub_by_edge_bounds, f);
       array[N_prod] int prod_ix = extract_ragged(prod_by_edge_long, prod_by_edge_bounds, f);
       vector[N_sub] sub_over_km = conc[sub_ix] ./ km[km_lookup[sub_ix, f]];
-      vector[N_prod] prod_over_km = conc[prod_ix] ./ km[km_lookup[prod_ix, f]];
       out[f] = prod((rep_vector(1, N_sub) + sub_over_km) ^ fabs(S[sub_ix, f]));
       if (edge_type[f] == 1){
+        vector[N_prod] prod_over_km = conc[prod_ix] ./ km[km_lookup[prod_ix, f]];
         out[f] += prod((rep_vector(1, N_prod) + prod_over_km) ^ fabs(S[prod_ix, f])) - 1;
       }
       if (N_ci > 0){
@@ -229,8 +229,8 @@ functions {
         Q_denom = 1 + sum(conc[aas] ./ dr[dr_lookup[aas, f]]);
       }
       if ((N_ai > 0) || (N_aa > 0)){
-        real tc_f = edge_to_tc[f];
-        out[f] = inv(1 + tc_f * free_enzyme_ratio[f] * Q_num / Q_denom) ^ subunits[f];
+        real tc_f = tc[edge_to_tc[f]];
+        out[f] = inv(1 + tc_f * (free_enzyme_ratio[f] * Q_num / Q_denom) ^ subunits[f]);
       }
     }
     return out;

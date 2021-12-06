@@ -304,7 +304,9 @@ def get_phos_act_inh_matrix(mi: MaudInput):
 
 def _get_lookup(mi: MaudInput, mics: List[str], edges: List[str]) -> Sequence[int]:
     shape = (len(mi.stan_coords.mics), len(mi.stan_coords.edges))
-    out = pd.DataFrame(np.zeros(shape), index=mi.stan_coords.mics, columns=mi.stan_coords.edges)
+    out = pd.DataFrame(
+        np.zeros(shape), index=mi.stan_coords.mics, columns=mi.stan_coords.edges
+    )
     for i, (mic_id, enz_id) in enumerate(zip(mics, edges)):
         out.loc[mic_id, enz_id] = i + 1
     return out.values.astype(int).tolist()
@@ -589,11 +591,10 @@ def get_input_data(mi: MaudInput) -> dict:
             mi.stan_coords.balanced_mics,
         )
     )
-    allosteric_enzymes = [e for e in sorted_enzymes if e.allosteric]
-    edge_codes = codify(mi.stan_coords.edges)
+    ae_codes = codify(mi.stan_coords.allosteric_enzymes)
     edge_to_tc = [
-        edge_codes[edge_id] if edge_id in allosteric_enzymes else 0
-        for edge_id in edge_codes.keys()
+        ae_codes[edge_id] if edge_id in ae_codes.keys() else 0
+        for edge_id in mi.stan_coords.edges
     ]
     prior_dict = get_prior_dict(mi.priors)
     config_dict = get_config_dict(mi)
@@ -606,33 +607,23 @@ def get_input_data(mi: MaudInput) -> dict:
     # encode ragged arrays
     mic_codes = codify(mi.stan_coords.mics)
     phos_enz_codes = codify(mi.stan_coords.phos_enzs)
-    sub_by_edge_long, sub_by_edge_bounds = encode_ragged([
-        [mic_codes[m] for m in S[e].index if S.loc[m, e] < 0]
-        for e in S.columns
-    ])
-    prod_by_edge_long, prod_by_edge_bounds = encode_ragged([
-        [mic_codes[m] for m in S[e].index if S.loc[m, e] > 0]
-        for e in S.columns
-    ])
+    sub_by_edge_long, sub_by_edge_bounds = encode_ragged(
+        [[mic_codes[m] for m in S[e].index if S.loc[m, e] < 0] for e in S.columns]
+    )
+    prod_by_edge_long, prod_by_edge_bounds = encode_ragged(
+        [[mic_codes[m] for m in S[e].index if S.loc[m, e] > 0] for e in S.columns]
+    )
     ci_by_edge_long, ci_by_edge_bounds = encode_ragged(
         mod_info["competitive_inhibitor"].tolist()
     )
     ci_by_edge_long = [mic_codes[i] for i in ci_by_edge_long]
-    ai_ix_long, ai_ix_bounds = encode_ragged(
-        mod_info["allosteric_inhibitor"].tolist()
-    )
+    ai_ix_long, ai_ix_bounds = encode_ragged(mod_info["allosteric_inhibitor"].tolist())
     ai_ix_long = [mic_codes[i] for i in ai_ix_long]
-    aa_ix_long, aa_ix_bounds = encode_ragged(
-        mod_info["allosteric_activator"].tolist()
-    )
+    aa_ix_long, aa_ix_bounds = encode_ragged(mod_info["allosteric_activator"].tolist())
     aa_ix_long = [mic_codes[i] for i in aa_ix_long]
-    pi_ix_long, pi_ix_bounds = encode_ragged(
-        phos_info["inhibitors"].tolist()
-    )
+    pi_ix_long, pi_ix_bounds = encode_ragged(phos_info["inhibitors"].tolist())
     pi_ix_long = [phos_enz_codes[i] for i in pi_ix_long]
-    pa_ix_long, pa_ix_bounds = encode_ragged(
-        phos_info["activators"].tolist()
-    )
+    pa_ix_long, pa_ix_bounds = encode_ragged(phos_info["activators"].tolist())
     pa_ix_long = [phos_enz_codes[i] for i in pa_ix_long]
     return {
         **{
@@ -654,7 +645,7 @@ def get_input_data(mi: MaudInput) -> dict:
             "N_ci": len(mi.stan_coords.ci_mics),
             "N_ai": len(mi.stan_coords.ai_mics),
             "N_aa": len(mi.stan_coords.aa_mics),
-            "N_ae": len(allosteric_enzymes),
+            "N_ae": len(mi.stan_coords.allosteric_enzymes),
             "N_pa": int(phos_info["activators"].apply(lambda l: len(l) > 0).sum()),
             "N_pi": int(phos_info["inhibitors"].apply(lambda l: len(l) > 0).sum()),
             "N_drain": len(mi.stan_coords.drains),
