@@ -173,7 +173,7 @@ class Reaction:
         if stoichiometry is None:
             stoichiometry = defaultdict()
         if enzymes is None:
-            enzymes = defaultdict()
+            enzymes = []
         self.id = id
         self.name = name if name is not None else id
         self.reaction_mechanism = reaction_mechanism
