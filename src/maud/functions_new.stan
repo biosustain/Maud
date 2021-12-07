@@ -160,10 +160,10 @@ functions {
     /* Find the proportion of enzyme that is free, for each edge. */
     int N_km = rows(km);
     int N_edge = cols(S);
-    vector[N_edge] out;
+    vector[N_edge] denom;
     for (f in 1:N_edge){
       if (edge_type[f] == 2){
-        out[f] = 1;
+        denom[f] = 1;
         continue;
       }
       int N_sub = measure_ragged(sub_by_edge_bounds, f);
@@ -172,27 +172,27 @@ functions {
       array[N_sub] int sub_ix = extract_ragged(sub_by_edge_long, sub_by_edge_bounds, f);
       array[N_prod] int prod_ix = extract_ragged(prod_by_edge_long, prod_by_edge_bounds, f);
       vector[N_sub] sub_over_km = conc[sub_ix] ./ km[km_lookup[sub_ix, f]];
-      out[f] = prod((rep_vector(1, N_sub) + sub_over_km) ^ fabs(S[sub_ix, f]));
+      denom[f] = prod((rep_vector(1, N_sub) + sub_over_km) ^ fabs(S[sub_ix, f]));
       if (edge_type[f] == 1){
         vector[N_prod] prod_over_km = conc[prod_ix] ./ km[km_lookup[prod_ix, f]];
-        out[f] += prod((rep_vector(1, N_prod) + prod_over_km) ^ fabs(S[prod_ix, f])) - 1;
+        denom[f] += prod((rep_vector(1, N_prod) + prod_over_km) ^ fabs(S[prod_ix, f])) - 1;
       }
       if (N_ci > 0){
         array[N_ci] int ci_ix = extract_ragged(ci_by_edge_long, ci_by_edge_bounds, f);
-        out[f] += sum(conc[ci_ix] ./ ki[ki_lookup[ci_ix, f]]);
+        denom[f] += sum(conc[ci_ix] ./ ki[ki_lookup[ci_ix, f]]);
       }
     }
-    return out;
+    return inv(denom);
   }
 
   vector get_reversibility(vector dgr, matrix S, vector conc, int[] edge_type){
     real RT = 0.008314 * 298.15;
     int N_edge = cols(S);
-    vector[N_edge] reaction_quotient = S' * conc;
+    vector[N_edge] reaction_quotient = S' * log(conc);
     vector[N_edge] out;
     for (f in 1:N_edge){
       if (edge_type[f] == 1)
-        out[f] = 1 - exp(dgr[f] + RT * reaction_quotient[f]);
+        out[f] = 1 - exp((dgr[f] + RT * reaction_quotient[f])/RT);
       else
         out[f] = 1;
     }
