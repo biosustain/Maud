@@ -515,6 +515,12 @@ def get_edge_type(edge_id: str, mi: MaudInput):
 
 
 def encode_ragged(ragged: List[List]) -> Tuple[List, List]:
+    """Encode a ragged list of lists in a Stan friendly format.
+
+    Specifically, the return value is a flat list with all the data, and a list
+    of bounds with the start and end points (1-indexed) of each entry.
+
+    """
     flat = []
     bounds = []
     ticker = 1
