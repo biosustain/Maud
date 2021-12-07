@@ -1,4 +1,4 @@
-#include functions_new.stan
+#include functions.stan
 data {
   // dimensions
   int<lower=1> N_mic;
