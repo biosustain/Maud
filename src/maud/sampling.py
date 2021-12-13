@@ -20,7 +20,7 @@ import itertools
 import json
 import os
 import warnings
-from typing import Dict, List, Union
+from typing import Dict, List, Sequence, Tuple, Union
 
 import cmdstanpy
 import numpy as np
@@ -302,17 +302,14 @@ def get_phos_act_inh_matrix(mi: MaudInput):
     return S_phos_act.T.tolist(), S_phos_inh.T.tolist()
 
 
-def _get_km_lookup(mi: MaudInput) -> List[List[int]]:
+def _get_lookup(mi: MaudInput, mics: List[str], edges: List[str]) -> Sequence[int]:
+    shape = (len(mi.stan_coords.mics), len(mi.stan_coords.edges))
     out = pd.DataFrame(
-        0,
-        index=mi.stan_coords.mics,
-        columns=mi.stan_coords.enzymes + mi.stan_coords.drains,
+        np.zeros(shape), index=mi.stan_coords.mics, columns=mi.stan_coords.edges
     )
-    for i, (mic_id, enz_id) in enumerate(
-        zip(mi.stan_coords.km_mics, mi.stan_coords.km_enzs)
-    ):
+    for i, (mic_id, enz_id) in enumerate(zip(mics, edges)):
         out.loc[mic_id, enz_id] = i + 1
-    return out.values
+    return out.values.astype(int).tolist()
 
 
 def _get_conc_init(mi: MaudInput) -> pd.DataFrame:
@@ -517,6 +514,23 @@ def get_edge_type(edge_id: str, mi: MaudInput):
         raise ValueError(f"Edge {reaction_mechanism} is of unknown type.")
 
 
+def encode_ragged(ragged: List[List]) -> Tuple[List, List]:
+    """Encode a ragged list of lists in a Stan friendly format.
+
+    Specifically, the return value is a flat list with all the data, and a list
+    of bounds with the start and end points (1-indexed) of each entry.
+
+    """
+    flat = []
+    bounds = []
+    ticker = 1
+    for sublist in ragged:
+        flat = flat + sublist
+        bounds.append([ticker, ticker + len(sublist) - 1])
+        ticker += len(sublist)
+    return flat, bounds
+
+
 def get_input_data(mi: MaudInput) -> dict:
     """Get the input to inference_model.stan from a MaudInput object.
 
@@ -532,7 +546,6 @@ def get_input_data(mi: MaudInput) -> dict:
         mi.kinetic_model.mics,
         key=lambda m: codify(mi.stan_coords.mics)[m.id],
     )
-    phos_enz_ix = codify(mi.stan_coords.phos_enzs)
     S = get_stoichiometry(mi)
     edge_type = [get_edge_type(eid, mi) for eid in S.columns]
     edge_to_enzyme = (
@@ -584,15 +597,46 @@ def get_input_data(mi: MaudInput) -> dict:
             mi.stan_coords.balanced_mics,
         )
     )
-    allosteric_enzymes = [e for e in sorted_enzymes if e.allosteric]
+    ae_codes = codify(mi.stan_coords.allosteric_enzymes)
+    edge_to_tc = [
+        ae_codes[edge_id] if edge_id in ae_codes.keys() else 0
+        for edge_id in mi.stan_coords.edges
+    ]
     prior_dict = get_prior_dict(mi.priors)
     config_dict = get_config_dict(mi)
     measurements_dict = get_measurements_dict(mi.measurements, mi.stan_coords)
-    mic_ix = codify(mi.stan_coords.mics)
+    # create lookup tables
+    km_lookup = _get_lookup(mi, mi.stan_coords.km_mics, mi.stan_coords.km_enzs)
+    ki_lookup = _get_lookup(mi, mi.stan_coords.ci_mics, mi.stan_coords.ci_enzs)
+    dt_lookup = _get_lookup(mi, mi.stan_coords.ai_mics, mi.stan_coords.ai_enzs)
+    dr_lookup = _get_lookup(mi, mi.stan_coords.aa_mics, mi.stan_coords.aa_enzs)
+    # encode ragged arrays
+    mic_codes = codify(mi.stan_coords.mics)
+    phos_enz_codes = codify(mi.stan_coords.phos_enzs)
+    sub_by_edge_long, sub_by_edge_bounds = encode_ragged(
+        [[mic_codes[m] for m in S[e].index if S.loc[m, e] < 0] for e in S.columns]
+    )
+    prod_by_edge_long, prod_by_edge_bounds = encode_ragged(
+        [[mic_codes[m] for m in S[e].index if S.loc[m, e] > 0] for e in S.columns]
+    )
+    ci_by_edge_long, ci_by_edge_bounds = encode_ragged(
+        mod_info["competitive_inhibitor"].tolist()
+    )
+    ci_by_edge_long = [mic_codes[i] for i in ci_by_edge_long]
+    ai_ix_long, ai_ix_bounds = encode_ragged(mod_info["allosteric_inhibitor"].tolist())
+    ai_ix_long = [mic_codes[i] for i in ai_ix_long]
+    aa_ix_long, aa_ix_bounds = encode_ragged(mod_info["allosteric_activator"].tolist())
+    aa_ix_long = [mic_codes[i] for i in aa_ix_long]
+    pi_ix_long, pi_ix_bounds = encode_ragged(phos_info["inhibitors"].tolist())
+    pi_ix_long = [phos_enz_codes[i] for i in pi_ix_long]
+    pa_ix_long, pa_ix_bounds = encode_ragged(phos_info["activators"].tolist())
+    pa_ix_long = [phos_enz_codes[i] for i in pa_ix_long]
     return {
         **{
             # sizes
             "N_mic": len(mi.kinetic_model.mics),
+            "N_edge_sub": len(sub_by_edge_long),
+            "N_edge_prod": len(prod_by_edge_long),
             "N_unbalanced": len(mi.stan_coords.unbalanced_mics),
             "N_metabolite": len(mi.stan_coords.metabolites),
             "N_km": len(mi.stan_coords.km_mics),
@@ -604,63 +648,46 @@ def get_input_data(mi: MaudInput) -> dict:
             "N_flux_measurement": len(mi.stan_coords.yflux_rxns),
             "N_enzyme_measurement": len(mi.stan_coords.yenz_enzs),
             "N_conc_measurement": len(mi.stan_coords.yconc_mics),
-            "N_ki": len(mi.stan_coords.ci_mics),
+            "N_ci": len(mi.stan_coords.ci_mics),
             "N_ai": len(mi.stan_coords.ai_mics),
             "N_aa": len(mi.stan_coords.aa_mics),
-            "N_ae": len(allosteric_enzymes),
+            "N_ae": len(mi.stan_coords.allosteric_enzymes),
             "N_pa": int(phos_info["activators"].apply(lambda l: len(l) > 0).sum()),
             "N_pi": int(phos_info["inhibitors"].apply(lambda l: len(l) > 0).sum()),
             "N_drain": len(mi.stan_coords.drains),
             # indexes
             "unbalanced_mic_ix": unbalanced_mic_ix,
             "balanced_mic_ix": balanced_mic_ix,
-            "ix_ci": mod_info["competitive_inhibitor"]
-            .explode()
-            .map(mic_ix)
-            .dropna()
-            .astype(int)
-            .values,
-            "ix_ai": mod_info["allosteric_inhibitor"]
-            .explode()
-            .map(mic_ix)
-            .dropna()
-            .astype(int)
-            .values,
-            "ix_aa": mod_info["allosteric_activator"]
-            .explode()
-            .map(mic_ix)
-            .dropna()
-            .astype(int)
-            .values,
-            "ix_pa": phos_info["activators"]
-            .explode()
-            .map(phos_enz_ix)
-            .dropna()
-            .astype(int)
-            .values,
-            "ix_pi": phos_info["inhibitors"]
-            .explode()
-            .map(phos_enz_ix)
-            .dropna()
-            .astype(int)
-            .values,
             # network properties
             "S": S.values,
             "edge_type": edge_type,
             "edge_to_enzyme": edge_to_enzyme.values,
+            "edge_to_tc": edge_to_tc,
             "edge_to_drain": edge_to_drain.values,
             "edge_to_reaction": edge_to_reaction.values,
             "water_stoichiometry": water_stoichiometry.values,
             "mic_to_met": mic_to_met,
-            "km_lookup": _get_km_lookup(mi),
+            "km_lookup": km_lookup,
+            "ki_lookup": ki_lookup,
+            "dt_lookup": dt_lookup,
+            "dr_lookup": dr_lookup,
             "is_knockout": knockout_matrix_enzyme.values.tolist(),
             "is_phos_knockout": knockout_matrix_phos.values.tolist(),
             "subunits": [e.subunits for e in sorted_enzymes],
-            "n_ci": mod_info["competitive_inhibitor"].map(len).values,
-            "n_ai": mod_info["allosteric_inhibitor"].map(len).values,
-            "n_aa": mod_info["allosteric_activator"].map(len).values,
-            "n_pa": phos_info["activators"].map(len).values,
-            "n_pi": phos_info["inhibitors"].map(len).values,
+            "sub_by_edge_long": sub_by_edge_long,
+            "sub_by_edge_bounds": sub_by_edge_bounds,
+            "prod_by_edge_long": prod_by_edge_long,
+            "prod_by_edge_bounds": prod_by_edge_bounds,
+            "ci_by_edge_long": ci_by_edge_long,
+            "ci_by_edge_bounds": ci_by_edge_bounds,
+            "ai_ix_long": ai_ix_long,
+            "ai_ix_bounds": ai_ix_bounds,
+            "aa_ix_long": aa_ix_long,
+            "aa_ix_bounds": aa_ix_bounds,
+            "pa_ix_long": pa_ix_long,
+            "pa_ix_bounds": pa_ix_bounds,
+            "pi_ix_long": pi_ix_long,
+            "pi_ix_bounds": pi_ix_bounds,
         },
         **prior_dict,
         **measurements_dict,
