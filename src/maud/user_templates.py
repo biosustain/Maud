@@ -164,10 +164,10 @@ def get_parameter_coords(scs):
     ]
 
 
-def get_prior_template(km, raw_measurements):
+def get_prior_template(km, raw_measurements, experiments, mode):
     """Get prior dataframe from KineticModel and Measurements."""
 
-    scs = get_stan_coords(km, raw_measurements)
+    scs = get_stan_coords(km, raw_measurements, experiments, mode)
     list_of_input_inits = get_parameter_coords(scs)
     prior_dataframe = pd.DataFrame(columns=PRIOR_FILE_COLUMNS)
     for par in list_of_input_inits:

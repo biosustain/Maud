@@ -156,7 +156,7 @@ def main():
     warmup = bool(args.warmup)
     yaml_output = os.path.join(HERE, args.yaml_output)
     csvs = get_csvs(maud_output_dir)
-    mi = load_maud_input(os.path.join(maud_output_dir, "user_input"))
+    mi = load_maud_input(os.path.join(maud_output_dir, "user_input"), mode="sample")
     infd = load_infd(csvs, mi)
     selected_experiment = None
     if selected_experiment is None:
