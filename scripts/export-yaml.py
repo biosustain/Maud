@@ -151,9 +151,9 @@ def main():
     )
     args = parser.parse_args()
     maud_output_dir = args.maud_output_dir[0]
-    chain = args.chain
-    draw = args.draw
-    warmup = args.warmup
+    chain = int(args.chain)
+    draw = int(args.draw)
+    warmup = bool(args.warmup)
     yaml_output = os.path.join(HERE, args.yaml_output)
     csvs = get_csvs(maud_output_dir)
     mi = load_maud_input(os.path.join(maud_output_dir, "user_input"))
