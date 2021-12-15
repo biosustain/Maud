@@ -1,7 +1,8 @@
 name = "linear_1_allo"
 kinetic_model = "kinetic_model.toml"
 priors = "priors.csv"
-experiments = "experiments.csv"
+measurements = "experiments.csv"
+biological_config = "biological_config.toml"
 likelihood = true
 
 [cmdstanpy_config]
