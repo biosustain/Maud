@@ -248,7 +248,8 @@ class MeasurementSet:
 
 
 class Experiment:
-    """Constructor for Experiment object
+    """Constructor for Experiment object.
+
     :param id: id for each experiment
     :param sample: if the experiment will be used in parameter sampling
     :param predict: if the experiment will be used in predictive samplig
@@ -429,7 +430,7 @@ class MaudInput:
         priors: PriorSet,
         stan_coords: StanCoordSet,
         measurements: MeasurementSet,
-        experiments: List[Experiment],
+        all_experiments: List[Experiment],
         inits: Dict[str, np.array],
     ):
         self.config = config
@@ -437,7 +438,7 @@ class MaudInput:
         self.priors = priors
         self.stan_coords = stan_coords
         self.measurements = measurements
-        self.experiments = experiments
+        self.all_experiments = all_experiments
         self.inits = inits
 
 

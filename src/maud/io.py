@@ -128,7 +128,7 @@ def load_maud_input(data_path: str, mode: str) -> MaudInput:
         priors=prior_set,
         stan_coords=stan_coords,
         measurements=measurement_set,
-        experiments=experiments,
+        all_experiments=all_experiments,
         inits=inits,
     )
     validation.validate_maud_input(mi)
@@ -209,7 +209,10 @@ def get_stan_coords(
     This function is responsible for setting the order of each parameter.
 
     :param km: KineticModel object
-    :param ms: MeasurementSet object
+    :param raw_measurements: MeasurementSet object
+    :param all_experiments: List of Experiment object,
+    all experiments in biological config file
+    :param mode: "sample" or "predict" determine which experiments will be used
     """
 
     def unpack(packed):
