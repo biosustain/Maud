@@ -62,7 +62,7 @@ def plot_box_plots(var, draws, measurements, variable_id_map):
 
 def plot_oos(maud_oos_dir, output_dir):
     """Save boxplots given maud oos predictions and ourput_dir."""
-    mi = io.load_maud_input(maud_oos_dir / "user_input")
+    mi = io.load_maud_input(data_path=maud_oos_dir / "user_input", mode="predict")
     flux_df = pd.read_csv(maud_oos_dir / "oos_samples" / "flux.csv")
     conc_df = pd.read_csv(maud_oos_dir / "oos_samples" / "conc.csv")
     conc_enzyme_df = pd.read_csv(maud_oos_dir / "oos_samples" / "conc_enzyme.csv")
