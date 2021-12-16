@@ -5,8 +5,8 @@ import tempfile
 from pathlib import Path
 
 from maud.cli import generate_predictions, simulate
-from maud.maud_utils.plot_oos import plot_oos
-from maud.maud_utils.plot_samples import plot_posteriors
+from maud.plotting.plot_oos import plot_oos
+from maud.plotting.plot_samples import plot_posteriors
 
 
 home_dir = Path.cwd()
