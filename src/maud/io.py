@@ -439,7 +439,7 @@ def parse_measurements(raw: pd.DataFrame, cs: StanCoordSet) -> MeasurementSet:
 
 def get_all_experiment_object(
     raw: dict,
-) -> Experiment:
+) -> List[Experiment]:
     """Get experiments from biological_context toml.
 
     :param raw: a dictionary the comes from a biological_context toml.
