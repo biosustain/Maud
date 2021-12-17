@@ -81,6 +81,8 @@ def load_maud_input(data_path: str, mode: str) -> MaudInput:
     Load an MaudInput object from a data path.
 
     :param filepath: path to directory containing input toml file
+    :param mode: determines which experiments will be included,
+    defined in the `biological_config` as "sample" and/or "predict".
 
     """
     config = parse_config(toml.load(os.path.join(data_path, "config.toml")))
