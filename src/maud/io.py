@@ -31,6 +31,7 @@ from maud import validation
 from maud.data_model import (
     Compartment,
     Enzyme,
+    Experiment,
     IndPrior1d,
     IndPrior2d,
     KineticModel,
@@ -75,22 +76,29 @@ DEFAULT_ODE_CONFIG = {
 }
 
 
-def load_maud_input(data_path: str) -> MaudInput:
+def load_maud_input(data_path: str, mode: str) -> MaudInput:
     """
     Load an MaudInput object from a data path.
 
     :param filepath: path to directory containing input toml file
+    :param mode: determines which experiments will be included,
+    defined in the `biological_config` as "sample" and/or "predict".
 
     """
     config = parse_config(toml.load(os.path.join(data_path, "config.toml")))
     kinetic_model_path = os.path.join(data_path, config.kinetic_model_file)
+    biological_config_path = os.path.join(data_path, config.biological_config_file)
     raw_kinetic_model = dict(toml.load(kinetic_model_path))
-    experiments_path = os.path.join(data_path, config.experiments_file)
+    raw_biological_config = dict(toml.load(biological_config_path))
+    measurements_path = os.path.join(data_path, config.measurements_file)
     priors_path = os.path.join(data_path, config.priors_file)
+    all_experiments = get_all_experiment_object(raw_biological_config)
     kinetic_model = parse_toml_kinetic_model(raw_kinetic_model)
-    raw_measurements = pd.read_csv(experiments_path)
+    raw_measurements = pd.read_csv(measurements_path)
     raw_priors = pd.read_csv(priors_path)
-    stan_coords = get_stan_coords(kinetic_model, raw_measurements)
+    stan_coords = get_stan_coords(
+        kinetic_model, raw_measurements, all_experiments, mode
+    )
     measurement_set = parse_measurements(raw_measurements, stan_coords)
     if config.dgf_mean_file is not None:
         dgf_loc = pd.Series(
@@ -122,6 +130,7 @@ def load_maud_input(data_path: str) -> MaudInput:
         priors=prior_set,
         stan_coords=stan_coords,
         measurements=measurement_set,
+        all_experiments=all_experiments,
         inits=inits,
     )
     validation.validate_maud_input(mi)
@@ -191,13 +200,21 @@ def get_km_coords(rxns: List[Reaction]):
     return sorted(coords)
 
 
-def get_stan_coords(km: KineticModel, raw_measurements: pd.DataFrame) -> StanCoordSet:
+def get_stan_coords(
+    km: KineticModel,
+    raw_measurements: pd.DataFrame,
+    all_experiments: Experiment,
+    mode: str,
+) -> StanCoordSet:
     """Get all the coordinates that Maud needs.
 
     This function is responsible for setting the order of each parameter.
 
     :param km: KineticModel object
-    :param ms: MeasurementSet object
+    :param raw_measurements: MeasurementSet object
+    :param all_experiments: List of Experiment object,
+    all experiments in biological config file
+    :param mode: "sample" or "predict" determine which experiments will be used
     """
 
     def unpack(packed):
@@ -227,7 +244,7 @@ def get_stan_coords(km: KineticModel, raw_measurements: pd.DataFrame) -> StanCoo
     phos_enzs = sorted([e.id for e in km.phosphorylation])
     drains = sorted([r.id for r in km.reactions if r.reaction_mechanism == "drain"])
     edges = enzymes + drains
-    experiments = sorted(raw_measurements["experiment_id"].unique().tolist())
+    experiments = sorted([e.id for e in all_experiments if getattr(e, mode)])
     ci_coords, ai_coords, aa_coords = (
         sorted(
             [
@@ -249,7 +266,8 @@ def get_stan_coords(km: KineticModel, raw_measurements: pd.DataFrame) -> StanCoo
             [
                 (row["experiment_id"], row["target_id"])
                 for _, row in raw_measurements.iterrows()
-                if row["measurement_type"] == measurement_type
+                if (row["measurement_type"] == measurement_type)
+                and (row["experiment_id"] in experiments)
             ]
         )
         for measurement_type in measurement_types
@@ -405,11 +423,13 @@ def parse_measurements(raw: pd.DataFrame, cs: StanCoordSet) -> MeasurementSet:
     for _, row in raw.loc[
         lambda df: df["measurement_type"] == "knockout_enz"
     ].iterrows():
-        enz_knockouts.loc[row["experiment_id"], row["target_id"]] = True
+        if row["experiment_id"] in cs.experiments:
+            enz_knockouts.loc[row["experiment_id"], row["target_id"]] = True
     for _, row in raw.loc[
         lambda df: df["measurement_type"] == "knockout_phos"
     ].iterrows():
-        phos_knockouts.loc[row["experiment_id"], row["target_id"]] = True
+        if row["experiment_id"] in cs.experiments:
+            phos_knockouts.loc[row["experiment_id"], row["target_id"]] = True
     return MeasurementSet(
         yconc=yconc,
         yflux=yflux,
@@ -417,6 +437,20 @@ def parse_measurements(raw: pd.DataFrame, cs: StanCoordSet) -> MeasurementSet:
         enz_knockouts=enz_knockouts,
         phos_knockouts=phos_knockouts,
     )
+
+
+def get_all_experiment_object(
+    raw: dict,
+) -> List[Experiment]:
+    """Get experiments from biological_context toml.
+
+    :param raw: a dictionary the comes from a biological_context toml.
+    """
+
+    return [
+        Experiment(id=exp["id"], sample=exp["sample"], predict=exp["predict"])
+        for exp in raw["experiment"]
+    ]
 
 
 def extract_1d_prior(
@@ -636,7 +670,8 @@ def parse_config(raw):
         name=raw["name"],
         kinetic_model_file=raw["kinetic_model"],
         priors_file=raw["priors"],
-        experiments_file=raw["experiments"],
+        measurements_file=raw["measurements"],
+        biological_config_file=raw["biological_config"],
         likelihood=raw["likelihood"],
         reject_non_steady=reject_non_steady,
         ode_config={**DEFAULT_ODE_CONFIG, **raw["ode_config"]},

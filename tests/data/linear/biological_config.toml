@@ -1,0 +1,9 @@
+[[experiment]]
+id = "condition_1"
+sample = true
+predict = true
+
+[[experiment]]
+id = "condition_2"
+sample = true
+predict = true

@@ -247,6 +247,20 @@ class MeasurementSet:
     phos_knockouts: pd.DataFrame
 
 
+class Experiment:
+    """Constructor for Experiment object.
+
+    :param id: id for each experiment
+    :param sample: if the experiment will be used in parameter sampling
+    :param predict: if the experiment will be used in predictive samplig
+    """
+
+    def __init__(self, id: str, sample: bool, predict: bool):
+        self.id = id
+        self.sample = sample
+        self.predict = predict
+
+
 @dataclass
 class IndPrior1d:
     """Independent location/scale prior for a 1-dimentional parameter."""
@@ -375,7 +389,8 @@ class MaudConfig:
         name: str,
         kinetic_model_file: str,
         priors_file: str,
-        experiments_file: str,
+        measurements_file: str,
+        biological_config_file: str,
         likelihood: bool,
         reject_non_steady: Optional[bool],
         ode_config: dict,
@@ -387,7 +402,8 @@ class MaudConfig:
         self.name = name
         self.kinetic_model_file = kinetic_model_file
         self.priors_file = priors_file
-        self.experiments_file = experiments_file
+        self.measurements_file = measurements_file
+        self.biological_config_file = biological_config_file
         self.likelihood = likelihood
         self.reject_non_steady = reject_non_steady
         self.ode_config = ode_config
@@ -414,6 +430,7 @@ class MaudInput:
         priors: PriorSet,
         stan_coords: StanCoordSet,
         measurements: MeasurementSet,
+        all_experiments: List[Experiment],
         inits: Dict[str, np.array],
     ):
         self.config = config
@@ -421,6 +438,7 @@ class MaudInput:
         self.priors = priors
         self.stan_coords = stan_coords
         self.measurements = measurements
+        self.all_experiments = all_experiments
         self.inits = inits
 
 

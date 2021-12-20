@@ -25,7 +25,12 @@ import toml
 
 from maud import sampling
 from maud.analysis import load_infd
-from maud.io import load_maud_input, parse_config, parse_toml_kinetic_model
+from maud.io import (
+    get_all_experiment_object,
+    load_maud_input,
+    parse_config,
+    parse_toml_kinetic_model,
+)
 from maud.user_templates import get_inits_from_draw, get_prior_template
 
 
@@ -56,7 +61,7 @@ def sample(data_path, output_dir):
     of cmdstanpy's diagnose and summary methods.
 
     """
-    mi = load_maud_input(data_path)
+    mi = load_maud_input(data_path, mode="sample")
     now = datetime.now().strftime("%Y%m%d%H%M%S")
     output_name = f"maud_output-{mi.config.name}-{now}"
     output_path = os.path.join(output_dir, output_name)
@@ -102,8 +107,10 @@ def generate_predictions(samples_path, oos_path, output_dir):
         for f in os.listdir(os.path.join(samples_path, "samples"))
         if f.endswith(".csv")
     ]
-    mi_oos = load_maud_input(oos_path)
-    mi_train = load_maud_input(os.path.join(samples_path, "user_input"))
+    mi_oos = load_maud_input(data_path=oos_path, mode="predict")
+    mi_train = load_maud_input(
+        data_path=os.path.join(samples_path, "user_input"), mode="sample"
+    )
     now = datetime.now().strftime("%Y%m%d%H%M%S")
     output_name = f"maud-oos_output-{mi_oos.config.name}-{now}"
     output_path = os.path.join(output_dir, output_name)
@@ -141,7 +148,7 @@ def generate_predictions_command(samples_path, oos_path, output_dir):
 def simulate(data_path, output_dir, n):
     """Generate draws from the prior mean."""
 
-    mi = load_maud_input(data_path)
+    mi = load_maud_input(data_path=data_path, mode="sample")
     now = datetime.now().strftime("%Y%m%d%H%M%S")
     output_name = f"maud_output_sim-{mi.config.name}-{now}"
     output_path = os.path.join(output_dir, output_name)
@@ -187,16 +194,22 @@ def generate_prior_template(data_path):
     :params data_path: a path to a maud input folder with a kinetic model
     and optionally experimental input file.
     """
-
     config = parse_config(toml.load(os.path.join(data_path, "config.toml")))
     kinetic_model_path = os.path.join(data_path, config.kinetic_model_file)
     kinetic_model = parse_toml_kinetic_model(toml.load(kinetic_model_path))
-    experiments_path = os.path.join(data_path, config.experiments_file)
-    raw_measurements = pd.read_csv(experiments_path)
+    measurements_path = os.path.join(data_path, config.measurements_file)
+    biological_config_path = os.path.join(data_path, config.biological_config_file)
+    all_experiments = get_all_experiment_object(toml.load(biological_config_path))
+    raw_measurements = pd.read_csv(measurements_path)
     output_name = "prior_template.csv"
     output_path = os.path.join(data_path, output_name)
     print("Creating template")
-    prior_dataframe = get_prior_template(kinetic_model, raw_measurements)
+    prior_dataframe = get_prior_template(
+        km=kinetic_model,
+        raw_measurements=raw_measurements,
+        experiments=all_experiments,
+        mode="sample",
+    )
     print(f"Saving template to: {output_path}")
     prior_dataframe.to_csv(output_path)
     return "Successfully generated prior template"
@@ -231,7 +244,7 @@ def generate_inits(data_path, chain, draw, warmup):
         for f in os.listdir(os.path.join(data_path, "samples"))
         if f.endswith(".csv")
     ]
-    mi = load_maud_input(os.path.join(data_path, "user_input"))
+    mi = load_maud_input(os.path.join(data_path, "user_input"), mode="sample")
     infd = load_infd(csvs, mi)
     output_name = "generated_inits.csv"
     output_path = os.path.join(data_path, output_name)

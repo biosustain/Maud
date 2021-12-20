@@ -204,7 +204,7 @@ def plot_posteriors(maud_output_dir, output_dir):
     """Plot posterior distributions of Maud model."""
     # Collecting information from draws and maud input
     csvs = list(Path(maud_output_dir / "samples").rglob("*.csv"))
-    mi = io.load_maud_input(maud_output_dir / "user_input")
+    mi = io.load_maud_input(data_path=maud_output_dir / "user_input", mode="sample")
     parameter_coords = get_parameter_coords(mi.stan_coords)
     infd = load_infd(csvs, mi)
     list_of_model_variables = list(infd.posterior.variables.keys())
