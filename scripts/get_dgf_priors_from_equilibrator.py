@@ -83,7 +83,7 @@ def main():
     )
     maud_input_dir = parser.parse_args().maud_input_dir[0]
     if os.path.exists(maud_input_dir):
-        mi = load_maud_input(maud_input_dir)
+        mi = load_maud_input(maud_input_dir, "sample")
         mu, cov = get_dgf_priors(mi)
         print("Prior mean vector:")
         print(mu)
