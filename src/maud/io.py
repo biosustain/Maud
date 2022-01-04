@@ -92,6 +92,10 @@ def load_maud_input(data_path: str, mode: str) -> MaudInput:
     raw_biological_config = dict(toml.load(biological_config_path))
     measurements_path = os.path.join(data_path, config.measurements_file)
     priors_path = os.path.join(data_path, config.priors_file)
+    dgf_prior_paths = {
+        "loc": os.path.join(data_path, str(config.dgf_mean_file)),
+        "cov": os.path.join(data_path, str(config.dgf_covariance_file)),
+    }
     all_experiments = get_all_experiment_object(raw_biological_config)
     kinetic_model = parse_toml_kinetic_model(raw_kinetic_model)
     raw_measurements = pd.read_csv(measurements_path)
@@ -100,20 +104,17 @@ def load_maud_input(data_path: str, mode: str) -> MaudInput:
         kinetic_model, raw_measurements, all_experiments, mode
     )
     measurement_set = parse_measurements(raw_measurements, stan_coords)
-    if config.dgf_mean_file is not None:
+    if os.path.exists(dgf_prior_paths["loc"]):
         dgf_loc = pd.Series(
-            pd.read_csv(
-                os.path.join(data_path, config.dgf_mean_file), index_col="metabolite"
-            )["prior_mean_dgf"]
+            pd.read_csv(dgf_prior_paths["loc"], index_col="metabolite")[
+                "prior_mean_dgf"
+            ]
         )
     else:
         dgf_loc = pd.Series([])
-    if config.dgf_covariance_file is not None:
+    if os.path.exists(dgf_prior_paths["cov"]):
         dgf_cov = pd.DataFrame(
-            pd.read_csv(
-                os.path.join(data_path, config.dgf_covariance_file),
-                index_col="metabolite",
-            )
+            pd.read_csv(dgf_prior_paths["cov"], index_col="metabolite")
         )
     else:
         dgf_cov = pd.DataFrame([])
