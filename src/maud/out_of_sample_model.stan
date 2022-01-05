@@ -91,6 +91,10 @@ generated quantities {
   array[N_experiment] vector[N_unbalanced] conc_unbalanced;
   array[N_experiment] vector[N_enzyme] conc_enzyme;
   array[N_experiment] vector[N_drain] drain;
+  array[N_experiment] vector[N_edge] free_enzyme_ratio;
+  array[N_experiment] vector[N_edge] saturation;
+  array[N_experiment] vector[N_edge] allostery;
+  array[N_experiment] vector[N_edge] reversibility;
   // Sampling experiment boundary conditions from priors
   for (e in 1:N_experiment){
     drain[e] = to_vector(normal_rng(priors_drain[1,e], priors_drain[2,e]));
@@ -190,5 +194,41 @@ generated quantities {
     for (j in 1:N_edge){
       flux[e, edge_to_reaction[j]] += edge_flux[j];
     }
+  }
+  for (e in 1:N_experiment){
+    free_enzyme_ratio[e] = get_free_enzyme_ratio(conc[e],
+                                                 S,
+                                                 km,
+                                                 ki,
+                                                 edge_type,
+                                                 km_lookup,
+                                                 ki_lookup,
+                                                 sub_by_edge_long,
+                                                 sub_by_edge_bounds,
+                                                 prod_by_edge_long,
+                                                 prod_by_edge_bounds,
+                                                 ci_by_edge_long,
+                                                 ci_by_edge_bounds);
+    saturation[e] = get_saturation(conc[e],
+                                   km,
+                                   free_enzyme_ratio[e],
+                                   km_lookup,
+                                   sub_by_edge_long,
+                                   sub_by_edge_bounds,
+                                   edge_type);
+    allostery[e] = get_allostery(conc[e],
+                                 free_enzyme_ratio[e],
+                                 transfer_constant,
+                                 diss_t,
+                                 diss_r,
+                                 subunits,
+                                 dt_lookup,
+                                 dr_lookup,
+                                 edge_to_tc,
+                                 ai_ix_long,
+                                 ai_ix_bounds,
+                                 aa_ix_long,
+                                 aa_ix_bounds);
+    reversibility[e] = get_reversibility(dgrs, S, conc[e], edge_type);
   }
 }
