@@ -42,6 +42,10 @@ def load_infd_fit(fit, mi: MaudInput) -> az.InferenceData:
             "conc_enzyme": ["experiments", "enzymes"],
             "conc_unbalanced": ["experiments", "unbalanced_mics"],
             "conc_phos": ["experiments", "phos_enzs"],
+            "saturation": ["experiments", "edges"],
+            "allostery": ["experiments", "edges"],
+            "phosphorylation": ["experiments", "edges"],
+            "reversibility": ["experiments", "edges"],
         },
         save_warmup=True,
     )
