@@ -21,7 +21,7 @@
 """
 
 import os
-from typing import Dict, List, Optional, Union
+from typing import Dict, List, Optional, Tuple, Union
 
 import numpy as np
 import pandas as pd
@@ -87,7 +87,9 @@ def load_maud_input(data_path: str, mode: str) -> MaudInput:
     """
     config = parse_config(toml.load(os.path.join(data_path, "config.toml")))
     kinetic_model_path = os.path.join(data_path, config.kinetic_model_file)
-    biological_config_path = os.path.join(data_path, config.biological_config_file)
+    biological_config_path = os.path.join(
+        data_path, config.biological_config_file
+    )
     raw_kinetic_model = dict(toml.load(kinetic_model_path))
     raw_biological_config = dict(toml.load(biological_config_path))
     measurements_path = os.path.join(data_path, config.measurements_file)
@@ -100,16 +102,18 @@ def load_maud_input(data_path: str, mode: str) -> MaudInput:
     kinetic_model = parse_toml_kinetic_model(raw_kinetic_model)
     raw_measurements = pd.read_csv(measurements_path)
     raw_priors = pd.read_csv(priors_path)
+    assert isinstance(raw_measurements, pd.DataFrame)
+    assert isinstance(raw_priors, pd.DataFrame)
     stan_coords = get_stan_coords(
         kinetic_model, raw_measurements, all_experiments, mode
     )
     measurement_set = parse_measurements(raw_measurements, stan_coords)
     if os.path.exists(dgf_prior_paths["loc"]):
-        dgf_loc = pd.Series(
-            pd.read_csv(dgf_prior_paths["loc"], index_col="metabolite")[
-                "prior_mean_dgf"
-            ]
+        dgf_prior_loc_df = pd.read_csv(
+            dgf_prior_paths["loc"], index_col="metabolite", squeeze=False
         )
+        assert isinstance(dgf_prior_loc_df, pd.Series)
+        dgf_loc = pd.Series(dgf_prior_loc_df["prior_mean_dgf"])
     else:
         dgf_loc = pd.Series([])
     if os.path.exists(dgf_prior_paths["cov"]):
@@ -157,7 +161,9 @@ def parse_toml_kinetic_model(raw: dict) -> KineticModel:
                 if "metabolite_inchi_key" in r.keys()
                 else None
             )
-            metabolites.append(Metabolite(id=r["metabolite"], inchi_key=inchi_key))
+            metabolites.append(
+                Metabolite(id=r["metabolite"], inchi_key=inchi_key)
+            )
     mics = [
         MetaboliteInCompartment(
             id=f"{m['metabolite']}_{m['compartment']}",
@@ -185,7 +191,7 @@ def parse_toml_kinetic_model(raw: dict) -> KineticModel:
     )
 
 
-def get_km_coords(rxns: List[Reaction]):
+def get_km_coords(rxns: List[Reaction]) -> List[Tuple[str]]:
     """Get coordinates for km parameters.
 
     The returned coordinate set for kms is dependent on if it's reversible.
@@ -195,7 +201,9 @@ def get_km_coords(rxns: List[Reaction]):
     for r in rxns:
         for e in r.enzymes:
             if r.reaction_mechanism == "irreversible_modular_rate_law":
-                coords += [(e.id, m[0]) for m in r.stoichiometry.items() if m[1] < 0]
+                coords += [
+                    (e.id, m[0]) for m in r.stoichiometry.items() if m[1] < 0
+                ]
             elif r.reaction_mechanism == "reversible_modular_rate_law":
                 coords += [(e.id, m[0]) for m in r.stoichiometry.items()]
     return sorted(coords)
@@ -204,7 +212,7 @@ def get_km_coords(rxns: List[Reaction]):
 def get_stan_coords(
     km: KineticModel,
     raw_measurements: pd.DataFrame,
-    all_experiments: Experiment,
+    all_experiments: List[Experiment],
     mode: str,
 ) -> StanCoordSet:
     """Get all the coordinates that Maud needs.
@@ -219,7 +227,7 @@ def get_stan_coords(
     """
 
     def unpack(packed):
-        return zip(*packed) if len(packed) > 0 else ([], [])
+        return map(list, zip(*packed)) if len(packed) > 0 else ([], [])
 
     measurement_types = [
         "mic",
@@ -243,7 +251,9 @@ def get_stan_coords(
         [e.id for r in km.reactions for e in r.enzymes if e.allosteric]
     )
     phos_enzs = sorted([e.id for e in km.phosphorylation])
-    drains = sorted([r.id for r in km.reactions if r.reaction_mechanism == "drain"])
+    drains = sorted(
+        [r.id for r in km.reactions if r.reaction_mechanism == "drain"]
+    )
     edges = enzymes + drains
     experiments = sorted([e.id for e in all_experiments if getattr(e, mode)])
     ci_coords, ai_coords, aa_coords = (
@@ -261,7 +271,7 @@ def get_stan_coords(
     ai_enzs, ai_mics = unpack(ai_coords)
     aa_enzs, aa_mics = unpack(aa_coords)
     km_coords = get_km_coords(km.reactions)
-    km_enzs, km_mics = zip(*km_coords)
+    km_enzs, km_mics = map(list, zip(*km_coords))
     yc_coords, yf_coords, ye_coords, enz_ko_coords, phos_ko_coords = (
         sorted(
             [
@@ -419,8 +429,12 @@ def parse_measurements(raw: pd.DataFrame, cs: StanCoordSet) -> MeasurementSet:
         )
         for t in ["mic", "flux", "enzyme"]
     )
-    enz_knockouts = pd.DataFrame(False, index=cs.experiments, columns=cs.enzymes)
-    phos_knockouts = pd.DataFrame(False, index=cs.experiments, columns=cs.phos_enzs)
+    enz_knockouts = pd.DataFrame(
+        False, index=cs.experiments, columns=cs.enzymes
+    )
+    phos_knockouts = pd.DataFrame(
+        False, index=cs.experiments, columns=cs.phos_enzs
+    )
     for _, row in raw.loc[
         lambda df: df["measurement_type"] == "knockout_enz"
     ].iterrows():
@@ -559,7 +573,7 @@ def extract_2d_prior(
         "conc_phos": ["experiment_id", "phos_enz_id"],
     }
     if len(col_coords) == 0:
-        return IndPrior1d(
+        return IndPrior2d(
             parameter_name=parameter_name,
             location=pd.DataFrame([]),
             scale=pd.DataFrame([]),
@@ -586,7 +600,9 @@ def extract_2d_prior(
         .unstack()
         .reindex(row_coords, columns=col_coords)
         .rename_axis(parameter_name_to_id_cols[parameter_name][0])
-        .rename_axis(parameter_name_to_id_cols[parameter_name][1], axis="columns")
+        .rename_axis(
+            parameter_name_to_id_cols[parameter_name][1], axis="columns"
+        )
         for col in ["location", "scale"]
     )
     return IndPrior2d(
@@ -597,7 +613,10 @@ def extract_2d_prior(
 
 
 def parse_priors(
-    raw: pd.DataFrame, cs: StanCoordSet, dgf_loc: pd.Series, dgf_cov: pd.DataFrame
+    raw: pd.DataFrame,
+    cs: StanCoordSet,
+    dgf_loc: pd.Series,
+    dgf_cov: pd.DataFrame,
 ) -> PriorSet:
     """Get a PriorSet object from a dataframe of raw priors.
 
@@ -610,7 +629,9 @@ def parse_priors(
     else:
         dgf_prior_1d = extract_1d_prior(raw, "dgf", [cs.metabolites])
         loc = dgf_prior_1d.location
-        cov = pd.DataFrame(np.diag(dgf_prior_1d.scale), index=met_ix, columns=met_ix)
+        cov = pd.DataFrame(
+            np.diag(dgf_prior_1d.scale), index=met_ix, columns=met_ix
+        )
     priors_dgf = MultiVariateNormalPrior1d(
         parameter_name="dgf", location=loc, covariance_matrix=cov
     )
@@ -662,7 +683,9 @@ def parse_config(raw):
         raw["dgf_mean_file"] if "dgf_mean_file" in raw.keys() else None
     )
     dgf_covariance_file: Optional[str] = (
-        raw["dgf_covariance_file"] if "dgf_covariance_file" in raw.keys() else None
+        raw["dgf_covariance_file"]
+        if "dgf_covariance_file" in raw.keys()
+        else None
     )
     reject_non_steady: bool = (
         raw["reject_non_steady"] if "reject_non_steady" in raw.keys() else True
@@ -683,7 +706,7 @@ def parse_config(raw):
     )
 
 
-def get_inits(priors: PriorSet, user_inits_path) -> Dict[str, np.array]:
+def get_inits(priors: PriorSet, user_inits_path) -> Dict[str, np.ndarray]:
     """Get a dictionary of initial values.
 
     :param priors: Priorset object
@@ -697,21 +720,26 @@ def get_inits(priors: PriorSet, user_inits_path) -> Dict[str, np.array]:
         u: pd.DataFrame, p: Union[IndPrior1d, IndPrior2d]
     ) -> pd.Series:
         if len(p.location) == 0:
-            return p.location
-        elif isinstance(p, IndPrior1d) or isinstance(p, MultiVariateNormalPrior1d):
-            return u.loc[lambda df: df["parameter_name"] == p.parameter_name].set_index(
-                p.location.index.names
-            )["value"]
+            return pd.Series(p.location)
+        elif isinstance(p, IndPrior1d) or isinstance(
+            p, MultiVariateNormalPrior1d
+        ):
+            return u.loc[
+                lambda df: df["parameter_name"] == p.parameter_name
+            ].set_index(p.location.index.names)["value"]
         elif isinstance(p, IndPrior2d):
-            return u.loc[lambda df: df["parameter_name"] == p.parameter_name].set_index(
-                [p.location.index.name, p.location.columns.name]
-            )["value"]
+            return u.loc[
+                lambda df: df["parameter_name"] == p.parameter_name
+            ].set_index([p.location.index.name, p.location.columns.name])[
+                "value"
+            ]
         else:
             raise ValueError("Unrecognised prior type: " + str(type(p)))
 
     inits = {p.parameter_name: p.location for p in priors.__dict__.values()}
     if user_inits_path is not None:
         user_inits_all = pd.read_csv(user_inits_path)
+        assert isinstance(user_inits_all, pd.DataFrame)
         for p in priors.__dict__.values():
             if p.location.empty:
                 continue
@@ -733,7 +761,7 @@ def get_inits(priors: PriorSet, user_inits_path) -> Dict[str, np.array]:
     return rescale_inits(inits, priors)
 
 
-def rescale_inits(inits: dict, priors: PriorSet) -> Dict[str, np.array]:
+def rescale_inits(inits: dict, priors: PriorSet) -> Dict[str, np.ndarray]:
     """Augment a dictionary of inits with equivalent normalised values.
 
     :param inits: original inits
@@ -747,5 +775,7 @@ def rescale_inits(inits: dict, priors: PriorSet) -> Dict[str, np.array]:
         elif n in NON_LN_SCALE_PARAMS:
             rescaled[n + "_z"] = (i - prior.location) / prior.scale
         else:
-            rescaled[f"log_{n}_z"] = (np.log(i) - np.log(prior.location)) / prior.scale
+            rescaled[f"log_{n}_z"] = (
+                np.log(i) - np.log(prior.location)
+            ) / prior.scale
     return {**inits, **rescaled}

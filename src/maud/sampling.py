@@ -25,6 +25,7 @@ from typing import Dict, List, Sequence, Tuple, Union
 import cmdstanpy
 import numpy as np
 import pandas as pd
+from xarray.core.dataset import Dataset
 
 from maud.analysis import load_infd, load_infd_fit
 from maud.data_model import (
@@ -82,7 +83,7 @@ def sample(mi: MaudInput, output_dir: str) -> cmdstanpy.CmdStanMCMC:
 
 def generate_predictions(
     mi_oos: MaudInput, mi_train: MaudInput, csvs: List[str], output_dir: str
-) -> cmdstanpy.CmdStanMCMC:
+):
     """Sample from the posterior defined by mi.
 
     :param mi: a MaudInput object
@@ -120,9 +121,9 @@ def _sample_given_config(
     inits_filepath = os.path.join(output_dir, "inits.json")
     coords_filepath = os.path.join(output_dir, "coords.json")
     input_data = get_input_data(mi)
-    inits = {k: v.values for k, v in mi.inits.items()}
+    # inits = {k: v.values for k, v in mi.inits.items()}
     cmdstanpy.utils.write_stan_json(input_filepath, input_data)
-    cmdstanpy.utils.write_stan_json(inits_filepath, inits)
+    cmdstanpy.utils.write_stan_json(inits_filepath, mi.inits)
     with open(coords_filepath, "w") as f:
         json.dump(mi.stan_coords.__dict__, f)
     config["inits"] = inits_filepath
@@ -179,8 +180,10 @@ def _generate_predictions(
     if config["threads_per_chain"] != 1:
         cpp_options["STAN_THREADS"] = True
         os.environ["STAN_NUM_THREADS"] = str(config["threads_per_chain"])
-    chains = infd.posterior.chain.to_series().values
-    draws = infd.posterior.draw.to_series().values
+    posterior = infd.get("posterior")
+    assert isinstance(posterior, Dataset)
+    chains = posterior.chain.to_series().values
+    draws = posterior.draw.to_series().values
     gq_model = cmdstanpy.CmdStanModel(
         stan_file=ppc_program_filepath,
         stanc_options=stanc_options,
@@ -192,9 +195,9 @@ def _generate_predictions(
     for chain in chains:
         for draw in draws:
             inits = {
-                par: infd.posterior[par][chain][draw].to_series().values
+                par: posterior[par][chain][draw].to_series().values
                 for par in kinetic_parameters
-                if par in infd.posterior.variables.keys()
+                if par in posterior.variables.keys()
             }
             gq_samples = gq_model.sample(
                 inits=inits,
@@ -203,14 +206,19 @@ def _generate_predictions(
                 data=input_filepath,
                 fixed_param=True,
             )
-            infd_fit = load_infd_fit(gq_samples.runset.csv_files, mi_oos)
-            tmp_conc = infd_fit.posterior.conc.to_dataframe().reset_index()
+            posterior_fit = load_infd_fit(
+                gq_samples.runset.csv_files, mi_oos
+            ).get("posterior")
+            assert isinstance(posterior_fit, Dataset)
+            tmp_conc = posterior_fit.conc.to_dataframe().reset_index()
             tmp_conc["chain"] = chain
             tmp_conc["draw"] = draw
-            tmp_conc_enz = infd_fit.posterior.conc_enzyme.to_dataframe().reset_index()
+            tmp_conc_enz = (
+                posterior_fit.conc_enzyme.to_dataframe().reset_index()
+            )
             tmp_conc_enz["chain"] = chain
             tmp_conc_enz["draw"] = draw
-            tmp_flux = infd_fit.posterior.flux.to_dataframe().reset_index()
+            tmp_flux = posterior_fit.flux.to_dataframe().reset_index()
             tmp_flux["chain"] = chain
             tmp_flux["draw"] = draw
             all_conc.append(tmp_conc)
@@ -252,7 +260,9 @@ def validate_specified_fluxes(mi: MaudInput):
     balanced_mic_ix = mi.stan_coords.balanced_mics
     reactions = mi.stan_coords.reactions
     for exp in mi.stan_coords.experiments:
-        measured_rxns = mi.measurements.yflux.reset_index()["target_id"].unique()
+        measured_rxns = mi.measurements.yflux.reset_index()[
+            "target_id"
+        ].unique()
         flux_paths = get_null_space(S.loc[balanced_mic_ix].values)
         _, n_dof = np.shape(flux_paths)
         rref_flux_paths = np.matrix(get_rref(flux_paths.T))
@@ -302,7 +312,9 @@ def get_phos_act_inh_matrix(mi: MaudInput):
     return S_phos_act.T.tolist(), S_phos_inh.T.tolist()
 
 
-def _get_lookup(mi: MaudInput, mics: List[str], edges: List[str]) -> Sequence[int]:
+def _get_lookup(
+    mi: MaudInput, mics: List[str], edges: List[str]
+) -> Sequence[int]:
     shape = (len(mi.stan_coords.mics), len(mi.stan_coords.edges))
     out = pd.DataFrame(
         np.zeros(shape), index=mi.stan_coords.mics, columns=mi.stan_coords.edges
@@ -326,9 +338,9 @@ def _get_conc_init(mi: MaudInput) -> pd.DataFrame:
 
     """
     cs = mi.stan_coords
-    out = mi.priors.priors_conc_unbalanced.location.reindex(columns=cs.mics).fillna(
-        0.01
-    )
+    out = mi.priors.priors_conc_unbalanced.location.reindex(
+        columns=cs.mics
+    ).fillna(0.01)
     for (exp_id, mic_id), value in mi.measurements.yconc["measurement"].items():
         out.loc[exp_id, mic_id] = value
     return out
@@ -337,7 +349,7 @@ def _get_conc_init(mi: MaudInput) -> pd.DataFrame:
 def get_prior_dict(ps: PriorSet) -> dict:
     """Get a dictionary of priors that be used as a Stan input."""
 
-    def unpack(p: Union[IndPrior1d, IndPrior2d]) -> List[np.ndarray]:
+    def unpack(p: Union[IndPrior1d, IndPrior2d]) -> List[List[float]]:
         return [p.location.values.tolist(), p.scale.values.tolist()]
 
     return {
@@ -405,7 +417,9 @@ def get_measurements_dict(ms: MeasurementSet, cs: StanCoordSet) -> dict:
         "experiment_yenz": (
             ms.yenz.reset_index()["experiment_id"].map(exp_ix).values.tolist()
         ),
-        "enzyme_yenz": (ms.yenz.reset_index()["target_id"].map(enz_ix).values.tolist()),
+        "enzyme_yenz": (
+            ms.yenz.reset_index()["target_id"].map(enz_ix).values.tolist()
+        ),
     }
 
 
@@ -550,7 +564,10 @@ def get_input_data(mi: MaudInput) -> dict:
     edge_type = [get_edge_type(eid, mi) for eid in S.columns]
     edge_to_enzyme = (
         pd.Series(
-            {e: codify(mi.stan_coords.enzymes)[e] for e in mi.stan_coords.enzymes},
+            {
+                e: codify(mi.stan_coords.enzymes)[e]
+                for e in mi.stan_coords.enzymes
+            },
             index=mi.stan_coords.edges,
         )
         .fillna(0)
@@ -558,7 +575,10 @@ def get_input_data(mi: MaudInput) -> dict:
     )
     edge_to_drain = (
         pd.Series(
-            {d: codify(mi.stan_coords.drains)[d] for d in mi.stan_coords.drains},
+            {
+                d: codify(mi.stan_coords.drains)[d]
+                for d in mi.stan_coords.drains
+            },
             index=mi.stan_coords.edges,
         )
         .fillna(0)
@@ -570,7 +590,10 @@ def get_input_data(mi: MaudInput) -> dict:
                 e.id: codify(mi.stan_coords.reactions)[e.reaction_id]
                 for e in sorted_enzymes
             },
-            **{d: codify(mi.stan_coords.reactions)[d] for d in mi.stan_coords.drains},
+            **{
+                d: codify(mi.stan_coords.reactions)[d]
+                for d in mi.stan_coords.drains
+            },
         },
         index=mi.stan_coords.edges,
     ).astype(int)
@@ -582,11 +605,12 @@ def get_input_data(mi: MaudInput) -> dict:
         ).water_stoichiometry
         for e in sorted_enzymes
     }
-    water_stoichiometry = pd.Series(water_stoichiometry_enzyme, index=S.columns).fillna(
-        0
-    )
+    water_stoichiometry = pd.Series(
+        water_stoichiometry_enzyme, index=S.columns
+    ).fillna(0)
     mic_to_met = [
-        codify(mi.stan_coords.metabolites)[mic.metabolite_id] for mic in sorted_mics
+        codify(mi.stan_coords.metabolites)[mic.metabolite_id]
+        for mic in sorted_mics
     ]
     knockout_matrix_enzyme = mi.measurements.enz_knockouts.astype(int)
     knockout_matrix_phos = mi.measurements.phos_knockouts.astype(int)
@@ -614,18 +638,28 @@ def get_input_data(mi: MaudInput) -> dict:
     mic_codes = codify(mi.stan_coords.mics)
     phos_enz_codes = codify(mi.stan_coords.phos_enzs)
     sub_by_edge_long, sub_by_edge_bounds = encode_ragged(
-        [[mic_codes[m] for m in S[e].index if S.loc[m, e] < 0] for e in S.columns]
+        [
+            [mic_codes[m] for m in S[e].index if S.loc[m, e] < 0]
+            for e in S.columns
+        ]
     )
     prod_by_edge_long, prod_by_edge_bounds = encode_ragged(
-        [[mic_codes[m] for m in S[e].index if S.loc[m, e] > 0] for e in S.columns]
+        [
+            [mic_codes[m] for m in S[e].index if S.loc[m, e] > 0]
+            for e in S.columns
+        ]
     )
     ci_by_edge_long, ci_by_edge_bounds = encode_ragged(
         mod_info["competitive_inhibitor"].tolist()
     )
     ci_by_edge_long = [mic_codes[i] for i in ci_by_edge_long]
-    ai_ix_long, ai_ix_bounds = encode_ragged(mod_info["allosteric_inhibitor"].tolist())
+    ai_ix_long, ai_ix_bounds = encode_ragged(
+        mod_info["allosteric_inhibitor"].tolist()
+    )
     ai_ix_long = [mic_codes[i] for i in ai_ix_long]
-    aa_ix_long, aa_ix_bounds = encode_ragged(mod_info["allosteric_activator"].tolist())
+    aa_ix_long, aa_ix_bounds = encode_ragged(
+        mod_info["allosteric_activator"].tolist()
+    )
     aa_ix_long = [mic_codes[i] for i in aa_ix_long]
     pi_ix_long, pi_ix_bounds = encode_ragged(phos_info["inhibitors"].tolist())
     pi_ix_long = [phos_enz_codes[i] for i in pi_ix_long]
@@ -652,8 +686,12 @@ def get_input_data(mi: MaudInput) -> dict:
             "N_ai": len(mi.stan_coords.ai_mics),
             "N_aa": len(mi.stan_coords.aa_mics),
             "N_ae": len(mi.stan_coords.allosteric_enzymes),
-            "N_pa": int(phos_info["activators"].apply(lambda l: len(l) > 0).sum()),
-            "N_pi": int(phos_info["inhibitors"].apply(lambda l: len(l) > 0).sum()),
+            "N_pa": int(
+                phos_info["activators"].apply(lambda l: len(l) > 0).sum()
+            ),
+            "N_pi": int(
+                phos_info["inhibitors"].apply(lambda l: len(l) > 0).sum()
+            ),
             "N_drain": len(mi.stan_coords.drains),
             # indexes
             "unbalanced_mic_ix": unbalanced_mic_ix,

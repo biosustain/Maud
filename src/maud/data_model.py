@@ -67,9 +67,9 @@ class MetaboliteInCompartment:
     def __init__(
         self,
         id: str,
+        metabolite_id: str,
+        compartment_id: str,
         name: str = None,
-        metabolite_id: str = None,
-        compartment_id: str = None,
         balanced: bool = None,
     ):
         self.id = id
@@ -197,10 +197,10 @@ class Phosphorylation:
     def __init__(
         self,
         id: str,
+        enzyme_id: str,
         name: str = None,
         activating: bool = None,
         inhibiting: bool = None,
-        enzyme_id: str = None,
     ):
         self.id = id
         self.name = name
@@ -233,7 +233,9 @@ class KineticModel:
         self.reactions = reactions
         self.compartments = compartments
         self.mics = mics
-        self.phosphorylation = phosphorylation if phosphorylation is not None else []
+        self.phosphorylation = (
+            phosphorylation if phosphorylation is not None else []
+        )
 
 
 @dataclass
@@ -308,7 +310,9 @@ class MultiVariateNormalPrior1d:
         try:
             np.linalg.cholesky(self.covariance_matrix.values)
         except LinAlgError as e:
-            raise ValueError("Covariance matrix is not positive definite") from e
+            raise ValueError(
+                "Covariance matrix is not positive definite"
+            ) from e
 
 
 @dataclass
@@ -392,12 +396,12 @@ class MaudConfig:
         measurements_file: str,
         biological_config_file: str,
         likelihood: bool,
-        reject_non_steady: Optional[bool],
         ode_config: dict,
         cmdstanpy_config: dict,
         user_inits_file: Optional[str],
         dgf_mean_file: Optional[str],
         dgf_covariance_file: Optional[str],
+        reject_non_steady: bool = True,
     ):
         self.name = name
         self.kinetic_model_file = kinetic_model_file
@@ -431,7 +435,7 @@ class MaudInput:
         stan_coords: StanCoordSet,
         measurements: MeasurementSet,
         all_experiments: List[Experiment],
-        inits: Dict[str, np.array],
+        inits: Dict[str, np.ndarray],
     ):
         self.config = config
         self.kinetic_model = kinetic_model
