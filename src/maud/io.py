@@ -491,8 +491,8 @@ def extract_1d_prior(
     if any(len(c) == 0 for c in coords):
         return IndPrior1d(
             parameter_name=parameter_name,
-            location=pd.Series([]),
-            scale=pd.Series([]),
+            location=pd.Series([], dtype="float64"),
+            scale=pd.Series([], dtype="float64"),
         )
     non_negative = parameter_name not in ["dgf"]
     qfunc = (
