@@ -105,13 +105,12 @@ generated quantities {
   // Simulation of experiments
   for (e in 1:N_experiment){
     flux[e] = rep_vector(0, N_reaction);
-    real timepoints[2] = {timepoint, timepoint + 10};
     vector[N_enzyme] conc_enzyme_experiment = conc_enzyme[e] .* knockout[e]';
     vector[N_phosphorylation_enzymes] conc_phos_experiment = conc_phos[e] .* phos_knockout[e]';
-    vector[N_mic-N_unbalanced] conc_balanced[2] = ode_bdf_tol(dbalanced_dt,
+    vector[N_mic-N_unbalanced] conc_balanced[1] = ode_bdf_tol(dbalanced_dt,
                   conc_init[e, balanced_mic_ix],
                   initial_time,
-                  timepoints,
+                  {timepoint},
                   rel_tol, 
                   abs_tol,
                   max_num_steps,
@@ -154,7 +153,7 @@ generated quantities {
                   pi_ix_long,
                   pi_ix_bounds);
     conc[e, balanced_mic_ix] = conc_balanced[1];
-    conc[e, unbalanced_mic_ix] = conc_unbalanced[e,:];
+    conc[e, unbalanced_mic_ix] = conc_unbalanced[e];
     vector[N_edge] edge_flux = get_edge_flux(conc[e],
                                              conc_enzyme_experiment,
                                              dgrs,
