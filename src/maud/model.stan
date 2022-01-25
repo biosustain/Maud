@@ -129,14 +129,13 @@ transformed parameters {
   vector[N_edge] dgrs = get_dgrs(S, dgf, mic_to_met, water_stoichiometry);
   for (e in 1:N_experiment){
     flux[e] = rep_vector(0, N_reaction);
-    real timepoints[2] = {timepoint, timepoint + 10};
     vector[N_enzyme] conc_enzyme_experiment = conc_enzyme[e] .* knockout[e]';
     vector[N_phosphorylation_enzymes] conc_phos_experiment = conc_phos[e] .* phos_knockout[e]';
-    vector[N_mic-N_unbalanced] conc_balanced[2] =
+    vector[N_mic-N_unbalanced] conc_balanced[1] =
       ode_bdf_tol(dbalanced_dt,
                   conc_init[e, balanced_mic_ix],
                   initial_time,
-                  timepoints,
+                  {timepoint},
                   rel_tol, 
                   abs_tol,
                   max_num_steps,
@@ -219,25 +218,26 @@ transformed parameters {
                                              pi_ix_bounds);
     for (j in 1:N_edge)
       flux[e, edge_to_reaction[j]] += edge_flux[j];
-    }
-    if (reject_non_steady == 1 && check_steady_state(conc_balanced,
-                                                     e,
-                                                     flux[e],
-                                                     conc_init[e],
-                                                     timepoints,
-                                                     conc_unbalanced[e],
-                                                     conc_enzyme_experiment,
-                                                     km,
-                                                     drain[e],
-                                                     kcat,
-                                                     dgrs,
-                                                     ki,
-                                                     diss_t,
-                                                     diss_r,
-                                                     transfer_constant,
-                                                     kcat_phos,
-                                                     conc_phos_experiment) == 0) {
-      reject("Non-steady state in experiment ", e);
+    if (reject_non_steady == 1 &&
+        check_steady_state((S * edge_flux)[balanced_mic_ix], conc_balanced[1]) == 0){
+        print("Non-steady state in experiment ", e);
+        print("Balanced metabolite concentration", conc_balanced[1]);
+        print("flux: ", flux);
+        print("conc_init: ", conc_init);
+        print("conc_unbalanced: ", conc_unbalanced[e]);
+        print("conc_enzyme_experiment: ", conc_enzyme_experiment);
+        print("km: ", km);
+        print("drain: ", drain[e]);
+        print("kcat: ", kcat);
+        print("dgrs: ", dgrs);
+        print("ki: ", ki);
+        print("diss_t: ", diss_t);
+        print("diss_r: ", diss_r);
+        print("transfer_constant: ", transfer_constant);
+        print("kcat_phos: ", kcat_phos);
+        print("conc_phos_experiment: ", conc_phos_experiment);
+        reject("Rejecting");
+      }
     }
   }
 }
