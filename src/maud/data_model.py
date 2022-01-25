@@ -233,9 +233,7 @@ class KineticModel:
         self.reactions = reactions
         self.compartments = compartments
         self.mics = mics
-        self.phosphorylation = (
-            phosphorylation if phosphorylation is not None else []
-        )
+        self.phosphorylation = phosphorylation if phosphorylation is not None else []
 
 
 @dataclass
@@ -310,9 +308,7 @@ class MultiVariateNormalPrior1d:
         try:
             np.linalg.cholesky(self.covariance_matrix.values)
         except LinAlgError as e:
-            raise ValueError(
-                "Covariance matrix is not positive definite"
-            ) from e
+            raise ValueError("Covariance matrix is not positive definite") from e
 
 
 @dataclass

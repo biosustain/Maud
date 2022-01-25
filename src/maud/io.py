@@ -87,9 +87,7 @@ def load_maud_input(data_path: str, mode: str) -> MaudInput:
     """
     config = parse_config(toml.load(os.path.join(data_path, "config.toml")))
     kinetic_model_path = os.path.join(data_path, config.kinetic_model_file)
-    biological_config_path = os.path.join(
-        data_path, config.biological_config_file
-    )
+    biological_config_path = os.path.join(data_path, config.biological_config_file)
     raw_kinetic_model = dict(toml.load(kinetic_model_path))
     raw_biological_config = dict(toml.load(biological_config_path))
     measurements_path = os.path.join(data_path, config.measurements_file)
@@ -161,9 +159,7 @@ def parse_toml_kinetic_model(raw: dict) -> KineticModel:
                 if "metabolite_inchi_key" in r.keys()
                 else None
             )
-            metabolites.append(
-                Metabolite(id=r["metabolite"], inchi_key=inchi_key)
-            )
+            metabolites.append(Metabolite(id=r["metabolite"], inchi_key=inchi_key))
     mics = [
         MetaboliteInCompartment(
             id=f"{m['metabolite']}_{m['compartment']}",
@@ -201,9 +197,7 @@ def get_km_coords(rxns: List[Reaction]) -> List[Tuple[str]]:
     for r in rxns:
         for e in r.enzymes:
             if r.reaction_mechanism == "irreversible_modular_rate_law":
-                coords += [
-                    (e.id, m[0]) for m in r.stoichiometry.items() if m[1] < 0
-                ]
+                coords += [(e.id, m[0]) for m in r.stoichiometry.items() if m[1] < 0]
             elif r.reaction_mechanism == "reversible_modular_rate_law":
                 coords += [(e.id, m[0]) for m in r.stoichiometry.items()]
     return sorted(coords)
@@ -251,9 +245,7 @@ def get_stan_coords(
         [e.id for r in km.reactions for e in r.enzymes if e.allosteric]
     )
     phos_enzs = sorted([e.id for e in km.phosphorylation])
-    drains = sorted(
-        [r.id for r in km.reactions if r.reaction_mechanism == "drain"]
-    )
+    drains = sorted([r.id for r in km.reactions if r.reaction_mechanism == "drain"])
     edges = enzymes + drains
     experiments = sorted([e.id for e in all_experiments if getattr(e, mode)])
     ci_coords, ai_coords, aa_coords = (
@@ -429,12 +421,8 @@ def parse_measurements(raw: pd.DataFrame, cs: StanCoordSet) -> MeasurementSet:
         )
         for t in ["mic", "flux", "enzyme"]
     )
-    enz_knockouts = pd.DataFrame(
-        False, index=cs.experiments, columns=cs.enzymes
-    )
-    phos_knockouts = pd.DataFrame(
-        False, index=cs.experiments, columns=cs.phos_enzs
-    )
+    enz_knockouts = pd.DataFrame(False, index=cs.experiments, columns=cs.enzymes)
+    phos_knockouts = pd.DataFrame(False, index=cs.experiments, columns=cs.phos_enzs)
     for _, row in raw.loc[
         lambda df: df["measurement_type"] == "knockout_enz"
     ].iterrows():
@@ -600,9 +588,7 @@ def extract_2d_prior(
         .unstack()
         .reindex(row_coords, columns=col_coords)
         .rename_axis(parameter_name_to_id_cols[parameter_name][0])
-        .rename_axis(
-            parameter_name_to_id_cols[parameter_name][1], axis="columns"
-        )
+        .rename_axis(parameter_name_to_id_cols[parameter_name][1], axis="columns")
         for col in ["location", "scale"]
     )
     return IndPrior2d(
@@ -629,9 +615,7 @@ def parse_priors(
     else:
         dgf_prior_1d = extract_1d_prior(raw, "dgf", [cs.metabolites])
         loc = dgf_prior_1d.location
-        cov = pd.DataFrame(
-            np.diag(dgf_prior_1d.scale), index=met_ix, columns=met_ix
-        )
+        cov = pd.DataFrame(np.diag(dgf_prior_1d.scale), index=met_ix, columns=met_ix)
     priors_dgf = MultiVariateNormalPrior1d(
         parameter_name="dgf", location=loc, covariance_matrix=cov
     )
@@ -683,9 +667,7 @@ def parse_config(raw):
         raw["dgf_mean_file"] if "dgf_mean_file" in raw.keys() else None
     )
     dgf_covariance_file: Optional[str] = (
-        raw["dgf_covariance_file"]
-        if "dgf_covariance_file" in raw.keys()
-        else None
+        raw["dgf_covariance_file"] if "dgf_covariance_file" in raw.keys() else None
     )
     reject_non_steady: bool = (
         raw["reject_non_steady"] if "reject_non_steady" in raw.keys() else True
@@ -721,18 +703,14 @@ def get_inits(priors: PriorSet, user_inits_path) -> Dict[str, np.ndarray]:
     ) -> pd.Series:
         if len(p.location) == 0:
             return pd.Series(p.location)
-        elif isinstance(p, IndPrior1d) or isinstance(
-            p, MultiVariateNormalPrior1d
-        ):
-            return u.loc[
-                lambda df: df["parameter_name"] == p.parameter_name
-            ].set_index(p.location.index.names)["value"]
+        elif isinstance(p, IndPrior1d) or isinstance(p, MultiVariateNormalPrior1d):
+            return u.loc[lambda df: df["parameter_name"] == p.parameter_name].set_index(
+                p.location.index.names
+            )["value"]
         elif isinstance(p, IndPrior2d):
-            return u.loc[
-                lambda df: df["parameter_name"] == p.parameter_name
-            ].set_index([p.location.index.name, p.location.columns.name])[
-                "value"
-            ]
+            return u.loc[lambda df: df["parameter_name"] == p.parameter_name].set_index(
+                [p.location.index.name, p.location.columns.name]
+            )["value"]
         else:
             raise ValueError("Unrecognised prior type: " + str(type(p)))
 
@@ -775,7 +753,5 @@ def rescale_inits(inits: dict, priors: PriorSet) -> Dict[str, np.ndarray]:
         elif n in NON_LN_SCALE_PARAMS:
             rescaled[n + "_z"] = (i - prior.location) / prior.scale
         else:
-            rescaled[f"log_{n}_z"] = (
-                np.log(i) - np.log(prior.location)
-            ) / prior.scale
+            rescaled[f"log_{n}_z"] = (np.log(i) - np.log(prior.location)) / prior.scale
     return {**inits, **rescaled}
