@@ -65,47 +65,16 @@ functions {
     return dgrs;
   }
 
-  int check_steady_state(vector[] conc_balanced,
-                        int e,
-                        vector flux,
-                        vector conc_init,
-                        real[] timepoints,
-                        vector conc_unbalanced,
-                        vector conc_enzyme_experiment,
-                        vector km,
-                        vector drain,
-                        vector kcat,
-                        vector dgrs,
-                        vector ki,
-                        vector diss_t,
-                        vector diss_r,
-                        vector transfer_constant,
-                        vector kcat_phos,
-                        vector conc_phos_experiment){
-    if ((max(fabs(conc_balanced[1]-conc_balanced[2])./conc_balanced[2]) > 0.001)){
-      print("");
-      print("Non-steady state in experiment ", e, ".");
-      print("Balanced metabolite concentration at ", timepoints[1], " seconds: ", conc_balanced[1]);
-      print("Balanced metabolite concentration at ", timepoints[2], " seconds: ", conc_balanced[2]);
-      print("flux: ", flux);
-      print("conc_init: ", conc_init);
-      print("conc_unbalanced: ", conc_unbalanced);
-      print("conc_enzyme_experiment: ", conc_enzyme_experiment);
-      print("km: ", km);
-      print("drain: ", drain);
-      print("kcat: ", kcat);
-      print("dgrs: ", dgrs);
-      print("ki: ", ki);
-      print("diss_t: ", diss_t);
-      print("diss_r: ", diss_r);
-      print("transfer_constant: ", transfer_constant);
-      print("kcat_phos: ", kcat_phos);
-      print("conc_phos_experiment: ", conc_phos_experiment);
-      return 0;
-    }
-    else {
-      return 1;
-    }
+  int check_steady_state(matrix S, vector v, vector conc){
+    /* Relative and absolute check for steady state. */
+    vector[rows(conc)] Sv = S * v;
+    real abs_thresh = 1e-8;
+    vector[rows(conc)] rel_thresh = conc * 1e-3;
+    int relative_check_failed = max(fabs(Sv) - rel_thresh) > 0;
+    int absolute_check_failed = max(fabs(Sv)) > abs_thresh;
+    if (relative_check_failed) print("Sv", Sv, " not within ", rel_thresh, " of zero.");
+    if (absolute_check_failed) print("Sv", Sv, " not within ", abs_thresh, " of zero.");
+    return (relative_check_failed || absolute_check_failed) ? 0 : 1;
   }
 
   int measure_ragged(int[,] bounds, int i){
