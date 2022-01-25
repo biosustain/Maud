@@ -218,25 +218,26 @@ transformed parameters {
                                              pi_ix_bounds);
     for (j in 1:N_edge)
       flux[e, edge_to_reaction[j]] += edge_flux[j];
-    }
-    if (reject_non_steady == 1 && check_steady_state(S[balanced_mic_ix], flux[e], conc_balanced[1]) == 0){
-      print("Non-steady state in experiment ", e);
-      print("Balanced metabolite concentration", conc_balanced[1]);
-      print("flux: ", flux);
-      print("conc_init: ", conc_init);
-      print("conc_unbalanced: ", conc_unbalanced[e]);
-      print("conc_enzyme_experiment: ", conc_enzyme_experiment);
-      print("km: ", km);
-      print("drain: ", drain[e]);
-      print("kcat: ", kcat);
-      print("dgrs: ", dgrs);
-      print("ki: ", ki);
-      print("diss_t: ", diss_t);
-      print("diss_r: ", diss_r);
-      print("transfer_constant: ", transfer_constant);
-      print("kcat_phos: ", kcat_phos);
-      print("conc_phos_experiment: ", conc_phos_experiment);
-      reject("Rejecting");
+    if (reject_non_steady == 1 &&
+        check_steady_state((S * edge_flux)[balanced_mic_ix], conc_balanced[1]) == 0){
+        print("Non-steady state in experiment ", e);
+        print("Balanced metabolite concentration", conc_balanced[1]);
+        print("flux: ", flux);
+        print("conc_init: ", conc_init);
+        print("conc_unbalanced: ", conc_unbalanced[e]);
+        print("conc_enzyme_experiment: ", conc_enzyme_experiment);
+        print("km: ", km);
+        print("drain: ", drain[e]);
+        print("kcat: ", kcat);
+        print("dgrs: ", dgrs);
+        print("ki: ", ki);
+        print("diss_t: ", diss_t);
+        print("diss_r: ", diss_r);
+        print("transfer_constant: ", transfer_constant);
+        print("kcat_phos: ", kcat_phos);
+        print("conc_phos_experiment: ", conc_phos_experiment);
+        reject("Rejecting");
+      }
     }
   }
 }
