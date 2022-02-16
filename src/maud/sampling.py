@@ -363,6 +363,8 @@ def get_config_dict(mi: MaudInput) -> dict:
         **{
             "LIKELIHOOD": int(mi.config.likelihood),
             "reject_non_steady": int(mi.config.reject_non_steady),
+            "steady_state_threshold_abs": mi.config.steady_state_threshold_abs,
+            "steady_state_threshold_rel": mi.config.steady_state_threshold_rel,
             "conc_init": _get_conc_init(mi).values,
         },
         **mi.config.ode_config,

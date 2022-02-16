@@ -597,7 +597,10 @@ def extract_2d_prior(
 
 
 def parse_priors(
-    raw: pd.DataFrame, cs: StanCoordSet, dgf_loc: pd.Series, dgf_cov: pd.DataFrame
+    raw: pd.DataFrame,
+    cs: StanCoordSet,
+    dgf_loc: pd.Series,
+    dgf_cov: pd.DataFrame,
 ) -> PriorSet:
     """Get a PriorSet object from a dataframe of raw priors.
 
@@ -667,6 +670,17 @@ def parse_config(raw):
     reject_non_steady: bool = (
         raw["reject_non_steady"] if "reject_non_steady" in raw.keys() else True
     )
+    steady_state_threshold_abs: float = (
+        raw["steady_state_threshold_abs"]
+        if "steady_state_threshold_abs" in raw.keys()
+        else 1e-4
+    )
+    steady_state_threshold_rel: float = (
+        raw["steady_state_threshold_abs"]
+        if "steady_state_threshold_abs" in raw.keys()
+        else 1e-3
+    )
+
     return MaudConfig(
         name=raw["name"],
         kinetic_model_file=raw["kinetic_model"],
@@ -680,6 +694,8 @@ def parse_config(raw):
         user_inits_file=user_inits_file,
         dgf_mean_file=dgf_mean_file,
         dgf_covariance_file=dgf_covariance_file,
+        steady_state_threshold_abs=steady_state_threshold_abs,
+        steady_state_threshold_rel=steady_state_threshold_rel,
     )
 
 
