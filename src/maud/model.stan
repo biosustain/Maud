@@ -85,6 +85,8 @@ data {
   vector<lower=0>[N_mic] conc_init[N_experiment];
   real rel_tol; 
   real abs_tol;
+  real steady_state_threshold_abs;
+  real steady_state_threshold_rel;
   int max_num_steps;
   int<lower=0,upper=1> LIKELIHOOD;  // set to 0 for priors-only mode
   real<lower=0> timepoint;
@@ -219,7 +221,7 @@ transformed parameters {
     for (j in 1:N_edge)
       flux[e, edge_to_reaction[j]] += edge_flux[j];
     if (reject_non_steady == 1 &&
-        check_steady_state((S * edge_flux)[balanced_mic_ix], conc_balanced[1]) == 0){
+        check_steady_state((S * edge_flux)[balanced_mic_ix], conc_balanced[1], steady_state_threshold_abs, steady_state_threshold_rel) == 0){
         print("Non-steady state in experiment ", e);
         print("Balanced metabolite concentration", conc_balanced[1]);
         print("flux: ", flux);

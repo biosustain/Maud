@@ -65,14 +65,13 @@ functions {
     return dgrs;
   }
 
-  int check_steady_state(vector Sv, vector conc){
+  int check_steady_state(vector Sv, vector conc, real abs_thresh, real rel_thresh){
     /* Relative and absolute check for steady state. */
-    real abs_thresh = 1e-8;
-    vector[rows(conc)] rel_thresh = conc * 1e-3;
-    int relative_check_failed = max(fabs(Sv) - rel_thresh) > 0;
+    vector[rows(conc)] rel_thresh_per_conc = conc * rel_thresh;
+    int relative_check_failed = max(fabs(Sv) - rel_thresh_per_conc) > 0;
     int absolute_check_failed = max(fabs(Sv)) > abs_thresh;
-    if (relative_check_failed) print("Sv", Sv, " not within ", rel_thresh, " of zero.");
-    if (absolute_check_failed) print("Sv", Sv, " not within ", abs_thresh, " of zero.");
+    if (relative_check_failed) print("Sv ", Sv, " not within ", rel_thresh_per_conc, " of zero.");
+    if (absolute_check_failed) print("Sv ", Sv, " not within ", abs_thresh, " of zero.");
     return (relative_check_failed || absolute_check_failed) ? 0 : 1;
   }
 
@@ -393,7 +392,7 @@ functions {
     vector[rows(current_balanced)+rows(unbalanced)] current_concentration;
     current_concentration[balanced_ix] = current_balanced;
     current_concentration[unbalanced_ix] = unbalanced;
-    vector[rows(S)] edge_flux = get_edge_flux(current_concentration,
+    vector[cols(S)] edge_flux = get_edge_flux(current_concentration,
                                               enzyme,
                                               dgr,
                                               kcat,

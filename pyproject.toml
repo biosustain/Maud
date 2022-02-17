@@ -19,5 +19,5 @@ reportMissingImports = true
 reportMissingTypeStubs = false
 disableOrganizeImports = false
 useLibraryCodeForTypes = true
-venv = "maud"
+venv = ".venv_maud"
 pythonPlatform = "Darwin"
