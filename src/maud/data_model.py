@@ -383,8 +383,8 @@ class MaudConfig:
     :param user_inits_file: path to a csv file of initial values.
     :param dgf_mean_file: path to a csv file of formation energy means.
     :param dgf_covariance_file: path to a csv file of formation energy covariances.
-    :param steady_state_threshold_abs: how absolutely close to zero must Sv be at steady state
-    :param steady_state_threshold_rel: how relatively close to zero must Sv be at steady state
+    :param steady_state_threshold_abs: absolute threshold for Sv=0 be at steady state
+    :param steady_state_threshold_rel: relative threshold for Sv=0 be at steady state
     """
 
     name: str
