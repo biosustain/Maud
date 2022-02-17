@@ -392,7 +392,7 @@ functions {
     vector[rows(current_balanced)+rows(unbalanced)] current_concentration;
     current_concentration[balanced_ix] = current_balanced;
     current_concentration[unbalanced_ix] = unbalanced;
-    vector[rows(S)] edge_flux = get_edge_flux(current_concentration,
+    vector[cols(S)] edge_flux = get_edge_flux(current_concentration,
                                               enzyme,
                                               dgr,
                                               kcat,
