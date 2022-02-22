@@ -233,7 +233,9 @@ class KineticModel:
         self.reactions = reactions
         self.compartments = compartments
         self.mics = mics
-        self.phosphorylation = phosphorylation if phosphorylation is not None else []
+        self.phosphorylation = (
+            phosphorylation if phosphorylation is not None else []
+        )
 
 
 @dataclass
@@ -308,7 +310,9 @@ class MultiVariateNormalPrior1d:
         try:
             np.linalg.cholesky(self.covariance_matrix.values)
         except LinAlgError as e:
-            raise ValueError("Covariance matrix is not positive definite") from e
+            raise ValueError(
+                "Covariance matrix is not positive definite"
+            ) from e
 
 
 @dataclass
@@ -380,6 +384,9 @@ class MaudConfig:
     :param reject_non_steady: Reject draws if a non-steady state is encountered.
     :param ode_config: Configuration for Stan's ode solver.
     :param cmdstanpy_config: Arguments to cmdstanpy.CmdStanModel.sample.
+    :param stanc_options: Valid choices for CmdStanModel argument `stanc_options`.
+    :param cpp_options: Valid choices for CmdStanModel `cpp_options`.
+    :param variational_options: Arguments for CmdStanModel.variational.
     :param user_inits_file: path to a csv file of initial values.
     :param dgf_mean_file: path to a csv file of formation energy means.
     :param dgf_covariance_file: path to a csv file of formation energy covariances.
@@ -396,6 +403,9 @@ class MaudConfig:
     reject_non_steady: bool
     ode_config: dict
     cmdstanpy_config: dict
+    stanc_options: Optional[dict]
+    cpp_options: Optional[dict]
+    variational_options: Optional[dict]
     user_inits_file: Optional[str]
     dgf_mean_file: Optional[str]
     dgf_covariance_file: Optional[str]

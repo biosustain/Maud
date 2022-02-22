@@ -672,6 +672,15 @@ def parse_config(raw):
     reject_non_steady: bool = (
         raw["reject_non_steady"] if "reject_non_steady" in raw.keys() else True
     )
+    stanc_options: Optional[dict] = (
+        raw["stanc_options"] if "stanc_options" in raw.keys() else None
+    )
+    cpp_options: Optional[dict] = (
+        raw["cpp_options"] if "cpp_options" in raw.keys() else None
+    )
+    variational_options: Optional[dict] = (
+        raw["variational_options"] if "variational_options" in raw.keys() else None
+    )
     steady_state_threshold_abs: float = (
         raw["steady_state_threshold_abs"]
         if "steady_state_threshold_abs" in raw.keys()
@@ -693,6 +702,9 @@ def parse_config(raw):
         reject_non_steady=reject_non_steady,
         ode_config={**DEFAULT_ODE_CONFIG, **raw["ode_config"]},
         cmdstanpy_config=raw["cmdstanpy_config"],
+        stanc_options=stanc_options,
+        cpp_options=cpp_options,
+        variational_options=variational_options,
         user_inits_file=user_inits_file,
         dgf_mean_file=dgf_mean_file,
         dgf_covariance_file=dgf_covariance_file,
