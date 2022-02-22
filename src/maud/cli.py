@@ -163,21 +163,9 @@ def simulate(data_path, output_dir, n):
     infd = load_infd(stanfit.runset.csv_files, mi)
     infd.to_netcdf(os.path.join(output_path, "infd.nc"))
     print("\n\nSimulated concentrations:")
-    print(
-        infd.posterior["conc"]
-        .mean(dim=["chain", "draw"])
-        .to_series()
-        .unstack()
-        .T
-    )
+    print(infd.posterior["conc"].mean(dim=["chain", "draw"]).to_series().unstack().T)
     print("\n\nSimulated fluxes:")
-    print(
-        infd.posterior["flux"]
-        .mean(dim=["chain", "draw"])
-        .to_series()
-        .unstack()
-        .T
-    )
+    print(infd.posterior["flux"].mean(dim=["chain", "draw"]).to_series().unstack().T)
     print("\n\nSimulated enzyme concentrations:")
     print(
         infd.posterior["conc_enzyme"]
@@ -192,19 +180,11 @@ def simulate(data_path, output_dir, n):
     print(infd.posterior["yconc_sim"].mean(dim=["chain", "draw"]).to_series())
     print(infd.posterior["yflux_sim"].mean(dim=["chain", "draw"]).to_series())
     print("\n\nSimulated log likelihoods:")
-    print(
-        infd.posterior["log_lik_conc"].mean(dim=["chain", "draw"]).to_series()
-    )
-    print(
-        infd.posterior["log_lik_flux"].mean(dim=["chain", "draw"]).to_series()
-    )
+    print(infd.posterior["log_lik_conc"].mean(dim=["chain", "draw"]).to_series())
+    print(infd.posterior["log_lik_flux"].mean(dim=["chain", "draw"]).to_series())
     print("\n\nSimulated allostery:")
     print(
-        infd.posterior["allostery"]
-        .mean(dim=["chain", "draw"])
-        .to_series()
-        .unstack()
-        .T
+        infd.posterior["allostery"].mean(dim=["chain", "draw"]).to_series().unstack().T
     )
     print("\n\nSimulated reversibilities:")
     print(
@@ -216,11 +196,7 @@ def simulate(data_path, output_dir, n):
     )
     print("\n\nSimulated saturation:")
     print(
-        infd.posterior["saturation"]
-        .mean(dim=["chain", "draw"])
-        .to_series()
-        .unstack()
-        .T
+        infd.posterior["saturation"].mean(dim=["chain", "draw"]).to_series().unstack().T
     )
     return output_path
 
@@ -248,12 +224,8 @@ def generate_prior_template(data_path):
     kinetic_model_path = os.path.join(data_path, config.kinetic_model_file)
     kinetic_model = parse_toml_kinetic_model(toml.load(kinetic_model_path))
     measurements_path = os.path.join(data_path, config.measurements_file)
-    biological_config_path = os.path.join(
-        data_path, config.biological_config_file
-    )
-    all_experiments = get_all_experiment_object(
-        toml.load(biological_config_path)
-    )
+    biological_config_path = os.path.join(data_path, config.biological_config_file)
+    all_experiments = get_all_experiment_object(toml.load(biological_config_path))
     raw_measurements = pd.read_csv(measurements_path)
     output_name = "prior_template.csv"
     output_path = os.path.join(data_path, output_name)
@@ -320,9 +292,7 @@ def generate_inits(data_path, chain, draw, warmup):
     default=0,
     help="Sampling draw using python indexing from start of phase",
 )
-@click.option(
-    "--warmup", default=0, help="0 if in sampling, 1 if in warmup phase"
-)
+@click.option("--warmup", default=0, help="0 if in sampling, 1 if in warmup phase")
 def generate_inits_command(data_path, chain, draw, warmup):
     """Run the generate_inits function as a click command."""
     click.echo(generate_inits(data_path, chain, draw, warmup))
