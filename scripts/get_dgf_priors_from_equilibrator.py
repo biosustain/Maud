@@ -49,22 +49,24 @@ def get_dgf_priors(mi: MaudInput) -> Tuple[pd.Series, pd.DataFrame]:
     mu = []
     sigmas_fin = []
     sigmas_inf = []
-    external_ids = {m.id: m.inchi_key for m in mi.kinetic_model.metabolites}
     met_ix = pd.Index(mi.stan_coords.metabolites, name="metabolite")
-    for met_id in met_ix:
-        external_id = external_ids[met_id]
-        if external_id is None:
-            raise ValueError(f"metabolite {met_id} has no external id.")
+    for m in mi.kinetic_model.metabolites:
+        external_id = m.id if m.inchi_key is None else m.inchi_key
         c = cc.get_compound(external_id)
         if isinstance(c, Compound):
             mu_c, sigma_fin_c, sigma_inf_c = cc.standard_dg_formation(c)
+            mu_c += c.transform(
+                cc.p_h, cc.ionic_strength, cc.temperature, cc.p_mg
+            ).m_as("kJ/mol")
             mu.append(mu_c)
             sigmas_fin.append(sigma_fin_c)
             sigmas_inf.append(sigma_inf_c)
         else:
             raise ValueError(
-                f"cannot find compound for metabolite {met_id}"
+                f"cannot find compound for metabolite {m.id}"
                 f" with external id {external_id}."
+                "\nConsider setting the field metabolite_inchi_key"
+                " if you haven't already."
             )
     sigmas_fin = np.array(sigmas_fin)
     sigmas_inf = np.array(sigmas_inf)
@@ -79,7 +81,10 @@ def main():
     """Run the script."""
     parser = argparse.ArgumentParser(description=HELP_MSG)
     parser.add_argument(
-        "maud_input_dir", type=str, nargs=1, help="A path to a Maud input directory"
+        "maud_input_dir",
+        type=str,
+        nargs=1,
+        help="A path to a Maud input directory",
     )
     maud_input_dir = parser.parse_args().maud_input_dir[0]
     if os.path.exists(maud_input_dir):
