@@ -97,6 +97,7 @@ transformed data {
   matrix[N_experiment, N_enzyme] knockout = rep_matrix(1, N_experiment, N_enzyme) - is_knockout;
   matrix[N_experiment, N_phosphorylation_enzymes] phos_knockout =
     rep_matrix(1, N_experiment, N_phosphorylation_enzymes) - is_phos_knockout;
+  matrix[N_metabolite, N_metabolite] prior_cov_dgf_chol = cholesky_decompose(prior_cov_dgf);
 }
 parameters {
   vector[N_metabolite] dgf;
@@ -250,7 +251,7 @@ model {
   log_diss_t_z ~ std_normal();
   log_diss_r_z ~ std_normal();
   log_transfer_constant_z ~ std_normal();
-  dgf ~ multi_normal(prior_loc_dgf, prior_cov_dgf);
+  dgf ~ multi_normal_cholesky(prior_loc_dgf, prior_cov_dgf_chol);
   log_kcat_phos_z ~ std_normal();
   for (ex in 1:N_experiment){
     log_conc_unbalanced_z[ex] ~ std_normal();

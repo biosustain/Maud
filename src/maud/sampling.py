@@ -20,11 +20,14 @@ import itertools
 import json
 import os
 import warnings
-from typing import Dict, List, Sequence, Tuple, Union
+from typing import Dict, List, Optional, Sequence, Tuple, Union
 
 import cmdstanpy
 import numpy as np
 import pandas as pd
+from cmdstanpy.model import CmdStanModel
+from cmdstanpy.stanfit.mcmc import CmdStanMCMC
+from cmdstanpy.stanfit.vb import CmdStanVB
 
 from maud.analysis import load_infd, load_infd_fit
 from maud.data_model import (
@@ -56,7 +59,11 @@ DEFAULT_SAMPLE_CONFIG = {
     "save_warmup": True,
     "threads_per_chain": 1,
 }
-
+DEFAULT_VARIATIONAL_CONFIG = {
+    "algorithm": "meanfield",
+    "output_samples": 10,
+    "require_converged": True,
+}
 SIM_CONFIG = {
     "chains": 1,
     "fixed_param": True,
@@ -66,34 +73,45 @@ SIM_CONFIG = {
 }
 
 
-def sample(mi: MaudInput, output_dir: str) -> cmdstanpy.CmdStanMCMC:
+def sample(mi: MaudInput, output_dir: str) -> CmdStanMCMC:
     """Sample from the posterior defined by mi.
 
     :param mi: a MaudInput object
     :param output_dir: a string specifying where to save the output.
     """
-    config = {
-        **DEFAULT_SAMPLE_CONFIG,
-        **mi.config.cmdstanpy_config,
-        **{"output_dir": output_dir},
-    }
-    return _sample_given_config(mi, output_dir, config)
+    model = get_cmdstan_model(mi.config.cpp_options, mi.config.stanc_options)
+    set_up_output_dir(output_dir, mi)
+    return model.sample(
+        data=os.path.join(output_dir, "input_data.json"),
+        inits=os.path.join(output_dir, "inits.json"),
+        **{
+            **DEFAULT_SAMPLE_CONFIG,
+            **mi.config.cmdstanpy_config,
+            **{"output_dir": output_dir},
+        },
+    )
 
 
-def generate_predictions(
-    mi_oos: MaudInput, mi_train: MaudInput, csvs: List[str], output_dir: str
-) -> cmdstanpy.CmdStanMCMC:
-    """Sample from the posterior defined by mi.
+def variational(mi: MaudInput, output_dir: str) -> CmdStanVB:
+    """Do variational inference for the posterior defined by mi.
 
     :param mi: a MaudInput object
     :param output_dir: a string specifying where to save the output.
     """
-    config = {
-        **DEFAULT_SAMPLE_CONFIG,
-        **mi_oos.config.cmdstanpy_config,
-        **{"output_dir": output_dir},
-    }
-    return _generate_predictions(mi_oos, mi_train, csvs, output_dir, config)
+    mi_options = (
+        {} if mi.config.variational_options is None else mi.config.variational_options
+    )
+    model = get_cmdstan_model(mi.config.cpp_options, mi.config.stanc_options)
+    set_up_output_dir(output_dir, mi)
+    return model.variational(
+        data=os.path.join(output_dir, "input_data.json"),
+        inits=os.path.join(output_dir, "inits.json"),
+        **{
+            **DEFAULT_VARIATIONAL_CONFIG,
+            **mi_options,
+            **{"output_dir": output_dir},
+        },
+    )
 
 
 def simulate(mi: MaudInput, output_dir: str, n: int) -> cmdstanpy.CmdStanMCMC:
@@ -102,8 +120,54 @@ def simulate(mi: MaudInput, output_dir: str, n: int) -> cmdstanpy.CmdStanMCMC:
     :param mi: a MaudInput object
     :param output_dir: a string specifying where to save the output.
     """
-    config = {**SIM_CONFIG, **{"output_dir": output_dir, "iter_sampling": n}}
-    return _sample_given_config(mi, output_dir, config)
+    model = get_cmdstan_model(mi.config.cpp_options, mi.config.stanc_options)
+    set_up_output_dir(output_dir, mi)
+    return model.sample(
+        data=os.path.join(output_dir, "input_data.json"),
+        inits=os.path.join(output_dir, "inits.json"),
+        **{**SIM_CONFIG, **{"output_dir": output_dir, "iter_sampling": n}},
+    )
+
+
+def set_up_output_dir(output_dir: str, mi: MaudInput):
+    """Write input data, inits and coords to the output directory."""
+    input_filepath = os.path.join(output_dir, "input_data.json")
+    inits_filepath = os.path.join(output_dir, "inits.json")
+    coords_filepath = os.path.join(output_dir, "coords.json")
+    input_data = get_input_data(mi)
+    inits = {k: v.values for k, v in mi.inits.items()}
+    cmdstanpy.utils.write_stan_json(input_filepath, input_data)
+    cmdstanpy.utils.write_stan_json(inits_filepath, inits)
+    with open(coords_filepath, "w") as f:
+        json.dump(mi.stan_coords.__dict__, f)
+
+
+def get_cmdstan_model(
+    cpp_options: Optional[dict], stanc_options: Optional[dict]
+) -> CmdStanModel:
+    """Get a CmdStanModel object.
+
+    :param cpp_options: a dictionary of c++ options. For a list of things you
+    can set see <cmdstan-home>/cmdstan/stan/lib/stan_math/make/compiler_flags
+
+    :param stanc_options: a dictionary of c++ options. For a list of things you
+    can set see https://mc-stan.org/docs/2_29/stan-users-guide/stanc-args.html
+
+    """
+
+    if cpp_options is None:
+        cpp_options = {}
+    if stanc_options is None:
+        stanc_options = {}
+    stanc_options = {
+        **{"include-paths": [os.path.join(HERE, INCLUDE_PATH)]},
+        **stanc_options,
+    }
+    return cmdstanpy.CmdStanModel(
+        stan_file=os.path.join(HERE, STAN_PROGRAM_RELATIVE_PATH),
+        stanc_options=stanc_options,
+        cpp_options=cpp_options,
+    )
 
 
 def _sample_given_config(
@@ -141,20 +205,23 @@ def _sample_given_config(
     return model.sample(data=input_filepath, **config)
 
 
-def _generate_predictions(
+def generate_predictions(
     mi_oos: MaudInput,
     mi_train: MaudInput,
     csvs: List[str],
     output_dir: str,
-    config: dict,
 ):
-    """Call CmdStanModel.out_of_sample, having already specified all arguments.
+    """Call CmdStanModel.sample for out of sample predictions.
 
     :param mi_oos: a MaudInput object defining the out-of-sample experiments
     :param mi_train: a MaudInput object defining the training experiments
     :param output_dir: a string specifying where to save the output.
-    :param config: a dictionary of keyword arguments to CmdStanModel.sample.
     """
+    config = {
+        **DEFAULT_SAMPLE_CONFIG,
+        **mi_oos.config.cmdstanpy_config,
+        **{"output_dir": output_dir},
+    }
     input_filepath = os.path.join(output_dir, "input_data.json")
     coords_filepath = os.path.join(output_dir, "coords.json")
     input_data = get_input_data(mi_oos)
@@ -223,7 +290,6 @@ def _generate_predictions(
     flux_df.to_csv(os.path.join(output_dir, "flux.csv"))
     conc_df.to_csv(os.path.join(output_dir, "conc.csv"))
     conc_enz_df.to_csv(os.path.join(output_dir, "conc_enzyme.csv"))
-    return
 
 
 def get_stoichiometry(mi: MaudInput) -> pd.DataFrame:
