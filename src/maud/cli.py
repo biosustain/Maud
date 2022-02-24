@@ -162,16 +162,42 @@ def simulate(data_path, output_dir, n):
     stanfit = sampling.simulate(mi, samples_path, n)
     infd = load_infd(stanfit.runset.csv_files, mi)
     infd.to_netcdf(os.path.join(output_path, "infd.nc"))
-    print("\nSimulated concentrations and fluxes:")
-    print(infd.posterior["conc"].mean(dim=["chain", "draw"]).to_series())
-    print(infd.posterior["flux"].mean(dim=["chain", "draw"]).to_series())
-    print(infd.posterior["conc_enzyme"].mean(dim=["chain", "draw"]).to_series())
-    print("\nSimulated measurements:")
+    print("\n\nSimulated concentrations:")
+    print(infd.posterior["conc"].mean(dim=["chain", "draw"]).to_series().unstack().T)
+    print("\n\nSimulated fluxes:")
+    print(infd.posterior["flux"].mean(dim=["chain", "draw"]).to_series().unstack().T)
+    print("\n\nSimulated enzyme concentrations:")
+    print(
+        infd.posterior["conc_enzyme"]
+        .mean(dim=["chain", "draw"])
+        .to_series()
+        .unstack()
+        .T
+    )
+    print("\n\nSimulated reaction delta Gs:")
+    print(infd.posterior["dgrs"].mean(dim=["chain", "draw"]).to_series())
+    print("\n\nSimulated measurements:")
     print(infd.posterior["yconc_sim"].mean(dim=["chain", "draw"]).to_series())
     print(infd.posterior["yflux_sim"].mean(dim=["chain", "draw"]).to_series())
-    print("\nSimulated log likelihoods:")
+    print("\n\nSimulated log likelihoods:")
     print(infd.posterior["log_lik_conc"].mean(dim=["chain", "draw"]).to_series())
     print(infd.posterior["log_lik_flux"].mean(dim=["chain", "draw"]).to_series())
+    print("\n\nSimulated allostery:")
+    print(
+        infd.posterior["allostery"].mean(dim=["chain", "draw"]).to_series().unstack().T
+    )
+    print("\n\nSimulated reversibilities:")
+    print(
+        infd.posterior["reversibility"]
+        .mean(dim=["chain", "draw"])
+        .to_series()
+        .unstack()
+        .T
+    )
+    print("\n\nSimulated saturation:")
+    print(
+        infd.posterior["saturation"].mean(dim=["chain", "draw"]).to_series().unstack().T
+    )
     return output_path
 
 
@@ -262,9 +288,48 @@ def generate_inits(data_path, chain, draw, warmup):
 )
 @click.option("--chain", default=0, help="Sampling chain using python indexing")
 @click.option(
-    "--draw", default=0, help="Sampling draw using python indexing from start of phase"
+    "--draw",
+    default=0,
+    help="Sampling draw using python indexing from start of phase",
 )
 @click.option("--warmup", default=0, help="0 if in sampling, 1 if in warmup phase")
 def generate_inits_command(data_path, chain, draw, warmup):
     """Run the generate_inits function as a click command."""
     click.echo(generate_inits(data_path, chain, draw, warmup))
+
+
+def variational(data_path, output_dir):
+    """Generate MCMC samples given a user input directory.
+
+    This function creates a new directory in output_dir with a name starting
+    with "maud_output". It first copies the directory at data_path into the new
+    this directory at new_dir/user_input, then runs the sampling.sample
+    function to write samples in new_dir/samples. Finally it prints the results
+    of cmdstanpy's diagnose and summary methods.
+
+    """
+    mi = load_maud_input(data_path, mode="sample")
+    now = datetime.now().strftime("%Y%m%d%H%M%S")
+    output_name = f"maud_output_vi-{mi.config.name}-{now}"
+    output_path = os.path.join(output_dir, output_name)
+    samples_path = os.path.join(output_path, "samples")
+    ui_dir = os.path.join(output_path, "user_input")
+    print("Creating output directory: " + output_path)
+    os.mkdir(output_path)
+    os.mkdir(samples_path)
+    print(f"Copying user input from {data_path} to {ui_dir}")
+    shutil.copytree(data_path, ui_dir)
+    sampling.variational(mi, samples_path)
+    return output_path
+
+
+@cli.command("variational")
+@click.option("--output_dir", default=".", help="Where to save Maud's output")
+@click.argument(
+    "data_path",
+    type=click.Path(exists=True, dir_okay=True, file_okay=False),
+    default=get_example_path(RELATIVE_PATH_EXAMPLE),
+)
+def variational_command(data_path, output_dir):
+    """Run the sample function as a click command."""
+    click.echo(variational(data_path, output_dir))

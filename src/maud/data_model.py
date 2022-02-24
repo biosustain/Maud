@@ -368,6 +368,7 @@ class StanCoordSet:
     phos_ko_enzs: List[str]
 
 
+@dataclass
 class MaudConfig:
     """User's configuration for a Maud input.
 
@@ -379,38 +380,33 @@ class MaudConfig:
     :param reject_non_steady: Reject draws if a non-steady state is encountered.
     :param ode_config: Configuration for Stan's ode solver.
     :param cmdstanpy_config: Arguments to cmdstanpy.CmdStanModel.sample.
+    :param stanc_options: Valid choices for CmdStanModel argument `stanc_options`.
+    :param cpp_options: Valid choices for CmdStanModel `cpp_options`.
+    :param variational_options: Arguments for CmdStanModel.variational.
     :param user_inits_file: path to a csv file of initial values.
     :param dgf_mean_file: path to a csv file of formation energy means.
     :param dgf_covariance_file: path to a csv file of formation energy covariances.
+    :param steady_state_threshold_abs: absolute threshold for Sv=0 be at steady state
+    :param steady_state_threshold_rel: relative threshold for Sv=0 be at steady state
     """
 
-    def __init__(
-        self,
-        name: str,
-        kinetic_model_file: str,
-        priors_file: str,
-        measurements_file: str,
-        biological_config_file: str,
-        likelihood: bool,
-        ode_config: dict,
-        cmdstanpy_config: dict,
-        user_inits_file: Optional[str],
-        dgf_mean_file: Optional[str],
-        dgf_covariance_file: Optional[str],
-        reject_non_steady: bool = True,
-    ):
-        self.name = name
-        self.kinetic_model_file = kinetic_model_file
-        self.priors_file = priors_file
-        self.measurements_file = measurements_file
-        self.biological_config_file = biological_config_file
-        self.likelihood = likelihood
-        self.reject_non_steady = reject_non_steady
-        self.ode_config = ode_config
-        self.cmdstanpy_config = cmdstanpy_config
-        self.user_inits_file = user_inits_file
-        self.dgf_mean_file = dgf_mean_file
-        self.dgf_covariance_file = dgf_covariance_file
+    name: str
+    kinetic_model_file: str
+    priors_file: str
+    measurements_file: str
+    biological_config_file: str
+    likelihood: bool
+    reject_non_steady: bool
+    ode_config: dict
+    cmdstanpy_config: dict
+    stanc_options: Optional[dict]
+    cpp_options: Optional[dict]
+    variational_options: Optional[dict]
+    user_inits_file: Optional[str]
+    dgf_mean_file: Optional[str]
+    dgf_covariance_file: Optional[str]
+    steady_state_threshold_abs: float
+    steady_state_threshold_rel: float
 
 
 class MaudInput:

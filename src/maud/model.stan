@@ -85,6 +85,8 @@ data {
   vector<lower=0>[N_mic] conc_init[N_experiment];
   real rel_tol; 
   real abs_tol;
+  real steady_state_threshold_abs;
+  real steady_state_threshold_rel;
   int max_num_steps;
   int<lower=0,upper=1> LIKELIHOOD;  // set to 0 for priors-only mode
   real<lower=0> timepoint;
@@ -95,6 +97,7 @@ transformed data {
   matrix[N_experiment, N_enzyme] knockout = rep_matrix(1, N_experiment, N_enzyme) - is_knockout;
   matrix[N_experiment, N_phosphorylation_enzymes] phos_knockout =
     rep_matrix(1, N_experiment, N_phosphorylation_enzymes) - is_phos_knockout;
+  matrix[N_metabolite, N_metabolite] prior_cov_dgf_chol = cholesky_decompose(prior_cov_dgf);
 }
 parameters {
   vector[N_metabolite] dgf;
@@ -129,14 +132,13 @@ transformed parameters {
   vector[N_edge] dgrs = get_dgrs(S, dgf, mic_to_met, water_stoichiometry);
   for (e in 1:N_experiment){
     flux[e] = rep_vector(0, N_reaction);
-    real timepoints[2] = {timepoint, timepoint + 10};
     vector[N_enzyme] conc_enzyme_experiment = conc_enzyme[e] .* knockout[e]';
     vector[N_phosphorylation_enzymes] conc_phos_experiment = conc_phos[e] .* phos_knockout[e]';
-    vector[N_mic-N_unbalanced] conc_balanced[2] =
+    vector[N_mic-N_unbalanced] conc_balanced[1] =
       ode_bdf_tol(dbalanced_dt,
                   conc_init[e, balanced_mic_ix],
                   initial_time,
-                  timepoints,
+                  {timepoint},
                   rel_tol, 
                   abs_tol,
                   max_num_steps,
@@ -219,25 +221,26 @@ transformed parameters {
                                              pi_ix_bounds);
     for (j in 1:N_edge)
       flux[e, edge_to_reaction[j]] += edge_flux[j];
-    }
-    if (reject_non_steady == 1 && check_steady_state(conc_balanced,
-                                                     e,
-                                                     flux[e],
-                                                     conc_init[e],
-                                                     timepoints,
-                                                     conc_unbalanced[e],
-                                                     conc_enzyme_experiment,
-                                                     km,
-                                                     drain[e],
-                                                     kcat,
-                                                     dgrs,
-                                                     ki,
-                                                     diss_t,
-                                                     diss_r,
-                                                     transfer_constant,
-                                                     kcat_phos,
-                                                     conc_phos_experiment) == 0) {
-      reject("Non-steady state in experiment ", e);
+    if (reject_non_steady == 1 &&
+        check_steady_state((S * edge_flux)[balanced_mic_ix], conc_balanced[1], steady_state_threshold_abs, steady_state_threshold_rel) == 0){
+        print("Non-steady state in experiment ", e);
+        print("Balanced metabolite concentration", conc_balanced[1]);
+        print("flux: ", flux);
+        print("conc_init: ", conc_init);
+        print("conc_unbalanced: ", conc_unbalanced[e]);
+        print("conc_enzyme_experiment: ", conc_enzyme_experiment);
+        print("km: ", km);
+        print("drain: ", drain[e]);
+        print("kcat: ", kcat);
+        print("dgrs: ", dgrs);
+        print("ki: ", ki);
+        print("diss_t: ", diss_t);
+        print("diss_r: ", diss_r);
+        print("transfer_constant: ", transfer_constant);
+        print("kcat_phos: ", kcat_phos);
+        print("conc_phos_experiment: ", conc_phos_experiment);
+        reject("Rejecting");
+      }
     }
   }
 }
@@ -248,7 +251,7 @@ model {
   log_diss_t_z ~ std_normal();
   log_diss_r_z ~ std_normal();
   log_transfer_constant_z ~ std_normal();
-  dgf ~ multi_normal(prior_loc_dgf, prior_cov_dgf);
+  dgf ~ multi_normal_cholesky(prior_loc_dgf, prior_cov_dgf_chol);
   log_kcat_phos_z ~ std_normal();
   for (ex in 1:N_experiment){
     log_conc_unbalanced_z[ex] ~ std_normal();

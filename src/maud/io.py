@@ -57,6 +57,8 @@ DEFAULT_PRIOR_LOC_UNBALANCED = 0.1
 DEFAULT_PRIOR_SCALE_UNBALANCED = 2.0
 DEFAULT_PRIOR_LOC_ENZYME = 0.1
 DEFAULT_PRIOR_SCALE_ENZYME = 2.0
+DEFAULT_STEADY_STATE_THRESHOLD_ABS = 1e-8
+DEFAULT_STEADY_STATE_THRESHOLD_REL = 1e-3
 NON_LN_SCALE_PARAMS = ["dgf", "drain"]
 DEFAULT_ODE_CONFIG = {
     "rel_tol": 1e-9,
@@ -672,6 +674,26 @@ def parse_config(raw):
     reject_non_steady: bool = (
         raw["reject_non_steady"] if "reject_non_steady" in raw.keys() else True
     )
+    stanc_options: Optional[dict] = (
+        raw["stanc_options"] if "stanc_options" in raw.keys() else None
+    )
+    cpp_options: Optional[dict] = (
+        raw["cpp_options"] if "cpp_options" in raw.keys() else None
+    )
+    variational_options: Optional[dict] = (
+        raw["variational_options"] if "variational_options" in raw.keys() else None
+    )
+    steady_state_threshold_abs: float = (
+        raw["steady_state_threshold_abs"]
+        if "steady_state_threshold_abs" in raw.keys()
+        else DEFAULT_STEADY_STATE_THRESHOLD_ABS
+    )
+    steady_state_threshold_rel: float = (
+        raw["steady_state_threshold_abs"]
+        if "steady_state_threshold_abs" in raw.keys()
+        else DEFAULT_STEADY_STATE_THRESHOLD_REL
+    )
+
     return MaudConfig(
         name=raw["name"],
         kinetic_model_file=raw["kinetic_model"],
@@ -682,9 +704,14 @@ def parse_config(raw):
         reject_non_steady=reject_non_steady,
         ode_config={**DEFAULT_ODE_CONFIG, **raw["ode_config"]},
         cmdstanpy_config=raw["cmdstanpy_config"],
+        stanc_options=stanc_options,
+        cpp_options=cpp_options,
+        variational_options=variational_options,
         user_inits_file=user_inits_file,
         dgf_mean_file=dgf_mean_file,
         dgf_covariance_file=dgf_covariance_file,
+        steady_state_threshold_abs=steady_state_threshold_abs,
+        steady_state_threshold_rel=steady_state_threshold_rel,
     )
 
 
