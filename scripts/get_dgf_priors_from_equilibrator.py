@@ -50,6 +50,7 @@ def get_dgf_priors(mi: MaudInput) -> Tuple[pd.Series, pd.DataFrame]:
     sigmas_fin = []
     sigmas_inf = []
     met_ix = pd.Index(mi.stan_coords.metabolites, name="metabolite")
+    met_order = [m.id for m in mi.kinetic_model.metabolites]
     for m in mi.kinetic_model.metabolites:
         external_id = m.id if m.inchi_key is None else m.inchi_key
         c = cc.get_compound(external_id)
@@ -71,10 +72,13 @@ def get_dgf_priors(mi: MaudInput) -> Tuple[pd.Series, pd.DataFrame]:
     sigmas_fin = np.array(sigmas_fin)
     sigmas_inf = np.array(sigmas_inf)
     cov = sigmas_fin @ sigmas_fin.T + 1e6 * sigmas_inf @ sigmas_inf.T
-    return (
-        pd.Series(mu, index=met_ix, name="prior_mean_dgf").round(10),
-        pd.DataFrame(cov, index=met_ix, columns=met_ix).round(10),
+    cov = (
+        pd.DataFrame(cov, index=met_order, columns=met_order)
+        .loc[met_ix, met_ix]
+        .round(10)
     )
+    mu = pd.Series(mu, index=met_order, name="prior_mean_dgf").loc[met_ix].round(10)
+    return mu, cov
 
 
 def main():
