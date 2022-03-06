@@ -28,6 +28,7 @@ import pandas as pd
 from cmdstanpy.model import CmdStanModel
 from cmdstanpy.stanfit.mcmc import CmdStanMCMC
 from cmdstanpy.stanfit.vb import CmdStanVB
+from xarray.core.dataset import Dataset
 
 from maud.analysis import load_infd, load_infd_fit
 from maud.data_model import (
@@ -184,9 +185,9 @@ def _sample_given_config(
     inits_filepath = os.path.join(output_dir, "inits.json")
     coords_filepath = os.path.join(output_dir, "coords.json")
     input_data = get_input_data(mi)
-    inits = {k: v.values for k, v in mi.inits.items()}
+    # inits = {k: v.values for k, v in mi.inits.items()}
     cmdstanpy.utils.write_stan_json(input_filepath, input_data)
-    cmdstanpy.utils.write_stan_json(inits_filepath, inits)
+    cmdstanpy.utils.write_stan_json(inits_filepath, mi.inits)
     with open(coords_filepath, "w") as f:
         json.dump(mi.stan_coords.__dict__, f)
     config["inits"] = inits_filepath
@@ -246,8 +247,10 @@ def generate_predictions(
     if config["threads_per_chain"] != 1:
         cpp_options["STAN_THREADS"] = True
         os.environ["STAN_NUM_THREADS"] = str(config["threads_per_chain"])
-    chains = infd.posterior.chain.to_series().values
-    draws = infd.posterior.draw.to_series().values
+    posterior = infd.get("posterior")
+    assert isinstance(posterior, Dataset)
+    chains = posterior.chain.to_series().values
+    draws = posterior.draw.to_series().values
     gq_model = cmdstanpy.CmdStanModel(
         stan_file=ppc_program_filepath,
         stanc_options=stanc_options,
@@ -259,9 +262,9 @@ def generate_predictions(
     for chain in chains:
         for draw in draws:
             inits = {
-                par: infd.posterior[par][chain][draw].to_series().values
+                par: posterior[par][chain][draw].to_series().values
                 for par in kinetic_parameters
-                if par in infd.posterior.variables.keys()
+                if par in posterior.variables.keys()
             }
             gq_samples = gq_model.sample(
                 inits=inits,
@@ -270,14 +273,17 @@ def generate_predictions(
                 data=input_filepath,
                 fixed_param=True,
             )
-            infd_fit = load_infd_fit(gq_samples.runset.csv_files, mi_oos)
-            tmp_conc = infd_fit.posterior.conc.to_dataframe().reset_index()
+            posterior_fit = load_infd_fit(gq_samples.runset.csv_files, mi_oos).get(
+                "posterior"
+            )
+            assert isinstance(posterior_fit, Dataset)
+            tmp_conc = posterior_fit.conc.to_dataframe().reset_index()
             tmp_conc["chain"] = chain
             tmp_conc["draw"] = draw
-            tmp_conc_enz = infd_fit.posterior.conc_enzyme.to_dataframe().reset_index()
+            tmp_conc_enz = posterior_fit.conc_enzyme.to_dataframe().reset_index()
             tmp_conc_enz["chain"] = chain
             tmp_conc_enz["draw"] = draw
-            tmp_flux = infd_fit.posterior.flux.to_dataframe().reset_index()
+            tmp_flux = posterior_fit.flux.to_dataframe().reset_index()
             tmp_flux["chain"] = chain
             tmp_flux["draw"] = draw
             all_conc.append(tmp_conc)
@@ -403,7 +409,7 @@ def _get_conc_init(mi: MaudInput) -> pd.DataFrame:
 def get_prior_dict(ps: PriorSet) -> dict:
     """Get a dictionary of priors that be used as a Stan input."""
 
-    def unpack(p: Union[IndPrior1d, IndPrior2d]) -> List[np.ndarray]:
+    def unpack(p: Union[IndPrior1d, IndPrior2d]) -> List[List[float]]:
         return [p.location.values.tolist(), p.scale.values.tolist()]
 
     return {

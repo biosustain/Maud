@@ -21,7 +21,7 @@
 """
 
 import os
-from typing import Dict, List, Optional, Union
+from typing import Dict, List, Optional, Tuple, Union
 
 import numpy as np
 import pandas as pd
@@ -102,16 +102,18 @@ def load_maud_input(data_path: str, mode: str) -> MaudInput:
     kinetic_model = parse_toml_kinetic_model(raw_kinetic_model)
     raw_measurements = pd.read_csv(measurements_path)
     raw_priors = pd.read_csv(priors_path)
+    assert isinstance(raw_measurements, pd.DataFrame)
+    assert isinstance(raw_priors, pd.DataFrame)
     stan_coords = get_stan_coords(
         kinetic_model, raw_measurements, all_experiments, mode
     )
     measurement_set = parse_measurements(raw_measurements, stan_coords)
     if os.path.exists(dgf_prior_paths["loc"]):
-        dgf_loc = pd.Series(
-            pd.read_csv(dgf_prior_paths["loc"], index_col="metabolite")[
-                "prior_mean_dgf"
-            ]
+        dgf_prior_loc_df = pd.read_csv(
+            dgf_prior_paths["loc"], index_col="metabolite", squeeze=False
         )
+        assert isinstance(dgf_prior_loc_df, pd.Series)
+        dgf_loc = pd.Series(dgf_prior_loc_df["prior_mean_dgf"])
     else:
         dgf_loc = pd.Series([])
     if os.path.exists(dgf_prior_paths["cov"]):
@@ -187,7 +189,7 @@ def parse_toml_kinetic_model(raw: dict) -> KineticModel:
     )
 
 
-def get_km_coords(rxns: List[Reaction]):
+def get_km_coords(rxns: List[Reaction]) -> List[Tuple[str]]:
     """Get coordinates for km parameters.
 
     The returned coordinate set for kms is dependent on if it's reversible.
@@ -206,7 +208,7 @@ def get_km_coords(rxns: List[Reaction]):
 def get_stan_coords(
     km: KineticModel,
     raw_measurements: pd.DataFrame,
-    all_experiments: Experiment,
+    all_experiments: List[Experiment],
     mode: str,
 ) -> StanCoordSet:
     """Get all the coordinates that Maud needs.
@@ -221,7 +223,7 @@ def get_stan_coords(
     """
 
     def unpack(packed):
-        return zip(*packed) if len(packed) > 0 else ([], [])
+        return map(list, zip(*packed)) if len(packed) > 0 else ([], [])
 
     measurement_types = [
         "mic",
@@ -263,7 +265,7 @@ def get_stan_coords(
     ai_enzs, ai_mics = unpack(ai_coords)
     aa_enzs, aa_mics = unpack(aa_coords)
     km_coords = get_km_coords(km.reactions)
-    km_enzs, km_mics = zip(*km_coords)
+    km_enzs, km_mics = map(list, zip(*km_coords))
     yc_coords, yf_coords, ye_coords, enz_ko_coords, phos_ko_coords = (
         sorted(
             [
@@ -491,8 +493,8 @@ def extract_1d_prior(
     if any(len(c) == 0 for c in coords):
         return IndPrior1d(
             parameter_name=parameter_name,
-            location=pd.Series([]),
-            scale=pd.Series([]),
+            location=pd.Series([], dtype="float64"),
+            scale=pd.Series([], dtype="float64"),
         )
     non_negative = parameter_name not in ["dgf"]
     qfunc = (
@@ -561,7 +563,7 @@ def extract_2d_prior(
         "conc_phos": ["experiment_id", "phos_enz_id"],
     }
     if len(col_coords) == 0:
-        return IndPrior1d(
+        return IndPrior2d(
             parameter_name=parameter_name,
             location=pd.DataFrame([]),
             scale=pd.DataFrame([]),
@@ -713,7 +715,7 @@ def parse_config(raw):
     )
 
 
-def get_inits(priors: PriorSet, user_inits_path) -> Dict[str, np.array]:
+def get_inits(priors: PriorSet, user_inits_path) -> Dict[str, np.ndarray]:
     """Get a dictionary of initial values.
 
     :param priors: Priorset object
@@ -727,7 +729,7 @@ def get_inits(priors: PriorSet, user_inits_path) -> Dict[str, np.array]:
         u: pd.DataFrame, p: Union[IndPrior1d, IndPrior2d]
     ) -> pd.Series:
         if len(p.location) == 0:
-            return p.location
+            return pd.Series(p.location)
         elif isinstance(p, IndPrior1d) or isinstance(p, MultiVariateNormalPrior1d):
             return u.loc[lambda df: df["parameter_name"] == p.parameter_name].set_index(
                 p.location.index.names
@@ -742,6 +744,7 @@ def get_inits(priors: PriorSet, user_inits_path) -> Dict[str, np.array]:
     inits = {p.parameter_name: p.location for p in priors.__dict__.values()}
     if user_inits_path is not None:
         user_inits_all = pd.read_csv(user_inits_path)
+        assert isinstance(user_inits_all, pd.DataFrame)
         for p in priors.__dict__.values():
             if p.location.empty:
                 continue
@@ -763,7 +766,7 @@ def get_inits(priors: PriorSet, user_inits_path) -> Dict[str, np.array]:
     return rescale_inits(inits, priors)
 
 
-def rescale_inits(inits: dict, priors: PriorSet) -> Dict[str, np.array]:
+def rescale_inits(inits: dict, priors: PriorSet) -> Dict[str, np.ndarray]:
     """Augment a dictionary of inits with equivalent normalised values.
 
     :param inits: original inits

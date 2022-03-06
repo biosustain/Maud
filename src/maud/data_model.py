@@ -67,9 +67,9 @@ class MetaboliteInCompartment:
     def __init__(
         self,
         id: str,
+        metabolite_id: str,
+        compartment_id: str,
         name: str = None,
-        metabolite_id: str = None,
-        compartment_id: str = None,
         balanced: bool = None,
     ):
         self.id = id
@@ -197,10 +197,10 @@ class Phosphorylation:
     def __init__(
         self,
         id: str,
+        enzyme_id: str,
         name: str = None,
         activating: bool = None,
         inhibiting: bool = None,
-        enzyme_id: str = None,
     ):
         self.id = id
         self.name = name
@@ -427,7 +427,7 @@ class MaudInput:
         stan_coords: StanCoordSet,
         measurements: MeasurementSet,
         all_experiments: List[Experiment],
-        inits: Dict[str, np.array],
+        inits: Dict[str, np.ndarray],
     ):
         self.config = config
         self.kinetic_model = kinetic_model
