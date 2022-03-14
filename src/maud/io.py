@@ -112,7 +112,7 @@ def load_maud_input(data_path: str, mode: str) -> MaudInput:
         dgf_prior_loc_df = pd.read_csv(
             dgf_prior_paths["loc"], index_col="metabolite", squeeze=False
         )
-        assert isinstance(dgf_prior_loc_df, pd.Series)
+        assert isinstance(dgf_prior_loc_df, pd.DataFrame)
         dgf_loc = pd.Series(dgf_prior_loc_df["prior_mean_dgf"])
     else:
         dgf_loc = pd.Series([])
