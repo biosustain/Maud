@@ -49,7 +49,7 @@ functions {
         formation energy is known exactly.
     */
     real minus_RT = -0.008314 * 298.15;
-    real dgf_water = -237.14;  // From http://equilibrator.weizmann.ac.il/metabolite?compoundId=C00001
+    real dgf_water = -150.9;  // From http://equilibrator.weizmann.ac.il/metabolite?compoundId=C00001
     vector[cols(S)] delta_g = S' * dgf[mic_to_met] + water_stoichiometry * dgf_water;
     return exp(delta_g / minus_RT);
   }
@@ -60,7 +60,7 @@ functions {
         formation energy is known exactly.
     */
     real minus_RT = -0.008314 * 298.15;
-    real dgf_water = -237.14;  // From http://equilibrator.weizmann.ac.il/metabolite?compoundId=C00001
+    real dgf_water = -150.9;  // From http://equilibrator.weizmann.ac.il/metabolite?compoundId=C00001
     vector[cols(S)] dgrs = S' * dgf[mic_to_met] + water_stoichiometry * dgf_water;
     return dgrs;
   }
