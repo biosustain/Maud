@@ -33,6 +33,16 @@ metabolite = 'M2'
 compartment = 'c'
 balanced = true
 
+[[enzyme]]
+id = 'e2'
+name = 'the enzyme that catalyses reaction r2'
+[[enzyme.modifier]]
+modifier_type = 'allosteric_inhibitor'
+mic_id = 'M1_c'
+[[enzyme.modifier]]
+modifier_type = 'competitive_inhibitor'
+mic_id = 'M2_c'
+
 [[reaction]]
 id = 'r1'
 name = 'reaction number 1'
@@ -50,15 +60,7 @@ id = 'r2'
 name = 'reaction number 2'
 stoichiometry = { M1_c = -1, M2_c = 1 }
 mechanism = "reversible_modular_rate_law"
-[[reaction.enzyme]]
-id = 'r2'
-name = 'the enzyme that catalyses reaction r2'
-[[reaction.enzyme.modifier]]
-modifier_type = 'allosteric_inhibitor'
-mic_id = 'M1_c'
-[[reaction.enzyme.modifier]]
-modifier_type = 'competitive_inhibitor'
-mic_id = 'M2_c'
+enzymes = ["e2"]
 
 [[reaction]]
 id = 'r3'
