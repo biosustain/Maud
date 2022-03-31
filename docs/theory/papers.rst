@@ -83,6 +83,20 @@ Computational Models of metabolic networks
   This paper takes a very similar approach to Maud, but represents reactions
   using lin-log kinetics.
 
+- Kacser, H., & Burns, J. A. (1973). The control of flux.
+  Symposia of the Society for Experimental Biology, 27, 65–104.
+
+  Implementation of Metabolic Control Analysis
+
+- Steuer, R., & Junker, B. H. (2008). Computational Models of Metabolism: 
+  Stability and Regulation in Metabolic Networks. In S. A. Rice (Ed.), 
+  Advances in Chemical Physics (pp. 105–251). John Wiley & Sons, Inc. 
+  https://doi.org/10.1002/9780470475935.ch3
+
+  Great description of implementation of MCA as done in Maud.
+
+
+
 Statistics
 ==========
 
@@ -113,3 +127,10 @@ Algorithms
   C++. arXiv:1509.07164 [cs], (), .
 
   Explains Stan's automatic differentiation implementation.
+
+- Lyness, J. N., & Moler, C. B. (1967). Numerical Differentiation of Analytic 
+  Functions. SIAM Journal on Numerical Analysis, 4(2), 202–210.
+  https://doi.org/10.1137/0704019
+
+  Explains the complex number differentiation
+
