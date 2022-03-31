@@ -33,6 +33,7 @@ experiments and the existing literature.
    theory/thermodynamics
    theory/drains
    theory/papers
+   theory/metabolic_control_analysis
 
 .. toctree::
    :maxdepth: 1
