@@ -60,7 +60,6 @@ VARIABLES_TO_ANALYSE = [
 
 ENZYME_GROUP = [
     "kcat",
-    "keq",
     "km",
     "ki",
     "transfer_constant",
