@@ -28,12 +28,12 @@ This equation serves as the basis for calculating the Concentration control coef
 By rearranging this we can isolate :math:`\frac{dX}{dp}:
 
 .. math::
-    \frac{dX}{dp} = -[S \frac{\partial v}{\partial X}]^-1 S\frac{\partial v}{\partial p}
+    \frac{dX}{dp} = -[S \frac{\partial v}{\partial X}]^{-1} S\frac{\partial v}{\partial p}
 
 where the concentration control coefficient is defined as:
 
 .. math::
-    C^X = -[S \frac{\partial v}{\partial X}]^-1 S
+    C^X = -[S \frac{\partial v}{\partial X}]^{-1} S
 
 and the flux control coefficient is:
 
