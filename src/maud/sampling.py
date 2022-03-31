@@ -437,6 +437,7 @@ def get_config_dict(mi: MaudInput) -> dict:
             "reject_non_steady": int(mi.config.reject_non_steady),
             "steady_state_threshold_abs": mi.config.steady_state_threshold_abs,
             "steady_state_threshold_rel": mi.config.steady_state_threshold_rel,
+            "drain_small_conc_corrector": mi.config.drain_small_conc_corrector,
             "conc_init": _get_conc_init(mi).values,
         },
         **mi.config.ode_config,
@@ -620,6 +621,10 @@ def get_input_data(mi: MaudInput) -> dict:
         mi.kinetic_model.mics,
         key=lambda m: codify(mi.stan_coords.mics)[m.id],
     )
+    sorted_experiments = sorted(
+        mi.all_experiments,
+        key=lambda exp: codify(mi.stan_coords.experiments)[exp.id],
+    )
     S = get_stoichiometry(mi)
     edge_type = [get_edge_type(eid, mi) for eid in S.columns]
     edge_to_enzyme = (
@@ -733,6 +738,7 @@ def get_input_data(mi: MaudInput) -> dict:
             "unbalanced_mic_ix": unbalanced_mic_ix,
             "balanced_mic_ix": balanced_mic_ix,
             # network properties
+            "temperature": [exp.temperature for exp in sorted_experiments],
             "S": S.values,
             "edge_type": edge_type,
             "edge_to_enzyme": edge_to_enzyme.values,

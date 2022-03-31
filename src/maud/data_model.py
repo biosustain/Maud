@@ -247,18 +247,19 @@ class MeasurementSet:
     phos_knockouts: pd.DataFrame
 
 
+@dataclass
 class Experiment:
     """Constructor for Experiment object.
 
     :param id: id for each experiment
     :param sample: if the experiment will be used in parameter sampling
     :param predict: if the experiment will be used in predictive samplig
+    :param temperature: temperature of the experiment
     """
-
-    def __init__(self, id: str, sample: bool, predict: bool):
-        self.id = id
-        self.sample = sample
-        self.predict = predict
+    id: str
+    sample: bool
+    predict: bool
+    temperature: float
 
 
 @dataclass
@@ -388,6 +389,7 @@ class MaudConfig:
     :param dgf_covariance_file: path to a csv file of formation energy covariances.
     :param steady_state_threshold_abs: absolute threshold for Sv=0 be at steady state
     :param steady_state_threshold_rel: relative threshold for Sv=0 be at steady state
+    :param: drain_small_conc_corrector: number for correcting small conc drains
     """
 
     name: str
@@ -407,6 +409,7 @@ class MaudConfig:
     dgf_covariance_file: Optional[str]
     steady_state_threshold_abs: float
     steady_state_threshold_rel: float
+    drain_small_conc_corrector: float
 
 
 class MaudInput:
