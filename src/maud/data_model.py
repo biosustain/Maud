@@ -256,6 +256,7 @@ class Experiment:
     :param predict: if the experiment will be used in predictive samplig
     :param temperature: temperature of the experiment
     """
+
     id: str
     sample: bool
     predict: bool

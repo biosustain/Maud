@@ -456,16 +456,14 @@ def get_all_experiment_object(
     out = []
     for exp in raw["experiment"]:
         temperature = (
-            exp["temperature"]
-            if "temperature" in exp.keys()
-            else DEFAULT_TEMPERATURE
+            exp["temperature"] if "temperature" in exp.keys() else DEFAULT_TEMPERATURE
         )
         out.append(
             Experiment(
                 id=exp["id"],
                 sample=exp["sample"],
                 predict=exp["predict"],
-                temperature=temperature
+                temperature=temperature,
             )
         )
     return out
@@ -730,7 +728,7 @@ def parse_config(raw):
         dgf_covariance_file=dgf_covariance_file,
         steady_state_threshold_abs=steady_state_threshold_abs,
         steady_state_threshold_rel=steady_state_threshold_rel,
-        drain_small_conc_corrector=drain_small_conc_corrector
+        drain_small_conc_corrector=drain_small_conc_corrector,
     )
 
 
