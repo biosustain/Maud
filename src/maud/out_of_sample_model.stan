@@ -59,11 +59,14 @@ data {
   matrix<lower=0,upper=1>[N_experiment, N_enzyme] is_knockout;
   matrix<lower=0,upper=1>[N_experiment, N_phosphorylation_enzymes] is_phos_knockout;
   vector<lower=1>[N_enzyme] subunits;
+  // hardcoded biological information
+  vector[N_experiment] temperature;
   // configuration
   vector<lower=0>[N_mic] conc_init[N_experiment];
   real rel_tol; 
   real abs_tol;
   int max_num_steps;
+  real drain_small_conc_corrector;
   int<lower=0,upper=1> LIKELIHOOD;  // set to 0 for priors-only mode
   real<lower=0> timepoint;
 }
@@ -81,7 +84,7 @@ parameters {
   vector[N_aa] diss_r;
   vector[N_ae] transfer_constant;
   vector[N_phosphorylation_enzymes] kcat_phos;
-  vector[N_edge] dgrs;
+  array[N_experiment] vector[N_edge] dgrs;
 }
 
 generated quantities {
@@ -118,7 +121,7 @@ generated quantities {
                   balanced_mic_ix,
                   unbalanced_mic_ix,
                   conc_enzyme_experiment,
-                  dgrs,
+                  dgrs[e],
                   kcat,
                   km,
                   ki,
@@ -128,6 +131,8 @@ generated quantities {
                   kcat_phos,
                   conc_phos_experiment,
                   drain[e],
+                  temperature[e],
+                  drain_small_conc_corrector,
                   S,
                   subunits,
                   edge_type,
@@ -156,7 +161,7 @@ generated quantities {
     conc[e, unbalanced_mic_ix] = conc_unbalanced[e];
     vector[N_edge] edge_flux = get_edge_flux(conc[e],
                                              conc_enzyme_experiment,
-                                             dgrs,
+                                             dgrs[e],
                                              kcat,
                                              km,
                                              ki,
@@ -166,6 +171,8 @@ generated quantities {
                                              kcat_phos,
                                              conc_phos_experiment,
                                              drain[e],
+                                             temperature[e],
+                                             drain_small_conc_corrector,
                                              S,
                                              subunits,
                                              edge_type,
@@ -228,6 +235,6 @@ generated quantities {
                                  ai_ix_bounds,
                                  aa_ix_long,
                                  aa_ix_bounds);
-    reversibility[e] = get_reversibility(dgrs, S, conc[e], edge_type);
+    reversibility[e] = get_reversibility(dgrs[e], temperature[e], S, conc[e], edge_type);
   }
 }
