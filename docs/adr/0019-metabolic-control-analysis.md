@@ -4,7 +4,7 @@ Date: 2022-03-29
 
 ## Status
 
-In Progress
+On Hold
 
 ## Context
 
@@ -17,6 +17,8 @@ a parameter will influence the flux for any given reference state.
 ## Decision
 Calculate the flux control coefficients and metabolite control coefficients for
 every condition that is sampled.
+
+`This will be paused until complex matricies are introduced into Stan`
 
 
 ## Consequences
