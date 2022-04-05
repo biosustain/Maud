@@ -16,11 +16,15 @@
 
 """General purpose utility functions."""
 
-from typing import Dict, Iterable
+from typing import Any, Dict, Hashable, Iterable
 
 import numpy as np
 import sympy as sp
 from scipy.stats import norm
+
+
+def read_with_fallback(k: Hashable, d: Dict, default: Any):
+    return d[k] if k in d.keys() else default
 
 
 def codify(lx: Iterable[str]) -> Dict[str, int]:

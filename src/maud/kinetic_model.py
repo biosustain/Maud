@@ -19,10 +19,9 @@
 from dataclasses import field
 from enum import Enum
 from itertools import chain
-from typing import Dict, List
+from typing import Dict, List, Optional
 
 from pydantic import BaseModel, validator
-from pydantic.dataclasses import dataclass
 
 
 ID_SEPARATOR = "_"
@@ -39,11 +38,10 @@ class ModificationType(str, Enum):
     INHIBITION = "inhibition"
 
 
-@dataclass
 class Metabolite(BaseModel):
     id: str
-    name: str
-    inchi_key: str
+    name: Optional[str]
+    inchi_key: Optional[str]
 
     @validator("id")
     def id_must_not_contain_seps(cls, v):
@@ -51,10 +49,9 @@ class Metabolite(BaseModel):
         return v
 
 
-@dataclass
 class Enzyme(BaseModel):
     id: str
-    name: str
+    name: Optional[str]
     subunits: int
 
     @validator("id")
@@ -68,7 +65,6 @@ class Enzyme(BaseModel):
         return v
 
 
-@dataclass
 class Compartment(BaseModel):
     id: str
     name: str
@@ -80,10 +76,9 @@ class Compartment(BaseModel):
         return v
 
 
-@dataclass
-class Reaction:
+class Reaction(BaseModel):
     id: str
-    name: str
+    name: Optional[str]
     mechanism: ReactionMechanism
     stoichiometry: Dict[str, float]
     water_stoichiometry: float
@@ -99,19 +94,17 @@ class Reaction:
         return v
 
 
-@dataclass
-class MetaboliteInCompartment:
+class MetaboliteInCompartment(BaseModel):
     metabolite_id: str
     compartment_id: str
     balanced: bool
     id: str = field(init=False)
 
     def __post_init__(self):
-        self.id = self.metabolite_id + ID_SEPARATOR + self.compartment_id
+        self.id = ID_SEPARATOR.join([self.metabolite_id, self.compartment_id])
 
 
-@dataclass
-class EnzymeReaction:
+class EnzymeReaction(BaseModel):
     enzyme_id: str
     reaction_id: str
     id: str = field(init=False)
@@ -120,42 +113,31 @@ class EnzymeReaction:
         self.id = self.enzyme_id + ID_SEPARATOR + self.reaction_id
 
 
-@dataclass
-class Allostery:
+class Allostery(BaseModel):
     enzyme_id: str
     mic_id: str
     modification_type: ModificationType
     id: str = field(init=False)
 
     def __post_init__(self):
-        self.id = (
-            self.enzyme_id
-            + ID_SEPARATOR
-            + self.mic_id
-            + ID_SEPARATOR
-            + self.modification_type
+        self.id = ID_SEPARATOR.join(
+            [self.enzyme_id, self.mic_id, self.modification_type]
         )
 
 
-@dataclass
-class CompetitiveInhibition:
-    er_id: str
+class CompetitiveInhibition(BaseModel):
+    enzyme_id: str
+    reaction_id: str
     mic_id: str
-    modification_type: ModificationType
     id: str = field(init=False)
 
     def __post_init__(self):
-        self.id = (
-            self.er_id
-            + ID_SEPARATOR
-            + self.mic_id
-            + ID_SEPARATOR
-            + self.modification_type
+        self.id = ID_SEPARATOR.join(
+            [self.enzyme_id, self.reaction_id, self.mic_id]
         )
 
 
-@dataclass
-class Phosphorylation:
+class Phosphorylation(BaseModel):
     enzyme_id: str
     modification_type: ModificationType
     id: str = field(init=False)
@@ -240,7 +222,7 @@ class KineticModel(BaseModel):
         er_ids = [m.id for m in values["ers"]]
         mic_ids = [m.id for m in values["mics"]]
         for ci in v:
-            assert ci.enzyme_id in er_ids
+            assert ID_SEPARATOR.join([ci.enzyme_id, ci.reaction_id]) in er_ids
             assert ci.mic_id in mic_ids
         return v
 

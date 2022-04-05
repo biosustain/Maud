@@ -21,6 +21,7 @@
 """
 
 import os
+from datetime import datetime
 from typing import Dict, List, Optional, Tuple, Union
 
 import numpy as np
@@ -29,27 +30,33 @@ import toml
 
 from maud import validation
 from maud.data_model import (
-    Compartment,
-    Enzyme,
     Experiment,
     IndPrior1d,
     IndPrior2d,
-    KineticModel,
     MaudConfig,
     MaudInput,
     MeasurementSet,
+    MultiVariateNormalPrior1d,
+    PriorSet,
+    StanCoordSet,
+)
+from maud.kinetic_model import (
+    Allostery,
+    Compartment,
+    CompetitiveInhibition,
+    Enzyme,
+    EnzymeReaction,
+    KineticModel,
     Metabolite,
     MetaboliteInCompartment,
-    Modifier,
-    MultiVariateNormalPrior1d,
+    ModificationType,
     Phosphorylation,
-    PriorSet,
     Reaction,
-    StanCoordSet,
 )
 from maud.utils import (
     get_lognormal_parameters_from_quantiles,
     get_normal_parameters_from_quantiles,
+    read_with_fallback,
 )
 
 
@@ -89,7 +96,9 @@ def load_maud_input(data_path: str, mode: str) -> MaudInput:
     """
     config = parse_config(toml.load(os.path.join(data_path, "config.toml")))
     kinetic_model_path = os.path.join(data_path, config.kinetic_model_file)
-    biological_config_path = os.path.join(data_path, config.biological_config_file)
+    biological_config_path = os.path.join(
+        data_path, config.biological_config_file
+    )
     raw_kinetic_model = dict(toml.load(kinetic_model_path))
     raw_biological_config = dict(toml.load(biological_config_path))
     measurements_path = os.path.join(data_path, config.measurements_file)
@@ -148,44 +157,115 @@ def parse_toml_kinetic_model(raw: dict) -> KineticModel:
     :param raw: Result of running toml.load on a suitable toml file
 
     """
-    model_id = raw["model_id"] if "model_id" in raw.keys() else "mi"
+    name = read_with_fallback(
+        "name", raw, datetime.now().strftime("%Y%m%d%H%M%S")
+    )
     compartments = [
         Compartment(id=c["id"], name=c["name"], volume=c["volume"])
         for c in raw["compartment"]
     ]
-    metabolites = []
-    for r in raw["metabolite-in-compartment"]:
-        if not any(r["metabolite"] == m.id for m in metabolites):
-            inchi_key = (
-                r["metabolite_inchi_key"]
-                if "metabolite_inchi_key" in r.keys()
-                else None
-            )
-            metabolites.append(Metabolite(id=r["metabolite"], inchi_key=inchi_key))
     mics = [
         MetaboliteInCompartment(
-            id=f"{m['metabolite']}_{m['compartment']}",
-            metabolite_id=m["metabolite"],
-            compartment_id=m["compartment"],
-            balanced=m["balanced"],
+            metabolite_id=mic["metabolite_id"],
+            compartment_id=mic["compartment_id"],
+            balanced=mic["balanced"],
         )
-        for m in raw["metabolite-in-compartment"]
+        for mic in raw["metabolite_in_compartment"]
     ]
-    reactions = [parse_toml_reaction(r) for r in raw["reaction"]]
-    if "drain" in raw.keys():
-        reactions += [parse_toml_drain(d) for d in raw["drain"]]
-    phosphorylation = (
-        [parse_toml_phosphorylation(d) for d in raw["phosphorylation"]]
-        if "phosphorylation" in raw.keys()
-        else []
-    )
+    ers = [
+        EnzymeReaction(enzyme_id=er["enzyme_id"], reaction_id=er["reaction"])
+        for er in raw["enzyme_reaction"]
+    ]
+    reactions = [
+        Reaction(
+            id=r["id"],
+            name=read_with_fallback("name", r, None),
+            mechanism=r["mechanism"],
+            stoichiometry=r["stoichiometry"],
+            water_stoichiometry=read_with_fallback("water_stoichiometry", r, 0),
+        )
+        for r in raw["reactions"]
+    ]
+    # parse explicitly provided metabolites (if any), then infer extra ones
+    metabolites = []
+    explicit_met_ids: List[str] = []
+    if "metabolite" in raw.keys():
+        metabolites = [
+            Metabolite(
+                id=m["id"],
+                name=read_with_fallback("name", m, None),
+                inchi_key=read_with_fallback("inchi_key", m, None),
+            )
+            for m in raw["metabolite"]
+        ]
+        explicit_met_ids = [m.id for m in metabolites]
+    for mic_met_id in set(
+        mic["metabolite_id"] for mic in raw["metabolite_in_compartment"]
+    ):
+        if mic_met_id not in explicit_met_ids:
+            metabolites.append(
+                Metabolite(id=mic_met_id, name=None, inchi_key=None)
+            )
+    # parse explicitly provided enzymes (if any), then infer extra ones
+    enzymes = []
+    explicit_enz_ids = []
+    if "enzyme" in raw.keys():
+        enzymes = [
+            Enzyme(
+                id=e["id"],
+                name=read_with_fallback("name", e, None),
+                subunits=read_with_fallback("subunits", e, 1),
+            )
+            for e in raw["enzyme"]
+        ]
+        explicit_enz_ids = [e.id for e in enzymes]
+    for er_enz_id in set(er["enzyme_id"] for er in raw["enzyme_reaction"]):
+        if er_enz_id not in explicit_enz_ids:
+            enzymes.append(Metabolite(id=er_enz_id, name=None, subunits=1))
+    # load modifiers
+    if "phosphorylation" in raw.keys():
+        phosphorylations = [
+            Phosphorylation(
+                enzyme_id=p["enzyme_id"],
+                modification_type=ModificationType(p["modification_type"]),
+            )
+            for p in raw["phosphorylation"]
+        ]
+    else:
+        phosphorylations = []
+    if "allostery" in raw.keys():
+        allosteries = [
+            Allostery(
+                enzyme_id=a["enzyme_id"],
+                mic_id=a["mic_id"],
+                modification_type=ModificationType(a["modification_type"]),
+            )
+            for a in raw["allostery"]
+        ]
+    else:
+        allosteries = []
+    if "competitive_inhibition" in raw.keys():
+        competitive_inhibitions = [
+            CompetitiveInhibition(
+                enzyme_id=ci["enzyme_id"],
+                reaction_id=ci["reaction_id"],
+                mic_id=ci["mic_id"],
+            )
+            for ci in raw["competitive_inhibition"]
+        ]
+    else:
+        competitive_inhibitions = []
     return KineticModel(
-        model_id=model_id,
+        name=name,
         metabolites=metabolites,
+        enzymes=enzymes,
         compartments=compartments,
-        mics=mics,
         reactions=reactions,
-        phosphorylation=phosphorylation,
+        mics=mics,
+        ers=ers,
+        allosteries=allosteries,
+        competitive_inhibitions=competitive_inhibitions,
+        phosphorylations=phosphorylations,
     )
 
 
@@ -199,7 +279,9 @@ def get_km_coords(rxns: List[Reaction]) -> List[Tuple[str]]:
     for r in rxns:
         for e in r.enzymes:
             if r.reaction_mechanism == "irreversible_modular_rate_law":
-                coords += [(e.id, m[0]) for m in r.stoichiometry.items() if m[1] < 0]
+                coords += [
+                    (e.id, m[0]) for m in r.stoichiometry.items() if m[1] < 0
+                ]
             elif r.reaction_mechanism == "reversible_modular_rate_law":
                 coords += [(e.id, m[0]) for m in r.stoichiometry.items()]
     return sorted(coords)
@@ -247,7 +329,9 @@ def get_stan_coords(
         [e.id for r in km.reactions for e in r.enzymes if e.allosteric]
     )
     phos_enzs = sorted([e.id for e in km.phosphorylation])
-    drains = sorted([r.id for r in km.reactions if r.reaction_mechanism == "drain"])
+    drains = sorted(
+        [r.id for r in km.reactions if r.reaction_mechanism == "drain"]
+    )
     edges = enzymes + drains
     experiments = sorted([e.id for e in all_experiments if getattr(e, mode)])
     ci_coords, ai_coords, aa_coords = (
@@ -423,8 +507,12 @@ def parse_measurements(raw: pd.DataFrame, cs: StanCoordSet) -> MeasurementSet:
         )
         for t in ["mic", "flux", "enzyme"]
     )
-    enz_knockouts = pd.DataFrame(False, index=cs.experiments, columns=cs.enzymes)
-    phos_knockouts = pd.DataFrame(False, index=cs.experiments, columns=cs.phos_enzs)
+    enz_knockouts = pd.DataFrame(
+        False, index=cs.experiments, columns=cs.enzymes
+    )
+    phos_knockouts = pd.DataFrame(
+        False, index=cs.experiments, columns=cs.phos_enzs
+    )
     for _, row in raw.loc[
         lambda df: df["measurement_type"] == "knockout_enz"
     ].iterrows():
@@ -590,7 +678,9 @@ def extract_2d_prior(
         .unstack()
         .reindex(row_coords, columns=col_coords)
         .rename_axis(parameter_name_to_id_cols[parameter_name][0])
-        .rename_axis(parameter_name_to_id_cols[parameter_name][1], axis="columns")
+        .rename_axis(
+            parameter_name_to_id_cols[parameter_name][1], axis="columns"
+        )
         for col in ["location", "scale"]
     )
     return IndPrior2d(
@@ -617,7 +707,9 @@ def parse_priors(
     else:
         dgf_prior_1d = extract_1d_prior(raw, "dgf", [cs.metabolites])
         loc = dgf_prior_1d.location
-        cov = pd.DataFrame(np.diag(dgf_prior_1d.scale), index=met_ix, columns=met_ix)
+        cov = pd.DataFrame(
+            np.diag(dgf_prior_1d.scale), index=met_ix, columns=met_ix
+        )
     priors_dgf = MultiVariateNormalPrior1d(
         parameter_name="dgf", location=loc, covariance_matrix=cov
     )
@@ -669,7 +761,9 @@ def parse_config(raw):
         raw["dgf_mean_file"] if "dgf_mean_file" in raw.keys() else None
     )
     dgf_covariance_file: Optional[str] = (
-        raw["dgf_covariance_file"] if "dgf_covariance_file" in raw.keys() else None
+        raw["dgf_covariance_file"]
+        if "dgf_covariance_file" in raw.keys()
+        else None
     )
     reject_non_steady: bool = (
         raw["reject_non_steady"] if "reject_non_steady" in raw.keys() else True
@@ -681,7 +775,9 @@ def parse_config(raw):
         raw["cpp_options"] if "cpp_options" in raw.keys() else None
     )
     variational_options: Optional[dict] = (
-        raw["variational_options"] if "variational_options" in raw.keys() else None
+        raw["variational_options"]
+        if "variational_options" in raw.keys()
+        else None
     )
     steady_state_threshold_abs: float = (
         raw["steady_state_threshold_abs"]
@@ -730,14 +826,18 @@ def get_inits(priors: PriorSet, user_inits_path) -> Dict[str, np.ndarray]:
     ) -> pd.Series:
         if len(p.location) == 0:
             return pd.Series(p.location)
-        elif isinstance(p, IndPrior1d) or isinstance(p, MultiVariateNormalPrior1d):
-            return u.loc[lambda df: df["parameter_name"] == p.parameter_name].set_index(
-                p.location.index.names
-            )["value"]
+        elif isinstance(p, IndPrior1d) or isinstance(
+            p, MultiVariateNormalPrior1d
+        ):
+            return u.loc[
+                lambda df: df["parameter_name"] == p.parameter_name
+            ].set_index(p.location.index.names)["value"]
         elif isinstance(p, IndPrior2d):
-            return u.loc[lambda df: df["parameter_name"] == p.parameter_name].set_index(
-                [p.location.index.name, p.location.columns.name]
-            )["value"]
+            return u.loc[
+                lambda df: df["parameter_name"] == p.parameter_name
+            ].set_index([p.location.index.name, p.location.columns.name])[
+                "value"
+            ]
         else:
             raise ValueError("Unrecognised prior type: " + str(type(p)))
 
@@ -780,5 +880,7 @@ def rescale_inits(inits: dict, priors: PriorSet) -> Dict[str, np.ndarray]:
         elif n in NON_LN_SCALE_PARAMS:
             rescaled[n + "_z"] = (i - prior.location) / prior.scale
         else:
-            rescaled[f"log_{n}_z"] = (np.log(i) - np.log(prior.location)) / prior.scale
+            rescaled[f"log_{n}_z"] = (
+                np.log(i) - np.log(prior.location)
+            ) / prior.scale
     return {**inits, **rescaled}
