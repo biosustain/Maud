@@ -78,9 +78,11 @@ data {
   array[N_edge, 2] int pi_ix_bounds;
   int<lower=1,upper=N_metabolite> mic_to_met[N_mic];
   vector[N_edge] water_stoichiometry;
+  vector[N_edge] transported_charge;
   matrix<lower=0,upper=1>[N_experiment, N_enzyme] is_knockout;
   matrix<lower=0,upper=1>[N_experiment, N_phosphorylation_enzymes] is_phos_knockout;
   vector<lower=1>[N_enzyme] subunits;
+  array[2] vector[N_experiment] priors_pmf;
   // hardcoded biological information
   vector[N_experiment] temperature;
   // configuration
@@ -111,6 +113,7 @@ parameters {
   vector[N_ai] log_diss_t_z;
   vector[N_aa] log_diss_r_z;
   vector[N_ae] log_transfer_constant_z;
+  vector[N_experiment] pmf_z;
   array[N_experiment] vector[N_drain] drain_z;
   array[N_experiment] vector[N_enzyme] log_conc_enzyme_z;
   array[N_experiment] vector[N_phosphorylation_enzymes] log_conc_phos_z;
@@ -125,6 +128,7 @@ transformed parameters {
   vector[N_aa] diss_r = unz_log_1d(priors_diss_r, log_diss_r_z);
   vector[N_ae] transfer_constant = unz_log_1d(priors_transfer_constant, log_transfer_constant_z);
   vector[N_phosphorylation_enzymes] kcat_phos = unz_log_1d(priors_kcat_phos, log_kcat_phos_z);
+  vector[N_experiment] pmf = unz_1d(priors_pmf, pmf_z);
   array[N_experiment] vector[N_drain] drain = unz_2d(priors_drain, drain_z);
   array[N_experiment] vector[N_enzyme] conc_enzyme = unz_log_2d(priors_conc_enzyme, log_conc_enzyme_z);
   array[N_experiment] vector[N_unbalanced] conc_unbalanced = unz_log_2d(priors_conc_unbalanced, log_conc_unbalanced_z);
@@ -134,7 +138,7 @@ transformed parameters {
   array[N_experiment] vector[N_reaction] flux;
   array[N_experiment] vector[N_edge] dgrs;
   for (e in 1:N_experiment){
-    dgrs[e] = get_dgrs(S, dgf, temperature[e], mic_to_met, water_stoichiometry);
+    dgrs[e] = get_dgrs(S, dgf, temperature[e], mic_to_met, water_stoichiometry, transported_charge, pmf[e]);
     flux[e] = rep_vector(0, N_reaction);
     vector[N_enzyme] conc_enzyme_experiment = conc_enzyme[e] .* knockout[e]';
     vector[N_phosphorylation_enzymes] conc_phos_experiment = conc_phos[e] .* phos_knockout[e]';
@@ -266,6 +270,7 @@ model {
     log_conc_enzyme_z[ex] ~ std_normal();
     log_conc_phos_z[ex] ~ std_normal();
     drain_z[ex] ~ std_normal();
+    pmf_z[ex] ~ std_normal();
   }
   if (LIKELIHOOD == 1){
     for (c in 1:N_conc_measurement)
@@ -296,7 +301,7 @@ generated quantities {
     log_lik_flux[f] = normal_lpdf(yflux[f] | flux[experiment_yflux[f], reaction_yflux[f]], sigma_flux[f]);
   }
   for (e in 1:N_experiment){
-    keq[e] = get_keq(S, dgf, temperature[e], mic_to_met, water_stoichiometry);
+    keq[e] = get_keq(S, dgf, temperature[e], mic_to_met, water_stoichiometry, transported_charge, pmf[e]);
     free_enzyme_ratio[e] = get_free_enzyme_ratio(conc[e],
                                                  S,
                                                  km,

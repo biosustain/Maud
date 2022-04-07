@@ -169,6 +169,7 @@ class Reaction:
         stoichiometry: Dict[str, float],
         enzymes: List[Enzyme],
         water_stoichiometry: float = 0,
+        transported_charge: float = 0.0,
     ):
         if stoichiometry is None:
             stoichiometry = defaultdict()
@@ -180,6 +181,7 @@ class Reaction:
         self.stoichiometry = stoichiometry
         self.enzymes = enzymes
         self.water_stoichiometry = water_stoichiometry
+        self.transported_charge = transported_charge
 
 
 class Phosphorylation:
@@ -329,6 +331,7 @@ class PriorSet:
     priors_drain: IndPrior2d
     priors_conc_enzyme: IndPrior2d
     priors_conc_phos: IndPrior2d
+    priors_pmf: IndPrior1d
 
 
 @dataclass
@@ -368,6 +371,7 @@ class StanCoordSet:
     enz_ko_enzs: List[str]
     phos_ko_exps: List[str]
     phos_ko_enzs: List[str]
+    pmf: List[str]
 
 
 @dataclass

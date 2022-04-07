@@ -421,6 +421,7 @@ def get_prior_dict(ps: PriorSet) -> dict:
         "priors_diss_t": unpack(ps.priors_diss_t),
         "priors_diss_r": unpack(ps.priors_diss_r),
         "priors_kcat_phos": unpack(ps.priors_kcat_phos),
+        "priors_pmf": unpack(ps.priors_pmf),
         "priors_transfer_constant": unpack(ps.priors_transfer_constant),
         "priors_conc_unbalanced": unpack(ps.priors_conc_unbalanced),
         "priors_conc_enzyme": unpack(ps.priors_conc_enzyme),
@@ -664,6 +665,13 @@ def get_input_data(mi: MaudInput) -> dict:
     water_stoichiometry = pd.Series(water_stoichiometry_enzyme, index=S.columns).fillna(
         0
     )
+    transported_charge_enzyme = {
+        e.id: next(
+            filter(lambda r: e in r.enzymes, mi.kinetic_model.reactions)
+        ).transported_charge
+        for e in sorted_enzymes
+    }
+    transported_charge = pd.Series(transported_charge_enzyme, index=S.columns).fillna(0)
     mic_to_met = [
         codify(mi.stan_coords.metabolites)[mic.metabolite_id] for mic in sorted_mics
     ]
@@ -746,6 +754,7 @@ def get_input_data(mi: MaudInput) -> dict:
             "edge_to_drain": edge_to_drain.values,
             "edge_to_reaction": edge_to_reaction.values,
             "water_stoichiometry": water_stoichiometry.values,
+            "transported_charge": transported_charge.values,
             "mic_to_met": mic_to_met,
             "km_lookup": km_lookup,
             "ki_lookup": ki_lookup,

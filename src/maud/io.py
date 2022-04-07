@@ -252,6 +252,7 @@ def get_stan_coords(
     drains = sorted([r.id for r in km.reactions if r.reaction_mechanism == "drain"])
     edges = enzymes + drains
     experiments = sorted([e.id for e in all_experiments if getattr(e, mode)])
+    pmf = experiments.copy()
     ci_coords, ai_coords, aa_coords = (
         sorted(
             [
@@ -314,6 +315,7 @@ def get_stan_coords(
         enz_ko_enzs=enz_ko_enzs,
         phos_ko_exps=phos_ko_exps,
         phos_ko_enzs=phos_ko_enzs,
+        pmf=pmf,
     )
 
 
@@ -364,6 +366,7 @@ def parse_toml_reaction(raw: dict) -> Reaction:
     water_stoichiometry = (
         raw["water_stoichiometry"] if "water_stoichiometry" in raw.keys() else 0
     )
+    transported_charge = raw["transported_charge"] if "transported_charge" in raw else 0
     for e in raw["enzyme"]:
         modifiers = {
             "competitive_inhibitor": [],
@@ -400,6 +403,7 @@ def parse_toml_reaction(raw: dict) -> Reaction:
         stoichiometry=raw["stoichiometry"],
         enzymes=enzymes,
         water_stoichiometry=water_stoichiometry,
+        transported_charge=transported_charge,
     )
 
 
@@ -500,6 +504,7 @@ def extract_1d_prior(
         "ki": ["enzyme_id", "mic_id"],
         "transfer_constant": ["enzyme_id"],
         "kcat_phos": ["phos_enz_id"],
+        "pmf": ["experiment_id"],
     }
     if any(len(c) == 0 for c in coords):
         return IndPrior1d(
@@ -644,6 +649,7 @@ def parse_priors(
             raw, "transfer_constant", [cs.allosteric_enzymes]
         ),
         priors_kcat_phos=extract_1d_prior(raw, "kcat_phos", [cs.phos_enzs]),
+        priors_pmf=extract_1d_prior(raw, "pmf", [cs.pmf]),
         # 2d priors
         priors_drain=extract_2d_prior(raw, "drain", cs.experiments, cs.drains),
         priors_conc_enzyme=extract_2d_prior(
