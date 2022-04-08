@@ -43,27 +43,25 @@ functions {
     return out;
   }
 
-  vector get_dgrs(matrix S, vector dgf, real temperature, int[] mic_to_met, vector water_stoichiometry, vector trans_charge, real pmf){
+  vector get_dgrs(matrix S, vector dgf, real temperature, int[] mic_to_met, vector water_stoichiometry, vector trans_charge, real psi){
     /*
         Calculate dgr standard from metabolite formation energies, assuming water's
         formation energy is known exactly.
     */
     real minus_RT = -0.008314 * temperature;
     real dgf_water = -150.9;  // From http://equilibrator.weizmann.ac.il/metabolite?compoundId=C00001
-    // TODO(jorge): this is harcoded for Δph = 1
-    real Z = 2.30225 * -minus_RT;
-    real pmf_F = 2.30225 * pmf;
-    vector[cols(S)] dgrs = S' * dgf[mic_to_met] + water_stoichiometry * dgf_water + trans_charge * (Z + pmf);
+    real F = 96.5;  // Faraday constant kJ/mol/V
+    vector[cols(S)] dgrs = S' * dgf[mic_to_met] + water_stoichiometry * dgf_water + trans_charge * psi * F;
     return dgrs;
   }
 
-  vector get_keq(matrix S, vector dgf, real temperature, int[] mic_to_met, vector water_stoichiometry, vector trans_charge, real pmf){
+  vector get_keq(matrix S, vector dgf, real temperature, int[] mic_to_met, vector water_stoichiometry, vector trans_charge, real psi){
     /*
         Calculate keqs from metabolite formation energies, assuming water's
         formation energy is known exactly.
     */
     real minus_RT = -0.008314 * temperature;
-    vector[cols(S)] dgrs = get_dgrs(S, dgf, temperature, mic_to_met, water_stoichiometry, trans_charge, pmf);
+    vector[cols(S)] dgrs = get_dgrs(S, dgf, temperature, mic_to_met, water_stoichiometry, trans_charge, psi);
     return exp(dgrs / minus_RT);
   }
 

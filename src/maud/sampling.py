@@ -421,7 +421,7 @@ def get_prior_dict(ps: PriorSet) -> dict:
         "priors_diss_t": unpack(ps.priors_diss_t),
         "priors_diss_r": unpack(ps.priors_diss_r),
         "priors_kcat_phos": unpack(ps.priors_kcat_phos),
-        "priors_pmf": unpack(ps.priors_pmf),
+        "priors_psi": unpack(ps.priors_psi),
         "priors_transfer_constant": unpack(ps.priors_transfer_constant),
         "priors_conc_unbalanced": unpack(ps.priors_conc_unbalanced),
         "priors_conc_enzyme": unpack(ps.priors_conc_enzyme),

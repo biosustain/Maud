@@ -331,7 +331,7 @@ class PriorSet:
     priors_drain: IndPrior2d
     priors_conc_enzyme: IndPrior2d
     priors_conc_phos: IndPrior2d
-    priors_pmf: IndPrior1d
+    priors_psi: IndPrior1d
 
 
 @dataclass
@@ -371,7 +371,7 @@ class StanCoordSet:
     enz_ko_enzs: List[str]
     phos_ko_exps: List[str]
     phos_ko_enzs: List[str]
-    pmf: List[str]
+    psi: List[str]
 
 
 @dataclass
