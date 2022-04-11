@@ -19,8 +19,20 @@
 from typing import Any, Dict, Hashable, Iterable
 
 import numpy as np
+import pandas as pd
 import sympy as sp
 from scipy.stats import norm
+
+
+def check_is_df(maybe_df: Any) -> pd.DataFrame:
+    assert isinstance(maybe_df, pd.DataFrame)
+    return maybe_df
+
+
+def series_to_diag_df(s: pd.Series) -> pd.DataFrame:
+    out = pd.DataFrame(np.nan, index=s.index, columns=s.index)
+    np.fill_diagonal(out.values, s.values)
+    return out
 
 
 def read_with_fallback(k: Hashable, d: Dict, default: Any):

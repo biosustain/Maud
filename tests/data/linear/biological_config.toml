@@ -1,9 +1,13 @@
 [[experiment]]
-id = "condition_1"
-sample = true
-predict = true
+id = "condition1"
+is_train = true
+is_test = true
 
 [[experiment]]
-id = "condition_2"
-sample = true
-predict = true
+id = "condition2"
+is_train = true
+is_test = true
+
+# [[knockout]]
+# experiment_id = "condition1"
+# enzyme_id = "r3"
