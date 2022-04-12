@@ -78,7 +78,7 @@ def get_prior_set(upi: UserPriorInput, sv: StanVariableSet) -> PriorSet:
     else:
         ip = load_1d_prior(upi.main_table, sv.dgf)
         prior_dgf = MultiVariateNormalPrior1d(
-            sv.dgf, ip.location, series_to_diag_df(ip.scale)
+            sv.dgf, ip.location, series_to_diag_df(ip.scale).fillna(0)
         )
     return PriorSet(
         dgf=prior_dgf,

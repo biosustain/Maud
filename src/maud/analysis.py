@@ -8,7 +8,7 @@ import numpy as np
 from arviz.utils import Numba
 from matplotlib import pyplot as plt
 
-from maud.data_model import MaudInput
+from maud.data_model.maud_input import MaudInput
 
 
 def join_list_of_strings(l1, l2, sep="-"):

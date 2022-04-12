@@ -30,8 +30,8 @@ class StanVariable:
     id_components: List[List[IdComponent]]
     split_ids: Optional[List[List[List[str]]]]
     non_negative: bool
-    default_loc: float = 0
-    default_scale: float = 1
+    default_scale: float
+    default_loc: float
 
     def __post_init__(self):
         self.var_type = StanVariableType.PARAMETER
@@ -60,6 +60,8 @@ class Km(StanVariable):
         self.non_negative = True
         self.mic_ids: List[str] = field(init=False)
         self.er_ids: List[str] = field(init=False)
+        self.default_loc = 0.5
+        self.default_scale = 1
 
     def __post_init__(self):
         self.mic_ids = [
@@ -89,6 +91,8 @@ class Kcat(StanVariable):
         self.id_components = [[IdComponent.ENZYME, IdComponent.REACTION]]
         self.split_ids = split_ids
         self.non_negative = True
+        self.default_loc = 0.5
+        self.default_scale = 1
 
 
 @dataclass(init=False)
@@ -110,6 +114,8 @@ class Ki(StanVariable):
         self.non_negative = True
         self.mic_ids: List[str] = field(init=False)
         self.er_ids: List[str] = field(init=False)
+        self.default_loc = 0.5
+        self.default_scale = 1
 
     def __post_init__(self):
         self.mic_ids = [
@@ -131,6 +137,8 @@ class Dgf(StanVariable):
         self.shape_names = ["N_metabolite"]
         self.id_components = [[IdComponent.METABOLITE]]
         self.non_negative = False
+        self.default_loc = 0
+        self.default_scale = 10
 
 
 @dataclass(init=False)
@@ -151,6 +159,8 @@ class DissociationConstant(StanVariable):
         self.non_negative = True
         self.mic_ids: List[str] = field(init=False)
         self.enzyme_ids: List[str] = field(init=False)
+        self.default_loc = 0.5
+        self.default_scale = 1
 
     def __post_init__(self):
         self.mic_ids = [
@@ -170,6 +180,8 @@ class TransferConstant(StanVariable):
         self.id_components = [[IdComponent.ENZYME]]
         self.split_ids = None
         self.non_negative = True
+        self.default_loc = 0.5
+        self.default_scale = 1
 
 
 @dataclass(init=False)
@@ -182,17 +194,22 @@ class KcatPhos(StanVariable):
         self.split_ids = None
         self.id_components = [[IdComponent.ENZYME]]
         self.non_negative = True
+        self.default_loc = 0.5
+        self.default_scale = 1
 
 
 @dataclass(init=False)
 class Drain(StanVariable):
     def __init__(self, ids):
         self.name = "drain"
+        self.var_type = StanVariableType.PARAMETER
         self.ids = ids
         self.shape_names = ["N_experiment", "N_drain"]
         self.id_components = [[IdComponent.EXPERIMENT], [IdComponent.REACTION]]
         self.split_ids = None
         self.non_negative = False
+        self.default_loc = 0
+        self.default_scale = 1
 
 
 @dataclass(init=False)
@@ -207,12 +224,15 @@ class ConcEnzyme(StanVariable):
         self.non_negative = True
         self.default_loc = 0.1
         self.default_scale = 2.0
+        self.default_loc = 0.5
+        self.default_scale = 1
 
 
 @dataclass(init=False)
 class ConcUnbalanced(StanVariable):
     def __init__(self, ids):
         self.name = "conc_unbalanced"
+        self.var_type = StanVariableType.PARAMETER
         self.ids = ids
         self.shape_names = ["N_experiment", "N_unbalanced"]
         self.split_ids = None
@@ -238,6 +258,8 @@ class ConcPhos(StanVariable):
         self.split_ids = None
         self.id_components = [[IdComponent.EXPERIMENT, IdComponent.ENZYME]]
         self.non_negative = True
+        self.default_loc = 0.1
+        self.default_scale = 2.0
 
 
 @dataclass

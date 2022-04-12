@@ -42,15 +42,15 @@ class MaudConfig:
     measurements_file: str
     biological_config_file: str
     likelihood: bool
-    reject_non_steady: bool
-    ode_config: ODEConfig
-    cmdstanpy_config: Optional[dict]
-    stanc_options: Optional[dict]
-    cpp_options: Optional[dict]
-    variational_options: Optional[dict]
-    user_inits_file: Optional[str]
-    dgf_mean_file: Optional[str]
-    dgf_covariance_file: Optional[str]
+    cmdstanpy_config: Optional[dict] = None
+    stanc_options: Optional[dict] = None
+    cpp_options: Optional[dict] = None
+    variational_options: Optional[dict] = None
+    user_inits_file: Optional[str] = None
+    dgf_mean_file: Optional[str] = None
+    dgf_covariance_file: Optional[str] = None
+    ode_config: ODEConfig = ODEConfig()
+    reject_non_steady: bool = True
     steady_state_threshold_abs: float = 1e-8
     steady_state_threshold_rel: float = 1e-3
     default_initial_concentration: float = 0.01

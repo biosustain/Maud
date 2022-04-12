@@ -30,8 +30,8 @@ from maud.data_model.hardcoding import ID_SEPARATOR
 
 
 class ReactionMechanism(str, Enum):
-    RMM = 1
-    IMM = 2
+    REVERSIBLE_MICHAELIS_MENTEN = 1
+    IRREVERSIBLE_MICHAELIS_MENTEN = 2
     DRAIN = 3
 
 

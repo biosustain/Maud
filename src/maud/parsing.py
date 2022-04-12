@@ -19,18 +19,13 @@ from maud.data_model.kinetic_model import (
     Reaction,
     ReactionMechanism,
 )
-from maud.data_model.maud_input import MaudConfig
+from maud.data_model.maud_config import MaudConfig, ODEConfig
 from maud.data_model.measurement_set import (
     EnzymeKnockout,
     Experiment,
     MeasurementSet,
     MeasurementType,
     PhosphorylationKnockout,
-)
-from maud.defaults import (
-    DEFAULT_ODE_CONFIG,
-    DEFAULT_STEADY_STATE_THRESHOLD_ABS,
-    DEFAULT_STEADY_STATE_THRESHOLD_REL,
 )
 from maud.utils import read_with_fallback
 
@@ -50,7 +45,7 @@ def parse_measurement_set(
     y = {
         mt: raw_measurement_table.loc[
             lambda df: df["measurement_type"] == mt.value
-        ].set_index(["experiment_id", "target_id"])
+        ]
         for mt in MeasurementType
     }
     enz_knockouts = (
@@ -88,66 +83,10 @@ def parse_config(raw: dict) -> MaudConfig:
 
     :param raw: result of running toml.load on a suitable file
     """
-    user_inits_file = (
-        raw["user_inits_file"] if "user_inits_file" in raw.keys() else None
-    )
-    dgf_mean_file = (
-        raw["dgf_mean_file"] if "dgf_mean_file" in raw.keys() else None
-    )
-    dgf_covariance_file = (
-        raw["dgf_covariance_file"]
-        if "dgf_covariance_file" in raw.keys()
-        else None
-    )
-    reject_non_steady = (
-        raw["reject_non_steady"] if "reject_non_steady" in raw.keys() else True
-    )
-    stanc_options = (
-        raw["stanc_options"] if "stanc_options" in raw.keys() else None
-    )
-    cpp_options = raw["cpp_options"] if "cpp_options" in raw.keys() else None
-    variational_options = (
-        raw["variational_options"]
-        if "variational_options" in raw.keys()
-        else None
-    )
-    steady_state_threshold_abs = (
-        raw["steady_state_threshold_abs"]
-        if "steady_state_threshold_abs" in raw.keys()
-        else DEFAULT_STEADY_STATE_THRESHOLD_ABS
-    )
-    steady_state_threshold_rel = (
-        raw["steady_state_threshold_abs"]
-        if "steady_state_threshold_abs" in raw.keys()
-        else DEFAULT_STEADY_STATE_THRESHOLD_REL
-    )
-    ode_config = (
-        {**DEFAULT_ODE_CONFIG, **raw["ode_config"]}
-        if "ode_config" in raw.keys()
-        else DEFAULT_ODE_CONFIG
-    )
-    cmdstanpy_config = (
-        raw["cmdstanpy_config"] if "cmdstanpy_config" in raw.keys() else None
-    )
-    return MaudConfig(
-        name=raw["name"],
-        kinetic_model_file=raw["kinetic_model"],
-        priors_file=raw["priors"],
-        measurements_file=raw["measurements"],
-        biological_config_file=raw["biological_config"],
-        likelihood=raw["likelihood"],
-        reject_non_steady=reject_non_steady,
-        ode_config=ode_config,
-        cmdstanpy_config=cmdstanpy_config,
-        stanc_options=stanc_options,
-        cpp_options=cpp_options,
-        variational_options=variational_options,
-        user_inits_file=user_inits_file,
-        dgf_mean_file=dgf_mean_file,
-        dgf_covariance_file=dgf_covariance_file,
-        steady_state_threshold_abs=steady_state_threshold_abs,
-        steady_state_threshold_rel=steady_state_threshold_rel,
-    )
+    init_kwargs = raw.copy()
+    if "ode_config" in init_kwargs.keys():
+        init_kwargs["ode_config"] = ODEConfig(**init_kwargs["ode_config"])
+    return MaudConfig(**init_kwargs)
 
 
 def parse_kinetic_model(raw: dict) -> KineticModel:
@@ -176,7 +115,7 @@ def parse_kinetic_model(raw: dict) -> KineticModel:
         Reaction(
             id=r["id"],
             name=read_with_fallback("name", r, None),
-            mechanism=ReactionMechanism(r["mechanism"]),
+            mechanism=ReactionMechanism[r["mechanism"].upper()],
             stoichiometry=r["stoichiometry"],
             water_stoichiometry=read_with_fallback(
                 "water_stoichiometry", r, 0),
@@ -190,7 +129,7 @@ def parse_kinetic_model(raw: dict) -> KineticModel:
         "phosphorylation",
         lambda p: Phosphorylation(
             enzyme_id=p["enzyme_id"],
-            modification_type=ModificationType(p["modification_type"]),
+            modification_type=ModificationType[p["modification_type"].upper()],
         ),
     )
     allosteries = parse_field_if_available(
@@ -200,7 +139,7 @@ def parse_kinetic_model(raw: dict) -> KineticModel:
             enzyme_id=a["enzyme_id"],
             metabolite_id=a["metabolite_id"],
             compartment_id=a["compartment_id"],
-            modification_type=ModificationType(a["modification_type"]),
+            modification_type=ModificationType[a["modification_type"].upper()],
         ),
     )
     competitive_inhibitions = parse_field_if_available(

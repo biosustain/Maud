@@ -93,11 +93,11 @@ functions {
   vector get_saturation(vector conc,
                         vector km,
                         vector free_enzyme_ratio,
-                        array[N_edge_sub] int sub_km_ix_by_edge_long,
-                        array[N_edge,2] int sub_km_ix_by_edge_bounds,
-                        int[] sub_by_edge_long,
-                        int[,] sub_by_edge_bounds,
-                        int[] edge_type){
+                        array[] int sub_km_ix_by_edge_long,
+                        array[,] int sub_km_ix_by_edge_bounds,
+                        array[] int sub_by_edge_long,
+                        array[,] int sub_by_edge_bounds,
+                        array[] int edge_type){
     int N_edge = size(sub_by_edge_bounds);
     vector[N_edge] prod_conc_over_km;
     for (f in 1:N_edge){
@@ -126,8 +126,8 @@ functions {
                                int[,] sub_by_edge_bounds,
                                int[] prod_by_edge_long,
                                int[,] prod_by_edge_bounds,
-                               int[] ci_by_edge_long,
-                               int[,] ci_by_edge_bounds){
+                               int[] ci_ix_long,
+                               int[,] ci_ix_bounds){
     /* Find the proportion of enzyme that is free, for each edge. */
     int N_edge = cols(S);
     vector[N_edge] denom;
@@ -138,7 +138,7 @@ functions {
       }
       int N_sub = measure_ragged(sub_by_edge_bounds, f);
       int N_prod = measure_ragged(prod_by_edge_bounds, f);
-      int N_ci = measure_ragged(ci_by_edge_bounds, f);
+      int N_ci = measure_ragged(ci_ix_bounds, f);
       array[N_sub] int sub_ix = extract_ragged(sub_by_edge_long, sub_by_edge_bounds, f);
       array[N_sub] int sub_km_ix = extract_ragged(sub_km_ix_by_edge_long, sub_km_ix_by_edge_bounds, f);
       array[N_prod] int prod_ix = extract_ragged(prod_by_edge_long, prod_by_edge_bounds, f);
@@ -150,7 +150,7 @@ functions {
         denom[f] += prod((rep_vector(1, N_prod) + prod_over_km) ^ fabs(S[prod_ix, f])) - 1;
       }
       if (N_ci > 0){
-        array[N_ci] int ci_ix = extract_ragged(ci_by_edge_long, ci_by_edge_bounds, f);
+        array[N_ci] int ci_ix = extract_ragged(ci_ix_long, ci_ix_bounds, f);
         denom[f] += sum(conc[ci_ix] ./ ki[ci_ix]);
       }
     }
@@ -194,7 +194,7 @@ functions {
       real tc_edge = tc[edge_to_tc[f]];
       for (allostery in extract_ragged(allostery_ix_long, allostery_ix_bounds, f)){
         real conc_over_dc = conc[allostery_mic[allostery]] / dc[allostery];
-        if (allostery_type == 1){ // inhibition
+        if (allostery_type[allostery] == 1){ // inhibition
           Q_num += conc_over_dc;
         }
         else {  // activation
@@ -212,10 +212,10 @@ functions {
                              array[,] int phos_ix_bounds,
                              array[] int phos_type,
                              vector subunits){
-    int N_edge = size(pa_ix_bounds);
+    int N_edge = size(phos_ix_bounds);
     vector[N_edge] out = rep_vector(1, N_edge);
     for (f in 1:N_edge){
-      N_phos = measure_ragged(phos_ix_bounds, f);
+      int N_phos = measure_ragged(phos_ix_bounds, f);
       if (N_phos == 0){
         continue;
       }
@@ -271,8 +271,7 @@ functions {
                        vector km,
                        vector ki,
                        vector tc,
-                       vector dt,
-                       vector dr,
+                       vector dc,
                        vector kcat_phos,
                        vector conc_phos,
                        vector drain,
@@ -280,7 +279,6 @@ functions {
                        vector subunits,
                        array[] int edge_type,
                        array[] int edge_to_enzyme,
-                       array[] int edge_to_tc,
                        array[] int edge_to_drain,
                        array[] int sub_km_ix_by_edge_long,
                        array[,] int sub_km_ix_by_edge_bounds,
@@ -290,16 +288,16 @@ functions {
                        array[,] int sub_by_edge_bounds,
                        array[] int prod_by_edge_long,
                        array[,] int prod_by_edge_bounds,
-                       array[] int ci_by_edge_long,
-                       array[,] int ci_by_edge_bounds,
-                       array[] int ai_ix_long,
-                       array[,] int ai_ix_bounds,
-                       array[] int aa_ix_long,
-                       array[,] int aa_ix_bounds,
-                       array[] int pa_ix_long,
-                       array[,] int pa_ix_bounds,
-                       array[] int pi_ix_long,
-                       array[,] int pi_ix_bounds){
+                       array[] int ci_ix_long,
+                       array[,] int ci_ix_bounds,
+                       array[] int allostery_ix_long,
+                       array[,] int allostery_ix_bounds,
+                       array[] int allostery_type,
+                       array[] int allostery_mic,
+                       array[] int edge_to_tc,
+                       array[] int phos_ix_long,
+                       array[,] int phos_ix_bounds,
+                       array[] int phosphorylation_type){
     int N_edge = cols(S);
     vector[N_edge] vmax = get_vmax_by_edge(enzyme, kcat, edge_to_enzyme, edge_type);
     vector[N_edge] reversibility = get_reversibility(dgr, S, conc, edge_type);
@@ -316,8 +314,8 @@ functions {
                                                              sub_by_edge_bounds,
                                                              prod_by_edge_long,
                                                              prod_by_edge_bounds,
-                                                             ci_by_edge_long,
-                                                             ci_by_edge_bounds);
+                                                             ci_ix_long,
+                                                             ci_ix_bounds);
     vector[N_edge] saturation = get_saturation(conc,
                                                km,
                                                free_enzyme_ratio,
@@ -329,20 +327,18 @@ functions {
     vector[N_edge] allostery = get_allostery(conc,
                                              free_enzyme_ratio,
                                              tc,
-                                             dt,
-                                             dr,
+                                             dc,
                                              subunits,
-                                             edge_to_tc,
-                                             ai_ix_long,
-                                             ai_ix_bounds,
-                                             aa_ix_long,
-                                             aa_ix_bounds);
+                                             allostery_ix_long,
+                                             allostery_ix_bounds,
+                                             allostery_type,
+                                             allostery_mic,
+                                             edge_to_tc);
     vector[N_edge] phosphorylation = get_phosphorylation(kcat_phos,
                                                          conc_phos,
-                                                         pa_ix_long,
-                                                         pa_ix_bounds,
-                                                         pi_ix_long,
-                                                         pi_ix_bounds,
+                                                         phos_ix_long,
+                                                         phos_ix_bounds,
+                                                         phosphorylation_type,
                                                          subunits);
     vector[N_edge] drain_by_edge = get_drain_by_edge(drain,
                                                      conc,
@@ -364,8 +360,7 @@ functions {
                       vector km,
                       vector ki,
                       vector tc,
-                      vector dt,
-                      vector dr,
+                      vector dc,
                       vector kcat_phos,
                       vector conc_phos,
                       vector drain,
@@ -391,9 +386,7 @@ functions {
                       array[] int edge_to_tc,
                       array[] int phosphorylation_ix_long,
                       array[,] int phosphorylation_ix_bounds,
-                      array[] int phosphorylation_type
-
-                      ){
+                      array[] int phosphorylation_type){
     vector[rows(current_balanced)+rows(unbalanced)] current_concentration;
     current_concentration[balanced_ix] = current_balanced;
     current_concentration[unbalanced_ix] = unbalanced;
@@ -404,8 +397,7 @@ functions {
                                               km,
                                               ki,
                                               tc,
-                                              dt,
-                                              dr,
+                                              dc,
                                               kcat_phos,
                                               conc_phos,
                                               drain,
@@ -413,7 +405,6 @@ functions {
                                               subunits,
                                               edge_type,
                                               edge_to_enzyme,
-                                              edge_to_tc,
                                               edge_to_drain,
                                               sub_km_ix_by_edge_long,
                                               sub_km_ix_by_edge_bounds,
@@ -423,16 +414,16 @@ functions {
                                               sub_by_edge_bounds,
                                               prod_by_edge_long,
                                               prod_by_edge_bounds,
-                                              ci_by_edge_long,
-                                              ci_by_edge_bounds,
-                                              ai_ix_long,
-                                              ai_ix_bounds,
-                                              aa_ix_long,
-                                              aa_ix_bounds,
-                                              pa_ix_long,
-                                              pa_ix_bounds,
-                                              pi_ix_long,
-                                              pi_ix_bounds);
+                                              ci_ix_long,
+                                              ci_ix_bounds,
+                                              allostery_ix_long,
+                                              allostery_ix_bounds,
+                                              allostery_type,
+                                              allostery_mic,
+                                              edge_to_tc,
+                                              phosphorylation_ix_long,
+                                              phosphorylation_ix_bounds,
+                                              phosphorylation_type);
     return (S * edge_flux)[balanced_ix];
   }
 }

@@ -1,20 +1,22 @@
 """Provides dataclass MaudInput."""
 
 from dataclasses import field
-from typing import Dict, Optional
+from typing import Dict, List, Optional
 
-import numpy as np
 import pandas as pd
 from pydantic.dataclasses import dataclass
 
 from maud.data_model.kinetic_model import KineticModel
 from maud.data_model.maud_config import MaudConfig
+from maud.data_model.maud_init import InitDict
 from maud.data_model.measurement_set import MeasurementSet
 from maud.data_model.prior_set import PriorSet, UserPriorInput
 from maud.data_model.stan_variable_set import StanVariableSet
+from maud.data_model.stan_input import StanInput
 from maud.getting_inits import get_inits
 from maud.getting_priors import get_prior_set
 from maud.getting_stan_variables import get_stan_variable_set
+from maud.getting_stan_inputs import get_stan_input
 
 
 class MIConfig:
@@ -39,7 +41,8 @@ class MaudInput:
     user_inits: Optional[pd.DataFrame]
     stan_variable_set: StanVariableSet = field(init=False)
     priors: PriorSet = field(init=False)
-    inits: Dict[str, np.ndarray] = field(init=False)
+    inits: InitDict = field(init=False)
+    stan_input: StanInput = field(init=False)
 
     def __post_init__(self):
         self.stan_variable_set = get_stan_variable_set(
@@ -47,5 +50,6 @@ class MaudInput:
         )
         self.priors = get_prior_set(self.user_priors, self.stan_variable_set)
         self.inits = get_inits(self.priors, self.user_inits)
-
-        
+        self.stan_input = get_stan_input(
+            self.measurements, self.priors, self.kinetic_model, self.config
+        )

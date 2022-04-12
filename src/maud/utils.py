@@ -16,12 +16,25 @@
 
 """General purpose utility functions."""
 
-from typing import Any, Dict, Hashable, Iterable
+from typing import Any, List, Dict, Hashable, Iterable, Sequence
 
 import numpy as np
 import pandas as pd
 import sympy as sp
 from scipy.stats import norm
+
+
+def recursively_flatten_sequence(o: Sequence) -> List:
+    """Recursively flatten a nested list
+    copied from https://symbiosisacademy.org/tutorial-index/python-flatten-nested-lists-tuples-sets/
+    """
+    gather = []
+    for item in o:
+        if isinstance(item, Sequence):
+            gather.extend(recursively_flatten_sequence(item))
+        else:
+            gather.append(item)
+    return gather
 
 
 def check_is_df(maybe_df: Any) -> pd.DataFrame:

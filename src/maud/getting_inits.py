@@ -3,6 +3,7 @@ from typing import Dict, Optional, Union
 import numpy as np
 import pandas as pd
 
+from maud.data_model.maud_init import InitDict
 from maud.data_model.prior_set import (
     IndPrior1d,
     IndPrior2d,
@@ -13,7 +14,7 @@ from maud.data_model.prior_set import (
 
 def get_inits(
     priors: PriorSet, user_inits: Optional[pd.DataFrame]
-) -> Dict[str, np.ndarray]:
+) -> InitDict:
     """Get a dictionary of initial values.
 
     :param priors: Priorset object
@@ -51,9 +52,7 @@ def get_inits(
                 inits[p.stan_variable.name] = combined.unstack()
             else:
                 inits[p.stan_variable.name] = combined
-    return {
-        k: np.array(v.values) for k, v in rescale_inits(inits, priors).items()
-    }
+    return rescale_inits(inits, priors)
 
 
 def user_inits_for_param(
@@ -61,22 +60,20 @@ def user_inits_for_param(
     p: Union[IndPrior1d, IndPrior2d, MultiVariateNormalPrior1d],
 ) -> pd.Series:
     if len(p.location) == 0:
-        return pd.Series(p.location)
+        return pd.Series(p.location).astype(float).values.tolist()
     elif isinstance(p, IndPrior1d) or isinstance(p, MultiVariateNormalPrior1d):
         return u.loc[
             lambda df: df["parameter_name"] == p.stan_variable.name
-        ].set_index(p.location.index.names)["value"]
+        ].set_index(p.location.index.names)["value"].astype(float).values.tolist()
     elif isinstance(p, IndPrior2d):
         return u.loc[
             lambda df: df["parameter_name"] == p.stan_variable.name
-        ].set_index([p.location.index.name, p.location.columns.name])["value"]
+        ].set_index([p.location.index.name, p.location.columns.name])["value"].astype(float).values.tolist()
     else:
         raise ValueError("Unrecognised prior type: " + str(type(p)))
 
 
-def rescale_inits(
-    inits: dict, priors: PriorSet
-) -> Dict[str, Union[pd.DataFrame, pd.Series]]:
+def rescale_inits(inits: dict, priors: PriorSet) -> InitDict:
     """Augment a dictionary of inits with equivalent normalised values.
 
     :param inits: original inits
@@ -88,9 +85,9 @@ def rescale_inits(
         if isinstance(prior, MultiVariateNormalPrior1d):
             continue
         elif not prior.stan_variable.non_negative:
-            rescaled[n + "_z"] = (i - prior.location) / prior.scale
+            rescaled[n + "_z"] = ((i - prior.location) / prior.scale).astype(float).values.tolist()
         else:
-            rescaled[f"log_{n}_z"] = (
+            rescaled[f"log_{n}_z"] = ((
                 np.log(i) - np.log(prior.location)
-            ) / prior.scale
-    return {**inits, **rescaled}
+            ) / prior.scale).astype(float).values.tolist()
+    return {**{k: v.astype(float).values.tolist() for k, v in inits.items()}, **rescaled}

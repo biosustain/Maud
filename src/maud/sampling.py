@@ -19,7 +19,7 @@
 import json
 import os
 import warnings
-from typing import Optional
+from typing import List, Optional
 
 import cmdstanpy
 import numpy as np
@@ -30,7 +30,7 @@ from cmdstanpy.stanfit.vb import CmdStanVB
 from xarray.core.dataset import Dataset
 
 from maud.analysis import load_infd, load_infd_fit
-from maud.utils import codify, get_null_space, get_rref
+from maud.utils import get_null_space, get_rref
 from maud.data_model.maud_input import MaudInput
 
 
@@ -116,9 +116,11 @@ def simulate(mi: MaudInput, output_dir: str, n: int) -> cmdstanpy.CmdStanMCMC:
     model = get_cmdstan_model(mi.config.cpp_options, mi.config.stanc_options)
     set_up_output_dir(output_dir, mi)
     return model.sample(
+        output_dir=output_dir,
+        iter_sampling=n,
         data=os.path.join(output_dir, "input_data.json"),
         inits=os.path.join(output_dir, "inits.json"),
-        **{**SIM_CONFIG, **{"output_dir": output_dir, "iter_sampling": n}},
+        **SIM_CONFIG,
     )
 
 
@@ -126,13 +128,11 @@ def set_up_output_dir(output_dir: str, mi: MaudInput):
     """Write input data, inits and coords to the output directory."""
     input_filepath = os.path.join(output_dir, "input_data.json")
     inits_filepath = os.path.join(output_dir, "inits.json")
-    coords_filepath = os.path.join(output_dir, "coords.json")
-    input_data = get_input_data(mi)
-    inits = {k: v.values for k, v in mi.inits.items()}
-    cmdstanpy.utils.write_stan_json(input_filepath, input_data)
-    cmdstanpy.utils.write_stan_json(inits_filepath, inits)
-    with open(coords_filepath, "w") as f:
-        json.dump(mi.stan_coords.__dict__, f)
+    # coords_filepath = os.path.join(output_dir, "coords.json")
+    cmdstanpy.utils.write_stan_json(input_filepath, mi.stan_input.stan_input_dict)
+    cmdstanpy.utils.write_stan_json(inits_filepath, mi.inits)
+    # with open(coords_filepath, "w") as f:
+        # json.dump(mi.stan_coords.__dict__, f)
 
 
 def get_cmdstan_model(
