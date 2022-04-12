@@ -65,6 +65,7 @@ id = 'r3'
 name = 'reaction number 3'
 stoichiometry = { M2_c = -1, M2_e = 1}
 mechanism = "reversible_modular_rate_law"
+transported_charge = 1
 [[reaction.enzyme]]
 id = 'r3'
 name = 'the enzyme that catalyses reaction r3'
