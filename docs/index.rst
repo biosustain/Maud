@@ -32,6 +32,7 @@ experiments and the existing literature.
    theory/statistics
    theory/thermodynamics
    theory/drains
+   theory/transported_charges
    theory/papers
 
 .. toctree::
