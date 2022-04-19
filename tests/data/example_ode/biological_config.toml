@@ -1,4 +1,4 @@
 [[experiment]]
-id = "condition_1"
-sample = true
-predict = true
+id = "condition1"
+is_train = true
+is_test = true

@@ -16,22 +16,42 @@
 
 """General purpose utility functions."""
 
-from typing import Any, List, Dict, Hashable, Iterable, Sequence
+from typing import Any, Dict, Hashable, List, Sequence, Union
 
 import numpy as np
 import pandas as pd
+import scipy
 import sympy as sp
-from scipy.stats import norm
+from depinfo import print_dependencies
 
 
-def recursively_flatten_sequence(o: Sequence) -> List:
-    """Recursively flatten a nested list
-    copied from https://symbiosisacademy.org/tutorial-index/python-flatten-nested-lists-tuples-sets/
-    """
+def join_str_cols(df: pd.DataFrame, sep: str, name=None) -> pd.Series:
+    out = df.apply(sep.join, axis=1).rename(name)
+    assert isinstance(out, pd.Series)
+    return out
+
+
+def load_df(read_csv_input, **kwargs) -> pd.DataFrame:
+    """Wrapper for pd.read_csv that ensures a dataframe is returned."""
+    return check_is_df(pd.read_csv(read_csv_input, **kwargs))
+
+
+def show_versions():
+    """Print dependency information."""
+    print_dependencies("maud")
+
+
+def get_dict_field_if_available(d: dict, field: str) -> Union[None, Any]:
+    """Get a field from a dictionary if it exists."""
+    return d[field] if field in d.keys() else None
+
+
+def recursively_flatten_list(o: List) -> List:
+    """Recursively flatten a nested list."""
     gather = []
     for item in o:
-        if isinstance(item, Sequence):
-            gather.extend(recursively_flatten_sequence(item))
+        if isinstance(item, List):
+            gather.extend(recursively_flatten_list(item))
         else:
             gather.append(item)
     return gather
@@ -52,8 +72,8 @@ def read_with_fallback(k: Hashable, d: Dict, default: Any):
     return d[k] if k in d.keys() else default
 
 
-def codify(lx: Iterable[str]) -> Dict[str, int]:
-    """Turn an iterable of strings into a dictionary mapping them to integer indexes."""
+def codify(lx: List) -> Dict[str, int]:
+    """Turn a list of strings into a dictionary mapping them to integers."""
     return dict(zip(lx, range(1, len(lx) + 1)))
 
 
@@ -66,9 +86,11 @@ def get_lognormal_parameters_from_quantiles(x1, p1, x2, p2):
     """
     logx1 = np.log(x1)
     logx2 = np.log(x2)
-    denom = norm.ppf(p2) - norm.ppf(p1)
+    denom = scipy.stats.norm.ppf(p2) - scipy.stats.norm.ppf(p1)
     sigma = (logx2 - logx1) / denom
-    mu = (logx1 * norm.ppf(p2) - logx2 * norm.ppf(p1)) / denom
+    mu = (
+        logx1 * scipy.stats.norm.ppf(p2) - logx2 * scipy.stats.norm.ppf(p1)
+    ) / denom
     return mu, sigma
 
 
@@ -79,9 +101,11 @@ def get_normal_parameters_from_quantiles(x1, p1, x2, p2):
     x1) = p1 and pr(X < x2) = p2.
 
     """
-    denom = norm.ppf(p2) - norm.ppf(p1)
+    denom = scipy.stats.norm.ppf(p2) - scipy.stats.norm.ppf(p1)
     sigma = (x2 - x1) / denom
-    mu = (x1 * norm.ppf(p2) - x2 * norm.ppf(p1)) / denom
+    mu = (
+        x1 * scipy.stats.norm.ppf(p2) - x2 * scipy.stats.norm.ppf(p1)
+    ) / denom
     return mu, sigma
 
 

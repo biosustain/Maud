@@ -1,6 +1,6 @@
+from dataclasses import field
 from enum import Enum
 from typing import List, Optional
-from dataclasses import field
 
 from pydantic import validator
 from pydantic.dataclasses import dataclass
@@ -254,7 +254,7 @@ class ConcPhos(StanVariable):
         self.name = "conc_phos"
         self.var_type = StanVariableType.PARAMETER
         self.ids = ids
-        self.shape_names = ["N_experiment", "N_phosphorylation_enzyme"]
+        self.shape_names = ["N_experiment", "N_phosphorylation"]
         self.split_ids = None
         self.id_components = [[IdComponent.EXPERIMENT, IdComponent.ENZYME]]
         self.non_negative = True

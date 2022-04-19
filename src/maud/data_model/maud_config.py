@@ -26,6 +26,7 @@ class MaudConfig:
     :param reject_non_steady: Reject draws if a non-steady state is encountered.
     :param ode_config: Configuration for Stan's ode solver.
     :param cmdstanpy_config: Arguments to cmdstanpy.CmdStanModel.sample.
+    :param cmdstanpy_config: Arguments to cmdstanpy.CmdStanModel.sample to use when predicting.
     :param stanc_options: Valid choices for CmdStanModel argument `stanc_options`.
     :param cpp_options: Valid choices for CmdStanModel `cpp_options`.
     :param variational_options: Arguments for CmdStanModel.variational.
@@ -43,6 +44,7 @@ class MaudConfig:
     biological_config_file: str
     likelihood: bool
     cmdstanpy_config: Optional[dict] = None
+    cmdstanpy_config_predict: Optional[dict] = None
     stanc_options: Optional[dict] = None
     cpp_options: Optional[dict] = None
     variational_options: Optional[dict] = None

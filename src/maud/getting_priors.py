@@ -45,12 +45,12 @@ def load_2d_prior(
     loc = pd.DataFrame(
         stan_variable.default_loc,
         index=stan_variable.ids[0],
-        columns=stan_variable.ids[1]
+        columns=stan_variable.ids[1],
     )
     scale = pd.DataFrame(
         stan_variable.default_scale,
         index=stan_variable.ids[0],
-        columns=stan_variable.ids[1]
+        columns=stan_variable.ids[1],
     )
     user_df_for_param = user_df.loc[
         lambda df: df["parameter"] == stan_variable.name
@@ -85,7 +85,9 @@ def get_prior_set(upi: UserPriorInput, sv: StanVariableSet) -> PriorSet:
         km=load_1d_prior(upi.main_table, sv.km),
         ki=load_1d_prior(upi.main_table, sv.ki),
         kcat=load_1d_prior(upi.main_table, sv.kcat),
-        dissociation_constant=load_1d_prior(upi.main_table, sv.dissociation_constant),
+        dissociation_constant=load_1d_prior(
+            upi.main_table, sv.dissociation_constant
+        ),
         transfer_constant=load_1d_prior(upi.main_table, sv.transfer_constant),
         kcat_phos=load_1d_prior(upi.main_table, sv.kcat_phos),
         drain=load_2d_prior(upi.main_table, sv.drain),

@@ -1,4 +1,4 @@
-from typing import Dict, Optional, Union
+from typing import Optional, Union
 
 import numpy as np
 import pandas as pd
@@ -36,7 +36,7 @@ def get_inits(
                 continue
             if p.location.empty:
                 continue
-            user = user_inits_for_param(user_inits, p)
+            user = get_user_inits_for_param(user_inits, p)
             default = prior_inits[p.stan_variable.name]
             if isinstance(prior_inits[p.stan_variable.name], pd.DataFrame):
                 default = default.stack()
@@ -55,20 +55,34 @@ def get_inits(
     return rescale_inits(inits, priors)
 
 
-def user_inits_for_param(
+def get_user_inits_for_param(
     u: pd.DataFrame,
     p: Union[IndPrior1d, IndPrior2d, MultiVariateNormalPrior1d],
 ) -> pd.Series:
     if len(p.location) == 0:
-        return pd.Series(p.location).astype(float).values.tolist()
+        v = pd.Series(p.location).astype(float).values
+        assert isinstance(v, np.ndarray)
+        return v.tolist()
     elif isinstance(p, IndPrior1d) or isinstance(p, MultiVariateNormalPrior1d):
-        return u.loc[
-            lambda df: df["parameter_name"] == p.stan_variable.name
-        ].set_index(p.location.index.names)["value"].astype(float).values.tolist()
+        v = (
+            u.loc[lambda df: df["parameter_name"] == p.stan_variable.name]
+            .set_index(p.location.index.names)["value"]
+            .astype(float)
+            .values
+        )
+        assert isinstance(v, np.ndarray)
+        return v.tolist()
     elif isinstance(p, IndPrior2d):
-        return u.loc[
-            lambda df: df["parameter_name"] == p.stan_variable.name
-        ].set_index([p.location.index.name, p.location.columns.name])["value"].astype(float).values.tolist()
+        v = (
+            u.loc[lambda df: df["parameter_name"] == p.stan_variable.name]
+            .set_index([p.location.index.name, p.location.columns.name])[
+                "value"
+            ]
+            .astype(float)
+            .values
+        )
+        assert isinstance(v, np.ndarray)
+        return v.tolist()
     else:
         raise ValueError("Unrecognised prior type: " + str(type(p)))
 
@@ -85,9 +99,18 @@ def rescale_inits(inits: dict, priors: PriorSet) -> InitDict:
         if isinstance(prior, MultiVariateNormalPrior1d):
             continue
         elif not prior.stan_variable.non_negative:
-            rescaled[n + "_z"] = ((i - prior.location) / prior.scale).astype(float).values.tolist()
+            rescaled[n + "_z"] = (
+                ((i - prior.location) / prior.scale)
+                .astype(float)
+                .values.tolist()
+            )
         else:
-            rescaled[f"log_{n}_z"] = ((
-                np.log(i) - np.log(prior.location)
-            ) / prior.scale).astype(float).values.tolist()
-    return {**{k: v.astype(float).values.tolist() for k, v in inits.items()}, **rescaled}
+            rescaled[f"log_{n}_z"] = (
+                ((np.log(i) - np.log(prior.location)) / prior.scale)
+                .astype(float)
+                .values.tolist()
+            )
+    return {
+        **{k: v.astype(float).values.tolist() for k, v in inits.items()},
+        **rescaled,
+    }

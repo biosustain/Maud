@@ -94,8 +94,8 @@ def get_stan_variable_set(kmod: KineticModel, ms: MeasurementSet):
     enzyme_ids = [e.id for e in kmod.enzymes]
     kcat_ids, kcat_enzs, kcat_rxns = get_kcat_coords(kmod)
     allosteric_enzyme_ids = (
-        list(set(a.enzyme_id for a in kmod.allosteries))
-        if kmod.allosteries is not None
+        [e.id for e in kmod.allosteric_enzymes]
+        if kmod.allosteric_enzymes is not None
         else []
     )
     metabolite_ids = [m.id for m in kmod.metabolites]
@@ -114,7 +114,9 @@ def get_stan_variable_set(kmod: KineticModel, ms: MeasurementSet):
         km=Km(ids=[km_ids], split_ids=[km_enzs, km_mets, km_cpts]),
         kcat=Kcat(ids=[kcat_ids], split_ids=[kcat_enzs, kcat_rxns]),
         ki=Ki(ids=[ci_ids], split_ids=[ci_enzs, ci_rxns, ci_mets, ci_cpts]),
-        dissociation_constant=DissociationConstant(ids=[dc_ids], split_ids=[dc_enzs, dc_mets, dc_cpts]),
+        dissociation_constant=DissociationConstant(
+            ids=[dc_ids], split_ids=[dc_enzs, dc_mets, dc_cpts]
+        ),
         transfer_constant=TransferConstant(ids=[allosteric_enzyme_ids]),
         kcat_phos=KcatPhos(ids=[phos_enzs]),
         drain=Drain(ids=[exp_ids, drain_ids]),

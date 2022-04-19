@@ -7,8 +7,8 @@ likelihood = true
 
 [cmdstanpy_config]
 refresh = 1
-iter_warmup = 200
-iter_sampling = 200
+iter_warmup = 20
+iter_sampling = 20
 chains = 4
 save_warmup = true
 

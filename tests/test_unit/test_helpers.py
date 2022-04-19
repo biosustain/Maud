@@ -16,12 +16,12 @@
 """Ensure the expected outcomes of helper functions."""
 
 
-import maud.helpers as helpers
+from maud.utils import show_versions
 
 
 def test_show_versions(capsys):
     """Expect a semi-defined output of package information."""
-    helpers.show_versions()
+    show_versions()
     captured = capsys.readouterr()
     lines = captured.out.split("\n")
     assert lines[1].startswith("System Information")

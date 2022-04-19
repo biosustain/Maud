@@ -31,7 +31,9 @@ class EnzymeKnockout:
     id: str = field(init=False)
 
     def __post_init__(self):
-        self.id = ID_SEPARATOR.join(["eko", self.experiment_id, self.enzyme_id])
+        self.id = ID_SEPARATOR.join(
+            ["eko", self.experiment_id, self.enzyme_id]
+        )
 
 
 @dataclass
@@ -41,7 +43,9 @@ class PhosphorylationKnockout:
     id: str = field(init=False)
 
     def __post_init__(self):
-        self.id = ID_SEPARATOR.join(["pko", self.experiment_id, self.enzyme_id])
+        self.id = ID_SEPARATOR.join(
+            ["pko", self.experiment_id, self.enzyme_id]
+        )
 
 
 class MeasurementSet(BaseModel):

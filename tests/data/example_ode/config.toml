@@ -1,15 +1,14 @@
 name = "test-ode"
-kinetic_model = "kinetic_model.toml"
-priors = "priors.csv"
-measurements = "experiments.csv"
-biological_config = "biological_config.toml"
+kinetic_model_file = "kinetic_model.toml"
+priors_file = "priors.csv"
+measurements_file = "experiments.csv"
+biological_config_file = "biological_config.toml"
 likelihood = true
 
 [cmdstanpy_config]
 iter_warmup = 0
 iter_sampling = 1
 chains = 1
-save_warmup = true
 
 [ode_config]
 max_num_steps = 1e9

@@ -22,6 +22,7 @@ from typing import Dict, List, Optional, Union
 
 import pandas as pd
 from pydantic import root_validator, validator
+
 # hack to use normal dataclass when type checking
 # see https://github.com/microsoft/pyright/issues/1510
 from pydantic.dataclasses import dataclass
@@ -191,6 +192,7 @@ class KineticModel:
     reactions: List[Reaction]
     ers: List[EnzymeReaction]
     allosteries: Optional[List[Allostery]]
+    allosteric_enzymes: Optional[List[Enzyme]]
     competitive_inhibitions: Optional[List[CompetitiveInhibition]]
     phosphorylations: Optional[List[Phosphorylation]]
     drains: List[Reaction] = field(init=False)
@@ -202,8 +204,8 @@ class KineticModel:
             r for r in self.reactions if r.mechanism == ReactionMechanism.DRAIN
         ]
         self.edges = self.drains + self.ers
-        self.stoichiometric_matrix = (
-            get_stoichiometric_matrix(self.edges, self.mics, self.reactions)
+        self.stoichiometric_matrix = get_stoichiometric_matrix(
+            self.edges, self.mics, self.reactions
         )
 
     @validator("metabolites")
@@ -303,7 +305,7 @@ class KineticModel:
 def get_stoichiometric_matrix(
     edges: List[Union[Reaction, EnzymeReaction]],
     mics: List[MetaboliteInCompartment],
-    rxns: List[Reaction]
+    rxns: List[Reaction],
 ) -> pd.DataFrame:
     edge_ids = [e.id for e in edges]
     mic_ids = [mic.id for mic in mics]

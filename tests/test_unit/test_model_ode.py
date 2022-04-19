@@ -8,9 +8,7 @@ from numpy import isclose
 
 here = os.path.dirname(__file__)
 data_path = os.path.join(here, "..", "data")
-model_path = os.path.join(here, "..", "..", "src", "maud", "model.stan")
-include_path = os.path.join(here, "..", "..", "src", "maud")
-stanc_options = {"include_paths": [include_path]}
+model_path = os.path.join(here, "..", "..", "src", "maud", "stan", "model.stan")
 
 SIM_CONFIG = {
     "chains": 1,
@@ -28,12 +26,7 @@ def test_model_ode():
     init_data = os.path.join(input_path, "inits.json")
     input_data = os.path.join(input_path, "input_data.json")
     SIM_CONFIG["inits"] = init_data
-    cpp_options = {}
-    model = cmdstanpy.CmdStanModel(
-        stan_file=model_path,
-        stanc_options=stanc_options,
-        cpp_options=cpp_options,
-    )
+    model = cmdstanpy.CmdStanModel(stan_file=model_path)
     remap = {
         "conc[1,1]": "A",
         "conc[1,2]": "B",
@@ -58,5 +51,7 @@ def test_model_ode():
         .to_dict()
     )
     msg = f"\nTrue values:\n {true_values}\nSimulated values:\n {sim_values}"
-    for true_value, sim_value in zip(true_values.values(), sim_values.values()):
+    for true_value, sim_value in zip(
+        true_values.values(), sim_values.values()
+    ):
         assert isclose(true_value, sim_value), msg

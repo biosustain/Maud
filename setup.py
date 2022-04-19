@@ -21,8 +21,6 @@
 
 from setuptools import setup
 
-import versioneer
-
 
 # All other arguments are defined in `setup.cfg`.
-setup(version=versioneer.get_version(), cmdclass=versioneer.get_cmdclass())
+setup()

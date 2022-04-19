@@ -14,21 +14,18 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-"""Functions for loading MaudInput objects.
-
-(and at some point in the future also saving MaudOutput objects)
-
-"""
+"""Provides function load_maud_input"""
 
 import os
 
-import pandas as pd
 import toml
 
 from maud.data_model.maud_input import MaudInput
 from maud.data_model.prior_set import UserPriorInput
-from maud.parsing import parse_config, parse_kinetic_model, parse_measurement_set
-from maud.utils import check_is_df
+from maud.parsing_configs import parse_config
+from maud.parsing_kinetic_models import parse_kinetic_model
+from maud.parsing_measurements import parse_measurement_set
+from maud.utils import load_df
 
 
 def load_maud_input(data_path: str) -> MaudInput:
@@ -40,47 +37,40 @@ def load_maud_input(data_path: str) -> MaudInput:
     defined in the `biological_config` as "sample" and/or "predict".
 
     """
-    raw_path = os.path.join(data_path, "config.toml")
-    raw = toml.load(raw_path)
-    assert isinstance(raw, dict), f"Failed to load input from {raw_path}"
-    config = parse_config(raw)
+    # get config
+    config_path = os.path.join(data_path, "config.toml")
+    config = parse_config(dict(toml.load(config_path)))
+    # loading
     kinetic_model_path = os.path.join(data_path, config.kinetic_model_file)
-    biological_config_path = os.path.join(
-        data_path, config.biological_config_file
-    )
+    bio_config_path = os.path.join(data_path, config.biological_config_file)
     raw_kinetic_model = dict(toml.load(kinetic_model_path))
-    raw_biological_config = dict(toml.load(biological_config_path))
+    raw_bio_config = dict(toml.load(bio_config_path))
     measurements_path = os.path.join(data_path, config.measurements_file)
     priors_path = os.path.join(data_path, config.priors_file)
-    kinetic_model = parse_kinetic_model(raw_kinetic_model)
-    raw_measurements = check_is_df(pd.read_csv(measurements_path))
-    main_prior_table = check_is_df(pd.read_csv(priors_path))
-    measurement_set = parse_measurement_set(
-        raw_measurements, raw_biological_config
-    )
-    if config.multivariate_dgf_priors:
-        dgf_loc = check_is_df(
-            pd.read_csv(
-                os.path.join(data_path, str(config.dgf_mean_file)),
-                index_col="metabolite",
-                squeeze=False,
-            )
+    raw_measurements = load_df(measurements_path)
+    main_prior_table = load_df(priors_path)
+    if (
+        config.dgf_mean_file is not None
+        and config.dgf_covariance_file is not None
+    ):
+        dgf_mean_path = os.path.join(data_path, config.dgf_mean_file)
+        dgf_cov_path = os.path.join(data_path, config.dgf_covariance_file)
+        dgf_loc = load_df(
+            dgf_mean_path, index_col="metabolite", squeeze=False
         )["prior_mean_dgf"]
-        dgf_cov = check_is_df(
-            pd.read_csv(
-                os.path.join(data_path, str(config.dgf_covariance_file)),
-                index_col="metabolite",
-            )
-        )
+        dgf_cov = load_df(dgf_cov_path, index_col="metabolite")
     else:
         dgf_loc = None
         dgf_cov = None
-    user_priors = UserPriorInput(main_prior_table, dgf_loc, dgf_cov)
     if config.user_inits_file is not None:
         user_inits_path = os.path.join(data_path, config.user_inits_file)
-        user_inits = check_is_df(pd.read_csv(user_inits_path))
+        user_inits = load_df(user_inits_path)
     else:
         user_inits = None
+    # parsing
+    kinetic_model = parse_kinetic_model(raw_kinetic_model)
+    measurement_set = parse_measurement_set(raw_measurements, raw_bio_config)
+    user_priors = UserPriorInput(main_prior_table, dgf_loc, dgf_cov)
     return MaudInput(
         config=config,
         kinetic_model=kinetic_model,

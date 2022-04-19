@@ -24,7 +24,9 @@ def test_plot_samples():
     linear_model_path = data_wd / "linear"
     tmp_dir = tempfile.mkdtemp(dir=data_wd)
     output_path = Path(tmp_dir)
-    maud_output_path = Path(simulate(linear_model_path, output_path, n_samples))
+    maud_output_path = Path(
+        simulate(linear_model_path, output_path, n_samples)
+    )
     plot_posteriors(maud_output_path, output_path)
     shutil.rmtree(tmp_dir)
     assert True
@@ -40,7 +42,9 @@ def test_plot_oos():
     linear_model_path = data_wd / "linear"
     tmp_dir = tempfile.mkdtemp(dir=data_wd)
     output_path = Path(tmp_dir)
-    maud_output_path = Path(simulate(linear_model_path, output_path, n_samples))
+    maud_output_path = Path(
+        simulate(linear_model_path, output_path, n_samples)
+    )
     maud_oos_path = Path(
         generate_predictions(maud_output_path, linear_model_path, output_path)
     )

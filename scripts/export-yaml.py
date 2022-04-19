@@ -59,7 +59,9 @@ Template_Haldane = Template(
     {%- if not loop.last %} * {% endif %} {%- endfor -%} / {{Keq}}"""
 )
 
-Template_Tr = Template("""{{enz}} * {{kcat}} * ({{Trf}} - {{Trr}} * {{Hal}})""")
+Template_Tr = Template(
+    """{{enz}} * {{kcat}} * ({{Trf}} - {{Trr}} * {{Hal}})"""
+)
 
 Template_Tr_irr = Template("""{{enz}} * {{kcat}} * {{Trf}}""")
 
@@ -134,20 +136,31 @@ def main():
     """Run the script."""
     parser = argparse.ArgumentParser(description=HELP_MSG)
     parser.add_argument(
-        "maud_output_dir", type=str, nargs=1, help="A path to Maud output directory"
+        "maud_output_dir",
+        type=str,
+        nargs=1,
+        help="A path to Maud output directory",
     )
     parser.add_argument(
-        "--chain", default=0, help="Chain number to export parameter values for"
+        "--chain",
+        default=0,
+        help="Chain number to export parameter values for",
     )
     parser.add_argument(
         "--draw", default=0, help="Draw number to export parameter values for"
     )
-    parser.add_argument("--warmup", default=0, help="If draw is in warmup phase or not")
     parser.add_argument(
-        "--yaml_output", default="output.yaml", help="Output of constructed yaml"
+        "--warmup", default=0, help="If draw is in warmup phase or not"
     )
     parser.add_argument(
-        "--selected_experiment", default=None, help="Experiment parameters exported"
+        "--yaml_output",
+        default="output.yaml",
+        help="Output of constructed yaml",
+    )
+    parser.add_argument(
+        "--selected_experiment",
+        default=None,
+        help="Experiment parameters exported",
     )
     args = parser.parse_args()
     maud_output_dir = args.maud_output_dir[0]
@@ -156,7 +169,9 @@ def main():
     warmup = bool(args.warmup)
     yaml_output = os.path.join(HERE, args.yaml_output)
     csvs = get_csvs(maud_output_dir)
-    mi = load_maud_input(os.path.join(maud_output_dir, "user_input"), mode="sample")
+    mi = load_maud_input(
+        os.path.join(maud_output_dir, "user_input"), mode="sample"
+    )
     infd = load_infd(csvs, mi)
     selected_experiment = None
     if selected_experiment is None:
@@ -190,7 +205,9 @@ def main():
             par_input.append(
                 [
                     f"m{mic.id}",
-                    list(conc_values[conc_values["mic_id"] == mic.id]["value"])[0],
+                    list(
+                        conc_values[conc_values["mic_id"] == mic.id]["value"]
+                    )[0],
                 ]
             )
     for rxn in mi.kinetic_model.reactions:
@@ -198,7 +215,9 @@ def main():
             par_input.append(
                 [
                     f"e{enz.id}",
-                    list(enz_values[enz_values["enzyme_id"] == enz.id]["value"])[0],
+                    list(
+                        enz_values[enz_values["enzyme_id"] == enz.id]["value"]
+                    )[0],
                 ]
             )
     for rxn in mi.kinetic_model.reactions:
@@ -206,7 +225,11 @@ def main():
             par_input.append(
                 [
                     f"r{rxn.id}",
-                    list(drain_values[drain_values["drain_id"] == rxn.id]["value"])[0],
+                    list(
+                        drain_values[drain_values["drain_id"] == rxn.id][
+                            "value"
+                        ]
+                    )[0],
                 ]
             )
 
@@ -224,7 +247,9 @@ def main():
                 met_id = next(
                     filter(lambda mic: mic.id == mic_id, mi.kinetic_model.mics)
                 ).metabolite_id
-                met_dgf = list(dgfs[dgfs["metabolite_id"] == met_id]["value"])[0]
+                met_dgf = list(dgfs[dgfs["metabolite_id"] == met_id]["value"])[
+                    0
+                ]
                 tmp_dg += stoic * met_dgf
             if rxn.water_stoichiometry:
                 tmp_dg += rxn.water_stoichiometry * -157.6
@@ -237,7 +262,9 @@ def main():
                 [f"km_{row['enzyme_id']}_{row['mic_id']}", row["value"]]
                 for _, row in tmp_kms.iterrows()
             ]
-            tmp_kcats = tmp_enz_pars.loc[tmp_enz_pars["parameter_name"] == "kcat"]
+            tmp_kcats = tmp_enz_pars.loc[
+                tmp_enz_pars["parameter_name"] == "kcat"
+            ]
             par_input += [
                 [f"kcat_{row['enzyme_id']}", row["value"]]
                 for _, row in tmp_kcats.iterrows()
@@ -247,12 +274,16 @@ def main():
                 [f"ki_{row['enzyme_id']}_{row['mic_id']}", row["value"]]
                 for _, row in tmp_kis.iterrows()
             ]
-            tmp_aas = tmp_enz_pars.loc[tmp_enz_pars["parameter_name"] == "diss_r"]
+            tmp_aas = tmp_enz_pars.loc[
+                tmp_enz_pars["parameter_name"] == "diss_r"
+            ]
             par_input += [
                 [f"aa_{row['enzyme_id']}_{row['mic_id']}", row["value"]]
                 for _, row in tmp_aas.iterrows()
             ]
-            tmp_ais = tmp_enz_pars.loc[tmp_enz_pars["parameter_name"] == "diss_t"]
+            tmp_ais = tmp_enz_pars.loc[
+                tmp_enz_pars["parameter_name"] == "diss_t"
+            ]
             par_input += [
                 [f"ai_{row['enzyme_id']}_{row['mic_id']}", row["value"]]
                 for _, row in tmp_ais.iterrows()
@@ -266,10 +297,14 @@ def main():
             ]
 
             substrate_list = [
-                f"m{mic}" for mic, stoic in rxn.stoichiometry.items() if stoic < 0
+                f"m{mic}"
+                for mic, stoic in rxn.stoichiometry.items()
+                if stoic < 0
             ]
             product_list = [
-                f"m{mic}" for mic, stoic in rxn.stoichiometry.items() if stoic > 0
+                f"m{mic}"
+                for mic, stoic in rxn.stoichiometry.items()
+                if stoic > 0
             ]
             mic_list = [f"m{mic}" for mic, _ in rxn.stoichiometry.items()]
 
@@ -277,7 +312,10 @@ def main():
                 zip(
                     substrate_list,
                     [f"km_{enz.id}_{mic[1:]}" for mic in substrate_list],
-                    [np.abs(rxn.stoichiometry[mic[1:]]) for mic in substrate_list],
+                    [
+                        np.abs(rxn.stoichiometry[mic[1:]])
+                        for mic in substrate_list
+                    ],
                 )
             )
 
@@ -285,7 +323,10 @@ def main():
                 zip(
                     product_list,
                     [f"km_{enz.id}_{mic[1:]}" for mic in product_list],
-                    [np.abs(rxn.stoichiometry[mic[1:]]) for mic in product_list],
+                    [
+                        np.abs(rxn.stoichiometry[mic[1:]])
+                        for mic in product_list
+                    ],
                 )
             )
 
@@ -316,9 +357,15 @@ def main():
             if rxn.reaction_mechanism == "reversible_modular_rate_law":
                 Trf = Template_T_met.render(met_array=substrate_entry)
                 Trr = Template_T_met.render(met_array=product_entry)
-                Hal = Template_Haldane.render(Km_array=haldane_entry, Keq=tmp_Keq)
+                Hal = Template_Haldane.render(
+                    Km_array=haldane_entry, Keq=tmp_Keq
+                )
                 Tr = Template_Tr.render(
-                    enz=f"e{enz.id}", kcat=f"kcat_{enz.id}", Trf=Trf, Trr=Trr, Hal=Hal
+                    enz=f"e{enz.id}",
+                    kcat=f"kcat_{enz.id}",
+                    Trf=Trf,
+                    Trr=Trr,
+                    Hal=Hal,
                 )
                 Dr = Template_Dr.render(
                     sub_array=substrate_entry, prod_array=product_entry
@@ -334,8 +381,12 @@ def main():
             Drreg = Template_Drreg.render(met_array=competitive_entry)
             if competitive_entry == []:
                 Drreg = "0"
-            Allo_Act = Template_Allo_Act_Inh.render(met_array=allosteric_activators)
-            Allo_Inh = Template_Allo_Act_Inh.render(met_array=allosteric_inhibitors)
+            Allo_Act = Template_Allo_Act_Inh.render(
+                met_array=allosteric_activators
+            )
+            Allo_Inh = Template_Allo_Act_Inh.render(
+                met_array=allosteric_inhibitors
+            )
             if allosteric_activators == []:
                 Allo_Act = "1"
             if allosteric_inhibitors == []:
@@ -355,11 +406,15 @@ def main():
             flux_dict[enz.id] = flux
         if rxn.reaction_mechanism == "drain":
             substrate_list = [
-                f"m{mic}" for mic, stoic in rxn.stoichiometry.items() if stoic < 0
+                f"m{mic}"
+                for mic, stoic in rxn.stoichiometry.items()
+                if stoic < 0
             ]
             if substrate_list == []:
                 substrate_list = [1]
-            flux = Template_drain.render(drain=f"r{rxn.id}", sub_array=substrate_list)
+            flux = Template_drain.render(
+                drain=f"r{rxn.id}", sub_array=substrate_list
+            )
             flux_dict[rxn.id] = flux
 
     system_odes = {}
@@ -371,9 +426,13 @@ def main():
                 if S.loc[mic.id, edge] != 0:
                     if first == 0:
                         first += 1
-                        tmp_met_ode += f"({S.loc[mic.id, edge]}*{flux_dict[edge]})"
+                        tmp_met_ode += (
+                            f"({S.loc[mic.id, edge]}*{flux_dict[edge]})"
+                        )
                     else:
-                        tmp_met_ode += f"+({S.loc[mic.id, edge]}*{flux_dict[edge]})"
+                        tmp_met_ode += (
+                            f"+({S.loc[mic.id, edge]}*{flux_dict[edge]})"
+                        )
             system_odes[mic.id] = tmp_met_ode
     ode_input = [
         [f"m{mic.id}", system_odes[mic.id], balanced_mic_values[mic.id]]

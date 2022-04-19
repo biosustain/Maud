@@ -1,0 +1,57 @@
+import pandas as pd
+
+from maud.data_model.measurement_set import (
+    EnzymeKnockout,
+    Experiment,
+    MeasurementSet,
+    MeasurementType,
+    PhosphorylationKnockout,
+)
+
+
+def parse_measurement_set(
+    raw_measurement_table: pd.DataFrame, raw_biological_config: dict
+) -> MeasurementSet:
+    """Parse a measurements dataframe.
+
+    :param measurement_table: result of running pd.read_csv on suitable file
+    :param raw_biological_config: result of running toml.load on suitable file
+    """
+    experiments = [
+        Experiment(id=e["id"], is_train=e["is_train"], is_test=e["is_test"])
+        for e in raw_biological_config["experiment"]
+    ]
+    y = {
+        mt: raw_measurement_table.loc[
+            lambda df: df["measurement_type"] == mt.value
+        ]
+        for mt in MeasurementType
+    }
+    enz_knockouts = (
+        [
+            EnzymeKnockout(
+                experiment_id=eko["experiment_id"], enzyme_id=eko["enzyme_id"]
+            )
+            for eko in raw_biological_config["enzyme_knockout"]
+        ]
+        if "enzyme_knockout" in raw_biological_config.keys()
+        else None
+    )
+    phos_knockouts = (
+        [
+            PhosphorylationKnockout(
+                experiment_id=pko["experiment_id"], enzyme_id=pko["enzyme_id"]
+            )
+            for pko in raw_biological_config["phos_knockout"]
+        ]
+        if "phos_knockout" in raw_biological_config.keys()
+        else None
+    )
+    return MeasurementSet(
+        yconc=y[MeasurementType.MIC],
+        yflux=y[MeasurementType.FLUX],
+        yenz=y[MeasurementType.ENZYME],
+        enz_knockouts=enz_knockouts,
+        phos_knockouts=phos_knockouts,
+        experiments=experiments,
+    )

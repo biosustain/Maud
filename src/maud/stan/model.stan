@@ -81,7 +81,7 @@ data {
   array[N_experiment, 2] int phosphorylation_knockout_bounds;
   vector<lower=1>[N_enzyme] subunits;
   // configuration
-  vector<lower=0>[N_mic] conc_init[N_experiment];
+  array[N_experiment] vector<lower=0>[N_mic] conc_init;
   real rel_tol; 
   real abs_tol;
   real steady_state_threshold_abs;
@@ -141,50 +141,6 @@ transformed parameters {
         extract_ragged(phosphorylation_knockout_long, phosphorylation_knockout_bounds, e);
       conc_phos_experiment[pko_experiment] = rep_vector(0, N_pko_experiment);
     }
-    /* print("conc_init[e, balanced_mic_ix]",conc_init[e, balanced_mic_ix]); */
-    /* print("initial_time",initial_time); */
-    /* print("{timepoint}",{timepoint}); */
-    /* print("rel_tol",rel_tol); */
-    /* print("abs_tol",abs_tol); */
-    /* print("max_num_steps",max_num_steps); */
-    /* print("conc_unbalanced[e]",conc_unbalanced[e]); */
-    /* print("balanced_mic_ix",balanced_mic_ix); */
-    /* print("unbalanced_mic_ix",unbalanced_mic_ix); */
-    /* print("conc_enzyme_experiment",conc_enzyme_experiment); */
-    /* print("dgrs",dgrs); */
-    /* print("kcat",kcat); */
-    /* print("km",km); */
-    /* print("ki",ki); */
-    /* print("transfer_constant",transfer_constant); */
-    /* print("dissociation_constant",dissociation_constant); */
-    /* print("log_dissociation_constant_z",log_dissociation_constant_z); */
-    /* print("kcat_phos",kcat_phos); */
-    /* print("conc_phos_experiment",conc_phos_experiment); */
-    /* print("drain[e]",drain[e]); */
-    /* print("S",S); */
-    /* print("subunits",subunits); */
-    /* print("edge_type",edge_type); */
-    /* print("edge_to_enzyme",edge_to_enzyme); */
-    /* print("edge_to_drain",edge_to_drain); */
-    /* print("sub_km_ix_by_edge_long",sub_km_ix_by_edge_long); */
-    /* print("sub_km_ix_by_edge_bounds",sub_km_ix_by_edge_bounds); */
-    /* print("prod_km_ix_by_edge_long",prod_km_ix_by_edge_long); */
-    /* print("prod_km_ix_by_edge_bounds",prod_km_ix_by_edge_bounds); */
-    /* print("sub_by_edge_long",sub_by_edge_long); */
-    /* print("sub_by_edge_bounds",sub_by_edge_bounds); */
-    /* print("prod_by_edge_long",prod_by_edge_long); */
-    /* print("prod_by_edge_bounds",prod_by_edge_bounds); */
-    /* print("ci_ix_long",ci_ix_long); */
-    /* print("ci_ix_bounds",ci_ix_bounds); */
-    /* print("allostery_ix_long",allostery_ix_long); */
-    /* print("allostery_ix_bounds",allostery_ix_bounds); */
-    /* print("allostery_type",allostery_type); */
-    /* print("allostery_mic",allostery_mic); */
-    /* print("edge_to_tc",edge_to_tc); */
-    /* print("phosphorylation_ix_long",phosphorylation_ix_long); */
-    /* print("phosphorylation_ix_bounds",phosphorylation_ix_bounds); */
-    /* print("phosphorylation_type",phosphorylation_type); */
-
     conc_balanced =
       ode_bdf_tol(dbalanced_dt,
                   conc_init[e, balanced_mic_ix],
