@@ -194,11 +194,11 @@ functions {
       real tc_edge = tc[edge_to_tc[f]];
       for (allostery in extract_ragged(allostery_ix_long, allostery_ix_bounds, f)){
         real conc_over_dc = conc[allostery_mic[allostery]] / dc[allostery];
-        if (allostery_type[allostery] == 1){ // inhibition
-          Q_num += conc_over_dc;
-        }
-        else {  // activation
+        if (allostery_type[allostery] == 1){ // activation
           Q_denom += conc_over_dc;
+        }
+        else {  // inhibition
+          Q_num += conc_over_dc;
         }
       }
       out[f] = inv(1 + tc_edge * (free_enzyme_ratio[f] * (1+Q_num) / (1+Q_denom)) ^ subunits[f]);
