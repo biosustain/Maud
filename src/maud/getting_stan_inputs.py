@@ -120,6 +120,9 @@ def get_stan_inputs(
     unbalanced_mic_codes = [
         mic_codes[mic.id] for mic in mics if not mic.balanced
     ]
+    ci_mic_codes = [
+        mic_codes[ci.mic_id] for ci in kinetic_model.competitive_inhibitions
+    ] if kinetic_model.competitive_inhibitions is not None else []
     edge_tc_code = [
         tc_codes[e.enzyme_id]
         if isinstance(e, EnzymeReaction) and e.enzyme_id in tc_codes.keys()
@@ -351,6 +354,7 @@ def get_stan_inputs(
         N_reaction=StanData("N_reaction", len(reactions)),
         balanced_mic_ix=StanData("balanced_mic_ix", balanced_mic_codes),
         unbalanced_mic_ix=StanData("unbalanced_mic_ix", unbalanced_mic_codes),
+        ci_mic_ix=StanData("ci_mic_ix", ci_mic_codes),
         edge_type=StanData("edge_type", edge_mechanism_code),
         edge_to_enzyme=StanData("edge_to_enzyme", edge_enzyme_code),
         edge_to_tc=StanData("edge_to_tc", edge_tc_code),
@@ -451,6 +455,7 @@ def get_stan_inputs(
         N_allosteric_enzyme=StanData("N_allosteric_enzyme", len(tc_codes)),
         balanced_mic_ix=StanData("balanced_mic_ix", balanced_mic_codes),
         unbalanced_mic_ix=StanData("unbalanced_mic_ix", unbalanced_mic_codes),
+        ci_mic_ix=StanData("ci_mic_ix", ci_mic_codes),
         edge_type=StanData("edge_type", edge_mechanism_code),
         edge_to_enzyme=StanData("edge_to_enzyme", edge_enzyme_code),
         edge_to_tc=StanData("edge_to_tc", edge_tc_code),

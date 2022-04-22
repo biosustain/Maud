@@ -118,6 +118,7 @@ functions {
                                vector km,
                                vector ki,
                                int[] edge_type,
+                               int[] ci_mic_ix,
                                int[] sub_km_ix_by_edge_long,
                                int[,] sub_km_ix_by_edge_bounds,
                                int[] prod_km_ix_by_edge_long,
@@ -151,7 +152,7 @@ functions {
       }
       if (N_ci > 0){
         array[N_ci] int ci_ix = extract_ragged(ci_ix_long, ci_ix_bounds, f);
-        denom[f] += sum(conc[ci_ix] ./ ki[ci_ix]);
+        denom[f] += sum(conc[ci_mic_ix[ci_ix]] ./ ki[ci_ix]);
       }
     }
     return inv(denom);
@@ -280,6 +281,7 @@ functions {
                        array[] int edge_type,
                        array[] int edge_to_enzyme,
                        array[] int edge_to_drain,
+                       array[] int ci_mic_ix,
                        array[] int sub_km_ix_by_edge_long,
                        array[,] int sub_km_ix_by_edge_bounds,
                        array[] int prod_km_ix_by_edge_long,
@@ -306,6 +308,7 @@ functions {
                                                              km,
                                                              ki,
                                                              edge_type,
+                                                             ci_mic_ix,
                                                              sub_km_ix_by_edge_long,
                                                              sub_km_ix_by_edge_bounds,
                                                              prod_km_ix_by_edge_long,
@@ -369,6 +372,7 @@ functions {
                       array[] int edge_type,
                       array[] int edge_to_enzyme,
                       array[] int edge_to_drain,
+                      array[] int ci_mic_ix,
                       array[] int sub_km_ix_by_edge_long,
                       array[,] int sub_km_ix_by_edge_bounds,
                       array[] int prod_km_ix_by_edge_long,
@@ -406,6 +410,7 @@ functions {
                                               edge_type,
                                               edge_to_enzyme,
                                               edge_to_drain,
+                                              ci_mic_ix,
                                               sub_km_ix_by_edge_long,
                                               sub_km_ix_by_edge_bounds,
                                               prod_km_ix_by_edge_long,

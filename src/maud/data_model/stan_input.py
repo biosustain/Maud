@@ -73,6 +73,7 @@ class StanInputTrain:
     N_reaction: StanData
     balanced_mic_ix: StanData
     unbalanced_mic_ix: StanData
+    ci_mic_ix: StanData
     edge_type: StanData
     edge_to_enzyme: StanData
     edge_to_tc: StanData
@@ -218,6 +219,7 @@ class StanInputTest:
     N_allosteric_enzyme: StanData
     balanced_mic_ix: StanData
     unbalanced_mic_ix: StanData
+    ci_mic_ix: StanData
     edge_type: StanData
     edge_to_enzyme: StanData
     edge_to_tc: StanData

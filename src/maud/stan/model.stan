@@ -51,6 +51,7 @@ data {
   matrix[N_mic, N_edge] S;
   array[N_mic-N_unbalanced] int<lower=1,upper=N_mic> balanced_mic_ix;
   array[N_unbalanced] int<lower=1,upper=N_mic> unbalanced_mic_ix;
+  array[N_competitive_inhibition] int<lower=1,upper=N_mic> ci_mic_ix;
   array[N_edge] int<lower=1,upper=3> edge_type;  // 1 = reversible modular rate law, 2 = drain
   array[N_edge] int<lower=0,upper=N_enzyme> edge_to_enzyme;  // 0 if drain
   array[N_edge] int<lower=0,upper=N_allostery> edge_to_tc;  // 0 if non-allosteric
@@ -167,6 +168,7 @@ transformed parameters {
                   edge_type,
                   edge_to_enzyme,
                   edge_to_drain,
+                  ci_mic_ix,
                   sub_km_ix_by_edge_long,
                   sub_km_ix_by_edge_bounds,
                   prod_km_ix_by_edge_long,
@@ -204,6 +206,7 @@ transformed parameters {
                                              edge_type,
                                              edge_to_enzyme,
                                              edge_to_drain,
+                                             ci_mic_ix,
                                              sub_km_ix_by_edge_long,
                                              sub_km_ix_by_edge_bounds,
                                              prod_km_ix_by_edge_long,
@@ -294,6 +297,7 @@ generated quantities {
                                                  km,
                                                  ki,
                                                  edge_type,
+                                                 ci_mic_ix,
                                                  sub_km_ix_by_edge_long,
                                                  sub_km_ix_by_edge_bounds,
                                                  prod_km_ix_by_edge_long,
