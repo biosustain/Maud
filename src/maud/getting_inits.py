@@ -1,3 +1,5 @@
+"""Functions for creating InitDict objects."""
+
 from typing import Optional, Union
 
 import numpy as np
@@ -59,6 +61,7 @@ def get_user_inits_for_param(
     u: pd.DataFrame,
     p: Union[IndPrior1d, IndPrior2d, MultiVariateNormalPrior1d],
 ) -> pd.Series:
+    """Process a parameter and a dataframe of user-provided initial values."""
     if len(p.location) == 0:
         v = pd.Series(p.location).astype(float).values
         assert isinstance(v, np.ndarray)

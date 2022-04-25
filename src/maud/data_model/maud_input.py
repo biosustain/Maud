@@ -1,4 +1,4 @@
-"""Provides dataclass MaudInput."""
+"""Provides dataclass MaudInput containing Maud needs to run."""
 
 from dataclasses import field
 from typing import Optional
@@ -20,6 +20,8 @@ from maud.getting_stan_variables import get_stan_variable_set
 
 
 class MIConfig:
+    """Config for MaudInput, allowing it to contain pandas objects."""
+
     arbitrary_types_allowed = True
 
 
@@ -46,6 +48,7 @@ class MaudInput:
     stan_input_test: StanInputTest = field(init=False)
 
     def __post_init__(self):
+        """Add attributes that depend on other ones."""
         self.stan_variable_set = get_stan_variable_set(
             self.kinetic_model, self.measurements
         )

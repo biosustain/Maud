@@ -1,19 +1,3 @@
-# Copyright (C) 2019 Novo Nordisk Foundation Center for Biosustainability,
-# Technical University of Denmark.
-#
-# This program is free software: you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation, either version 3 of the License, or
-# (at your option) any later version.
-#
-# This program is distributed in the hope that it will be useful,
-# but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-# GNU General Public License for more details.
-#
-# You should have received a copy of the GNU General Public License
-# along with this program.  If not, see <https://www.gnu.org/licenses/>.
-
 """Code for sampling from a posterior distribution."""
 
 import os
@@ -149,6 +133,7 @@ def predict(
     idata_train: az.InferenceData,
 ) -> az.InferenceData:
     """Call CmdStanModel.sample for out of sample predictions.
+
     :param mi: a MaudInput object
     :param output_dir: directory where output will be saved
     :param idata_train: InferenceData object with posterior draws
@@ -169,9 +154,11 @@ def predict(
         "ki",
     ]
     posterior = idata_train.get("posterior")
-
-    chains = idata_train.sample_stats["chain"]
-    draws = idata_train.sample_stats["draw"]
+    sample_stats = idata_train.get("sample_stats")
+    assert posterior is not None
+    assert sample_stats is not None
+    chains = sample_stats["chain"]
+    draws = sample_stats["draw"]
     dims = {
         "conc": ["experiment", "mic"],
         "conc_enzyme": ["experiment", "enzyme"],
@@ -218,84 +205,13 @@ def predict(
             if draw == 0:
                 idata_chain = idata_draw.copy()
             else:
-                idata_chain = az.concat([idata_chain, idata_draw], dim="draw", reset_dim=False)
+                idata_chain = az.concat(
+                    [idata_chain, idata_draw],
+                    dim="draw",
+                    reset_dim=False
+                )
         if chain == 0:
             out = idata_chain.copy()
         else:
             out = az.concat([out, idata_chain], dim="chain", reset_dim=False)
     return out
-
-
-    # config = {
-    #     **DEFAULT_SAMPLE_CONFIG,
-    #     **{"output_dir": output_dir},
-    # }
-    # input_filepath = os.path.join(output_dir, "input_data.json")
-    # input_data = mi.stan_input_train.stan_input_dict
-    # cmdstanpy.utils.write_stan_json(input_filepath, input_data)
-    # ppc_program_filepath = os.path.join(HERE, PPC_PROGRAM_RELATIVE_PATH)
-    # include_path = os.path.join(HERE, INCLUDE_PATH)
-    # cpp_options = {}
-    # stanc_options = {"include_paths": [include_path]}
-    # infd = load_infd(csvs, mi_train)
-    # kinetic_parameters = [
-    #     "keq",
-    #     "km",
-    #     "kcat",
-    #     "dissociation_constant",
-    #     "transfer_constant",
-    #     "kcat_phos",
-    #     "ki",
-    # ]
-    # if config["threads_per_chain"] != 1:
-    #     cpp_options["STAN_THREADS"] = True
-    #     os.environ["STAN_NUM_THREADS"] = str(config["threads_per_chain"])
-    # posterior = infd.get("posterior")
-    # assert isinstance(posterior, Dataset)
-    # chains = posterior.chain.to_series().values
-    # draws = posterior.draw.to_series().values
-    # gq_model = cmdstanpy.CmdStanModel(
-    #     stan_file=ppc_program_filepath,
-    #     stanc_options=stanc_options,
-    #     cpp_options=cpp_options,
-    # )
-    # all_conc = []
-    # all_conc_enz = []
-    # all_flux = []
-    # for chain in chains:
-    #     for draw in draws:
-    #         inits = {
-    #             par: posterior[par][chain][draw].to_series().values
-    #             for par in kinetic_parameters
-    #             if par in posterior.variables.keys()
-    #         }
-    #         gq_samples = gq_model.sample(
-    #             inits=inits,
-    #             iter_warmup=0,
-    #             iter_sampling=1,
-    #             data=input_filepath,
-    #             fixed_param=True,
-    #         )
-    #         posterior_fit = load_infd_fit(gq_samples.runset.csv_files, mi_oos).get(
-    #             "posterior"
-    #         )
-    #         assert isinstance(posterior_fit, Dataset)
-    #         tmp_conc = posterior_fit.conc.to_dataframe().reset_index()
-    #         tmp_conc["chain"] = chain
-    #         tmp_conc["draw"] = draw
-    #         tmp_conc_enz = posterior_fit.conc_enzyme.to_dataframe().reset_index()
-    #         tmp_conc_enz["chain"] = chain
-    #         tmp_conc_enz["draw"] = draw
-    #         tmp_flux = posterior_fit.flux.to_dataframe().reset_index()
-    #         tmp_flux["chain"] = chain
-    #         tmp_flux["draw"] = draw
-    #         all_conc.append(tmp_conc)
-    #         all_conc_enz.append(tmp_conc_enz)
-    #         all_flux.append(tmp_flux)
-    # draws = {}
-    # flux_df = pd.concat(all_flux)
-    # conc_df = pd.concat(all_conc)
-    # conc_enz_df = pd.concat(all_conc_enz)
-    # flux_df.to_csv(os.path.join(output_dir, "flux.csv"))
-    # conc_df.to_csv(os.path.join(output_dir, "conc.csv"))
-    # conc_enz_df.to_csv(os.path.join(output_dir, "conc_enzyme.csv"))

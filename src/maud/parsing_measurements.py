@@ -1,3 +1,5 @@
+"""Functions for parsing measurements from raw Maud inputs."""
+
 import pandas as pd
 
 from maud.data_model.measurement_set import (
@@ -27,7 +29,7 @@ def parse_measurement_set(
         ]
         for mt in MeasurementType
     }
-    enz_knockouts = (
+    enzyme_knockouts = (
         [
             EnzymeKnockout(
                 experiment_id=eko["experiment_id"], enzyme_id=eko["enzyme_id"]
@@ -37,7 +39,7 @@ def parse_measurement_set(
         if "enzyme_knockout" in raw_biological_config.keys()
         else None
     )
-    phos_knockouts = (
+    phosphorylation_knockouts = (
         [
             PhosphorylationKnockout(
                 experiment_id=pko["experiment_id"], enzyme_id=pko["enzyme_id"]
@@ -51,7 +53,7 @@ def parse_measurement_set(
         yconc=y[MeasurementType.MIC],
         yflux=y[MeasurementType.FLUX],
         yenz=y[MeasurementType.ENZYME],
-        enz_knockouts=enz_knockouts,
-        phos_knockouts=phos_knockouts,
+        enzyme_knockouts=enzyme_knockouts,
+        phosphorylation_knockouts=phosphorylation_knockouts,
         experiments=experiments,
     )

@@ -1,7 +1,6 @@
-from typing import Dict, Iterable, List, Optional, Tuple, Union
+"""Code for creating StanInput objects."""
 
-import numpy as np
-import pandas as pd
+from typing import Dict, Iterable, List, Optional, Tuple, Union
 
 from maud.data_model.hardcoding import ID_SEPARATOR
 from maud.data_model.kinetic_model import (
@@ -19,7 +18,6 @@ from maud.data_model.maud_config import MaudConfig
 from maud.data_model.measurement_set import Experiment, MeasurementSet
 from maud.data_model.prior_set import IndPrior1d, IndPrior2d, PriorSet
 from maud.data_model.stan_input import StanData, StanInputTest, StanInputTrain
-from maud.data_model.stan_variable_set import DissociationConstant, Ki, Km
 
 
 CodifiableMaudObject = Union[
@@ -546,25 +544,6 @@ def encode_ragged(ragged: List[List]) -> Tuple[List, List]:
     return flat, bounds
 
 
-def get_lookup(k: Union[Km, Ki], S: pd.DataFrame) -> List[int]:
-    out = pd.DataFrame(np.zeros(S.shape), index=S.index, columns=S.columns)
-    for i, (mic_id, er_id) in enumerate(zip(k.mic_ids, k.er_ids)):
-        out.loc[mic_id, er_id] = i + 1
-    return out.values.astype(int).tolist()
-
-
-def get_diss_lookup(d: DissociationConstant, S: pd.DataFrame) -> List[int]:
-    out = pd.DataFrame(np.zeros(S.shape), index=S.index, columns=S.columns)
-    for i, (mic_id, enz_id) in enumerate(zip(d.mic_ids, d.enzyme_ids)):
-        er_ids = [
-            er_id
-            for er_id in S.columns
-            if er_id.split(ID_SEPARATOR)[0] == enz_id
-        ]
-        out.loc[mic_id, er_ids] = i + 1
-    return out.values.astype(int).tolist()
-
-
 def get_conc_init(
     ms: MeasurementSet,
     kinetic_model: KineticModel,
@@ -603,12 +582,14 @@ def get_conc_init(
 def unpack_priors_2d(
     p: IndPrior2d, exp_ids: Optional[List[str]]
 ) -> List[List[List[float]]]:
+    """Turn an IndPrior2d object into a json-compatible list."""
     loc = p.location if exp_ids is None else p.location.loc[exp_ids]
     scale = p.scale if exp_ids is None else p.scale.loc[exp_ids]
     return [loc.values.tolist(), scale.values.tolist()]
 
 
 def unpack_priors_1d(p: IndPrior1d) -> List[List[float]]:
+    """Turn an IndPrior1d object into a json-compatible list."""
     return [p.location.to_list(), p.scale.to_list()]
 
 

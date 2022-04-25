@@ -1,3 +1,5 @@
+"""Functions for creating *Prior* and PriorSet objects."""
+
 import pandas as pd
 
 from maud.data_model.prior_set import (
@@ -18,6 +20,10 @@ from maud.utils import (
 def load_1d_prior(
     user_df: pd.DataFrame, stan_variable: StanVariable
 ) -> IndPrior1d:
+    """Get an IndPrior1d object from a dataframe and StanVariable.
+
+    The StanVariable provides defaults and is included in the return value.
+    """
     loc = pd.Series(stan_variable.default_loc, index=stan_variable.ids[0])
     scale = pd.Series(stan_variable.default_scale, index=stan_variable.ids[0])
     user_df_for_param = user_df.loc[
@@ -42,6 +48,10 @@ def load_1d_prior(
 def load_2d_prior(
     user_df: pd.DataFrame, stan_variable: StanVariable
 ) -> IndPrior2d:
+    """Get an IndPrior2d object from a dataframe and StanVariable.
+
+    The StanVariable provides defaults and is included in the return value.
+    """
     loc = pd.DataFrame(
         stan_variable.default_loc,
         index=stan_variable.ids[0],
@@ -73,6 +83,7 @@ def load_2d_prior(
 
 
 def get_prior_set(upi: UserPriorInput, sv: StanVariableSet) -> PriorSet:
+    """Get a PriorSet from a UserPriorInput and StanVariableSet."""
     if upi.dgf_loc is not None and upi.dgf_cov is not None:
         prior_dgf = MultiVariateNormalPrior1d(sv.dgf, upi.dgf_loc, upi.dgf_cov)
     else:

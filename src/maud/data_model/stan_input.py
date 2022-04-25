@@ -1,3 +1,5 @@
+"""Definitions of inputs for Maud's Stan models."""
+
 from dataclasses import field, fields
 from math import isnan
 from typing import Dict, Sequence, Union
@@ -24,11 +26,14 @@ StanInputDict = Dict[str, StanDataValue]
 
 @dataclass
 class StanData:
+    """Something that will go in Stan's data block, in Python form."""
+
     name: str
     value: StanDataValue
 
     @root_validator
     def no_nans_allowed(cls, values):
+        """Check that Stan input data isn't null and doesn't contain nulls."""
         msg = f"StanData {values['name']} has non-numbers: {values['value']}"
         if isinstance(values["value"], Sequence):
             flat = recursively_flatten_list(values["value"])
@@ -40,6 +45,8 @@ class StanData:
 
 @dataclass
 class StanInputTrain:
+    """Input for model.stan, i.e. the training model."""
+
     # priors
     prior_loc_dgf: StanData
     prior_cov_dgf: StanData
@@ -140,6 +147,7 @@ class StanInputTrain:
     stan_input_dict: StanInputDict = field(init=False)
 
     def __post_init__(self):
+        """Add fields that can be inferred from other ones."""
         self.N_mic = StanData(name="N_mic", value=len(self.S.value))
         self.N_edge_sub = StanData(
             name="N_edge_sub", value=len(self.sub_by_edge_long.value)
@@ -205,6 +213,8 @@ class StanInputTrain:
 
 @dataclass
 class StanInputTest:
+    """Input for out_of_sample_model.stan, i.e. the test model."""
+
     # priors
     priors_conc_phos: StanData
     priors_conc_unbalanced: StanData
@@ -277,6 +287,7 @@ class StanInputTest:
     stan_input_dict: StanInputDict = field(init=False)
 
     def __post_init__(self):
+        """Add fields that can be inferred from other ones."""
         self.N_mic = StanData(name="N_mic", value=len(self.S.value))
         self.N_edge_sub = StanData(
             name="N_edge_sub", value=len(self.sub_by_edge_long.value)

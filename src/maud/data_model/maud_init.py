@@ -1,3 +1,5 @@
+"""Types that go in initial values specificaitons."""
+
 from typing import Dict, Sequence, Union
 
 

@@ -1,3 +1,5 @@
+"""Functions for creating InferenceData objects from Maud outputs."""
+
 from typing import List
 
 import arviz as az

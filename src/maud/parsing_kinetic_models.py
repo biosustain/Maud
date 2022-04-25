@@ -1,3 +1,5 @@
+"""Functions for parsing kinetic models from raw Maud input data."""
+
 from datetime import datetime
 from typing import List
 
@@ -112,7 +114,7 @@ def parse_kinetic_model(raw: dict) -> KineticModel:
 
 
 def parse_metabolites(raw: dict) -> List[Metabolite]:
-    """parse explicitly provided metabolites (if any), then infer extra ones.
+    """Parse explicitly provided metabolites (if any), then infer extra ones.
 
     :param raw: output of running toml.load on a suitable file
 
@@ -140,7 +142,7 @@ def parse_metabolites(raw: dict) -> List[Metabolite]:
 
 
 def parse_enzymes(raw: dict) -> List[Enzyme]:
-    """parse explicitly provided enzymes (if any), then infer extra ones.
+    """Parse explicitly provided enzymes (if any), then infer extra ones.
 
     :param raw: output of running toml.load on a suitable file
 

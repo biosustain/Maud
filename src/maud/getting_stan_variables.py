@@ -28,6 +28,7 @@ KiCoords = Tuple[List[str], List[str], List[str], List[str], List[str]]
 
 
 def get_km_coords(kinetic_model: KineticModel) -> KmCoords:
+    """Get ids and split ids for a model's Kms."""
     km_ids = []
     km_enzs = []
     km_mets = []
@@ -47,6 +48,7 @@ def get_km_coords(kinetic_model: KineticModel) -> KmCoords:
 
 
 def get_dc_coords(kinetic_model: KineticModel) -> AllostericCoords:
+    """Get ids and split ids for a model's dissociation constants."""
     ids = []
     enzs = []
     mets = []
@@ -61,6 +63,7 @@ def get_dc_coords(kinetic_model: KineticModel) -> AllostericCoords:
 
 
 def get_ci_coords(kinetic_model: KineticModel) -> KiCoords:
+    """Get ids and split ids for a model's competitive inhibition constants."""
     ids = []
     enzs = []
     rxns = []
@@ -77,6 +80,7 @@ def get_ci_coords(kinetic_model: KineticModel) -> KiCoords:
 
 
 def get_kcat_coords(kinetic_model: KineticModel) -> KcatCoords:
+    """Get ids and split ids for a model's Kcats."""
     ids = []
     enzs = []
     rxns = []
@@ -88,6 +92,7 @@ def get_kcat_coords(kinetic_model: KineticModel) -> KcatCoords:
 
 
 def get_stan_variable_set(kmod: KineticModel, ms: MeasurementSet):
+    """Get a StanVariableSet object from a KineticModel and a MeasurementSet."""
     km_ids, km_enzs, km_mets, km_cpts = get_km_coords(kmod)
     dc_ids, dc_enzs, dc_mets, dc_cpts = get_dc_coords(kmod)
     ci_ids, ci_enzs, ci_rxns, ci_mets, ci_cpts = get_ci_coords(kmod)

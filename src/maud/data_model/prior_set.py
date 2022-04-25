@@ -1,3 +1,10 @@
+"""Definitions of prior-related things.
+
+The most important is PriorSet, which defines the set of priors that any
+MaudInput must have.
+
+"""
+
 from typing import Optional
 
 import numpy as np
@@ -10,11 +17,15 @@ from maud.data_model.stan_variable_set import StanVariable
 
 
 class PriorConfig:
+    """Config allowing priors to contain pandas objects."""
+
     arbitrary_types_allowed = True
 
 
 @dataclass(config=PriorConfig)
 class UserPriorInput:
+    """The user's prior input, consisting of a dataframe and maybe dgf info."""
+
     main_table: pd.DataFrame
     dgf_loc: Optional[pd.Series]
     dgf_cov: Optional[pd.DataFrame]
@@ -29,7 +40,8 @@ class IndPrior1d:
     scale: pd.Series
 
     @root_validator
-    def cov_and_loc_indexes_must_match(cls, values):
+    def loc_and_scale_indexes_must_match(cls, values):
+        """Check that location and scale have the same index."""
         assert values["location"].index.equals(
             values["scale"].index
         ), "Location index doesn't match scale index."
@@ -46,6 +58,7 @@ class IndPrior2d:
 
     @root_validator
     def loc_and_scale_indexes_and_columns_must_match(cls, values):
+        """Check that location and scale have the same index and columns."""
         assert values["location"].index.equals(
             values["scale"].index
         ), "Location index doesn't match scale index."
@@ -65,6 +78,7 @@ class MultiVariateNormalPrior1d:
 
     @root_validator
     def cov_and_loc_indexes_must_match(cls, values):
+        """Check that location and cov agree."""
         assert values["location"].index.equals(
             values["covariance_matrix"].index
         ), "Location index doesn't match covariance matrix index."
@@ -75,6 +89,7 @@ class MultiVariateNormalPrior1d:
 
     @validator("covariance_matrix")
     def cov_matrix_must_be_pos_def(cls, v):
+        """Check that covariance matrix is positive definite."""
         try:
             np.linalg.cholesky(v.values)
         except LinAlgError as e:

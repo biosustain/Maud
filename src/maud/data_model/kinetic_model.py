@@ -1,19 +1,3 @@
-# Copyright (C) 2022 Novo Nordisk Foundation Center for Biosustainability,
-# Technical University of Denmark.
-#
-# This program is free software: you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation, either version 3 of the License, or
-# (at your option) any later version.
-#
-# This program is distributed in the hope that it will be useful,
-# but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-# GNU General Public License for more details.
-#
-# You should have received a copy of the GNU General Public License
-# along with this program.  If not, see <https://www.gnu.org/licenses/>.
-
 """Maud's definition of a kinetic model."""
 
 from dataclasses import field
@@ -31,63 +15,85 @@ from maud.data_model.hardcoding import ID_SEPARATOR
 
 
 class ReactionMechanism(str, Enum):
+    """Possible reaction mechanisms."""
+
     REVERSIBLE_MICHAELIS_MENTEN = 1
     IRREVERSIBLE_MICHAELIS_MENTEN = 2
     DRAIN = 3
 
 
 class ModificationType(str, Enum):
+    """Possible modification types."""
+
     ACTIVATION = 1
     INHIBITION = 2
 
 
 class KMConfig:
+    """Config allowing the KineticModel class to contain pandas objects."""
+
     arbitrary_types_allowed = True
 
 
 @dataclass
 class Metabolite:
+    """Maud representation of a metabolite."""
+
     id: str
     name: Optional[str]
     inchi_key: Optional[str]
 
     @validator("id")
     def id_must_not_contain_seps(cls, v):
+        """Check that the id doesn't contain ID_SEPARATOR."""
         assert ID_SEPARATOR not in v
         return v
 
 
 @dataclass
 class Enzyme:
+    """Maud representation of an enzyme."""
+
     id: str
     name: Optional[str]
     subunits: int
 
     @validator("id")
     def id_must_not_contain_seps(cls, v):
+        """Check that the id doesn't contain ID_SEPARATOR."""
         assert ID_SEPARATOR not in v
         return v
 
     @validator("subunits")
     def subunits_must_be_positive(cls, v):
+        """Check that the subunits attribute is biologically possible."""
         assert v > 0
         return v
 
 
 @dataclass
 class Compartment:
+    """Maud representation of an intra-cellular compartment.
+
+    For example, cytosol or mitochondria.
+
+    """
+
     id: str
     name: Optional[str]
     volume: float
 
     @validator("id")
     def id_must_not_contain_seps(cls, v):
+        """Check that the id doesn't contain ID_SEPARATOR."""
         assert ID_SEPARATOR not in v
         return v
 
 
 @dataclass
 class Reaction:
+    """Maud representation of a chemical reaction."""
+
     id: str
     name: Optional[str]
     mechanism: ReactionMechanism
@@ -96,38 +102,60 @@ class Reaction:
 
     @validator("id")
     def id_must_not_contain_seps(cls, v):
+        """Check that the id doesn't contain ID_SEPARATOR."""
         assert ID_SEPARATOR not in v
         return v
 
     @validator("stoichiometry")
     def stoichiometry_must_be_non_zero(cls, v):
+        """Check that the stoichiometry is not zero."""
         assert v != 0
         return v
 
 
 @dataclass
 class MetaboliteInCompartment:
+    """Maud representation of a metabolite/compartment pair.
+
+    This is needed because metabolites often exist in multiple compartments, and
+    the concentration in each one is important.
+
+    A metabolite may also be "balanced" (i.e. not be consumed or produced at
+    steady state) in one compartment but not in another.
+
+    """
+
     metabolite_id: str
     compartment_id: str
     balanced: bool
     id: str = field(init=False)
 
     def __post_init__(self):
+        """Add the id field."""
         self.id = ID_SEPARATOR.join([self.metabolite_id, self.compartment_id])
 
 
 @dataclass
 class EnzymeReaction:
+    """Maud representation of an enzyme/reaction pair.
+
+    This is needed because some enzymes catalyse multiple reactions.
+
+    """
+
     enzyme_id: str
     reaction_id: str
     id: str = field(init=False)
 
     def __post_init__(self):
+        """Add the id field."""
         self.id = self.enzyme_id + ID_SEPARATOR + self.reaction_id
 
 
 @dataclass
 class Allostery:
+    """Maud representation of an allosteric modification."""
+
     enzyme_id: str
     metabolite_id: str
     compartment_id: str
@@ -135,6 +163,7 @@ class Allostery:
     id: str = field(init=False)
 
     def __post_init__(self):
+        """Add the id and mic_id fields."""
         self.id = ID_SEPARATOR.join(
             [
                 self.enzyme_id,
@@ -149,6 +178,8 @@ class Allostery:
 
 @dataclass
 class CompetitiveInhibition:
+    """Maud representation of a competitive inhibition."""
+
     enzyme_id: str
     reaction_id: str
     metabolite_id: str
@@ -156,6 +187,7 @@ class CompetitiveInhibition:
     id: str = field(init=False)
 
     def __post_init__(self):
+        """Add the id, er_id and mic_id fields."""
         self.id = ID_SEPARATOR.join(
             [
                 self.enzyme_id,
@@ -172,11 +204,14 @@ class CompetitiveInhibition:
 
 @dataclass
 class Phosphorylation:
+    """Maud representation of a phosphorylation modification."""
+
     enzyme_id: str
     modification_type: ModificationType
     id: str = field(init=False)
 
     def __post_init__(self):
+        """Add the id field."""
         self.id = self.enzyme_id + ID_SEPARATOR + self.modification_type
 
 
@@ -200,6 +235,7 @@ class KineticModel:
     stoichiometric_matrix: pd.DataFrame = field(init=False)
 
     def __post_init__(self):
+        """Add drains, edges and stoichiometric matrix."""
         self.drains = [
             r for r in self.reactions if r.mechanism == ReactionMechanism.DRAIN
         ]
@@ -210,30 +246,35 @@ class KineticModel:
 
     @validator("metabolites")
     def metabolite_ids_must_be_unique(cls, v):
+        """Make sure there aren't any duplicated metabolite ids."""
         met_ids = [m.id for m in v]
         assert len(met_ids) == len(set(met_ids))
         return v
 
     @validator("enzymes")
     def enzyme_ids_must_be_unique(cls, v):
+        """Make sure there aren't any duplicated enzyme ids."""
         met_ids = [m.id for m in v]
         assert len(met_ids) == len(set(met_ids))
         return v
 
     @validator("compartments")
     def compartment_ids_must_be_unique(cls, v):
+        """Make sure there aren't any duplicated compartment ids."""
         met_ids = [m.id for m in v]
         assert len(met_ids) == len(set(met_ids))
         return v
 
     @validator("reactions")
     def reaction_ids_must_be_unique(cls, v):
+        """Make sure there aren't any duplicated reaction ids."""
         rxn_ids = [r.id for r in v]
         assert len(rxn_ids) == len(set(rxn_ids))
         return v
 
     @root_validator
     def stoic_keys_must_be_mic_ids(cls, values):
+        """Make sure reaction stoichiometries have existent mic ids."""
         mic_ids = [mic.id for mic in values["mics"]]
         for r in values["reactions"]:
             for stoich_mic_id in r.stoichiometry.keys():
@@ -244,6 +285,7 @@ class KineticModel:
 
     @root_validator
     def mic_references_must_exist(cls, values):
+        """Make sure mics have existent metabolite and compartment ids."""
         metabolite_ids = [m.id for m in values["metabolites"]]
         compartment_ids = [c.id for c in values["compartments"]]
         for mic in values["mics"]:
@@ -257,6 +299,7 @@ class KineticModel:
 
     @root_validator
     def er_references_must_exist(cls, values):
+        """Make sure ers have existent enzyme and reaction ids."""
         enzyme_ids = [e.id for e in values["enzymes"]]
         reaction_ids = [r.id for r in values["reactions"]]
         for er in values["ers"]:
@@ -268,6 +311,7 @@ class KineticModel:
 
     @root_validator
     def allostery_references_must_exist(cls, values):
+        """Make sure allosteries' external ids exist."""
         if values["allosteries"] is None:
             return values
         enzyme_ids = [e.id for e in values["enzymes"]]
@@ -283,6 +327,7 @@ class KineticModel:
 
     @root_validator
     def ci_references_must_exist(cls, values):
+        """Make sure competitive inhibitions' external ids exist."""
         if values["competitive_inhibitions"] is None:
             return values
         er_ids = [er.id for er in values["ers"]]
@@ -294,6 +339,7 @@ class KineticModel:
 
     @root_validator
     def phosphorylation_references_must_exist(cls, values):
+        """Make sure phosphorylations' external ids exist."""
         if values["phosphorylations"] is None:
             return values
         enzyme_ids = [e.id for e in values["enzymes"]]
@@ -307,6 +353,7 @@ def get_stoichiometric_matrix(
     mics: List[MetaboliteInCompartment],
     rxns: List[Reaction],
 ) -> pd.DataFrame:
+    """Get a stoichiometric matrix from lists of edges, mics and reactions."""
     edge_ids = [e.id for e in edges]
     mic_ids = [mic.id for mic in mics]
     S = pd.DataFrame(0, index=mic_ids, columns=edge_ids)

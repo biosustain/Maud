@@ -8,6 +8,8 @@ from pydantic.dataclasses import dataclass
 
 @dataclass
 class ODEConfig:
+    """Config that is specific to the ODE solver."""
+
     rel_tol: float = 1e-9
     abs_tol: float = 1e-9
     max_num_steps: int = int(1e9)
@@ -26,7 +28,6 @@ class MaudConfig:
     :param reject_non_steady: Reject draws if a non-steady state is encountered.
     :param ode_config: Configuration for Stan's ode solver.
     :param cmdstanpy_config: Arguments to cmdstanpy.CmdStanModel.sample.
-    :param cmdstanpy_config: Arguments to cmdstanpy.CmdStanModel.sample to use when predicting.
     :param stanc_options: Valid choices for CmdStanModel argument `stanc_options`.
     :param cpp_options: Valid choices for CmdStanModel `cpp_options`.
     :param variational_options: Arguments for CmdStanModel.variational.
@@ -59,10 +60,12 @@ class MaudConfig:
     multivariate_dgf_priors: bool = field(init=False)
 
     def __post_init__(self):
+        """Add multivariate_dgf_priors indicator attribute."""
         self.multivariate_dgf_priors = self.dgf_mean_file is not None
 
     @root_validator
     def must_have_either_both_or_neither_dgf_files(cls, values):
+        """If one special dgf file is specified, the other one must be too."""
         if values["dgf_mean_file"] is not None:
             msg = "dgf mean file provided without dgf covariance file."
             assert values["dgf_covariance_file"] is not None, msg
