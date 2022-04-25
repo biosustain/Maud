@@ -2,6 +2,7 @@
 id = "condition_1"
 sample = true
 predict = true
+temperature = 299.0
 
 [[experiment]]
 id = "condition_2"

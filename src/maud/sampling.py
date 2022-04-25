@@ -421,6 +421,7 @@ def get_prior_dict(ps: PriorSet) -> dict:
         "priors_diss_t": unpack(ps.priors_diss_t),
         "priors_diss_r": unpack(ps.priors_diss_r),
         "priors_kcat_phos": unpack(ps.priors_kcat_phos),
+        "priors_psi": unpack(ps.priors_psi),
         "priors_transfer_constant": unpack(ps.priors_transfer_constant),
         "priors_conc_unbalanced": unpack(ps.priors_conc_unbalanced),
         "priors_conc_enzyme": unpack(ps.priors_conc_enzyme),
@@ -437,6 +438,7 @@ def get_config_dict(mi: MaudInput) -> dict:
             "reject_non_steady": int(mi.config.reject_non_steady),
             "steady_state_threshold_abs": mi.config.steady_state_threshold_abs,
             "steady_state_threshold_rel": mi.config.steady_state_threshold_rel,
+            "drain_small_conc_corrector": mi.config.drain_small_conc_corrector,
             "conc_init": _get_conc_init(mi).values,
         },
         **mi.config.ode_config,
@@ -620,6 +622,10 @@ def get_input_data(mi: MaudInput) -> dict:
         mi.kinetic_model.mics,
         key=lambda m: codify(mi.stan_coords.mics)[m.id],
     )
+    sorted_experiments = sorted(
+        mi.all_experiments,
+        key=lambda exp: codify(mi.stan_coords.experiments)[exp.id],
+    )
     S = get_stoichiometry(mi)
     edge_type = [get_edge_type(eid, mi) for eid in S.columns]
     edge_to_enzyme = (
@@ -659,6 +665,13 @@ def get_input_data(mi: MaudInput) -> dict:
     water_stoichiometry = pd.Series(water_stoichiometry_enzyme, index=S.columns).fillna(
         0
     )
+    transported_charge_enzyme = {
+        e.id: next(
+            filter(lambda r: e in r.enzymes, mi.kinetic_model.reactions)
+        ).transported_charge
+        for e in sorted_enzymes
+    }
+    transported_charge = pd.Series(transported_charge_enzyme, index=S.columns).fillna(0)
     mic_to_met = [
         codify(mi.stan_coords.metabolites)[mic.metabolite_id] for mic in sorted_mics
     ]
@@ -733,6 +746,7 @@ def get_input_data(mi: MaudInput) -> dict:
             "unbalanced_mic_ix": unbalanced_mic_ix,
             "balanced_mic_ix": balanced_mic_ix,
             # network properties
+            "temperature": [exp.temperature for exp in sorted_experiments],
             "S": S.values,
             "edge_type": edge_type,
             "edge_to_enzyme": edge_to_enzyme.values,
@@ -740,6 +754,7 @@ def get_input_data(mi: MaudInput) -> dict:
             "edge_to_drain": edge_to_drain.values,
             "edge_to_reaction": edge_to_reaction.values,
             "water_stoichiometry": water_stoichiometry.values,
+            "transported_charge": transported_charge.values,
             "mic_to_met": mic_to_met,
             "km_lookup": km_lookup,
             "ki_lookup": ki_lookup,

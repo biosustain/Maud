@@ -76,6 +76,8 @@ DEFAULT_ODE_CONFIG = {
     "solver_backward": 2,  # BDF or change to 1 for adams
     "timepoint": 500,
 }
+DEFAULT_TEMPERATURE = 298.15
+DEFAULT_DRAIN_SMAL_CONC_CORRECTOR = 1e-6
 
 
 def load_maud_input(data_path: str, mode: str) -> MaudInput:
@@ -250,6 +252,7 @@ def get_stan_coords(
     drains = sorted([r.id for r in km.reactions if r.reaction_mechanism == "drain"])
     edges = enzymes + drains
     experiments = sorted([e.id for e in all_experiments if getattr(e, mode)])
+    psi = experiments.copy()
     ci_coords, ai_coords, aa_coords = (
         sorted(
             [
@@ -312,6 +315,7 @@ def get_stan_coords(
         enz_ko_enzs=enz_ko_enzs,
         phos_ko_exps=phos_ko_exps,
         phos_ko_enzs=phos_ko_enzs,
+        psi=psi,
     )
 
 
@@ -362,6 +366,7 @@ def parse_toml_reaction(raw: dict) -> Reaction:
     water_stoichiometry = (
         raw["water_stoichiometry"] if "water_stoichiometry" in raw.keys() else 0
     )
+    transported_charge = raw["transported_charge"] if "transported_charge" in raw else 0
     for e in raw["enzyme"]:
         modifiers = {
             "competitive_inhibitor": [],
@@ -398,6 +403,7 @@ def parse_toml_reaction(raw: dict) -> Reaction:
         stoichiometry=raw["stoichiometry"],
         enzymes=enzymes,
         water_stoichiometry=water_stoichiometry,
+        transported_charge=transported_charge,
     )
 
 
@@ -451,11 +457,20 @@ def get_all_experiment_object(
 
     :param raw: a dictionary the comes from a biological_context toml.
     """
-
-    return [
-        Experiment(id=exp["id"], sample=exp["sample"], predict=exp["predict"])
-        for exp in raw["experiment"]
-    ]
+    out = []
+    for exp in raw["experiment"]:
+        temperature = (
+            exp["temperature"] if "temperature" in exp.keys() else DEFAULT_TEMPERATURE
+        )
+        out.append(
+            Experiment(
+                id=exp["id"],
+                sample=exp["sample"],
+                predict=exp["predict"],
+                temperature=temperature,
+            )
+        )
+    return out
 
 
 def extract_1d_prior(
@@ -489,6 +504,7 @@ def extract_1d_prior(
         "ki": ["enzyme_id", "mic_id"],
         "transfer_constant": ["enzyme_id"],
         "kcat_phos": ["phos_enz_id"],
+        "psi": ["experiment_id"],
     }
     if any(len(c) == 0 for c in coords):
         return IndPrior1d(
@@ -633,6 +649,7 @@ def parse_priors(
             raw, "transfer_constant", [cs.allosteric_enzymes]
         ),
         priors_kcat_phos=extract_1d_prior(raw, "kcat_phos", [cs.phos_enzs]),
+        priors_psi=extract_1d_prior(raw, "psi", [cs.psi]),
         # 2d priors
         priors_drain=extract_2d_prior(raw, "drain", cs.experiments, cs.drains),
         priors_conc_enzyme=extract_2d_prior(
@@ -693,6 +710,11 @@ def parse_config(raw):
         if "steady_state_threshold_abs" in raw.keys()
         else DEFAULT_STEADY_STATE_THRESHOLD_REL
     )
+    drain_small_conc_corrector: float = (
+        raw["drain_small_conc_corrector"]
+        if "drain_small_conc_corrector" in raw.keys()
+        else DEFAULT_DRAIN_SMAL_CONC_CORRECTOR
+    )
 
     return MaudConfig(
         name=raw["name"],
@@ -712,6 +734,7 @@ def parse_config(raw):
         dgf_covariance_file=dgf_covariance_file,
         steady_state_threshold_abs=steady_state_threshold_abs,
         steady_state_threshold_rel=steady_state_threshold_rel,
+        drain_small_conc_corrector=drain_small_conc_corrector,
     )
 
 

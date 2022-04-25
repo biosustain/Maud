@@ -198,6 +198,9 @@ def simulate(data_path, output_dir, n):
     print(
         infd.posterior["saturation"].mean(dim=["chain", "draw"]).to_series().unstack().T
     )
+    # TODO(jorge): Psi posteriors should say the experiment they relate to
+    print("\n\nSimulated membrane potential:")
+    print(infd.posterior["psi"].mean(dim=["chain", "draw"]).to_series().T)
     return output_path
 
 

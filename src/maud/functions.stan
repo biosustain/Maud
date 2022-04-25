@@ -43,26 +43,26 @@ functions {
     return out;
   }
 
-  vector get_keq(matrix S, vector dgf, int[] mic_to_met, vector water_stoichiometry){
-    /*
-        Calculate keqs from metabolite formation energies, assuming water's
-        formation energy is known exactly.
-    */
-    real minus_RT = -0.008314 * 298.15;
-    real dgf_water = -150.9;  // From http://equilibrator.weizmann.ac.il/metabolite?compoundId=C00001
-    vector[cols(S)] delta_g = S' * dgf[mic_to_met] + water_stoichiometry * dgf_water;
-    return exp(delta_g / minus_RT);
-  }
-
-  vector get_dgrs(matrix S, vector dgf, int[] mic_to_met, vector water_stoichiometry){
+  vector get_dgrs(matrix S, vector dgf, real temperature, int[] mic_to_met, vector water_stoichiometry, vector trans_charge, real psi){
     /*
         Calculate dgr standard from metabolite formation energies, assuming water's
         formation energy is known exactly.
     */
-    real minus_RT = -0.008314 * 298.15;
+    real minus_RT = -0.008314 * temperature;
     real dgf_water = -150.9;  // From http://equilibrator.weizmann.ac.il/metabolite?compoundId=C00001
-    vector[cols(S)] dgrs = S' * dgf[mic_to_met] + water_stoichiometry * dgf_water;
+    real F = 96.5;  // Faraday constant kJ/mol/V
+    vector[cols(S)] dgrs = S' * dgf[mic_to_met] + water_stoichiometry * dgf_water + trans_charge * psi * F;
     return dgrs;
+  }
+
+  vector get_keq(matrix S, vector dgf, real temperature, int[] mic_to_met, vector water_stoichiometry, vector trans_charge, real psi){
+    /*
+        Calculate keqs from metabolite formation energies, assuming water's
+        formation energy is known exactly.
+    */
+    real minus_RT = -0.008314 * temperature;
+    vector[cols(S)] dgrs = get_dgrs(S, dgf, temperature, mic_to_met, water_stoichiometry, trans_charge, psi);
+    return exp(dgrs / minus_RT);
   }
 
   int check_steady_state(vector Sv, vector conc, real abs_thresh, real rel_thresh){
@@ -152,8 +152,8 @@ functions {
     return inv(denom);
   }
 
-  vector get_reversibility(vector dgr, matrix S, vector conc, int[] edge_type){
-    real RT = 0.008314 * 298.15;
+  vector get_reversibility(vector dgr, real temperature, matrix S, vector conc, int[] edge_type){
+    real RT = 0.008314 * temperature;
     int N_edge = cols(S);
     vector[N_edge] reaction_quotient = S' * log(conc);
     vector[N_edge] out;
@@ -237,14 +237,15 @@ functions {
                            int[] edge_to_drain,
                            int[] sub_by_edge_long,
                            int[,] sub_by_edge_bounds,
-                           int[] edge_type){
+                           int[] edge_type,
+                           real drain_small_conc_corrector){
     int N_edge = size(edge_type);
     vector[N_edge] out = rep_vector(1, N_edge);
     for (f in 1:N_edge){
       if (edge_type[f] == 2){
         int N_sub = measure_ragged(sub_by_edge_bounds, f);
         int subs[N_sub] = extract_ragged(sub_by_edge_long, sub_by_edge_bounds, f);
-        out[f] = drain[edge_to_drain[f]] * prod(conc[subs] ./ (conc[subs] + 1e-6));
+        out[f] = drain[edge_to_drain[f]] * prod(conc[subs] ./ (conc[subs] + drain_small_conc_corrector));
       }
     }
     return out;
@@ -273,6 +274,8 @@ functions {
                        vector kcat_phos,
                        vector conc_phos,
                        vector drain,
+                       real temperature,
+                       real drain_small_conc_corrector,
                        matrix S,
                        vector subunits,
                        int[] edge_type,
@@ -299,7 +302,7 @@ functions {
                        int[,] pi_ix_bounds){
     int N_edge = cols(S);
     vector[N_edge] vmax = get_vmax_by_edge(enzyme, kcat, edge_to_enzyme, edge_type);
-    vector[N_edge] reversibility = get_reversibility(dgr, S, conc, edge_type);
+    vector[N_edge] reversibility = get_reversibility(dgr, temperature, S, conc, edge_type);
     vector[N_edge] free_enzyme_ratio = get_free_enzyme_ratio(conc,
                                                              S,
                                                              km,
@@ -345,7 +348,8 @@ functions {
                                                      edge_to_drain,
                                                      sub_by_edge_long,
                                                      sub_by_edge_bounds,
-                                                     edge_type);
+                                                     edge_type,
+                                                     drain_small_conc_corrector);
     return vmax .* saturation .* reversibility .* allostery .* phosphorylation .* drain_by_edge;
   }
 
@@ -365,6 +369,8 @@ functions {
                       vector kcat_phos,
                       vector conc_phos,
                       vector drain,
+                      real temperature,
+                      real drain_small_conc_corrector,
                       matrix S,
                       vector subunits,
                       int[] edge_type,
@@ -404,6 +410,8 @@ functions {
                                               kcat_phos,
                                               conc_phos,
                                               drain,
+                                              temperature,
+                                              drain_small_conc_corrector,
                                               S,
                                               subunits,
                                               edge_type,

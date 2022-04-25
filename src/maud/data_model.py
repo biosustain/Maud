@@ -169,6 +169,7 @@ class Reaction:
         stoichiometry: Dict[str, float],
         enzymes: List[Enzyme],
         water_stoichiometry: float = 0,
+        transported_charge: float = 0.0,
     ):
         if stoichiometry is None:
             stoichiometry = defaultdict()
@@ -180,6 +181,7 @@ class Reaction:
         self.stoichiometry = stoichiometry
         self.enzymes = enzymes
         self.water_stoichiometry = water_stoichiometry
+        self.transported_charge = transported_charge
 
 
 class Phosphorylation:
@@ -247,18 +249,20 @@ class MeasurementSet:
     phos_knockouts: pd.DataFrame
 
 
+@dataclass
 class Experiment:
     """Constructor for Experiment object.
 
     :param id: id for each experiment
     :param sample: if the experiment will be used in parameter sampling
     :param predict: if the experiment will be used in predictive samplig
+    :param temperature: temperature of the experiment
     """
 
-    def __init__(self, id: str, sample: bool, predict: bool):
-        self.id = id
-        self.sample = sample
-        self.predict = predict
+    id: str
+    sample: bool
+    predict: bool
+    temperature: float
 
 
 @dataclass
@@ -327,6 +331,7 @@ class PriorSet:
     priors_drain: IndPrior2d
     priors_conc_enzyme: IndPrior2d
     priors_conc_phos: IndPrior2d
+    priors_psi: IndPrior1d
 
 
 @dataclass
@@ -366,6 +371,7 @@ class StanCoordSet:
     enz_ko_enzs: List[str]
     phos_ko_exps: List[str]
     phos_ko_enzs: List[str]
+    psi: List[str]
 
 
 @dataclass
@@ -388,6 +394,7 @@ class MaudConfig:
     :param dgf_covariance_file: path to a csv file of formation energy covariances.
     :param steady_state_threshold_abs: absolute threshold for Sv=0 be at steady state
     :param steady_state_threshold_rel: relative threshold for Sv=0 be at steady state
+    :param: drain_small_conc_corrector: number for correcting small conc drains
     """
 
     name: str
@@ -407,6 +414,7 @@ class MaudConfig:
     dgf_covariance_file: Optional[str]
     steady_state_threshold_abs: float
     steady_state_threshold_rel: float
+    drain_small_conc_corrector: float
 
 
 class MaudInput:
