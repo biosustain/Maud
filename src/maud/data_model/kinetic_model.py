@@ -6,9 +6,6 @@ from typing import Dict, List, Optional, Union
 
 import pandas as pd
 from pydantic import root_validator, validator
-
-# hack to use normal dataclass when type checking
-# see https://github.com/microsoft/pyright/issues/1510
 from pydantic.dataclasses import dataclass
 
 from maud.data_model.hardcoding import ID_SEPARATOR
