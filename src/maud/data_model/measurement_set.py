@@ -6,7 +6,6 @@ from typing import List, Optional
 
 import pandas as pd
 from pydantic.dataclasses import dataclass
-from pydantic.main import BaseModel
 
 from maud.data_model.hardcoding import ID_SEPARATOR
 

@@ -4,9 +4,9 @@ from typing import Any, Dict, Hashable, List, Union
 
 import numpy as np
 import pandas as pd
-from scipy.stats import norm
 import sympy as sp
 from depinfo import print_dependencies
+from scipy.stats import norm
 
 
 def join_str_cols(df: pd.DataFrame, sep: str, name=None) -> pd.Series:

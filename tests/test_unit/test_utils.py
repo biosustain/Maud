@@ -4,7 +4,8 @@
 import numpy as np
 
 from maud.utils import (
-    get_lognormal_parameters_from_quantiles, get_normal_parameters_from_quantiles
+    get_lognormal_parameters_from_quantiles,
+    get_normal_parameters_from_quantiles,
 )
 
 
