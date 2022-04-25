@@ -8,7 +8,9 @@ from numpy import isclose
 
 here = os.path.dirname(__file__)
 data_path = os.path.join(here, "..", "data")
-model_path = os.path.join(here, "..", "..", "src", "maud", "stan", "model.stan")
+model_path = os.path.join(
+    here, "..", "..", "src", "maud", "stan", "model.stan"
+)
 
 SIM_CONFIG = {
     "chains": 1,
@@ -17,6 +19,7 @@ SIM_CONFIG = {
     "iter_sampling": 1,
     "show_progress": False,
     "threads_per_chain": 1,
+    "output_dir": None,
 }
 
 
@@ -24,7 +27,7 @@ def test_model_ode():
     """Test that the function get_input_data behaves as expected."""
     input_path = os.path.join(data_path, "example_ode")
     init_data = os.path.join(input_path, "inits.json")
-    input_data = os.path.join(input_path, "input_data.json")
+    input_data = os.path.join(input_path, "input_data_train.json")
     SIM_CONFIG["inits"] = init_data
     model = cmdstanpy.CmdStanModel(stan_file=model_path)
     remap = {

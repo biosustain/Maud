@@ -23,9 +23,9 @@ from datetime import datetime
 import arviz as az
 import click
 
-from maud.running_stan import sample, predict, simulate, variational
 from maud.getting_idatas import get_idata
 from maud.loading_maud_inputs import load_maud_input
+from maud.running_stan import predict, sample, simulate, variational
 
 
 RELATIVE_PATH_EXAMPLE = "../../tests/data/linear"

@@ -4,7 +4,7 @@ from typing import Any, Dict, Hashable, List, Union
 
 import numpy as np
 import pandas as pd
-import scipy
+from scipy.stats import norm
 import sympy as sp
 from depinfo import print_dependencies
 
@@ -80,11 +80,9 @@ def get_lognormal_parameters_from_quantiles(x1, p1, x2, p2):
     """
     logx1 = np.log(x1)
     logx2 = np.log(x2)
-    denom = scipy.stats.norm.ppf(p2) - scipy.stats.norm.ppf(p1)
+    denom = norm.ppf(p2) - norm.ppf(p1)
     sigma = (logx2 - logx1) / denom
-    mu = (
-        logx1 * scipy.stats.norm.ppf(p2) - logx2 * scipy.stats.norm.ppf(p1)
-    ) / denom
+    mu = (logx1 * norm.ppf(p2) - logx2 * norm.ppf(p1)) / denom
     return mu, sigma
 
 
@@ -95,11 +93,9 @@ def get_normal_parameters_from_quantiles(x1, p1, x2, p2):
     x1) = p1 and pr(X < x2) = p2.
 
     """
-    denom = scipy.stats.norm.ppf(p2) - scipy.stats.norm.ppf(p1)
+    denom = norm.ppf(p2) - norm.ppf(p1)
     sigma = (x2 - x1) / denom
-    mu = (
-        x1 * scipy.stats.norm.ppf(p2) - x2 * scipy.stats.norm.ppf(p1)
-    ) / denom
+    mu = (x1 * norm.ppf(p2) - x2 * norm.ppf(p1)) / denom
     return mu, sigma
 
 

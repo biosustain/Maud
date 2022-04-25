@@ -14,7 +14,9 @@ HERE = os.path.dirname(os.path.abspath(__file__))
 DEFAULT_PRIOR_LOC_DRAIN = None
 DEFAULT_PRIOR_SCALE_DRAIN = None
 STAN_PROGRAM_RELATIVE_PATH = os.path.join("stan", "model.stan")
-STAN_PROGRAM_RELATIVE_PATH_PREDICT = os.path.join("stan", "out_of_sample_model.stan")
+STAN_PROGRAM_RELATIVE_PATH_PREDICT = os.path.join(
+    "stan", "out_of_sample_model.stan"
+)
 PPC_PROGRAM_RELATIVE_PATH = "out_of_sample_model.stan"
 
 DEFAULT_SAMPLE_CONFIG = {
@@ -51,13 +53,13 @@ def sample(mi: MaudInput, output_dir: str) -> CmdStanMCMC:
     model = cmdstanpy.CmdStanModel(
         stan_file=os.path.join(HERE, STAN_PROGRAM_RELATIVE_PATH),
         cpp_options=mi.config.cpp_options,
-        stanc_options=mi.config.stanc_options
+        stanc_options=mi.config.stanc_options,
     )
     set_up_output_dir(output_dir, mi)
     sample_args: dict = {
         "data": os.path.join(output_dir, "input_data_train.json"),
         "inits": os.path.join(output_dir, "inits.json"),
-        "output_dir": output_dir
+        "output_dir": output_dir,
     }
     sample_args = {**sample_args, **DEFAULT_SAMPLE_CONFIG}
     if mi.config.cmdstanpy_config is not None:
@@ -72,13 +74,14 @@ def variational(mi: MaudInput, output_dir: str) -> CmdStanVB:
     :param output_dir: a string specifying where to save the output.
     """
     mi_options = (
-        {} if mi.config.variational_options is None
+        {}
+        if mi.config.variational_options is None
         else mi.config.variational_options
     )
     model = cmdstanpy.CmdStanModel(
         stan_file=os.path.join(HERE, STAN_PROGRAM_RELATIVE_PATH),
         cpp_options=mi.config.cpp_options,
-        stanc_options=mi.config.stanc_options
+        stanc_options=mi.config.stanc_options,
     )
     set_up_output_dir(output_dir, mi)
     return model.variational(
@@ -101,7 +104,7 @@ def simulate(mi: MaudInput, output_dir: str, n: int) -> CmdStanMCMC:
     model = cmdstanpy.CmdStanModel(
         stan_file=os.path.join(HERE, STAN_PROGRAM_RELATIVE_PATH),
         cpp_options=mi.config.cpp_options,
-        stanc_options=mi.config.stanc_options
+        stanc_options=mi.config.stanc_options,
     )
     set_up_output_dir(output_dir, mi)
     return model.sample(
@@ -141,7 +144,7 @@ def predict(
     model = cmdstanpy.CmdStanModel(
         stan_file=os.path.join(HERE, STAN_PROGRAM_RELATIVE_PATH_PREDICT),
         cpp_options=mi.config.cpp_options,
-        stanc_options=mi.config.stanc_options
+        stanc_options=mi.config.stanc_options,
     )
     set_up_output_dir(output_dir, mi)
     kinetic_parameters = [
@@ -162,7 +165,7 @@ def predict(
     dims = {
         "conc": ["experiment", "mic"],
         "conc_enzyme": ["experiment", "enzyme"],
-        "flux": ["experiment", "reaction"]
+        "flux": ["experiment", "reaction"],
     }
     for chain in chains:
         for draw in draws:
@@ -183,10 +186,13 @@ def predict(
                 "iter_warmup": 0,
                 "iter_sampling": 1,
                 "fixed_param": True,
-                "show_progress": False
+                "show_progress": False,
             }
             if mi.config.cmdstanpy_config_predict is not None:
-                sample_args = {**sample_args, **mi.config.cmdstanpy_config_predict}
+                sample_args = {
+                    **sample_args,
+                    **mi.config.cmdstanpy_config_predict,
+                }
             mcmc_draw = model.sample(**sample_args)
             idata_draw = az.from_cmdstan(
                 mcmc_draw.runset.csv_files,
@@ -198,17 +204,16 @@ def predict(
                     "enzyme": [e.id for e in mi.kinetic_model.enzymes],
                     "reaction": [r.id for r in mi.kinetic_model.reactions],
                 },
-                dims=dims
+                dims=dims,
             ).assign_coords(
-                coords={"chain": [chain], "draw": [draw]}, groups="posterior_groups"
+                coords={"chain": [chain], "draw": [draw]},
+                groups="posterior_groups",
             )
             if draw == 0:
                 idata_chain = idata_draw.copy()
             else:
                 idata_chain = az.concat(
-                    [idata_chain, idata_draw],
-                    dim="draw",
-                    reset_dim=False
+                    [idata_chain, idata_draw], dim="draw", reset_dim=False
                 )
         if chain == 0:
             out = idata_chain.copy()

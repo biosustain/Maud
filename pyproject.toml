@@ -18,5 +18,5 @@ exclude = '''
 plugins = ["pydantic.mypy", "numpy.typing.mypy_plugin"]
 
 [[tool.mypy.overrides]]
-module = ["scipy", "cmdstanpy.*", "depinfo", "maud.*", "matplotlib.*"]
+module = ["scipy.*", "cmdstanpy.*", "depinfo", "maud.*", "matplotlib.*"]
 ignore_missing_imports = true

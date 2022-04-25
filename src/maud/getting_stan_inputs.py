@@ -118,9 +118,11 @@ def get_stan_inputs(
     unbalanced_mic_codes = [
         mic_codes[mic.id] for mic in mics if not mic.balanced
     ]
-    ci_mic_codes = [
-        mic_codes[ci.mic_id] for ci in kinetic_model.competitive_inhibitions
-    ] if kinetic_model.competitive_inhibitions is not None else []
+    ci_mic_codes = (
+        [mic_codes[ci.mic_id] for ci in kinetic_model.competitive_inhibitions]
+        if kinetic_model.competitive_inhibitions is not None
+        else []
+    )
     edge_tc_code = [
         tc_codes[e.enzyme_id]
         if isinstance(e, EnzymeReaction) and e.enzyme_id in tc_codes.keys()

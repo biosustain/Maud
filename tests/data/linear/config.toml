@@ -4,6 +4,7 @@ priors_file = "priors.csv"
 measurements_file = "experiments.csv"
 biological_config_file = "biological_config.toml"
 likelihood = true
+steady_state_threshold_abs = 1e-6
 
 [cmdstanpy_config]
 refresh = 1
