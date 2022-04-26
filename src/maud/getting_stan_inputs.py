@@ -370,7 +370,9 @@ def get_stan_inputs(
         water_stoichiometry=StanData(
             "water_stoichiometry", edge_water_stoichiometry
         ),
-        transported_charge=StanData("transported_charge", edge_transported_charge),
+        transported_charge=StanData(
+            "transported_charge", edge_transported_charge
+        ),
         mic_to_met=StanData("mic_to_met", mic_met_code),
         subunits=StanData(
             "subunits", [e.subunits for e in kinetic_model.enzymes]
@@ -431,7 +433,8 @@ def get_stan_inputs(
         conc_init=get_conc_init(ms, kinetic_model, priors, config),
         likelihood=StanData("likelihood", int(config.likelihood)),
         drain_small_conc_corrector=StanData(
-            "drain_small_conc_corrector", int(config.drain_small_conc_corrector)
+            "drain_small_conc_corrector",
+            int(config.drain_small_conc_corrector),
         ),
         reject_non_steady=StanData(
             "reject_non_steady", int(config.reject_non_steady)
@@ -537,7 +540,8 @@ def get_stan_inputs(
         conc_init=get_conc_init(ms, kinetic_model, priors, config),
         likelihood=StanData("likelihood", int(config.likelihood)),
         drain_small_conc_corrector=StanData(
-            "drain_small_conc_corrector", int(config.drain_small_conc_corrector)
+            "drain_small_conc_corrector",
+            int(config.drain_small_conc_corrector),
         ),
         rel_tol=StanData("rel_tol", config.ode_config.rel_tol),
         abs_tol=StanData("abs_tol", config.ode_config.abs_tol),

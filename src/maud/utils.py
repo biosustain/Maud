@@ -1,6 +1,6 @@
 """General purpose utility functions."""
 
-from typing import Any, Dict, Hashable, List, Union
+from typing import Any, Dict, Hashable, List
 
 import numpy as np
 import pandas as pd

@@ -23,8 +23,12 @@ def load_infd_fit(fit, mi: MaudInput) -> az.InferenceData:
         **mi.stan_coords.__dict__,
         **{
             "reactions": mi.stan_coords.reactions,
-            "kms": join_list_of_strings(mi.stan_coords.km_enzs, mi.stan_coords.km_mics),
-            "kis": join_list_of_strings(mi.stan_coords.ci_enzs, mi.stan_coords.ci_mics),
+            "kms": join_list_of_strings(
+                mi.stan_coords.km_enzs, mi.stan_coords.km_mics
+            ),
+            "kis": join_list_of_strings(
+                mi.stan_coords.ci_enzs, mi.stan_coords.ci_mics
+            ),
             "diss_ts": join_list_of_strings(
                 mi.stan_coords.ai_enzs, mi.stan_coords.ai_mics
             ),
@@ -59,8 +63,12 @@ def load_infd(csvs: List[str], mi: MaudInput) -> az.InferenceData:
         **mi.stan_coords.__dict__,
         **{
             "reactions": mi.stan_coords.reactions,
-            "kms": join_list_of_strings(mi.stan_coords.km_enzs, mi.stan_coords.km_mics),
-            "kis": join_list_of_strings(mi.stan_coords.ci_enzs, mi.stan_coords.ci_mics),
+            "kms": join_list_of_strings(
+                mi.stan_coords.km_enzs, mi.stan_coords.km_mics
+            ),
+            "kis": join_list_of_strings(
+                mi.stan_coords.ci_enzs, mi.stan_coords.ci_mics
+            ),
             "diss_ts": join_list_of_strings(
                 mi.stan_coords.ai_enzs, mi.stan_coords.ai_mics
             ),
@@ -133,7 +141,9 @@ def plot_1d_var(
         hist, bins = np.histogram(x, bins=30)
         xscale = "linear"
         if logscale:
-            bins = np.logspace(np.log10(bins[0]), np.log10(bins[-1]), len(bins))
+            bins = np.logspace(
+                np.log10(bins[0]), np.log10(bins[-1]), len(bins)
+            )
             xscale = "log"
         _, _, hist_patches = ax.hist(x, bins=bins)
         ax.set_xscale(xscale)
@@ -166,18 +176,24 @@ def plot_experiment_var(
             hist, bins = np.histogram(x, bins=30)
             xscale = "linear"
             if logscale:
-                bins = np.logspace(np.log10(bins[0]), np.log10(bins[-1]), len(bins))
+                bins = np.logspace(
+                    np.log10(bins[0]), np.log10(bins[-1]), len(bins)
+                )
                 xscale = "log"
             _, _, hist_patches = ax.hist(x, bins=bins)
             ax.set_xscale(xscale)
             if true_values is not None:
                 if exp in true_values.keys():
                     if var in true_values[exp].keys():
-                        vline_truth = ax.axvline(true_values[exp][var], color="red")
+                        vline_truth = ax.axvline(
+                            true_values[exp][var], color="red"
+                        )
             if meas_values is not None:
                 if exp in meas_values.keys():
                     if var in meas_values[exp].keys():
-                        vline_meas = ax.axvline(meas_values[exp][var], color="orange")
+                        vline_meas = ax.axvline(
+                            meas_values[exp][var], color="orange"
+                        )
             ax.set_title(var)
         axrow[0].set_ylabel(exp)
     leg_handles = [hist_patches[0]]

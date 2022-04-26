@@ -51,9 +51,7 @@ def parse_kinetic_model(raw: dict) -> KineticModel:
             water_stoichiometry=read_with_fallback(
                 "water_stoichiometry", r, 0
             ),
-            transported_charge=read_with_fallback(
-                "water_stoichiometry", r, 0
-            ),
+            transported_charge=read_with_fallback("water_stoichiometry", r, 0),
         )
         for r in raw["reaction"]
     ]

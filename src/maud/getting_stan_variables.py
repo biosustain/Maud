@@ -16,9 +16,9 @@ from maud.data_model.stan_variable_set import (
     KcatPhos,
     Ki,
     Km,
+    Psi,
     StanVariableSet,
     TransferConstant,
-    Psi
 )
 
 

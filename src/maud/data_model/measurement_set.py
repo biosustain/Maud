@@ -5,8 +5,8 @@ from enum import Enum
 from typing import List, Optional
 
 import pandas as pd
-from pydantic.dataclasses import dataclass
 from pydantic import validator
+from pydantic.dataclasses import dataclass
 
 from maud.data_model.hardcoding import ID_SEPARATOR
 

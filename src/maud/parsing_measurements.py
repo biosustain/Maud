@@ -19,7 +19,9 @@ def parse_measurement_set(
     :param measurement_table: result of running pd.read_csv on suitable file
     :param raw_biological_config: result of running toml.load on suitable file
     """
-    experiments = [Experiment(**e) for e in raw_biological_config["experiment"]]
+    experiments = [
+        Experiment(**e) for e in raw_biological_config["experiment"]
+    ]
     y = {
         mt: raw_measurement_table.loc[
             lambda df: df["measurement_type"] == mt.value
