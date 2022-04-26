@@ -23,11 +23,11 @@ class MaudConfig:
     :param name: name for the input. Used to name the output directory
     :param kinetic_model_file: path to a valid kientic model file.
     :param priors_file: path to a valid priors file.
-    :param experiments_file: path to a valid experiments file.
+    :param measurements_file: path to a valid experiments file.
     :param likelihood: Whether or not to take measurements into account.
+    :param cmdstanpy_config: Arguments to cmdstanpy.CmdStanModel.sample.
     :param reject_non_steady: Reject draws if a non-steady state is encountered.
     :param ode_config: Configuration for Stan's ode solver.
-    :param cmdstanpy_config: Arguments to cmdstanpy.CmdStanModel.sample.
     :param stanc_options: Valid choices for CmdStanModel argument `stanc_options`.
     :param cpp_options: Valid choices for CmdStanModel `cpp_options`.
     :param variational_options: Arguments for CmdStanModel.variational.
@@ -43,7 +43,7 @@ class MaudConfig:
     kinetic_model_file: str
     priors_file: str
     measurements_file: str
-    biological_config_file: str
+    experimental_setup_file: str
     likelihood: bool
     cmdstanpy_config: Optional[dict] = None
     cmdstanpy_config_predict: Optional[dict] = None

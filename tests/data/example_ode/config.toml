@@ -2,7 +2,7 @@ name = "test-ode"
 kinetic_model_file = "kinetic_model.toml"
 priors_file = "priors.csv"
 measurements_file = "experiments.csv"
-biological_config_file = "biological_config.toml"
+experimental_setup_file = "experimental_setup.toml"
 likelihood = true
 
 [cmdstanpy_config]

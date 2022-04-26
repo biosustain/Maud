@@ -12,15 +12,15 @@ from maud.data_model.measurement_set import (
 
 
 def parse_measurement_set(
-    raw_measurement_table: pd.DataFrame, raw_biological_config: dict
+    raw_measurement_table: pd.DataFrame, raw_experimental_setup: dict
 ) -> MeasurementSet:
     """Parse a measurements dataframe.
 
     :param measurement_table: result of running pd.read_csv on suitable file
-    :param raw_biological_config: result of running toml.load on suitable file
+    :param raw_experimental_setup: result of running toml.load on suitable file
     """
     experiments = [
-        Experiment(**e) for e in raw_biological_config["experiment"]
+        Experiment(**e) for e in raw_experimental_setup["experiment"]
     ]
     y = {
         mt: raw_measurement_table.loc[
@@ -33,9 +33,9 @@ def parse_measurement_set(
             EnzymeKnockout(
                 experiment_id=eko["experiment_id"], enzyme_id=eko["enzyme_id"]
             )
-            for eko in raw_biological_config["enzyme_knockout"]
+            for eko in raw_experimental_setup["enzyme_knockout"]
         ]
-        if "enzyme_knockout" in raw_biological_config.keys()
+        if "enzyme_knockout" in raw_experimental_setup.keys()
         else None
     )
     phosphorylation_knockouts = (
@@ -43,9 +43,9 @@ def parse_measurement_set(
             PhosphorylationKnockout(
                 experiment_id=pko["experiment_id"], enzyme_id=pko["enzyme_id"]
             )
-            for pko in raw_biological_config["phos_knockout"]
+            for pko in raw_experimental_setup["phos_knockout"]
         ]
-        if "phos_knockout" in raw_biological_config.keys()
+        if "phos_knockout" in raw_experimental_setup.keys()
         else None
     )
     return MeasurementSet(

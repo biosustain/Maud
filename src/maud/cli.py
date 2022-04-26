@@ -53,7 +53,17 @@ def cli():
     default=get_example_path(RELATIVE_PATH_EXAMPLE),
 )
 def sample_command(data_path, output_dir):
-    """Run the sample function as a click command."""
+    """Generate MCMC samples given a user input directory.
+
+    This function creates a new directory in output_dir with a name starting
+    with "maud_output". It first copies the directory at data_path into the new
+    this directory at new_dir/user_input, then runs the running_stan.sample
+    function to write samples in new_dir/samples. Finally it prints the results
+    of cmdstanpy's diagnose and summary methods.
+
+
+    Run the sample function as a click command.
+    """
     click.echo(do_sample(data_path, output_dir))
 
 
@@ -92,7 +102,18 @@ def do_sample(data_path, output_dir):
     type=click.Path(exists=True, dir_okay=True, file_okay=False),
 )
 def predict_command(data_path):
-    """Run the sample function as a click command."""
+    """Generate MCMC samples given a Maud output folder at train_path.
+
+    This function creates a new directory in output_dir with a name starting
+    with "maud-predict-output". It first copies the testing directory at
+    train_path into the new this directory at new_dir/user_input, then runs the
+    running_stan.predict_out_of_sample function to write samples in
+    new_dir/oos_samples.
+
+    The trained output is stored in the new_dir/trained_samples folder along
+    with the user input required to generate the trained samples.
+
+    """
     click.echo(do_predict(data_path))
 
 
@@ -135,12 +156,12 @@ def do_predict(data_path: str):
     default=get_example_path(RELATIVE_PATH_EXAMPLE),
 )
 def simulate_command(data_path, output_dir, n):
-    """Run the simulate function as a click command."""
+    """Generate draws from the initial values."""
     click.echo(do_simulate(data_path, output_dir, n))
 
 
 def do_simulate(data_path, output_dir, n):
-    """Generate draws from the prior mean."""
+    """Generate draws from the initial values."""
 
     mi = load_maud_input(data_path=data_path)
     now = datetime.now().strftime("%Y%m%d%H%M%S")
@@ -228,7 +249,15 @@ def do_simulate(data_path, output_dir, n):
     default=get_example_path(RELATIVE_PATH_EXAMPLE),
 )
 def variational_command(data_path, output_dir):
-    """Run the sample function as a click command."""
+    """Generate MCMC samples given a user input directory.
+
+    This function creates a new directory in output_dir with a name starting
+    with "maud_output". It first copies the directory at data_path into the new
+    this directory at new_dir/user_input, then runs the running_stan.sample
+    function to write samples in new_dir/samples. Finally it prints the results
+    of cmdstanpy's diagnose and summary methods.
+
+    """
     click.echo(do_variational(data_path, output_dir))
 
 

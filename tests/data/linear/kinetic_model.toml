@@ -5,6 +5,17 @@ compartment = [
   {id = 'e', name = 'external', volume = 1},
 ]
 
+metabolite = [
+  {id = "M1", name = "Metabolite number 1"},
+  {id = "M2", name = "Metabolite number 2"},
+]
+
+enzyme = [
+  {id = "r1", name = "r1ase", subunits = 1},
+  {id = "r2", name = "r2ase", subunits = 1},
+  {id = "r3", name = "r3ase", subunits = 1},
+]
+
 metabolite_in_compartment = [
   {metabolite_id = "M1", compartment_id = "e", balanced = false},
   {metabolite_id = "M1", compartment_id = "c", balanced = true},
@@ -16,16 +27,6 @@ enzyme_reaction = [
   {enzyme_id = "r2", reaction_id = "r2"},
   {enzyme_id = "r3", reaction_id = "r3"},
 ]
-
-# only specify metabolites and enzymes if there is something extra to say about them
-[[metabolite]]
-id = 'M1'
-name = 'Metabolite number 1'
-
-[[enzyme]]
-id = "r2"
-name = "r2ase"
-subunits = 1
 
 [[reaction]]
 id = "r1"

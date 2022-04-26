@@ -1,8 +1,8 @@
 name = "linear"
 kinetic_model_file = "kinetic_model.toml"
 priors_file = "priors.csv"
-measurements_file = "experiments.csv"
-biological_config_file = "biological_config.toml"
+measurements_file = "measurements.csv"
+experimental_setup_file = "experimental_setup.toml"
 likelihood = true
 steady_state_threshold_abs = 1e-6
 
@@ -16,10 +16,6 @@ save_warmup = true
 [ode_config]
 abs_tol = 1e-4
 rel_tol = 1e-4
-# abs_tol_backward = 1e-4
-# rel_tol_backward = 1e-4
-# abs_tol_quadrature = 1e-4
-# rel_tol_quadrature = 1e-4
 max_num_steps = 1e6
 timepoint = 1e3
 

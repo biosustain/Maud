@@ -27,14 +27,7 @@ class MIConfig:
 
 @dataclass(config=MIConfig)
 class MaudInput:
-    """Everything that is needed to run Maud.
-
-    :param kinetic_model: a KineticModel object
-    :param priors: a dictionary mapping prior types to lists of Prior objects
-    :param stan_coords: a StanCoordSet object
-    :param measurement_set: a list of Measurement objects
-    :param inits: a dictionary of initial parameter values
-    """
+    """Everything that is needed to run Maud."""
 
     config: MaudConfig
     kinetic_model: KineticModel

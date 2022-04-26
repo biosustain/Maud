@@ -18,7 +18,7 @@ def load_maud_input(data_path: str) -> MaudInput:
 
     :param filepath: path to directory containing input toml file
     :param mode: determines which experiments will be included,
-    defined in the `biological_config` as "sample" and/or "predict".
+    defined in the `experimental_setup` as "sample" and/or "predict".
 
     """
     # get config
@@ -26,7 +26,7 @@ def load_maud_input(data_path: str) -> MaudInput:
     config = parse_config(dict(toml.load(config_path)))
     # loading
     kinetic_model_path = os.path.join(data_path, config.kinetic_model_file)
-    bio_config_path = os.path.join(data_path, config.biological_config_file)
+    bio_config_path = os.path.join(data_path, config.experimental_setup_file)
     raw_kinetic_model = dict(toml.load(kinetic_model_path))
     raw_bio_config = dict(toml.load(bio_config_path))
     measurements_path = os.path.join(data_path, config.measurements_file)
