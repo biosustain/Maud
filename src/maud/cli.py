@@ -215,6 +215,8 @@ def do_simulate(data_path, output_dir, n):
         .unstack()
         .T
     )
+    print("\n\nSimulated membrane potential:")
+    print(idata.posterior["psi"].mean(dim=["chain", "draw"]).to_series().T)
     return output_path
 
 

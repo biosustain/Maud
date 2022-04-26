@@ -108,6 +108,7 @@ class PriorSet:
     kcat: IndPrior1d
     kcat_phos: IndPrior1d
     ki: IndPrior1d
+    psi: IndPrior1d
     dissociation_constant: IndPrior1d
     transfer_constant: IndPrior1d
     conc_unbalanced: IndPrior2d

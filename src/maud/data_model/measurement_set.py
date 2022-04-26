@@ -6,6 +6,7 @@ from typing import List, Optional
 
 import pandas as pd
 from pydantic.dataclasses import dataclass
+from pydantic import validator
 
 from maud.data_model.hardcoding import ID_SEPARATOR
 
@@ -36,6 +37,18 @@ class Experiment:
     id: str
     is_train: bool
     is_test: bool
+    temperature: float = 298.15
+
+    def __post_init__(self):
+        """Add set temperature to default if it is None."""
+        if self.temperature is None:
+            self.temperature = 298.15
+
+    @validator("temperature")
+    def temp_must_be_non_negative(cls, v):
+        """Make sure the temperature isn't negative."""
+        assert v >= 0
+        return v
 
 
 @dataclass

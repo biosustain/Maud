@@ -113,6 +113,12 @@ def get_stan_inputs(
         else 0
         for e in edges
     ]
+    edge_transported_charge = [
+        reaction_by_id[e.reaction_id].transported_charge
+        if isinstance(e, EnzymeReaction)
+        else 0
+        for e in edges
+    ]
     mic_met_code = [metabolite_codes[m.metabolite_id] for m in mics]
     balanced_mic_codes = [mic_codes[mic.id] for mic in mics if mic.balanced]
     unbalanced_mic_codes = [
@@ -310,6 +316,7 @@ def get_stan_inputs(
         priors_kcat_phos=StanData(
             "priors_kcat", unpack_priors_1d(priors.kcat_phos)
         ),
+        priors_psi=StanData("priors_psi", unpack_priors_1d(priors.psi)),
         priors_conc_phos=StanData("priors_conc_phos", priors_conc_phos_train),
         priors_conc_unbalanced=StanData(
             "priors_conc_unbalanced", priors_conc_unbalanced_train
@@ -363,9 +370,13 @@ def get_stan_inputs(
         water_stoichiometry=StanData(
             "water_stoichiometry", edge_water_stoichiometry
         ),
+        transported_charge=StanData("transported_charge", edge_transported_charge),
         mic_to_met=StanData("mic_to_met", mic_met_code),
         subunits=StanData(
             "subunits", [e.subunits for e in kinetic_model.enzymes]
+        ),
+        temperature=StanData(
+            "temperature", [e.temperature for e in experiments_train]
         ),
         sub_by_edge_long=StanData("sub_by_edge_long", sub_by_edge_long),
         sub_by_edge_bounds=StanData("sub_by_edge_bounds", sub_by_edge_bounds),
@@ -419,6 +430,9 @@ def get_stan_inputs(
         # configuration
         conc_init=get_conc_init(ms, kinetic_model, priors, config),
         likelihood=StanData("likelihood", int(config.likelihood)),
+        drain_small_conc_corrector=StanData(
+            "drain_small_conc_corrector", int(config.drain_small_conc_corrector)
+        ),
         reject_non_steady=StanData(
             "reject_non_steady", int(config.reject_non_steady)
         ),
@@ -467,6 +481,9 @@ def get_stan_inputs(
         mic_to_met=StanData("mic_to_met", mic_met_code),
         subunits=StanData(
             "subunits", [e.subunits for e in kinetic_model.enzymes]
+        ),
+        temperature=StanData(
+            "temperature", [e.temperature for e in experiments_test]
         ),
         sub_by_edge_long=StanData("sub_by_edge_long", sub_by_edge_long),
         sub_by_edge_bounds=StanData("sub_by_edge_bounds", sub_by_edge_bounds),
@@ -519,6 +536,9 @@ def get_stan_inputs(
         # configuration
         conc_init=get_conc_init(ms, kinetic_model, priors, config),
         likelihood=StanData("likelihood", int(config.likelihood)),
+        drain_small_conc_corrector=StanData(
+            "drain_small_conc_corrector", int(config.drain_small_conc_corrector)
+        ),
         rel_tol=StanData("rel_tol", config.ode_config.rel_tol),
         abs_tol=StanData("abs_tol", config.ode_config.abs_tol),
         timepoint=StanData("timepoint", config.ode_config.timepoint),

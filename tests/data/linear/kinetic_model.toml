@@ -44,6 +44,7 @@ id = "r3"
 name = "Reaction number 3"
 mechanism = "reversible_michaelis_menten"
 stoichiometry = { M2_c = -1, M2_e = 1}
+transported_charge = 1
 
 [[allostery]]
 enzyme_id = "r1"

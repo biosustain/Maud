@@ -57,19 +57,18 @@ data {
   array[N_phosphorylation_knockout] int<lower=0,upper=N_phosphorylation> phosphorylation_knockout_long;
   array[N_experiment, 2] int phosphorylation_knockout_bounds;
   vector<lower=1>[N_enzyme] subunits;
+  vector[N_experiment] temperature;
   // configuration
   array[N_experiment] vector<lower=0>[N_mic] conc_init;
   real rel_tol; 
   real abs_tol;
   int max_num_steps;
   int<lower=0,upper=1> likelihood;  // set to 0 for priors-only mode
+  real drain_small_conc_corrector;
   real<lower=0> timepoint;
 }
 transformed data {
   real initial_time = 0;
-  /* matrix[N_experiment, N_enzyme] knockout = rep_matrix(1, N_experiment, N_enzyme) - is_knockout; */
-  /* matrix[N_experiment, N_phosphorylation_enzymes] phos_knockout = */
-    /* rep_matrix(1, N_experiment, N_phosphorylation_enzymes) - is_phos_knockout; */
 }
 parameters {
   vector[N_km] km;
@@ -78,7 +77,7 @@ parameters {
   vector[N_allostery] dissociation_constant;
   vector[N_allosteric_enzyme] transfer_constant;
   vector[N_phosphorylation] kcat_phos;
-  vector[N_edge] dgrs;
+  array[N_experiment] vector[N_edge] dgrs;
 }
 
 generated quantities {
@@ -130,7 +129,7 @@ generated quantities {
                   balanced_mic_ix,
                   unbalanced_mic_ix,
                   conc_enzyme_experiment,
-                  dgrs,
+                  dgrs[e],
                   kcat,
                   km,
                   ki,
@@ -139,6 +138,8 @@ generated quantities {
                   kcat_phos,
                   conc_phos_experiment,
                   drain[e],
+                  temperature[e],
+                  drain_small_conc_corrector,
                   S,
                   subunits,
                   edge_type,
@@ -167,7 +168,7 @@ generated quantities {
     conc[e, unbalanced_mic_ix] = conc_unbalanced[e];
     vector[N_edge] edge_flux = get_edge_flux(conc[e],
                                              conc_enzyme_experiment,
-                                             dgrs,
+                                             dgrs[e],
                                              kcat,
                                              km,
                                              ki,
@@ -176,6 +177,8 @@ generated quantities {
                                              kcat_phos,
                                              conc_phos_experiment,
                                              drain[e],
+                                             temperature[e],
+                                             drain_small_conc_corrector,
                                              S,
                                              subunits,
                                              edge_type,
@@ -245,6 +248,6 @@ generated quantities {
                                              phosphorylation_ix_bounds,
                                              phosphorylation_type,
                                              subunits);
-    reversibility[e] = get_reversibility(dgrs, S, conc[e], edge_type);
+    reversibility[e] = get_reversibility(dgrs[e], temperature[e], S, conc[e], edge_type);
   }
 }

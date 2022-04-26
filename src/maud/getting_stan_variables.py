@@ -18,6 +18,7 @@ from maud.data_model.stan_variable_set import (
     Km,
     StanVariableSet,
     TransferConstant,
+    Psi
 )
 
 
@@ -128,4 +129,5 @@ def get_stan_variable_set(kmod: KineticModel, ms: MeasurementSet):
         conc_enzyme=ConcEnzyme(ids=[exp_ids, enzyme_ids]),
         conc_unbalanced=ConcUnbalanced(ids=[exp_ids, unbalanced_mics]),
         conc_phos=ConcPhos(ids=[exp_ids, phos_enzs]),
+        psi=Psi(ids=[exp_ids]),
     )

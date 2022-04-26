@@ -56,6 +56,7 @@ class StanInputTrain:
     priors_dissociation_constant: StanData
     priors_transfer_constant: StanData
     priors_kcat_phos: StanData
+    priors_psi: StanData
     priors_conc_phos: StanData
     priors_conc_unbalanced: StanData
     priors_conc_enzyme: StanData
@@ -87,8 +88,10 @@ class StanInputTrain:
     edge_to_drain: StanData
     edge_to_reaction: StanData
     water_stoichiometry: StanData
+    transported_charge: StanData
     mic_to_met: StanData
     subunits: StanData
+    temperature: StanData
     sub_by_edge_long: StanData
     sub_by_edge_bounds: StanData
     prod_by_edge_long: StanData
@@ -114,6 +117,7 @@ class StanInputTrain:
     # user configuration
     conc_init: StanData
     likelihood: StanData
+    drain_small_conc_corrector: StanData
     reject_non_steady: StanData
     steady_state_threshold_abs: StanData
     steady_state_threshold_rel: StanData
@@ -238,6 +242,7 @@ class StanInputTest:
     water_stoichiometry: StanData
     mic_to_met: StanData
     subunits: StanData
+    temperature: StanData
     sub_by_edge_long: StanData
     sub_by_edge_bounds: StanData
     prod_by_edge_long: StanData
@@ -263,6 +268,7 @@ class StanInputTest:
     # user configuration
     conc_init: StanData
     likelihood: StanData
+    drain_small_conc_corrector: StanData
     rel_tol: StanData
     abs_tol: StanData
     timepoint: StanData

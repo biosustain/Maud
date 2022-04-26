@@ -96,6 +96,7 @@ def get_prior_set(upi: UserPriorInput, sv: StanVariableSet) -> PriorSet:
         km=load_1d_prior(upi.main_table, sv.km),
         ki=load_1d_prior(upi.main_table, sv.ki),
         kcat=load_1d_prior(upi.main_table, sv.kcat),
+        psi=load_1d_prior(upi.main_table, sv.psi),
         dissociation_constant=load_1d_prior(
             upi.main_table, sv.dissociation_constant
         ),

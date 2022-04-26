@@ -43,6 +43,7 @@ class StanVariable:
         """Make sure that id_components contains lists with the same length."""
         first_length = len(v[0])
         assert all([len(x) == first_length for x in v])
+        return v
 
 
 @dataclass
@@ -280,6 +281,21 @@ class ConcPhos(StanVariable):
         self.default_scale = 2.0
 
 
+@dataclass(init=False)
+class Psi(StanVariable):
+    """Stan variable representing per-experiment membrane potentials."""
+
+    def __init__(self, ids):
+        self.name = "psi"
+        self.ids = ids
+        self.shape_names = ["N_experiment"]
+        self.split_ids = None
+        self.id_components = [[IdComponent.EXPERIMENT]]
+        self.non_negative = False
+        self.default_loc = 0
+        self.default_scale = 2
+
+
 @dataclass
 class StanVariableSet:
     """A MaudInput's set of Stan variables."""
@@ -295,3 +311,4 @@ class StanVariableSet:
     conc_enzyme: ConcEnzyme
     conc_unbalanced: ConcUnbalanced
     conc_phos: ConcPhos
+    psi: Psi

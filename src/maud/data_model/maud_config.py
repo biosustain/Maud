@@ -36,6 +36,7 @@ class MaudConfig:
     :param dgf_covariance_file: path to a csv file of formation energy covariances.
     :param steady_state_threshold_abs: absolute threshold for Sv=0 be at steady state
     :param steady_state_threshold_rel: relative threshold for Sv=0 be at steady state
+    :param: drain_small_conc_corrector: number for correcting small conc drains
     """
 
     name: str
@@ -57,6 +58,7 @@ class MaudConfig:
     steady_state_threshold_abs: float = 1e-8
     steady_state_threshold_rel: float = 1e-3
     default_initial_concentration: float = 0.01
+    drain_small_conc_corrector: float = 1e-6
     multivariate_dgf_priors: bool = field(init=False)
 
     def __post_init__(self):

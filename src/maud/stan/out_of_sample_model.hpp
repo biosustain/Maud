@@ -8,7 +8,7 @@ using namespace stan::math;
 
 
 stan::math::profile_map profiles__;
-static constexpr std::array<const char*, 395> locations_array__ = 
+static constexpr std::array<const char*, 401> locations_array__ = 
 {" (found before start of program)",
  " (in '/Users/tedgro/Code/Maud/src/maud/stan/out_of_sample_model.stan', line 74, column 2 to column 18)",
  " (in '/Users/tedgro/Code/Maud/src/maud/stan/out_of_sample_model.stan', line 75, column 2 to column 38)",
@@ -16,7 +16,7 @@ static constexpr std::array<const char*, 395> locations_array__ =
  " (in '/Users/tedgro/Code/Maud/src/maud/stan/out_of_sample_model.stan', line 77, column 2 to column 44)",
  " (in '/Users/tedgro/Code/Maud/src/maud/stan/out_of_sample_model.stan', line 78, column 2 to column 48)",
  " (in '/Users/tedgro/Code/Maud/src/maud/stan/out_of_sample_model.stan', line 79, column 2 to column 38)",
- " (in '/Users/tedgro/Code/Maud/src/maud/stan/out_of_sample_model.stan', line 80, column 2 to column 22)",
+ " (in '/Users/tedgro/Code/Maud/src/maud/stan/out_of_sample_model.stan', line 80, column 2 to column 42)",
  " (in '/Users/tedgro/Code/Maud/src/maud/stan/out_of_sample_model.stan', line 84, column 2 to column 50)",
  " (in '/Users/tedgro/Code/Maud/src/maud/stan/out_of_sample_model.stan', line 85, column 2 to column 46)",
  " (in '/Users/tedgro/Code/Maud/src/maud/stan/out_of_sample_model.stan', line 86, column 2 to column 58)",
@@ -53,23 +53,23 @@ static constexpr std::array<const char*, 395> locations_array__ =
  " (in '/Users/tedgro/Code/Maud/src/maud/stan/out_of_sample_model.stan', line 118, column 6 to column 77)",
  " (in '/Users/tedgro/Code/Maud/src/maud/stan/out_of_sample_model.stan', line 115, column 29 to line 119, column 5)",
  " (in '/Users/tedgro/Code/Maud/src/maud/stan/out_of_sample_model.stan', line 115, column 4 to line 119, column 5)",
- " (in '/Users/tedgro/Code/Maud/src/maud/stan/out_of_sample_model.stan', line 120, column 4 to line 163, column 40)",
- " (in '/Users/tedgro/Code/Maud/src/maud/stan/out_of_sample_model.stan', line 164, column 4 to column 48)",
- " (in '/Users/tedgro/Code/Maud/src/maud/stan/out_of_sample_model.stan', line 165, column 4 to column 52)",
- " (in '/Users/tedgro/Code/Maud/src/maud/stan/out_of_sample_model.stan', line 166, column 11 to column 17)",
- " (in '/Users/tedgro/Code/Maud/src/maud/stan/out_of_sample_model.stan', line 166, column 4 to line 199, column 67)",
- " (in '/Users/tedgro/Code/Maud/src/maud/stan/out_of_sample_model.stan', line 201, column 6 to column 51)",
- " (in '/Users/tedgro/Code/Maud/src/maud/stan/out_of_sample_model.stan', line 200, column 23 to line 202, column 5)",
- " (in '/Users/tedgro/Code/Maud/src/maud/stan/out_of_sample_model.stan', line 200, column 4 to line 202, column 5)",
- " (in '/Users/tedgro/Code/Maud/src/maud/stan/out_of_sample_model.stan', line 103, column 27 to line 203, column 3)",
- " (in '/Users/tedgro/Code/Maud/src/maud/stan/out_of_sample_model.stan', line 103, column 2 to line 203, column 3)",
- " (in '/Users/tedgro/Code/Maud/src/maud/stan/out_of_sample_model.stan', line 205, column 4 to line 219, column 63)",
- " (in '/Users/tedgro/Code/Maud/src/maud/stan/out_of_sample_model.stan', line 220, column 4 to line 227, column 46)",
- " (in '/Users/tedgro/Code/Maud/src/maud/stan/out_of_sample_model.stan', line 228, column 4 to line 237, column 45)",
- " (in '/Users/tedgro/Code/Maud/src/maud/stan/out_of_sample_model.stan', line 238, column 4 to line 243, column 55)",
- " (in '/Users/tedgro/Code/Maud/src/maud/stan/out_of_sample_model.stan', line 244, column 4 to column 70)",
- " (in '/Users/tedgro/Code/Maud/src/maud/stan/out_of_sample_model.stan', line 204, column 27 to line 245, column 3)",
- " (in '/Users/tedgro/Code/Maud/src/maud/stan/out_of_sample_model.stan', line 204, column 2 to line 245, column 3)",
+ " (in '/Users/tedgro/Code/Maud/src/maud/stan/out_of_sample_model.stan', line 120, column 4 to line 166, column 40)",
+ " (in '/Users/tedgro/Code/Maud/src/maud/stan/out_of_sample_model.stan', line 167, column 4 to column 48)",
+ " (in '/Users/tedgro/Code/Maud/src/maud/stan/out_of_sample_model.stan', line 168, column 4 to column 52)",
+ " (in '/Users/tedgro/Code/Maud/src/maud/stan/out_of_sample_model.stan', line 169, column 11 to column 17)",
+ " (in '/Users/tedgro/Code/Maud/src/maud/stan/out_of_sample_model.stan', line 169, column 4 to line 205, column 67)",
+ " (in '/Users/tedgro/Code/Maud/src/maud/stan/out_of_sample_model.stan', line 207, column 6 to column 51)",
+ " (in '/Users/tedgro/Code/Maud/src/maud/stan/out_of_sample_model.stan', line 206, column 23 to line 208, column 5)",
+ " (in '/Users/tedgro/Code/Maud/src/maud/stan/out_of_sample_model.stan', line 206, column 4 to line 208, column 5)",
+ " (in '/Users/tedgro/Code/Maud/src/maud/stan/out_of_sample_model.stan', line 103, column 27 to line 209, column 3)",
+ " (in '/Users/tedgro/Code/Maud/src/maud/stan/out_of_sample_model.stan', line 103, column 2 to line 209, column 3)",
+ " (in '/Users/tedgro/Code/Maud/src/maud/stan/out_of_sample_model.stan', line 211, column 4 to line 226, column 63)",
+ " (in '/Users/tedgro/Code/Maud/src/maud/stan/out_of_sample_model.stan', line 227, column 4 to line 234, column 46)",
+ " (in '/Users/tedgro/Code/Maud/src/maud/stan/out_of_sample_model.stan', line 235, column 4 to line 244, column 45)",
+ " (in '/Users/tedgro/Code/Maud/src/maud/stan/out_of_sample_model.stan', line 245, column 4 to line 250, column 55)",
+ " (in '/Users/tedgro/Code/Maud/src/maud/stan/out_of_sample_model.stan', line 251, column 4 to column 89)",
+ " (in '/Users/tedgro/Code/Maud/src/maud/stan/out_of_sample_model.stan', line 210, column 27 to line 252, column 3)",
+ " (in '/Users/tedgro/Code/Maud/src/maud/stan/out_of_sample_model.stan', line 210, column 2 to line 252, column 3)",
  " (in '/Users/tedgro/Code/Maud/src/maud/stan/out_of_sample_model.stan', line 4, column 2 to column 21)",
  " (in '/Users/tedgro/Code/Maud/src/maud/stan/out_of_sample_model.stan', line 5, column 2 to column 26)",
  " (in '/Users/tedgro/Code/Maud/src/maud/stan/out_of_sample_model.stan', line 6, column 2 to column 27)",
@@ -106,80 +106,86 @@ static constexpr std::array<const char*, 395> locations_array__ =
  " (in '/Users/tedgro/Code/Maud/src/maud/stan/out_of_sample_model.stan', line 28, column 2 to column 69)",
  " (in '/Users/tedgro/Code/Maud/src/maud/stan/out_of_sample_model.stan', line 29, column 8 to column 20)",
  " (in '/Users/tedgro/Code/Maud/src/maud/stan/out_of_sample_model.stan', line 29, column 2 to column 65)",
- " (in '/Users/tedgro/Code/Maud/src/maud/stan/out_of_sample_model.stan', line 30, column 8 to column 14)",
- " (in '/Users/tedgro/Code/Maud/src/maud/stan/out_of_sample_model.stan', line 30, column 2 to column 47)",
+ " (in '/Users/tedgro/Code/Maud/src/maud/stan/out_of_sample_model.stan', line 30, column 8 to column 32)",
+ " (in '/Users/tedgro/Code/Maud/src/maud/stan/out_of_sample_model.stan', line 30, column 2 to column 69)",
  " (in '/Users/tedgro/Code/Maud/src/maud/stan/out_of_sample_model.stan', line 31, column 8 to column 14)",
- " (in '/Users/tedgro/Code/Maud/src/maud/stan/out_of_sample_model.stan', line 31, column 2 to column 59)",
+ " (in '/Users/tedgro/Code/Maud/src/maud/stan/out_of_sample_model.stan', line 31, column 2 to column 47)",
  " (in '/Users/tedgro/Code/Maud/src/maud/stan/out_of_sample_model.stan', line 32, column 8 to column 14)",
- " (in '/Users/tedgro/Code/Maud/src/maud/stan/out_of_sample_model.stan', line 32, column 2 to column 58)",
+ " (in '/Users/tedgro/Code/Maud/src/maud/stan/out_of_sample_model.stan', line 32, column 2 to column 59)",
  " (in '/Users/tedgro/Code/Maud/src/maud/stan/out_of_sample_model.stan', line 33, column 8 to column 14)",
- " (in '/Users/tedgro/Code/Maud/src/maud/stan/out_of_sample_model.stan', line 33, column 2 to column 57)",
+ " (in '/Users/tedgro/Code/Maud/src/maud/stan/out_of_sample_model.stan', line 33, column 2 to column 58)",
  " (in '/Users/tedgro/Code/Maud/src/maud/stan/out_of_sample_model.stan', line 34, column 8 to column 14)",
- " (in '/Users/tedgro/Code/Maud/src/maud/stan/out_of_sample_model.stan', line 34, column 2 to column 63)",
- " (in '/Users/tedgro/Code/Maud/src/maud/stan/out_of_sample_model.stan', line 35, column 8 to column 19)",
- " (in '/Users/tedgro/Code/Maud/src/maud/stan/out_of_sample_model.stan', line 35, column 2 to column 57)",
+ " (in '/Users/tedgro/Code/Maud/src/maud/stan/out_of_sample_model.stan', line 34, column 2 to column 57)",
+ " (in '/Users/tedgro/Code/Maud/src/maud/stan/out_of_sample_model.stan', line 35, column 8 to column 14)",
+ " (in '/Users/tedgro/Code/Maud/src/maud/stan/out_of_sample_model.stan', line 35, column 2 to column 63)",
  " (in '/Users/tedgro/Code/Maud/src/maud/stan/out_of_sample_model.stan', line 36, column 8 to column 19)",
- " (in '/Users/tedgro/Code/Maud/src/maud/stan/out_of_sample_model.stan', line 36, column 2 to column 60)",
- " (in '/Users/tedgro/Code/Maud/src/maud/stan/out_of_sample_model.stan', line 37, column 8 to column 25)",
- " (in '/Users/tedgro/Code/Maud/src/maud/stan/out_of_sample_model.stan', line 37, column 2 to column 69)",
- " (in '/Users/tedgro/Code/Maud/src/maud/stan/out_of_sample_model.stan', line 38, column 8 to column 18)",
- " (in '/Users/tedgro/Code/Maud/src/maud/stan/out_of_sample_model.stan', line 38, column 2 to column 41)",
- " (in '/Users/tedgro/Code/Maud/src/maud/stan/out_of_sample_model.stan', line 39, column 8 to column 14)",
+ " (in '/Users/tedgro/Code/Maud/src/maud/stan/out_of_sample_model.stan', line 36, column 2 to column 57)",
+ " (in '/Users/tedgro/Code/Maud/src/maud/stan/out_of_sample_model.stan', line 37, column 8 to column 19)",
+ " (in '/Users/tedgro/Code/Maud/src/maud/stan/out_of_sample_model.stan', line 37, column 2 to column 60)",
+ " (in '/Users/tedgro/Code/Maud/src/maud/stan/out_of_sample_model.stan', line 38, column 8 to column 25)",
+ " (in '/Users/tedgro/Code/Maud/src/maud/stan/out_of_sample_model.stan', line 38, column 2 to column 69)",
+ " (in '/Users/tedgro/Code/Maud/src/maud/stan/out_of_sample_model.stan', line 39, column 8 to column 18)",
  " (in '/Users/tedgro/Code/Maud/src/maud/stan/out_of_sample_model.stan', line 39, column 2 to column 41)",
- " (in '/Users/tedgro/Code/Maud/src/maud/stan/out_of_sample_model.stan', line 40, column 8 to column 19)",
- " (in '/Users/tedgro/Code/Maud/src/maud/stan/out_of_sample_model.stan', line 40, column 2 to column 43)",
- " (in '/Users/tedgro/Code/Maud/src/maud/stan/out_of_sample_model.stan', line 41, column 8 to column 14)",
+ " (in '/Users/tedgro/Code/Maud/src/maud/stan/out_of_sample_model.stan', line 40, column 8 to column 14)",
+ " (in '/Users/tedgro/Code/Maud/src/maud/stan/out_of_sample_model.stan', line 40, column 2 to column 41)",
+ " (in '/Users/tedgro/Code/Maud/src/maud/stan/out_of_sample_model.stan', line 41, column 8 to column 19)",
  " (in '/Users/tedgro/Code/Maud/src/maud/stan/out_of_sample_model.stan', line 41, column 2 to column 43)",
- " (in '/Users/tedgro/Code/Maud/src/maud/stan/out_of_sample_model.stan', line 42, column 8 to column 18)",
- " (in '/Users/tedgro/Code/Maud/src/maud/stan/out_of_sample_model.stan', line 42, column 2 to column 47)",
- " (in '/Users/tedgro/Code/Maud/src/maud/stan/out_of_sample_model.stan', line 43, column 8 to column 14)",
- " (in '/Users/tedgro/Code/Maud/src/maud/stan/out_of_sample_model.stan', line 43, column 2 to column 48)",
- " (in '/Users/tedgro/Code/Maud/src/maud/stan/out_of_sample_model.stan', line 44, column 8 to column 19)",
- " (in '/Users/tedgro/Code/Maud/src/maud/stan/out_of_sample_model.stan', line 44, column 2 to column 49)",
- " (in '/Users/tedgro/Code/Maud/src/maud/stan/out_of_sample_model.stan', line 45, column 8 to column 14)",
- " (in '/Users/tedgro/Code/Maud/src/maud/stan/out_of_sample_model.stan', line 45, column 2 to column 48)",
- " (in '/Users/tedgro/Code/Maud/src/maud/stan/out_of_sample_model.stan', line 46, column 8 to column 32)",
- " (in '/Users/tedgro/Code/Maud/src/maud/stan/out_of_sample_model.stan', line 46, column 2 to column 49)",
- " (in '/Users/tedgro/Code/Maud/src/maud/stan/out_of_sample_model.stan', line 47, column 8 to column 14)",
- " (in '/Users/tedgro/Code/Maud/src/maud/stan/out_of_sample_model.stan', line 47, column 2 to column 36)",
- " (in '/Users/tedgro/Code/Maud/src/maud/stan/out_of_sample_model.stan', line 48, column 8 to column 19)",
- " (in '/Users/tedgro/Code/Maud/src/maud/stan/out_of_sample_model.stan', line 48, column 2 to column 43)",
- " (in '/Users/tedgro/Code/Maud/src/maud/stan/out_of_sample_model.stan', line 49, column 8 to column 14)",
+ " (in '/Users/tedgro/Code/Maud/src/maud/stan/out_of_sample_model.stan', line 42, column 8 to column 14)",
+ " (in '/Users/tedgro/Code/Maud/src/maud/stan/out_of_sample_model.stan', line 42, column 2 to column 43)",
+ " (in '/Users/tedgro/Code/Maud/src/maud/stan/out_of_sample_model.stan', line 43, column 8 to column 18)",
+ " (in '/Users/tedgro/Code/Maud/src/maud/stan/out_of_sample_model.stan', line 43, column 2 to column 47)",
+ " (in '/Users/tedgro/Code/Maud/src/maud/stan/out_of_sample_model.stan', line 44, column 8 to column 14)",
+ " (in '/Users/tedgro/Code/Maud/src/maud/stan/out_of_sample_model.stan', line 44, column 2 to column 48)",
+ " (in '/Users/tedgro/Code/Maud/src/maud/stan/out_of_sample_model.stan', line 45, column 8 to column 19)",
+ " (in '/Users/tedgro/Code/Maud/src/maud/stan/out_of_sample_model.stan', line 45, column 2 to column 49)",
+ " (in '/Users/tedgro/Code/Maud/src/maud/stan/out_of_sample_model.stan', line 46, column 8 to column 14)",
+ " (in '/Users/tedgro/Code/Maud/src/maud/stan/out_of_sample_model.stan', line 46, column 2 to column 48)",
+ " (in '/Users/tedgro/Code/Maud/src/maud/stan/out_of_sample_model.stan', line 47, column 8 to column 32)",
+ " (in '/Users/tedgro/Code/Maud/src/maud/stan/out_of_sample_model.stan', line 47, column 2 to column 49)",
+ " (in '/Users/tedgro/Code/Maud/src/maud/stan/out_of_sample_model.stan', line 48, column 8 to column 14)",
+ " (in '/Users/tedgro/Code/Maud/src/maud/stan/out_of_sample_model.stan', line 48, column 2 to column 36)",
+ " (in '/Users/tedgro/Code/Maud/src/maud/stan/out_of_sample_model.stan', line 49, column 8 to column 19)",
  " (in '/Users/tedgro/Code/Maud/src/maud/stan/out_of_sample_model.stan', line 49, column 2 to column 43)",
- " (in '/Users/tedgro/Code/Maud/src/maud/stan/out_of_sample_model.stan', line 50, column 8 to column 25)",
- " (in '/Users/tedgro/Code/Maud/src/maud/stan/out_of_sample_model.stan', line 50, column 2 to column 55)",
- " (in '/Users/tedgro/Code/Maud/src/maud/stan/out_of_sample_model.stan', line 51, column 8 to column 14)",
- " (in '/Users/tedgro/Code/Maud/src/maud/stan/out_of_sample_model.stan', line 51, column 2 to column 49)",
- " (in '/Users/tedgro/Code/Maud/src/maud/stan/out_of_sample_model.stan', line 52, column 8 to column 13)",
- " (in '/Users/tedgro/Code/Maud/src/maud/stan/out_of_sample_model.stan', line 52, column 2 to column 58)",
- " (in '/Users/tedgro/Code/Maud/src/maud/stan/out_of_sample_model.stan', line 53, column 9 to column 15)",
- " (in '/Users/tedgro/Code/Maud/src/maud/stan/out_of_sample_model.stan', line 53, column 2 to column 37)",
- " (in '/Users/tedgro/Code/Maud/src/maud/stan/out_of_sample_model.stan', line 54, column 8 to column 25)",
- " (in '/Users/tedgro/Code/Maud/src/maud/stan/out_of_sample_model.stan', line 54, column 2 to column 76)",
- " (in '/Users/tedgro/Code/Maud/src/maud/stan/out_of_sample_model.stan', line 55, column 8 to column 20)",
- " (in '/Users/tedgro/Code/Maud/src/maud/stan/out_of_sample_model.stan', line 55, column 2 to column 52)",
- " (in '/Users/tedgro/Code/Maud/src/maud/stan/out_of_sample_model.stan', line 56, column 8 to column 34)",
- " (in '/Users/tedgro/Code/Maud/src/maud/stan/out_of_sample_model.stan', line 56, column 2 to column 103)",
- " (in '/Users/tedgro/Code/Maud/src/maud/stan/out_of_sample_model.stan', line 57, column 8 to column 20)",
- " (in '/Users/tedgro/Code/Maud/src/maud/stan/out_of_sample_model.stan', line 57, column 2 to column 61)",
- " (in '/Users/tedgro/Code/Maud/src/maud/stan/out_of_sample_model.stan', line 58, column 18 to column 26)",
- " (in '/Users/tedgro/Code/Maud/src/maud/stan/out_of_sample_model.stan', line 58, column 2 to column 37)",
- " (in '/Users/tedgro/Code/Maud/src/maud/stan/out_of_sample_model.stan', line 60, column 35 to column 47)",
- " (in '/Users/tedgro/Code/Maud/src/maud/stan/out_of_sample_model.stan', line 60, column 18 to column 23)",
- " (in '/Users/tedgro/Code/Maud/src/maud/stan/out_of_sample_model.stan', line 60, column 2 to column 49)",
- " (in '/Users/tedgro/Code/Maud/src/maud/stan/out_of_sample_model.stan', line 61, column 2 to column 15)",
- " (in '/Users/tedgro/Code/Maud/src/maud/stan/out_of_sample_model.stan', line 62, column 2 to column 15)",
- " (in '/Users/tedgro/Code/Maud/src/maud/stan/out_of_sample_model.stan', line 63, column 2 to column 20)",
- " (in '/Users/tedgro/Code/Maud/src/maud/stan/out_of_sample_model.stan', line 64, column 2 to column 34)",
- " (in '/Users/tedgro/Code/Maud/src/maud/stan/out_of_sample_model.stan', line 65, column 2 to column 26)",
- " (in '/Users/tedgro/Code/Maud/src/maud/stan/out_of_sample_model.stan', line 68, column 2 to column 24)",
+ " (in '/Users/tedgro/Code/Maud/src/maud/stan/out_of_sample_model.stan', line 50, column 8 to column 14)",
+ " (in '/Users/tedgro/Code/Maud/src/maud/stan/out_of_sample_model.stan', line 50, column 2 to column 43)",
+ " (in '/Users/tedgro/Code/Maud/src/maud/stan/out_of_sample_model.stan', line 51, column 8 to column 25)",
+ " (in '/Users/tedgro/Code/Maud/src/maud/stan/out_of_sample_model.stan', line 51, column 2 to column 55)",
+ " (in '/Users/tedgro/Code/Maud/src/maud/stan/out_of_sample_model.stan', line 52, column 8 to column 14)",
+ " (in '/Users/tedgro/Code/Maud/src/maud/stan/out_of_sample_model.stan', line 52, column 2 to column 49)",
+ " (in '/Users/tedgro/Code/Maud/src/maud/stan/out_of_sample_model.stan', line 53, column 8 to column 13)",
+ " (in '/Users/tedgro/Code/Maud/src/maud/stan/out_of_sample_model.stan', line 53, column 2 to column 58)",
+ " (in '/Users/tedgro/Code/Maud/src/maud/stan/out_of_sample_model.stan', line 54, column 9 to column 15)",
+ " (in '/Users/tedgro/Code/Maud/src/maud/stan/out_of_sample_model.stan', line 54, column 2 to column 37)",
+ " (in '/Users/tedgro/Code/Maud/src/maud/stan/out_of_sample_model.stan', line 55, column 8 to column 25)",
+ " (in '/Users/tedgro/Code/Maud/src/maud/stan/out_of_sample_model.stan', line 55, column 2 to column 76)",
+ " (in '/Users/tedgro/Code/Maud/src/maud/stan/out_of_sample_model.stan', line 56, column 8 to column 20)",
+ " (in '/Users/tedgro/Code/Maud/src/maud/stan/out_of_sample_model.stan', line 56, column 2 to column 52)",
+ " (in '/Users/tedgro/Code/Maud/src/maud/stan/out_of_sample_model.stan', line 57, column 8 to column 34)",
+ " (in '/Users/tedgro/Code/Maud/src/maud/stan/out_of_sample_model.stan', line 57, column 2 to column 103)",
+ " (in '/Users/tedgro/Code/Maud/src/maud/stan/out_of_sample_model.stan', line 58, column 8 to column 20)",
+ " (in '/Users/tedgro/Code/Maud/src/maud/stan/out_of_sample_model.stan', line 58, column 2 to column 61)",
+ " (in '/Users/tedgro/Code/Maud/src/maud/stan/out_of_sample_model.stan', line 59, column 18 to column 26)",
+ " (in '/Users/tedgro/Code/Maud/src/maud/stan/out_of_sample_model.stan', line 59, column 2 to column 37)",
+ " (in '/Users/tedgro/Code/Maud/src/maud/stan/out_of_sample_model.stan', line 60, column 9 to column 21)",
+ " (in '/Users/tedgro/Code/Maud/src/maud/stan/out_of_sample_model.stan', line 60, column 2 to column 35)",
+ " (in '/Users/tedgro/Code/Maud/src/maud/stan/out_of_sample_model.stan', line 62, column 8 to column 20)",
+ " (in '/Users/tedgro/Code/Maud/src/maud/stan/out_of_sample_model.stan', line 62, column 38 to column 43)",
+ " (in '/Users/tedgro/Code/Maud/src/maud/stan/out_of_sample_model.stan', line 62, column 2 to column 55)",
+ " (in '/Users/tedgro/Code/Maud/src/maud/stan/out_of_sample_model.stan', line 63, column 2 to column 15)",
+ " (in '/Users/tedgro/Code/Maud/src/maud/stan/out_of_sample_model.stan', line 64, column 2 to column 15)",
+ " (in '/Users/tedgro/Code/Maud/src/maud/stan/out_of_sample_model.stan', line 65, column 2 to column 20)",
+ " (in '/Users/tedgro/Code/Maud/src/maud/stan/out_of_sample_model.stan', line 66, column 2 to column 34)",
+ " (in '/Users/tedgro/Code/Maud/src/maud/stan/out_of_sample_model.stan', line 67, column 2 to column 34)",
+ " (in '/Users/tedgro/Code/Maud/src/maud/stan/out_of_sample_model.stan', line 68, column 2 to column 26)",
+ " (in '/Users/tedgro/Code/Maud/src/maud/stan/out_of_sample_model.stan', line 71, column 2 to column 24)",
  " (in '/Users/tedgro/Code/Maud/src/maud/stan/out_of_sample_model.stan', line 74, column 9 to column 13)",
  " (in '/Users/tedgro/Code/Maud/src/maud/stan/out_of_sample_model.stan', line 75, column 9 to column 33)",
  " (in '/Users/tedgro/Code/Maud/src/maud/stan/out_of_sample_model.stan', line 76, column 9 to column 17)",
  " (in '/Users/tedgro/Code/Maud/src/maud/stan/out_of_sample_model.stan', line 77, column 9 to column 20)",
  " (in '/Users/tedgro/Code/Maud/src/maud/stan/out_of_sample_model.stan', line 78, column 9 to column 28)",
  " (in '/Users/tedgro/Code/Maud/src/maud/stan/out_of_sample_model.stan', line 79, column 9 to column 26)",
- " (in '/Users/tedgro/Code/Maud/src/maud/stan/out_of_sample_model.stan', line 80, column 9 to column 15)",
+ " (in '/Users/tedgro/Code/Maud/src/maud/stan/out_of_sample_model.stan', line 80, column 8 to column 20)",
+ " (in '/Users/tedgro/Code/Maud/src/maud/stan/out_of_sample_model.stan', line 80, column 29 to column 35)",
  " (in '/Users/tedgro/Code/Maud/src/maud/stan/out_of_sample_model.stan', line 84, column 8 to column 20)",
  " (in '/Users/tedgro/Code/Maud/src/maud/stan/out_of_sample_model.stan', line 84, column 38 to column 43)",
  " (in '/Users/tedgro/Code/Maud/src/maud/stan/out_of_sample_model.stan', line 85, column 8 to column 20)",
@@ -224,16 +230,16 @@ static constexpr std::array<const char*, 395> locations_array__ =
  " (in '/Users/tedgro/Code/Maud/src/maud/stan/functions.stan', line 33, column 49, included from\n'/Users/tedgro/Code/Maud/src/maud/stan/out_of_sample_model.stan', line 1, column 0)",
  " (in '/Users/tedgro/Code/Maud/src/maud/stan/functions.stan', line 51, column 4, included from\n'/Users/tedgro/Code/Maud/src/maud/stan/out_of_sample_model.stan', line 1, column 0)",
  " (in '/Users/tedgro/Code/Maud/src/maud/stan/functions.stan', line 52, column 4, included from\n'/Users/tedgro/Code/Maud/src/maud/stan/out_of_sample_model.stan', line 1, column 0)",
- " (in '/Users/tedgro/Code/Maud/src/maud/stan/functions.stan', line 53, column 11, included from\n'/Users/tedgro/Code/Maud/src/maud/stan/out_of_sample_model.stan', line 1, column 0)",
  " (in '/Users/tedgro/Code/Maud/src/maud/stan/functions.stan', line 53, column 4, included from\n'/Users/tedgro/Code/Maud/src/maud/stan/out_of_sample_model.stan', line 1, column 0)",
+ " (in '/Users/tedgro/Code/Maud/src/maud/stan/functions.stan', line 54, column 11, included from\n'/Users/tedgro/Code/Maud/src/maud/stan/out_of_sample_model.stan', line 1, column 0)",
  " (in '/Users/tedgro/Code/Maud/src/maud/stan/functions.stan', line 54, column 4, included from\n'/Users/tedgro/Code/Maud/src/maud/stan/out_of_sample_model.stan', line 1, column 0)",
- " (in '/Users/tedgro/Code/Maud/src/maud/stan/functions.stan', line 46, column 84, included from\n'/Users/tedgro/Code/Maud/src/maud/stan/out_of_sample_model.stan', line 1, column 0)",
- " (in '/Users/tedgro/Code/Maud/src/maud/stan/functions.stan', line 62, column 4, included from\n'/Users/tedgro/Code/Maud/src/maud/stan/out_of_sample_model.stan', line 1, column 0)",
+ " (in '/Users/tedgro/Code/Maud/src/maud/stan/functions.stan', line 55, column 4, included from\n'/Users/tedgro/Code/Maud/src/maud/stan/out_of_sample_model.stan', line 1, column 0)",
+ " (in '/Users/tedgro/Code/Maud/src/maud/stan/functions.stan', line 46, column 134, included from\n'/Users/tedgro/Code/Maud/src/maud/stan/out_of_sample_model.stan', line 1, column 0)",
  " (in '/Users/tedgro/Code/Maud/src/maud/stan/functions.stan', line 63, column 4, included from\n'/Users/tedgro/Code/Maud/src/maud/stan/out_of_sample_model.stan', line 1, column 0)",
  " (in '/Users/tedgro/Code/Maud/src/maud/stan/functions.stan', line 64, column 11, included from\n'/Users/tedgro/Code/Maud/src/maud/stan/out_of_sample_model.stan', line 1, column 0)",
  " (in '/Users/tedgro/Code/Maud/src/maud/stan/functions.stan', line 64, column 4, included from\n'/Users/tedgro/Code/Maud/src/maud/stan/out_of_sample_model.stan', line 1, column 0)",
  " (in '/Users/tedgro/Code/Maud/src/maud/stan/functions.stan', line 65, column 4, included from\n'/Users/tedgro/Code/Maud/src/maud/stan/out_of_sample_model.stan', line 1, column 0)",
- " (in '/Users/tedgro/Code/Maud/src/maud/stan/functions.stan', line 57, column 85, included from\n'/Users/tedgro/Code/Maud/src/maud/stan/out_of_sample_model.stan', line 1, column 0)",
+ " (in '/Users/tedgro/Code/Maud/src/maud/stan/functions.stan', line 58, column 133, included from\n'/Users/tedgro/Code/Maud/src/maud/stan/out_of_sample_model.stan', line 1, column 0)",
  " (in '/Users/tedgro/Code/Maud/src/maud/stan/functions.stan', line 70, column 11, included from\n'/Users/tedgro/Code/Maud/src/maud/stan/out_of_sample_model.stan', line 1, column 0)",
  " (in '/Users/tedgro/Code/Maud/src/maud/stan/functions.stan', line 70, column 4, included from\n'/Users/tedgro/Code/Maud/src/maud/stan/out_of_sample_model.stan', line 1, column 0)",
  " (in '/Users/tedgro/Code/Maud/src/maud/stan/functions.stan', line 71, column 4, included from\n'/Users/tedgro/Code/Maud/src/maud/stan/out_of_sample_model.stan', line 1, column 0)",
@@ -265,145 +271,145 @@ static constexpr std::array<const char*, 395> locations_array__ =
  " (in '/Users/tedgro/Code/Maud/src/maud/stan/functions.stan', line 103, column 4, included from\n'/Users/tedgro/Code/Maud/src/maud/stan/out_of_sample_model.stan', line 1, column 0)",
  " (in '/Users/tedgro/Code/Maud/src/maud/stan/functions.stan', line 113, column 4, included from\n'/Users/tedgro/Code/Maud/src/maud/stan/out_of_sample_model.stan', line 1, column 0)",
  " (in '/Users/tedgro/Code/Maud/src/maud/stan/functions.stan', line 100, column 46, included from\n'/Users/tedgro/Code/Maud/src/maud/stan/out_of_sample_model.stan', line 1, column 0)",
- " (in '/Users/tedgro/Code/Maud/src/maud/stan/functions.stan', line 132, column 4, included from\n'/Users/tedgro/Code/Maud/src/maud/stan/out_of_sample_model.stan', line 1, column 0)",
- " (in '/Users/tedgro/Code/Maud/src/maud/stan/functions.stan', line 133, column 11, included from\n'/Users/tedgro/Code/Maud/src/maud/stan/out_of_sample_model.stan', line 1, column 0)",
  " (in '/Users/tedgro/Code/Maud/src/maud/stan/functions.stan', line 133, column 4, included from\n'/Users/tedgro/Code/Maud/src/maud/stan/out_of_sample_model.stan', line 1, column 0)",
- " (in '/Users/tedgro/Code/Maud/src/maud/stan/functions.stan', line 136, column 8, included from\n'/Users/tedgro/Code/Maud/src/maud/stan/out_of_sample_model.stan', line 1, column 0)",
+ " (in '/Users/tedgro/Code/Maud/src/maud/stan/functions.stan', line 134, column 11, included from\n'/Users/tedgro/Code/Maud/src/maud/stan/out_of_sample_model.stan', line 1, column 0)",
+ " (in '/Users/tedgro/Code/Maud/src/maud/stan/functions.stan', line 134, column 4, included from\n'/Users/tedgro/Code/Maud/src/maud/stan/out_of_sample_model.stan', line 1, column 0)",
  " (in '/Users/tedgro/Code/Maud/src/maud/stan/functions.stan', line 137, column 8, included from\n'/Users/tedgro/Code/Maud/src/maud/stan/out_of_sample_model.stan', line 1, column 0)",
- " (in '/Users/tedgro/Code/Maud/src/maud/stan/functions.stan', line 135, column 28, included from\n'/Users/tedgro/Code/Maud/src/maud/stan/out_of_sample_model.stan', line 1, column 0)",
- " (in '/Users/tedgro/Code/Maud/src/maud/stan/functions.stan', line 135, column 6, included from\n'/Users/tedgro/Code/Maud/src/maud/stan/out_of_sample_model.stan', line 1, column 0)",
- " (in '/Users/tedgro/Code/Maud/src/maud/stan/functions.stan', line 139, column 6, included from\n'/Users/tedgro/Code/Maud/src/maud/stan/out_of_sample_model.stan', line 1, column 0)",
+ " (in '/Users/tedgro/Code/Maud/src/maud/stan/functions.stan', line 138, column 8, included from\n'/Users/tedgro/Code/Maud/src/maud/stan/out_of_sample_model.stan', line 1, column 0)",
+ " (in '/Users/tedgro/Code/Maud/src/maud/stan/functions.stan', line 136, column 28, included from\n'/Users/tedgro/Code/Maud/src/maud/stan/out_of_sample_model.stan', line 1, column 0)",
+ " (in '/Users/tedgro/Code/Maud/src/maud/stan/functions.stan', line 136, column 6, included from\n'/Users/tedgro/Code/Maud/src/maud/stan/out_of_sample_model.stan', line 1, column 0)",
  " (in '/Users/tedgro/Code/Maud/src/maud/stan/functions.stan', line 140, column 6, included from\n'/Users/tedgro/Code/Maud/src/maud/stan/out_of_sample_model.stan', line 1, column 0)",
  " (in '/Users/tedgro/Code/Maud/src/maud/stan/functions.stan', line 141, column 6, included from\n'/Users/tedgro/Code/Maud/src/maud/stan/out_of_sample_model.stan', line 1, column 0)",
- " (in '/Users/tedgro/Code/Maud/src/maud/stan/functions.stan', line 142, column 12, included from\n'/Users/tedgro/Code/Maud/src/maud/stan/out_of_sample_model.stan', line 1, column 0)",
  " (in '/Users/tedgro/Code/Maud/src/maud/stan/functions.stan', line 142, column 6, included from\n'/Users/tedgro/Code/Maud/src/maud/stan/out_of_sample_model.stan', line 1, column 0)",
  " (in '/Users/tedgro/Code/Maud/src/maud/stan/functions.stan', line 143, column 12, included from\n'/Users/tedgro/Code/Maud/src/maud/stan/out_of_sample_model.stan', line 1, column 0)",
  " (in '/Users/tedgro/Code/Maud/src/maud/stan/functions.stan', line 143, column 6, included from\n'/Users/tedgro/Code/Maud/src/maud/stan/out_of_sample_model.stan', line 1, column 0)",
  " (in '/Users/tedgro/Code/Maud/src/maud/stan/functions.stan', line 144, column 12, included from\n'/Users/tedgro/Code/Maud/src/maud/stan/out_of_sample_model.stan', line 1, column 0)",
  " (in '/Users/tedgro/Code/Maud/src/maud/stan/functions.stan', line 144, column 6, included from\n'/Users/tedgro/Code/Maud/src/maud/stan/out_of_sample_model.stan', line 1, column 0)",
- " (in '/Users/tedgro/Code/Maud/src/maud/stan/functions.stan', line 145, column 13, included from\n'/Users/tedgro/Code/Maud/src/maud/stan/out_of_sample_model.stan', line 1, column 0)",
+ " (in '/Users/tedgro/Code/Maud/src/maud/stan/functions.stan', line 145, column 12, included from\n'/Users/tedgro/Code/Maud/src/maud/stan/out_of_sample_model.stan', line 1, column 0)",
  " (in '/Users/tedgro/Code/Maud/src/maud/stan/functions.stan', line 145, column 6, included from\n'/Users/tedgro/Code/Maud/src/maud/stan/out_of_sample_model.stan', line 1, column 0)",
+ " (in '/Users/tedgro/Code/Maud/src/maud/stan/functions.stan', line 146, column 13, included from\n'/Users/tedgro/Code/Maud/src/maud/stan/out_of_sample_model.stan', line 1, column 0)",
  " (in '/Users/tedgro/Code/Maud/src/maud/stan/functions.stan', line 146, column 6, included from\n'/Users/tedgro/Code/Maud/src/maud/stan/out_of_sample_model.stan', line 1, column 0)",
- " (in '/Users/tedgro/Code/Maud/src/maud/stan/functions.stan', line 148, column 14, included from\n'/Users/tedgro/Code/Maud/src/maud/stan/out_of_sample_model.stan', line 1, column 0)",
- " (in '/Users/tedgro/Code/Maud/src/maud/stan/functions.stan', line 148, column 8, included from\n'/Users/tedgro/Code/Maud/src/maud/stan/out_of_sample_model.stan', line 1, column 0)",
- " (in '/Users/tedgro/Code/Maud/src/maud/stan/functions.stan', line 149, column 15, included from\n'/Users/tedgro/Code/Maud/src/maud/stan/out_of_sample_model.stan', line 1, column 0)",
- " (in '/Users/tedgro/Code/Maud/src/maud/stan/functions.stan', line 149, column 8, included from\n'/Users/tedgro/Code/Maud/src/maud/stan/out_of_sample_model.stan', line 1, column 0)",
- " (in '/Users/tedgro/Code/Maud/src/maud/stan/functions.stan', line 150, column 8, included from\n'/Users/tedgro/Code/Maud/src/maud/stan/out_of_sample_model.stan', line 1, column 0)",
- " (in '/Users/tedgro/Code/Maud/src/maud/stan/functions.stan', line 147, column 28, included from\n'/Users/tedgro/Code/Maud/src/maud/stan/out_of_sample_model.stan', line 1, column 0)",
  " (in '/Users/tedgro/Code/Maud/src/maud/stan/functions.stan', line 147, column 6, included from\n'/Users/tedgro/Code/Maud/src/maud/stan/out_of_sample_model.stan', line 1, column 0)",
- " (in '/Users/tedgro/Code/Maud/src/maud/stan/functions.stan', line 153, column 14, included from\n'/Users/tedgro/Code/Maud/src/maud/stan/out_of_sample_model.stan', line 1, column 0)",
- " (in '/Users/tedgro/Code/Maud/src/maud/stan/functions.stan', line 153, column 8, included from\n'/Users/tedgro/Code/Maud/src/maud/stan/out_of_sample_model.stan', line 1, column 0)",
+ " (in '/Users/tedgro/Code/Maud/src/maud/stan/functions.stan', line 149, column 14, included from\n'/Users/tedgro/Code/Maud/src/maud/stan/out_of_sample_model.stan', line 1, column 0)",
+ " (in '/Users/tedgro/Code/Maud/src/maud/stan/functions.stan', line 149, column 8, included from\n'/Users/tedgro/Code/Maud/src/maud/stan/out_of_sample_model.stan', line 1, column 0)",
+ " (in '/Users/tedgro/Code/Maud/src/maud/stan/functions.stan', line 150, column 15, included from\n'/Users/tedgro/Code/Maud/src/maud/stan/out_of_sample_model.stan', line 1, column 0)",
+ " (in '/Users/tedgro/Code/Maud/src/maud/stan/functions.stan', line 150, column 8, included from\n'/Users/tedgro/Code/Maud/src/maud/stan/out_of_sample_model.stan', line 1, column 0)",
+ " (in '/Users/tedgro/Code/Maud/src/maud/stan/functions.stan', line 151, column 8, included from\n'/Users/tedgro/Code/Maud/src/maud/stan/out_of_sample_model.stan', line 1, column 0)",
+ " (in '/Users/tedgro/Code/Maud/src/maud/stan/functions.stan', line 148, column 28, included from\n'/Users/tedgro/Code/Maud/src/maud/stan/out_of_sample_model.stan', line 1, column 0)",
+ " (in '/Users/tedgro/Code/Maud/src/maud/stan/functions.stan', line 148, column 6, included from\n'/Users/tedgro/Code/Maud/src/maud/stan/out_of_sample_model.stan', line 1, column 0)",
+ " (in '/Users/tedgro/Code/Maud/src/maud/stan/functions.stan', line 154, column 14, included from\n'/Users/tedgro/Code/Maud/src/maud/stan/out_of_sample_model.stan', line 1, column 0)",
  " (in '/Users/tedgro/Code/Maud/src/maud/stan/functions.stan', line 154, column 8, included from\n'/Users/tedgro/Code/Maud/src/maud/stan/out_of_sample_model.stan', line 1, column 0)",
- " (in '/Users/tedgro/Code/Maud/src/maud/stan/functions.stan', line 152, column 19, included from\n'/Users/tedgro/Code/Maud/src/maud/stan/out_of_sample_model.stan', line 1, column 0)",
- " (in '/Users/tedgro/Code/Maud/src/maud/stan/functions.stan', line 152, column 6, included from\n'/Users/tedgro/Code/Maud/src/maud/stan/out_of_sample_model.stan', line 1, column 0)",
- " (in '/Users/tedgro/Code/Maud/src/maud/stan/functions.stan', line 134, column 23, included from\n'/Users/tedgro/Code/Maud/src/maud/stan/out_of_sample_model.stan', line 1, column 0)",
- " (in '/Users/tedgro/Code/Maud/src/maud/stan/functions.stan', line 134, column 4, included from\n'/Users/tedgro/Code/Maud/src/maud/stan/out_of_sample_model.stan', line 1, column 0)",
- " (in '/Users/tedgro/Code/Maud/src/maud/stan/functions.stan', line 157, column 4, included from\n'/Users/tedgro/Code/Maud/src/maud/stan/out_of_sample_model.stan', line 1, column 0)",
- " (in '/Users/tedgro/Code/Maud/src/maud/stan/functions.stan', line 130, column 51, included from\n'/Users/tedgro/Code/Maud/src/maud/stan/out_of_sample_model.stan', line 1, column 0)",
- " (in '/Users/tedgro/Code/Maud/src/maud/stan/functions.stan', line 161, column 4, included from\n'/Users/tedgro/Code/Maud/src/maud/stan/out_of_sample_model.stan', line 1, column 0)",
+ " (in '/Users/tedgro/Code/Maud/src/maud/stan/functions.stan', line 155, column 8, included from\n'/Users/tedgro/Code/Maud/src/maud/stan/out_of_sample_model.stan', line 1, column 0)",
+ " (in '/Users/tedgro/Code/Maud/src/maud/stan/functions.stan', line 153, column 19, included from\n'/Users/tedgro/Code/Maud/src/maud/stan/out_of_sample_model.stan', line 1, column 0)",
+ " (in '/Users/tedgro/Code/Maud/src/maud/stan/functions.stan', line 153, column 6, included from\n'/Users/tedgro/Code/Maud/src/maud/stan/out_of_sample_model.stan', line 1, column 0)",
+ " (in '/Users/tedgro/Code/Maud/src/maud/stan/functions.stan', line 135, column 23, included from\n'/Users/tedgro/Code/Maud/src/maud/stan/out_of_sample_model.stan', line 1, column 0)",
+ " (in '/Users/tedgro/Code/Maud/src/maud/stan/functions.stan', line 135, column 4, included from\n'/Users/tedgro/Code/Maud/src/maud/stan/out_of_sample_model.stan', line 1, column 0)",
+ " (in '/Users/tedgro/Code/Maud/src/maud/stan/functions.stan', line 158, column 4, included from\n'/Users/tedgro/Code/Maud/src/maud/stan/out_of_sample_model.stan', line 1, column 0)",
+ " (in '/Users/tedgro/Code/Maud/src/maud/stan/functions.stan', line 131, column 51, included from\n'/Users/tedgro/Code/Maud/src/maud/stan/out_of_sample_model.stan', line 1, column 0)",
  " (in '/Users/tedgro/Code/Maud/src/maud/stan/functions.stan', line 162, column 4, included from\n'/Users/tedgro/Code/Maud/src/maud/stan/out_of_sample_model.stan', line 1, column 0)",
- " (in '/Users/tedgro/Code/Maud/src/maud/stan/functions.stan', line 163, column 11, included from\n'/Users/tedgro/Code/Maud/src/maud/stan/out_of_sample_model.stan', line 1, column 0)",
  " (in '/Users/tedgro/Code/Maud/src/maud/stan/functions.stan', line 163, column 4, included from\n'/Users/tedgro/Code/Maud/src/maud/stan/out_of_sample_model.stan', line 1, column 0)",
  " (in '/Users/tedgro/Code/Maud/src/maud/stan/functions.stan', line 164, column 11, included from\n'/Users/tedgro/Code/Maud/src/maud/stan/out_of_sample_model.stan', line 1, column 0)",
  " (in '/Users/tedgro/Code/Maud/src/maud/stan/functions.stan', line 164, column 4, included from\n'/Users/tedgro/Code/Maud/src/maud/stan/out_of_sample_model.stan', line 1, column 0)",
- " (in '/Users/tedgro/Code/Maud/src/maud/stan/functions.stan', line 169, column 8, included from\n'/Users/tedgro/Code/Maud/src/maud/stan/out_of_sample_model.stan', line 1, column 0)",
- " (in '/Users/tedgro/Code/Maud/src/maud/stan/functions.stan', line 167, column 8, included from\n'/Users/tedgro/Code/Maud/src/maud/stan/out_of_sample_model.stan', line 1, column 0)",
- " (in '/Users/tedgro/Code/Maud/src/maud/stan/functions.stan', line 166, column 6, included from\n'/Users/tedgro/Code/Maud/src/maud/stan/out_of_sample_model.stan', line 1, column 0)",
- " (in '/Users/tedgro/Code/Maud/src/maud/stan/functions.stan', line 165, column 23, included from\n'/Users/tedgro/Code/Maud/src/maud/stan/out_of_sample_model.stan', line 1, column 0)",
+ " (in '/Users/tedgro/Code/Maud/src/maud/stan/functions.stan', line 165, column 11, included from\n'/Users/tedgro/Code/Maud/src/maud/stan/out_of_sample_model.stan', line 1, column 0)",
  " (in '/Users/tedgro/Code/Maud/src/maud/stan/functions.stan', line 165, column 4, included from\n'/Users/tedgro/Code/Maud/src/maud/stan/out_of_sample_model.stan', line 1, column 0)",
- " (in '/Users/tedgro/Code/Maud/src/maud/stan/functions.stan', line 171, column 4, included from\n'/Users/tedgro/Code/Maud/src/maud/stan/out_of_sample_model.stan', line 1, column 0)",
- " (in '/Users/tedgro/Code/Maud/src/maud/stan/functions.stan', line 160, column 78, included from\n'/Users/tedgro/Code/Maud/src/maud/stan/out_of_sample_model.stan', line 1, column 0)",
- " (in '/Users/tedgro/Code/Maud/src/maud/stan/functions.stan', line 185, column 4, included from\n'/Users/tedgro/Code/Maud/src/maud/stan/out_of_sample_model.stan', line 1, column 0)",
- " (in '/Users/tedgro/Code/Maud/src/maud/stan/functions.stan', line 186, column 11, included from\n'/Users/tedgro/Code/Maud/src/maud/stan/out_of_sample_model.stan', line 1, column 0)",
+ " (in '/Users/tedgro/Code/Maud/src/maud/stan/functions.stan', line 170, column 8, included from\n'/Users/tedgro/Code/Maud/src/maud/stan/out_of_sample_model.stan', line 1, column 0)",
+ " (in '/Users/tedgro/Code/Maud/src/maud/stan/functions.stan', line 168, column 8, included from\n'/Users/tedgro/Code/Maud/src/maud/stan/out_of_sample_model.stan', line 1, column 0)",
+ " (in '/Users/tedgro/Code/Maud/src/maud/stan/functions.stan', line 167, column 6, included from\n'/Users/tedgro/Code/Maud/src/maud/stan/out_of_sample_model.stan', line 1, column 0)",
+ " (in '/Users/tedgro/Code/Maud/src/maud/stan/functions.stan', line 166, column 23, included from\n'/Users/tedgro/Code/Maud/src/maud/stan/out_of_sample_model.stan', line 1, column 0)",
+ " (in '/Users/tedgro/Code/Maud/src/maud/stan/functions.stan', line 166, column 4, included from\n'/Users/tedgro/Code/Maud/src/maud/stan/out_of_sample_model.stan', line 1, column 0)",
+ " (in '/Users/tedgro/Code/Maud/src/maud/stan/functions.stan', line 172, column 4, included from\n'/Users/tedgro/Code/Maud/src/maud/stan/out_of_sample_model.stan', line 1, column 0)",
+ " (in '/Users/tedgro/Code/Maud/src/maud/stan/functions.stan', line 161, column 96, included from\n'/Users/tedgro/Code/Maud/src/maud/stan/out_of_sample_model.stan', line 1, column 0)",
  " (in '/Users/tedgro/Code/Maud/src/maud/stan/functions.stan', line 186, column 4, included from\n'/Users/tedgro/Code/Maud/src/maud/stan/out_of_sample_model.stan', line 1, column 0)",
- " (in '/Users/tedgro/Code/Maud/src/maud/stan/functions.stan', line 188, column 6, included from\n'/Users/tedgro/Code/Maud/src/maud/stan/out_of_sample_model.stan', line 1, column 0)",
- " (in '/Users/tedgro/Code/Maud/src/maud/stan/functions.stan', line 190, column 8, included from\n'/Users/tedgro/Code/Maud/src/maud/stan/out_of_sample_model.stan', line 1, column 0)",
- " (in '/Users/tedgro/Code/Maud/src/maud/stan/functions.stan', line 189, column 27, included from\n'/Users/tedgro/Code/Maud/src/maud/stan/out_of_sample_model.stan', line 1, column 0)",
+ " (in '/Users/tedgro/Code/Maud/src/maud/stan/functions.stan', line 187, column 11, included from\n'/Users/tedgro/Code/Maud/src/maud/stan/out_of_sample_model.stan', line 1, column 0)",
+ " (in '/Users/tedgro/Code/Maud/src/maud/stan/functions.stan', line 187, column 4, included from\n'/Users/tedgro/Code/Maud/src/maud/stan/out_of_sample_model.stan', line 1, column 0)",
  " (in '/Users/tedgro/Code/Maud/src/maud/stan/functions.stan', line 189, column 6, included from\n'/Users/tedgro/Code/Maud/src/maud/stan/out_of_sample_model.stan', line 1, column 0)",
- " (in '/Users/tedgro/Code/Maud/src/maud/stan/functions.stan', line 192, column 6, included from\n'/Users/tedgro/Code/Maud/src/maud/stan/out_of_sample_model.stan', line 1, column 0)",
+ " (in '/Users/tedgro/Code/Maud/src/maud/stan/functions.stan', line 191, column 8, included from\n'/Users/tedgro/Code/Maud/src/maud/stan/out_of_sample_model.stan', line 1, column 0)",
+ " (in '/Users/tedgro/Code/Maud/src/maud/stan/functions.stan', line 190, column 27, included from\n'/Users/tedgro/Code/Maud/src/maud/stan/out_of_sample_model.stan', line 1, column 0)",
+ " (in '/Users/tedgro/Code/Maud/src/maud/stan/functions.stan', line 190, column 6, included from\n'/Users/tedgro/Code/Maud/src/maud/stan/out_of_sample_model.stan', line 1, column 0)",
  " (in '/Users/tedgro/Code/Maud/src/maud/stan/functions.stan', line 193, column 6, included from\n'/Users/tedgro/Code/Maud/src/maud/stan/out_of_sample_model.stan', line 1, column 0)",
  " (in '/Users/tedgro/Code/Maud/src/maud/stan/functions.stan', line 194, column 6, included from\n'/Users/tedgro/Code/Maud/src/maud/stan/out_of_sample_model.stan', line 1, column 0)",
  " (in '/Users/tedgro/Code/Maud/src/maud/stan/functions.stan', line 195, column 6, included from\n'/Users/tedgro/Code/Maud/src/maud/stan/out_of_sample_model.stan', line 1, column 0)",
- " (in '/Users/tedgro/Code/Maud/src/maud/stan/functions.stan', line 196, column 8, included from\n'/Users/tedgro/Code/Maud/src/maud/stan/out_of_sample_model.stan', line 1, column 0)",
- " (in '/Users/tedgro/Code/Maud/src/maud/stan/functions.stan', line 201, column 10, included from\n'/Users/tedgro/Code/Maud/src/maud/stan/out_of_sample_model.stan', line 1, column 0)",
- " (in '/Users/tedgro/Code/Maud/src/maud/stan/functions.stan', line 200, column 13, included from\n'/Users/tedgro/Code/Maud/src/maud/stan/out_of_sample_model.stan', line 1, column 0)",
- " (in '/Users/tedgro/Code/Maud/src/maud/stan/functions.stan', line 198, column 10, included from\n'/Users/tedgro/Code/Maud/src/maud/stan/out_of_sample_model.stan', line 1, column 0)",
- " (in '/Users/tedgro/Code/Maud/src/maud/stan/functions.stan', line 197, column 43, included from\n'/Users/tedgro/Code/Maud/src/maud/stan/out_of_sample_model.stan', line 1, column 0)",
+ " (in '/Users/tedgro/Code/Maud/src/maud/stan/functions.stan', line 196, column 6, included from\n'/Users/tedgro/Code/Maud/src/maud/stan/out_of_sample_model.stan', line 1, column 0)",
  " (in '/Users/tedgro/Code/Maud/src/maud/stan/functions.stan', line 197, column 8, included from\n'/Users/tedgro/Code/Maud/src/maud/stan/out_of_sample_model.stan', line 1, column 0)",
- " (in '/Users/tedgro/Code/Maud/src/maud/stan/functions.stan', line 204, column 6, included from\n'/Users/tedgro/Code/Maud/src/maud/stan/out_of_sample_model.stan', line 1, column 0)",
- " (in '/Users/tedgro/Code/Maud/src/maud/stan/functions.stan', line 187, column 23, included from\n'/Users/tedgro/Code/Maud/src/maud/stan/out_of_sample_model.stan', line 1, column 0)",
- " (in '/Users/tedgro/Code/Maud/src/maud/stan/functions.stan', line 187, column 4, included from\n'/Users/tedgro/Code/Maud/src/maud/stan/out_of_sample_model.stan', line 1, column 0)",
- " (in '/Users/tedgro/Code/Maud/src/maud/stan/functions.stan', line 206, column 4, included from\n'/Users/tedgro/Code/Maud/src/maud/stan/out_of_sample_model.stan', line 1, column 0)",
- " (in '/Users/tedgro/Code/Maud/src/maud/stan/functions.stan', line 184, column 3, included from\n'/Users/tedgro/Code/Maud/src/maud/stan/out_of_sample_model.stan', line 1, column 0)",
- " (in '/Users/tedgro/Code/Maud/src/maud/stan/functions.stan', line 215, column 4, included from\n'/Users/tedgro/Code/Maud/src/maud/stan/out_of_sample_model.stan', line 1, column 0)",
- " (in '/Users/tedgro/Code/Maud/src/maud/stan/functions.stan', line 216, column 11, included from\n'/Users/tedgro/Code/Maud/src/maud/stan/out_of_sample_model.stan', line 1, column 0)",
+ " (in '/Users/tedgro/Code/Maud/src/maud/stan/functions.stan', line 202, column 10, included from\n'/Users/tedgro/Code/Maud/src/maud/stan/out_of_sample_model.stan', line 1, column 0)",
+ " (in '/Users/tedgro/Code/Maud/src/maud/stan/functions.stan', line 201, column 13, included from\n'/Users/tedgro/Code/Maud/src/maud/stan/out_of_sample_model.stan', line 1, column 0)",
+ " (in '/Users/tedgro/Code/Maud/src/maud/stan/functions.stan', line 199, column 10, included from\n'/Users/tedgro/Code/Maud/src/maud/stan/out_of_sample_model.stan', line 1, column 0)",
+ " (in '/Users/tedgro/Code/Maud/src/maud/stan/functions.stan', line 198, column 43, included from\n'/Users/tedgro/Code/Maud/src/maud/stan/out_of_sample_model.stan', line 1, column 0)",
+ " (in '/Users/tedgro/Code/Maud/src/maud/stan/functions.stan', line 198, column 8, included from\n'/Users/tedgro/Code/Maud/src/maud/stan/out_of_sample_model.stan', line 1, column 0)",
+ " (in '/Users/tedgro/Code/Maud/src/maud/stan/functions.stan', line 205, column 6, included from\n'/Users/tedgro/Code/Maud/src/maud/stan/out_of_sample_model.stan', line 1, column 0)",
+ " (in '/Users/tedgro/Code/Maud/src/maud/stan/functions.stan', line 188, column 23, included from\n'/Users/tedgro/Code/Maud/src/maud/stan/out_of_sample_model.stan', line 1, column 0)",
+ " (in '/Users/tedgro/Code/Maud/src/maud/stan/functions.stan', line 188, column 4, included from\n'/Users/tedgro/Code/Maud/src/maud/stan/out_of_sample_model.stan', line 1, column 0)",
+ " (in '/Users/tedgro/Code/Maud/src/maud/stan/functions.stan', line 207, column 4, included from\n'/Users/tedgro/Code/Maud/src/maud/stan/out_of_sample_model.stan', line 1, column 0)",
+ " (in '/Users/tedgro/Code/Maud/src/maud/stan/functions.stan', line 185, column 3, included from\n'/Users/tedgro/Code/Maud/src/maud/stan/out_of_sample_model.stan', line 1, column 0)",
  " (in '/Users/tedgro/Code/Maud/src/maud/stan/functions.stan', line 216, column 4, included from\n'/Users/tedgro/Code/Maud/src/maud/stan/out_of_sample_model.stan', line 1, column 0)",
- " (in '/Users/tedgro/Code/Maud/src/maud/stan/functions.stan', line 218, column 6, included from\n'/Users/tedgro/Code/Maud/src/maud/stan/out_of_sample_model.stan', line 1, column 0)",
- " (in '/Users/tedgro/Code/Maud/src/maud/stan/functions.stan', line 220, column 8, included from\n'/Users/tedgro/Code/Maud/src/maud/stan/out_of_sample_model.stan', line 1, column 0)",
- " (in '/Users/tedgro/Code/Maud/src/maud/stan/functions.stan', line 219, column 22, included from\n'/Users/tedgro/Code/Maud/src/maud/stan/out_of_sample_model.stan', line 1, column 0)",
+ " (in '/Users/tedgro/Code/Maud/src/maud/stan/functions.stan', line 217, column 11, included from\n'/Users/tedgro/Code/Maud/src/maud/stan/out_of_sample_model.stan', line 1, column 0)",
+ " (in '/Users/tedgro/Code/Maud/src/maud/stan/functions.stan', line 217, column 4, included from\n'/Users/tedgro/Code/Maud/src/maud/stan/out_of_sample_model.stan', line 1, column 0)",
  " (in '/Users/tedgro/Code/Maud/src/maud/stan/functions.stan', line 219, column 6, included from\n'/Users/tedgro/Code/Maud/src/maud/stan/out_of_sample_model.stan', line 1, column 0)",
- " (in '/Users/tedgro/Code/Maud/src/maud/stan/functions.stan', line 222, column 6, included from\n'/Users/tedgro/Code/Maud/src/maud/stan/out_of_sample_model.stan', line 1, column 0)",
+ " (in '/Users/tedgro/Code/Maud/src/maud/stan/functions.stan', line 221, column 8, included from\n'/Users/tedgro/Code/Maud/src/maud/stan/out_of_sample_model.stan', line 1, column 0)",
+ " (in '/Users/tedgro/Code/Maud/src/maud/stan/functions.stan', line 220, column 22, included from\n'/Users/tedgro/Code/Maud/src/maud/stan/out_of_sample_model.stan', line 1, column 0)",
+ " (in '/Users/tedgro/Code/Maud/src/maud/stan/functions.stan', line 220, column 6, included from\n'/Users/tedgro/Code/Maud/src/maud/stan/out_of_sample_model.stan', line 1, column 0)",
  " (in '/Users/tedgro/Code/Maud/src/maud/stan/functions.stan', line 223, column 6, included from\n'/Users/tedgro/Code/Maud/src/maud/stan/out_of_sample_model.stan', line 1, column 0)",
  " (in '/Users/tedgro/Code/Maud/src/maud/stan/functions.stan', line 224, column 6, included from\n'/Users/tedgro/Code/Maud/src/maud/stan/out_of_sample_model.stan', line 1, column 0)",
- " (in '/Users/tedgro/Code/Maud/src/maud/stan/functions.stan', line 225, column 8, included from\n'/Users/tedgro/Code/Maud/src/maud/stan/out_of_sample_model.stan', line 1, column 0)",
- " (in '/Users/tedgro/Code/Maud/src/maud/stan/functions.stan', line 230, column 10, included from\n'/Users/tedgro/Code/Maud/src/maud/stan/out_of_sample_model.stan', line 1, column 0)",
- " (in '/Users/tedgro/Code/Maud/src/maud/stan/functions.stan', line 229, column 12, included from\n'/Users/tedgro/Code/Maud/src/maud/stan/out_of_sample_model.stan', line 1, column 0)",
- " (in '/Users/tedgro/Code/Maud/src/maud/stan/functions.stan', line 227, column 10, included from\n'/Users/tedgro/Code/Maud/src/maud/stan/out_of_sample_model.stan', line 1, column 0)",
- " (in '/Users/tedgro/Code/Maud/src/maud/stan/functions.stan', line 226, column 33, included from\n'/Users/tedgro/Code/Maud/src/maud/stan/out_of_sample_model.stan', line 1, column 0)",
+ " (in '/Users/tedgro/Code/Maud/src/maud/stan/functions.stan', line 225, column 6, included from\n'/Users/tedgro/Code/Maud/src/maud/stan/out_of_sample_model.stan', line 1, column 0)",
  " (in '/Users/tedgro/Code/Maud/src/maud/stan/functions.stan', line 226, column 8, included from\n'/Users/tedgro/Code/Maud/src/maud/stan/out_of_sample_model.stan', line 1, column 0)",
- " (in '/Users/tedgro/Code/Maud/src/maud/stan/functions.stan', line 232, column 8, included from\n'/Users/tedgro/Code/Maud/src/maud/stan/out_of_sample_model.stan', line 1, column 0)",
- " (in '/Users/tedgro/Code/Maud/src/maud/stan/functions.stan', line 217, column 23, included from\n'/Users/tedgro/Code/Maud/src/maud/stan/out_of_sample_model.stan', line 1, column 0)",
- " (in '/Users/tedgro/Code/Maud/src/maud/stan/functions.stan', line 217, column 4, included from\n'/Users/tedgro/Code/Maud/src/maud/stan/out_of_sample_model.stan', line 1, column 0)",
- " (in '/Users/tedgro/Code/Maud/src/maud/stan/functions.stan', line 235, column 4, included from\n'/Users/tedgro/Code/Maud/src/maud/stan/out_of_sample_model.stan', line 1, column 0)",
- " (in '/Users/tedgro/Code/Maud/src/maud/stan/functions.stan', line 214, column 45, included from\n'/Users/tedgro/Code/Maud/src/maud/stan/out_of_sample_model.stan', line 1, column 0)",
- " (in '/Users/tedgro/Code/Maud/src/maud/stan/functions.stan', line 244, column 4, included from\n'/Users/tedgro/Code/Maud/src/maud/stan/out_of_sample_model.stan', line 1, column 0)",
- " (in '/Users/tedgro/Code/Maud/src/maud/stan/functions.stan', line 245, column 11, included from\n'/Users/tedgro/Code/Maud/src/maud/stan/out_of_sample_model.stan', line 1, column 0)",
- " (in '/Users/tedgro/Code/Maud/src/maud/stan/functions.stan', line 245, column 4, included from\n'/Users/tedgro/Code/Maud/src/maud/stan/out_of_sample_model.stan', line 1, column 0)",
- " (in '/Users/tedgro/Code/Maud/src/maud/stan/functions.stan', line 248, column 8, included from\n'/Users/tedgro/Code/Maud/src/maud/stan/out_of_sample_model.stan', line 1, column 0)",
- " (in '/Users/tedgro/Code/Maud/src/maud/stan/functions.stan', line 249, column 17, included from\n'/Users/tedgro/Code/Maud/src/maud/stan/out_of_sample_model.stan', line 1, column 0)",
- " (in '/Users/tedgro/Code/Maud/src/maud/stan/functions.stan', line 249, column 8, included from\n'/Users/tedgro/Code/Maud/src/maud/stan/out_of_sample_model.stan', line 1, column 0)",
- " (in '/Users/tedgro/Code/Maud/src/maud/stan/functions.stan', line 250, column 8, included from\n'/Users/tedgro/Code/Maud/src/maud/stan/out_of_sample_model.stan', line 1, column 0)",
- " (in '/Users/tedgro/Code/Maud/src/maud/stan/functions.stan', line 247, column 28, included from\n'/Users/tedgro/Code/Maud/src/maud/stan/out_of_sample_model.stan', line 1, column 0)",
- " (in '/Users/tedgro/Code/Maud/src/maud/stan/functions.stan', line 247, column 6, included from\n'/Users/tedgro/Code/Maud/src/maud/stan/out_of_sample_model.stan', line 1, column 0)",
- " (in '/Users/tedgro/Code/Maud/src/maud/stan/functions.stan', line 246, column 23, included from\n'/Users/tedgro/Code/Maud/src/maud/stan/out_of_sample_model.stan', line 1, column 0)",
+ " (in '/Users/tedgro/Code/Maud/src/maud/stan/functions.stan', line 231, column 10, included from\n'/Users/tedgro/Code/Maud/src/maud/stan/out_of_sample_model.stan', line 1, column 0)",
+ " (in '/Users/tedgro/Code/Maud/src/maud/stan/functions.stan', line 230, column 12, included from\n'/Users/tedgro/Code/Maud/src/maud/stan/out_of_sample_model.stan', line 1, column 0)",
+ " (in '/Users/tedgro/Code/Maud/src/maud/stan/functions.stan', line 228, column 10, included from\n'/Users/tedgro/Code/Maud/src/maud/stan/out_of_sample_model.stan', line 1, column 0)",
+ " (in '/Users/tedgro/Code/Maud/src/maud/stan/functions.stan', line 227, column 33, included from\n'/Users/tedgro/Code/Maud/src/maud/stan/out_of_sample_model.stan', line 1, column 0)",
+ " (in '/Users/tedgro/Code/Maud/src/maud/stan/functions.stan', line 227, column 8, included from\n'/Users/tedgro/Code/Maud/src/maud/stan/out_of_sample_model.stan', line 1, column 0)",
+ " (in '/Users/tedgro/Code/Maud/src/maud/stan/functions.stan', line 233, column 8, included from\n'/Users/tedgro/Code/Maud/src/maud/stan/out_of_sample_model.stan', line 1, column 0)",
+ " (in '/Users/tedgro/Code/Maud/src/maud/stan/functions.stan', line 218, column 23, included from\n'/Users/tedgro/Code/Maud/src/maud/stan/out_of_sample_model.stan', line 1, column 0)",
+ " (in '/Users/tedgro/Code/Maud/src/maud/stan/functions.stan', line 218, column 4, included from\n'/Users/tedgro/Code/Maud/src/maud/stan/out_of_sample_model.stan', line 1, column 0)",
+ " (in '/Users/tedgro/Code/Maud/src/maud/stan/functions.stan', line 236, column 4, included from\n'/Users/tedgro/Code/Maud/src/maud/stan/out_of_sample_model.stan', line 1, column 0)",
+ " (in '/Users/tedgro/Code/Maud/src/maud/stan/functions.stan', line 215, column 45, included from\n'/Users/tedgro/Code/Maud/src/maud/stan/out_of_sample_model.stan', line 1, column 0)",
  " (in '/Users/tedgro/Code/Maud/src/maud/stan/functions.stan', line 246, column 4, included from\n'/Users/tedgro/Code/Maud/src/maud/stan/out_of_sample_model.stan', line 1, column 0)",
- " (in '/Users/tedgro/Code/Maud/src/maud/stan/functions.stan', line 253, column 4, included from\n'/Users/tedgro/Code/Maud/src/maud/stan/out_of_sample_model.stan', line 1, column 0)",
- " (in '/Users/tedgro/Code/Maud/src/maud/stan/functions.stan', line 243, column 43, included from\n'/Users/tedgro/Code/Maud/src/maud/stan/out_of_sample_model.stan', line 1, column 0)",
- " (in '/Users/tedgro/Code/Maud/src/maud/stan/functions.stan', line 257, column 4, included from\n'/Users/tedgro/Code/Maud/src/maud/stan/out_of_sample_model.stan', line 1, column 0)",
- " (in '/Users/tedgro/Code/Maud/src/maud/stan/functions.stan', line 258, column 11, included from\n'/Users/tedgro/Code/Maud/src/maud/stan/out_of_sample_model.stan', line 1, column 0)",
- " (in '/Users/tedgro/Code/Maud/src/maud/stan/functions.stan', line 258, column 4, included from\n'/Users/tedgro/Code/Maud/src/maud/stan/out_of_sample_model.stan', line 1, column 0)",
- " (in '/Users/tedgro/Code/Maud/src/maud/stan/functions.stan', line 261, column 8, included from\n'/Users/tedgro/Code/Maud/src/maud/stan/out_of_sample_model.stan', line 1, column 0)",
- " (in '/Users/tedgro/Code/Maud/src/maud/stan/functions.stan', line 260, column 28, included from\n'/Users/tedgro/Code/Maud/src/maud/stan/out_of_sample_model.stan', line 1, column 0)",
- " (in '/Users/tedgro/Code/Maud/src/maud/stan/functions.stan', line 260, column 6, included from\n'/Users/tedgro/Code/Maud/src/maud/stan/out_of_sample_model.stan', line 1, column 0)",
- " (in '/Users/tedgro/Code/Maud/src/maud/stan/functions.stan', line 259, column 23, included from\n'/Users/tedgro/Code/Maud/src/maud/stan/out_of_sample_model.stan', line 1, column 0)",
+ " (in '/Users/tedgro/Code/Maud/src/maud/stan/functions.stan', line 247, column 11, included from\n'/Users/tedgro/Code/Maud/src/maud/stan/out_of_sample_model.stan', line 1, column 0)",
+ " (in '/Users/tedgro/Code/Maud/src/maud/stan/functions.stan', line 247, column 4, included from\n'/Users/tedgro/Code/Maud/src/maud/stan/out_of_sample_model.stan', line 1, column 0)",
+ " (in '/Users/tedgro/Code/Maud/src/maud/stan/functions.stan', line 250, column 8, included from\n'/Users/tedgro/Code/Maud/src/maud/stan/out_of_sample_model.stan', line 1, column 0)",
+ " (in '/Users/tedgro/Code/Maud/src/maud/stan/functions.stan', line 251, column 17, included from\n'/Users/tedgro/Code/Maud/src/maud/stan/out_of_sample_model.stan', line 1, column 0)",
+ " (in '/Users/tedgro/Code/Maud/src/maud/stan/functions.stan', line 251, column 8, included from\n'/Users/tedgro/Code/Maud/src/maud/stan/out_of_sample_model.stan', line 1, column 0)",
+ " (in '/Users/tedgro/Code/Maud/src/maud/stan/functions.stan', line 252, column 8, included from\n'/Users/tedgro/Code/Maud/src/maud/stan/out_of_sample_model.stan', line 1, column 0)",
+ " (in '/Users/tedgro/Code/Maud/src/maud/stan/functions.stan', line 249, column 28, included from\n'/Users/tedgro/Code/Maud/src/maud/stan/out_of_sample_model.stan', line 1, column 0)",
+ " (in '/Users/tedgro/Code/Maud/src/maud/stan/functions.stan', line 249, column 6, included from\n'/Users/tedgro/Code/Maud/src/maud/stan/out_of_sample_model.stan', line 1, column 0)",
+ " (in '/Users/tedgro/Code/Maud/src/maud/stan/functions.stan', line 248, column 23, included from\n'/Users/tedgro/Code/Maud/src/maud/stan/out_of_sample_model.stan', line 1, column 0)",
+ " (in '/Users/tedgro/Code/Maud/src/maud/stan/functions.stan', line 248, column 4, included from\n'/Users/tedgro/Code/Maud/src/maud/stan/out_of_sample_model.stan', line 1, column 0)",
+ " (in '/Users/tedgro/Code/Maud/src/maud/stan/functions.stan', line 255, column 4, included from\n'/Users/tedgro/Code/Maud/src/maud/stan/out_of_sample_model.stan', line 1, column 0)",
+ " (in '/Users/tedgro/Code/Maud/src/maud/stan/functions.stan', line 245, column 59, included from\n'/Users/tedgro/Code/Maud/src/maud/stan/out_of_sample_model.stan', line 1, column 0)",
  " (in '/Users/tedgro/Code/Maud/src/maud/stan/functions.stan', line 259, column 4, included from\n'/Users/tedgro/Code/Maud/src/maud/stan/out_of_sample_model.stan', line 1, column 0)",
- " (in '/Users/tedgro/Code/Maud/src/maud/stan/functions.stan', line 264, column 4, included from\n'/Users/tedgro/Code/Maud/src/maud/stan/out_of_sample_model.stan', line 1, column 0)",
- " (in '/Users/tedgro/Code/Maud/src/maud/stan/functions.stan', line 256, column 92, included from\n'/Users/tedgro/Code/Maud/src/maud/stan/out_of_sample_model.stan', line 1, column 0)",
- " (in '/Users/tedgro/Code/Maud/src/maud/stan/functions.stan', line 301, column 4, included from\n'/Users/tedgro/Code/Maud/src/maud/stan/out_of_sample_model.stan', line 1, column 0)",
- " (in '/Users/tedgro/Code/Maud/src/maud/stan/functions.stan', line 302, column 11, included from\n'/Users/tedgro/Code/Maud/src/maud/stan/out_of_sample_model.stan', line 1, column 0)",
- " (in '/Users/tedgro/Code/Maud/src/maud/stan/functions.stan', line 302, column 4, included from\n'/Users/tedgro/Code/Maud/src/maud/stan/out_of_sample_model.stan', line 1, column 0)",
- " (in '/Users/tedgro/Code/Maud/src/maud/stan/functions.stan', line 303, column 11, included from\n'/Users/tedgro/Code/Maud/src/maud/stan/out_of_sample_model.stan', line 1, column 0)",
- " (in '/Users/tedgro/Code/Maud/src/maud/stan/functions.stan', line 303, column 4, included from\n'/Users/tedgro/Code/Maud/src/maud/stan/out_of_sample_model.stan', line 1, column 0)",
- " (in '/Users/tedgro/Code/Maud/src/maud/stan/functions.stan', line 304, column 11, included from\n'/Users/tedgro/Code/Maud/src/maud/stan/out_of_sample_model.stan', line 1, column 0)",
- " (in '/Users/tedgro/Code/Maud/src/maud/stan/functions.stan', line 304, column 4, included from\n'/Users/tedgro/Code/Maud/src/maud/stan/out_of_sample_model.stan', line 1, column 0)",
- " (in '/Users/tedgro/Code/Maud/src/maud/stan/functions.stan', line 319, column 11, included from\n'/Users/tedgro/Code/Maud/src/maud/stan/out_of_sample_model.stan', line 1, column 0)",
- " (in '/Users/tedgro/Code/Maud/src/maud/stan/functions.stan', line 319, column 4, included from\n'/Users/tedgro/Code/Maud/src/maud/stan/out_of_sample_model.stan', line 1, column 0)",
- " (in '/Users/tedgro/Code/Maud/src/maud/stan/functions.stan', line 327, column 11, included from\n'/Users/tedgro/Code/Maud/src/maud/stan/out_of_sample_model.stan', line 1, column 0)",
- " (in '/Users/tedgro/Code/Maud/src/maud/stan/functions.stan', line 327, column 4, included from\n'/Users/tedgro/Code/Maud/src/maud/stan/out_of_sample_model.stan', line 1, column 0)",
- " (in '/Users/tedgro/Code/Maud/src/maud/stan/functions.stan', line 337, column 11, included from\n'/Users/tedgro/Code/Maud/src/maud/stan/out_of_sample_model.stan', line 1, column 0)",
- " (in '/Users/tedgro/Code/Maud/src/maud/stan/functions.stan', line 337, column 4, included from\n'/Users/tedgro/Code/Maud/src/maud/stan/out_of_sample_model.stan', line 1, column 0)",
+ " (in '/Users/tedgro/Code/Maud/src/maud/stan/functions.stan', line 260, column 11, included from\n'/Users/tedgro/Code/Maud/src/maud/stan/out_of_sample_model.stan', line 1, column 0)",
+ " (in '/Users/tedgro/Code/Maud/src/maud/stan/functions.stan', line 260, column 4, included from\n'/Users/tedgro/Code/Maud/src/maud/stan/out_of_sample_model.stan', line 1, column 0)",
+ " (in '/Users/tedgro/Code/Maud/src/maud/stan/functions.stan', line 263, column 8, included from\n'/Users/tedgro/Code/Maud/src/maud/stan/out_of_sample_model.stan', line 1, column 0)",
+ " (in '/Users/tedgro/Code/Maud/src/maud/stan/functions.stan', line 262, column 28, included from\n'/Users/tedgro/Code/Maud/src/maud/stan/out_of_sample_model.stan', line 1, column 0)",
+ " (in '/Users/tedgro/Code/Maud/src/maud/stan/functions.stan', line 262, column 6, included from\n'/Users/tedgro/Code/Maud/src/maud/stan/out_of_sample_model.stan', line 1, column 0)",
+ " (in '/Users/tedgro/Code/Maud/src/maud/stan/functions.stan', line 261, column 23, included from\n'/Users/tedgro/Code/Maud/src/maud/stan/out_of_sample_model.stan', line 1, column 0)",
+ " (in '/Users/tedgro/Code/Maud/src/maud/stan/functions.stan', line 261, column 4, included from\n'/Users/tedgro/Code/Maud/src/maud/stan/out_of_sample_model.stan', line 1, column 0)",
+ " (in '/Users/tedgro/Code/Maud/src/maud/stan/functions.stan', line 266, column 4, included from\n'/Users/tedgro/Code/Maud/src/maud/stan/out_of_sample_model.stan', line 1, column 0)",
+ " (in '/Users/tedgro/Code/Maud/src/maud/stan/functions.stan', line 258, column 92, included from\n'/Users/tedgro/Code/Maud/src/maud/stan/out_of_sample_model.stan', line 1, column 0)",
+ " (in '/Users/tedgro/Code/Maud/src/maud/stan/functions.stan', line 306, column 4, included from\n'/Users/tedgro/Code/Maud/src/maud/stan/out_of_sample_model.stan', line 1, column 0)",
+ " (in '/Users/tedgro/Code/Maud/src/maud/stan/functions.stan', line 307, column 11, included from\n'/Users/tedgro/Code/Maud/src/maud/stan/out_of_sample_model.stan', line 1, column 0)",
+ " (in '/Users/tedgro/Code/Maud/src/maud/stan/functions.stan', line 307, column 4, included from\n'/Users/tedgro/Code/Maud/src/maud/stan/out_of_sample_model.stan', line 1, column 0)",
+ " (in '/Users/tedgro/Code/Maud/src/maud/stan/functions.stan', line 308, column 11, included from\n'/Users/tedgro/Code/Maud/src/maud/stan/out_of_sample_model.stan', line 1, column 0)",
+ " (in '/Users/tedgro/Code/Maud/src/maud/stan/functions.stan', line 308, column 4, included from\n'/Users/tedgro/Code/Maud/src/maud/stan/out_of_sample_model.stan', line 1, column 0)",
+ " (in '/Users/tedgro/Code/Maud/src/maud/stan/functions.stan', line 309, column 11, included from\n'/Users/tedgro/Code/Maud/src/maud/stan/out_of_sample_model.stan', line 1, column 0)",
+ " (in '/Users/tedgro/Code/Maud/src/maud/stan/functions.stan', line 309, column 4, included from\n'/Users/tedgro/Code/Maud/src/maud/stan/out_of_sample_model.stan', line 1, column 0)",
+ " (in '/Users/tedgro/Code/Maud/src/maud/stan/functions.stan', line 325, column 11, included from\n'/Users/tedgro/Code/Maud/src/maud/stan/out_of_sample_model.stan', line 1, column 0)",
+ " (in '/Users/tedgro/Code/Maud/src/maud/stan/functions.stan', line 325, column 4, included from\n'/Users/tedgro/Code/Maud/src/maud/stan/out_of_sample_model.stan', line 1, column 0)",
+ " (in '/Users/tedgro/Code/Maud/src/maud/stan/functions.stan', line 333, column 11, included from\n'/Users/tedgro/Code/Maud/src/maud/stan/out_of_sample_model.stan', line 1, column 0)",
+ " (in '/Users/tedgro/Code/Maud/src/maud/stan/functions.stan', line 333, column 4, included from\n'/Users/tedgro/Code/Maud/src/maud/stan/out_of_sample_model.stan', line 1, column 0)",
  " (in '/Users/tedgro/Code/Maud/src/maud/stan/functions.stan', line 343, column 11, included from\n'/Users/tedgro/Code/Maud/src/maud/stan/out_of_sample_model.stan', line 1, column 0)",
  " (in '/Users/tedgro/Code/Maud/src/maud/stan/functions.stan', line 343, column 4, included from\n'/Users/tedgro/Code/Maud/src/maud/stan/out_of_sample_model.stan', line 1, column 0)",
+ " (in '/Users/tedgro/Code/Maud/src/maud/stan/functions.stan', line 349, column 11, included from\n'/Users/tedgro/Code/Maud/src/maud/stan/out_of_sample_model.stan', line 1, column 0)",
  " (in '/Users/tedgro/Code/Maud/src/maud/stan/functions.stan', line 349, column 4, included from\n'/Users/tedgro/Code/Maud/src/maud/stan/out_of_sample_model.stan', line 1, column 0)",
- " (in '/Users/tedgro/Code/Maud/src/maud/stan/functions.stan', line 300, column 56, included from\n'/Users/tedgro/Code/Maud/src/maud/stan/out_of_sample_model.stan', line 1, column 0)",
- " (in '/Users/tedgro/Code/Maud/src/maud/stan/functions.stan', line 390, column 11, included from\n'/Users/tedgro/Code/Maud/src/maud/stan/out_of_sample_model.stan', line 1, column 0)",
- " (in '/Users/tedgro/Code/Maud/src/maud/stan/functions.stan', line 390, column 4, included from\n'/Users/tedgro/Code/Maud/src/maud/stan/out_of_sample_model.stan', line 1, column 0)",
- " (in '/Users/tedgro/Code/Maud/src/maud/stan/functions.stan', line 391, column 4, included from\n'/Users/tedgro/Code/Maud/src/maud/stan/out_of_sample_model.stan', line 1, column 0)",
- " (in '/Users/tedgro/Code/Maud/src/maud/stan/functions.stan', line 392, column 4, included from\n'/Users/tedgro/Code/Maud/src/maud/stan/out_of_sample_model.stan', line 1, column 0)",
- " (in '/Users/tedgro/Code/Maud/src/maud/stan/functions.stan', line 393, column 11, included from\n'/Users/tedgro/Code/Maud/src/maud/stan/out_of_sample_model.stan', line 1, column 0)",
- " (in '/Users/tedgro/Code/Maud/src/maud/stan/functions.stan', line 393, column 4, included from\n'/Users/tedgro/Code/Maud/src/maud/stan/out_of_sample_model.stan', line 1, column 0)",
- " (in '/Users/tedgro/Code/Maud/src/maud/stan/functions.stan', line 427, column 4, included from\n'/Users/tedgro/Code/Maud/src/maud/stan/out_of_sample_model.stan', line 1, column 0)",
- " (in '/Users/tedgro/Code/Maud/src/maud/stan/functions.stan', line 389, column 55, included from\n'/Users/tedgro/Code/Maud/src/maud/stan/out_of_sample_model.stan', line 1, column 0)"};
+ " (in '/Users/tedgro/Code/Maud/src/maud/stan/functions.stan', line 356, column 4, included from\n'/Users/tedgro/Code/Maud/src/maud/stan/out_of_sample_model.stan', line 1, column 0)",
+ " (in '/Users/tedgro/Code/Maud/src/maud/stan/functions.stan', line 305, column 56, included from\n'/Users/tedgro/Code/Maud/src/maud/stan/out_of_sample_model.stan', line 1, column 0)",
+ " (in '/Users/tedgro/Code/Maud/src/maud/stan/functions.stan', line 400, column 11, included from\n'/Users/tedgro/Code/Maud/src/maud/stan/out_of_sample_model.stan', line 1, column 0)",
+ " (in '/Users/tedgro/Code/Maud/src/maud/stan/functions.stan', line 400, column 4, included from\n'/Users/tedgro/Code/Maud/src/maud/stan/out_of_sample_model.stan', line 1, column 0)",
+ " (in '/Users/tedgro/Code/Maud/src/maud/stan/functions.stan', line 401, column 4, included from\n'/Users/tedgro/Code/Maud/src/maud/stan/out_of_sample_model.stan', line 1, column 0)",
+ " (in '/Users/tedgro/Code/Maud/src/maud/stan/functions.stan', line 402, column 4, included from\n'/Users/tedgro/Code/Maud/src/maud/stan/out_of_sample_model.stan', line 1, column 0)",
+ " (in '/Users/tedgro/Code/Maud/src/maud/stan/functions.stan', line 403, column 11, included from\n'/Users/tedgro/Code/Maud/src/maud/stan/out_of_sample_model.stan', line 1, column 0)",
+ " (in '/Users/tedgro/Code/Maud/src/maud/stan/functions.stan', line 403, column 4, included from\n'/Users/tedgro/Code/Maud/src/maud/stan/out_of_sample_model.stan', line 1, column 0)",
+ " (in '/Users/tedgro/Code/Maud/src/maud/stan/functions.stan', line 440, column 4, included from\n'/Users/tedgro/Code/Maud/src/maud/stan/out_of_sample_model.stan', line 1, column 0)",
+ " (in '/Users/tedgro/Code/Maud/src/maud/stan/functions.stan', line 399, column 55, included from\n'/Users/tedgro/Code/Maud/src/maud/stan/out_of_sample_model.stan', line 1, column 0)"};
 
 struct extract_ragged_functor__ {
   std::vector<int>
@@ -438,7 +444,8 @@ struct get_edge_flux_functor__ {
   template <typename T0__, typename T1__, typename T2__, typename T3__,
             typename T4__, typename T5__, typename T6__, typename T7__,
             typename T8__, typename T9__, typename T10__, typename T11__,
-            typename T12__, stan::require_col_vector_t<T0__>* = nullptr,
+            typename T12__, typename T13__, typename T14__,
+            stan::require_col_vector_t<T0__>* = nullptr,
             stan::require_col_vector_t<T1__>* = nullptr,
             stan::require_col_vector_t<T2__>* = nullptr,
             stan::require_col_vector_t<T3__>* = nullptr,
@@ -449,8 +456,10 @@ struct get_edge_flux_functor__ {
             stan::require_col_vector_t<T8__>* = nullptr,
             stan::require_col_vector_t<T9__>* = nullptr,
             stan::require_col_vector_t<T10__>* = nullptr,
-            stan::require_eigen_matrix_dynamic_t<T11__>* = nullptr,
-            stan::require_col_vector_t<T12__>* = nullptr>
+            stan::require_stan_scalar_t<T11__>* = nullptr,
+            stan::require_stan_scalar_t<T12__>* = nullptr,
+            stan::require_eigen_matrix_dynamic_t<T13__>* = nullptr,
+            stan::require_col_vector_t<T14__>* = nullptr>
   Eigen::Matrix<stan::promote_args_t<stan::value_type_t<T0__>, stan::value_type_t<T1__>,
                        stan::value_type_t<T2__>, stan::value_type_t<T3__>,
                        stan::value_type_t<T4__>,
@@ -460,15 +469,18 @@ struct get_edge_flux_functor__ {
                                             stan::value_type_t<T8__>,
                                             stan::value_type_t<T9__>,
                                             stan::promote_args_t<stan::value_type_t<T10__>,
-                                                                 stan::value_type_t<T11__>,
-                                                                 stan::value_type_t<T12__>>>>, -1, 1>
+                                                                 T11__, T12__,
+                                                                 stan::value_type_t<T13__>,
+                                                                 stan::value_type_t<T14__>>>>, -1, 1>
   operator()(const T0__& conc, const T1__& enzyme, const T2__& dgr,
              const T3__& kcat, const T4__& km, const T5__& ki, const T6__& tc,
              const T7__& dc, const T8__& kcat_phos, const T9__& conc_phos,
-             const T10__& drain, const T11__& S, const T12__& subunits,
-             const std::vector<int>& edge_type,
+             const T10__& drain, const T11__& temperature,
+             const T12__& drain_small_conc_corrector, const T13__& S,
+             const T14__& subunits, const std::vector<int>& edge_type,
              const std::vector<int>& edge_to_enzyme,
              const std::vector<int>& edge_to_drain,
+             const std::vector<int>& ci_mic_ix,
              const std::vector<int>& sub_km_ix_by_edge_long,
              const std::vector<std::vector<int>>& sub_km_ix_by_edge_bounds,
              const std::vector<int>& prod_km_ix_by_edge_long,
@@ -490,14 +502,16 @@ struct get_edge_flux_functor__ {
              std::ostream* pstream__) const;
 };
 struct get_reversibility_functor__ {
-  template <typename T0__, typename T1__, typename T2__,
+  template <typename T0__, typename T1__, typename T2__, typename T3__,
             stan::require_col_vector_t<T0__>* = nullptr,
-            stan::require_eigen_matrix_dynamic_t<T1__>* = nullptr,
-            stan::require_col_vector_t<T2__>* = nullptr>
-  Eigen::Matrix<stan::promote_args_t<stan::value_type_t<T0__>, stan::value_type_t<T1__>,
-                       stan::value_type_t<T2__>>, -1, 1>
-  operator()(const T0__& dgr, const T1__& S, const T2__& conc,
-             const std::vector<int>& edge_type, std::ostream* pstream__) const;
+            stan::require_stan_scalar_t<T1__>* = nullptr,
+            stan::require_eigen_matrix_dynamic_t<T2__>* = nullptr,
+            stan::require_col_vector_t<T3__>* = nullptr>
+  Eigen::Matrix<stan::promote_args_t<stan::value_type_t<T0__>, T1__,
+                       stan::value_type_t<T2__>, stan::value_type_t<T3__>>, -1, 1>
+  operator()(const T0__& dgr, const T1__& temperature, const T2__& S,
+             const T3__& conc, const std::vector<int>& edge_type,
+             std::ostream* pstream__) const;
 };
 struct get_free_enzyme_ratio_functor__ {
   template <typename T0__, typename T1__, typename T2__, typename T3__,
@@ -509,6 +523,7 @@ struct get_free_enzyme_ratio_functor__ {
                        stan::value_type_t<T2__>, stan::value_type_t<T3__>>, -1, 1>
   operator()(const T0__& conc, const T1__& S, const T2__& km, const T3__& ki,
              const std::vector<int>& edge_type,
+             const std::vector<int>& ci_mic_ix,
              const std::vector<int>& sub_km_ix_by_edge_long,
              const std::vector<std::vector<int>>& sub_km_ix_by_edge_bounds,
              const std::vector<int>& prod_km_ix_by_edge_long,
@@ -563,15 +578,21 @@ struct get_vmax_by_edge_functor__ {
              const std::vector<int>& edge_type, std::ostream* pstream__) const;
 };
 struct get_dgrs_functor__ {
-  template <typename T0__, typename T1__, typename T3__,
+  template <typename T0__, typename T1__, typename T2__, typename T4__,
+            typename T5__, typename T6__,
             stan::require_eigen_matrix_dynamic_t<T0__>* = nullptr,
             stan::require_col_vector_t<T1__>* = nullptr,
-            stan::require_col_vector_t<T3__>* = nullptr>
+            stan::require_stan_scalar_t<T2__>* = nullptr,
+            stan::require_col_vector_t<T4__>* = nullptr,
+            stan::require_col_vector_t<T5__>* = nullptr,
+            stan::require_stan_scalar_t<T6__>* = nullptr>
   Eigen::Matrix<stan::promote_args_t<stan::value_type_t<T0__>, stan::value_type_t<T1__>,
-                       stan::value_type_t<T3__>>, -1, 1>
-  operator()(const T0__& S, const T1__& dgf,
+                       T2__, stan::value_type_t<T4__>,
+                       stan::value_type_t<T5__>, stan::promote_args_t<T6__>>, -1, 1>
+  operator()(const T0__& S, const T1__& dgf, const T2__& temperature,
              const std::vector<int>& mic_to_met,
-             const T3__& water_stoichiometry, std::ostream* pstream__) const;
+             const T4__& water_stoichiometry, const T5__& trans_charge,
+             const T6__& psi, std::ostream* pstream__) const;
 };
 struct get_saturation_functor__ {
   template <typename T0__, typename T1__, typename T2__,
@@ -591,8 +612,8 @@ struct dbalanced_dt_functor__ {
   template <typename T0__, typename T1__, typename T2__, typename T5__,
             typename T6__, typename T7__, typename T8__, typename T9__,
             typename T10__, typename T11__, typename T12__, typename T13__,
-            typename T14__, typename T15__, typename T16__,
-            stan::require_stan_scalar_t<T0__>* = nullptr,
+            typename T14__, typename T15__, typename T16__, typename T17__,
+            typename T18__, stan::require_stan_scalar_t<T0__>* = nullptr,
             stan::require_col_vector_t<T1__>* = nullptr,
             stan::require_col_vector_t<T2__>* = nullptr,
             stan::require_col_vector_t<T5__>* = nullptr,
@@ -605,8 +626,10 @@ struct dbalanced_dt_functor__ {
             stan::require_col_vector_t<T12__>* = nullptr,
             stan::require_col_vector_t<T13__>* = nullptr,
             stan::require_col_vector_t<T14__>* = nullptr,
-            stan::require_eigen_matrix_dynamic_t<T15__>* = nullptr,
-            stan::require_col_vector_t<T16__>* = nullptr>
+            stan::require_stan_scalar_t<T15__>* = nullptr,
+            stan::require_stan_scalar_t<T16__>* = nullptr,
+            stan::require_eigen_matrix_dynamic_t<T17__>* = nullptr,
+            stan::require_col_vector_t<T18__>* = nullptr>
   Eigen::Matrix<stan::promote_args_t<T0__, stan::value_type_t<T1__>,
                        stan::value_type_t<T2__>, stan::value_type_t<T5__>,
                        stan::value_type_t<T6__>,
@@ -618,17 +641,22 @@ struct dbalanced_dt_functor__ {
                                             stan::promote_args_t<stan::value_type_t<T12__>,
                                                                  stan::value_type_t<T13__>,
                                                                  stan::value_type_t<T14__>,
-                                                                 stan::value_type_t<T15__>,
-                                                                 stan::value_type_t<T16__>>>>, -1, 1>
+                                                                 T15__, T16__,
+                                                                 stan::promote_args_t<
+                                                                 stan::value_type_t<T17__>,
+                                                                 stan::value_type_t<T18__>>>>>, -1, 1>
   operator()(const T0__& time, const T1__& current_balanced,
              const T2__& unbalanced, const std::vector<int>& balanced_ix,
              const std::vector<int>& unbalanced_ix, const T5__& enzyme,
              const T6__& dgr, const T7__& kcat, const T8__& km, const T9__& ki,
              const T10__& tc, const T11__& dc, const T12__& kcat_phos,
-             const T13__& conc_phos, const T14__& drain, const T15__& S,
-             const T16__& subunits, const std::vector<int>& edge_type,
+             const T13__& conc_phos, const T14__& drain,
+             const T15__& temperature, const T16__& drain_small_conc_corrector,
+             const T17__& S, const T18__& subunits,
+             const std::vector<int>& edge_type,
              const std::vector<int>& edge_to_enzyme,
              const std::vector<int>& edge_to_drain,
+             const std::vector<int>& ci_mic_ix,
              const std::vector<int>& sub_km_ix_by_edge_long,
              const std::vector<std::vector<int>>& sub_km_ix_by_edge_bounds,
              const std::vector<int>& prod_km_ix_by_edge_long,
@@ -662,8 +690,8 @@ struct dbalanced_dt_odefunctor__ {
   template <typename T0__, typename T1__, typename T2__, typename T5__,
             typename T6__, typename T7__, typename T8__, typename T9__,
             typename T10__, typename T11__, typename T12__, typename T13__,
-            typename T14__, typename T15__, typename T16__,
-            stan::require_stan_scalar_t<T0__>* = nullptr,
+            typename T14__, typename T15__, typename T16__, typename T17__,
+            typename T18__, stan::require_stan_scalar_t<T0__>* = nullptr,
             stan::require_col_vector_t<T1__>* = nullptr,
             stan::require_col_vector_t<T2__>* = nullptr,
             stan::require_col_vector_t<T5__>* = nullptr,
@@ -676,8 +704,10 @@ struct dbalanced_dt_odefunctor__ {
             stan::require_col_vector_t<T12__>* = nullptr,
             stan::require_col_vector_t<T13__>* = nullptr,
             stan::require_col_vector_t<T14__>* = nullptr,
-            stan::require_eigen_matrix_dynamic_t<T15__>* = nullptr,
-            stan::require_col_vector_t<T16__>* = nullptr>
+            stan::require_stan_scalar_t<T15__>* = nullptr,
+            stan::require_stan_scalar_t<T16__>* = nullptr,
+            stan::require_eigen_matrix_dynamic_t<T17__>* = nullptr,
+            stan::require_col_vector_t<T18__>* = nullptr>
   Eigen::Matrix<stan::promote_args_t<T0__, stan::value_type_t<T1__>,
                        stan::value_type_t<T2__>, stan::value_type_t<T5__>,
                        stan::value_type_t<T6__>,
@@ -689,18 +719,23 @@ struct dbalanced_dt_odefunctor__ {
                                             stan::promote_args_t<stan::value_type_t<T12__>,
                                                                  stan::value_type_t<T13__>,
                                                                  stan::value_type_t<T14__>,
-                                                                 stan::value_type_t<T15__>,
-                                                                 stan::value_type_t<T16__>>>>, -1, 1>
+                                                                 T15__, T16__,
+                                                                 stan::promote_args_t<
+                                                                 stan::value_type_t<T17__>,
+                                                                 stan::value_type_t<T18__>>>>>, -1, 1>
   operator()(const T0__& time, const T1__& current_balanced,
              std::ostream* pstream__, const T2__& unbalanced,
              const std::vector<int>& balanced_ix,
              const std::vector<int>& unbalanced_ix, const T5__& enzyme,
              const T6__& dgr, const T7__& kcat, const T8__& km, const T9__& ki,
              const T10__& tc, const T11__& dc, const T12__& kcat_phos,
-             const T13__& conc_phos, const T14__& drain, const T15__& S,
-             const T16__& subunits, const std::vector<int>& edge_type,
+             const T13__& conc_phos, const T14__& drain,
+             const T15__& temperature, const T16__& drain_small_conc_corrector,
+             const T17__& S, const T18__& subunits,
+             const std::vector<int>& edge_type,
              const std::vector<int>& edge_to_enzyme,
              const std::vector<int>& edge_to_drain,
+             const std::vector<int>& ci_mic_ix,
              const std::vector<int>& sub_km_ix_by_edge_long,
              const std::vector<std::vector<int>>& sub_km_ix_by_edge_bounds,
              const std::vector<int>& prod_km_ix_by_edge_long,
@@ -729,26 +764,34 @@ struct unz_log_1d_functor__ {
              const T1__& z, std::ostream* pstream__) const;
 };
 struct get_drain_by_edge_functor__ {
-  template <typename T0__, typename T1__,
+  template <typename T0__, typename T1__, typename T6__,
             stan::require_col_vector_t<T0__>* = nullptr,
-            stan::require_col_vector_t<T1__>* = nullptr>
-  Eigen::Matrix<stan::promote_args_t<stan::value_type_t<T0__>, stan::value_type_t<T1__>>, -1, 1>
+            stan::require_col_vector_t<T1__>* = nullptr,
+            stan::require_stan_scalar_t<T6__>* = nullptr>
+  Eigen::Matrix<stan::promote_args_t<stan::value_type_t<T0__>, stan::value_type_t<T1__>, T6__>, -1, 1>
   operator()(const T0__& drain, const T1__& conc,
              const std::vector<int>& edge_to_drain,
              const std::vector<int>& sub_by_edge_long,
              const std::vector<std::vector<int>>& sub_by_edge_bounds,
-             const std::vector<int>& edge_type, std::ostream* pstream__) const;
+             const std::vector<int>& edge_type,
+             const T6__& drain_small_conc_corrector, std::ostream* pstream__) const;
 };
 struct get_keq_functor__ {
-  template <typename T0__, typename T1__, typename T3__,
+  template <typename T0__, typename T1__, typename T2__, typename T4__,
+            typename T5__, typename T6__,
             stan::require_eigen_matrix_dynamic_t<T0__>* = nullptr,
             stan::require_col_vector_t<T1__>* = nullptr,
-            stan::require_col_vector_t<T3__>* = nullptr>
+            stan::require_stan_scalar_t<T2__>* = nullptr,
+            stan::require_col_vector_t<T4__>* = nullptr,
+            stan::require_col_vector_t<T5__>* = nullptr,
+            stan::require_stan_scalar_t<T6__>* = nullptr>
   Eigen::Matrix<stan::promote_args_t<stan::value_type_t<T0__>, stan::value_type_t<T1__>,
-                       stan::value_type_t<T3__>>, -1, 1>
-  operator()(const T0__& S, const T1__& dgf,
+                       T2__, stan::value_type_t<T4__>,
+                       stan::value_type_t<T5__>, stan::promote_args_t<T6__>>, -1, 1>
+  operator()(const T0__& S, const T1__& dgf, const T2__& temperature,
              const std::vector<int>& mic_to_met,
-             const T3__& water_stoichiometry, std::ostream* pstream__) const;
+             const T4__& water_stoichiometry, const T5__& trans_charge,
+             const T6__& psi, std::ostream* pstream__) const;
 };
 struct unz_1d_functor__ {
   template <typename T0__, typename T1__,
@@ -774,7 +817,7 @@ template <typename T0__, typename T1__,
     local_scalar_t__ DUMMY_VAR__(std::numeric_limits<double>::quiet_NaN());
     (void) DUMMY_VAR__;  // suppress unused var warning
     try {
-      current_statement__ = 193;
+      current_statement__ = 199;
       return stan::math::add(
                stan::model::rvalue(mnsd, "mnsd", stan::model::index_uni(1)),
                stan::math::elt_multiply(
@@ -799,7 +842,7 @@ template <typename T0__, typename T1__,
     local_scalar_t__ DUMMY_VAR__(std::numeric_limits<double>::quiet_NaN());
     (void) DUMMY_VAR__;  // suppress unused var warning
     try {
-      current_statement__ = 195;
+      current_statement__ = 201;
       return stan::math::exp(
                stan::math::add(
                  stan::math::log(
@@ -826,10 +869,10 @@ template <typename T0__, typename T1__,
     local_scalar_t__ DUMMY_VAR__(std::numeric_limits<double>::quiet_NaN());
     (void) DUMMY_VAR__;  // suppress unused var warning
     try {
-      current_statement__ = 197;
+      current_statement__ = 203;
       stan::math::validate_non_negative_index("out", "size(z)",
                                               stan::math::size(z));
-      current_statement__ = 198;
+      current_statement__ = 204;
       stan::math::validate_non_negative_index("out", "rows(z[1])",
                                               stan::math::rows(
                                                 stan::model::rvalue(z, "z",
@@ -841,9 +884,9 @@ template <typename T0__, typename T1__,
              stan::math::rows(
                stan::model::rvalue(z, "z", stan::model::index_uni(1))),
              DUMMY_VAR__));
-      current_statement__ = 202;
+      current_statement__ = 208;
       for (int ex = 1; ex <= stan::math::size(z); ++ex) {
-        current_statement__ = 200;
+        current_statement__ = 206;
         stan::model::assign(out,
           unz_1d(
             stan::model::rvalue(mnsd, "mnsd",
@@ -851,7 +894,7 @@ template <typename T0__, typename T1__,
             stan::model::rvalue(z, "z", stan::model::index_uni(ex)), pstream__),
           "assigning variable out", stan::model::index_uni(ex));
       }
-      current_statement__ = 203;
+      current_statement__ = 209;
       return out;
     } catch (const std::exception& e) {
       stan::lang::rethrow_located(e, locations_array__[current_statement__]);
@@ -871,10 +914,10 @@ template <typename T0__, typename T1__,
     local_scalar_t__ DUMMY_VAR__(std::numeric_limits<double>::quiet_NaN());
     (void) DUMMY_VAR__;  // suppress unused var warning
     try {
-      current_statement__ = 205;
+      current_statement__ = 211;
       stan::math::validate_non_negative_index("out", "size(z)",
                                               stan::math::size(z));
-      current_statement__ = 206;
+      current_statement__ = 212;
       stan::math::validate_non_negative_index("out", "rows(z[1])",
                                               stan::math::rows(
                                                 stan::model::rvalue(z, "z",
@@ -886,9 +929,9 @@ template <typename T0__, typename T1__,
              stan::math::rows(
                stan::model::rvalue(z, "z", stan::model::index_uni(1))),
              DUMMY_VAR__));
-      current_statement__ = 210;
+      current_statement__ = 216;
       for (int ex = 1; ex <= stan::math::size(z); ++ex) {
-        current_statement__ = 208;
+        current_statement__ = 214;
         stan::model::assign(out,
           unz_log_1d(
             stan::model::rvalue(mnsd, "mnsd",
@@ -896,77 +939,39 @@ template <typename T0__, typename T1__,
             stan::model::rvalue(z, "z", stan::model::index_uni(ex)), pstream__),
           "assigning variable out", stan::model::index_uni(ex));
       }
-      current_statement__ = 211;
+      current_statement__ = 217;
       return out;
     } catch (const std::exception& e) {
       stan::lang::rethrow_located(e, locations_array__[current_statement__]);
     }
     }
-template <typename T0__, typename T1__, typename T3__,
+template <typename T0__, typename T1__, typename T2__, typename T4__,
+          typename T5__, typename T6__,
           stan::require_eigen_matrix_dynamic_t<T0__>* = nullptr,
           stan::require_col_vector_t<T1__>* = nullptr,
-          stan::require_col_vector_t<T3__>* = nullptr>
+          stan::require_stan_scalar_t<T2__>* = nullptr,
+          stan::require_col_vector_t<T4__>* = nullptr,
+          stan::require_col_vector_t<T5__>* = nullptr,
+          stan::require_stan_scalar_t<T6__>* = nullptr>
   Eigen::Matrix<stan::promote_args_t<stan::value_type_t<T0__>, stan::value_type_t<T1__>,
-                     stan::value_type_t<T3__>>, -1, 1>
-  get_keq(const T0__& S_arg__, const T1__& dgf_arg__,
-          const std::vector<int>& mic_to_met,
-          const T3__& water_stoichiometry_arg__, std::ostream* pstream__) {
-    using local_scalar_t__ =
-            stan::promote_args_t<stan::value_type_t<T0__>,
-                                 stan::value_type_t<T1__>,
-                                 stan::value_type_t<T3__>>;
-    int current_statement__ = 0; 
-    const auto& S = stan::math::to_ref(S_arg__);
-    const auto& dgf = stan::math::to_ref(dgf_arg__);
-    const auto& water_stoichiometry = stan::math::to_ref(water_stoichiometry_arg__);
-    static constexpr bool propto__ = true;
-    (void) propto__;
-    local_scalar_t__ DUMMY_VAR__(std::numeric_limits<double>::quiet_NaN());
-    (void) DUMMY_VAR__;  // suppress unused var warning
-    try {
-      local_scalar_t__ minus_RT = DUMMY_VAR__;
-      current_statement__ = 213;
-      minus_RT = (-0.008314 * 298.15);
-      local_scalar_t__ dgf_water = DUMMY_VAR__;
-      current_statement__ = 214;
-      dgf_water = -150.9;
-      current_statement__ = 215;
-      stan::math::validate_non_negative_index("delta_g", "cols(S)",
-                                              stan::math::cols(S));
-      Eigen::Matrix<local_scalar_t__, -1, 1> delta_g =
-         Eigen::Matrix<local_scalar_t__, -1, 1>::Constant(
-           stan::math::cols(S), DUMMY_VAR__);
-      current_statement__ = 216;
-      stan::model::assign(delta_g,
-        stan::math::add(
-          stan::math::multiply(stan::math::transpose(S),
-            stan::model::rvalue(dgf, "dgf",
-              stan::model::index_multi(mic_to_met))),
-          stan::math::multiply(water_stoichiometry, dgf_water)),
-        "assigning variable delta_g");
-      current_statement__ = 217;
-      return stan::math::exp(stan::math::divide(delta_g, minus_RT));
-    } catch (const std::exception& e) {
-      stan::lang::rethrow_located(e, locations_array__[current_statement__]);
-    }
-    }
-template <typename T0__, typename T1__, typename T3__,
-          stan::require_eigen_matrix_dynamic_t<T0__>* = nullptr,
-          stan::require_col_vector_t<T1__>* = nullptr,
-          stan::require_col_vector_t<T3__>* = nullptr>
-  Eigen::Matrix<stan::promote_args_t<stan::value_type_t<T0__>, stan::value_type_t<T1__>,
-                     stan::value_type_t<T3__>>, -1, 1>
+                     T2__, stan::value_type_t<T4__>,
+                     stan::value_type_t<T5__>, stan::promote_args_t<T6__>>, -1, 1>
   get_dgrs(const T0__& S_arg__, const T1__& dgf_arg__,
-           const std::vector<int>& mic_to_met,
-           const T3__& water_stoichiometry_arg__, std::ostream* pstream__) {
+           const T2__& temperature, const std::vector<int>& mic_to_met,
+           const T4__& water_stoichiometry_arg__,
+           const T5__& trans_charge_arg__, const T6__& psi,
+           std::ostream* pstream__) {
     using local_scalar_t__ =
             stan::promote_args_t<stan::value_type_t<T0__>,
-                                 stan::value_type_t<T1__>,
-                                 stan::value_type_t<T3__>>;
+                                 stan::value_type_t<T1__>, T2__,
+                                 stan::value_type_t<T4__>,
+                                 stan::value_type_t<T5__>,
+                                 stan::promote_args_t<T6__>>;
     int current_statement__ = 0; 
     const auto& S = stan::math::to_ref(S_arg__);
     const auto& dgf = stan::math::to_ref(dgf_arg__);
     const auto& water_stoichiometry = stan::math::to_ref(water_stoichiometry_arg__);
+    const auto& trans_charge = stan::math::to_ref(trans_charge_arg__);
     static constexpr bool propto__ = true;
     (void) propto__;
     local_scalar_t__ DUMMY_VAR__(std::numeric_limits<double>::quiet_NaN());
@@ -974,26 +979,82 @@ template <typename T0__, typename T1__, typename T3__,
     try {
       local_scalar_t__ minus_RT = DUMMY_VAR__;
       current_statement__ = 219;
-      minus_RT = (-0.008314 * 298.15);
+      minus_RT = (-0.008314 * temperature);
       local_scalar_t__ dgf_water = DUMMY_VAR__;
       current_statement__ = 220;
       dgf_water = -150.9;
+      local_scalar_t__ F = DUMMY_VAR__;
       current_statement__ = 221;
+      F = 96.5;
+      current_statement__ = 222;
       stan::math::validate_non_negative_index("dgrs", "cols(S)",
                                               stan::math::cols(S));
       Eigen::Matrix<local_scalar_t__, -1, 1> dgrs =
          Eigen::Matrix<local_scalar_t__, -1, 1>::Constant(
            stan::math::cols(S), DUMMY_VAR__);
-      current_statement__ = 222;
+      current_statement__ = 223;
       stan::model::assign(dgrs,
         stan::math::add(
-          stan::math::multiply(stan::math::transpose(S),
-            stan::model::rvalue(dgf, "dgf",
-              stan::model::index_multi(mic_to_met))),
-          stan::math::multiply(water_stoichiometry, dgf_water)),
+          stan::math::add(
+            stan::math::multiply(stan::math::transpose(S),
+              stan::model::rvalue(dgf, "dgf",
+                stan::model::index_multi(mic_to_met))),
+            stan::math::multiply(water_stoichiometry, dgf_water)),
+          stan::math::multiply(stan::math::multiply(trans_charge, psi), F)),
         "assigning variable dgrs");
-      current_statement__ = 223;
+      current_statement__ = 224;
       return dgrs;
+    } catch (const std::exception& e) {
+      stan::lang::rethrow_located(e, locations_array__[current_statement__]);
+    }
+    }
+template <typename T0__, typename T1__, typename T2__, typename T4__,
+          typename T5__, typename T6__,
+          stan::require_eigen_matrix_dynamic_t<T0__>* = nullptr,
+          stan::require_col_vector_t<T1__>* = nullptr,
+          stan::require_stan_scalar_t<T2__>* = nullptr,
+          stan::require_col_vector_t<T4__>* = nullptr,
+          stan::require_col_vector_t<T5__>* = nullptr,
+          stan::require_stan_scalar_t<T6__>* = nullptr>
+  Eigen::Matrix<stan::promote_args_t<stan::value_type_t<T0__>, stan::value_type_t<T1__>,
+                     T2__, stan::value_type_t<T4__>,
+                     stan::value_type_t<T5__>, stan::promote_args_t<T6__>>, -1, 1>
+  get_keq(const T0__& S_arg__, const T1__& dgf_arg__,
+          const T2__& temperature, const std::vector<int>& mic_to_met,
+          const T4__& water_stoichiometry_arg__,
+          const T5__& trans_charge_arg__, const T6__& psi,
+          std::ostream* pstream__) {
+    using local_scalar_t__ =
+            stan::promote_args_t<stan::value_type_t<T0__>,
+                                 stan::value_type_t<T1__>, T2__,
+                                 stan::value_type_t<T4__>,
+                                 stan::value_type_t<T5__>,
+                                 stan::promote_args_t<T6__>>;
+    int current_statement__ = 0; 
+    const auto& S = stan::math::to_ref(S_arg__);
+    const auto& dgf = stan::math::to_ref(dgf_arg__);
+    const auto& water_stoichiometry = stan::math::to_ref(water_stoichiometry_arg__);
+    const auto& trans_charge = stan::math::to_ref(trans_charge_arg__);
+    static constexpr bool propto__ = true;
+    (void) propto__;
+    local_scalar_t__ DUMMY_VAR__(std::numeric_limits<double>::quiet_NaN());
+    (void) DUMMY_VAR__;  // suppress unused var warning
+    try {
+      local_scalar_t__ minus_RT = DUMMY_VAR__;
+      current_statement__ = 226;
+      minus_RT = (-0.008314 * temperature);
+      current_statement__ = 227;
+      stan::math::validate_non_negative_index("dgrs", "cols(S)",
+                                              stan::math::cols(S));
+      Eigen::Matrix<local_scalar_t__, -1, 1> dgrs =
+         Eigen::Matrix<local_scalar_t__, -1, 1>::Constant(
+           stan::math::cols(S), DUMMY_VAR__);
+      current_statement__ = 228;
+      stan::model::assign(dgrs,
+        get_dgrs(S, dgf, temperature, mic_to_met, water_stoichiometry,
+          trans_charge, psi, pstream__), "assigning variable dgrs");
+      current_statement__ = 229;
+      return stan::math::exp(stan::math::divide(dgrs, minus_RT));
     } catch (const std::exception& e) {
       stan::lang::rethrow_located(e, locations_array__[current_statement__]);
     }
@@ -1017,31 +1078,31 @@ template <typename T0__, typename T1__, typename T2__, typename T3__,
     local_scalar_t__ DUMMY_VAR__(std::numeric_limits<double>::quiet_NaN());
     (void) DUMMY_VAR__;  // suppress unused var warning
     try {
-      current_statement__ = 225;
+      current_statement__ = 231;
       stan::math::validate_non_negative_index("rel_thresh_per_conc",
                                               "rows(conc)",
                                               stan::math::rows(conc));
       Eigen::Matrix<local_scalar_t__, -1, 1> rel_thresh_per_conc =
          Eigen::Matrix<local_scalar_t__, -1, 1>::Constant(
            stan::math::rows(conc), DUMMY_VAR__);
-      current_statement__ = 226;
+      current_statement__ = 232;
       stan::model::assign(rel_thresh_per_conc,
         stan::math::multiply(conc, rel_thresh),
         "assigning variable rel_thresh_per_conc");
       int relative_check_failed = std::numeric_limits<int>::min();
-      current_statement__ = 227;
+      current_statement__ = 233;
       relative_check_failed = stan::math::logical_gt(
                                 stan::math::max(
                                   stan::math::subtract(stan::math::fabs(Sv),
                                     rel_thresh_per_conc)), 0);
       int absolute_check_failed = std::numeric_limits<int>::min();
-      current_statement__ = 228;
+      current_statement__ = 234;
       absolute_check_failed = stan::math::logical_gt(
                                 stan::math::max(stan::math::fabs(Sv)),
                                 abs_thresh);
-      current_statement__ = 230;
+      current_statement__ = 236;
       if (relative_check_failed) {
-        current_statement__ = 229;
+        current_statement__ = 235;
         if (pstream__) {
           stan::math::stan_print(pstream__, "Sv ");
           stan::math::stan_print(pstream__, Sv);
@@ -1051,9 +1112,9 @@ template <typename T0__, typename T1__, typename T2__, typename T3__,
           stan::math::stan_print(pstream__, "\n");
         }
       } 
-      current_statement__ = 232;
+      current_statement__ = 238;
       if (absolute_check_failed) {
-        current_statement__ = 231;
+        current_statement__ = 237;
         if (pstream__) {
           stan::math::stan_print(pstream__, "Sv ");
           stan::math::stan_print(pstream__, Sv);
@@ -1063,7 +1124,7 @@ template <typename T0__, typename T1__, typename T2__, typename T3__,
           stan::math::stan_print(pstream__, "\n");
         }
       } 
-      current_statement__ = 233;
+      current_statement__ = 239;
       return ((stan::math::primitive_value(relative_check_failed) ||
                 stan::math::primitive_value(absolute_check_failed)) ? 0 : 1);
     } catch (const std::exception& e) {
@@ -1080,7 +1141,7 @@ int
     local_scalar_t__ DUMMY_VAR__(std::numeric_limits<double>::quiet_NaN());
     (void) DUMMY_VAR__;  // suppress unused var warning
     try {
-      current_statement__ = 235;
+      current_statement__ = 241;
       return ((stan::model::rvalue(bounds, "bounds",
                  stan::model::index_uni(i), stan::model::index_uni(2)) -
                 stan::model::rvalue(bounds, "bounds",
@@ -1100,7 +1161,7 @@ std::vector<int>
     local_scalar_t__ DUMMY_VAR__(std::numeric_limits<double>::quiet_NaN());
     (void) DUMMY_VAR__;  // suppress unused var warning
     try {
-      current_statement__ = 237;
+      current_statement__ = 243;
       return stan::model::rvalue(ix_long, "ix_long",
                stan::model::index_min_max(stan::model::rvalue(bounds,
                                             "bounds",
@@ -1139,45 +1200,45 @@ template <typename T0__, typename T1__, typename T2__,
     (void) DUMMY_VAR__;  // suppress unused var warning
     try {
       int N_edge = std::numeric_limits<int>::min();
-      current_statement__ = 239;
+      current_statement__ = 245;
       N_edge = stan::math::size(sub_by_edge_bounds);
-      current_statement__ = 240;
+      current_statement__ = 246;
       stan::math::validate_non_negative_index("prod_conc_over_km", "N_edge",
                                               N_edge);
       Eigen::Matrix<local_scalar_t__, -1, 1> prod_conc_over_km =
          Eigen::Matrix<local_scalar_t__, -1, 1>::Constant(N_edge,
            DUMMY_VAR__);
-      current_statement__ = 253;
+      current_statement__ = 259;
       for (int f = 1; f <= N_edge; ++f) {
-        current_statement__ = 245;
+        current_statement__ = 251;
         if (stan::math::logical_eq(
               stan::model::rvalue(edge_type, "edge_type",
                 stan::model::index_uni(f)), 2)) {
-          current_statement__ = 242;
+          current_statement__ = 248;
           stan::model::assign(prod_conc_over_km, 1,
             "assigning variable prod_conc_over_km", stan::model::index_uni(f));
           continue;
         } 
         int N_sub = std::numeric_limits<int>::min();
-        current_statement__ = 246;
+        current_statement__ = 252;
         N_sub = measure_ragged(sub_by_edge_bounds, f, pstream__);
-        current_statement__ = 247;
+        current_statement__ = 253;
         stan::math::validate_non_negative_index("sub_ix", "N_sub", N_sub);
         std::vector<int> sub_ix =
            std::vector<int>(N_sub, std::numeric_limits<int>::min());
-        current_statement__ = 248;
+        current_statement__ = 254;
         stan::model::assign(sub_ix,
           extract_ragged(sub_by_edge_long, sub_by_edge_bounds, f, pstream__),
           "assigning variable sub_ix");
-        current_statement__ = 249;
+        current_statement__ = 255;
         stan::math::validate_non_negative_index("sub_km_ix", "N_sub", N_sub);
         std::vector<int> sub_km_ix =
            std::vector<int>(N_sub, std::numeric_limits<int>::min());
-        current_statement__ = 250;
+        current_statement__ = 256;
         stan::model::assign(sub_km_ix,
           extract_ragged(sub_km_ix_by_edge_long, sub_km_ix_by_edge_bounds,
             f, pstream__), "assigning variable sub_km_ix");
-        current_statement__ = 251;
+        current_statement__ = 257;
         stan::model::assign(prod_conc_over_km,
           stan::math::prod(
             stan::math::elt_divide(
@@ -1187,7 +1248,7 @@ template <typename T0__, typename T1__, typename T2__,
                 stan::model::index_multi(sub_km_ix)))),
           "assigning variable prod_conc_over_km", stan::model::index_uni(f));
       }
-      current_statement__ = 254;
+      current_statement__ = 260;
       return stan::math::elt_multiply(prod_conc_over_km, free_enzyme_ratio);
     } catch (const std::exception& e) {
       stan::lang::rethrow_located(e, locations_array__[current_statement__]);
@@ -1203,6 +1264,7 @@ template <typename T0__, typename T1__, typename T2__, typename T3__,
   get_free_enzyme_ratio(const T0__& conc_arg__, const T1__& S_arg__,
                         const T2__& km_arg__, const T3__& ki_arg__,
                         const std::vector<int>& edge_type,
+                        const std::vector<int>& ci_mic_ix,
                         const std::vector<int>& sub_km_ix_by_edge_long,
                         const std::vector<std::vector<int>>& sub_km_ix_by_edge_bounds,
                         const std::vector<int>& prod_km_ix_by_edge_long,
@@ -1230,63 +1292,63 @@ template <typename T0__, typename T1__, typename T2__, typename T3__,
     (void) DUMMY_VAR__;  // suppress unused var warning
     try {
       int N_edge = std::numeric_limits<int>::min();
-      current_statement__ = 256;
+      current_statement__ = 262;
       N_edge = stan::math::cols(S);
-      current_statement__ = 257;
+      current_statement__ = 263;
       stan::math::validate_non_negative_index("denom", "N_edge", N_edge);
       Eigen::Matrix<local_scalar_t__, -1, 1> denom =
          Eigen::Matrix<local_scalar_t__, -1, 1>::Constant(N_edge,
            DUMMY_VAR__);
-      current_statement__ = 288;
+      current_statement__ = 294;
       for (int f = 1; f <= N_edge; ++f) {
-        current_statement__ = 262;
+        current_statement__ = 268;
         if (stan::math::logical_eq(
               stan::model::rvalue(edge_type, "edge_type",
                 stan::model::index_uni(f)), 2)) {
-          current_statement__ = 259;
+          current_statement__ = 265;
           stan::model::assign(denom, 1,
             "assigning variable denom", stan::model::index_uni(f));
           continue;
         } 
         int N_sub = std::numeric_limits<int>::min();
-        current_statement__ = 263;
+        current_statement__ = 269;
         N_sub = measure_ragged(sub_by_edge_bounds, f, pstream__);
         int N_prod = std::numeric_limits<int>::min();
-        current_statement__ = 264;
+        current_statement__ = 270;
         N_prod = measure_ragged(prod_by_edge_bounds, f, pstream__);
         int N_ci = std::numeric_limits<int>::min();
-        current_statement__ = 265;
+        current_statement__ = 271;
         N_ci = measure_ragged(ci_ix_bounds, f, pstream__);
-        current_statement__ = 266;
+        current_statement__ = 272;
         stan::math::validate_non_negative_index("sub_ix", "N_sub", N_sub);
         std::vector<int> sub_ix =
            std::vector<int>(N_sub, std::numeric_limits<int>::min());
-        current_statement__ = 267;
+        current_statement__ = 273;
         stan::model::assign(sub_ix,
           extract_ragged(sub_by_edge_long, sub_by_edge_bounds, f, pstream__),
           "assigning variable sub_ix");
-        current_statement__ = 268;
+        current_statement__ = 274;
         stan::math::validate_non_negative_index("sub_km_ix", "N_sub", N_sub);
         std::vector<int> sub_km_ix =
            std::vector<int>(N_sub, std::numeric_limits<int>::min());
-        current_statement__ = 269;
+        current_statement__ = 275;
         stan::model::assign(sub_km_ix,
           extract_ragged(sub_km_ix_by_edge_long, sub_km_ix_by_edge_bounds,
             f, pstream__), "assigning variable sub_km_ix");
-        current_statement__ = 270;
+        current_statement__ = 276;
         stan::math::validate_non_negative_index("prod_ix", "N_prod", N_prod);
         std::vector<int> prod_ix =
            std::vector<int>(N_prod, std::numeric_limits<int>::min());
-        current_statement__ = 271;
+        current_statement__ = 277;
         stan::model::assign(prod_ix,
           extract_ragged(prod_by_edge_long, prod_by_edge_bounds,
             f, pstream__), "assigning variable prod_ix");
-        current_statement__ = 272;
+        current_statement__ = 278;
         stan::math::validate_non_negative_index("sub_over_km", "N_sub", N_sub);
         Eigen::Matrix<local_scalar_t__, -1, 1> sub_over_km =
            Eigen::Matrix<local_scalar_t__, -1, 1>::Constant(N_sub,
              DUMMY_VAR__);
-        current_statement__ = 273;
+        current_statement__ = 279;
         stan::model::assign(sub_over_km,
           stan::math::elt_divide(
             stan::model::rvalue(conc, "conc",
@@ -1294,7 +1356,7 @@ template <typename T0__, typename T1__, typename T2__, typename T3__,
             stan::model::rvalue(km, "km",
               stan::model::index_multi(sub_km_ix))),
           "assigning variable sub_over_km");
-        current_statement__ = 274;
+        current_statement__ = 280;
         stan::model::assign(denom,
           stan::math::prod(
             stan::math::pow(
@@ -1303,27 +1365,27 @@ template <typename T0__, typename T1__, typename T2__, typename T3__,
                 stan::model::rvalue(S, "S",
                   stan::model::index_multi(sub_ix), stan::model::index_uni(f))))),
           "assigning variable denom", stan::model::index_uni(f));
-        current_statement__ = 281;
+        current_statement__ = 287;
         if (stan::math::logical_eq(
               stan::model::rvalue(edge_type, "edge_type",
                 stan::model::index_uni(f)), 1)) {
-          current_statement__ = 275;
+          current_statement__ = 281;
           stan::math::validate_non_negative_index("prod_km_ix", "N_prod",
                                                   N_prod);
           std::vector<int> prod_km_ix =
              std::vector<int>(N_prod, std::numeric_limits<int>::min());
-          current_statement__ = 276;
+          current_statement__ = 282;
           stan::model::assign(prod_km_ix,
             extract_ragged(prod_km_ix_by_edge_long,
               prod_km_ix_by_edge_bounds, f, pstream__),
             "assigning variable prod_km_ix");
-          current_statement__ = 277;
+          current_statement__ = 283;
           stan::math::validate_non_negative_index("prod_over_km", "N_prod",
                                                   N_prod);
           Eigen::Matrix<local_scalar_t__, -1, 1> prod_over_km =
              Eigen::Matrix<local_scalar_t__, -1, 1>::Constant(N_prod,
                DUMMY_VAR__);
-          current_statement__ = 278;
+          current_statement__ = 284;
           stan::model::assign(prod_over_km,
             stan::math::elt_divide(
               stan::model::rvalue(conc, "conc",
@@ -1331,7 +1393,7 @@ template <typename T0__, typename T1__, typename T2__, typename T3__,
               stan::model::rvalue(km, "km",
                 stan::model::index_multi(prod_km_ix))),
             "assigning variable prod_over_km");
-          current_statement__ = 279;
+          current_statement__ = 285;
           stan::model::assign(denom,
             (stan::model::rvalue(denom, "denom", stan::model::index_uni(f)) +
               (stan::math::prod(
@@ -1344,48 +1406,51 @@ template <typename T0__, typename T1__, typename T2__, typename T3__,
                          stan::model::index_uni(f))))) - 1)),
             "assigning variable denom", stan::model::index_uni(f));
         } 
-        current_statement__ = 286;
+        current_statement__ = 292;
         if (stan::math::logical_gt(N_ci, 0)) {
-          current_statement__ = 282;
+          current_statement__ = 288;
           stan::math::validate_non_negative_index("ci_ix", "N_ci", N_ci);
           std::vector<int> ci_ix =
              std::vector<int>(N_ci, std::numeric_limits<int>::min());
-          current_statement__ = 283;
+          current_statement__ = 289;
           stan::model::assign(ci_ix,
             extract_ragged(ci_ix_long, ci_ix_bounds, f, pstream__),
             "assigning variable ci_ix");
-          current_statement__ = 284;
+          current_statement__ = 290;
           stan::model::assign(denom,
             (stan::model::rvalue(denom, "denom", stan::model::index_uni(f)) +
               stan::math::sum(
                 stan::math::elt_divide(
                   stan::model::rvalue(conc, "conc",
-                    stan::model::index_multi(ci_ix)),
+                    stan::model::index_multi(stan::model::rvalue(ci_mic_ix,
+                                               "ci_mic_ix",
+                                               stan::model::index_multi(ci_ix)))),
                   stan::model::rvalue(ki, "ki",
                     stan::model::index_multi(ci_ix))))),
             "assigning variable denom", stan::model::index_uni(f));
         } 
       }
-      current_statement__ = 289;
+      current_statement__ = 295;
       return stan::math::inv(denom);
     } catch (const std::exception& e) {
       stan::lang::rethrow_located(e, locations_array__[current_statement__]);
     }
     }
-template <typename T0__, typename T1__, typename T2__,
+template <typename T0__, typename T1__, typename T2__, typename T3__,
           stan::require_col_vector_t<T0__>* = nullptr,
-          stan::require_eigen_matrix_dynamic_t<T1__>* = nullptr,
-          stan::require_col_vector_t<T2__>* = nullptr>
-  Eigen::Matrix<stan::promote_args_t<stan::value_type_t<T0__>, stan::value_type_t<T1__>,
-                     stan::value_type_t<T2__>>, -1, 1>
-  get_reversibility(const T0__& dgr_arg__, const T1__& S_arg__,
-                    const T2__& conc_arg__,
+          stan::require_stan_scalar_t<T1__>* = nullptr,
+          stan::require_eigen_matrix_dynamic_t<T2__>* = nullptr,
+          stan::require_col_vector_t<T3__>* = nullptr>
+  Eigen::Matrix<stan::promote_args_t<stan::value_type_t<T0__>, T1__,
+                     stan::value_type_t<T2__>, stan::value_type_t<T3__>>, -1, 1>
+  get_reversibility(const T0__& dgr_arg__, const T1__& temperature,
+                    const T2__& S_arg__, const T3__& conc_arg__,
                     const std::vector<int>& edge_type,
                     std::ostream* pstream__) {
     using local_scalar_t__ =
-            stan::promote_args_t<stan::value_type_t<T0__>,
-                                 stan::value_type_t<T1__>,
-                                 stan::value_type_t<T2__>>;
+            stan::promote_args_t<stan::value_type_t<T0__>, T1__,
+                                 stan::value_type_t<T2__>,
+                                 stan::value_type_t<T3__>>;
     int current_statement__ = 0; 
     const auto& dgr = stan::math::to_ref(dgr_arg__);
     const auto& S = stan::math::to_ref(S_arg__);
@@ -1396,33 +1461,33 @@ template <typename T0__, typename T1__, typename T2__,
     (void) DUMMY_VAR__;  // suppress unused var warning
     try {
       local_scalar_t__ RT = DUMMY_VAR__;
-      current_statement__ = 291;
-      RT = (0.008314 * 298.15);
+      current_statement__ = 297;
+      RT = (0.008314 * temperature);
       int N_edge = std::numeric_limits<int>::min();
-      current_statement__ = 292;
+      current_statement__ = 298;
       N_edge = stan::math::cols(S);
-      current_statement__ = 293;
+      current_statement__ = 299;
       stan::math::validate_non_negative_index("reaction_quotient", "N_edge",
                                               N_edge);
       Eigen::Matrix<local_scalar_t__, -1, 1> reaction_quotient =
          Eigen::Matrix<local_scalar_t__, -1, 1>::Constant(N_edge,
            DUMMY_VAR__);
-      current_statement__ = 294;
+      current_statement__ = 300;
       stan::model::assign(reaction_quotient,
         stan::math::multiply(stan::math::transpose(S), stan::math::log(conc)),
         "assigning variable reaction_quotient");
-      current_statement__ = 295;
+      current_statement__ = 301;
       stan::math::validate_non_negative_index("out", "N_edge", N_edge);
       Eigen::Matrix<local_scalar_t__, -1, 1> out =
          Eigen::Matrix<local_scalar_t__, -1, 1>::Constant(N_edge,
            DUMMY_VAR__);
-      current_statement__ = 301;
+      current_statement__ = 307;
       for (int f = 1; f <= N_edge; ++f) {
-        current_statement__ = 299;
+        current_statement__ = 305;
         if (stan::math::logical_eq(
               stan::model::rvalue(edge_type, "edge_type",
                 stan::model::index_uni(f)), 1)) {
-          current_statement__ = 298;
+          current_statement__ = 304;
           stan::model::assign(out,
             (1 -
               stan::math::exp(
@@ -1433,12 +1498,12 @@ template <typename T0__, typename T1__, typename T2__,
                        "reaction_quotient", stan::model::index_uni(f)))) /
                   RT))), "assigning variable out", stan::model::index_uni(f));
         } else {
-          current_statement__ = 297;
+          current_statement__ = 303;
           stan::model::assign(out, 1,
             "assigning variable out", stan::model::index_uni(f));
         }
       }
-      current_statement__ = 302;
+      current_statement__ = 308;
       return out;
     } catch (const std::exception& e) {
       stan::lang::rethrow_located(e, locations_array__[current_statement__]);
@@ -1479,51 +1544,51 @@ template <typename T0__, typename T1__, typename T2__, typename T3__,
     (void) DUMMY_VAR__;  // suppress unused var warning
     try {
       int N_edge = std::numeric_limits<int>::min();
-      current_statement__ = 304;
+      current_statement__ = 310;
       N_edge = stan::math::size(allostery_ix_bounds);
-      current_statement__ = 305;
+      current_statement__ = 311;
       stan::math::validate_non_negative_index("out", "N_edge", N_edge);
       Eigen::Matrix<local_scalar_t__, -1, 1> out =
          Eigen::Matrix<local_scalar_t__, -1, 1>::Constant(N_edge,
            DUMMY_VAR__);
-      current_statement__ = 306;
+      current_statement__ = 312;
       stan::model::assign(out, stan::math::rep_vector(1, N_edge),
         "assigning variable out");
-      current_statement__ = 323;
+      current_statement__ = 329;
       for (int f = 1; f <= N_edge; ++f) {
         int N_allostery = std::numeric_limits<int>::min();
-        current_statement__ = 307;
+        current_statement__ = 313;
         N_allostery = measure_ragged(allostery_ix_bounds, f, pstream__);
-        current_statement__ = 310;
+        current_statement__ = 316;
         if (stan::math::logical_eq(N_allostery, 0)) {
           continue;
         } 
         local_scalar_t__ Q_num = DUMMY_VAR__;
-        current_statement__ = 311;
+        current_statement__ = 317;
         Q_num = 1;
         local_scalar_t__ Q_denom = DUMMY_VAR__;
-        current_statement__ = 312;
+        current_statement__ = 318;
         Q_denom = 1;
         local_scalar_t__ tc_edge = DUMMY_VAR__;
-        current_statement__ = 313;
+        current_statement__ = 319;
         tc_edge = stan::model::rvalue(tc, "tc",
                     stan::model::index_uni(stan::model::rvalue(edge_to_tc,
                                              "edge_to_tc",
                                              stan::model::index_uni(f))));
         {
           std::vector<int> sym1__;
-          current_statement__ = 314;
+          current_statement__ = 320;
           stan::model::assign(sym1__,
             extract_ragged(allostery_ix_long, allostery_ix_bounds,
               f, pstream__), "assigning variable sym1__");
-          current_statement__ = 314;
+          current_statement__ = 320;
           for (int sym2__ = 1; sym2__ <= stan::math::size(sym1__); ++sym2__) {
             {
               int allostery;
-              current_statement__ = 314;
+              current_statement__ = 320;
               allostery = sym1__[(sym2__ - 1)];
               local_scalar_t__ conc_over_dc = DUMMY_VAR__;
-              current_statement__ = 315;
+              current_statement__ = 321;
               conc_over_dc = (stan::model::rvalue(conc, "conc",
                                 stan::model::index_uni(stan::model::rvalue(
                                                          allostery_mic,
@@ -1532,20 +1597,20 @@ template <typename T0__, typename T1__, typename T2__, typename T3__,
                                /
                                stan::model::rvalue(dc, "dc",
                                  stan::model::index_uni(allostery)));
-              current_statement__ = 320;
+              current_statement__ = 326;
               if (stan::math::logical_eq(
                     stan::model::rvalue(allostery_type, "allostery_type",
                       stan::model::index_uni(allostery)), 1)) {
-                current_statement__ = 318;
-                Q_num = (Q_num + conc_over_dc);
-              } else {
-                current_statement__ = 316;
+                current_statement__ = 324;
                 Q_denom = (Q_denom + conc_over_dc);
+              } else {
+                current_statement__ = 322;
+                Q_num = (Q_num + conc_over_dc);
               }
             }
           }
         }
-        current_statement__ = 321;
+        current_statement__ = 327;
         stan::model::assign(out,
           stan::math::inv(
             (1 +
@@ -1553,12 +1618,12 @@ template <typename T0__, typename T1__, typename T2__, typename T3__,
                 stan::math::pow(
                   ((stan::model::rvalue(free_enzyme_ratio,
                       "free_enzyme_ratio", stan::model::index_uni(f)) *
-                     (1 + Q_num)) / (1 + Q_denom)),
+                     Q_num) / Q_denom),
                   stan::model::rvalue(subunits, "subunits",
                     stan::model::index_uni(f)))))),
           "assigning variable out", stan::model::index_uni(f));
       }
-      current_statement__ = 324;
+      current_statement__ = 330;
       return out;
     } catch (const std::exception& e) {
       stan::lang::rethrow_located(e, locations_array__[current_statement__]);
@@ -1590,60 +1655,60 @@ template <typename T0__, typename T1__, typename T5__,
     (void) DUMMY_VAR__;  // suppress unused var warning
     try {
       int N_edge = std::numeric_limits<int>::min();
-      current_statement__ = 326;
+      current_statement__ = 332;
       N_edge = stan::math::size(phos_ix_bounds);
-      current_statement__ = 327;
+      current_statement__ = 333;
       stan::math::validate_non_negative_index("out", "N_edge", N_edge);
       Eigen::Matrix<local_scalar_t__, -1, 1> out =
          Eigen::Matrix<local_scalar_t__, -1, 1>::Constant(N_edge,
            DUMMY_VAR__);
-      current_statement__ = 328;
+      current_statement__ = 334;
       stan::model::assign(out, stan::math::rep_vector(1, N_edge),
         "assigning variable out");
-      current_statement__ = 344;
+      current_statement__ = 350;
       for (int f = 1; f <= N_edge; ++f) {
         int N_phos = std::numeric_limits<int>::min();
-        current_statement__ = 329;
+        current_statement__ = 335;
         N_phos = measure_ragged(phos_ix_bounds, f, pstream__);
-        current_statement__ = 332;
+        current_statement__ = 338;
         if (stan::math::logical_eq(N_phos, 0)) {
           continue;
         } 
         local_scalar_t__ alpha = DUMMY_VAR__;
-        current_statement__ = 333;
+        current_statement__ = 339;
         alpha = 0;
         local_scalar_t__ beta = DUMMY_VAR__;
-        current_statement__ = 334;
+        current_statement__ = 340;
         beta = 0;
         {
           std::vector<int> sym1__;
-          current_statement__ = 335;
+          current_statement__ = 341;
           stan::model::assign(sym1__,
             extract_ragged(phos_ix_long, phos_ix_bounds, f, pstream__),
             "assigning variable sym1__");
-          current_statement__ = 335;
+          current_statement__ = 341;
           for (int sym2__ = 1; sym2__ <= stan::math::size(sym1__); ++sym2__) {
             {
               int phos;
-              current_statement__ = 335;
+              current_statement__ = 341;
               phos = sym1__[(sym2__ - 1)];
               local_scalar_t__ kcat_times_conc = DUMMY_VAR__;
-              current_statement__ = 336;
+              current_statement__ = 342;
               kcat_times_conc = (stan::model::rvalue(kcat_phos, "kcat_phos",
                                    stan::model::index_uni(phos)) *
                                   stan::model::rvalue(conc_phos, "conc_phos",
                                     stan::model::index_uni(phos)));
-              current_statement__ = 341;
+              current_statement__ = 347;
               if (stan::math::logical_eq(
                     stan::model::rvalue(phos_type, "phos_type",
                       stan::model::index_uni(phos)), 1)) {
-                current_statement__ = 339;
+                current_statement__ = 345;
                 alpha = (alpha + kcat_times_conc);
               } else {
-                current_statement__ = 337;
+                current_statement__ = 343;
                 beta = (beta + kcat_times_conc);
               }
-              current_statement__ = 342;
+              current_statement__ = 348;
               stan::model::assign(out,
                 stan::math::inv(
                   (1 +
@@ -1655,25 +1720,27 @@ template <typename T0__, typename T1__, typename T5__,
           }
         }
       }
-      current_statement__ = 345;
+      current_statement__ = 351;
       return out;
     } catch (const std::exception& e) {
       stan::lang::rethrow_located(e, locations_array__[current_statement__]);
     }
     }
-template <typename T0__, typename T1__,
+template <typename T0__, typename T1__, typename T6__,
           stan::require_col_vector_t<T0__>* = nullptr,
-          stan::require_col_vector_t<T1__>* = nullptr>
-  Eigen::Matrix<stan::promote_args_t<stan::value_type_t<T0__>, stan::value_type_t<T1__>>, -1, 1>
+          stan::require_col_vector_t<T1__>* = nullptr,
+          stan::require_stan_scalar_t<T6__>* = nullptr>
+  Eigen::Matrix<stan::promote_args_t<stan::value_type_t<T0__>, stan::value_type_t<T1__>, T6__>, -1, 1>
   get_drain_by_edge(const T0__& drain_arg__, const T1__& conc_arg__,
                     const std::vector<int>& edge_to_drain,
                     const std::vector<int>& sub_by_edge_long,
                     const std::vector<std::vector<int>>& sub_by_edge_bounds,
                     const std::vector<int>& edge_type,
+                    const T6__& drain_small_conc_corrector,
                     std::ostream* pstream__) {
     using local_scalar_t__ =
             stan::promote_args_t<stan::value_type_t<T0__>,
-                                 stan::value_type_t<T1__>>;
+                                 stan::value_type_t<T1__>, T6__>;
     int current_statement__ = 0; 
     const auto& drain = stan::math::to_ref(drain_arg__);
     const auto& conc = stan::math::to_ref(conc_arg__);
@@ -1683,34 +1750,34 @@ template <typename T0__, typename T1__,
     (void) DUMMY_VAR__;  // suppress unused var warning
     try {
       int N_edge = std::numeric_limits<int>::min();
-      current_statement__ = 347;
+      current_statement__ = 353;
       N_edge = stan::math::size(edge_type);
-      current_statement__ = 348;
+      current_statement__ = 354;
       stan::math::validate_non_negative_index("out", "N_edge", N_edge);
       Eigen::Matrix<local_scalar_t__, -1, 1> out =
          Eigen::Matrix<local_scalar_t__, -1, 1>::Constant(N_edge,
            DUMMY_VAR__);
-      current_statement__ = 349;
+      current_statement__ = 355;
       stan::model::assign(out, stan::math::rep_vector(1, N_edge),
         "assigning variable out");
-      current_statement__ = 357;
+      current_statement__ = 363;
       for (int f = 1; f <= N_edge; ++f) {
-        current_statement__ = 355;
+        current_statement__ = 361;
         if (stan::math::logical_eq(
               stan::model::rvalue(edge_type, "edge_type",
                 stan::model::index_uni(f)), 2)) {
           int N_sub = std::numeric_limits<int>::min();
-          current_statement__ = 350;
+          current_statement__ = 356;
           N_sub = measure_ragged(sub_by_edge_bounds, f, pstream__);
-          current_statement__ = 351;
+          current_statement__ = 357;
           stan::math::validate_non_negative_index("subs", "N_sub", N_sub);
           std::vector<int> subs =
              std::vector<int>(N_sub, std::numeric_limits<int>::min());
-          current_statement__ = 352;
+          current_statement__ = 358;
           stan::model::assign(subs,
             extract_ragged(sub_by_edge_long, sub_by_edge_bounds,
               f, pstream__), "assigning variable subs");
-          current_statement__ = 353;
+          current_statement__ = 359;
           stan::model::assign(out,
             (stan::model::rvalue(drain, "drain",
                stan::model::index_uni(stan::model::rvalue(edge_to_drain,
@@ -1722,11 +1789,12 @@ template <typename T0__, typename T1__,
                     stan::model::index_multi(subs)),
                   stan::math::add(
                     stan::model::rvalue(conc, "conc",
-                      stan::model::index_multi(subs)), 1e-6)))),
+                      stan::model::index_multi(subs)),
+                    drain_small_conc_corrector)))),
             "assigning variable out", stan::model::index_uni(f));
         } 
       }
-      current_statement__ = 358;
+      current_statement__ = 364;
       return out;
     } catch (const std::exception& e) {
       stan::lang::rethrow_located(e, locations_array__[current_statement__]);
@@ -1751,23 +1819,23 @@ template <typename T0__, typename T1__,
     (void) DUMMY_VAR__;  // suppress unused var warning
     try {
       int N_edge = std::numeric_limits<int>::min();
-      current_statement__ = 360;
+      current_statement__ = 366;
       N_edge = stan::math::size(edge_to_enzyme);
-      current_statement__ = 361;
+      current_statement__ = 367;
       stan::math::validate_non_negative_index("out", "N_edge", N_edge);
       Eigen::Matrix<local_scalar_t__, -1, 1> out =
          Eigen::Matrix<local_scalar_t__, -1, 1>::Constant(N_edge,
            DUMMY_VAR__);
-      current_statement__ = 362;
+      current_statement__ = 368;
       stan::model::assign(out, stan::math::rep_vector(1, N_edge),
         "assigning variable out");
-      current_statement__ = 367;
+      current_statement__ = 373;
       for (int f = 1; f <= N_edge; ++f) {
-        current_statement__ = 365;
+        current_statement__ = 371;
         if (stan::math::logical_neq(
               stan::model::rvalue(edge_type, "edge_type",
                 stan::model::index_uni(f)), 2)) {
-          current_statement__ = 363;
+          current_statement__ = 369;
           stan::model::assign(out,
             (stan::model::rvalue(enzyme, "enzyme",
                stan::model::index_uni(stan::model::rvalue(edge_to_enzyme,
@@ -1780,7 +1848,7 @@ template <typename T0__, typename T1__,
             "assigning variable out", stan::model::index_uni(f));
         } 
       }
-      current_statement__ = 368;
+      current_statement__ = 374;
       return out;
     } catch (const std::exception& e) {
       stan::lang::rethrow_located(e, locations_array__[current_statement__]);
@@ -1789,7 +1857,8 @@ template <typename T0__, typename T1__,
 template <typename T0__, typename T1__, typename T2__, typename T3__,
           typename T4__, typename T5__, typename T6__, typename T7__,
           typename T8__, typename T9__, typename T10__, typename T11__,
-          typename T12__, stan::require_col_vector_t<T0__>* = nullptr,
+          typename T12__, typename T13__, typename T14__,
+          stan::require_col_vector_t<T0__>* = nullptr,
           stan::require_col_vector_t<T1__>* = nullptr,
           stan::require_col_vector_t<T2__>* = nullptr,
           stan::require_col_vector_t<T3__>* = nullptr,
@@ -1800,8 +1869,10 @@ template <typename T0__, typename T1__, typename T2__, typename T3__,
           stan::require_col_vector_t<T8__>* = nullptr,
           stan::require_col_vector_t<T9__>* = nullptr,
           stan::require_col_vector_t<T10__>* = nullptr,
-          stan::require_eigen_matrix_dynamic_t<T11__>* = nullptr,
-          stan::require_col_vector_t<T12__>* = nullptr>
+          stan::require_stan_scalar_t<T11__>* = nullptr,
+          stan::require_stan_scalar_t<T12__>* = nullptr,
+          stan::require_eigen_matrix_dynamic_t<T13__>* = nullptr,
+          stan::require_col_vector_t<T14__>* = nullptr>
   Eigen::Matrix<stan::promote_args_t<stan::value_type_t<T0__>, stan::value_type_t<T1__>,
                      stan::value_type_t<T2__>, stan::value_type_t<T3__>,
                      stan::value_type_t<T4__>,
@@ -1811,18 +1882,21 @@ template <typename T0__, typename T1__, typename T2__, typename T3__,
                                           stan::value_type_t<T8__>,
                                           stan::value_type_t<T9__>,
                                           stan::promote_args_t<stan::value_type_t<T10__>,
-                                                               stan::value_type_t<T11__>,
-                                                               stan::value_type_t<T12__>>>>, -1, 1>
+                                                               T11__, T12__,
+                                                               stan::value_type_t<T13__>,
+                                                               stan::value_type_t<T14__>>>>, -1, 1>
   get_edge_flux(const T0__& conc_arg__, const T1__& enzyme_arg__,
                 const T2__& dgr_arg__, const T3__& kcat_arg__,
                 const T4__& km_arg__, const T5__& ki_arg__,
                 const T6__& tc_arg__, const T7__& dc_arg__,
                 const T8__& kcat_phos_arg__, const T9__& conc_phos_arg__,
-                const T10__& drain_arg__, const T11__& S_arg__,
-                const T12__& subunits_arg__,
+                const T10__& drain_arg__, const T11__& temperature,
+                const T12__& drain_small_conc_corrector,
+                const T13__& S_arg__, const T14__& subunits_arg__,
                 const std::vector<int>& edge_type,
                 const std::vector<int>& edge_to_enzyme,
                 const std::vector<int>& edge_to_drain,
+                const std::vector<int>& ci_mic_ix,
                 const std::vector<int>& sub_km_ix_by_edge_long,
                 const std::vector<std::vector<int>>& sub_km_ix_by_edge_bounds,
                 const std::vector<int>& prod_km_ix_by_edge_long,
@@ -1855,8 +1929,9 @@ template <typename T0__, typename T1__, typename T2__, typename T3__,
                                                       stan::value_type_t<T9__>,
                                                       stan::promote_args_t<
                                                       stan::value_type_t<T10__>,
-                                                      stan::value_type_t<T11__>,
-                                                      stan::value_type_t<T12__>>>>;
+                                                      T11__, T12__,
+                                                      stan::value_type_t<T13__>,
+                                                      stan::value_type_t<T14__>>>>;
     int current_statement__ = 0; 
     const auto& conc = stan::math::to_ref(conc_arg__);
     const auto& enzyme = stan::math::to_ref(enzyme_arg__);
@@ -1877,85 +1952,86 @@ template <typename T0__, typename T1__, typename T2__, typename T3__,
     (void) DUMMY_VAR__;  // suppress unused var warning
     try {
       int N_edge = std::numeric_limits<int>::min();
-      current_statement__ = 370;
+      current_statement__ = 376;
       N_edge = stan::math::cols(S);
-      current_statement__ = 371;
+      current_statement__ = 377;
       stan::math::validate_non_negative_index("vmax", "N_edge", N_edge);
       Eigen::Matrix<local_scalar_t__, -1, 1> vmax =
          Eigen::Matrix<local_scalar_t__, -1, 1>::Constant(N_edge,
            DUMMY_VAR__);
-      current_statement__ = 372;
+      current_statement__ = 378;
       stan::model::assign(vmax,
         get_vmax_by_edge(enzyme, kcat, edge_to_enzyme, edge_type, pstream__),
         "assigning variable vmax");
-      current_statement__ = 373;
+      current_statement__ = 379;
       stan::math::validate_non_negative_index("reversibility", "N_edge",
                                               N_edge);
       Eigen::Matrix<local_scalar_t__, -1, 1> reversibility =
          Eigen::Matrix<local_scalar_t__, -1, 1>::Constant(N_edge,
            DUMMY_VAR__);
-      current_statement__ = 374;
+      current_statement__ = 380;
       stan::model::assign(reversibility,
-        get_reversibility(dgr, S, conc, edge_type, pstream__),
+        get_reversibility(dgr, temperature, S, conc, edge_type, pstream__),
         "assigning variable reversibility");
-      current_statement__ = 375;
+      current_statement__ = 381;
       stan::math::validate_non_negative_index("free_enzyme_ratio", "N_edge",
                                               N_edge);
       Eigen::Matrix<local_scalar_t__, -1, 1> free_enzyme_ratio =
          Eigen::Matrix<local_scalar_t__, -1, 1>::Constant(N_edge,
            DUMMY_VAR__);
-      current_statement__ = 376;
+      current_statement__ = 382;
       stan::model::assign(free_enzyme_ratio,
-        get_free_enzyme_ratio(conc, S, km, ki, edge_type,
+        get_free_enzyme_ratio(conc, S, km, ki, edge_type, ci_mic_ix,
           sub_km_ix_by_edge_long, sub_km_ix_by_edge_bounds,
           prod_km_ix_by_edge_long, prod_km_ix_by_edge_bounds,
           sub_by_edge_long, sub_by_edge_bounds, prod_by_edge_long,
           prod_by_edge_bounds, ci_ix_long, ci_ix_bounds, pstream__),
         "assigning variable free_enzyme_ratio");
-      current_statement__ = 377;
+      current_statement__ = 383;
       stan::math::validate_non_negative_index("saturation", "N_edge", N_edge);
       Eigen::Matrix<local_scalar_t__, -1, 1> saturation =
          Eigen::Matrix<local_scalar_t__, -1, 1>::Constant(N_edge,
            DUMMY_VAR__);
-      current_statement__ = 378;
+      current_statement__ = 384;
       stan::model::assign(saturation,
         get_saturation(conc, km, free_enzyme_ratio, sub_km_ix_by_edge_long,
           sub_km_ix_by_edge_bounds, sub_by_edge_long, sub_by_edge_bounds,
           edge_type, pstream__), "assigning variable saturation");
-      current_statement__ = 379;
+      current_statement__ = 385;
       stan::math::validate_non_negative_index("allostery", "N_edge", N_edge);
       Eigen::Matrix<local_scalar_t__, -1, 1> allostery =
          Eigen::Matrix<local_scalar_t__, -1, 1>::Constant(N_edge,
            DUMMY_VAR__);
-      current_statement__ = 380;
+      current_statement__ = 386;
       stan::model::assign(allostery,
         get_allostery(conc, free_enzyme_ratio, tc, dc, subunits,
           allostery_ix_long, allostery_ix_bounds, allostery_type,
           allostery_mic, edge_to_tc, pstream__),
         "assigning variable allostery");
-      current_statement__ = 381;
+      current_statement__ = 387;
       stan::math::validate_non_negative_index("phosphorylation", "N_edge",
                                               N_edge);
       Eigen::Matrix<local_scalar_t__, -1, 1> phosphorylation =
          Eigen::Matrix<local_scalar_t__, -1, 1>::Constant(N_edge,
            DUMMY_VAR__);
-      current_statement__ = 382;
+      current_statement__ = 388;
       stan::model::assign(phosphorylation,
         get_phosphorylation(kcat_phos, conc_phos, phos_ix_long,
           phos_ix_bounds, phosphorylation_type, subunits, pstream__),
         "assigning variable phosphorylation");
-      current_statement__ = 383;
+      current_statement__ = 389;
       stan::math::validate_non_negative_index("drain_by_edge", "N_edge",
                                               N_edge);
       Eigen::Matrix<local_scalar_t__, -1, 1> drain_by_edge =
          Eigen::Matrix<local_scalar_t__, -1, 1>::Constant(N_edge,
            DUMMY_VAR__);
-      current_statement__ = 384;
+      current_statement__ = 390;
       stan::model::assign(drain_by_edge,
         get_drain_by_edge(drain, conc, edge_to_drain, sub_by_edge_long,
-          sub_by_edge_bounds, edge_type, pstream__),
+          sub_by_edge_bounds, edge_type,
+          drain_small_conc_corrector, pstream__),
         "assigning variable drain_by_edge");
-      current_statement__ = 385;
+      current_statement__ = 391;
       return stan::math::elt_multiply(
                stan::math::elt_multiply(
                  stan::math::elt_multiply(
@@ -1970,8 +2046,8 @@ template <typename T0__, typename T1__, typename T2__, typename T3__,
 template <typename T0__, typename T1__, typename T2__, typename T5__,
           typename T6__, typename T7__, typename T8__, typename T9__,
           typename T10__, typename T11__, typename T12__, typename T13__,
-          typename T14__, typename T15__, typename T16__,
-          stan::require_stan_scalar_t<T0__>* = nullptr,
+          typename T14__, typename T15__, typename T16__, typename T17__,
+          typename T18__, stan::require_stan_scalar_t<T0__>* = nullptr,
           stan::require_col_vector_t<T1__>* = nullptr,
           stan::require_col_vector_t<T2__>* = nullptr,
           stan::require_col_vector_t<T5__>* = nullptr,
@@ -1984,8 +2060,10 @@ template <typename T0__, typename T1__, typename T2__, typename T5__,
           stan::require_col_vector_t<T12__>* = nullptr,
           stan::require_col_vector_t<T13__>* = nullptr,
           stan::require_col_vector_t<T14__>* = nullptr,
-          stan::require_eigen_matrix_dynamic_t<T15__>* = nullptr,
-          stan::require_col_vector_t<T16__>* = nullptr>
+          stan::require_stan_scalar_t<T15__>* = nullptr,
+          stan::require_stan_scalar_t<T16__>* = nullptr,
+          stan::require_eigen_matrix_dynamic_t<T17__>* = nullptr,
+          stan::require_col_vector_t<T18__>* = nullptr>
   Eigen::Matrix<stan::promote_args_t<T0__, stan::value_type_t<T1__>,
                      stan::value_type_t<T2__>, stan::value_type_t<T5__>,
                      stan::value_type_t<T6__>,
@@ -1997,8 +2075,10 @@ template <typename T0__, typename T1__, typename T2__, typename T5__,
                                           stan::promote_args_t<stan::value_type_t<T12__>,
                                                                stan::value_type_t<T13__>,
                                                                stan::value_type_t<T14__>,
-                                                               stan::value_type_t<T15__>,
-                                                               stan::value_type_t<T16__>>>>, -1, 1>
+                                                               T15__, T16__,
+                                                               stan::promote_args_t<
+                                                               stan::value_type_t<T17__>,
+                                                               stan::value_type_t<T18__>>>>>, -1, 1>
   dbalanced_dt(const T0__& time, const T1__& current_balanced_arg__,
                const T2__& unbalanced_arg__,
                const std::vector<int>& balanced_ix,
@@ -2008,10 +2088,13 @@ template <typename T0__, typename T1__, typename T2__, typename T5__,
                const T9__& ki_arg__, const T10__& tc_arg__,
                const T11__& dc_arg__, const T12__& kcat_phos_arg__,
                const T13__& conc_phos_arg__, const T14__& drain_arg__,
-               const T15__& S_arg__, const T16__& subunits_arg__,
+               const T15__& temperature,
+               const T16__& drain_small_conc_corrector, const T17__& S_arg__,
+               const T18__& subunits_arg__,
                const std::vector<int>& edge_type,
                const std::vector<int>& edge_to_enzyme,
                const std::vector<int>& edge_to_drain,
+               const std::vector<int>& ci_mic_ix,
                const std::vector<int>& sub_km_ix_by_edge_long,
                const std::vector<std::vector<int>>& sub_km_ix_by_edge_bounds,
                const std::vector<int>& prod_km_ix_by_edge_long,
@@ -2045,8 +2128,10 @@ template <typename T0__, typename T1__, typename T2__, typename T5__,
                                                       stan::value_type_t<T12__>,
                                                       stan::value_type_t<T13__>,
                                                       stan::value_type_t<T14__>,
-                                                      stan::value_type_t<T15__>,
-                                                      stan::value_type_t<T16__>>>>;
+                                                      T15__, T16__,
+                                                      stan::promote_args_t<
+                                                      stan::value_type_t<T17__>,
+                                                      stan::value_type_t<T18__>>>>>;
     int current_statement__ = 0; 
     const auto& current_balanced = stan::math::to_ref(current_balanced_arg__);
     const auto& unbalanced = stan::math::to_ref(unbalanced_arg__);
@@ -2067,7 +2152,7 @@ template <typename T0__, typename T1__, typename T2__, typename T5__,
     local_scalar_t__ DUMMY_VAR__(std::numeric_limits<double>::quiet_NaN());
     (void) DUMMY_VAR__;  // suppress unused var warning
     try {
-      current_statement__ = 387;
+      current_statement__ = 393;
       stan::math::validate_non_negative_index("current_concentration",
                                               "rows(current_balanced) + rows(unbalanced)",
                                               (stan::math::rows(
@@ -2077,23 +2162,24 @@ template <typename T0__, typename T1__, typename T2__, typename T5__,
          Eigen::Matrix<local_scalar_t__, -1, 1>::Constant(
            (stan::math::rows(current_balanced) +
              stan::math::rows(unbalanced)), DUMMY_VAR__);
-      current_statement__ = 389;
+      current_statement__ = 395;
       stan::model::assign(current_concentration, current_balanced,
         "assigning variable current_concentration", stan::model::index_multi(balanced_ix));
-      current_statement__ = 390;
+      current_statement__ = 396;
       stan::model::assign(current_concentration, unbalanced,
         "assigning variable current_concentration", stan::model::index_multi(unbalanced_ix));
-      current_statement__ = 391;
+      current_statement__ = 397;
       stan::math::validate_non_negative_index("edge_flux", "cols(S)",
                                               stan::math::cols(S));
       Eigen::Matrix<local_scalar_t__, -1, 1> edge_flux =
          Eigen::Matrix<local_scalar_t__, -1, 1>::Constant(
            stan::math::cols(S), DUMMY_VAR__);
-      current_statement__ = 392;
+      current_statement__ = 398;
       stan::model::assign(edge_flux,
         get_edge_flux(current_concentration, enzyme, dgr, kcat, km, ki, tc,
-          dc, kcat_phos, conc_phos, drain, S, subunits, edge_type,
-          edge_to_enzyme, edge_to_drain, sub_km_ix_by_edge_long,
+          dc, kcat_phos, conc_phos, drain, temperature,
+          drain_small_conc_corrector, S, subunits, edge_type, edge_to_enzyme,
+          edge_to_drain, ci_mic_ix, sub_km_ix_by_edge_long,
           sub_km_ix_by_edge_bounds, prod_km_ix_by_edge_long,
           prod_km_ix_by_edge_bounds, sub_by_edge_long, sub_by_edge_bounds,
           prod_by_edge_long, prod_by_edge_bounds, ci_ix_long, ci_ix_bounds,
@@ -2101,7 +2187,7 @@ template <typename T0__, typename T1__, typename T2__, typename T5__,
           allostery_mic, edge_to_tc, phosphorylation_ix_long,
           phosphorylation_ix_bounds, phosphorylation_type, pstream__),
         "assigning variable edge_flux");
-      current_statement__ = 393;
+      current_statement__ = 399;
       return stan::model::rvalue(stan::math::multiply(S, edge_flux),
                "(S * edge_flux)", stan::model::index_multi(balanced_ix));
     } catch (const std::exception& e) {
@@ -2153,7 +2239,8 @@ get_allostery_functor__::operator()(const T0__& conc,
 template <typename T0__, typename T1__, typename T2__, typename T3__,
           typename T4__, typename T5__, typename T6__, typename T7__,
           typename T8__, typename T9__, typename T10__, typename T11__,
-          typename T12__, stan::require_col_vector_t<T0__>*,
+          typename T12__, typename T13__, typename T14__,
+          stan::require_col_vector_t<T0__>*,
           stan::require_col_vector_t<T1__>*,
           stan::require_col_vector_t<T2__>*,
           stan::require_col_vector_t<T3__>*,
@@ -2164,8 +2251,10 @@ template <typename T0__, typename T1__, typename T2__, typename T3__,
           stan::require_col_vector_t<T8__>*,
           stan::require_col_vector_t<T9__>*,
           stan::require_col_vector_t<T10__>*,
-          stan::require_eigen_matrix_dynamic_t<T11__>*,
-          stan::require_col_vector_t<T12__>*>
+          stan::require_stan_scalar_t<T11__>*,
+          stan::require_stan_scalar_t<T12__>*,
+          stan::require_eigen_matrix_dynamic_t<T13__>*,
+          stan::require_col_vector_t<T14__>*>
 Eigen::Matrix<stan::promote_args_t<stan::value_type_t<T0__>, stan::value_type_t<T1__>,
                      stan::value_type_t<T2__>, stan::value_type_t<T3__>,
                      stan::value_type_t<T4__>,
@@ -2175,19 +2264,23 @@ Eigen::Matrix<stan::promote_args_t<stan::value_type_t<T0__>, stan::value_type_t<
                                           stan::value_type_t<T8__>,
                                           stan::value_type_t<T9__>,
                                           stan::promote_args_t<stan::value_type_t<T10__>,
-                                                               stan::value_type_t<T11__>,
-                                                               stan::value_type_t<T12__>>>>, -1, 1>
+                                                               T11__, T12__,
+                                                               stan::value_type_t<T13__>,
+                                                               stan::value_type_t<T14__>>>>, -1, 1>
 get_edge_flux_functor__::operator()(const T0__& conc, const T1__& enzyme,
                                     const T2__& dgr, const T3__& kcat,
                                     const T4__& km, const T5__& ki,
                                     const T6__& tc, const T7__& dc,
                                     const T8__& kcat_phos,
                                     const T9__& conc_phos,
-                                    const T10__& drain, const T11__& S,
-                                    const T12__& subunits,
+                                    const T10__& drain,
+                                    const T11__& temperature,
+                                    const T12__& drain_small_conc_corrector,
+                                    const T13__& S, const T14__& subunits,
                                     const std::vector<int>& edge_type,
                                     const std::vector<int>& edge_to_enzyme,
                                     const std::vector<int>& edge_to_drain,
+                                    const std::vector<int>& ci_mic_ix,
                                     const std::vector<int>& sub_km_ix_by_edge_long,
                                     const std::vector<std::vector<int>>& sub_km_ix_by_edge_bounds,
                                     const std::vector<int>& prod_km_ix_by_edge_long,
@@ -2209,8 +2302,9 @@ get_edge_flux_functor__::operator()(const T0__& conc, const T1__& enzyme,
                                     std::ostream* pstream__)  const
 {
   return get_edge_flux(conc, enzyme, dgr, kcat, km, ki, tc, dc, kcat_phos,
-           conc_phos, drain, S, subunits, edge_type, edge_to_enzyme,
-           edge_to_drain, sub_km_ix_by_edge_long, sub_km_ix_by_edge_bounds,
+           conc_phos, drain, temperature, drain_small_conc_corrector, S,
+           subunits, edge_type, edge_to_enzyme, edge_to_drain, ci_mic_ix,
+           sub_km_ix_by_edge_long, sub_km_ix_by_edge_bounds,
            prod_km_ix_by_edge_long, prod_km_ix_by_edge_bounds,
            sub_by_edge_long, sub_by_edge_bounds, prod_by_edge_long,
            prod_by_edge_bounds, ci_ix_long, ci_ix_bounds, allostery_ix_long,
@@ -2218,18 +2312,20 @@ get_edge_flux_functor__::operator()(const T0__& conc, const T1__& enzyme,
            phos_ix_long, phos_ix_bounds, phosphorylation_type, pstream__);
 }
 
-template <typename T0__, typename T1__, typename T2__,
+template <typename T0__, typename T1__, typename T2__, typename T3__,
           stan::require_col_vector_t<T0__>*,
-          stan::require_eigen_matrix_dynamic_t<T1__>*,
-          stan::require_col_vector_t<T2__>*>
-Eigen::Matrix<stan::promote_args_t<stan::value_type_t<T0__>, stan::value_type_t<T1__>,
-                     stan::value_type_t<T2__>>, -1, 1>
-get_reversibility_functor__::operator()(const T0__& dgr, const T1__& S,
-                                        const T2__& conc,
+          stan::require_stan_scalar_t<T1__>*,
+          stan::require_eigen_matrix_dynamic_t<T2__>*,
+          stan::require_col_vector_t<T3__>*>
+Eigen::Matrix<stan::promote_args_t<stan::value_type_t<T0__>, T1__,
+                     stan::value_type_t<T2__>, stan::value_type_t<T3__>>, -1, 1>
+get_reversibility_functor__::operator()(const T0__& dgr,
+                                        const T1__& temperature,
+                                        const T2__& S, const T3__& conc,
                                         const std::vector<int>& edge_type,
                                         std::ostream* pstream__)  const
 {
-  return get_reversibility(dgr, S, conc, edge_type, pstream__);
+  return get_reversibility(dgr, temperature, S, conc, edge_type, pstream__);
 }
 
 template <typename T0__, typename T1__, typename T2__, typename T3__,
@@ -2242,6 +2338,7 @@ Eigen::Matrix<stan::promote_args_t<stan::value_type_t<T0__>, stan::value_type_t<
 get_free_enzyme_ratio_functor__::operator()(const T0__& conc, const T1__& S,
                                             const T2__& km, const T3__& ki,
                                             const std::vector<int>& edge_type,
+                                            const std::vector<int>& ci_mic_ix,
                                             const std::vector<int>& sub_km_ix_by_edge_long,
                                             const std::vector<std::vector<int>>& sub_km_ix_by_edge_bounds,
                                             const std::vector<int>& prod_km_ix_by_edge_long,
@@ -2254,7 +2351,7 @@ get_free_enzyme_ratio_functor__::operator()(const T0__& conc, const T1__& S,
                                             const std::vector<std::vector<int>>& ci_ix_bounds,
                                             std::ostream* pstream__)  const
 {
-  return get_free_enzyme_ratio(conc, S, km, ki, edge_type,
+  return get_free_enzyme_ratio(conc, S, km, ki, edge_type, ci_mic_ix,
            sub_km_ix_by_edge_long, sub_km_ix_by_edge_bounds,
            prod_km_ix_by_edge_long, prod_km_ix_by_edge_bounds,
            sub_by_edge_long, sub_by_edge_bounds, prod_by_edge_long,
@@ -2314,18 +2411,26 @@ get_vmax_by_edge_functor__::operator()(const T0__& enzyme, const T1__& kcat,
   return get_vmax_by_edge(enzyme, kcat, edge_to_enzyme, edge_type, pstream__);
 }
 
-template <typename T0__, typename T1__, typename T3__,
+template <typename T0__, typename T1__, typename T2__, typename T4__,
+          typename T5__, typename T6__,
           stan::require_eigen_matrix_dynamic_t<T0__>*,
           stan::require_col_vector_t<T1__>*,
-          stan::require_col_vector_t<T3__>*>
+          stan::require_stan_scalar_t<T2__>*,
+          stan::require_col_vector_t<T4__>*,
+          stan::require_col_vector_t<T5__>*,
+          stan::require_stan_scalar_t<T6__>*>
 Eigen::Matrix<stan::promote_args_t<stan::value_type_t<T0__>, stan::value_type_t<T1__>,
-                     stan::value_type_t<T3__>>, -1, 1>
+                     T2__, stan::value_type_t<T4__>,
+                     stan::value_type_t<T5__>, stan::promote_args_t<T6__>>, -1, 1>
 get_dgrs_functor__::operator()(const T0__& S, const T1__& dgf,
+                               const T2__& temperature,
                                const std::vector<int>& mic_to_met,
-                               const T3__& water_stoichiometry,
+                               const T4__& water_stoichiometry,
+                               const T5__& trans_charge, const T6__& psi,
                                std::ostream* pstream__)  const
 {
-  return get_dgrs(S, dgf, mic_to_met, water_stoichiometry, pstream__);
+  return get_dgrs(S, dgf, temperature, mic_to_met, water_stoichiometry,
+           trans_charge, psi, pstream__);
 }
 
 template <typename T0__, typename T1__, typename T2__,
@@ -2351,8 +2456,8 @@ get_saturation_functor__::operator()(const T0__& conc, const T1__& km,
 template <typename T0__, typename T1__, typename T2__, typename T5__,
           typename T6__, typename T7__, typename T8__, typename T9__,
           typename T10__, typename T11__, typename T12__, typename T13__,
-          typename T14__, typename T15__, typename T16__,
-          stan::require_stan_scalar_t<T0__>*,
+          typename T14__, typename T15__, typename T16__, typename T17__,
+          typename T18__, stan::require_stan_scalar_t<T0__>*,
           stan::require_col_vector_t<T1__>*,
           stan::require_col_vector_t<T2__>*,
           stan::require_col_vector_t<T5__>*,
@@ -2365,8 +2470,10 @@ template <typename T0__, typename T1__, typename T2__, typename T5__,
           stan::require_col_vector_t<T12__>*,
           stan::require_col_vector_t<T13__>*,
           stan::require_col_vector_t<T14__>*,
-          stan::require_eigen_matrix_dynamic_t<T15__>*,
-          stan::require_col_vector_t<T16__>*>
+          stan::require_stan_scalar_t<T15__>*,
+          stan::require_stan_scalar_t<T16__>*,
+          stan::require_eigen_matrix_dynamic_t<T17__>*,
+          stan::require_col_vector_t<T18__>*>
 Eigen::Matrix<stan::promote_args_t<T0__, stan::value_type_t<T1__>,
                      stan::value_type_t<T2__>, stan::value_type_t<T5__>,
                      stan::value_type_t<T6__>,
@@ -2378,8 +2485,10 @@ Eigen::Matrix<stan::promote_args_t<T0__, stan::value_type_t<T1__>,
                                           stan::promote_args_t<stan::value_type_t<T12__>,
                                                                stan::value_type_t<T13__>,
                                                                stan::value_type_t<T14__>,
-                                                               stan::value_type_t<T15__>,
-                                                               stan::value_type_t<T16__>>>>, -1, 1>
+                                                               T15__, T16__,
+                                                               stan::promote_args_t<
+                                                               stan::value_type_t<T17__>,
+                                                               stan::value_type_t<T18__>>>>>, -1, 1>
 dbalanced_dt_functor__::operator()(const T0__& time,
                                    const T1__& current_balanced,
                                    const T2__& unbalanced,
@@ -2390,11 +2499,14 @@ dbalanced_dt_functor__::operator()(const T0__& time,
                                    const T9__& ki, const T10__& tc,
                                    const T11__& dc, const T12__& kcat_phos,
                                    const T13__& conc_phos,
-                                   const T14__& drain, const T15__& S,
-                                   const T16__& subunits,
+                                   const T14__& drain,
+                                   const T15__& temperature,
+                                   const T16__& drain_small_conc_corrector,
+                                   const T17__& S, const T18__& subunits,
                                    const std::vector<int>& edge_type,
                                    const std::vector<int>& edge_to_enzyme,
                                    const std::vector<int>& edge_to_drain,
+                                   const std::vector<int>& ci_mic_ix,
                                    const std::vector<int>& sub_km_ix_by_edge_long,
                                    const std::vector<std::vector<int>>& sub_km_ix_by_edge_bounds,
                                    const std::vector<int>& prod_km_ix_by_edge_long,
@@ -2417,8 +2529,9 @@ dbalanced_dt_functor__::operator()(const T0__& time,
 {
   return dbalanced_dt(time, current_balanced, unbalanced, balanced_ix,
            unbalanced_ix, enzyme, dgr, kcat, km, ki, tc, dc, kcat_phos,
-           conc_phos, drain, S, subunits, edge_type, edge_to_enzyme,
-           edge_to_drain, sub_km_ix_by_edge_long, sub_km_ix_by_edge_bounds,
+           conc_phos, drain, temperature, drain_small_conc_corrector, S,
+           subunits, edge_type, edge_to_enzyme, edge_to_drain, ci_mic_ix,
+           sub_km_ix_by_edge_long, sub_km_ix_by_edge_bounds,
            prod_km_ix_by_edge_long, prod_km_ix_by_edge_bounds,
            sub_by_edge_long, sub_by_edge_bounds, prod_by_edge_long,
            prod_by_edge_bounds, ci_ix_long, ci_ix_bounds, allostery_ix_long,
@@ -2440,8 +2553,8 @@ unz_log_2d_functor__::operator()(const std::vector<std::vector<Eigen::Matrix<T0_
 template <typename T0__, typename T1__, typename T2__, typename T5__,
           typename T6__, typename T7__, typename T8__, typename T9__,
           typename T10__, typename T11__, typename T12__, typename T13__,
-          typename T14__, typename T15__, typename T16__,
-          stan::require_stan_scalar_t<T0__>*,
+          typename T14__, typename T15__, typename T16__, typename T17__,
+          typename T18__, stan::require_stan_scalar_t<T0__>*,
           stan::require_col_vector_t<T1__>*,
           stan::require_col_vector_t<T2__>*,
           stan::require_col_vector_t<T5__>*,
@@ -2454,8 +2567,10 @@ template <typename T0__, typename T1__, typename T2__, typename T5__,
           stan::require_col_vector_t<T12__>*,
           stan::require_col_vector_t<T13__>*,
           stan::require_col_vector_t<T14__>*,
-          stan::require_eigen_matrix_dynamic_t<T15__>*,
-          stan::require_col_vector_t<T16__>*>
+          stan::require_stan_scalar_t<T15__>*,
+          stan::require_stan_scalar_t<T16__>*,
+          stan::require_eigen_matrix_dynamic_t<T17__>*,
+          stan::require_col_vector_t<T18__>*>
 Eigen::Matrix<stan::promote_args_t<T0__, stan::value_type_t<T1__>,
                      stan::value_type_t<T2__>, stan::value_type_t<T5__>,
                      stan::value_type_t<T6__>,
@@ -2467,8 +2582,10 @@ Eigen::Matrix<stan::promote_args_t<T0__, stan::value_type_t<T1__>,
                                           stan::promote_args_t<stan::value_type_t<T12__>,
                                                                stan::value_type_t<T13__>,
                                                                stan::value_type_t<T14__>,
-                                                               stan::value_type_t<T15__>,
-                                                               stan::value_type_t<T16__>>>>, -1, 1>
+                                                               T15__, T16__,
+                                                               stan::promote_args_t<
+                                                               stan::value_type_t<T17__>,
+                                                               stan::value_type_t<T18__>>>>>, -1, 1>
 dbalanced_dt_odefunctor__::operator()(const T0__& time,
                                       const T1__& current_balanced,
                                       std::ostream* pstream__,
@@ -2481,11 +2598,14 @@ dbalanced_dt_odefunctor__::operator()(const T0__& time,
                                       const T11__& dc,
                                       const T12__& kcat_phos,
                                       const T13__& conc_phos,
-                                      const T14__& drain, const T15__& S,
-                                      const T16__& subunits,
+                                      const T14__& drain,
+                                      const T15__& temperature,
+                                      const T16__& drain_small_conc_corrector,
+                                      const T17__& S, const T18__& subunits,
                                       const std::vector<int>& edge_type,
                                       const std::vector<int>& edge_to_enzyme,
                                       const std::vector<int>& edge_to_drain,
+                                      const std::vector<int>& ci_mic_ix,
                                       const std::vector<int>& sub_km_ix_by_edge_long,
                                       const std::vector<std::vector<int>>& sub_km_ix_by_edge_bounds,
                                       const std::vector<int>& prod_km_ix_by_edge_long,
@@ -2508,8 +2628,9 @@ const
 {
   return dbalanced_dt(time, current_balanced, unbalanced, balanced_ix,
            unbalanced_ix, enzyme, dgr, kcat, km, ki, tc, dc, kcat_phos,
-           conc_phos, drain, S, subunits, edge_type, edge_to_enzyme,
-           edge_to_drain, sub_km_ix_by_edge_long, sub_km_ix_by_edge_bounds,
+           conc_phos, drain, temperature, drain_small_conc_corrector, S,
+           subunits, edge_type, edge_to_enzyme, edge_to_drain, ci_mic_ix,
+           sub_km_ix_by_edge_long, sub_km_ix_by_edge_bounds,
            prod_km_ix_by_edge_long, prod_km_ix_by_edge_bounds,
            sub_by_edge_long, sub_by_edge_bounds, prod_by_edge_long,
            prod_by_edge_bounds, ci_ix_long, ci_ix_bounds, allostery_ix_long,
@@ -2528,32 +2649,44 @@ const
   return unz_log_1d(mnsd, z, pstream__);
 }
 
-template <typename T0__, typename T1__, stan::require_col_vector_t<T0__>*,
-          stan::require_col_vector_t<T1__>*>
-Eigen::Matrix<stan::promote_args_t<stan::value_type_t<T0__>, stan::value_type_t<T1__>>, -1, 1>
+template <typename T0__, typename T1__, typename T6__,
+          stan::require_col_vector_t<T0__>*,
+          stan::require_col_vector_t<T1__>*,
+          stan::require_stan_scalar_t<T6__>*>
+Eigen::Matrix<stan::promote_args_t<stan::value_type_t<T0__>, stan::value_type_t<T1__>, T6__>, -1, 1>
 get_drain_by_edge_functor__::operator()(const T0__& drain, const T1__& conc,
                                         const std::vector<int>& edge_to_drain,
                                         const std::vector<int>& sub_by_edge_long,
                                         const std::vector<std::vector<int>>& sub_by_edge_bounds,
                                         const std::vector<int>& edge_type,
+                                        const T6__& drain_small_conc_corrector,
                                         std::ostream* pstream__)  const
 {
   return get_drain_by_edge(drain, conc, edge_to_drain, sub_by_edge_long,
-           sub_by_edge_bounds, edge_type, pstream__);
+           sub_by_edge_bounds, edge_type, drain_small_conc_corrector,
+           pstream__);
 }
 
-template <typename T0__, typename T1__, typename T3__,
+template <typename T0__, typename T1__, typename T2__, typename T4__,
+          typename T5__, typename T6__,
           stan::require_eigen_matrix_dynamic_t<T0__>*,
           stan::require_col_vector_t<T1__>*,
-          stan::require_col_vector_t<T3__>*>
+          stan::require_stan_scalar_t<T2__>*,
+          stan::require_col_vector_t<T4__>*,
+          stan::require_col_vector_t<T5__>*,
+          stan::require_stan_scalar_t<T6__>*>
 Eigen::Matrix<stan::promote_args_t<stan::value_type_t<T0__>, stan::value_type_t<T1__>,
-                     stan::value_type_t<T3__>>, -1, 1>
+                     T2__, stan::value_type_t<T4__>,
+                     stan::value_type_t<T5__>, stan::promote_args_t<T6__>>, -1, 1>
 get_keq_functor__::operator()(const T0__& S, const T1__& dgf,
+                              const T2__& temperature,
                               const std::vector<int>& mic_to_met,
-                              const T3__& water_stoichiometry,
+                              const T4__& water_stoichiometry,
+                              const T5__& trans_charge, const T6__& psi,
                               std::ostream* pstream__)  const
 {
-  return get_keq(S, dgf, mic_to_met, water_stoichiometry, pstream__);
+  return get_keq(S, dgf, temperature, mic_to_met, water_stoichiometry,
+           trans_charge, psi, pstream__);
 }
 
 template <typename T0__, typename T1__, stan::require_stan_scalar_t<T0__>*,
@@ -2593,6 +2726,7 @@ class out_of_sample_model_model final : public model_base_crtp<out_of_sample_mod
   Eigen::Matrix<double, -1, -1> S__;
   std::vector<int> balanced_mic_ix;
   std::vector<int> unbalanced_mic_ix;
+  std::vector<int> ci_mic_ix;
   std::vector<int> edge_type;
   std::vector<int> edge_to_enzyme;
   std::vector<int> edge_to_tc;
@@ -2622,16 +2756,19 @@ class out_of_sample_model_model final : public model_base_crtp<out_of_sample_mod
   std::vector<int> phosphorylation_knockout_long;
   std::vector<std::vector<int>> phosphorylation_knockout_bounds;
   Eigen::Matrix<double, -1, 1> subunits__;
+  Eigen::Matrix<double, -1, 1> temperature__;
   std::vector<Eigen::Matrix<double, -1, 1>> conc_init;
   double rel_tol;
   double abs_tol;
   int max_num_steps;
   int likelihood;
+  double drain_small_conc_corrector;
   double timepoint;
   double initial_time; 
   Eigen::Map<Eigen::Matrix<double, -1, -1>> S{nullptr, 0, 0};
   Eigen::Map<Eigen::Matrix<double, -1, 1>> water_stoichiometry{nullptr, 0};
   Eigen::Map<Eigen::Matrix<double, -1, 1>> subunits{nullptr, 0};
+  Eigen::Map<Eigen::Matrix<double, -1, 1>> temperature{nullptr, 0};
  
  public:
   ~out_of_sample_model_model() { }
@@ -3084,131 +3221,151 @@ class out_of_sample_model_model final : public model_base_crtp<out_of_sample_mod
       stan::math::check_less_or_equal(function__, "unbalanced_mic_ix",
                                          unbalanced_mic_ix, N_mic);
       current_statement__ = 97;
-      stan::math::validate_non_negative_index("edge_type", "N_edge", N_edge);
+      stan::math::validate_non_negative_index("ci_mic_ix",
+                                              "N_competitive_inhibition",
+                                              N_competitive_inhibition);
       current_statement__ = 98;
+      context__.validate_dims("data initialization","ci_mic_ix","int",
+           std::vector<size_t>{static_cast<size_t>(N_competitive_inhibition)});
+      ci_mic_ix = 
+        std::vector<int>(N_competitive_inhibition, 
+          std::numeric_limits<int>::min());
+      
+      
+      current_statement__ = 98;
+      ci_mic_ix = context__.vals_i("ci_mic_ix");
+      current_statement__ = 98;
+      stan::math::check_greater_or_equal(function__, "ci_mic_ix", ci_mic_ix,
+                                            1);
+      current_statement__ = 98;
+      stan::math::check_less_or_equal(function__, "ci_mic_ix", ci_mic_ix,
+                                         N_mic);
+      current_statement__ = 99;
+      stan::math::validate_non_negative_index("edge_type", "N_edge", N_edge);
+      current_statement__ = 100;
       context__.validate_dims("data initialization","edge_type","int",
            std::vector<size_t>{static_cast<size_t>(N_edge)});
       edge_type = std::vector<int>(N_edge, std::numeric_limits<int>::min());
       
       
-      current_statement__ = 98;
+      current_statement__ = 100;
       edge_type = context__.vals_i("edge_type");
-      current_statement__ = 98;
+      current_statement__ = 100;
       stan::math::check_greater_or_equal(function__, "edge_type", edge_type,
                                             1);
-      current_statement__ = 98;
+      current_statement__ = 100;
       stan::math::check_less_or_equal(function__, "edge_type", edge_type, 3);
-      current_statement__ = 99;
+      current_statement__ = 101;
       stan::math::validate_non_negative_index("edge_to_enzyme", "N_edge",
                                               N_edge);
-      current_statement__ = 100;
+      current_statement__ = 102;
       context__.validate_dims("data initialization","edge_to_enzyme","int",
            std::vector<size_t>{static_cast<size_t>(N_edge)});
       edge_to_enzyme = 
         std::vector<int>(N_edge, std::numeric_limits<int>::min());
       
       
-      current_statement__ = 100;
+      current_statement__ = 102;
       edge_to_enzyme = context__.vals_i("edge_to_enzyme");
-      current_statement__ = 100;
+      current_statement__ = 102;
       stan::math::check_greater_or_equal(function__, "edge_to_enzyme",
                                             edge_to_enzyme, 0);
-      current_statement__ = 100;
+      current_statement__ = 102;
       stan::math::check_less_or_equal(function__, "edge_to_enzyme",
                                          edge_to_enzyme, N_enzyme);
-      current_statement__ = 101;
+      current_statement__ = 103;
       stan::math::validate_non_negative_index("edge_to_tc", "N_edge", N_edge);
-      current_statement__ = 102;
+      current_statement__ = 104;
       context__.validate_dims("data initialization","edge_to_tc","int",
            std::vector<size_t>{static_cast<size_t>(N_edge)});
       edge_to_tc = std::vector<int>(N_edge, std::numeric_limits<int>::min());
       
       
-      current_statement__ = 102;
+      current_statement__ = 104;
       edge_to_tc = context__.vals_i("edge_to_tc");
-      current_statement__ = 102;
+      current_statement__ = 104;
       stan::math::check_greater_or_equal(function__, "edge_to_tc",
                                             edge_to_tc, 0);
-      current_statement__ = 102;
+      current_statement__ = 104;
       stan::math::check_less_or_equal(function__, "edge_to_tc", edge_to_tc,
                                          N_allostery);
-      current_statement__ = 103;
+      current_statement__ = 105;
       stan::math::validate_non_negative_index("edge_to_drain", "N_edge",
                                               N_edge);
-      current_statement__ = 104;
+      current_statement__ = 106;
       context__.validate_dims("data initialization","edge_to_drain","int",
            std::vector<size_t>{static_cast<size_t>(N_edge)});
       edge_to_drain = 
         std::vector<int>(N_edge, std::numeric_limits<int>::min());
       
       
-      current_statement__ = 104;
+      current_statement__ = 106;
       edge_to_drain = context__.vals_i("edge_to_drain");
-      current_statement__ = 104;
+      current_statement__ = 106;
       stan::math::check_greater_or_equal(function__, "edge_to_drain",
                                             edge_to_drain, 0);
-      current_statement__ = 104;
+      current_statement__ = 106;
       stan::math::check_less_or_equal(function__, "edge_to_drain",
                                          edge_to_drain, N_drain);
-      current_statement__ = 105;
+      current_statement__ = 107;
       stan::math::validate_non_negative_index("edge_to_reaction", "N_edge",
                                               N_edge);
-      current_statement__ = 106;
+      current_statement__ = 108;
       context__.validate_dims("data initialization","edge_to_reaction","int",
            std::vector<size_t>{static_cast<size_t>(N_edge)});
       edge_to_reaction = 
         std::vector<int>(N_edge, std::numeric_limits<int>::min());
       
       
-      current_statement__ = 106;
+      current_statement__ = 108;
       edge_to_reaction = context__.vals_i("edge_to_reaction");
-      current_statement__ = 106;
+      current_statement__ = 108;
       stan::math::check_greater_or_equal(function__, "edge_to_reaction",
                                             edge_to_reaction, 0);
-      current_statement__ = 106;
+      current_statement__ = 108;
       stan::math::check_less_or_equal(function__, "edge_to_reaction",
                                          edge_to_reaction, N_reaction);
-      current_statement__ = 107;
+      current_statement__ = 109;
       stan::math::validate_non_negative_index("allostery_type",
                                               "N_allostery", N_allostery);
-      current_statement__ = 108;
+      current_statement__ = 110;
       context__.validate_dims("data initialization","allostery_type","int",
            std::vector<size_t>{static_cast<size_t>(N_allostery)});
       allostery_type = 
         std::vector<int>(N_allostery, std::numeric_limits<int>::min());
       
       
-      current_statement__ = 108;
+      current_statement__ = 110;
       allostery_type = context__.vals_i("allostery_type");
-      current_statement__ = 108;
+      current_statement__ = 110;
       stan::math::check_greater_or_equal(function__, "allostery_type",
                                             allostery_type, 1);
-      current_statement__ = 108;
+      current_statement__ = 110;
       stan::math::check_less_or_equal(function__, "allostery_type",
                                          allostery_type, 2);
-      current_statement__ = 109;
+      current_statement__ = 111;
       stan::math::validate_non_negative_index("allostery_mic", "N_allostery",
                                               N_allostery);
-      current_statement__ = 110;
+      current_statement__ = 112;
       context__.validate_dims("data initialization","allostery_mic","int",
            std::vector<size_t>{static_cast<size_t>(N_allostery)});
       allostery_mic = 
         std::vector<int>(N_allostery, std::numeric_limits<int>::min());
       
       
-      current_statement__ = 110;
+      current_statement__ = 112;
       allostery_mic = context__.vals_i("allostery_mic");
-      current_statement__ = 110;
+      current_statement__ = 112;
       stan::math::check_greater_or_equal(function__, "allostery_mic",
                                             allostery_mic, 1);
-      current_statement__ = 110;
+      current_statement__ = 112;
       stan::math::check_less_or_equal(function__, "allostery_mic",
                                          allostery_mic, N_mic);
-      current_statement__ = 111;
+      current_statement__ = 113;
       stan::math::validate_non_negative_index("phosphorylation_type",
                                               "N_phosphorylation",
                                               N_phosphorylation);
-      current_statement__ = 112;
+      current_statement__ = 114;
       context__.validate_dims("data initialization","phosphorylation_type",
           "int",
            std::vector<size_t>{static_cast<size_t>(N_phosphorylation)});
@@ -3216,30 +3373,30 @@ class out_of_sample_model_model final : public model_base_crtp<out_of_sample_mod
         std::vector<int>(N_phosphorylation, std::numeric_limits<int>::min());
       
       
-      current_statement__ = 112;
+      current_statement__ = 114;
       phosphorylation_type = context__.vals_i("phosphorylation_type");
-      current_statement__ = 112;
+      current_statement__ = 114;
       stan::math::check_greater_or_equal(function__, "phosphorylation_type",
                                             phosphorylation_type, 1);
-      current_statement__ = 112;
+      current_statement__ = 114;
       stan::math::check_less_or_equal(function__, "phosphorylation_type",
                                          phosphorylation_type, 2);
-      current_statement__ = 113;
+      current_statement__ = 115;
       stan::math::validate_non_negative_index("sub_by_edge_long",
                                               "N_edge_sub", N_edge_sub);
-      current_statement__ = 114;
+      current_statement__ = 116;
       context__.validate_dims("data initialization","sub_by_edge_long","int",
            std::vector<size_t>{static_cast<size_t>(N_edge_sub)});
       sub_by_edge_long = 
         std::vector<int>(N_edge_sub, std::numeric_limits<int>::min());
       
       
-      current_statement__ = 114;
+      current_statement__ = 116;
       sub_by_edge_long = context__.vals_i("sub_by_edge_long");
-      current_statement__ = 115;
+      current_statement__ = 117;
       stan::math::validate_non_negative_index("sub_by_edge_bounds", "N_edge",
                                               N_edge);
-      current_statement__ = 116;
+      current_statement__ = 118;
       context__.validate_dims("data initialization","sub_by_edge_bounds",
           "int",
            std::vector<size_t>{static_cast<size_t>(N_edge),
@@ -3251,40 +3408,40 @@ class out_of_sample_model_model final : public model_base_crtp<out_of_sample_mod
       
       {
         std::vector<int> sub_by_edge_bounds_flat__;
-        current_statement__ = 116;
+        current_statement__ = 118;
         sub_by_edge_bounds_flat__ = context__.vals_i("sub_by_edge_bounds");
-        current_statement__ = 116;
+        current_statement__ = 118;
         pos__ = 1;
-        current_statement__ = 116;
+        current_statement__ = 118;
         for (int sym1__ = 1; sym1__ <= 2; ++sym1__) {
-          current_statement__ = 116;
+          current_statement__ = 118;
           for (int sym2__ = 1; sym2__ <= N_edge; ++sym2__) {
-            current_statement__ = 116;
+            current_statement__ = 118;
             stan::model::assign(sub_by_edge_bounds,
               sub_by_edge_bounds_flat__[(pos__ - 1)],
               "assigning variable sub_by_edge_bounds", stan::model::index_uni(sym2__),
                                                          stan::model::index_uni(sym1__));
-            current_statement__ = 116;
+            current_statement__ = 118;
             pos__ = (pos__ + 1);
           }
         }
       }
-      current_statement__ = 117;
+      current_statement__ = 119;
       stan::math::validate_non_negative_index("prod_by_edge_long",
                                               "N_edge_prod", N_edge_prod);
-      current_statement__ = 118;
+      current_statement__ = 120;
       context__.validate_dims("data initialization","prod_by_edge_long",
           "int", std::vector<size_t>{static_cast<size_t>(N_edge_prod)});
       prod_by_edge_long = 
         std::vector<int>(N_edge_prod, std::numeric_limits<int>::min());
       
       
-      current_statement__ = 118;
+      current_statement__ = 120;
       prod_by_edge_long = context__.vals_i("prod_by_edge_long");
-      current_statement__ = 119;
+      current_statement__ = 121;
       stan::math::validate_non_negative_index("prod_by_edge_bounds",
                                               "N_edge", N_edge);
-      current_statement__ = 120;
+      current_statement__ = 122;
       context__.validate_dims("data initialization","prod_by_edge_bounds",
           "int",
            std::vector<size_t>{static_cast<size_t>(N_edge),
@@ -3296,40 +3453,40 @@ class out_of_sample_model_model final : public model_base_crtp<out_of_sample_mod
       
       {
         std::vector<int> prod_by_edge_bounds_flat__;
-        current_statement__ = 120;
+        current_statement__ = 122;
         prod_by_edge_bounds_flat__ = context__.vals_i("prod_by_edge_bounds");
-        current_statement__ = 120;
+        current_statement__ = 122;
         pos__ = 1;
-        current_statement__ = 120;
+        current_statement__ = 122;
         for (int sym1__ = 1; sym1__ <= 2; ++sym1__) {
-          current_statement__ = 120;
+          current_statement__ = 122;
           for (int sym2__ = 1; sym2__ <= N_edge; ++sym2__) {
-            current_statement__ = 120;
+            current_statement__ = 122;
             stan::model::assign(prod_by_edge_bounds,
               prod_by_edge_bounds_flat__[(pos__ - 1)],
               "assigning variable prod_by_edge_bounds", stan::model::index_uni(sym2__),
                                                           stan::model::index_uni(sym1__));
-            current_statement__ = 120;
+            current_statement__ = 122;
             pos__ = (pos__ + 1);
           }
         }
       }
-      current_statement__ = 121;
+      current_statement__ = 123;
       stan::math::validate_non_negative_index("sub_km_ix_by_edge_long",
                                               "N_edge_sub", N_edge_sub);
-      current_statement__ = 122;
+      current_statement__ = 124;
       context__.validate_dims("data initialization","sub_km_ix_by_edge_long",
           "int", std::vector<size_t>{static_cast<size_t>(N_edge_sub)});
       sub_km_ix_by_edge_long = 
         std::vector<int>(N_edge_sub, std::numeric_limits<int>::min());
       
       
-      current_statement__ = 122;
+      current_statement__ = 124;
       sub_km_ix_by_edge_long = context__.vals_i("sub_km_ix_by_edge_long");
-      current_statement__ = 123;
+      current_statement__ = 125;
       stan::math::validate_non_negative_index("sub_km_ix_by_edge_bounds",
                                               "N_edge", N_edge);
-      current_statement__ = 124;
+      current_statement__ = 126;
       context__.validate_dims("data initialization",
           "sub_km_ix_by_edge_bounds","int",
            std::vector<size_t>{static_cast<size_t>(N_edge),
@@ -3341,28 +3498,28 @@ class out_of_sample_model_model final : public model_base_crtp<out_of_sample_mod
       
       {
         std::vector<int> sub_km_ix_by_edge_bounds_flat__;
-        current_statement__ = 124;
+        current_statement__ = 126;
         sub_km_ix_by_edge_bounds_flat__ = context__.vals_i("sub_km_ix_by_edge_bounds");
-        current_statement__ = 124;
+        current_statement__ = 126;
         pos__ = 1;
-        current_statement__ = 124;
+        current_statement__ = 126;
         for (int sym1__ = 1; sym1__ <= 2; ++sym1__) {
-          current_statement__ = 124;
+          current_statement__ = 126;
           for (int sym2__ = 1; sym2__ <= N_edge; ++sym2__) {
-            current_statement__ = 124;
+            current_statement__ = 126;
             stan::model::assign(sub_km_ix_by_edge_bounds,
               sub_km_ix_by_edge_bounds_flat__[(pos__ - 1)],
               "assigning variable sub_km_ix_by_edge_bounds", stan::model::index_uni(sym2__),
                                                                stan::model::index_uni(sym1__));
-            current_statement__ = 124;
+            current_statement__ = 126;
             pos__ = (pos__ + 1);
           }
         }
       }
-      current_statement__ = 125;
+      current_statement__ = 127;
       stan::math::validate_non_negative_index("prod_km_ix_by_edge_long",
                                               "N_edge_prod", N_edge_prod);
-      current_statement__ = 126;
+      current_statement__ = 128;
       context__.validate_dims("data initialization",
           "prod_km_ix_by_edge_long","int",
            std::vector<size_t>{static_cast<size_t>(N_edge_prod)});
@@ -3370,12 +3527,12 @@ class out_of_sample_model_model final : public model_base_crtp<out_of_sample_mod
         std::vector<int>(N_edge_prod, std::numeric_limits<int>::min());
       
       
-      current_statement__ = 126;
+      current_statement__ = 128;
       prod_km_ix_by_edge_long = context__.vals_i("prod_km_ix_by_edge_long");
-      current_statement__ = 127;
+      current_statement__ = 129;
       stan::math::validate_non_negative_index("prod_km_ix_by_edge_bounds",
                                               "N_edge", N_edge);
-      current_statement__ = 128;
+      current_statement__ = 130;
       context__.validate_dims("data initialization",
           "prod_km_ix_by_edge_bounds","int",
            std::vector<size_t>{static_cast<size_t>(N_edge),
@@ -3387,29 +3544,29 @@ class out_of_sample_model_model final : public model_base_crtp<out_of_sample_mod
       
       {
         std::vector<int> prod_km_ix_by_edge_bounds_flat__;
-        current_statement__ = 128;
+        current_statement__ = 130;
         prod_km_ix_by_edge_bounds_flat__ = context__.vals_i("prod_km_ix_by_edge_bounds");
-        current_statement__ = 128;
+        current_statement__ = 130;
         pos__ = 1;
-        current_statement__ = 128;
+        current_statement__ = 130;
         for (int sym1__ = 1; sym1__ <= 2; ++sym1__) {
-          current_statement__ = 128;
+          current_statement__ = 130;
           for (int sym2__ = 1; sym2__ <= N_edge; ++sym2__) {
-            current_statement__ = 128;
+            current_statement__ = 130;
             stan::model::assign(prod_km_ix_by_edge_bounds,
               prod_km_ix_by_edge_bounds_flat__[(pos__ - 1)],
               "assigning variable prod_km_ix_by_edge_bounds", stan::model::index_uni(sym2__),
                                                                 stan::model::index_uni(sym1__));
-            current_statement__ = 128;
+            current_statement__ = 130;
             pos__ = (pos__ + 1);
           }
         }
       }
-      current_statement__ = 129;
+      current_statement__ = 131;
       stan::math::validate_non_negative_index("ci_ix_long",
                                               "N_competitive_inhibition",
                                               N_competitive_inhibition);
-      current_statement__ = 130;
+      current_statement__ = 132;
       context__.validate_dims("data initialization","ci_ix_long","int",
            std::vector<size_t>{static_cast<size_t>(N_competitive_inhibition)});
       ci_ix_long = 
@@ -3417,12 +3574,12 @@ class out_of_sample_model_model final : public model_base_crtp<out_of_sample_mod
           std::numeric_limits<int>::min());
       
       
-      current_statement__ = 130;
+      current_statement__ = 132;
       ci_ix_long = context__.vals_i("ci_ix_long");
-      current_statement__ = 131;
+      current_statement__ = 133;
       stan::math::validate_non_negative_index("ci_ix_bounds", "N_edge",
                                               N_edge);
-      current_statement__ = 132;
+      current_statement__ = 134;
       context__.validate_dims("data initialization","ci_ix_bounds","int",
            std::vector<size_t>{static_cast<size_t>(N_edge),
             static_cast<size_t>(2)});
@@ -3433,40 +3590,40 @@ class out_of_sample_model_model final : public model_base_crtp<out_of_sample_mod
       
       {
         std::vector<int> ci_ix_bounds_flat__;
-        current_statement__ = 132;
+        current_statement__ = 134;
         ci_ix_bounds_flat__ = context__.vals_i("ci_ix_bounds");
-        current_statement__ = 132;
+        current_statement__ = 134;
         pos__ = 1;
-        current_statement__ = 132;
+        current_statement__ = 134;
         for (int sym1__ = 1; sym1__ <= 2; ++sym1__) {
-          current_statement__ = 132;
+          current_statement__ = 134;
           for (int sym2__ = 1; sym2__ <= N_edge; ++sym2__) {
-            current_statement__ = 132;
+            current_statement__ = 134;
             stan::model::assign(ci_ix_bounds,
               ci_ix_bounds_flat__[(pos__ - 1)],
               "assigning variable ci_ix_bounds", stan::model::index_uni(sym2__),
                                                    stan::model::index_uni(sym1__));
-            current_statement__ = 132;
+            current_statement__ = 134;
             pos__ = (pos__ + 1);
           }
         }
       }
-      current_statement__ = 133;
+      current_statement__ = 135;
       stan::math::validate_non_negative_index("allostery_ix_long",
                                               "N_allostery", N_allostery);
-      current_statement__ = 134;
+      current_statement__ = 136;
       context__.validate_dims("data initialization","allostery_ix_long",
           "int", std::vector<size_t>{static_cast<size_t>(N_allostery)});
       allostery_ix_long = 
         std::vector<int>(N_allostery, std::numeric_limits<int>::min());
       
       
-      current_statement__ = 134;
+      current_statement__ = 136;
       allostery_ix_long = context__.vals_i("allostery_ix_long");
-      current_statement__ = 135;
+      current_statement__ = 137;
       stan::math::validate_non_negative_index("allostery_ix_bounds",
                                               "N_edge", N_edge);
-      current_statement__ = 136;
+      current_statement__ = 138;
       context__.validate_dims("data initialization","allostery_ix_bounds",
           "int",
            std::vector<size_t>{static_cast<size_t>(N_edge),
@@ -3478,29 +3635,29 @@ class out_of_sample_model_model final : public model_base_crtp<out_of_sample_mod
       
       {
         std::vector<int> allostery_ix_bounds_flat__;
-        current_statement__ = 136;
+        current_statement__ = 138;
         allostery_ix_bounds_flat__ = context__.vals_i("allostery_ix_bounds");
-        current_statement__ = 136;
+        current_statement__ = 138;
         pos__ = 1;
-        current_statement__ = 136;
+        current_statement__ = 138;
         for (int sym1__ = 1; sym1__ <= 2; ++sym1__) {
-          current_statement__ = 136;
+          current_statement__ = 138;
           for (int sym2__ = 1; sym2__ <= N_edge; ++sym2__) {
-            current_statement__ = 136;
+            current_statement__ = 138;
             stan::model::assign(allostery_ix_bounds,
               allostery_ix_bounds_flat__[(pos__ - 1)],
               "assigning variable allostery_ix_bounds", stan::model::index_uni(sym2__),
                                                           stan::model::index_uni(sym1__));
-            current_statement__ = 136;
+            current_statement__ = 138;
             pos__ = (pos__ + 1);
           }
         }
       }
-      current_statement__ = 137;
+      current_statement__ = 139;
       stan::math::validate_non_negative_index("phosphorylation_ix_long",
                                               "N_phosphorylation",
                                               N_phosphorylation);
-      current_statement__ = 138;
+      current_statement__ = 140;
       context__.validate_dims("data initialization",
           "phosphorylation_ix_long","int",
            std::vector<size_t>{static_cast<size_t>(N_phosphorylation)});
@@ -3508,12 +3665,12 @@ class out_of_sample_model_model final : public model_base_crtp<out_of_sample_mod
         std::vector<int>(N_phosphorylation, std::numeric_limits<int>::min());
       
       
-      current_statement__ = 138;
+      current_statement__ = 140;
       phosphorylation_ix_long = context__.vals_i("phosphorylation_ix_long");
-      current_statement__ = 139;
+      current_statement__ = 141;
       stan::math::validate_non_negative_index("phosphorylation_ix_bounds",
                                               "N_edge", N_edge);
-      current_statement__ = 140;
+      current_statement__ = 142;
       context__.validate_dims("data initialization",
           "phosphorylation_ix_bounds","int",
            std::vector<size_t>{static_cast<size_t>(N_edge),
@@ -3525,44 +3682,44 @@ class out_of_sample_model_model final : public model_base_crtp<out_of_sample_mod
       
       {
         std::vector<int> phosphorylation_ix_bounds_flat__;
-        current_statement__ = 140;
+        current_statement__ = 142;
         phosphorylation_ix_bounds_flat__ = context__.vals_i("phosphorylation_ix_bounds");
-        current_statement__ = 140;
+        current_statement__ = 142;
         pos__ = 1;
-        current_statement__ = 140;
+        current_statement__ = 142;
         for (int sym1__ = 1; sym1__ <= 2; ++sym1__) {
-          current_statement__ = 140;
+          current_statement__ = 142;
           for (int sym2__ = 1; sym2__ <= N_edge; ++sym2__) {
-            current_statement__ = 140;
+            current_statement__ = 142;
             stan::model::assign(phosphorylation_ix_bounds,
               phosphorylation_ix_bounds_flat__[(pos__ - 1)],
               "assigning variable phosphorylation_ix_bounds", stan::model::index_uni(sym2__),
                                                                 stan::model::index_uni(sym1__));
-            current_statement__ = 140;
+            current_statement__ = 142;
             pos__ = (pos__ + 1);
           }
         }
       }
-      current_statement__ = 141;
+      current_statement__ = 143;
       stan::math::validate_non_negative_index("mic_to_met", "N_mic", N_mic);
-      current_statement__ = 142;
+      current_statement__ = 144;
       context__.validate_dims("data initialization","mic_to_met","int",
            std::vector<size_t>{static_cast<size_t>(N_mic)});
       mic_to_met = std::vector<int>(N_mic, std::numeric_limits<int>::min());
       
       
-      current_statement__ = 142;
+      current_statement__ = 144;
       mic_to_met = context__.vals_i("mic_to_met");
-      current_statement__ = 142;
+      current_statement__ = 144;
       stan::math::check_greater_or_equal(function__, "mic_to_met",
                                             mic_to_met, 1);
-      current_statement__ = 142;
+      current_statement__ = 144;
       stan::math::check_less_or_equal(function__, "mic_to_met", mic_to_met,
                                          N_metabolite);
-      current_statement__ = 143;
+      current_statement__ = 145;
       stan::math::validate_non_negative_index("water_stoichiometry",
                                               "N_edge", N_edge);
-      current_statement__ = 144;
+      current_statement__ = 146;
       context__.validate_dims("data initialization","water_stoichiometry",
           "double", std::vector<size_t>{static_cast<size_t>(N_edge)});
       water_stoichiometry__ = 
@@ -3573,25 +3730,25 @@ class out_of_sample_model_model final : public model_base_crtp<out_of_sample_mod
       
       {
         std::vector<local_scalar_t__> water_stoichiometry_flat__;
-        current_statement__ = 144;
+        current_statement__ = 146;
         water_stoichiometry_flat__ = context__.vals_r("water_stoichiometry");
-        current_statement__ = 144;
+        current_statement__ = 146;
         pos__ = 1;
-        current_statement__ = 144;
+        current_statement__ = 146;
         for (int sym1__ = 1; sym1__ <= N_edge; ++sym1__) {
-          current_statement__ = 144;
+          current_statement__ = 146;
           stan::model::assign(water_stoichiometry,
             water_stoichiometry_flat__[(pos__ - 1)],
             "assigning variable water_stoichiometry", stan::model::index_uni(sym1__));
-          current_statement__ = 144;
+          current_statement__ = 146;
           pos__ = (pos__ + 1);
         }
       }
-      current_statement__ = 145;
+      current_statement__ = 147;
       stan::math::validate_non_negative_index("enzyme_knockout_long",
                                               "N_enzyme_knockout",
                                               N_enzyme_knockout);
-      current_statement__ = 146;
+      current_statement__ = 148;
       context__.validate_dims("data initialization","enzyme_knockout_long",
           "int",
            std::vector<size_t>{static_cast<size_t>(N_enzyme_knockout)});
@@ -3599,18 +3756,18 @@ class out_of_sample_model_model final : public model_base_crtp<out_of_sample_mod
         std::vector<int>(N_enzyme_knockout, std::numeric_limits<int>::min());
       
       
-      current_statement__ = 146;
+      current_statement__ = 148;
       enzyme_knockout_long = context__.vals_i("enzyme_knockout_long");
-      current_statement__ = 146;
+      current_statement__ = 148;
       stan::math::check_greater_or_equal(function__, "enzyme_knockout_long",
                                             enzyme_knockout_long, 0);
-      current_statement__ = 146;
+      current_statement__ = 148;
       stan::math::check_less_or_equal(function__, "enzyme_knockout_long",
                                          enzyme_knockout_long, N_enzyme);
-      current_statement__ = 147;
+      current_statement__ = 149;
       stan::math::validate_non_negative_index("enzyme_knockout_bounds",
                                               "N_experiment", N_experiment);
-      current_statement__ = 148;
+      current_statement__ = 150;
       context__.validate_dims("data initialization","enzyme_knockout_bounds",
           "int",
            std::vector<size_t>{static_cast<size_t>(N_experiment),
@@ -3622,29 +3779,29 @@ class out_of_sample_model_model final : public model_base_crtp<out_of_sample_mod
       
       {
         std::vector<int> enzyme_knockout_bounds_flat__;
-        current_statement__ = 148;
+        current_statement__ = 150;
         enzyme_knockout_bounds_flat__ = context__.vals_i("enzyme_knockout_bounds");
-        current_statement__ = 148;
+        current_statement__ = 150;
         pos__ = 1;
-        current_statement__ = 148;
+        current_statement__ = 150;
         for (int sym1__ = 1; sym1__ <= 2; ++sym1__) {
-          current_statement__ = 148;
+          current_statement__ = 150;
           for (int sym2__ = 1; sym2__ <= N_experiment; ++sym2__) {
-            current_statement__ = 148;
+            current_statement__ = 150;
             stan::model::assign(enzyme_knockout_bounds,
               enzyme_knockout_bounds_flat__[(pos__ - 1)],
               "assigning variable enzyme_knockout_bounds", stan::model::index_uni(sym2__),
                                                              stan::model::index_uni(sym1__));
-            current_statement__ = 148;
+            current_statement__ = 150;
             pos__ = (pos__ + 1);
           }
         }
       }
-      current_statement__ = 149;
+      current_statement__ = 151;
       stan::math::validate_non_negative_index("phosphorylation_knockout_long",
                                               "N_phosphorylation_knockout",
                                               N_phosphorylation_knockout);
-      current_statement__ = 150;
+      current_statement__ = 152;
       context__.validate_dims("data initialization",
           "phosphorylation_knockout_long","int",
            std::vector<size_t>{
@@ -3654,19 +3811,19 @@ class out_of_sample_model_model final : public model_base_crtp<out_of_sample_mod
           std::numeric_limits<int>::min());
       
       
-      current_statement__ = 150;
+      current_statement__ = 152;
       phosphorylation_knockout_long = context__.vals_i("phosphorylation_knockout_long");
-      current_statement__ = 150;
+      current_statement__ = 152;
       stan::math::check_greater_or_equal(function__, "phosphorylation_knockout_long",
                                             phosphorylation_knockout_long, 0);
-      current_statement__ = 150;
+      current_statement__ = 152;
       stan::math::check_less_or_equal(function__, "phosphorylation_knockout_long",
                                          phosphorylation_knockout_long,
                                          N_phosphorylation);
-      current_statement__ = 151;
+      current_statement__ = 153;
       stan::math::validate_non_negative_index("phosphorylation_knockout_bounds",
                                               "N_experiment", N_experiment);
-      current_statement__ = 152;
+      current_statement__ = 154;
       context__.validate_dims("data initialization",
           "phosphorylation_knockout_bounds","int",
            std::vector<size_t>{static_cast<size_t>(N_experiment),
@@ -3678,28 +3835,28 @@ class out_of_sample_model_model final : public model_base_crtp<out_of_sample_mod
       
       {
         std::vector<int> phosphorylation_knockout_bounds_flat__;
-        current_statement__ = 152;
+        current_statement__ = 154;
         phosphorylation_knockout_bounds_flat__ = context__.vals_i("phosphorylation_knockout_bounds");
-        current_statement__ = 152;
+        current_statement__ = 154;
         pos__ = 1;
-        current_statement__ = 152;
+        current_statement__ = 154;
         for (int sym1__ = 1; sym1__ <= 2; ++sym1__) {
-          current_statement__ = 152;
+          current_statement__ = 154;
           for (int sym2__ = 1; sym2__ <= N_experiment; ++sym2__) {
-            current_statement__ = 152;
+            current_statement__ = 154;
             stan::model::assign(phosphorylation_knockout_bounds,
               phosphorylation_knockout_bounds_flat__[(pos__ - 1)],
               "assigning variable phosphorylation_knockout_bounds", stan::model::index_uni(sym2__),
                                                                     stan::model::index_uni(sym1__));
-            current_statement__ = 152;
+            current_statement__ = 154;
             pos__ = (pos__ + 1);
           }
         }
       }
-      current_statement__ = 153;
+      current_statement__ = 155;
       stan::math::validate_non_negative_index("subunits", "N_enzyme",
                                               N_enzyme);
-      current_statement__ = 154;
+      current_statement__ = 156;
       context__.validate_dims("data initialization","subunits","double",
            std::vector<size_t>{static_cast<size_t>(N_enzyme)});
       subunits__ = 
@@ -3710,27 +3867,54 @@ class out_of_sample_model_model final : public model_base_crtp<out_of_sample_mod
       
       {
         std::vector<local_scalar_t__> subunits_flat__;
-        current_statement__ = 154;
+        current_statement__ = 156;
         subunits_flat__ = context__.vals_r("subunits");
-        current_statement__ = 154;
+        current_statement__ = 156;
         pos__ = 1;
-        current_statement__ = 154;
+        current_statement__ = 156;
         for (int sym1__ = 1; sym1__ <= N_enzyme; ++sym1__) {
-          current_statement__ = 154;
+          current_statement__ = 156;
           stan::model::assign(subunits, subunits_flat__[(pos__ - 1)],
             "assigning variable subunits", stan::model::index_uni(sym1__));
-          current_statement__ = 154;
+          current_statement__ = 156;
           pos__ = (pos__ + 1);
         }
       }
-      current_statement__ = 154;
+      current_statement__ = 156;
       stan::math::check_greater_or_equal(function__, "subunits", subunits, 1);
-      current_statement__ = 155;
+      current_statement__ = 157;
+      stan::math::validate_non_negative_index("temperature", "N_experiment",
+                                              N_experiment);
+      current_statement__ = 158;
+      context__.validate_dims("data initialization","temperature","double",
+           std::vector<size_t>{static_cast<size_t>(N_experiment)});
+      temperature__ = 
+        Eigen::Matrix<double, -1, 1>::Constant(N_experiment,
+          std::numeric_limits<double>::quiet_NaN());
+      new (&temperature) Eigen::Map<Eigen::Matrix<double, -1, 1>>(temperature__.data(), N_experiment);
+        
+      
+      {
+        std::vector<local_scalar_t__> temperature_flat__;
+        current_statement__ = 158;
+        temperature_flat__ = context__.vals_r("temperature");
+        current_statement__ = 158;
+        pos__ = 1;
+        current_statement__ = 158;
+        for (int sym1__ = 1; sym1__ <= N_experiment; ++sym1__) {
+          current_statement__ = 158;
+          stan::model::assign(temperature, temperature_flat__[(pos__ - 1)],
+            "assigning variable temperature", stan::model::index_uni(sym1__));
+          current_statement__ = 158;
+          pos__ = (pos__ + 1);
+        }
+      }
+      current_statement__ = 159;
       stan::math::validate_non_negative_index("conc_init", "N_experiment",
                                               N_experiment);
-      current_statement__ = 156;
+      current_statement__ = 160;
       stan::math::validate_non_negative_index("conc_init", "N_mic", N_mic);
-      current_statement__ = 157;
+      current_statement__ = 161;
       context__.validate_dims("data initialization","conc_init","double",
            std::vector<size_t>{static_cast<size_t>(N_experiment),
             static_cast<size_t>(N_mic)});
@@ -3742,169 +3926,181 @@ class out_of_sample_model_model final : public model_base_crtp<out_of_sample_mod
       
       {
         std::vector<local_scalar_t__> conc_init_flat__;
-        current_statement__ = 157;
+        current_statement__ = 161;
         conc_init_flat__ = context__.vals_r("conc_init");
-        current_statement__ = 157;
+        current_statement__ = 161;
         pos__ = 1;
-        current_statement__ = 157;
+        current_statement__ = 161;
         for (int sym1__ = 1; sym1__ <= N_mic; ++sym1__) {
-          current_statement__ = 157;
+          current_statement__ = 161;
           for (int sym2__ = 1; sym2__ <= N_experiment; ++sym2__) {
-            current_statement__ = 157;
+            current_statement__ = 161;
             stan::model::assign(conc_init, conc_init_flat__[(pos__ - 1)],
               "assigning variable conc_init", stan::model::index_uni(sym2__),
                                                 stan::model::index_uni(sym1__));
-            current_statement__ = 157;
+            current_statement__ = 161;
             pos__ = (pos__ + 1);
           }
         }
       }
-      current_statement__ = 157;
+      current_statement__ = 161;
       stan::math::check_greater_or_equal(function__, "conc_init", conc_init,
                                             0);
-      current_statement__ = 158;
+      current_statement__ = 162;
       context__.validate_dims("data initialization","rel_tol","double",
            std::vector<size_t>{});
       rel_tol = std::numeric_limits<double>::quiet_NaN();
       
       
-      current_statement__ = 158;
+      current_statement__ = 162;
       rel_tol = context__.vals_r("rel_tol")[(1 - 1)];
-      current_statement__ = 159;
+      current_statement__ = 163;
       context__.validate_dims("data initialization","abs_tol","double",
            std::vector<size_t>{});
       abs_tol = std::numeric_limits<double>::quiet_NaN();
       
       
-      current_statement__ = 159;
+      current_statement__ = 163;
       abs_tol = context__.vals_r("abs_tol")[(1 - 1)];
-      current_statement__ = 160;
+      current_statement__ = 164;
       context__.validate_dims("data initialization","max_num_steps","int",
            std::vector<size_t>{});
       max_num_steps = std::numeric_limits<int>::min();
       
       
-      current_statement__ = 160;
+      current_statement__ = 164;
       max_num_steps = context__.vals_i("max_num_steps")[(1 - 1)];
-      current_statement__ = 161;
+      current_statement__ = 165;
       context__.validate_dims("data initialization","likelihood","int",
            std::vector<size_t>{});
       likelihood = std::numeric_limits<int>::min();
       
       
-      current_statement__ = 161;
+      current_statement__ = 165;
       likelihood = context__.vals_i("likelihood")[(1 - 1)];
-      current_statement__ = 161;
+      current_statement__ = 165;
       stan::math::check_greater_or_equal(function__, "likelihood",
                                             likelihood, 0);
-      current_statement__ = 161;
+      current_statement__ = 165;
       stan::math::check_less_or_equal(function__, "likelihood", likelihood, 1);
-      current_statement__ = 162;
+      current_statement__ = 166;
+      context__.validate_dims("data initialization",
+          "drain_small_conc_corrector","double", std::vector<size_t>{});
+      drain_small_conc_corrector = std::numeric_limits<double>::quiet_NaN();
+      
+      
+      current_statement__ = 166;
+      drain_small_conc_corrector = context__.vals_r("drain_small_conc_corrector")[
+          (1 - 1)];
+      current_statement__ = 167;
       context__.validate_dims("data initialization","timepoint","double",
            std::vector<size_t>{});
       timepoint = std::numeric_limits<double>::quiet_NaN();
       
       
-      current_statement__ = 162;
+      current_statement__ = 167;
       timepoint = context__.vals_r("timepoint")[(1 - 1)];
-      current_statement__ = 162;
+      current_statement__ = 167;
       stan::math::check_greater_or_equal(function__, "timepoint", timepoint,
                                             0);
-      current_statement__ = 163;
+      current_statement__ = 168;
       initial_time = std::numeric_limits<double>::quiet_NaN();
       
       
-      current_statement__ = 163;
+      current_statement__ = 168;
       initial_time = 0;
-      current_statement__ = 164;
+      current_statement__ = 169;
       stan::math::validate_non_negative_index("km", "N_km", N_km);
-      current_statement__ = 165;
+      current_statement__ = 170;
       stan::math::validate_non_negative_index("ki",
                                               "N_competitive_inhibition",
                                               N_competitive_inhibition);
-      current_statement__ = 166;
+      current_statement__ = 171;
       stan::math::validate_non_negative_index("kcat", "N_enzyme", N_enzyme);
-      current_statement__ = 167;
+      current_statement__ = 172;
       stan::math::validate_non_negative_index("dissociation_constant",
                                               "N_allostery", N_allostery);
-      current_statement__ = 168;
+      current_statement__ = 173;
       stan::math::validate_non_negative_index("transfer_constant",
                                               "N_allosteric_enzyme",
                                               N_allosteric_enzyme);
-      current_statement__ = 169;
+      current_statement__ = 174;
       stan::math::validate_non_negative_index("kcat_phos",
                                               "N_phosphorylation",
                                               N_phosphorylation);
-      current_statement__ = 170;
-      stan::math::validate_non_negative_index("dgrs", "N_edge", N_edge);
-      current_statement__ = 171;
-      stan::math::validate_non_negative_index("conc", "N_experiment",
-                                              N_experiment);
-      current_statement__ = 172;
-      stan::math::validate_non_negative_index("conc", "N_mic", N_mic);
-      current_statement__ = 173;
-      stan::math::validate_non_negative_index("flux", "N_experiment",
-                                              N_experiment);
-      current_statement__ = 174;
-      stan::math::validate_non_negative_index("flux", "N_reaction",
-                                              N_reaction);
       current_statement__ = 175;
-      stan::math::validate_non_negative_index("conc_phos", "N_experiment",
+      stan::math::validate_non_negative_index("dgrs", "N_experiment",
                                               N_experiment);
       current_statement__ = 176;
+      stan::math::validate_non_negative_index("dgrs", "N_edge", N_edge);
+      current_statement__ = 177;
+      stan::math::validate_non_negative_index("conc", "N_experiment",
+                                              N_experiment);
+      current_statement__ = 178;
+      stan::math::validate_non_negative_index("conc", "N_mic", N_mic);
+      current_statement__ = 179;
+      stan::math::validate_non_negative_index("flux", "N_experiment",
+                                              N_experiment);
+      current_statement__ = 180;
+      stan::math::validate_non_negative_index("flux", "N_reaction",
+                                              N_reaction);
+      current_statement__ = 181;
+      stan::math::validate_non_negative_index("conc_phos", "N_experiment",
+                                              N_experiment);
+      current_statement__ = 182;
       stan::math::validate_non_negative_index("conc_phos",
                                               "N_phosphorylation",
                                               N_phosphorylation);
-      current_statement__ = 177;
-      stan::math::validate_non_negative_index("conc_unbalanced",
-                                              "N_experiment", N_experiment);
-      current_statement__ = 178;
-      stan::math::validate_non_negative_index("conc_unbalanced",
-                                              "N_unbalanced", N_unbalanced);
-      current_statement__ = 179;
-      stan::math::validate_non_negative_index("conc_enzyme", "N_experiment",
-                                              N_experiment);
-      current_statement__ = 180;
-      stan::math::validate_non_negative_index("conc_enzyme", "N_enzyme",
-                                              N_enzyme);
-      current_statement__ = 181;
-      stan::math::validate_non_negative_index("drain", "N_experiment",
-                                              N_experiment);
-      current_statement__ = 182;
-      stan::math::validate_non_negative_index("drain", "N_drain", N_drain);
       current_statement__ = 183;
-      stan::math::validate_non_negative_index("free_enzyme_ratio",
+      stan::math::validate_non_negative_index("conc_unbalanced",
                                               "N_experiment", N_experiment);
       current_statement__ = 184;
-      stan::math::validate_non_negative_index("free_enzyme_ratio", "N_edge",
-                                              N_edge);
+      stan::math::validate_non_negative_index("conc_unbalanced",
+                                              "N_unbalanced", N_unbalanced);
       current_statement__ = 185;
-      stan::math::validate_non_negative_index("saturation", "N_experiment",
+      stan::math::validate_non_negative_index("conc_enzyme", "N_experiment",
                                               N_experiment);
       current_statement__ = 186;
-      stan::math::validate_non_negative_index("saturation", "N_edge", N_edge);
+      stan::math::validate_non_negative_index("conc_enzyme", "N_enzyme",
+                                              N_enzyme);
       current_statement__ = 187;
-      stan::math::validate_non_negative_index("allostery", "N_experiment",
+      stan::math::validate_non_negative_index("drain", "N_experiment",
                                               N_experiment);
       current_statement__ = 188;
-      stan::math::validate_non_negative_index("allostery", "N_edge", N_edge);
+      stan::math::validate_non_negative_index("drain", "N_drain", N_drain);
       current_statement__ = 189;
-      stan::math::validate_non_negative_index("phosphorylation",
+      stan::math::validate_non_negative_index("free_enzyme_ratio",
                                               "N_experiment", N_experiment);
       current_statement__ = 190;
-      stan::math::validate_non_negative_index("phosphorylation", "N_edge",
+      stan::math::validate_non_negative_index("free_enzyme_ratio", "N_edge",
                                               N_edge);
       current_statement__ = 191;
+      stan::math::validate_non_negative_index("saturation", "N_experiment",
+                                              N_experiment);
+      current_statement__ = 192;
+      stan::math::validate_non_negative_index("saturation", "N_edge", N_edge);
+      current_statement__ = 193;
+      stan::math::validate_non_negative_index("allostery", "N_experiment",
+                                              N_experiment);
+      current_statement__ = 194;
+      stan::math::validate_non_negative_index("allostery", "N_edge", N_edge);
+      current_statement__ = 195;
+      stan::math::validate_non_negative_index("phosphorylation",
+                                              "N_experiment", N_experiment);
+      current_statement__ = 196;
+      stan::math::validate_non_negative_index("phosphorylation", "N_edge",
+                                              N_edge);
+      current_statement__ = 197;
       stan::math::validate_non_negative_index("reversibility",
                                               "N_experiment", N_experiment);
-      current_statement__ = 192;
+      current_statement__ = 198;
       stan::math::validate_non_negative_index("reversibility", "N_edge",
                                               N_edge);
     } catch (const std::exception& e) {
       stan::lang::rethrow_located(e, locations_array__[current_statement__]);
     }
     num_params_r__ = N_km + N_competitive_inhibition + N_enzyme + N_allostery
-       + N_allosteric_enzyme + N_phosphorylation + N_edge;
+       + N_allosteric_enzyme + N_phosphorylation + (N_experiment * N_edge);
     
   }
   
@@ -3962,12 +4158,14 @@ class out_of_sample_model_model final : public model_base_crtp<out_of_sample_mod
       current_statement__ = 6;
       kcat_phos = in__.template read<Eigen::Matrix<local_scalar_t__, -1, 1>>(
                     N_phosphorylation);
-      Eigen::Matrix<local_scalar_t__, -1, 1> dgrs =
-         Eigen::Matrix<local_scalar_t__, -1, 1>::Constant(N_edge,
-           DUMMY_VAR__);
+      std::vector<Eigen::Matrix<local_scalar_t__, -1, 1>> dgrs =
+         std::vector<Eigen::Matrix<local_scalar_t__, -1, 1>>(N_experiment, 
+           Eigen::Matrix<local_scalar_t__, -1, 1>::Constant(N_edge,
+             DUMMY_VAR__));
       current_statement__ = 7;
-      dgrs = in__.template read<Eigen::Matrix<local_scalar_t__, -1, 1>>(
-               N_edge);
+      dgrs = in__.template read<
+               std::vector<Eigen::Matrix<local_scalar_t__, -1, 1>>>(
+               N_experiment, N_edge);
     } catch (const std::exception& e) {
       stan::lang::rethrow_located(e, locations_array__[current_statement__]);
     }
@@ -4037,19 +4235,25 @@ class out_of_sample_model_model final : public model_base_crtp<out_of_sample_mod
       current_statement__ = 6;
       kcat_phos = in__.template read<Eigen::Matrix<local_scalar_t__, -1, 1>>(
                     N_phosphorylation);
-      Eigen::Matrix<double, -1, 1> dgrs =
-         Eigen::Matrix<double, -1, 1>::Constant(N_edge,
-           std::numeric_limits<double>::quiet_NaN());
+      std::vector<Eigen::Matrix<double, -1, 1>> dgrs =
+         std::vector<Eigen::Matrix<double, -1, 1>>(N_experiment, 
+           Eigen::Matrix<double, -1, 1>::Constant(N_edge,
+             std::numeric_limits<double>::quiet_NaN()));
       current_statement__ = 7;
-      dgrs = in__.template read<Eigen::Matrix<local_scalar_t__, -1, 1>>(
-               N_edge);
+      dgrs = in__.template read<
+               std::vector<Eigen::Matrix<local_scalar_t__, -1, 1>>>(
+               N_experiment, N_edge);
       out__.write(km);
       out__.write(ki);
       out__.write(kcat);
       out__.write(dissociation_constant);
       out__.write(transfer_constant);
       out__.write(kcat_phos);
-      out__.write(dgrs);
+      for (int sym1__ = 1; sym1__ <= N_edge; ++sym1__) {
+        for (int sym2__ = 1; sym2__ <= N_experiment; ++sym2__) {
+          out__.write(dgrs[(sym2__ - 1)][(sym1__ - 1)]);
+        }
+      }
       if (stan::math::logical_negation((stan::math::primitive_value(
             emit_transformed_parameters__) || stan::math::primitive_value(
             emit_generated_quantities__)))) {
@@ -4241,10 +4445,14 @@ class out_of_sample_model_model final : public model_base_crtp<out_of_sample_mod
             pstream__,
             stan::model::rvalue(conc_unbalanced, "conc_unbalanced",
               stan::model::index_uni(e)), balanced_mic_ix, unbalanced_mic_ix,
-            conc_enzyme_experiment, dgrs, kcat, km, ki, transfer_constant,
-            dissociation_constant, kcat_phos, conc_phos_experiment,
+            conc_enzyme_experiment,
+            stan::model::rvalue(dgrs, "dgrs", stan::model::index_uni(e)),
+            kcat, km, ki, transfer_constant, dissociation_constant,
+            kcat_phos, conc_phos_experiment,
             stan::model::rvalue(drain, "drain", stan::model::index_uni(e)),
-            S, subunits, edge_type, edge_to_enzyme, edge_to_drain,
+            stan::model::rvalue(temperature, "temperature",
+              stan::model::index_uni(e)), drain_small_conc_corrector, S,
+            subunits, edge_type, edge_to_enzyme, edge_to_drain, ci_mic_ix,
             sub_km_ix_by_edge_long, sub_km_ix_by_edge_bounds,
             prod_km_ix_by_edge_long, prod_km_ix_by_edge_bounds,
             sub_by_edge_long, sub_by_edge_bounds, prod_by_edge_long,
@@ -4273,10 +4481,14 @@ class out_of_sample_model_model final : public model_base_crtp<out_of_sample_mod
         stan::model::assign(edge_flux,
           get_edge_flux(
             stan::model::rvalue(conc, "conc", stan::model::index_uni(e)),
-            conc_enzyme_experiment, dgrs, kcat, km, ki, transfer_constant,
-            dissociation_constant, kcat_phos, conc_phos_experiment,
+            conc_enzyme_experiment,
+            stan::model::rvalue(dgrs, "dgrs", stan::model::index_uni(e)),
+            kcat, km, ki, transfer_constant, dissociation_constant,
+            kcat_phos, conc_phos_experiment,
             stan::model::rvalue(drain, "drain", stan::model::index_uni(e)),
-            S, subunits, edge_type, edge_to_enzyme, edge_to_drain,
+            stan::model::rvalue(temperature, "temperature",
+              stan::model::index_uni(e)), drain_small_conc_corrector, S,
+            subunits, edge_type, edge_to_enzyme, edge_to_drain, ci_mic_ix,
             sub_km_ix_by_edge_long, sub_km_ix_by_edge_bounds,
             prod_km_ix_by_edge_long, prod_km_ix_by_edge_bounds,
             sub_by_edge_long, sub_by_edge_bounds, prod_by_edge_long,
@@ -4308,7 +4520,7 @@ class out_of_sample_model_model final : public model_base_crtp<out_of_sample_mod
         stan::model::assign(free_enzyme_ratio,
           get_free_enzyme_ratio(
             stan::model::rvalue(conc, "conc", stan::model::index_uni(e)), S,
-            km, ki, edge_type, sub_km_ix_by_edge_long,
+            km, ki, edge_type, ci_mic_ix, sub_km_ix_by_edge_long,
             sub_km_ix_by_edge_bounds, prod_km_ix_by_edge_long,
             prod_km_ix_by_edge_bounds, sub_by_edge_long, sub_by_edge_bounds,
             prod_by_edge_long, prod_by_edge_bounds, ci_ix_long,
@@ -4343,7 +4555,10 @@ class out_of_sample_model_model final : public model_base_crtp<out_of_sample_mod
           "assigning variable phosphorylation", stan::model::index_uni(e));
         current_statement__ = 58;
         stan::model::assign(reversibility,
-          get_reversibility(dgrs, S,
+          get_reversibility(
+            stan::model::rvalue(dgrs, "dgrs", stan::model::index_uni(e)),
+            stan::model::rvalue(temperature, "temperature",
+              stan::model::index_uni(e)), S,
             stan::model::rvalue(conc, "conc", stan::model::index_uni(e)),
             edge_type, pstream__),
           "assigning variable reversibility", stan::model::index_uni(e));
@@ -4473,12 +4688,16 @@ class out_of_sample_model_model final : public model_base_crtp<out_of_sample_mod
           "assigning variable kcat_phos", stan::model::index_uni(sym1__));
       }
       out__.write(kcat_phos);
-      Eigen::Matrix<local_scalar_t__, -1, 1> dgrs =
-         Eigen::Matrix<local_scalar_t__, -1, 1>::Constant(N_edge,
-           DUMMY_VAR__);
+      std::vector<Eigen::Matrix<local_scalar_t__, -1, 1>> dgrs =
+         std::vector<Eigen::Matrix<local_scalar_t__, -1, 1>>(N_experiment, 
+           Eigen::Matrix<local_scalar_t__, -1, 1>::Constant(N_edge,
+             DUMMY_VAR__));
       for (int sym1__ = 1; sym1__ <= N_edge; ++sym1__) {
-        stan::model::assign(dgrs, in__.read<local_scalar_t__>(),
-          "assigning variable dgrs", stan::model::index_uni(sym1__));
+        for (int sym2__ = 1; sym2__ <= N_experiment; ++sym2__) {
+          stan::model::assign(dgrs, in__.read<local_scalar_t__>(),
+            "assigning variable dgrs", stan::model::index_uni(sym2__),
+                                         stan::model::index_uni(sym1__));
+        }
       }
       out__.write(dgrs);
     } catch (const std::exception& e) {
@@ -4506,7 +4725,8 @@ class out_of_sample_model_model final : public model_base_crtp<out_of_sample_mod
       std::vector<size_t>{static_cast<size_t>(N_allostery)},
       std::vector<size_t>{static_cast<size_t>(N_allosteric_enzyme)},
       std::vector<size_t>{static_cast<size_t>(N_phosphorylation)},
-      std::vector<size_t>{static_cast<size_t>(N_edge)},
+      std::vector<size_t>{static_cast<size_t>(N_experiment),
+                          static_cast<size_t>(N_edge)},
       std::vector<size_t>{static_cast<size_t>(N_experiment),
                           static_cast<size_t>(N_mic)},
       std::vector<size_t>{static_cast<size_t>(N_experiment),
@@ -4570,7 +4790,11 @@ class out_of_sample_model_model final : public model_base_crtp<out_of_sample_mod
     }
     for (int sym1__ = 1; sym1__ <= N_edge; ++sym1__) {
       {
-        param_names__.emplace_back(std::string() + "dgrs" + '.' + std::to_string(sym1__));
+        for (int sym2__ = 1; sym2__ <= N_experiment; ++sym2__) {
+          {
+            param_names__.emplace_back(std::string() + "dgrs" + '.' + std::to_string(sym2__) + '.' + std::to_string(sym1__));
+          } 
+        }
       } 
     }
     if (emit_transformed_parameters__) {
@@ -4719,7 +4943,11 @@ class out_of_sample_model_model final : public model_base_crtp<out_of_sample_mod
     }
     for (int sym1__ = 1; sym1__ <= N_edge; ++sym1__) {
       {
-        param_names__.emplace_back(std::string() + "dgrs" + '.' + std::to_string(sym1__));
+        for (int sym2__ = 1; sym2__ <= N_experiment; ++sym2__) {
+          {
+            param_names__.emplace_back(std::string() + "dgrs" + '.' + std::to_string(sym2__) + '.' + std::to_string(sym1__));
+          } 
+        }
       } 
     }
     if (emit_transformed_parameters__) {
@@ -4832,13 +5060,13 @@ class out_of_sample_model_model final : public model_base_crtp<out_of_sample_mod
     
   inline std::string get_constrained_sizedtypes() const {
     
-    return std::string("[{\"name\":\"km\",\"type\":{\"name\":\"vector\",\"length\":" + std::to_string(N_km) + "},\"block\":\"parameters\"},{\"name\":\"ki\",\"type\":{\"name\":\"vector\",\"length\":" + std::to_string(N_competitive_inhibition) + "},\"block\":\"parameters\"},{\"name\":\"kcat\",\"type\":{\"name\":\"vector\",\"length\":" + std::to_string(N_enzyme) + "},\"block\":\"parameters\"},{\"name\":\"dissociation_constant\",\"type\":{\"name\":\"vector\",\"length\":" + std::to_string(N_allostery) + "},\"block\":\"parameters\"},{\"name\":\"transfer_constant\",\"type\":{\"name\":\"vector\",\"length\":" + std::to_string(N_allosteric_enzyme) + "},\"block\":\"parameters\"},{\"name\":\"kcat_phos\",\"type\":{\"name\":\"vector\",\"length\":" + std::to_string(N_phosphorylation) + "},\"block\":\"parameters\"},{\"name\":\"dgrs\",\"type\":{\"name\":\"vector\",\"length\":" + std::to_string(N_edge) + "},\"block\":\"parameters\"},{\"name\":\"conc\",\"type\":{\"name\":\"array\",\"length\":" + std::to_string(N_experiment) + ",\"element_type\":{\"name\":\"vector\",\"length\":" + std::to_string(N_mic) + "}},\"block\":\"generated_quantities\"},{\"name\":\"flux\",\"type\":{\"name\":\"array\",\"length\":" + std::to_string(N_experiment) + ",\"element_type\":{\"name\":\"vector\",\"length\":" + std::to_string(N_reaction) + "}},\"block\":\"generated_quantities\"},{\"name\":\"conc_phos\",\"type\":{\"name\":\"array\",\"length\":" + std::to_string(N_experiment) + ",\"element_type\":{\"name\":\"vector\",\"length\":" + std::to_string(N_phosphorylation) + "}},\"block\":\"generated_quantities\"},{\"name\":\"conc_unbalanced\",\"type\":{\"name\":\"array\",\"length\":" + std::to_string(N_experiment) + ",\"element_type\":{\"name\":\"vector\",\"length\":" + std::to_string(N_unbalanced) + "}},\"block\":\"generated_quantities\"},{\"name\":\"conc_enzyme\",\"type\":{\"name\":\"array\",\"length\":" + std::to_string(N_experiment) + ",\"element_type\":{\"name\":\"vector\",\"length\":" + std::to_string(N_enzyme) + "}},\"block\":\"generated_quantities\"},{\"name\":\"drain\",\"type\":{\"name\":\"array\",\"length\":" + std::to_string(N_experiment) + ",\"element_type\":{\"name\":\"vector\",\"length\":" + std::to_string(N_drain) + "}},\"block\":\"generated_quantities\"},{\"name\":\"free_enzyme_ratio\",\"type\":{\"name\":\"array\",\"length\":" + std::to_string(N_experiment) + ",\"element_type\":{\"name\":\"vector\",\"length\":" + std::to_string(N_edge) + "}},\"block\":\"generated_quantities\"},{\"name\":\"saturation\",\"type\":{\"name\":\"array\",\"length\":" + std::to_string(N_experiment) + ",\"element_type\":{\"name\":\"vector\",\"length\":" + std::to_string(N_edge) + "}},\"block\":\"generated_quantities\"},{\"name\":\"allostery\",\"type\":{\"name\":\"array\",\"length\":" + std::to_string(N_experiment) + ",\"element_type\":{\"name\":\"vector\",\"length\":" + std::to_string(N_edge) + "}},\"block\":\"generated_quantities\"},{\"name\":\"phosphorylation\",\"type\":{\"name\":\"array\",\"length\":" + std::to_string(N_experiment) + ",\"element_type\":{\"name\":\"vector\",\"length\":" + std::to_string(N_edge) + "}},\"block\":\"generated_quantities\"},{\"name\":\"reversibility\",\"type\":{\"name\":\"array\",\"length\":" + std::to_string(N_experiment) + ",\"element_type\":{\"name\":\"vector\",\"length\":" + std::to_string(N_edge) + "}},\"block\":\"generated_quantities\"}]");
+    return std::string("[{\"name\":\"km\",\"type\":{\"name\":\"vector\",\"length\":" + std::to_string(N_km) + "},\"block\":\"parameters\"},{\"name\":\"ki\",\"type\":{\"name\":\"vector\",\"length\":" + std::to_string(N_competitive_inhibition) + "},\"block\":\"parameters\"},{\"name\":\"kcat\",\"type\":{\"name\":\"vector\",\"length\":" + std::to_string(N_enzyme) + "},\"block\":\"parameters\"},{\"name\":\"dissociation_constant\",\"type\":{\"name\":\"vector\",\"length\":" + std::to_string(N_allostery) + "},\"block\":\"parameters\"},{\"name\":\"transfer_constant\",\"type\":{\"name\":\"vector\",\"length\":" + std::to_string(N_allosteric_enzyme) + "},\"block\":\"parameters\"},{\"name\":\"kcat_phos\",\"type\":{\"name\":\"vector\",\"length\":" + std::to_string(N_phosphorylation) + "},\"block\":\"parameters\"},{\"name\":\"dgrs\",\"type\":{\"name\":\"array\",\"length\":" + std::to_string(N_experiment) + ",\"element_type\":{\"name\":\"vector\",\"length\":" + std::to_string(N_edge) + "}},\"block\":\"parameters\"},{\"name\":\"conc\",\"type\":{\"name\":\"array\",\"length\":" + std::to_string(N_experiment) + ",\"element_type\":{\"name\":\"vector\",\"length\":" + std::to_string(N_mic) + "}},\"block\":\"generated_quantities\"},{\"name\":\"flux\",\"type\":{\"name\":\"array\",\"length\":" + std::to_string(N_experiment) + ",\"element_type\":{\"name\":\"vector\",\"length\":" + std::to_string(N_reaction) + "}},\"block\":\"generated_quantities\"},{\"name\":\"conc_phos\",\"type\":{\"name\":\"array\",\"length\":" + std::to_string(N_experiment) + ",\"element_type\":{\"name\":\"vector\",\"length\":" + std::to_string(N_phosphorylation) + "}},\"block\":\"generated_quantities\"},{\"name\":\"conc_unbalanced\",\"type\":{\"name\":\"array\",\"length\":" + std::to_string(N_experiment) + ",\"element_type\":{\"name\":\"vector\",\"length\":" + std::to_string(N_unbalanced) + "}},\"block\":\"generated_quantities\"},{\"name\":\"conc_enzyme\",\"type\":{\"name\":\"array\",\"length\":" + std::to_string(N_experiment) + ",\"element_type\":{\"name\":\"vector\",\"length\":" + std::to_string(N_enzyme) + "}},\"block\":\"generated_quantities\"},{\"name\":\"drain\",\"type\":{\"name\":\"array\",\"length\":" + std::to_string(N_experiment) + ",\"element_type\":{\"name\":\"vector\",\"length\":" + std::to_string(N_drain) + "}},\"block\":\"generated_quantities\"},{\"name\":\"free_enzyme_ratio\",\"type\":{\"name\":\"array\",\"length\":" + std::to_string(N_experiment) + ",\"element_type\":{\"name\":\"vector\",\"length\":" + std::to_string(N_edge) + "}},\"block\":\"generated_quantities\"},{\"name\":\"saturation\",\"type\":{\"name\":\"array\",\"length\":" + std::to_string(N_experiment) + ",\"element_type\":{\"name\":\"vector\",\"length\":" + std::to_string(N_edge) + "}},\"block\":\"generated_quantities\"},{\"name\":\"allostery\",\"type\":{\"name\":\"array\",\"length\":" + std::to_string(N_experiment) + ",\"element_type\":{\"name\":\"vector\",\"length\":" + std::to_string(N_edge) + "}},\"block\":\"generated_quantities\"},{\"name\":\"phosphorylation\",\"type\":{\"name\":\"array\",\"length\":" + std::to_string(N_experiment) + ",\"element_type\":{\"name\":\"vector\",\"length\":" + std::to_string(N_edge) + "}},\"block\":\"generated_quantities\"},{\"name\":\"reversibility\",\"type\":{\"name\":\"array\",\"length\":" + std::to_string(N_experiment) + ",\"element_type\":{\"name\":\"vector\",\"length\":" + std::to_string(N_edge) + "}},\"block\":\"generated_quantities\"}]");
     
     } // get_constrained_sizedtypes() 
     
   inline std::string get_unconstrained_sizedtypes() const {
     
-    return std::string("[{\"name\":\"km\",\"type\":{\"name\":\"vector\",\"length\":" + std::to_string(N_km) + "},\"block\":\"parameters\"},{\"name\":\"ki\",\"type\":{\"name\":\"vector\",\"length\":" + std::to_string(N_competitive_inhibition) + "},\"block\":\"parameters\"},{\"name\":\"kcat\",\"type\":{\"name\":\"vector\",\"length\":" + std::to_string(N_enzyme) + "},\"block\":\"parameters\"},{\"name\":\"dissociation_constant\",\"type\":{\"name\":\"vector\",\"length\":" + std::to_string(N_allostery) + "},\"block\":\"parameters\"},{\"name\":\"transfer_constant\",\"type\":{\"name\":\"vector\",\"length\":" + std::to_string(N_allosteric_enzyme) + "},\"block\":\"parameters\"},{\"name\":\"kcat_phos\",\"type\":{\"name\":\"vector\",\"length\":" + std::to_string(N_phosphorylation) + "},\"block\":\"parameters\"},{\"name\":\"dgrs\",\"type\":{\"name\":\"vector\",\"length\":" + std::to_string(N_edge) + "},\"block\":\"parameters\"},{\"name\":\"conc\",\"type\":{\"name\":\"array\",\"length\":" + std::to_string(N_experiment) + ",\"element_type\":{\"name\":\"vector\",\"length\":" + std::to_string(N_mic) + "}},\"block\":\"generated_quantities\"},{\"name\":\"flux\",\"type\":{\"name\":\"array\",\"length\":" + std::to_string(N_experiment) + ",\"element_type\":{\"name\":\"vector\",\"length\":" + std::to_string(N_reaction) + "}},\"block\":\"generated_quantities\"},{\"name\":\"conc_phos\",\"type\":{\"name\":\"array\",\"length\":" + std::to_string(N_experiment) + ",\"element_type\":{\"name\":\"vector\",\"length\":" + std::to_string(N_phosphorylation) + "}},\"block\":\"generated_quantities\"},{\"name\":\"conc_unbalanced\",\"type\":{\"name\":\"array\",\"length\":" + std::to_string(N_experiment) + ",\"element_type\":{\"name\":\"vector\",\"length\":" + std::to_string(N_unbalanced) + "}},\"block\":\"generated_quantities\"},{\"name\":\"conc_enzyme\",\"type\":{\"name\":\"array\",\"length\":" + std::to_string(N_experiment) + ",\"element_type\":{\"name\":\"vector\",\"length\":" + std::to_string(N_enzyme) + "}},\"block\":\"generated_quantities\"},{\"name\":\"drain\",\"type\":{\"name\":\"array\",\"length\":" + std::to_string(N_experiment) + ",\"element_type\":{\"name\":\"vector\",\"length\":" + std::to_string(N_drain) + "}},\"block\":\"generated_quantities\"},{\"name\":\"free_enzyme_ratio\",\"type\":{\"name\":\"array\",\"length\":" + std::to_string(N_experiment) + ",\"element_type\":{\"name\":\"vector\",\"length\":" + std::to_string(N_edge) + "}},\"block\":\"generated_quantities\"},{\"name\":\"saturation\",\"type\":{\"name\":\"array\",\"length\":" + std::to_string(N_experiment) + ",\"element_type\":{\"name\":\"vector\",\"length\":" + std::to_string(N_edge) + "}},\"block\":\"generated_quantities\"},{\"name\":\"allostery\",\"type\":{\"name\":\"array\",\"length\":" + std::to_string(N_experiment) + ",\"element_type\":{\"name\":\"vector\",\"length\":" + std::to_string(N_edge) + "}},\"block\":\"generated_quantities\"},{\"name\":\"phosphorylation\",\"type\":{\"name\":\"array\",\"length\":" + std::to_string(N_experiment) + ",\"element_type\":{\"name\":\"vector\",\"length\":" + std::to_string(N_edge) + "}},\"block\":\"generated_quantities\"},{\"name\":\"reversibility\",\"type\":{\"name\":\"array\",\"length\":" + std::to_string(N_experiment) + ",\"element_type\":{\"name\":\"vector\",\"length\":" + std::to_string(N_edge) + "}},\"block\":\"generated_quantities\"}]");
+    return std::string("[{\"name\":\"km\",\"type\":{\"name\":\"vector\",\"length\":" + std::to_string(N_km) + "},\"block\":\"parameters\"},{\"name\":\"ki\",\"type\":{\"name\":\"vector\",\"length\":" + std::to_string(N_competitive_inhibition) + "},\"block\":\"parameters\"},{\"name\":\"kcat\",\"type\":{\"name\":\"vector\",\"length\":" + std::to_string(N_enzyme) + "},\"block\":\"parameters\"},{\"name\":\"dissociation_constant\",\"type\":{\"name\":\"vector\",\"length\":" + std::to_string(N_allostery) + "},\"block\":\"parameters\"},{\"name\":\"transfer_constant\",\"type\":{\"name\":\"vector\",\"length\":" + std::to_string(N_allosteric_enzyme) + "},\"block\":\"parameters\"},{\"name\":\"kcat_phos\",\"type\":{\"name\":\"vector\",\"length\":" + std::to_string(N_phosphorylation) + "},\"block\":\"parameters\"},{\"name\":\"dgrs\",\"type\":{\"name\":\"array\",\"length\":" + std::to_string(N_experiment) + ",\"element_type\":{\"name\":\"vector\",\"length\":" + std::to_string(N_edge) + "}},\"block\":\"parameters\"},{\"name\":\"conc\",\"type\":{\"name\":\"array\",\"length\":" + std::to_string(N_experiment) + ",\"element_type\":{\"name\":\"vector\",\"length\":" + std::to_string(N_mic) + "}},\"block\":\"generated_quantities\"},{\"name\":\"flux\",\"type\":{\"name\":\"array\",\"length\":" + std::to_string(N_experiment) + ",\"element_type\":{\"name\":\"vector\",\"length\":" + std::to_string(N_reaction) + "}},\"block\":\"generated_quantities\"},{\"name\":\"conc_phos\",\"type\":{\"name\":\"array\",\"length\":" + std::to_string(N_experiment) + ",\"element_type\":{\"name\":\"vector\",\"length\":" + std::to_string(N_phosphorylation) + "}},\"block\":\"generated_quantities\"},{\"name\":\"conc_unbalanced\",\"type\":{\"name\":\"array\",\"length\":" + std::to_string(N_experiment) + ",\"element_type\":{\"name\":\"vector\",\"length\":" + std::to_string(N_unbalanced) + "}},\"block\":\"generated_quantities\"},{\"name\":\"conc_enzyme\",\"type\":{\"name\":\"array\",\"length\":" + std::to_string(N_experiment) + ",\"element_type\":{\"name\":\"vector\",\"length\":" + std::to_string(N_enzyme) + "}},\"block\":\"generated_quantities\"},{\"name\":\"drain\",\"type\":{\"name\":\"array\",\"length\":" + std::to_string(N_experiment) + ",\"element_type\":{\"name\":\"vector\",\"length\":" + std::to_string(N_drain) + "}},\"block\":\"generated_quantities\"},{\"name\":\"free_enzyme_ratio\",\"type\":{\"name\":\"array\",\"length\":" + std::to_string(N_experiment) + ",\"element_type\":{\"name\":\"vector\",\"length\":" + std::to_string(N_edge) + "}},\"block\":\"generated_quantities\"},{\"name\":\"saturation\",\"type\":{\"name\":\"array\",\"length\":" + std::to_string(N_experiment) + ",\"element_type\":{\"name\":\"vector\",\"length\":" + std::to_string(N_edge) + "}},\"block\":\"generated_quantities\"},{\"name\":\"allostery\",\"type\":{\"name\":\"array\",\"length\":" + std::to_string(N_experiment) + ",\"element_type\":{\"name\":\"vector\",\"length\":" + std::to_string(N_edge) + "}},\"block\":\"generated_quantities\"},{\"name\":\"phosphorylation\",\"type\":{\"name\":\"array\",\"length\":" + std::to_string(N_experiment) + ",\"element_type\":{\"name\":\"vector\",\"length\":" + std::to_string(N_edge) + "}},\"block\":\"generated_quantities\"},{\"name\":\"reversibility\",\"type\":{\"name\":\"array\",\"length\":" + std::to_string(N_experiment) + ",\"element_type\":{\"name\":\"vector\",\"length\":" + std::to_string(N_edge) + "}},\"block\":\"generated_quantities\"}]");
     
     } // get_unconstrained_sizedtypes() 
     
@@ -4853,7 +5081,7 @@ class out_of_sample_model_model final : public model_base_crtp<out_of_sample_mod
                             std::ostream* pstream = nullptr) const {
       const size_t num_params__ = 
   ((((((N_km + N_competitive_inhibition) + N_enzyme) + N_allostery) +
-      N_allosteric_enzyme) + N_phosphorylation) + N_edge);
+      N_allosteric_enzyme) + N_phosphorylation) + (N_experiment * N_edge));
       const size_t num_transformed = 0;
       const size_t num_gen_quantities = 
   (((((((((((N_experiment * N_mic) + (N_experiment * N_reaction)) +
@@ -4881,7 +5109,7 @@ class out_of_sample_model_model final : public model_base_crtp<out_of_sample_mod
                             std::ostream* pstream = nullptr) const {
       const size_t num_params__ = 
   ((((((N_km + N_competitive_inhibition) + N_enzyme) + N_allostery) +
-      N_allosteric_enzyme) + N_phosphorylation) + N_edge);
+      N_allosteric_enzyme) + N_phosphorylation) + (N_experiment * N_edge));
       const size_t num_transformed = 0;
       const size_t num_gen_quantities = 
   (((((((((((N_experiment * N_mic) + (N_experiment * N_reaction)) +
@@ -4929,7 +5157,7 @@ class out_of_sample_model_model final : public model_base_crtp<out_of_sample_mod
       "dissociation_constant", "transfer_constant", "kcat_phos", "dgrs"};
       const std::array<Eigen::Index, 7> constrain_param_sizes__{N_km,
        N_competitive_inhibition, N_enzyme, N_allostery, N_allosteric_enzyme,
-       N_phosphorylation, N_edge};
+       N_phosphorylation, (N_experiment * N_edge)};
       const auto num_constrained_params__ = std::accumulate(
         constrain_param_sizes__.begin(), constrain_param_sizes__.end(), 0);
     

@@ -96,6 +96,7 @@ class Reaction:
     mechanism: ReactionMechanism
     stoichiometry: Dict[str, float]
     water_stoichiometry: float
+    transported_charge: float
 
     @validator("id")
     def id_must_not_contain_seps(cls, v):

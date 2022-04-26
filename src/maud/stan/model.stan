@@ -43,6 +43,7 @@ data {
   array[2] vector[N_allostery] priors_dissociation_constant;
   array[2] vector[N_allosteric_enzyme] priors_transfer_constant;
   array[2] vector[N_phosphorylation] priors_kcat_phos;
+  array[2] vector[N_experiment] priors_psi;
   array[2, N_experiment] vector[N_phosphorylation] priors_conc_phos;
   array[2, N_experiment] vector[N_unbalanced] priors_conc_unbalanced;
   array[2, N_experiment] vector[N_enzyme] priors_conc_enzyme;
@@ -76,11 +77,13 @@ data {
   array[N_edge, 2] int phosphorylation_ix_bounds;
   array[N_mic] int<lower=1,upper=N_metabolite> mic_to_met;
   vector[N_edge] water_stoichiometry;
+  vector[N_edge] transported_charge;
   array[N_enzyme_knockout] int<lower=0,upper=N_enzyme> enzyme_knockout_long;
   array[N_experiment, 2] int enzyme_knockout_bounds;
   array[N_phosphorylation_knockout] int<lower=0,upper=N_phosphorylation> phosphorylation_knockout_long;
   array[N_experiment, 2] int phosphorylation_knockout_bounds;
   vector<lower=1>[N_enzyme] subunits;
+  vector[N_experiment] temperature;
   // configuration
   array[N_experiment] vector<lower=0>[N_mic] conc_init;
   real rel_tol; 
@@ -89,6 +92,7 @@ data {
   real steady_state_threshold_rel;
   int max_num_steps;
   int<lower=0,upper=1> likelihood;  // set to 0 for priors-only mode
+  real drain_small_conc_corrector;
   real<lower=0> timepoint;
   int<lower=0,upper=1> reject_non_steady;
 }
@@ -104,6 +108,7 @@ parameters {
   vector[N_competitive_inhibition] log_ki_z;
   vector[N_allostery] log_dissociation_constant_z;
   vector[N_allosteric_enzyme] log_transfer_constant_z;
+  vector[N_experiment] psi_z;
   array[N_experiment] vector[N_drain] drain_z;
   array[N_experiment] vector[N_enzyme] log_conc_enzyme_z;
   array[N_experiment] vector[N_phosphorylation] log_conc_phos_z;
@@ -117,6 +122,7 @@ transformed parameters {
   vector[N_allostery] dissociation_constant = unz_log_1d(priors_dissociation_constant, log_dissociation_constant_z);
   vector[N_allosteric_enzyme] transfer_constant = unz_log_1d(priors_transfer_constant, log_transfer_constant_z);
   vector[N_phosphorylation] kcat_phos = unz_log_1d(priors_kcat_phos, log_kcat_phos_z);
+  vector[N_experiment] psi = unz_1d(priors_psi, psi_z);
   array[N_experiment] vector[N_drain] drain = unz_2d(priors_drain, drain_z);
   array[N_experiment] vector[N_enzyme] conc_enzyme = unz_log_2d(priors_conc_enzyme, log_conc_enzyme_z);
   array[N_experiment] vector[N_unbalanced] conc_unbalanced = unz_log_2d(priors_conc_unbalanced, log_conc_unbalanced_z);
@@ -124,8 +130,9 @@ transformed parameters {
   // transform
   array[N_experiment] vector<lower=0>[N_mic] conc;
   array[N_experiment] vector[N_reaction] flux;
-  vector[N_edge] dgrs = get_dgrs(S, dgf, mic_to_met, water_stoichiometry);
+  array[N_experiment] vector[N_edge] dgrs;
   for (e in 1:N_experiment){
+    dgrs[e] = get_dgrs(S, dgf, temperature[e], mic_to_met, water_stoichiometry, transported_charge, psi[e]);
     flux[e] = rep_vector(0, N_reaction);
     vector[N_enzyme] conc_enzyme_experiment = conc_enzyme[e];
     vector[N_phosphorylation] conc_phos_experiment = conc_phos[e];
@@ -154,7 +161,7 @@ transformed parameters {
                   balanced_mic_ix,
                   unbalanced_mic_ix,
                   conc_enzyme_experiment,
-                  dgrs,
+                  dgrs[e],
                   kcat,
                   km,
                   ki,
@@ -163,6 +170,8 @@ transformed parameters {
                   kcat_phos,
                   conc_phos_experiment,
                   drain[e],
+                  temperature[e],
+                  drain_small_conc_corrector,
                   S,
                   subunits,
                   edge_type,
@@ -192,7 +201,7 @@ transformed parameters {
     {
     vector[N_edge] edge_flux = get_edge_flux(conc[e],
                                              conc_enzyme_experiment,
-                                             dgrs,
+                                             dgrs[e],
                                              kcat,
                                              km,
                                              ki,
@@ -201,6 +210,8 @@ transformed parameters {
                                              kcat_phos,
                                              conc_phos_experiment,
                                              drain[e],
+                                             temperature[e],
+                                             drain_small_conc_corrector,
                                              S,
                                              subunits,
                                              edge_type,
@@ -238,7 +249,7 @@ transformed parameters {
         print("km: ", km);
         print("drain: ", drain[e]);
         print("kcat: ", kcat);
-        print("dgrs: ", dgrs);
+        print("dgrs: ", dgrs[e]);
         print("ki: ", ki);
         print("dissociation_constant: ", dissociation_constant);
         print("transfer_constant: ", transfer_constant);
@@ -262,6 +273,7 @@ model {
     log_conc_enzyme_z[ex] ~ std_normal();
     log_conc_phos_z[ex] ~ std_normal();
     drain_z[ex] ~ std_normal();
+    psi_z[ex] ~ std_normal();
   }
   if (likelihood == 1){
     for (c in 1:N_conc_measurement)
@@ -282,7 +294,7 @@ generated quantities {
   array[N_experiment] vector[N_edge] allostery;
   array[N_experiment] vector[N_edge] phosphorylation;
   array[N_experiment] vector[N_edge] reversibility;
-  vector[N_edge] keq = get_keq(S, dgf, mic_to_met, water_stoichiometry);
+  array[N_experiment] vector[N_edge] keq;
   for (c in 1:N_conc_measurement){
     yconc_sim[c] = lognormal_rng(log(conc[experiment_yconc[c], mic_ix_yconc[c]]), sigma_conc[c]);
     log_lik_conc[c] = lognormal_lpdf(yconc[c] | log(conc[experiment_yconc[c], mic_ix_yconc[c]]), sigma_conc[c]);
@@ -292,6 +304,7 @@ generated quantities {
     log_lik_flux[f] = normal_lpdf(yflux[f] | flux[experiment_yflux[f], reaction_yflux[f]], sigma_flux[f]);
   }
   for (e in 1:N_experiment){
+    keq[e] = get_keq(S, dgf, temperature[e], mic_to_met, water_stoichiometry, transported_charge, psi[e]);
     free_enzyme_ratio[e] = get_free_enzyme_ratio(conc[e],
                                                  S,
                                                  km,
@@ -332,6 +345,6 @@ generated quantities {
                                              phosphorylation_ix_bounds,
                                              phosphorylation_type,
                                              subunits);
-    reversibility[e] = get_reversibility(dgrs, S, conc[e], edge_type);
+    reversibility[e] = get_reversibility(dgrs[e], temperature[e], S, conc[e], edge_type);
   }
 }

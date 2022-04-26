@@ -26,11 +26,6 @@ def show_versions():
     print_dependencies("maud")
 
 
-def get_dict_field_if_available(d: dict, field: str) -> Union[None, Any]:
-    """Get a field from a dictionary if it exists."""
-    return d[field] if field in d.keys() else None
-
-
 def recursively_flatten_list(o: List) -> List:
     """Recursively flatten a nested list."""
     gather = []
