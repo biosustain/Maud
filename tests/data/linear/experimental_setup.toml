@@ -1,0 +1,10 @@
+[[experiment]]
+id = "condition1"
+is_train = true
+is_test = true
+temperature = 299.0
+
+[[experiment]]
+id = "condition2"
+is_train = true
+is_test = true
