@@ -7,6 +7,9 @@ user, and holds the information that is passed to Stan. It extensively uses
 `pydantic dataclasses <https://pydantic-docs.helpmanual.io/usage/dataclasses/>`_
 for validation.
 
+Code implementing Maud's data model is in the folder 
+`src/maud/data_model <https://github.com/biosustain/Maud/tree/master/src/maud/data_model>`_.
+
 The information provided by the users consists of:
 
 - Configuration represented as a :code:`MaudConfig` object
