@@ -1,10 +1,10 @@
 """Definitions of inputs for Maud's Stan models."""
 
-from dataclasses import field, fields
+from dataclasses import fields
 from math import isnan
 from typing import Dict, Sequence, Union
 
-from pydantic import StrictFloat, StrictInt, root_validator
+from pydantic import Field, StrictFloat, StrictInt, root_validator
 from pydantic.dataclasses import dataclass
 
 from maud.utils import recursively_flatten_list
@@ -127,28 +127,28 @@ class StanInputTrain:
     max_num_steps: StanData
 
     # Data that can be inferred
-    N_mic: StanData = field(init=False)
-    N_edge_sub: StanData = field(init=False)
-    N_edge_prod: StanData = field(init=False)
-    N_edge: StanData = field(init=False)
-    N_unbalanced: StanData = field(init=False)
-    N_metabolite: StanData = field(init=False)
-    N_km: StanData = field(init=False)
-    N_enzyme: StanData = field(init=False)
-    N_phosphorylation: StanData = field(init=False)
-    N_experiment: StanData = field(init=False)
-    N_competitive_inhibition: StanData = field(init=False)
-    N_allostery: StanData = field(init=False)
-    N_allosteric_enzyme: StanData = field(init=False)
-    N_drain: StanData = field(init=False)
-    N_flux_measurement: StanData = field(init=False)
-    N_enzyme_measurement: StanData = field(init=False)
-    N_conc_measurement: StanData = field(init=False)
-    N_enzyme_knockout: StanData = field(init=False)
-    N_phosphorylation_knockout: StanData = field(init=False)
+    N_mic: StanData = Field(init=False, exclude=True)
+    N_edge_sub: StanData = Field(init=False, exclude=True)
+    N_edge_prod: StanData = Field(init=False, exclude=True)
+    N_edge: StanData = Field(init=False, exclude=True)
+    N_unbalanced: StanData = Field(init=False, exclude=True)
+    N_metabolite: StanData = Field(init=False, exclude=True)
+    N_km: StanData = Field(init=False, exclude=True)
+    N_enzyme: StanData = Field(init=False, exclude=True)
+    N_phosphorylation: StanData = Field(init=False, exclude=True)
+    N_experiment: StanData = Field(init=False, exclude=True)
+    N_competitive_inhibition: StanData = Field(init=False, exclude=True)
+    N_allostery: StanData = Field(init=False, exclude=True)
+    N_allosteric_enzyme: StanData = Field(init=False, exclude=True)
+    N_drain: StanData = Field(init=False, exclude=True)
+    N_flux_measurement: StanData = Field(init=False, exclude=True)
+    N_enzyme_measurement: StanData = Field(init=False, exclude=True)
+    N_conc_measurement: StanData = Field(init=False, exclude=True)
+    N_enzyme_knockout: StanData = Field(init=False, exclude=True)
+    N_phosphorylation_knockout: StanData = Field(init=False, exclude=True)
 
     # final output
-    stan_input_dict: StanInputDict = field(init=False)
+    stan_input_dict: StanInputDict = Field(init=False, exclude=True)
 
     def __post_init__(self):
         """Add fields that can be inferred from other ones."""
@@ -275,22 +275,22 @@ class StanInputTest:
     max_num_steps: StanData
 
     # Data that can be inferred
-    N_mic: StanData = field(init=False)
-    N_edge_sub: StanData = field(init=False)
-    N_edge_prod: StanData = field(init=False)
-    N_edge: StanData = field(init=False)
-    N_unbalanced: StanData = field(init=False)
-    N_experiment: StanData = field(init=False)
-    N_competitive_inhibition: StanData = field(init=False)
-    N_allostery: StanData = field(init=False)
-    N_phosphorylation: StanData = field(init=False)
-    N_drain: StanData = field(init=False)
-    N_enzyme: StanData = field(init=False)
-    N_enzyme_knockout: StanData = field(init=False)
-    N_phosphorylation_knockout: StanData = field(init=False)
+    N_mic: StanData = Field(init=False, exclude=True)
+    N_edge_sub: StanData = Field(init=False, exclude=True)
+    N_edge_prod: StanData = Field(init=False, exclude=True)
+    N_edge: StanData = Field(init=False, exclude=True)
+    N_unbalanced: StanData = Field(init=False, exclude=True)
+    N_experiment: StanData = Field(init=False, exclude=True)
+    N_competitive_inhibition: StanData = Field(init=False, exclude=True)
+    N_allostery: StanData = Field(init=False, exclude=True)
+    N_phosphorylation: StanData = Field(init=False, exclude=True)
+    N_drain: StanData = Field(init=False, exclude=True)
+    N_enzyme: StanData = Field(init=False, exclude=True)
+    N_enzyme_knockout: StanData = Field(init=False, exclude=True)
+    N_phosphorylation_knockout: StanData = Field(init=False, exclude=True)
 
     # final output
-    stan_input_dict: StanInputDict = field(init=False)
+    stan_input_dict: StanInputDict = Field(init=False, exclude=True)
 
     def __post_init__(self):
         """Add fields that can be inferred from other ones."""

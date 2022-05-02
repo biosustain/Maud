@@ -1,8 +1,7 @@
 """Provides dataclass MaudConfig."""
-from dataclasses import field
 from typing import Optional
 
-from pydantic import root_validator
+from pydantic import Field, root_validator
 from pydantic.dataclasses import dataclass
 
 
@@ -59,7 +58,7 @@ class MaudConfig:
     steady_state_threshold_rel: float = 1e-3
     default_initial_concentration: float = 0.01
     drain_small_conc_corrector: float = 1e-6
-    multivariate_dgf_priors: bool = field(init=False)
+    multivariate_dgf_priors: bool = Field(init=False, exclude=True)
 
     def __post_init__(self):
         """Add multivariate_dgf_priors indicator attribute."""

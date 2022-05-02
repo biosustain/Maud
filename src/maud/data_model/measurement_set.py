@@ -1,11 +1,10 @@
 """Provides dataclass MeasurementSet, representing a set of measurements."""
 
-from dataclasses import field
 from enum import Enum
 from typing import List, Optional
 
 import pandas as pd
-from pydantic import validator
+from pydantic import Field, validator
 from pydantic.dataclasses import dataclass
 
 from maud.data_model.hardcoding import ID_SEPARATOR
@@ -57,7 +56,7 @@ class EnzymeKnockout:
 
     experiment_id: str
     enzyme_id: str
-    id: str = field(init=False)
+    id: str = Field(init=False, exclude=True)
 
     def __post_init__(self):
         """Add id field."""
@@ -72,7 +71,7 @@ class PhosphorylationKnockout:
 
     experiment_id: str
     enzyme_id: str
-    id: str = field(init=False)
+    id: str = Field(init=False, exclude=True)
 
     def __post_init__(self):
         """Add id field."""

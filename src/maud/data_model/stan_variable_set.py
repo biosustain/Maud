@@ -1,10 +1,9 @@
 """Definitions of Stan variables and StanVariableSet."""
 
-from dataclasses import field
 from enum import Enum
 from typing import List, Optional
 
-from pydantic import validator
+from pydantic import Field, validator
 from pydantic.dataclasses import dataclass
 
 from maud.data_model.hardcoding import ID_SEPARATOR
@@ -63,8 +62,8 @@ class Km(StanVariable):
             ]
         ]
         self.non_negative = True
-        self.mic_ids: List[str] = field(init=False)
-        self.er_ids: List[str] = field(init=False)
+        self.mic_ids: List[str] = Field(init=False, exclude=True)
+        self.er_ids: List[str] = Field(init=False, exclude=True)
         self.default_loc = 0.5
         self.default_scale = 1
 
@@ -121,8 +120,8 @@ class Ki(StanVariable):
             ]
         ]
         self.non_negative = True
-        self.mic_ids: List[str] = field(init=False)
-        self.er_ids: List[str] = field(init=False)
+        self.mic_ids: List[str] = Field(init=False, exclude=True)
+        self.er_ids: List[str] = Field(init=False, exclude=True)
         self.default_loc = 0.5
         self.default_scale = 1
 
@@ -169,8 +168,8 @@ class DissociationConstant(StanVariable):
             ]
         ]
         self.non_negative = True
-        self.mic_ids: List[str] = field(init=False)
-        self.enzyme_ids: List[str] = field(init=False)
+        self.mic_ids: List[str] = Field(init=False, exclude=True)
+        self.enzyme_ids: List[str] = Field(init=False, exclude=True)
         self.default_loc = 0.5
         self.default_scale = 1
 

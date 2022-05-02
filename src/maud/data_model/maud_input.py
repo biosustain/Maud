@@ -1,9 +1,9 @@
 """Provides dataclass MaudInput containing Maud needs to run."""
 
-from dataclasses import field
 from typing import Optional
 
 import pandas as pd
+from pydantic import Field
 from pydantic.dataclasses import dataclass
 
 from maud.data_model.kinetic_model import KineticModel
@@ -34,11 +34,11 @@ class MaudInput:
     user_priors: UserPriorInput
     measurements: MeasurementSet
     user_inits: Optional[pd.DataFrame]
-    stan_variable_set: StanVariableSet = field(init=False)
-    priors: PriorSet = field(init=False)
-    inits: InitDict = field(init=False)
-    stan_input_train: StanInputTrain = field(init=False)
-    stan_input_test: StanInputTest = field(init=False)
+    stan_variable_set: StanVariableSet = Field(init=False, exclude=True)
+    priors: PriorSet = Field(init=False, exclude=True)
+    inits: InitDict = Field(init=False, exclude=True)
+    stan_input_train: StanInputTrain = Field(init=False, exclude=True)
+    stan_input_test: StanInputTest = Field(init=False, exclude=True)
 
     def __post_init__(self):
         """Add attributes that depend on other ones."""

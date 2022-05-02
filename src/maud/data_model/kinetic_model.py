@@ -1,17 +1,16 @@
 """Maud's definition of a kinetic model."""
 
-from dataclasses import field
 from enum import Enum
 from typing import Dict, List, Optional, Union
 
 import pandas as pd
-from pydantic import root_validator, validator
+from pydantic import Field, root_validator, validator
 from pydantic.dataclasses import dataclass
 
 from maud.data_model.hardcoding import ID_SEPARATOR
 
 
-class ReactionMechanism(str, Enum):
+class ReactionMechanism(int, Enum):
     """Possible reaction mechanisms."""
 
     REVERSIBLE_MICHAELIS_MENTEN = 1
@@ -19,7 +18,7 @@ class ReactionMechanism(str, Enum):
     DRAIN = 3
 
 
-class ModificationType(str, Enum):
+class ModificationType(int, Enum):
     """Possible modification types."""
 
     ACTIVATION = 1
@@ -126,7 +125,7 @@ class MetaboliteInCompartment:
     metabolite_id: str
     compartment_id: str
     balanced: bool
-    id: str = field(init=False)
+    id: str = Field(init=False, exclude=True)
 
     def __post_init__(self):
         """Add the id field."""
@@ -143,7 +142,7 @@ class EnzymeReaction:
 
     enzyme_id: str
     reaction_id: str
-    id: str = field(init=False)
+    id: str = Field(init=False, exclude=True)
 
     def __post_init__(self):
         """Add the id field."""
@@ -158,7 +157,7 @@ class Allostery:
     metabolite_id: str
     compartment_id: str
     modification_type: ModificationType
-    id: str = field(init=False)
+    id: str = Field(init=False, exclude=True)
 
     def __post_init__(self):
         """Add the id and mic_id fields."""
@@ -182,7 +181,7 @@ class CompetitiveInhibition:
     reaction_id: str
     metabolite_id: str
     compartment_id: str
-    id: str = field(init=False)
+    id: str = Field(init=False, exclude=True)
 
     def __post_init__(self):
         """Add the id, er_id and mic_id fields."""
@@ -206,7 +205,7 @@ class Phosphorylation:
 
     enzyme_id: str
     modification_type: ModificationType
-    id: str = field(init=False)
+    id: str = Field(init=False, exclude=True)
 
     def __post_init__(self):
         """Add the id field."""
@@ -228,9 +227,11 @@ class KineticModel:
     allosteric_enzymes: Optional[List[Enzyme]]
     competitive_inhibitions: Optional[List[CompetitiveInhibition]]
     phosphorylations: Optional[List[Phosphorylation]]
-    drains: List[Reaction] = field(init=False)
-    edges: List[Union[Reaction, EnzymeReaction]] = field(init=False)
-    stoichiometric_matrix: pd.DataFrame = field(init=False)
+    drains: List[Reaction] = Field(init=False, exclude=True)
+    edges: List[Union[Reaction, EnzymeReaction]] = Field(
+        init=False, exclude=True
+    )
+    stoichiometric_matrix: pd.DataFrame = Field(init=False, exclude=True)
 
     def __post_init__(self):
         """Add drains, edges and stoichiometric matrix."""

@@ -1,5 +1,8 @@
 """Functions for creating *Prior* and PriorSet objects."""
 
+from functools import partial
+
+import numpy as np
 import pandas as pd
 
 from maud.data_model.prior_set import (
@@ -24,25 +27,20 @@ def load_1d_prior(
 
     The StanVariable provides defaults and is included in the return value.
     """
-    loc = pd.Series(stan_variable.default_loc, index=stan_variable.ids[0])
+    location = pd.Series(stan_variable.default_loc, index=stan_variable.ids[0])
     scale = pd.Series(stan_variable.default_scale, index=stan_variable.ids[0])
-    user_df_for_param = user_df.loc[
-        lambda df: df["parameter"] == stan_variable.name
-    ]
-    for _, row in user_df_for_param.iterrows():
-        if row[["location", "scale"]].notnull().all():
-            loc.loc[row["row_id"]] = row["location"]
-            scale.loc[row["row_id"]] = row["scale"]
-        elif row["pct1"].notnull() and row["pct99"].notnull():
-            qf = (
-                get_lognormal_parameters_from_quantiles
-                if stan_variable.non_negative
-                else get_normal_parameters_from_quantiles
-            )
-            loc.loc[row["row_id"]], scale.loc[row["row_id"]] = qf(
-                row["pct1"], 0.01, row["pct99"], 0.99
-            )
-    return IndPrior1d(stan_variable, loc, scale)
+    user_df_sv = user_df.loc[lambda df: df["parameter"] == stan_variable.name]
+    qf = (
+        partial(get_lognormal_parameters_from_quantiles, p1=0.01, p2=0.99)
+        if stan_variable.non_negative
+        else partial(get_normal_parameters_from_quantiles, p1=0.01, p2=0.99)
+    )
+    pct_loc, pct_scale = qf(x1=user_df_sv["pct1"], x2=user_df_sv["pct99"])
+    ls_loc, ls_scale = user_df_sv["location"], user_df_sv["scale"]
+    is_ls = user_df_sv[["location", "scale"]].notnull().all(axis=1)
+    location.loc[user_df_sv["row_id"]] = np.where(is_ls, ls_loc, pct_loc)
+    scale.loc[user_df_sv["row_id"]] = np.where(is_ls, ls_scale, pct_scale)
+    return IndPrior1d(stan_variable, location, scale)
 
 
 def load_2d_prior(
@@ -62,23 +60,23 @@ def load_2d_prior(
         index=stan_variable.ids[0],
         columns=stan_variable.ids[1],
     )
-    user_df_for_param = user_df.loc[
-        lambda df: df["parameter"] == stan_variable.name
-    ]
-    for _, row in user_df_for_param.iterrows():
-        if row[["location", "scale"]].notnull().all():
-            loc.loc[row["row_id"], row["col_id"]] = row["location"]
-            scale.loc[row["row_id"], row["col_id"]] = row["scale"]
-        elif row["pct1"].notnull() and row["pct99"].notnull():
-            qf = (
-                get_lognormal_parameters_from_quantiles
-                if stan_variable.non_negative
-                else get_normal_parameters_from_quantiles
-            )
-            (
-                loc.loc[row["row_id"], row["col_id"]],
-                scale.loc[row["row_id"], row["col_id"]],
-            ) = qf(row["pct1"], 0.01, row["pct99"], 0.99)
+    user = user_df.loc[lambda df: df["parameter"] == stan_variable.name].copy()
+    qf = (
+        partial(get_lognormal_parameters_from_quantiles, p1=0.01, p2=0.99)
+        if stan_variable.non_negative
+        else partial(get_normal_parameters_from_quantiles, p1=0.01, p2=0.99)
+    )
+    user["pct_loc"], user["pct_scale"] = qf(x1=user["pct1"], x2=user["pct99"])
+    is_ls = user[["location", "scale"]].notnull().all(axis=1)
+    user["used_loc"] = np.where(is_ls, user["location"], user["pct_loc"])
+    user["used_scale"] = np.where(is_ls, user["scale"], user["pct_scale"])
+    if not user.empty:
+        user_loc = user.set_index(["row_id", "col_id"])["used_loc"].unstack()
+        user_scale = user.set_index(["row_id", "col_id"])[
+            "used_scale"
+        ].unstack()
+        loc = loc.mask(user_loc.notnull(), user_loc)
+        scale = scale.mask(user_scale.notnull(), user_scale)
     return IndPrior2d(stan_variable, loc, scale)
 
 
