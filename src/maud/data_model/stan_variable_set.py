@@ -9,7 +9,7 @@ from pydantic.dataclasses import dataclass
 from maud.data_model.hardcoding import ID_SEPARATOR
 
 
-class IdComponent(Enum):
+class IdComponent(str, Enum):
     """Possible kinds of id."""
 
     METABOLITE = "metabolite"
