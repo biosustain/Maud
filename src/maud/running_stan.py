@@ -124,9 +124,10 @@ def set_up_output_dir(output_dir: str, mi: MaudInput):
     cmdstanpy.utils.write_stan_json(
         input_filepath_train, mi.stan_input_train.stan_input_dict
     )
-    cmdstanpy.utils.write_stan_json(
-        input_filepath_test, mi.stan_input_test.stan_input_dict
-    )
+    if mi.stan_input_test is not None:
+        cmdstanpy.utils.write_stan_json(
+            input_filepath_test, mi.stan_input_test.stan_input_dict
+        )
     cmdstanpy.utils.write_stan_json(inits_filepath, mi.inits)
 
 

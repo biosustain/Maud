@@ -38,7 +38,7 @@ class MaudInput:
     priors: PriorSet = Field(init=False, exclude=True)
     inits: InitDict = Field(init=False, exclude=True)
     stan_input_train: StanInputTrain = Field(init=False, exclude=True)
-    stan_input_test: StanInputTest = Field(init=False, exclude=True)
+    stan_input_test: Optional[StanInputTest] = Field(init=False, exclude=True)
 
     def __post_init__(self):
         """Add attributes that depend on other ones."""
