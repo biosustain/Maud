@@ -14,8 +14,8 @@ chains = 4
 save_warmup = true
 
 [ode_config]
-abs_tol = 1e-4
-rel_tol = 1e-4
+abs_tol = 1e-5
+rel_tol = 1e-5
 max_num_steps = 1e6
 timepoint = 1e3
 

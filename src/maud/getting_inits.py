@@ -27,7 +27,9 @@ def get_inits(
     """
 
     prior_inits = {
-        p.stan_variable.name: p.location
+        p.stan_variable.name: np.exp(p.location)
+        if p.stan_variable.non_negative
+        else p.location
         for k, p in priors.__dict__.items()
         if not k.startswith("__")
     }
@@ -99,17 +101,15 @@ def rescale_inits(inits: dict, priors: PriorSet) -> InitDict:
     """
     rescaled = {}
     for (n, i), prior in zip(inits.items(), priors.__dict__.values()):
+        rescaled_name = (
+            f"log_{n}_z" if prior.stan_variable.non_negative else f"{n}_z"
+        )
         if isinstance(prior, MultiVariateNormalPrior1d):
             continue
-        elif not prior.stan_variable.non_negative:
-            rescaled[n + "_z"] = (
-                ((i - prior.location) / prior.scale)
-                .astype(float)
-                .values.tolist()
-            )
         else:
-            rescaled[f"log_{n}_z"] = (
-                ((np.log(i) - np.log(prior.location)) / prior.scale)
+            loc_current = np.log(i) if prior.stan_variable.non_negative else i
+            rescaled[rescaled_name] = (
+                ((loc_current - prior.location) / prior.scale)
                 .astype(float)
                 .values.tolist()
             )

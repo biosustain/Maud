@@ -14,7 +14,7 @@ functions {
       a 2xn array mnsd of vectors consisting of the lognormal mean and standard
       deviation of each element. 
     */
-    return exp(log(mnsd[1]) + mnsd[2] .* z);
+    return exp(mnsd[1] + mnsd[2] .* z);
   }
 
   vector[] unz_2d(vector[,] mnsd, vector[] z){

@@ -2,6 +2,8 @@
 
 from typing import Dict, Iterable, List, Optional, Tuple, Union
 
+import numpy as np
+
 from maud.data_model.hardcoding import ID_SEPARATOR
 from maud.data_model.kinetic_model import (
     Allostery,
@@ -611,7 +613,7 @@ def get_conc_init(
                 init_exp.append(config.default_initial_concentration)
             else:
                 init_exp.append(
-                    priors.conc_unbalanced.location.loc[exp.id, mic.id]
+                    np.exp(priors.conc_unbalanced.location.loc[exp.id, mic.id])
                 )
         out.append(init_exp)
     return StanData(name="conc_init", value=out)
@@ -621,9 +623,17 @@ def unpack_priors_2d(
     p: IndPrior2d, exp_ids: Optional[List[str]]
 ) -> List[List[List[float]]]:
     """Turn an IndPrior2d object into a json-compatible list."""
-    loc = p.location if exp_ids is None else p.location.loc[exp_ids]
-    scale = p.scale if exp_ids is None else p.scale.loc[exp_ids]
-    return [loc.values.tolist(), scale.values.tolist()]
+    if exp_ids is None:
+        exp_ids = p.location.index.tolist()
+    if len(exp_ids) == 0:
+        exp_ids = p.location.index.tolist()
+    assert isinstance(exp_ids, List)
+    loc = p.location.loc[exp_ids].values.tolist()
+    scale = p.scale.loc[exp_ids].values.tolist()
+    if len(loc) == 0:
+        loc = [[] for _ in range(len(exp_ids))]
+        scale = [[] for _ in range(len(exp_ids))]
+    return [loc, scale]
 
 
 def unpack_priors_1d(p: IndPrior1d) -> List[List[float]]:

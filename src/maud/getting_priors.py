@@ -37,6 +37,10 @@ def load_1d_prior(
     )
     pct_loc, pct_scale = qf(x1=user_df_sv["pct1"], x2=user_df_sv["pct99"])
     ls_loc, ls_scale = user_df_sv["location"], user_df_sv["scale"]
+    # this is because prior locations for non-negative variables are enterred
+    # unlogged:
+    if stan_variable.non_negative:
+        ls_loc = np.log(ls_loc)
     is_ls = user_df_sv[["location", "scale"]].notnull().all(axis=1)
     location.loc[user_df_sv["row_id"]] = np.where(is_ls, ls_loc, pct_loc)
     scale.loc[user_df_sv["row_id"]] = np.where(is_ls, ls_scale, pct_scale)
@@ -61,6 +65,10 @@ def load_2d_prior(
         columns=stan_variable.ids[1],
     )
     user = user_df.loc[lambda df: df["parameter"] == stan_variable.name].copy()
+    # this is because prior locations for non-negative variables are enterred
+    # unlogged:
+    if stan_variable.non_negative:
+        user["location"] = np.log(user["location"])
     qf = (
         partial(get_lognormal_parameters_from_quantiles, p1=0.01, p2=0.99)
         if stan_variable.non_negative
