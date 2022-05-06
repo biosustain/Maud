@@ -378,7 +378,7 @@ The priors table has the following fields:
 
 - :code:`parameter` String identifying a parameter
 - :code:`row_id` String identifier
-- :code:`column_id` String identifier
+- :code:`col_id` String identifier
 - :code:`location` Float specifying a location
 - :code:`scale` Float specifying a scale
 - :code:`pct1`: First percentile of the prior distribution
