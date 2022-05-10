@@ -118,6 +118,7 @@ class PriorSet:
 
     @root_validator
     def missing_priors_are_not_allowed(cls, values):
+        """Check that there are no missing priors."""
         for k, v in values.items():
             if isinstance(v.location, pd.DataFrame):
                 missing_loc = v.location.loc[:, v.location.isnull().any(0)]
