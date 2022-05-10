@@ -115,3 +115,15 @@ class PriorSet:
     drain: IndPrior2d
     conc_enzyme: IndPrior2d
     conc_phos: IndPrior2d
+
+    @root_validator
+    def missing_priors_are_not_allowed(cls, values):
+        for k, v in values.items():
+            if isinstance(v.location, pd.DataFrame):
+                missing_loc = v.location.loc[:, v.location.isnull().any(0)]
+            else:
+                missing_loc = v.location[v.location.isnull()]
+            assert (
+                missing_loc.empty
+            ), f"Missing {v.location.isnull().sum().sum()} {k}: {missing_loc}"
+        return values
