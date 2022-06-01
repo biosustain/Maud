@@ -254,11 +254,8 @@ class ConcUnbalanced(StanVariable):
         self.shape_names = ["N_experiment", "N_unbalanced"]
         self.split_ids = None
         self.id_components = [
-            [
-                IdComponent.EXPERIMENT,
-                IdComponent.METABOLITE,
-                IdComponent.COMPARTMENT,
-            ]
+            [IdComponent.EXPERIMENT],
+            [IdComponent.METABOLITE, IdComponent.COMPARTMENT]
         ]
         self.non_negative = True
         self.default_loc = 0.1
@@ -274,7 +271,7 @@ class ConcPhos(StanVariable):
         self.ids = ids
         self.shape_names = ["N_experiment", "N_phosphorylation"]
         self.split_ids = None
-        self.id_components = [[IdComponent.EXPERIMENT, IdComponent.ENZYME]]
+        self.id_components = [[IdComponent.EXPERIMENT], [IdComponent.ENZYME]]
         self.non_negative = True
         self.default_loc = 0.1
         self.default_scale = 2.0

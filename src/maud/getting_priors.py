@@ -12,6 +12,7 @@ from maud.data_model.prior_set import (
     PriorSet,
     UserPriorInput,
 )
+from maud.data_model.hardcoding import ID_SEPARATOR
 from maud.data_model.stan_variable_set import StanVariable, StanVariableSet
 from maud.utils import (
     get_lognormal_parameters_from_quantiles,
@@ -30,6 +31,8 @@ def load_1d_prior(
     location = pd.Series(stan_variable.default_loc, index=stan_variable.ids[0])
     scale = pd.Series(stan_variable.default_scale, index=stan_variable.ids[0])
     user_df_sv = user_df.loc[lambda df: df["parameter"] == stan_variable.name]
+    id_cols = [idc.value for idc in stan_variable.id_components[0]]
+    ids = user_df_sv[id_cols].apply(ID_SEPARATOR.join, axis=1).tolist()
     qf = (
         partial(get_lognormal_parameters_from_quantiles, p1=0.01, p2=0.99)
         if stan_variable.non_negative
@@ -42,8 +45,8 @@ def load_1d_prior(
     if stan_variable.non_negative:
         ls_loc = np.log(ls_loc)
     is_ls = user_df_sv[["location", "scale"]].notnull().all(axis=1)
-    location.loc[user_df_sv["row_id"]] = np.where(is_ls, ls_loc, pct_loc)
-    scale.loc[user_df_sv["row_id"]] = np.where(is_ls, ls_scale, pct_scale)
+    location.loc[ids] = np.where(is_ls, ls_loc, pct_loc)
+    scale.loc[ids] = np.where(is_ls, ls_scale, pct_scale)
     return IndPrior1d(stan_variable, location, scale)
 
 
@@ -65,6 +68,9 @@ def load_2d_prior(
         columns=stan_variable.ids[1],
     )
     user = user_df.loc[lambda df: df["parameter"] == stan_variable.name].copy()
+    row_id_cols = [idc.value for idc in stan_variable.id_components[1]]
+    user["col_id"] = user[row_id_cols].apply(ID_SEPARATOR.join, axis=1)
+    user["row_id"] = user["experiment"]
     # this is because prior locations for non-negative variables are enterred
     # unlogged:
     if stan_variable.non_negative:

@@ -369,16 +369,16 @@ The priors file
 ===============
 
 This is a csv file representing pre-experimental information that can be
-represented by independent probability distributions. All of the parameters in
-Maud's statistical model have either one or two dimensions: priors for one
-dimensional parameters are identified by a :code:`row_id`, while two dimensional
-parameters require an additional :code:`column_id`.
+represented by independent probability distributions.
 
 The priors table has the following fields:
 
 - :code:`parameter` String identifying a parameter
-- :code:`row_id` String identifier
-- :code:`col_id` String identifier
+- :code:`metabolite` String identifier
+- :code:`compartment` String identifier
+- :code:`enzyme` String identifier
+- :code:`reaction` String identifier
+- :code:`experiment` String identifier
 - :code:`location` Float specifying a location
 - :code:`scale` Float specifying a scale
 - :code:`pct1`: First percentile of the prior distribution
@@ -386,8 +386,8 @@ The priors table has the following fields:
 
 See the :code:`id_components` fields in the `corresponding code file
 <https://github.com/biosustain/Maud/tree/master/src/maud/data_model/stan_variable_set.py>`_
-for the correct :code:`row` for each kind of prior. :code:`column_ids` for two
-dimensional parameters are always experiment ids.
+for which columns need to be specified for each kind of
+prior.
 
 Prior distributions can either be specified by a location and scale or by a 1st
 and 99th percentile, but not both.
