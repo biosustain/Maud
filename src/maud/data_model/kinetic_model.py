@@ -117,8 +117,8 @@ class MetaboliteInCompartment:
     This is needed because metabolites often exist in multiple compartments, and
     the concentration in each one is important.
 
-    A metabolite may also be "balanced" (i.e. not be consumed or produced at
-    steady state) in one compartment but not in another.
+    A metabolite may also be "balanced" (i.e. where the inflows and outflows are
+    accounted for and equal) in one compartment but not in another.
 
     """
 
