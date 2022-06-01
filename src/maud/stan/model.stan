@@ -16,9 +16,9 @@ data {
   int<lower=0> N_phosphorylation;
   int<lower=0> N_competitive_inhibition;
   int<lower=1> N_experiment;
-  int<lower=1> N_flux_measurement;
+  int<lower=0> N_flux_measurement;
   int<lower=0> N_enzyme_measurement;
-  int<lower=1> N_conc_measurement;
+  int<lower=0> N_conc_measurement;
   int<lower=0> N_enzyme_knockout;
   int<lower=0> N_phosphorylation_knockout;
   // measurements
