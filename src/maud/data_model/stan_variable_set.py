@@ -255,7 +255,7 @@ class ConcUnbalanced(StanVariable):
         self.split_ids = None
         self.id_components = [
             [IdComponent.EXPERIMENT],
-            [IdComponent.METABOLITE, IdComponent.COMPARTMENT]
+            [IdComponent.METABOLITE, IdComponent.COMPARTMENT],
         ]
         self.non_negative = True
         self.default_loc = 0.1

@@ -5,6 +5,7 @@ from functools import partial
 import numpy as np
 import pandas as pd
 
+from maud.data_model.hardcoding import ID_SEPARATOR
 from maud.data_model.prior_set import (
     IndPrior1d,
     IndPrior2d,
@@ -12,7 +13,6 @@ from maud.data_model.prior_set import (
     PriorSet,
     UserPriorInput,
 )
-from maud.data_model.hardcoding import ID_SEPARATOR
 from maud.data_model.stan_variable_set import StanVariable, StanVariableSet
 from maud.utils import (
     get_lognormal_parameters_from_quantiles,
