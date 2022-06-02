@@ -22,5 +22,4 @@
 from setuptools import setup
 
 
-# All other arguments are defined in `setup.cfg`.
 setup()
