@@ -96,4 +96,4 @@ Now push the new tag to github:
  
 .. code:: bash
 
-          git push --tags
+          git push origin "0.2.1"
