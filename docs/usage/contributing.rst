@@ -81,15 +81,12 @@ you can run this reformatting command:
 Releasing versions
 ==================
 
-Maud uses `versioneer<https://github.com/warner/python-versioneer>`_ to handle
-releases.
-
-To release a new version of Maud, first make a pull request updating the
-changelog with the new version number and explaining what has changed since the
-previous version.
+To release a new version of Maud, edit the field :code:`version` in the file
+:code:`setup.cfg`, then make a pull request with this change.
 
 Once the changes are merged into the :code:`origin/master` branch, add a tag
-with the new version number to your local :code:`master` branch:
+with the new version number to your local :code:`master` branch, for example
+like this:
 
 .. code:: bash
 
@@ -99,4 +96,4 @@ Now push the new tag to github:
  
 .. code:: bash
 
-          git push --tags
+          git push origin "0.2.1"
