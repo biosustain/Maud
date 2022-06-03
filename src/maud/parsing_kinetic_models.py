@@ -65,7 +65,7 @@ def parse_kinetic_model(raw: dict) -> KineticModel:
                 modification_type=ModificationType[
                     p["modification_type"].upper()
                 ],
-                name=p["name"] if "name" in p.keys() else None
+                name=p["name"] if "name" in p.keys() else None,
             )
             for p in raw["phosphorylation"]
         ]

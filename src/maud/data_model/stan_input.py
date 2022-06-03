@@ -177,7 +177,9 @@ class StanInputTrain:
             name="N_phosphorylation",
             value=len(self.phosphorylation_type.value),
         )
-        self.N_pme = StanData(name="N_pme", value=len(self.priors_kcat_pme.value[0]))
+        self.N_pme = StanData(
+            name="N_pme", value=len(self.priors_kcat_pme.value[0])
+        )
         self.N_experiment = StanData(
             name="N_experiment",
             value=len(self.priors_conc_unbalanced.value[0]),
@@ -316,7 +318,9 @@ class StanInputTest:
         self.N_phosphorylation = StanData(
             "N_phosphorylation", len(self.phosphorylation_ix_long.value)
         )
-        self.N_pme = StanData(name="N_pme", value=len(self.priors_conc_pme.value[0][0]))
+        self.N_pme = StanData(
+            name="N_pme", value=len(self.priors_conc_pme.value[0][0])
+        )
         self.N_experiment = StanData(
             "N_experiment",
             len(self.priors_conc_unbalanced.value[0]),
