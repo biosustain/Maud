@@ -21,7 +21,7 @@ def test_load_maud_input():
     expected_var_ids = {
         "dgf": [["M1", "M2"]],
         "conc_unbalanced": [["condition1", "condition2"], ["M1_e", "M2_e"]],
-        "conc_phos": [["condition1", "condition2"], []],
+        "conc_pme": [["condition1", "condition2"], []],
         "dissociation_constant": [["r1_M2_c", "r2_M1_c"]],
     }
     mi = load_maud_input(data_path=LINEAR_PATH)
