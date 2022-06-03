@@ -1,0 +1,17 @@
+name = "linear_phos"
+kinetic_model_file = "kinetic_model.toml"
+priors_file = "priors.csv"
+measurements_file = "measurements.csv"
+experimental_setup_file = "experimental_setup.toml"
+likelihood = true
+steady_state_threshold_abs = 1e-6
+
+[cmdstanpy_config]
+iter_warmup = 20
+iter_sampling = 20
+chains = 1
+save_warmup = true
+
+[ode_config]
+max_num_steps = 1e9
+timepoint = 1e3
