@@ -212,7 +212,7 @@ def do_simulate(data_path, output_dir, n):
     print(
         idata.posterior["log_lik_flux"].mean(dim=["chain", "draw"]).to_series()
     )
-    print("\n\nSimulated allostery:")
+    print("\n\nSimulated allostery terms:")
     print(
         idata.posterior["allostery"]
         .mean(dim=["chain", "draw"])
@@ -220,7 +220,7 @@ def do_simulate(data_path, output_dir, n):
         .unstack()
         .T
     )
-    print("\n\nSimulated reversibilities:")
+    print("\n\nSimulated reversibility terms:")
     print(
         idata.posterior["reversibility"]
         .mean(dim=["chain", "draw"])
@@ -228,7 +228,7 @@ def do_simulate(data_path, output_dir, n):
         .unstack()
         .T
     )
-    print("\n\nSimulated saturation:")
+    print("\n\nSimulated saturation terms:")
     print(
         idata.posterior["saturation"]
         .mean(dim=["chain", "draw"])
@@ -236,6 +236,15 @@ def do_simulate(data_path, output_dir, n):
         .unstack()
         .T
     )
+    if mi.kinetic_model.phosphorylations is not None:
+        print("\n\nSimulated phosphorylation terms:")
+        print(
+            idata.posterior["phosphorylation"]
+            .mean(dim=["chain", "draw"])
+            .to_series()
+            .unstack()
+            .T
+        )
     print("\n\nSimulated membrane potential:")
     print(idata.posterior["psi"].mean(dim=["chain", "draw"]).to_series().T)
     return output_path
