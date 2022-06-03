@@ -17,6 +17,7 @@ class IdComponent(str, Enum):
     ENZYME = "enzyme"
     REACTION = "reaction"
     EXPERIMENT = "experiment"
+    PHOSPHORYLATION_MODIFYING_ENZYME = "phosphorylation_modifying_enzyme"
 
 
 @dataclass
@@ -198,15 +199,15 @@ class TransferConstant(StanVariable):
 
 
 @dataclass(init=False)
-class KcatPhos(StanVariable):
-    """Stan variable representing a model's phosphorylation Kcats."""
+class KcatPme(StanVariable):
+    """Stan variable representing Kcats of phosphorylation modifying enzymes."""
 
     def __init__(self, ids):
-        self.name = "kcat_phos"
+        self.name = "kcat_pme"
         self.ids = ids
-        self.shape_names = ["N_phosphorylation_enzymes"]
+        self.shape_names = ["N_pme"]
         self.split_ids = None
-        self.id_components = [[IdComponent.ENZYME]]
+        self.id_components = [[IdComponent.PHOSPHORYLATION_MODIFYING_ENZYME]]
         self.non_negative = True
         self.default_loc = 0.5
         self.default_scale = 1
@@ -263,15 +264,18 @@ class ConcUnbalanced(StanVariable):
 
 
 @dataclass(init=False)
-class ConcPhos(StanVariable):
-    """Stan variable representing a model's phosphorylation enzyme concentrations."""
+class ConcPme(StanVariable):
+    """Stan variable representing a model's pme concentrations."""
 
     def __init__(self, ids):
-        self.name = "conc_phos"
+        self.name = "conc_pme"
         self.ids = ids
-        self.shape_names = ["N_experiment", "N_phosphorylation"]
+        self.shape_names = ["N_experiment", "N_pme"]
         self.split_ids = None
-        self.id_components = [[IdComponent.EXPERIMENT], [IdComponent.ENZYME]]
+        self.id_components = [
+            [IdComponent.EXPERIMENT],
+            [IdComponent.PHOSPHORYLATION_MODIFYING_ENZYME],
+        ]
         self.non_negative = True
         self.default_loc = 0.1
         self.default_scale = 2.0
@@ -302,9 +306,9 @@ class StanVariableSet:
     kcat: Kcat
     dissociation_constant: DissociationConstant
     transfer_constant: TransferConstant
-    kcat_phos: KcatPhos
+    kcat_pme: KcatPme
     drain: Drain
     conc_enzyme: ConcEnzyme
     conc_unbalanced: ConcUnbalanced
-    conc_phos: ConcPhos
+    conc_pme: ConcPme
     psi: Psi

@@ -66,11 +66,11 @@ class EnzymeKnockout:
 
 
 @dataclass
-class PhosphorylationKnockout:
-    """Maud representation of a phosphorylation being prevented in an experiment."""
+class PhosphorylationModifyingEnzymeKnockout:
+    """Maud representation of a pme being knocked out in an experiment."""
 
     experiment_id: str
-    enzyme_id: str
+    pme_id: str
     id: str = Field(init=False, exclude=True)
 
     def __post_init__(self):
@@ -88,5 +88,5 @@ class MeasurementSet:
     yflux: pd.DataFrame
     yenz: pd.DataFrame
     enzyme_knockouts: Optional[List[EnzymeKnockout]]
-    phosphorylation_knockouts: Optional[List[PhosphorylationKnockout]]
+    pme_knockouts: Optional[List[PhosphorylationModifyingEnzymeKnockout]]
     experiments: List[Experiment]

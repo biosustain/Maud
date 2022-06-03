@@ -7,7 +7,7 @@ from maud.data_model.measurement_set import (
     Experiment,
     MeasurementSet,
     MeasurementType,
-    PhosphorylationKnockout,
+    PhosphorylationModifyingEnzymeKnockout,
 )
 
 
@@ -38,10 +38,10 @@ def parse_measurement_set(
         if "enzyme_knockout" in raw_experimental_setup.keys()
         else None
     )
-    phosphorylation_knockouts = (
+    pme_knockouts = (
         [
-            PhosphorylationKnockout(
-                experiment_id=pko["experiment_id"], enzyme_id=pko["enzyme_id"]
+            PhosphorylationModifyingEnzymeKnockout(
+                experiment_id=pko["experiment_id"], pme_id=pko["pme_id"]
             )
             for pko in raw_experimental_setup["phos_knockout"]
         ]
@@ -53,6 +53,6 @@ def parse_measurement_set(
         yflux=y[MeasurementType.FLUX],
         yenz=y[MeasurementType.ENZYME],
         enzyme_knockouts=enzyme_knockouts,
-        phosphorylation_knockouts=phosphorylation_knockouts,
+        pme_knockouts=pme_knockouts,
         experiments=experiments,
     )

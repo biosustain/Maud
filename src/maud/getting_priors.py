@@ -32,6 +32,8 @@ def load_1d_prior(
     scale = pd.Series(stan_variable.default_scale, index=stan_variable.ids[0])
     user_df_sv = user_df.loc[lambda df: df["parameter"] == stan_variable.name]
     id_cols = [idc.value for idc in stan_variable.id_components[0]]
+    if all(c not in user_df_sv.columns for c in id_cols):
+        return IndPrior1d(stan_variable, location, scale)
     ids = user_df_sv[id_cols].apply(ID_SEPARATOR.join, axis=1).tolist()
     qf = (
         partial(get_lognormal_parameters_from_quantiles, p1=0.01, p2=0.99)
@@ -69,6 +71,8 @@ def load_2d_prior(
     )
     user = user_df.loc[lambda df: df["parameter"] == stan_variable.name].copy()
     row_id_cols = [idc.value for idc in stan_variable.id_components[1]]
+    if all(c not in user.columns for c in row_id_cols):
+        return IndPrior2d(stan_variable, loc, scale)
     user["col_id"] = user[row_id_cols].apply(ID_SEPARATOR.join, axis=1)
     user["row_id"] = user["experiment"]
     # this is because prior locations for non-negative variables are enterred
@@ -113,9 +117,9 @@ def get_prior_set(upi: UserPriorInput, sv: StanVariableSet) -> PriorSet:
             upi.main_table, sv.dissociation_constant
         ),
         transfer_constant=load_1d_prior(upi.main_table, sv.transfer_constant),
-        kcat_phos=load_1d_prior(upi.main_table, sv.kcat_phos),
+        kcat_pme=load_1d_prior(upi.main_table, sv.kcat_pme),
         drain=load_2d_prior(upi.main_table, sv.drain),
         conc_enzyme=load_2d_prior(upi.main_table, sv.conc_enzyme),
         conc_unbalanced=load_2d_prior(upi.main_table, sv.conc_unbalanced),
-        conc_phos=load_2d_prior(upi.main_table, sv.conc_phos),
+        conc_pme=load_2d_prior(upi.main_table, sv.conc_pme),
     )

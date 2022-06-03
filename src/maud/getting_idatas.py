@@ -27,6 +27,12 @@ def get_idata(csvs: List[str], mi: MaudInput) -> az.InferenceData:
         "phosphorylations": [p.id for p in mi.kinetic_model.phosphorylations]
         if mi.kinetic_model.phosphorylations is not None
         else [],
+        "phosphorylation_modifying_enzymes": [
+            pme.id
+            for pme in mi.kinetic_model.phosphorylation_modifying_enzymes
+        ]
+        if mi.kinetic_model.phosphorylation_modifying_enzymes is not None
+        else [],
         "allosteries": [p.id for p in mi.kinetic_model.allosteries]
         if mi.kinetic_model.allosteries is not None
         else [],
@@ -66,7 +72,7 @@ def get_idata(csvs: List[str], mi: MaudInput) -> az.InferenceData:
             "conc": ["experiments", "mics"],
             "conc_enzyme": ["experiments", "enzymes"],
             "conc_unbalanced": ["experiments", "unbalanced_mics"],
-            "conc_phos": ["experiments", "phosphorylations"],
+            "conc_pme": ["experiments", "phosphorylation_modifying_enzymes"],
             "drain": ["experiments", "drains"],
             "dissociation_constant": ["allosteries"],
             "transfer_constant": ["allosteric_enzymes"],
@@ -74,7 +80,7 @@ def get_idata(csvs: List[str], mi: MaudInput) -> az.InferenceData:
             "dgrs": ["experiments", "edges"],
             "keq": ["experiments", "edges"],
             "kcat": ["enzymes"],
-            "kcat_phos": ["phosphorylations"],
+            "kcat_pme": ["phosphorylation_modifying_enzymes"],
             "km": ["kms"],
             "ki": ["kis"],
             "psi": ["experiments"],

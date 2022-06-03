@@ -7,13 +7,13 @@ from maud.data_model.kinetic_model import KineticModel, ReactionMechanism
 from maud.data_model.measurement_set import MeasurementSet
 from maud.data_model.stan_variable_set import (
     ConcEnzyme,
-    ConcPhos,
+    ConcPme,
     ConcUnbalanced,
     Dgf,
     DissociationConstant,
     Drain,
     Kcat,
-    KcatPhos,
+    KcatPme,
     Ki,
     Km,
     Psi,
@@ -105,8 +105,8 @@ def get_stan_variable_set(kmod: KineticModel, ms: MeasurementSet):
         else []
     )
     metabolite_ids = [m.id for m in kmod.metabolites]
-    phos_enzs = (
-        [p.enzyme_id for p in kmod.phosphorylations]
+    phos_modifying_enzymes = (
+        [p.modifying_enzyme_id for p in kmod.phosphorylations]
         if kmod.phosphorylations is not None
         else []
     )
@@ -124,10 +124,10 @@ def get_stan_variable_set(kmod: KineticModel, ms: MeasurementSet):
             ids=[dc_ids], split_ids=[dc_enzs, dc_mets, dc_cpts]
         ),
         transfer_constant=TransferConstant(ids=[allosteric_enzyme_ids]),
-        kcat_phos=KcatPhos(ids=[phos_enzs]),
+        kcat_pme=KcatPme(ids=[phos_modifying_enzymes]),
         drain=Drain(ids=[exp_ids, drain_ids]),
         conc_enzyme=ConcEnzyme(ids=[exp_ids, enzyme_ids]),
         conc_unbalanced=ConcUnbalanced(ids=[exp_ids, unbalanced_mics]),
-        conc_phos=ConcPhos(ids=[exp_ids, phos_enzs]),
+        conc_pme=ConcPme(ids=[exp_ids, phos_modifying_enzymes]),
         psi=Psi(ids=[exp_ids]),
     )

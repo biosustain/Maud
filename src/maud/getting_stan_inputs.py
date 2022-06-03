@@ -14,6 +14,7 @@ from maud.data_model.kinetic_model import (
     Metabolite,
     MetaboliteInCompartment,
     Phosphorylation,
+    PhosphorylationModifyingEnzyme,
     Reaction,
 )
 from maud.data_model.maud_config import MaudConfig
@@ -29,6 +30,7 @@ CodifiableMaudObject = Union[
     EnzymeReaction,
     Enzyme,
     Phosphorylation,
+    PhosphorylationModifyingEnzyme,
     Reaction,
     Experiment,
     CompetitiveInhibition,
@@ -64,7 +66,6 @@ def get_stan_inputs(
     experiment_codes_train = codify_maud_object(experiments_train)
     km_ids = priors.km.stan_variable.ids[0]
     km_codes = dict(zip(km_ids, range(1, len(km_ids) + 1)))
-    # phos_enz_codes
     if allosteries is not None:
         tc_codes = codify_maud_object(
             [
@@ -85,8 +86,13 @@ def get_stan_inputs(
         phosphorylation_codes = codify_maud_object(
             kinetic_model.phosphorylations
         )
+        assert kinetic_model.phosphorylation_modifying_enzymes is not None
+        pme_codes = codify_maud_object(
+            kinetic_model.phosphorylation_modifying_enzymes
+        )
     else:
         phosphorylation_codes = dict()
+        pme_codes = dict()
     drain_codes = codify_maud_object(kinetic_model.drains)
     reaction_codes = codify_maud_object(reactions)
     reaction_to_mechanism = {rxn.id: rxn.mechanism for rxn in reactions}
@@ -180,16 +186,16 @@ def get_stan_inputs(
         else [[] for e in exps]
         for exps in (experiments_train, experiments_test)
     )
-    phos_ko_by_experiment_train, phos_ko_by_experiment_test = (
+    pme_ko_by_experiment_train, pme_ko_by_experiment_test = (
         [
             [
-                enzyme_codes[pko.enzyme_id]
-                for pko in ms.phosphorylation_knockouts
+                pme_codes[pko.pme_id]
+                for pko in ms.pme_knockouts
                 if pko.experiment_id == e
             ]
             for e in exps
         ]
-        if ms.phosphorylation_knockouts is not None
+        if ms.pme_knockouts is not None
         else [[] for e in exps]
         for exps in (experiments_train, experiments_test)
     )
@@ -234,13 +240,17 @@ def get_stan_inputs(
             int(p.modification_type.value)
             for p in kinetic_model.phosphorylations
         ]
+        phosphorylation_pme = [
+            pme_codes[p.modifying_enzyme_id]
+            for p in kinetic_model.phosphorylations
+        ]
         for p in kinetic_model.phosphorylations:
             edge_pos = next(
                 i
                 for i, er in enumerate(kinetic_model.edges)
                 if (
                     isinstance(er, EnzymeReaction)
-                    and er.enzyme_id == p.enzyme_id
+                    and er.enzyme_id == p.modified_enzyme_id
                 )
             )
             phosphorylation_by_edge[edge_pos].append(
@@ -248,6 +258,7 @@ def get_stan_inputs(
             )
     else:
         phosphorylation_type = []
+        phosphorylation_pme = []
     sub_by_edge_long, sub_by_edge_bounds = encode_ragged(sub_code_by_edge)
     prod_by_edge_long, prod_by_edge_bounds = encode_ragged(prod_code_by_edge)
     sub_km_ix_by_edge_long, sub_km_ix_by_edge_bounds = encode_ragged(
@@ -262,11 +273,11 @@ def get_stan_inputs(
     enz_knockout_long_test, enz_knockout_bounds_test = encode_ragged(
         enz_ko_by_experiment_test
     )
-    phos_knockout_long_train, phos_knockout_bounds_train = encode_ragged(
-        phos_ko_by_experiment_train
+    pme_knockout_long_train, pme_knockout_bounds_train = encode_ragged(
+        pme_ko_by_experiment_train
     )
-    phos_knockout_long_test, phos_knockout_bounds_test = encode_ragged(
-        phos_ko_by_experiment_test
+    pme_knockout_long_test, pme_knockout_bounds_test = encode_ragged(
+        pme_ko_by_experiment_test
     )
     ci_ix_long, ci_ix_bounds = encode_ragged(ci_by_edge)
     allostery_ix_long, allostery_ix_bounds = encode_ragged(allostery_by_edge)
@@ -281,8 +292,8 @@ def get_stan_inputs(
         ].reset_index()
         for df in (ms.yconc, ms.yenz, ms.yflux)
     )
-    priors_conc_phos_train, priors_conc_phos_test = [
-        unpack_priors_2d(priors.conc_phos, exp_ids=[e.id for e in exps])
+    priors_conc_pme_train, priors_conc_pme_test = [
+        unpack_priors_2d(priors.conc_pme, exp_ids=[e.id for e in exps])
         for exps in (experiments_train, experiments_test)
     ]
     priors_conc_unbalanced_train, priors_conc_unbalanced_test = [
@@ -315,11 +326,11 @@ def get_stan_inputs(
             "priors_transfer_constant",
             unpack_priors_1d(priors.transfer_constant),
         ),
-        priors_kcat_phos=StanData(
-            "priors_kcat", unpack_priors_1d(priors.kcat_phos)
+        priors_kcat_pme=StanData(
+            "priors_pme", unpack_priors_1d(priors.kcat_pme)
         ),
         priors_psi=StanData("priors_psi", unpack_priors_1d(priors.psi)),
-        priors_conc_phos=StanData("priors_conc_phos", priors_conc_phos_train),
+        priors_conc_pme=StanData("priors_conc_pme", priors_conc_pme_train),
         priors_conc_unbalanced=StanData(
             "priors_conc_unbalanced", priors_conc_unbalanced_train
         ),
@@ -417,19 +428,22 @@ def get_stan_inputs(
         phosphorylation_type=StanData(
             "phosphorylation_type", phosphorylation_type
         ),
+        phosphorylation_pme=StanData(
+            "phosphorylation_pme", phosphorylation_pme
+        ),
         enzyme_knockout_long=StanData(
             "enzyme_knockout_long", enz_knockout_long_train
         ),
         enzyme_knockout_bounds=StanData(
             "enzyme_knockout_bounds", enz_knockout_bounds_train
         ),
-        phosphorylation_knockout_long=StanData(
+        pme_knockout_long=StanData(
             "phosphorylation_knockout_long",
-            phos_knockout_long_train,
+            pme_knockout_long_train,
         ),
-        phosphorylation_knockout_bounds=StanData(
+        pme_knockout_bounds=StanData(
             "phosphorylation_knockout_bounds",
-            phos_knockout_bounds_train,
+            pme_knockout_bounds_train,
         ),
         # configuration
         conc_init=get_conc_init(ms, kinetic_model, priors, config),
@@ -461,9 +475,7 @@ def get_stan_inputs(
         if len(experiments_test) == 0
         else StanInputTest(
             # priors
-            priors_conc_phos=StanData(
-                "priors_conc_phos", priors_conc_phos_test
-            ),
+            priors_conc_pme=StanData("priors_conc_pme", priors_conc_pme_test),
             priors_conc_unbalanced=StanData(
                 "priors_conc_unbalanced", priors_conc_unbalanced_test
             ),
@@ -536,18 +548,20 @@ def get_stan_inputs(
             phosphorylation_type=StanData(
                 "phosphorylation_type", phosphorylation_type
             ),
+            phosphorylation_pme=StanData(
+                "phosphorylation_pme", phosphorylation_pme
+            ),
             enzyme_knockout_long=StanData(
                 "enzyme_knockout_long", enz_knockout_long_test
             ),
             enzyme_knockout_bounds=StanData(
                 "enzyme_knockout_bounds", enz_knockout_bounds_test
             ),
-            phosphorylation_knockout_long=StanData(
-                "phosphorylation_knockout_long", phos_knockout_long_test
+            pme_knockout_long=StanData(
+                "pme_knockout_long", pme_knockout_long_test
             ),
-            phosphorylation_knockout_bounds=StanData(
-                "phosphorylation_knockout_bounds",
-                phos_knockout_bounds_test,
+            pme_knockout_bounds=StanData(
+                "pme_knockout_bounds", pme_knockout_bounds_test
             ),
             # configuration
             conc_init=get_conc_init(ms, kinetic_model, priors, config),

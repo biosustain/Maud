@@ -68,6 +68,23 @@ class Enzyme:
 
 
 @dataclass
+class PhosphorylationModifyingEnzyme:
+    """Maud representation of a phosphorylation modifying enzyme.
+
+    For example, a phosphatase?
+
+    """
+
+    id: str
+
+    @validator("id")
+    def id_must_not_contain_seps(cls, v):
+        """Check that the id doesn't contain ID_SEPARATOR."""
+        assert ID_SEPARATOR not in v
+        return v
+
+
+@dataclass
 class Compartment:
     """Maud representation of an intra-cellular compartment.
 
@@ -203,13 +220,17 @@ class CompetitiveInhibition:
 class Phosphorylation:
     """Maud representation of a phosphorylation modification."""
 
-    enzyme_id: str
+    name: Optional[str]
+    modifying_enzyme_id: str
+    modified_enzyme_id: str
     modification_type: ModificationType
     id: str = Field(init=False, exclude=True)
 
     def __post_init__(self):
         """Add the id field."""
-        self.id = self.enzyme_id + ID_SEPARATOR + self.modification_type
+        self.id = (
+            self.modifying_enzyme_id + ID_SEPARATOR + self.modified_enzyme_id
+        )
 
 
 @dataclass(config=KMConfig)
@@ -232,6 +253,9 @@ class KineticModel:
         init=False, exclude=True
     )
     stoichiometric_matrix: pd.DataFrame = Field(init=False, exclude=True)
+    phosphorylation_modifying_enzymes: Optional[
+        List[PhosphorylationModifyingEnzyme]
+    ] = Field(init=False, exclude=True)
 
     def __post_init__(self):
         """Add drains, edges and stoichiometric matrix."""
@@ -241,6 +265,17 @@ class KineticModel:
         self.edges = self.drains + self.ers
         self.stoichiometric_matrix = get_stoichiometric_matrix(
             self.edges, self.mics, self.reactions
+        )
+
+        self.phosphorylation_modifying_enzymes = (
+            [
+                PhosphorylationModifyingEnzyme(pme_id)
+                for pme_id in list(
+                    set(p.modifying_enzyme_id for p in self.phosphorylations)
+                )
+            ]
+            if self.phosphorylations is not None
+            else None
         )
 
     @validator("metabolites")
@@ -342,8 +377,10 @@ class KineticModel:
         if values["phosphorylations"] is None:
             return values
         enzyme_ids = [e.id for e in values["enzymes"]]
-        for ci in values["phosphorylations"]:
-            assert ci.enzyme_id in enzyme_ids, f"{ci.id} has bad enzyme_id"
+        for p in values["phosphorylations"]:
+            assert (
+                p.modified_enzyme_id in enzyme_ids
+            ), f"{p.id} has bad enzyme_id"
         return values
 
 

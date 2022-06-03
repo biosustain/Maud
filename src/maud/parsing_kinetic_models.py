@@ -60,10 +60,12 @@ def parse_kinetic_model(raw: dict) -> KineticModel:
     if "phosphorylation" in raw.keys():
         phosphorylations = [
             Phosphorylation(
-                enzyme_id=p["enzyme_id"],
+                modifying_enzyme_id=p["modifying_enzyme_id"],
+                modified_enzyme_id=p["modified_enzyme_id"],
                 modification_type=ModificationType[
                     p["modification_type"].upper()
                 ],
+                name=p["name"] if "name" in p.keys() else None
             )
             for p in raw["phosphorylation"]
         ]

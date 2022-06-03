@@ -55,9 +55,9 @@ class StanInputTrain:
     priors_ki: StanData
     priors_dissociation_constant: StanData
     priors_transfer_constant: StanData
-    priors_kcat_phos: StanData
+    priors_kcat_pme: StanData
     priors_psi: StanData
-    priors_conc_phos: StanData
+    priors_conc_pme: StanData
     priors_conc_unbalanced: StanData
     priors_conc_enzyme: StanData
     priors_drain: StanData
@@ -109,10 +109,11 @@ class StanInputTrain:
     phosphorylation_ix_long: StanData
     phosphorylation_ix_bounds: StanData
     phosphorylation_type: StanData
+    phosphorylation_pme: StanData
     enzyme_knockout_long: StanData
     enzyme_knockout_bounds: StanData
-    phosphorylation_knockout_long: StanData
-    phosphorylation_knockout_bounds: StanData
+    pme_knockout_long: StanData
+    pme_knockout_bounds: StanData
 
     # user configuration
     conc_init: StanData
@@ -136,6 +137,7 @@ class StanInputTrain:
     N_km: StanData = Field(init=False, exclude=True)
     N_enzyme: StanData = Field(init=False, exclude=True)
     N_phosphorylation: StanData = Field(init=False, exclude=True)
+    N_pme: StanData = Field(init=False, exclude=True)
     N_experiment: StanData = Field(init=False, exclude=True)
     N_competitive_inhibition: StanData = Field(init=False, exclude=True)
     N_allostery: StanData = Field(init=False, exclude=True)
@@ -145,7 +147,7 @@ class StanInputTrain:
     N_enzyme_measurement: StanData = Field(init=False, exclude=True)
     N_conc_measurement: StanData = Field(init=False, exclude=True)
     N_enzyme_knockout: StanData = Field(init=False, exclude=True)
-    N_phosphorylation_knockout: StanData = Field(init=False, exclude=True)
+    N_pme_knockout: StanData = Field(init=False, exclude=True)
 
     # final output
     stan_input_dict: StanInputDict = Field(init=False, exclude=True)
@@ -172,8 +174,10 @@ class StanInputTrain:
             name="N_enzyme", value=len(self.priors_kcat.value[0])
         )
         self.N_phosphorylation = StanData(
-            name="N_phosphorylation", value=len(self.priors_kcat_phos.value[0])
+            name="N_phosphorylation",
+            value=len(self.phosphorylation_type.value),
         )
+        self.N_pme = StanData(name="N_pme", value=len(self.priors_kcat_pme.value[0]))
         self.N_experiment = StanData(
             name="N_experiment",
             value=len(self.priors_conc_unbalanced.value[0]),
@@ -204,9 +208,9 @@ class StanInputTrain:
             name="N_enzyme_knockout",
             value=len(self.enzyme_knockout_long.value),
         )
-        self.N_phosphorylation_knockout = StanData(
-            name="N_phosphorylation_knockout",
-            value=len(self.phosphorylation_knockout_long.value),
+        self.N_pme_knockout = StanData(
+            name="N_pme_knockout",
+            value=len(self.pme_knockout_long.value),
         )
         self.stan_input_dict = {
             f.name: getattr(self, f.name).value
@@ -220,7 +224,7 @@ class StanInputTest:
     """Input for out_of_sample_model.stan, i.e. the test model."""
 
     # priors
-    priors_conc_phos: StanData
+    priors_conc_pme: StanData
     priors_conc_unbalanced: StanData
     priors_conc_enzyme: StanData
     priors_drain: StanData
@@ -260,10 +264,11 @@ class StanInputTest:
     phosphorylation_ix_long: StanData
     phosphorylation_ix_bounds: StanData
     phosphorylation_type: StanData
+    phosphorylation_pme: StanData
     enzyme_knockout_long: StanData
     enzyme_knockout_bounds: StanData
-    phosphorylation_knockout_long: StanData
-    phosphorylation_knockout_bounds: StanData
+    pme_knockout_long: StanData
+    pme_knockout_bounds: StanData
 
     # user configuration
     conc_init: StanData
@@ -284,10 +289,11 @@ class StanInputTest:
     N_competitive_inhibition: StanData = Field(init=False, exclude=True)
     N_allostery: StanData = Field(init=False, exclude=True)
     N_phosphorylation: StanData = Field(init=False, exclude=True)
+    N_pme: StanData = Field(init=False, exclude=True)
     N_drain: StanData = Field(init=False, exclude=True)
     N_enzyme: StanData = Field(init=False, exclude=True)
     N_enzyme_knockout: StanData = Field(init=False, exclude=True)
-    N_phosphorylation_knockout: StanData = Field(init=False, exclude=True)
+    N_pme_knockout: StanData = Field(init=False, exclude=True)
 
     # final output
     stan_input_dict: StanInputDict = Field(init=False, exclude=True)
@@ -310,6 +316,7 @@ class StanInputTest:
         self.N_phosphorylation = StanData(
             "N_phosphorylation", len(self.phosphorylation_ix_long.value)
         )
+        self.N_pme = StanData(name="N_pme", value=len(self.priors_conc_pme.value[0][0]))
         self.N_experiment = StanData(
             "N_experiment",
             len(self.priors_conc_unbalanced.value[0]),
@@ -327,9 +334,8 @@ class StanInputTest:
             name="N_enzyme_knockout",
             value=len(self.enzyme_knockout_long.value),
         )
-        self.N_phosphorylation_knockout = StanData(
-            name="N_phosphorylation_knockout",
-            value=len(self.phosphorylation_knockout_long.value),
+        self.N_pme_knockout = StanData(
+            name="N_pme_knockout", value=len(self.pme_knockout_long.value)
         )
         self.stan_input_dict = {
             f.name: getattr(self, f.name).value

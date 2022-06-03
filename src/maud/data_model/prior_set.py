@@ -106,7 +106,7 @@ class PriorSet:
     dgf: MultiVariateNormalPrior1d
     km: IndPrior1d
     kcat: IndPrior1d
-    kcat_phos: IndPrior1d
+    kcat_pme: IndPrior1d
     ki: IndPrior1d
     psi: IndPrior1d
     dissociation_constant: IndPrior1d
@@ -114,7 +114,7 @@ class PriorSet:
     conc_unbalanced: IndPrior2d
     drain: IndPrior2d
     conc_enzyme: IndPrior2d
-    conc_phos: IndPrior2d
+    conc_pme: IndPrior2d
 
     @root_validator
     def missing_priors_are_not_allowed(cls, values):

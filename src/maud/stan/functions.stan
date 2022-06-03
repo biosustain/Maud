@@ -207,11 +207,12 @@ functions {
     return out;
   }
 
-  vector get_phosphorylation(vector kcat_phos,
-                             vector conc_phos,
+  vector get_phosphorylation(vector kcat_pme,
+                             vector conc_pme,
                              array[] int phos_ix_long,
                              array[,] int phos_ix_bounds,
                              array[] int phos_type,
+                             array[] int phos_pme,
                              vector subunits){
     int N_edge = size(phos_ix_bounds);
     vector[N_edge] out = rep_vector(1, N_edge);
@@ -223,15 +224,15 @@ functions {
       real alpha = 0;
       real beta = 0;
       for (phos in extract_ragged(phos_ix_long, phos_ix_bounds, f)){
-        real kcat_times_conc = kcat_phos[phos] * conc_phos[phos];
-        if (phos_type[phos] == 1){ // inhibition
+        real kcat_times_conc = kcat_pme[phos_pme[phos]] * conc_pme[phos_pme[phos]];
+        if (phos_type[phos] == 2){ // inhibition
           alpha += kcat_times_conc;
         }
         else{
           beta += kcat_times_conc;
         }
-        out[f] = inv(1 + (alpha / beta) ^ subunits[f]);
       }
+      out[f] = (beta / (alpha + beta)) ^ subunits[f];
     }
     return out;
   }
@@ -274,8 +275,8 @@ functions {
                        vector ki,
                        vector tc,
                        vector dc,
-                       vector kcat_phos,
-                       vector conc_phos,
+                       vector kcat_pme,
+                       vector conc_pme,
                        vector drain,
                        real temperature,
                        real drain_small_conc_corrector,
@@ -302,7 +303,8 @@ functions {
                        array[] int edge_to_tc,
                        array[] int phos_ix_long,
                        array[,] int phos_ix_bounds,
-                       array[] int phosphorylation_type){
+                       array[] int phosphorylation_type,
+                       array[] int phosphorylation_pme){
     int N_edge = cols(S);
     vector[N_edge] vmax = get_vmax_by_edge(enzyme, kcat, edge_to_enzyme, edge_type);
     vector[N_edge] reversibility = get_reversibility(dgr, temperature, S, conc, edge_type);
@@ -340,11 +342,12 @@ functions {
                                              allostery_type,
                                              allostery_mic,
                                              edge_to_tc);
-    vector[N_edge] phosphorylation = get_phosphorylation(kcat_phos,
-                                                         conc_phos,
+    vector[N_edge] phosphorylation = get_phosphorylation(kcat_pme,
+                                                         conc_pme,
                                                          phos_ix_long,
                                                          phos_ix_bounds,
                                                          phosphorylation_type,
+                                                         phosphorylation_pme,
                                                          subunits);
     vector[N_edge] drain_by_edge = get_drain_by_edge(drain,
                                                      conc,
@@ -368,8 +371,8 @@ functions {
                       vector ki,
                       vector tc,
                       vector dc,
-                      vector kcat_phos,
-                      vector conc_phos,
+                      vector kcat_pme,
+                      vector conc_pme,
                       vector drain,
                       real temperature,
                       real drain_small_conc_corrector,
@@ -396,7 +399,8 @@ functions {
                       array[] int edge_to_tc,
                       array[] int phosphorylation_ix_long,
                       array[,] int phosphorylation_ix_bounds,
-                      array[] int phosphorylation_type){
+                      array[] int phosphorylation_type,
+                      array[] int phosphorylation_pme){
     vector[rows(current_balanced)+rows(unbalanced)] current_concentration;
     current_concentration[balanced_ix] = current_balanced;
     current_concentration[unbalanced_ix] = unbalanced;
@@ -408,8 +412,8 @@ functions {
                                               ki,
                                               tc,
                                               dc,
-                                              kcat_phos,
-                                              conc_phos,
+                                              kcat_pme,
+                                              conc_pme,
                                               drain,
                                               temperature,
                                               drain_small_conc_corrector,
@@ -436,7 +440,8 @@ functions {
                                               edge_to_tc,
                                               phosphorylation_ix_long,
                                               phosphorylation_ix_bounds,
-                                              phosphorylation_type);
+                                              phosphorylation_type,
+                                              phosphorylation_pme);
     return (S * edge_flux)[balanced_ix];
   }
 }
