@@ -452,7 +452,7 @@ def get_stan_inputs(
         ),
         # configuration
         conc_init=get_conc_init(
-            ms, kinetic_model, priors, config, is_train=True, is_test=False
+            ms, kinetic_model, priors, config, mode="train"
         ),
         likelihood=StanData("likelihood", int(config.likelihood)),
         drain_small_conc_corrector=StanData(
@@ -572,7 +572,7 @@ def get_stan_inputs(
             ),
             # configuration
             conc_init=get_conc_init(
-                ms, kinetic_model, priors, config, is_train=False, is_test=True
+                ms, kinetic_model, priors, config, mode="test"
             ),
             likelihood=StanData("likelihood", int(config.likelihood)),
             drain_small_conc_corrector=StanData(
@@ -612,8 +612,7 @@ def get_conc_init(
     kinetic_model: KineticModel,
     priors: PriorSet,
     config: MaudConfig,
-    is_train: bool,
-    is_test: bool,
+    mode: str,
 ) -> StanData:
     """Get the initial mic concentrations for the ODE solver.
 
@@ -626,11 +625,17 @@ def get_conc_init(
 
     :param mi: a MaudInput object
 
+    :param mode: either "train" or "test"
+
     """
+    if mode not in ["train", "test"]:
+        raise ValueError("Param mode must be either 'train' or 'test'.")
     out = []
     y = ms.yconc.set_index(["target_id", "experiment_id"])["measurement"]
     for exp in ms.experiments:
-        if exp.is_train == is_train and exp.is_test == is_test:
+        if (mode == "train" and exp.is_train) or (
+            mode == "test" and exp.is_test
+        ):
             init_exp = []
             for mic in kinetic_model.mics:
                 if (mic.id, exp.id) in y.index:
