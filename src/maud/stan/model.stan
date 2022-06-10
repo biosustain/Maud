@@ -7,6 +7,8 @@ data {
   int<lower=1> N_unbalanced;
   int<lower=1> N_metabolite;
   int<lower=1> N_km;
+  int<lower=1> N_sub_km;
+  int<lower=1> N_prod_km;
   int<lower=1> N_reaction;
   int<lower=1> N_enzyme;
   int<lower=0> N_drain;
@@ -67,9 +69,9 @@ data {
   array[N_edge,2] int sub_by_edge_bounds;
   array[N_edge_prod] int prod_by_edge_long;
   array[N_edge, 2] int prod_by_edge_bounds;
-  array[N_edge_sub] int sub_km_ix_by_edge_long;
+  array[N_sub_km] int sub_km_ix_by_edge_long;
   array[N_edge, 2] int sub_km_ix_by_edge_bounds;
-  array[N_edge_prod] int prod_km_ix_by_edge_long;
+  array[N_prod_km] int prod_km_ix_by_edge_long;
   array[N_edge,2] int prod_km_ix_by_edge_bounds;
   array[N_competitive_inhibition] int ci_ix_long;
   array[N_edge, 2] int ci_ix_bounds;

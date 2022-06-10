@@ -135,6 +135,8 @@ class StanInputTrain:
     N_unbalanced: StanData = Field(init=False, exclude=True)
     N_metabolite: StanData = Field(init=False, exclude=True)
     N_km: StanData = Field(init=False, exclude=True)
+    N_sub_km: StanData = Field(init=False, exclude=True)
+    N_prod_km: StanData = Field(init=False, exclude=True)
     N_enzyme: StanData = Field(init=False, exclude=True)
     N_phosphorylation: StanData = Field(init=False, exclude=True)
     N_pme: StanData = Field(init=False, exclude=True)
@@ -159,7 +161,7 @@ class StanInputTrain:
             name="N_edge_sub", value=len(self.sub_by_edge_long.value)
         )
         self.N_edge_prod = StanData(
-            name="N_edge_sub", value=len(self.prod_by_edge_long.value)
+            name="N_edge_prod", value=len(self.prod_by_edge_long.value)
         )
         self.N_edge = StanData(name="N_edge", value=len(self.S.value[0]))
         self.N_unbalanced = StanData(
@@ -170,6 +172,8 @@ class StanInputTrain:
             name="N_metabolite", value=len(self.prior_loc_dgf.value)
         )
         self.N_km = StanData(name="N_km", value=len(self.priors_km.value[0]))
+        self.N_sub_km = StanData(name="N_sub_km", value=len(self.sub_km_ix_by_edge_long.value))
+        self.N_prod_km = StanData(name="N_prod_km", value=len(self.prod_km_ix_by_edge_long.value))
         self.N_enzyme = StanData(
             name="N_enzyme", value=len(self.priors_kcat.value[0])
         )
@@ -296,6 +300,8 @@ class StanInputTest:
     N_enzyme: StanData = Field(init=False, exclude=True)
     N_enzyme_knockout: StanData = Field(init=False, exclude=True)
     N_pme_knockout: StanData = Field(init=False, exclude=True)
+    N_sub_km: StanData = Field(init=False, exclude=True)
+    N_prod_km: StanData = Field(init=False, exclude=True)
 
     # final output
     stan_input_dict: StanInputDict = Field(init=False, exclude=True)
@@ -307,7 +313,7 @@ class StanInputTest:
             name="N_edge_sub", value=len(self.sub_by_edge_long.value)
         )
         self.N_edge_prod = StanData(
-            name="N_edge_sub", value=len(self.prod_by_edge_long.value)
+            name="N_edge_prod", value=len(self.prod_by_edge_long.value)
         )
         self.N_edge = StanData(name="N_edge", value=len(self.S.value[0]))
         self.N_unbalanced = StanData(
@@ -341,6 +347,8 @@ class StanInputTest:
         self.N_pme_knockout = StanData(
             name="N_pme_knockout", value=len(self.pme_knockout_long.value)
         )
+        self.N_sub_km = StanData(name="N_sub_km", value=len(self.sub_km_ix_by_edge_long.value))
+        self.N_prod_km = StanData(name="N_prod_km", value=len(self.prod_km_ix_by_edge_long.value))
         self.stan_input_dict = {
             f.name: getattr(self, f.name).value
             for f in fields(self)

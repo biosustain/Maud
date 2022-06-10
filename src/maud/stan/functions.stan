@@ -101,7 +101,7 @@ functions {
     int N_edge = size(sub_by_edge_bounds);
     vector[N_edge] prod_conc_over_km;
     for (f in 1:N_edge){
-      if (edge_type[f] == 2){
+      if (edge_type[f] == 3){
         prod_conc_over_km[f] = 1;
         continue;
       }
@@ -133,7 +133,7 @@ functions {
     int N_edge = cols(S);
     vector[N_edge] denom;
     for (f in 1:N_edge){
-      if (edge_type[f] == 2){
+      if (edge_type[f] == 3){  // drain
         denom[f] = 1;
         continue;
       }
@@ -145,7 +145,7 @@ functions {
       array[N_prod] int prod_ix = extract_ragged(prod_by_edge_long, prod_by_edge_bounds, f);
       vector[N_sub] sub_over_km = conc[sub_ix] ./ km[sub_km_ix];
       denom[f] = prod((rep_vector(1, N_sub) + sub_over_km) ^ fabs(S[sub_ix, f]));
-      if (edge_type[f] == 1){
+      if (edge_type[f] == 1){  // reversible michaelis menten
         array[N_prod] int prod_km_ix = extract_ragged(prod_km_ix_by_edge_long, prod_km_ix_by_edge_bounds, f);
         vector[N_prod] prod_over_km = conc[prod_ix] ./ km[prod_km_ix];
         denom[f] += prod((rep_vector(1, N_prod) + prod_over_km) ^ fabs(S[prod_ix, f])) - 1;
@@ -164,7 +164,7 @@ functions {
     vector[N_edge] reaction_quotient = S' * log(conc);
     vector[N_edge] out;
     for (f in 1:N_edge){
-      if (edge_type[f] == 1)
+      if (edge_type[f] == 1)  // reversible michaelis menten
         out[f] = 1 - exp((dgr[f] + RT * reaction_quotient[f])/RT);
       else
         out[f] = 1;
@@ -247,7 +247,7 @@ functions {
     int N_edge = size(edge_type);
     vector[N_edge] out = rep_vector(1, N_edge);
     for (f in 1:N_edge){
-      if (edge_type[f] == 2){
+      if (edge_type[f] == 3){
         int N_sub = measure_ragged(sub_by_edge_bounds, f);
         int subs[N_sub] = extract_ragged(sub_by_edge_long, sub_by_edge_bounds, f);
         out[f] = drain[edge_to_drain[f]] * prod(conc[subs] ./ (conc[subs] + drain_small_conc_corrector));
@@ -260,7 +260,7 @@ functions {
     int N_edge = size(edge_to_enzyme);
     vector[N_edge] out = rep_vector(1, N_edge);
     for (f in 1:N_edge){
-      if (edge_type[f] != 2){
+      if (edge_type[f] != 3){
         out[f] = enzyme[edge_to_enzyme[f]] * kcat[edge_to_enzyme[f]];
       }
     }

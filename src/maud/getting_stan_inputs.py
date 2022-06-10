@@ -63,6 +63,8 @@ def get_stan_inputs(
     enzyme_codes = codify_maud_object(enzymes)
     experiments_train = [e for e in ms.experiments if e.is_train]
     experiments_test = [e for e in ms.experiments if e.is_test]
+    experiment_ids_train = [exp.id for exp in experiments_train]
+    experiment_ids_test = [exp.id for exp in experiments_test]
     experiment_codes_train = codify_maud_object(experiments_train)
     km_ids = priors.km.stan_variable.ids[0]
     km_codes = dict(zip(km_ids, range(1, len(km_ids) + 1)))
@@ -149,7 +151,7 @@ def get_stan_inputs(
     prod_code_by_edge = []
     prod_km_code_by_edge = []
     for edge in edges:
-        if isinstance(edge, Reaction):
+        if isinstance(edge, Reaction):  # drain case
             rxn = edge
         else:
             rxn = next(r for r in reactions if r.id == edge.reaction_id)
@@ -159,7 +161,7 @@ def get_stan_inputs(
         prod_ids = [
             p for p in rxn.stoichiometry.keys() if rxn.stoichiometry[p] > 0
         ]
-        if isinstance(edge, Reaction):
+        if isinstance(edge, Reaction):  # drain case
             sub_km_ids = []
             prod_km_ids = []
         else:
@@ -293,20 +295,20 @@ def get_stan_inputs(
         for df in (ms.yconc, ms.yenz, ms.yflux)
     )
     priors_conc_pme_train, priors_conc_pme_test = [
-        unpack_priors_2d(priors.conc_pme, exp_ids=[e.id for e in exps])
-        for exps in (experiments_train, experiments_test)
+        unpack_priors_2d(priors.conc_pme, exp_ids=exp_ids)
+        for exp_ids in (experiment_ids_train, experiment_ids_test)
     ]
     priors_conc_unbalanced_train, priors_conc_unbalanced_test = [
-        unpack_priors_2d(priors.conc_unbalanced, exp_ids=[e.id for e in exps])
-        for exps in (experiments_train, experiments_test)
+        unpack_priors_2d(priors.conc_unbalanced, exp_ids=exp_ids)
+        for exp_ids in (experiment_ids_train, experiment_ids_test)
     ]
     priors_conc_enzyme_train, priors_conc_enzyme_test = [
-        unpack_priors_2d(priors.conc_enzyme, exp_ids=[e.id for e in exps])
-        for exps in (experiments_train, experiments_test)
+        unpack_priors_2d(priors.conc_enzyme, exp_ids=exp_ids)
+        for exp_ids in (experiment_ids_train, experiment_ids_test)
     ]
     priors_drain_train, priors_drain_test = [
-        unpack_priors_2d(priors.drain, exp_ids=[e.id for e in exps])
-        for exps in (experiments_train, experiments_test)
+        unpack_priors_2d(priors.drain, exp_ids=exp_ids)
+        for exp_ids in (experiment_ids_train, experiment_ids_test)
     ]
     stan_input_train = StanInputTrain(
         # priors
@@ -329,7 +331,10 @@ def get_stan_inputs(
         priors_kcat_pme=StanData(
             "priors_pme", unpack_priors_1d(priors.kcat_pme)
         ),
-        priors_psi=StanData("priors_psi", unpack_priors_1d(priors.psi)),
+        priors_psi=StanData(
+            "priors_psi",
+            unpack_priors_1d(priors.psi, ids=experiment_ids_train),
+        ),
         priors_conc_pme=StanData("priors_conc_pme", priors_conc_pme_train),
         priors_conc_unbalanced=StanData(
             "priors_conc_unbalanced", priors_conc_unbalanced_train
@@ -446,7 +451,9 @@ def get_stan_inputs(
             pme_knockout_bounds_train,
         ),
         # configuration
-        conc_init=get_conc_init(ms, kinetic_model, priors, config),
+        conc_init=get_conc_init(
+            ms, kinetic_model, priors, config, is_train=True, is_test=False
+        ),
         likelihood=StanData("likelihood", int(config.likelihood)),
         drain_small_conc_corrector=StanData(
             "drain_small_conc_corrector",
@@ -564,7 +571,9 @@ def get_stan_inputs(
                 "pme_knockout_bounds", pme_knockout_bounds_test
             ),
             # configuration
-            conc_init=get_conc_init(ms, kinetic_model, priors, config),
+            conc_init=get_conc_init(
+                ms, kinetic_model, priors, config, is_train=False, is_test=True
+            ),
             likelihood=StanData("likelihood", int(config.likelihood)),
             drain_small_conc_corrector=StanData(
                 "drain_small_conc_corrector",
@@ -603,6 +612,8 @@ def get_conc_init(
     kinetic_model: KineticModel,
     priors: PriorSet,
     config: MaudConfig,
+    is_train: bool,
+    is_test: bool,
 ) -> StanData:
     """Get the initial mic concentrations for the ODE solver.
 
@@ -619,17 +630,20 @@ def get_conc_init(
     out = []
     y = ms.yconc.set_index(["target_id", "experiment_id"])["measurement"]
     for exp in ms.experiments:
-        init_exp = []
-        for mic in kinetic_model.mics:
-            if (mic.id, exp.id) in y.index:
-                init_exp.append(y.loc[(mic.id, exp.id)])
-            elif mic.balanced:
-                init_exp.append(config.default_initial_concentration)
-            else:
-                init_exp.append(
-                    np.exp(priors.conc_unbalanced.location.loc[exp.id, mic.id])
-                )
-        out.append(init_exp)
+        if exp.is_train == is_train and exp.is_test == is_test:
+            init_exp = []
+            for mic in kinetic_model.mics:
+                if (mic.id, exp.id) in y.index:
+                    init_exp.append(y.loc[(mic.id, exp.id)])
+                elif mic.balanced:
+                    init_exp.append(config.default_initial_concentration)
+                else:
+                    init_exp.append(
+                        np.exp(
+                            priors.conc_unbalanced.location.loc[exp.id, mic.id]
+                        )
+                    )
+            out.append(init_exp)
     return StanData(name="conc_init", value=out)
 
 
@@ -650,9 +664,12 @@ def unpack_priors_2d(
     return [loc, scale]
 
 
-def unpack_priors_1d(p: IndPrior1d) -> List[List[float]]:
+def unpack_priors_1d(p: IndPrior1d, ids=None) -> List[List[float]]:
     """Turn an IndPrior1d object into a json-compatible list."""
-    return [p.location.to_list(), p.scale.to_list()]
+    if ids is None:
+        return [p.location.to_list(), p.scale.to_list()]
+    else:
+        return [p.location.loc[ids].to_list(), p.scale.loc[ids].to_list()]
 
 
 def codify_maud_object(lx: Iterable[CodifiableMaudObject]) -> Dict[str, int]:
