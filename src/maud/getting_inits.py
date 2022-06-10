@@ -57,14 +57,14 @@ def get_inits_for_param(
     elif isinstance(inits_pd, pd.Series):
         id_components = [c.value for c in prior.stan_variable.id_components[0]]
         if len(user) > 0:
-            for i, row in user.iterrows():
+            for _, row in user.iterrows():
                 param_id = ID_SEPARATOR.join([row[c] for c in id_components])
                 inits_pd.loc[param_id] = row["value"]
         return inits_pd
     elif isinstance(inits_pd, pd.DataFrame):
         id_components = [c.value for c in prior.stan_variable.id_components[1]]
         if len(user) > 0:
-            for i, row in user.iterrows():
+            for _, row in user.iterrows():
                 non_experiment_id = ID_SEPARATOR.join(
                     [row[c] for c in id_components]
                 )
