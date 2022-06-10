@@ -172,8 +172,12 @@ class StanInputTrain:
             name="N_metabolite", value=len(self.prior_loc_dgf.value)
         )
         self.N_km = StanData(name="N_km", value=len(self.priors_km.value[0]))
-        self.N_sub_km = StanData(name="N_sub_km", value=len(self.sub_km_ix_by_edge_long.value))
-        self.N_prod_km = StanData(name="N_prod_km", value=len(self.prod_km_ix_by_edge_long.value))
+        self.N_sub_km = StanData(
+            name="N_sub_km", value=len(self.sub_km_ix_by_edge_long.value)
+        )
+        self.N_prod_km = StanData(
+            name="N_prod_km", value=len(self.prod_km_ix_by_edge_long.value)
+        )
         self.N_enzyme = StanData(
             name="N_enzyme", value=len(self.priors_kcat.value[0])
         )
@@ -347,8 +351,12 @@ class StanInputTest:
         self.N_pme_knockout = StanData(
             name="N_pme_knockout", value=len(self.pme_knockout_long.value)
         )
-        self.N_sub_km = StanData(name="N_sub_km", value=len(self.sub_km_ix_by_edge_long.value))
-        self.N_prod_km = StanData(name="N_prod_km", value=len(self.prod_km_ix_by_edge_long.value))
+        self.N_sub_km = StanData(
+            name="N_sub_km", value=len(self.sub_km_ix_by_edge_long.value)
+        )
+        self.N_prod_km = StanData(
+            name="N_prod_km", value=len(self.prod_km_ix_by_edge_long.value)
+        )
         self.stan_input_dict = {
             f.name: getattr(self, f.name).value
             for f in fields(self)
