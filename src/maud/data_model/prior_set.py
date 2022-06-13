@@ -78,6 +78,7 @@ class MultiVariateNormalPrior1d:
 
     @root_validator
     def location_index_must_agree_with_stan_variable(cls, values):
+        """Check that location index is the same as stan variable ids."""
         location_index = values["location"].index.tolist()
         sv_index = values["stan_variable"].ids[0]
         for ix_loc, ix_sv in zip(location_index, sv_index):
