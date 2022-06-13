@@ -77,6 +77,14 @@ class MultiVariateNormalPrior1d:
     covariance_matrix: pd.DataFrame
 
     @root_validator
+    def location_index_must_agree_with_stan_variable(cls, values):
+        location_index = values["location"].index.tolist()
+        sv_index = values["stan_variable"].ids[0]
+        for ix_loc, ix_sv in zip(location_index, sv_index):
+            assert ix_loc == ix_sv
+        return values
+
+    @root_validator
     def cov_and_loc_indexes_must_match(cls, values):
         """Check that location and cov agree."""
         assert values["location"].index.equals(

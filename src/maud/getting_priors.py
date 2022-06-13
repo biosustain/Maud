@@ -101,7 +101,12 @@ def load_2d_prior(
 def get_prior_set(upi: UserPriorInput, sv: StanVariableSet) -> PriorSet:
     """Get a PriorSet from a UserPriorInput and StanVariableSet."""
     if upi.dgf_loc is not None and upi.dgf_cov is not None:
-        prior_dgf = MultiVariateNormalPrior1d(sv.dgf, upi.dgf_loc, upi.dgf_cov)
+        met_order = sv.dgf.ids[0]
+        prior_dgf = MultiVariateNormalPrior1d(
+            sv.dgf,
+            upi.dgf_loc.loc[met_order],
+            upi.dgf_cov.loc[met_order, met_order],
+        )
     else:
         ip = load_1d_prior(upi.main_table, sv.dgf)
         prior_dgf = MultiVariateNormalPrior1d(
