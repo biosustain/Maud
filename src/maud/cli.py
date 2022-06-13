@@ -91,7 +91,7 @@ def do_sample(data_path, output_dir):
     stanfit = sample(mi, samples_path)
     print(stanfit.diagnose())
     print(stanfit.summary())
-    idata = get_idata(stanfit.runset.csv_files, mi)
+    idata = get_idata(stanfit.runset.csv_files, mi, "train")
     idata.to_netcdf(os.path.join(output_path, "idata.nc"))
     return output_path
 
@@ -174,7 +174,7 @@ def do_simulate(data_path, output_dir, n):
     os.mkdir(samples_path)
     print(f"Copying user input from {data_path} to {ui_dir}")
     stanfit = simulate(mi, samples_path, n)
-    idata = get_idata(stanfit.runset.csv_files, mi)
+    idata = get_idata(stanfit.runset.csv_files, mi, "train")
     idata.to_netcdf(os.path.join(output_path, "idata.nc"))
     print("\n\nSimulated concentrations:")
     print(

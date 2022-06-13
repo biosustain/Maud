@@ -10,12 +10,17 @@ from maud.data_model.maud_input import MaudInput
 from maud.utils import join_str_cols
 
 
-def get_idata(csvs: List[str], mi: MaudInput) -> az.InferenceData:
+def get_idata(csvs: List[str], mi: MaudInput, mode: str) -> az.InferenceData:
     """Get an arviz InferenceData object from Maud csvs."""
 
     Numba.disable_numba()
+    experiments = (
+        [e.id for e in mi.measurements.experiments if e.is_train]
+        if mode == "train"
+        else [e.id for e in mi.measurements.experiments if e.is_test]
+    )
     coords = {
-        "experiments": [e.id for e in mi.measurements.experiments],
+        "experiments": experiments,
         "reactions": [r.id for r in mi.kinetic_model.reactions],
         "drains": [r.id for r in mi.kinetic_model.drains],
         "metabolites": [m.id for m in mi.kinetic_model.metabolites],
@@ -52,15 +57,18 @@ def get_idata(csvs: List[str], mi: MaudInput) -> az.InferenceData:
             mi.stan_variable_set.dissociation_constant.ids[0]
         ),
         "yconcs": join_str_cols(
-            mi.measurements.yconc[["experiment_id", "target_id"]],
+            mi.measurements.yconc[["experiment_id", "target_id"]]
+            .loc[lambda df: df["experiment_id"].isin(experiments)],
             sep=ID_SEPARATOR,
         ).to_list(),
         "yfluxs": join_str_cols(
-            mi.measurements.yflux[["experiment_id", "target_id"]],
+            mi.measurements.yflux[["experiment_id", "target_id"]]
+            .loc[lambda df: df["experiment_id"].isin(experiments)],
             sep=ID_SEPARATOR,
         ).to_list(),
         "yenz": join_str_cols(
-            mi.measurements.yenz[["experiment_id", "target_id"]],
+            mi.measurements.yenz[["experiment_id", "target_id"]]
+            .loc[lambda df: df["experiment_id"].isin(experiments)],
             sep=ID_SEPARATOR,
         ).to_list(),
     }
