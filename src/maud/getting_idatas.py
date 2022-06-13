@@ -57,18 +57,21 @@ def get_idata(csvs: List[str], mi: MaudInput, mode: str) -> az.InferenceData:
             mi.stan_variable_set.dissociation_constant.ids[0]
         ),
         "yconcs": join_str_cols(
-            mi.measurements.yconc[["experiment_id", "target_id"]]
-            .loc[lambda df: df["experiment_id"].isin(experiments)],
+            mi.measurements.yconc[["experiment_id", "target_id"]].loc[
+                lambda df: df["experiment_id"].isin(experiments)
+            ],
             sep=ID_SEPARATOR,
         ).to_list(),
         "yfluxs": join_str_cols(
-            mi.measurements.yflux[["experiment_id", "target_id"]]
-            .loc[lambda df: df["experiment_id"].isin(experiments)],
+            mi.measurements.yflux[["experiment_id", "target_id"]].loc[
+                lambda df: df["experiment_id"].isin(experiments)
+            ],
             sep=ID_SEPARATOR,
         ).to_list(),
         "yenz": join_str_cols(
-            mi.measurements.yenz[["experiment_id", "target_id"]]
-            .loc[lambda df: df["experiment_id"].isin(experiments)],
+            mi.measurements.yenz[["experiment_id", "target_id"]].loc[
+                lambda df: df["experiment_id"].isin(experiments)
+            ],
             sep=ID_SEPARATOR,
         ).to_list(),
     }
