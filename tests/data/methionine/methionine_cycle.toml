@@ -4,17 +4,9 @@ name = "compartment"
 volume = 1.0
 
 [[reaction]]
-id = "met-Lsource"
-name = "Methionine adenosyltransferase"
-mechanism = "DRAIN"
-transported_charge = 0.0
-[reaction.stoichiometry]
-met-L_c = 1.0
-
-[[reaction]]
 id = "METAT"
 name = "Methionine adenosyltransferase"
-mechanism = "REVERSIBLE_MICHAELIS_MENTEN"
+mechanism = "IRREVERSIBLE_MICHAELIS_MENTEN"
 water_stoichiometry = -1.0
 transported_charge = 0.0
 
@@ -24,10 +16,21 @@ atp_c = -1.0
 pi_c = 1.0
 ppi_c = 1.0
 amet_c = 1.0
+
+[[reaction]]
+id = "met-L-source"
+name = "met-L-source"
+mechanism = "DRAIN"
+water_stoichiometry = 0.0
+transported_charge = 0.0
+
+[reaction.stoichiometry]
+met-L_c = 1.0
+
 [[reaction]]
 id = "METH"
 name = "Methylase"
-mechanism = "REVERSIBLE_MICHAELIS_MENTEN"
+mechanism = "IRREVERSIBLE_MICHAELIS_MENTEN"
 water_stoichiometry = 0.0
 transported_charge = 0.0
 
@@ -37,7 +40,7 @@ ahcys_c = 1.0
 [[reaction]]
 id = "GNMT"
 name = "Glycine N-methyltransferase"
-mechanism = "REVERSIBLE_MICHAELIS_MENTEN"
+mechanism = "IRREVERSIBLE_MICHAELIS_MENTEN"
 water_stoichiometry = 0.0
 transported_charge = 0.0
 
@@ -60,7 +63,7 @@ hcys-L_c = 1.0
 [[reaction]]
 id = "MS"
 name = "Methionine Synthase"
-mechanism = "REVERSIBLE_MICHAELIS_MENTEN"
+mechanism = "IRREVERSIBLE_MICHAELIS_MENTEN"
 water_stoichiometry = 0.0
 transported_charge = 0.0
 
@@ -72,7 +75,7 @@ thf_c = 1.0
 [[reaction]]
 id = "BHMT"
 name = "Betaine-homocysteine methyltransferase"
-mechanism = "REVERSIBLE_MICHAELIS_MENTEN"
+mechanism = "IRREVERSIBLE_MICHAELIS_MENTEN"
 water_stoichiometry = 0.0
 transported_charge = 0.0
 
@@ -84,7 +87,7 @@ dmgly_c = 1.0
 [[reaction]]
 id = "CBS"
 name = "Cystathionine beta synthase"
-mechanism = "REVERSIBLE_MICHAELIS_MENTEN"
+mechanism = "IRREVERSIBLE_MICHAELIS_MENTEN"
 water_stoichiometry = 1.0
 transported_charge = 0.0
 
@@ -95,7 +98,7 @@ cyst-L_c = 1.0
 [[reaction]]
 id = "MTHFR"
 name = "Methylenetetrahydrofolate reductase"
-mechanism = "REVERSIBLE_MICHAELIS_MENTEN"
+mechanism = "IRREVERSIBLE_MICHAELIS_MENTEN"
 water_stoichiometry = 0.0
 transported_charge = 0.0
 
@@ -107,7 +110,7 @@ nadp_c = 1.0
 [[reaction]]
 id = "PROT"
 name = "Protein Synthesis"
-mechanism = "REVERSIBLE_MICHAELIS_MENTEN"
+mechanism = "IRREVERSIBLE_MICHAELIS_MENTEN"
 water_stoichiometry = 0.0
 transported_charge = 0.0
 
