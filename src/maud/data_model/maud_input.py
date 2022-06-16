@@ -46,7 +46,7 @@ class MaudInput:
             self.kinetic_model, self.measurements
         )
         self.priors = get_prior_set(self.user_priors, self.stan_variable_set)
-        self.inits = get_inits(self.priors, self.user_inits)
+        self.inits = get_inits(self.priors, self.user_inits, self.measurements)
         self.stan_input_train, self.stan_input_test = get_stan_inputs(
             self.measurements, self.priors, self.kinetic_model, self.config
         )
