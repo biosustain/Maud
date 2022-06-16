@@ -20,6 +20,7 @@ def get_idata(csvs: List[str], mi: MaudInput, mode: str) -> az.InferenceData:
         else [e.id for e in mi.measurements.experiments if e.is_test]
     )
     coords = {
+        "enzymes": [e.id for e in mi.kinetic_model.enzymes],
         "experiments": experiments,
         "reactions": [r.id for r in mi.kinetic_model.reactions],
         "drains": [r.id for r in mi.kinetic_model.drains],
