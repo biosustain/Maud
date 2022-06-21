@@ -1,0 +1,65 @@
+[[experiment]]
+id = "dataset1"
+is_train = true
+is_test = false
+
+[[experiment]]
+id = "dataset2"
+is_train = false
+is_test = true
+
+[[experiment]]
+id = "dataset3"
+is_train = false
+is_test = true
+
+[[experiment]]
+id = "dataset4"
+is_train = false
+is_test = true
+
+[[experiment]]
+id = "dataset5"
+is_train = true
+is_test = false
+
+[[experiment]]
+id = "dataset6"
+is_train = true
+is_test = false
+
+[[experiment]]
+id = "dataset7"
+is_train = false
+is_test = true
+
+[[experiment]]
+id = "dataset8"
+is_train = false
+is_test = true
+
+[[experiment]]
+id = "dataset9"
+is_train = true
+is_test = false
+
+[[experiment]]
+id = "dataset10"
+is_train = true
+is_test = false
+
+[[experiment]]
+id = "dataset11"
+is_train = false
+is_test = true
+
+[[experiment]]
+id = "dataset12"
+is_train = true
+is_test = false
+
+[[experiment]]
+id = "validation"
+is_train = false
+is_test = true
+

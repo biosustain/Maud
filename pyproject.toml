@@ -5,7 +5,7 @@ requires = [
 ]
 
 [tool.black]
-line-length = 88
+line-length = 79
 python-version = ['py38', 'py39']
 exclude = '''
 (
@@ -14,10 +14,9 @@ exclude = '''
 )
 '''
 
-[tool.pyright]
-reportMissingImports = true
-reportMissingTypeStubs = false
-disableOrganizeImports = false
-useLibraryCodeForTypes = true
-venv = ".venv_maud"
-pythonPlatform = "Darwin"
+[tool.mypy]
+plugins = ["pydantic.mypy", "numpy.typing.mypy_plugin"]
+
+[[tool.mypy.overrides]]
+module = ["scipy.*", "cmdstanpy.*", "depinfo", "maud.*", "matplotlib.*"]
+ignore_missing_imports = true

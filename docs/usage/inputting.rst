@@ -2,8 +2,10 @@
 Specifying input data
 =====================
 
-This document explains how to specify kinetic models, prior parameter
-distributions and experimental data in a form that Maud can use.
+This document explains how to create input data for Maud.
+
+.. contents::
+   :depth: 2
 
 Overview
 ========
@@ -12,34 +14,59 @@ Maud inputs are structured directories, somewhat inspired by the `PEtab
 <https://github.com/PEtab-dev/PEtab>`_ format. A Maud input directory must
 contain a `toml <https://github.com/toml-lang/toml>`_ file called
 :code:`config.toml` which gives the input a name, configures how Maud will be
-run and tells Maud where to find the information it needs.
+run and tells Maud where to find the information it needs. It must also include
+a file containing a kinetic model definition, one specifying independent prior
+distributions, a file with information about the experimental setup and another
+one recording the results of measurements. Finally, the input folder can also
+optionally include extra files specifying non-independent priors and a file
+specifying initial parameter values for the MCMC sampler.
 
 For some working examples of full inputs see `here
 <https://github.com/biosustain/Maud/tree/master/tests/data>`_.
 
 
-Specifying a configuration file
-===============================
+The configuration file
+======================
 
-The file :code:`config.toml` **must** contain the top-level fields
-:code:`name`, :code:`kinetic_model`, :code:`priors` and :code:`experiments`. It
-can also optionally include keyword arguments to the method
-`cmdstanpy.CmdStanModel.sample
-<https://github.com/stan-dev/cmdstanpy/blob/develop/cmdstanpy/model.py>`_ in
-the table :code:`cmdstanpy_config` and control parameters for Stan's ODE solver
-in the table :code:`ode_config`.
+The file :code:`config.toml` **must** contain these top-level fields:
+
+- :code:`name` String naming the input
+- :code:`kinetic_model_file` Path to a :code:`toml` file defining a kinetic model
+- :code:`priors_file` Path to a :code:`csv` file specifying independent priors
+- :code:`experimental_setup_file` Path to a :code:`toml` file specifying the experimental setup
+- :code:`measurements_file` Path to a code:`csv` file specifying measurements
+- :code:`likelihood` Boolean representing whether to use information from measurements
+
+The following optional fields can also be specified:
+
+- :code:`reject_non_steady` Boolean saying whether to reject draws that enter non-steady states
+- :code:`ode_config` Table of configuration options for Stan's ode solver
+- :code:`cmdstanpy_config` Table of keyword arguments to the cmdstanpy method `sample <https://cmdstanpy.readthedocs.io/en/v1.0.1/api.html#cmdstanpy.CmdStanModel.sample>`_
+- :code:`cmdstanpy_config_predict` Table of overriding sample keyword argments for predictions
+- :code:`stanc_options` Table of valid choices for `CmdStanModel <https://cmdstanpy.readthedocs.io/en/v1.0.1/api.html#cmdstanpy.CmdStanModel>`_ argument `stanc_options`
+- :code:`cpp_options` Table of valid choices for  `CmdStanModel <https://cmdstanpy.readthedocs.io/en/v1.0.1/api.html#cmdstanpy.CmdStanModel>`_ argument `cpp_options`
+- :code:`variational_options` Arguments for CmdStanModel.variational
+- :code:`user_inits_file` path to a csv file of initial values
+- :code:`dgf_mean_file` path to a csv file of formation energy means
+- :code:`dgf_covariance_file` path to a csv file of formation energy covariances
+- :code:`steady_state_threshold_abs` absolute threshold for Sv=0 be at steady state
+- :code:`steady_state_threshold_rel` relative threshold for Sv=0 be at steady state
+- :code:`drain_small_conc_corrector` number for correcting small conc drains
 
 Here is an example configuration file:
 
 .. code:: toml
 
     name = "linear"
-    kinetic_model = "kinetic_model.toml"
-    priors = "priors.csv"
-    experiments = "experiments.csv"
+    kinetic_model_file = "kinetic_model.toml"
+    priors_file = "priors.csv"
+    measurements_file = "measurements.csv"
+    experimental_setup_file = "experimental_setup.toml"
     likelihood = true
+    steady_state_threshold_abs = 1e-6
 
     [cmdstanpy_config]
+    refresh = 1
     iter_warmup = 200
     iter_sampling = 200
     chains = 4
@@ -48,222 +75,322 @@ Here is an example configuration file:
     [ode_config]
     abs_tol = 1e-4
     rel_tol = 1e-4
-    max_num_steps = 1e9
-    timepoint = 50
-
+    max_num_steps = 1e6
+    timepoint = 1e3
 
 This file tells Maud that a file representing a kinetic model can be found at
-the relative path :code:`kinetic_model.toml`, and that information about priors
-and experiments are at :code:`priors.csv` and :code:`experiments.csv`
-respectively.
+the relative path :code:`kinetic_model.toml`, and that priors, experimental
+setup information and measurements can be found at :code:`priors.csv`,
+:code:`experimental_setup.toml` and :code:`measurements.csv` respectively.
 
 The line :code:`likelihood = true` tells Maud to take into account the
-measurements in :code:`experiments.csv`: in other words, **not** to run in
+measurements in :code:`measurements.csv`: in other words, **not** to run in
 priors-only mode.
 
 When Maud samples with this input, it will create 4 MCMC chains, each with 200
 warmup and 200 sampling iterations, which will all be saved in the output csv
-files. the ODE solver will find steady states by simulating for 50 seconds,
+files. the ODE solver will find steady states by simulating for 1000 seconds,
 with a step limit as well as absolute and relative tolerances.
 
+The kinetic model file
+======================
 
-Specifying a kinetic model
-==========================
+A Maud input should use exactly one kinetic model file, which is written in the
+`toml <https://github.com/toml-lang/toml>`_ markup language and pointed to by
+the :code:`kinetic_model` field of the input's :code:`config.toml` file. This
+section explains how to write this kind of file.
 
-Kinetic models files are specified in `toml
-<https://github.com/toml-lang/toml>`_ files, which have three obligatory top
-level tables, namely :code:`compartment`, :code:`metabolite-in-compartment` and
-:code:`reaction`. In addition, kinetic models can include tables representing
-drains and phosphorylation reactions.
+If it doesn't make sense, make sure to check the `code that tells Maud what a
+kinetic model should look like
+<https://github.com/biosustain/Maud/blob/master/src/maud/data_model/kinetic_model.py>`_.
 
-A compartment must have an id, a name and a volume. Here is an example
-compartment specification:
+name
+----
+This top level field is a string describing the kinetic model.
 
-.. code:: toml
+compartment
+-----------
+A table with the following obligatory fields:
 
-    [[compartment]]
-    id = 'c'
-    name = 'cytosol'
-    volume = 1
+- :code:`id` A string identifying the compartment without any underscore characters.
+- :code:`name` A string describing the compartment
+- :code:`volume` A float specifying the compartment's volume
 
-The units for the :code:`volume` field are arbitrary.
-
-A metabolite-in-compartment must have a metabolite, a compartment (this should
-be the id of a compartment) and a property 'balanced' specifying whether its
-concentration should be constant at steady state.
-
-The id of a metabolite-in-compartment is the metabolite and its compartment,
-separated by an underscore - for example :code:`amp_c`.
-
-It is also possible to specify the `inchi key
-<http://inchi.info/inchikey_overview_en.html>`_ of the metabolite using the
-field :code:`metabolite_inchi_key`.
-
-Here is an example specification of a metabolite-in-compartment:
+Here is an example compartment table:
 
 .. code:: toml
 
-    [[metabolite-in-compartment]]
-    name = 'adenosine monophosphate'
-    metabolite = 'amp'
-    compartment = 'c'
-    balanced = false
-    metabolite_inchi_key = 'UDMBCSSLTHHNCD-KQYNXXCUSA-L'
+    compartment = [
+      {id = 'c', name = 'cytosol', volume = 1},
+      {id = 'e', name = 'external', volume = 1},
+    ]
 
-A reaction can be specified as follows:
+metabolite
+----------
+A table with the following obligatory fields:
+
+- :code:`id` A string identifying the metabolite without any underscore characters.
+- :code:`name` A string describing the metabolite
+
+Here is an example metabolite table:
+
+.. code:: toml
+
+    metabolite = [
+      {id = "M1", name = "Metabolite number 1"},
+      {id = "M2", name = "Metabolite number 2"},
+    ]
+
+metabolite_in_compartment
+-------------------------
+
+A table that specifies which metabolites exist in which compartments, and
+whether they should be considered balanced or not. The fields in this table are
+as follows:
+
+- :code:`metabolite_id` The id of an entry in the :code:`metabolite` table
+- :code:`compartment_id` The id of an entry in the :code:`compartment` table
+- :code:`balanced` A boolean
+
+For a :code:`metabolite_in_compartment` to be balanced means that its
+concentration does not change when the system is in a steady state. Often
+metabolites in the external compartment will be unbalanced.
+  
+Here is an example :code:`metabolite_in_compartment` table:
+
+.. code:: toml
+
+    metabolite_in_compartment = [
+      {metabolite_id = "M1", compartment_id = "e", balanced = false},
+      {metabolite_id = "M1", compartment_id = "c", balanced = true},
+      {metabolite_id = "M2", compartment_id = "c", balanced = true},
+      {metabolite_id = "M2", compartment_id = "e", balanced = false},
+    ]
+
+enzyme
+------
+
+A table with the following obligatory fields:
+
+- :code:`id` A string identifying the enzyme without any underscore characters.
+- :code:`name` A string describing the enzyme
+- :code:`subunits` An integer specifying how many subunits the enzyme has.
+
+.. code:: toml
+
+    enzyme = [
+      {id = "r1", name = "r1ase", subunits = 1},
+      {id = "r2", name = "r2ase", subunits = 1},
+      {id = "r3", name = "r3ase", subunits = 1},
+    ]
+
+reaction
+--------
+
+A table with the following obligatory fields:
+
+- :code:`id` A string identifying the reaction without any underscore characters.
+- :code:`name` A string describing the reaction
+- :code:`mechanism` A string specifying the reaction's mechanism
+- :code:`stoichiometry` A mapping representing the stoichiometric coefficient
+  for each :code:`metabolite_in_compartment` that the reaction creates or
+  destroys.
+
+In addition the following optional fields can be specified:
+
+- :code:`water_stoichiometry` A float indicating the reaction's water stoichiometry
+- :code:`transported_charge` A float indicating the reaction's transported charge
+
+Valid options for the :code:`mechanism` field are:
+
+- :code:`reversible_michaelis_menten`
+- :code:`irreversible_michaelis_menten`
+- :code:`drain`
+
+Each key in the :code:`stoichiometry` should identify an existing
+:code:`metabolite_in_compartment` using a :code:`metabolite` id and a
+:code:`compartment` id, separated by an underscore.
+
+Here is an example of an entry in a reaction table:
 
 .. code:: toml
 
     [[reaction]]
-    id = 'FBA'
-    name = 'FBA'
-    stoichiometry = { f16p_c = -1, dhap_c = 1, g3p_c = 1 }
-    [[reaction.enzyme]]
-    id = 'FBA'
-    name = 'FBA'
-    [[reaction.enzyme.modifier]]
-    modifier_type = 'allosteric_activator'
-    mic_id = 'amp_c'
+    id = "r1"
+    name = "Reaction number 1"
+    mechanism = "reversible_michaelis_menten"
+    stoichiometry = { M1_e = -1, M1_c = 1}
 
-Reaction level information is specified under :code:`[[reaction]]`, and
-enzyme-specific information goes under :code:`[[reaction.enzyme]]`. The
-stoichiometry property should map metabolite-in-compartment ids to numerical
-stoichiometries with arbitrary units. The mechanism property must be one of the
-mechanisms that Maud supports - these can be found in the source code file
-`big_k_rate_equations.stan
-<https://github.com/biosustain/Maud/blob/master/src/maud/stan_code/big_k_rate_equations.stan>`_. The
-optional property allosteric_inhibitors must be a list containing ids of
-metabolites that feature in the network.
+enzyme_reaction
+---------------
 
-Specifying experiments
-======================
+A table indicating which enzymes catalyse which reactions, with the following fields:
 
-Files containing information about experimental measurements should be csvs
-with the following fields:
+- :code:`enzyme_id` The id of an entry in the :code:`enzyme` table
+- :code:`reaction_id` The id of an entry in the :code:`reaction` table
 
-- :code:`measurement_type`: one out of these options:
-  - :code:`mic`: stands for metabolite-in-compartment, has the form :code:`<metabolite_id>_<compartment_id>`
-  - :code:`flux`
-  - :code:`enzyme`
-- :code:`target_id`: the id of the thing measured
-- :code:`experiment_id`: an id corresponding to the experiment
-- :code:`measurement`: the measured value
-- :code:`error_scale`: a number representing the accuracy of the measurement
+Here is an example :code:`enzyme_reaction` table:
 
-Error scales are interpreted as the standard deviation of a normal distribution
-for flux measurements, which can be negative, or as scale parameters of
-lognormal distributions for concentration and enzyme measurements, as these are
-always non-negative.
+enzyme_reaction = [
+  {enzyme_id = "r1", reaction_id = "r1"},
+  {enzyme_id = "r2", reaction_id = "r2"},
+  {enzyme_id = "r3", reaction_id = "r3"},
+]
 
-Here is an example experiment file:
+allostery
+---------
 
-.. csv-table::
+An optional table with the following fields:
 
-    measurement_type,target_id,experiment_id,measurement,error_scale
-    mic,f6p_c,Evo04ptsHIcrrEvo01EP,0.6410029,0.146145
-    mic,fdp_c,Evo04ptsHIcrrEvo01EP,4.5428601,0.237197
-    mic,dhap_c,Evo04ptsHIcrrEvo01EP,1.895018,0.078636
-    mic,f6p_c,Evo04Evo01EP,0.6410029,0.146145
-    mic,fdp_c,Evo04Evo01EP,4.5428601,0.237197
-    mic,dhap_c,Evo04Evo01EP,1.895018,0.078636
-    flux,PGI,Evo04ptsHIcrrEvo01EP,4.08767353555,1
-    flux,PGI,Evo04Evo01EP,4.08767353555,1
+- :code:`enzyme_id` The id of an entry in the :code:`enzyme` table
+- :code:`metabolite_id` The id of an entry in the :code:`metabolite` table
+- :code:`compartment_id` The id of an entry in the :code:`compartment` table
+- :code:`modification_type` A string specifying the kind of modification
 
-Units here are arbitrary, but the values must agree with the rest of the model.
+Valid options for the :code:`modification_type` field are:
 
-Specifying priors
-=================
+- :code:`activation`
+- :code:`inhibition`
 
-Files with information about priors should be csvs with the following fields:
+Here is an example of an entry in a allostery table:
 
-- :code:`parameter_type`: see below for options and corresponding id fields:
-- :code:`metabolite_id`
-- :code:`mic_id`
-- :code:`enzyme_id`
-- :code:`drain_id`
-- :code:`phos_enz_id`
-- :code:`experiment_id`
-- :code:`location`
-- :code:`scale`
-- :code:`pct1`: first percentile of the prior distribution
+.. code:: toml
+
+    [[allostery]]
+    enzyme_id = "r1"
+    metabolite_id = "M2"
+    compartment_id = "c"
+    modification_type = "activation"
+
+competitive_inhibition
+----------------------
+
+An optional table with the following fields:
+
+- :code:`enzyme_id` The id of an entry in the :code:`enzyme` table
+- :code:`reaction_id` The id of an entry in the :code:`reaction` table
+- :code:`metabolite_id` The id of an entry in the :code:`metabolite` table
+- :code:`compartment_id` The id of an entry in the :code:`compartment` table
+
+
+Here is an example of an entry in a allostery table:
+
+.. code:: toml
+
+    [[competitive_inhibition]]
+    enzyme_id = "r2"
+    reaction_id = "r2"
+    metabolite_id = "M1"
+    compartment_id = "c"
+
+phosphorylation
+---------------
+
+An optional table with the following fields:
+
+- :code:`enzyme_id` The id of an entry in the :code:`enzyme` table
+- :code:`modification_type` A string specifying the kind of modification
+
+Valid options for the :code:`modification_type` field are:
+
+- :code:`activation`
+- :code:`inhibition`
+
+Here is an example of an entry in a allostery table:
+
+.. code:: toml
+
+    [[phosphorylation]]
+    enzyme_id = "r1"
+    modification_type = "activation"
+
+The experimental setup file
+===========================
+
+This is a file written in toml, giving qualititative information about the
+input's experimental setup.
+
+This section describes this file's fields.
+
+experiment
+----------
+
+An obligatory table containing information that is specific to each of the
+input's experiments, with the following fields:
+
+- :code:`id` A string identifying the experiment, without any underscores
+- :code:`is_train` A boolean indicating whether to include the experiment in the
+  training dataset
+- :code:`is_test` A boolean indicating whether to include the experiment in the
+  test dataset
+- :code:`temperature` A float specifying the experiment's temperature.
+
+enzyme_knockout
+---------------
+
+An optional table specifying knockouts of enzymes, with the following fields:
+
+- :code:`experiment_id` Id of the knockout's experiment
+- :code:`enzyme_id` Id of the enzyme that was knocked out
+
+phosphorylation_knockout
+------------------------
+
+An optional table specifying knockouts of phosphorylation effects, with the
+following fields:
+
+- :code:`experiment_id` Id of the knockout's experiment
+- :code:`enzyme_id` Id of the enzyme whose phosphorylation was knocked out
+
+
+The measurements file
+=====================
+
+This is a csv file with the following fields:
+
+- :code:`measurement_type` A string specifying what kind of thing was measured 
+- :code:`target_id` A string identifying the thing that was measured 
+- :code:`experiment` A string specifying the measurement's experiment 
+- :code:`measurement` The measured value, as a float
+- :code:`error_scale` The measurement error, as a float
+
+Valid options for the :code:`measurement_type` field are:
+
+- :code:`mic` Concentration of a :code:`metabolite_in_compartment`
+- :code:`enzyme` Concentration of an enzyme
+- :code:`flux` Flux of a reaction
+
+`error_scale` is the standard deviation of a normal distribution for flux
+measurements or the scale parameter of a lognormal distribution for
+concentration measurements.
+
+
+The priors file
+===============
+
+This is a csv file representing pre-experimental information that can be
+represented by independent probability distributions.
+
+The priors table has the following fields:
+
+- :code:`parameter` String identifying a parameter
+- :code:`metabolite` String identifier
+- :code:`compartment` String identifier
+- :code:`enzyme` String identifier
+- :code:`reaction` String identifier
+- :code:`experiment` String identifier
+- :code:`location` Float specifying a location
+- :code:`scale` Float specifying a scale
+- :code:`pct1`: First percentile of the prior distribution
 - :code:`pct99`: 99th percentile of the prior distribution
 
-Each parameter type has specific required id fields, which are as follows:
+See the :code:`id_components` fields in the `corresponding code file
+<https://github.com/biosustain/Maud/tree/master/src/maud/data_model/stan_variable_set.py>`_
+for which columns need to be specified for each kind of
+prior.
 
-- :code:`kcat`: :code:`enzyme_id`
-- :code:`km`: :code:`enzyme_id` and :code:`mic_id`
-- :code:`dgf`: :code:`metabolite_id`
-- :code:`ki`: :code:`enzyme_id`
-- :code:`conc_enzyme`: :code:`enzyme_id` and :code:`experiment_id`
-- :code:`conc_unbalanced`: :code:`mic_id` and :code:`experiment_id`
-- :code:`drain`: :code:`drain_id` and :code:`experiment_id`
-- :code:`transfer_constant`: :code:`enzyme_id`
-- :code:`diss_r`: :code:`enzyme_id` and :code:`mic_id`
-- :code:`diss_t`: :code:`enzyme_id` and :code:`mic_id`
-- :code:`kcat_phos`: :code:`phos_enz_id`
-- :code:`conc_phos`: :code:`phos_enz_id` and :code:`experiment_id`
-
-Information in id fields other than the required ones will be ignored: for
-clarity it is best to leave these empty, as in the example below.
-
-Quantitative prior information must be represented either using the
-:code:`location` and :code:`scale` fields or else the :code:`pct1` and
-:code:`pct99` fields.
-
-Formation energy priors should have units of kJ/mol. The units for kinetic
-parameter priors are effectively set by those of the formation energies,
-through the equality :math:`keq = \exp(\frac{\Delta G}{-RT})` and the Haldane
-relationships linking :math:`keq` parameters with other kinetic parameters.
-
-Below is an example priors file.
-
-.. csv-table::
-
-    parameter_type,metabolite_id,mic_id,enzyme_id,drain_id,phos_enz_id,experiment_id,location,scale,pct1,pct99
-    kcat,,,PGI,,,,126.0,0.2,,
-    kcat,,,PFK,,,,110.0,0.2,,
-    kcat,,,FBP,,,,24.0,0.2,,
-    kcat,,,FBA,,,,7.0,0.2,,
-    kcat,,,TPI,,,,9000.0,0.2,,
-    km,,g6p_c,PGI,,,,3.0,0.2,,
-    km,,f6p_c,PGI,,,,0.16,0.2,,
-    km,,f6p_c,PFK,,,,0.04,0.2,,
-    km,,atp_c,PFK,,,,0.06,0.2,,
-    km,,fdp_c,PFK,,,,15,1.5,,
-    km,,adp_c,PFK,,,,0.55,1.5,,
-    km,,fdp_c,FBP,,,,16.0,0.2,,
-    km,,f6p_c,FBP,,,,0.689,1.5,,
-    km,,pi_c,FBP,,,,1.0,1.5,,
-    km,,fdp_c,FBA,,,,0.02,0.2,,
-    km,,g3p_c,FBA,,,,0.03,0.2,,
-    km,,dhap_c,FBA,,,,0.13,0.2,,
-    km,,dhap_c,TPI,,,,2.16,1.5,,
-    km,,g3p_c,TPI,,,,200.0,0.2,,
-    dgf,g6p,,,,,,-1336.3,1.3,,
-    dgf,f6p,,,,,,-1333.8,1.3,,
-    dgf,pi,,,,,,-1073.3,1.5,,
-    dgf,adp,,,,,,-1440.8,2.4,,
-    dgf,atp,,,,,,-2313.0,3.0,,
-    dgf,fdp,,,,,,-2220.9,2.1,,
-    dgf,g3p,,,,,,-1106.4,1.3,,
-    dgf,dhap,,,,,,-1111.9,1.1,,
-    conc_enzyme,,,PGI,,,Evo04ptsHIcrrEvo01EP,0.033875912,0.06,,
-    conc_enzyme,,,FBP,,,Evo04ptsHIcrrEvo01EP,0.00592291,0.047,,
-    conc_enzyme,,,FBA,,,Evo04ptsHIcrrEvo01EP,0.0702922488972023,0.19,,
-    conc_enzyme,,,TPI,,,Evo04ptsHIcrrEvo01EP,0.020866941,0.13,,
-    conc_enzyme,,,PFK,,,Evo04ptsHIcrrEvo01EP,0.018055101,0.13,,
-    conc_enzyme,,,FBP,,,Evo04Evo01EP,0.00592291,0.047,,
-    conc_enzyme,,,FBA,,,Evo04Evo01EP,0.0702922488972023,0.19,,
-    conc_enzyme,,,TPI,,,Evo04Evo01EP,0.0198,0.1,,
-    conc_enzyme,,,PFK,,,Evo04Evo01EP,0.0185,0.05,,
-    conc_unbalanced,,g6p_c,,,,Evo04ptsHIcrrEvo01EP,2.0804108,0.188651,,
-    conc_unbalanced,,adp_c,,,,Evo04ptsHIcrrEvo01EP,0.6113649,0.038811,,
-    conc_unbalanced,,atp_c,,,,Evo04ptsHIcrrEvo01EP,5.4080032,0.186962,,
-    conc_unbalanced,,g6p_c,,,,Evo04Evo01EP,2.0804108,0.188651,,
-    conc_unbalanced,,adp_c,,,,Evo04Evo01EP,0.6113649,0.038811,,
-    conc_unbalanced,,atp_c,,,,Evo04Evo01EP,5.4080032,0.186962,,
-    drain,,,,g3p_drain,,Evo04ptsHIcrrEvo01EP,,,0.3,1.2
-    drain,,,,g3p_drain,,Evo04Evo01EP,,,0.3,1.2
+Prior distributions can either be specified by a location and scale or by a 1st
+and 99th percentile, but not both.
 
 Multivariate priors for formation energy parameters
 ===================================================
@@ -338,80 +465,11 @@ an example:
     cyst-L,0.610913519,0,13.08072127,2.066261457,0,16.61784088
     ...
 
-To make it easier to generate the required csv files, Maud provides a script
-:code:`get_dgf_priors_from_equilibrator.py`. This script can be used as
-follows, given a maud input directory at the path :code:`input_dir`:
 
-.. code:: bash
-          python scripts/get_dgf_priors_from_equilibrator.py input_dir
+The initial parameter values file
+=================================
 
-The script extracts metabolites from the input directory and searches for
-matching thermodynamic data using the the package `equilibrator-api
-<https://pypi.org/project/equilibrator-api/>`_. It uses this data to create
-appropriate files `dgf_prior_mean_equilibrator.csv`_ and
-`dgf_prior_cov_equilibrator.csv`_ in the target directory. Note that in order to
-use this script the field :code:`metabolite_inchi_key` must be filled in for all
-metabolites in the kinetic model file.
-
-
-Specifying initial parameter values
-===================================
-
-Setting initial parameter values is mainly intended for generating samples from
-known inputs using :code:`maud simulate`. It can be useful with :code:`maud
-sample` when the posterior distribution concentrates in a hard-to-find region.
-
-Initial parameter values should be entered in a csv file, which should in turn
-be specified the :code:`config.toml` file of a Maud input directory, using the
-field :code:`user_inits_file`. For example:
-
-.. code:: toml
-
-    name = "methionine_cycle"
-    kinetic_model = "methionine_cycle.toml"
-    priors = "priors.csv"
-    experiments = "experiments.csv"
-    likelihood = true
-    user_inits_file = "simulation_input_values.csv"
-
-The csv file indicated by :code:`user_inits_file` must have the following
-fields:
-
-- :code:`parameter_name`
-- :code:`experiment_id`
-- :code:`mic_id`
-- :code:`enzyme_id`
-- :code:`drain_id`
-- :code:`metabolite_id`
-- :code:`value`
-
-Parameters not specified in the csv will be initialised at their prior mean
-value, as would happen if no user-specified initial values were provided.
-
-For example, a file with the following contents would set initial values for
-the parameter :code:`enzyme` in the experiments :code:`dataset_1` and
-:code:`dataset_2`:
-
-.. csv-table::
-
-    parameter_name,experiment_id,mic_id,enzyme_id,drain_id,metabolite_id,value
-    enzyme,dataset_1,,AHC1,,,1
-    enzyme,dataset_1,,BHMT1,,,1
-    enzyme,dataset_1,,CBS1,,,1.5
-    enzyme,dataset_1,,GNMT1,,,1
-    enzyme,dataset_1,,MAT1,,,1
-    enzyme,dataset_1,,MAT3,,,1
-    enzyme,dataset_1,,METH_Gen,,,1
-    enzyme,dataset_1,,MS1,,,1
-    enzyme,dataset_1,,MTHFR1,,,1
-    enzyme,dataset_2,,AHC1,,,1
-    enzyme,dataset_2,,BHMT1,,,1
-    enzyme,dataset_2,,CBS1,,,1
-    enzyme,dataset_2,,GNMT1,,,1
-    enzyme,dataset_2,,MAT1,,,1
-    enzyme,dataset_2,,MAT3,,,1
-    enzyme,dataset_2,,METH_Gen,,,1
-    enzyme,dataset_2,,MS1,,,1
-    enzyme,dataset_2,,MTHFR1,,,1
+Initial parameter values can be entered in a :code:`json` file. This file should
+be a valid option for the :code:`inits` argument of the cmdstan sample method.
 
 

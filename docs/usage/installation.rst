@@ -2,18 +2,14 @@
 Installation
 ============
 
-This document explains how to install Maud.
-
-Install
-=======
+This page explains how to install Maud.
 
 We recommend using a fresh virtual environment to install Maud. To make one and
 then activate it, run the following commands:
 
 .. code-block:: console
 
-    sudo pip3.7 install virtualenv     # if virtualenv isn't installed already
-    python3.7 -m virtualenv maud_venv  # choose any name you like!
+    python -m venv maud_venv  # choose any name you like!
     source maud_venv/bin/activate
 
 To install the latest Maud and its python dependencies to your new virtual

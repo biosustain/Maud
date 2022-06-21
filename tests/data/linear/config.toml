@@ -1,24 +1,21 @@
 name = "linear"
-kinetic_model = "kinetic_model.toml"
-priors = "priors.csv"
-measurements = "experiments.csv"
-biological_config = "biological_config.toml"
+kinetic_model_file = "kinetic_model.toml"
+priors_file = "priors.csv"
+measurements_file = "measurements.csv"
+experimental_setup_file = "experimental_setup.toml"
 likelihood = true
+steady_state_threshold_abs = 1e-6
 
 [cmdstanpy_config]
 refresh = 1
-iter_warmup = 200
-iter_sampling = 200
+iter_warmup = 20
+iter_sampling = 20
 chains = 4
 save_warmup = true
 
 [ode_config]
-abs_tol_forward = 1e-4
-rel_tol_forward = 1e-4
-abs_tol_backward = 1e-4
-rel_tol_backward = 1e-4
-abs_tol_quadrature = 1e-4
-rel_tol_quadrature = 1e-4
+abs_tol = 1e-5
+rel_tol = 1e-5
 max_num_steps = 1e6
 timepoint = 1e3
 

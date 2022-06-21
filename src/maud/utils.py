@@ -1,30 +1,68 @@
-# Copyright (C) 2019 Novo Nordisk Foundation Center for Biosustainability,
-# Technical University of Denmark.
-#
-# This program is free software: you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation, either version 3 of the License, or
-# (at your option) any later version.
-#
-# This program is distributed in the hope that it will be useful,
-# but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-# GNU General Public License for more details.
-#
-# You should have received a copy of the GNU General Public License
-# along with this program.  If not, see <https://www.gnu.org/licenses/>.
-
 """General purpose utility functions."""
 
-from typing import Dict, Iterable
+from typing import Any, Dict, Hashable, List
 
 import numpy as np
+import pandas as pd
 import sympy as sp
+from depinfo import print_dependencies
 from scipy.stats import norm
 
 
-def codify(lx: Iterable[str]) -> Dict[str, int]:
-    """Turn an iterable of strings into a dictionary mapping them to integer indexes."""
+def join_str_cols(df: pd.DataFrame, sep: str, name=None) -> pd.Series:
+    """Join the columns of a dataframe into a Series separated by sep."""
+    out = df.apply(sep.join, axis=1).rename(name)
+    assert isinstance(out, pd.Series)
+    return out
+
+
+def load_df(read_csv_input, **kwargs) -> pd.DataFrame:
+    """Wrap pd.read_csv, ensuring that a dataframe is returned."""
+    return check_is_df(pd.read_csv(read_csv_input, **kwargs))
+
+
+def show_versions():
+    """Print dependency information."""
+    print_dependencies("maud")
+
+
+def recursively_flatten_list(o: List) -> List:
+    """Recursively flatten a nested list."""
+    gather = []
+    for item in o:
+        if isinstance(item, List):
+            gather.extend(recursively_flatten_list(item))
+        else:
+            gather.append(item)
+    return gather
+
+
+def check_is_df(maybe_df: Any) -> pd.DataFrame:
+    """Assert that an object is a pandas DataFrame, then return it.
+
+    This is useful for keeping mypy happy.
+    """
+    assert isinstance(maybe_df, pd.DataFrame)
+    return maybe_df
+
+
+def series_to_diag_df(s: pd.Series) -> pd.DataFrame:
+    """Turn a Series into a Dataframe with it on the diagonal.
+
+    The off-diagonal cells are nan.
+    """
+    out = pd.DataFrame(np.nan, index=s.index, columns=s.index)
+    np.fill_diagonal(out.values, s.values)
+    return out
+
+
+def read_with_fallback(k: Hashable, d: Dict, default: Any):
+    """Get item k from d if it is available, otherwise return default."""
+    return d[k] if k in d.keys() else default
+
+
+def codify(lx: List) -> Dict[str, int]:
+    """Turn a list of strings into a dictionary mapping them to integers."""
     return dict(zip(lx, range(1, len(lx) + 1)))
 
 

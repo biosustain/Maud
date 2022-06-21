@@ -77,7 +77,11 @@ def get_dgf_priors(mi: MaudInput) -> Tuple[pd.Series, pd.DataFrame]:
         .loc[met_ix, met_ix]
         .round(10)
     )
-    mu = pd.Series(mu, index=met_order, name="prior_mean_dgf").loc[met_ix].round(10)
+    mu = (
+        pd.Series(mu, index=met_order, name="prior_mean_dgf")
+        .loc[met_ix]
+        .round(10)
+    )
     return mu, cov
 
 
@@ -98,8 +102,12 @@ def main():
         print(mu)
         print("Prior covariance:")
         print(cov)
-        mu.to_csv(os.path.join(maud_input_dir, "dgf_prior_mean_equilibrator.csv"))
-        cov.to_csv(os.path.join(maud_input_dir, "dgf_prior_cov_equilibrator.csv"))
+        mu.to_csv(
+            os.path.join(maud_input_dir, "dgf_prior_mean_equilibrator.csv")
+        )
+        cov.to_csv(
+            os.path.join(maud_input_dir, "dgf_prior_cov_equilibrator.csv")
+        )
     else:
         raise ValueError(f"{maud_input_dir} is not a valid path.")
 

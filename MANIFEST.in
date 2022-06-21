@@ -1,2 +1,2 @@
 recursive-include tests/data *
-recursive-include src/maud *.stan
+recursive-include src/maud/stan *.stan
