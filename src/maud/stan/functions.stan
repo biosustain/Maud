@@ -374,19 +374,7 @@ functions {
                                                      sub_by_edge_bounds,
                                                      edge_type,
                                                      drain_small_conc_corrector);
-    print("edge_type: ", edge_type);
-    print("conc: ", conc);
-    print("free_enzyme_ratio: ", free_enzyme_ratio);
-    print("vmax: ", vmax);
-    print("dgr: ", dgr);
-    print("reversibility: ", reversibility);
-    print("saturation: ", saturation);
-    print("allostery: ", allostery);
-    print("phosphorylation: ", phosphorylation);
-    print("drain_by_edge: ", drain_by_edge);
-    vector[N_edge] out = vmax .* saturation .* reversibility .* allostery .* phosphorylation .* drain_by_edge;
-    print("edge_flux", out);
-    return out;
+    return out = vmax .* saturation .* reversibility .* allostery .* phosphorylation .* drain_by_edge;
   }
 
   vector dbalanced_dt(real time,
