@@ -11,7 +11,7 @@ from maud.data_model.maud_config import MaudConfig
 from maud.data_model.maud_init import InitDict
 from maud.data_model.measurement_set import MeasurementSet
 from maud.data_model.prior_set import PriorSet, UserPriorInput
-from maud.data_model.stan_input import StanInputTest, StanInputTrain
+from maud.data_model.stan_input import StanInput
 from maud.data_model.stan_variable_set import StanVariableSet
 from maud.getting_inits import get_inits
 from maud.getting_priors import get_prior_set
@@ -37,8 +37,8 @@ class MaudInput:
     stan_variable_set: StanVariableSet = Field(init=False, exclude=True)
     priors: PriorSet = Field(init=False, exclude=True)
     inits: InitDict = Field(init=False, exclude=True)
-    stan_input_train: StanInputTrain = Field(init=False, exclude=True)
-    stan_input_test: Optional[StanInputTest] = Field(init=False, exclude=True)
+    stan_input_train: StanInput = Field(init=False, exclude=True)
+    stan_input_test: Optional[StanInput] = Field(init=False, exclude=True)
 
     def __post_init__(self):
         """Add attributes that depend on other ones."""

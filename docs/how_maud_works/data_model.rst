@@ -24,7 +24,7 @@ On initialisation a :code:`MaudInput` performs the following steps:
   a :code:`StanVariableSet`.
 - User-specified priors are supplemented with defaults to create a :code:`PriorSet`. The :code:`StanVariableSet` is required at this stage in order to ensure correct shapes.
 - A full set of initial values is created using prior means as defaults.
-- Stan inputs for the train and test models are created as ``StanInputTrain`` and ``StanInputTest`` objects.
+- Stan inputs for the train and test models are created as ``StanInput`` objects.
 
 `MaudConfig
 <https://github.com/biosustain/Maud/tree/master/src/maud/data_model/maud_config.py>`_
@@ -55,7 +55,7 @@ and scale and composition of its ids.
 specifies what kind of prior each parameter should have. The options are
 independent 1d, independent 2d or multivariate 1d.
 
-`StanInputTrain and StanInputTest
+`StanInput
 <https://github.com/biosustain/Maud/tree/master/src/maud/data_model/stan_input.py>`_
-specify what data can possibly go into Maud's Stan input dictionaries, performs
-validation and sets out what these dictionaries should look like.
+specifies what kinds of data can go into Maud's Stan input dictionaries and performs
+validation.
