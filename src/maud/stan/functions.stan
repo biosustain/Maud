@@ -374,7 +374,7 @@ functions {
                                                      sub_by_edge_bounds,
                                                      edge_type,
                                                      drain_small_conc_corrector);
-    return out = vmax .* saturation .* reversibility .* allostery .* phosphorylation .* drain_by_edge;
+    return vmax .* saturation .* reversibility .* allostery .* phosphorylation .* drain_by_edge;
   }
 
   vector dbalanced_dt(real time,
