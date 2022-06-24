@@ -1,0 +1,34 @@
+name = "Example model including promiscuous enzymes"
+compartment = [
+  {id = 'c', name = 'cytosol', volume = 1},
+  {id = 'e', name = 'external', volume = 1},
+]
+metabolite = [
+  {id = "M1", name = "Metabolite number 1"},
+  {id = "M2", name = "Metabolite number 2"},
+  {id = "M3", name = "Metabolite number 3"},
+]
+metabolite_in_compartment = [
+  {metabolite_id = "M1", compartment_id = "e", balanced = false},
+  {metabolite_id = "M1", compartment_id = "c", balanced = true},
+  {metabolite_id = "M2", compartment_id = "c", balanced = true},
+  {metabolite_id = "M3", compartment_id = "c", balanced = true},
+  {metabolite_id = "M2", compartment_id = "e", balanced = false},
+  {metabolite_id = "M3", compartment_id = "e", balanced = false},
+]
+enzyme = [
+  {id = "e1", name = "r1ase", subunits = 1},
+  {id = "e2", name = "r2ase", subunits = 1},
+]
+reaction = [
+  {id = "r1", mechanism = "reversible_michaelis_menten", stoichiometry = {M1_e = -1, M1_c = 1}},
+  {id = "r2", mechanism = "reversible_michaelis_menten", stoichiometry = {M1_c = -1, M2_c = 1}},
+  {id = "r3", mechanism = "reversible_michaelis_menten", stoichiometry = {M1_c = -1, M3_c = 1}},
+  {id = "r4", mechanism = "drain", stoichiometry = {M2_c = -1, M2_e = 1}},
+  {id = "r5", mechanism = "drain", stoichiometry = {M3_c = -1, M3_e = 1}},
+]
+enzyme_reaction = [
+  {enzyme_id = "e1", reaction_id = "r1"},
+  {enzyme_id = "e2", reaction_id = "r2"},
+  {enzyme_id = "e2", reaction_id = "r3"},
+]
