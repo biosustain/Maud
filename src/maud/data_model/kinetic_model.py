@@ -233,6 +233,9 @@ class Phosphorylation:
         )
 
 
+Edge = Union[Reaction, EnzymeReaction]
+
+
 @dataclass(config=KMConfig)
 class KineticModel:
     """Representation of a system of metabolic network."""
@@ -249,9 +252,7 @@ class KineticModel:
     competitive_inhibitions: Optional[List[CompetitiveInhibition]]
     phosphorylations: Optional[List[Phosphorylation]]
     drains: List[Reaction] = Field(init=False, exclude=True)
-    edges: List[Union[Reaction, EnzymeReaction]] = Field(
-        init=False, exclude=True
-    )
+    edges: List[Edge] = Field(init=False, exclude=True)
     stoichiometric_matrix: pd.DataFrame = Field(init=False, exclude=True)
     phosphorylation_modifying_enzymes: Optional[
         List[PhosphorylationModifyingEnzyme]
