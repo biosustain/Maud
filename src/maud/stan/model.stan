@@ -2,6 +2,10 @@
 data {
   // dimensions
   int<lower=1> N_mic;
+  int<lower=1> N_edge;
+  int<lower=1> N_reaction;
+  int<lower=1> N_enzyme;
+  int<lower=1> N_enzyme_reaction;
   int<lower=1> N_edge_sub;
   int<lower=1> N_edge_prod;
   int<lower=1> N_unbalanced;
@@ -9,10 +13,7 @@ data {
   int<lower=1> N_km;
   int<lower=1> N_sub_km;
   int<lower=1> N_prod_km;
-  int<lower=1> N_reaction;
-  int<lower=1> N_enzyme;
   int<lower=0> N_drain;
-  int<lower=1> N_edge;
   int<lower=0> N_allostery;
   int<lower=0> N_allosteric_enzyme;
   int<lower=0> N_phosphorylation;
@@ -24,6 +25,8 @@ data {
   int<lower=0> N_conc_measurement;
   int<lower=0> N_enzyme_knockout;
   int<lower=0> N_pme_knockout;
+  int<lower=0> N_promiscuous_enzyme;
+  int<lower=0> N_promiscuous_enzyme_edge;
   // measurements
   array[N_conc_measurement] int<lower=1,upper=N_experiment> experiment_yconc;
   array[N_conc_measurement] int<lower=1,upper=N_mic> mic_ix_yconc;
@@ -40,7 +43,7 @@ data {
   // hardcoded priors
   vector[N_metabolite] prior_loc_dgf;
   cov_matrix[N_metabolite] prior_cov_dgf;
-  array[2] vector[N_enzyme] priors_kcat;
+  array[2] vector[N_enzyme_reaction] priors_kcat;
   array[2] vector[N_km] priors_km;
   array[2] vector[N_competitive_inhibition] priors_ki;
   array[2] vector[N_allostery] priors_dissociation_constant;
@@ -51,6 +54,7 @@ data {
   array[2, N_experiment] vector[N_unbalanced] priors_conc_unbalanced;
   array[2, N_experiment] vector[N_enzyme] priors_conc_enzyme;
   array[2, N_experiment] vector[N_drain] priors_drain;
+  array[2, N_experiment] vector[N_promiscuous_enzyme_edge] priors_promiscuous_enzyme_proportion_invsm;
   // network properties
   matrix[N_mic, N_edge] S;
   array[N_mic-N_unbalanced] int<lower=1,upper=N_mic> balanced_mic_ix;
@@ -58,6 +62,7 @@ data {
   array[N_competitive_inhibition] int<lower=1,upper=N_mic> ci_mic_ix;
   array[N_edge] int<lower=1,upper=3> edge_type;  // 1 = reversible modular rate law, 2 = drain
   array[N_edge] int<lower=0,upper=N_enzyme> edge_to_enzyme;  // 0 if drain
+  array[N_edge] int<lower=0,upper=N_enzyme_reaction> edge_to_enzyme_reaction;  // 0 if drain
   array[N_edge] int<lower=0,upper=N_allostery> edge_to_tc;  // 0 if non-allosteric
   array[N_edge] int<lower=0,upper=N_drain> edge_to_drain;  // 0 if enzyme
   array[N_edge] int<lower=0,upper=N_reaction> edge_to_reaction;
@@ -65,6 +70,8 @@ data {
   array[N_allostery] int<lower=1,upper=N_mic> allostery_mic;
   array[N_phosphorylation] int<lower=1,upper=2> phosphorylation_type;
   array[N_phosphorylation] int<lower=1,upper=N_pme> phosphorylation_pme;
+  array[N_promiscuous_enzyme_edge] int<lower=0,upper=N_edge> edge_by_promiscuous_enzyme_long;
+  array[N_promiscuous_enzyme, 2] int edge_by_promiscuous_enzyme_bounds;
   array[N_edge_sub] int sub_by_edge_long;
   array[N_edge,2] int sub_by_edge_bounds;
   array[N_edge_prod] int prod_by_edge_long;
@@ -106,13 +113,14 @@ transformed data {
 }
 parameters {
   vector[N_metabolite] dgf;
-  vector[N_enzyme] log_kcat_z;
+  vector[N_enzyme_reaction] log_kcat_z;
   vector[N_km] log_km_z;
   vector[N_pme] log_kcat_pme_z;
   vector[N_competitive_inhibition] log_ki_z;
   vector[N_allostery] log_dissociation_constant_z;
   vector[N_allosteric_enzyme] log_transfer_constant_z;
   vector[N_experiment] psi_z;
+  array[N_experiment] vector[N_promiscuous_enzyme_edge] promiscuous_enzyme_proportion_invsm_z;
   array[N_experiment] vector[N_drain] drain_z;
   array[N_experiment] vector[N_enzyme] log_conc_enzyme_z;
   array[N_experiment] vector[N_pme] log_conc_pme_z;
@@ -122,7 +130,7 @@ transformed parameters {
   // rescale
   vector[N_km] km = unz_log_1d(priors_km, log_km_z);
   vector[N_competitive_inhibition] ki = unz_log_1d(priors_ki, log_ki_z);
-  vector[N_enzyme] kcat = unz_log_1d(priors_kcat, log_kcat_z);
+  vector[N_enzyme_reaction] kcat = unz_log_1d(priors_kcat, log_kcat_z);
   vector[N_allostery] dissociation_constant = unz_log_1d(priors_dissociation_constant, log_dissociation_constant_z);
   vector[N_allosteric_enzyme] transfer_constant = unz_log_1d(priors_transfer_constant, log_transfer_constant_z);
   vector[N_pme] kcat_pme = unz_log_1d(priors_kcat_pme, log_kcat_pme_z);
@@ -131,6 +139,8 @@ transformed parameters {
   array[N_experiment] vector[N_enzyme] conc_enzyme = unz_log_2d(priors_conc_enzyme, log_conc_enzyme_z);
   array[N_experiment] vector[N_unbalanced] conc_unbalanced = unz_log_2d(priors_conc_unbalanced, log_conc_unbalanced_z);
   array[N_experiment] vector[N_pme] conc_pme = unz_log_2d(priors_conc_pme, log_conc_pme_z);
+  array[N_experiment] vector[N_promiscuous_enzyme_edge] promiscuous_enzyme_proportion_invsm
+  = unz_2d(priors_promiscuous_enzyme_proportion_invsm, promiscuous_enzyme_proportion_invsm_z);
   // transform
   array[N_experiment] vector<lower=0>[N_mic] conc;
   array[N_experiment] vector[N_reaction] flux;
@@ -138,19 +148,22 @@ transformed parameters {
   for (e in 1:N_experiment){
     dgrs[e] = get_dgrs(S, dgf, temperature[e], mic_to_met, water_stoichiometry, transported_charge, psi[e]);
     flux[e] = rep_vector(0, N_reaction);
+    vector[N_edge] edge_enzyme_proportion = rep_vector(1, N_edge);
+    edge_enzyme_proportion[edge_by_promiscuous_enzyme_long] =
+      get_promiscuous_enzyme_edge_proportion(promiscuous_enzyme_proportion_invsm[e],
+                                             edge_by_promiscuous_enzyme_long,
+                                             edge_by_promiscuous_enzyme_bounds);
     vector[N_enzyme] conc_enzyme_experiment = conc_enzyme[e];
     vector[N_pme] conc_pme_experiment = conc_pme[e];
     array[1] vector[N_mic-N_unbalanced] conc_balanced;
     int N_eko_experiment = measure_ragged(enzyme_knockout_bounds, e);
     int N_pko_experiment = measure_ragged(pme_knockout_bounds, e);
     if (N_eko_experiment > 0){
-      array[N_eko_experiment] int eko_experiment =
-        extract_ragged(enzyme_knockout_long, enzyme_knockout_bounds, e);
+      array[N_eko_experiment] int eko_experiment = extract_ragged(enzyme_knockout_long, enzyme_knockout_bounds, e);
       conc_enzyme_experiment[eko_experiment] = rep_vector(0, N_eko_experiment);
     }
     if (N_pko_experiment > 0){
-      array[N_pko_experiment] int pko_experiment =
-        extract_ragged(pme_knockout_long, pme_knockout_bounds, e);
+      array[N_pko_experiment] int pko_experiment = extract_ragged(pme_knockout_long, pme_knockout_bounds, e);
       conc_pme_experiment[pko_experiment] = rep_vector(0, N_pko_experiment);
     }
     conc_balanced =
@@ -174,12 +187,14 @@ transformed parameters {
                   kcat_pme,
                   conc_pme_experiment,
                   drain[e],
+                  edge_enzyme_proportion,
                   temperature[e],
                   drain_small_conc_corrector,
                   S,
                   subunits,
                   edge_type,
                   edge_to_enzyme,
+                  edge_to_enzyme_reaction,
                   edge_to_drain,
                   ci_mic_ix,
                   sub_km_ix_by_edge_long,
@@ -215,12 +230,14 @@ transformed parameters {
                                              kcat_pme,
                                              conc_pme_experiment,
                                              drain[e],
+                                             edge_enzyme_proportion,
                                              temperature[e],
                                              drain_small_conc_corrector,
                                              S,
                                              subunits,
                                              edge_type,
                                              edge_to_enzyme,
+                                             edge_to_enzyme_reaction,
                                              edge_to_drain,
                                              ci_mic_ix,
                                              sub_km_ix_by_edge_long,
@@ -280,6 +297,7 @@ model {
     log_conc_pme_z[ex] ~ std_normal();
     drain_z[ex] ~ std_normal();
     psi_z[ex] ~ std_normal();
+    promiscuous_enzyme_proportion_invsm_z[ex] ~ std_normal();
   }
   if (likelihood == 1){
     for (c in 1:N_conc_measurement)

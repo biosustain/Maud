@@ -127,4 +127,7 @@ def get_prior_set(upi: UserPriorInput, sv: StanVariableSet) -> PriorSet:
         conc_enzyme=load_2d_prior(upi.main_table, sv.conc_enzyme),
         conc_unbalanced=load_2d_prior(upi.main_table, sv.conc_unbalanced),
         conc_pme=load_2d_prior(upi.main_table, sv.conc_pme),
+        promiscuous_enzyme_proportion_invsm=load_2d_prior(
+            upi.main_table, sv.promiscuous_enzyme_proportion_invsm
+        ),
     )

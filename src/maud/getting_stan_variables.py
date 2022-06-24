@@ -1,5 +1,6 @@
 """Provides function get_stan_variable_set."""
 
+from itertools import chain
 from typing import List, Tuple
 
 from maud.data_model.hardcoding import ID_SEPARATOR
@@ -16,6 +17,7 @@ from maud.data_model.stan_variable_set import (
     KcatPme,
     Ki,
     Km,
+    PromiscuousEnzymeProportionInvsm,
     Psi,
     StanVariableSet,
     TransferConstant,
@@ -104,6 +106,15 @@ def get_stan_variable_set(kmod: KineticModel, ms: MeasurementSet):
         if kmod.allosteric_enzymes is not None
         else []
     )
+    promiscuous_enzyme_enzyme_reactions = list(
+        chain(
+            *[
+                [er for er in kmod.ers if er.enzyme_id == e.id]
+                for e in kmod.enzymes
+                if len([er for er in kmod.ers if er.enzyme_id == e.id]) > 1
+            ]
+        )
+    )
     metabolite_ids = [m.id for m in kmod.metabolites]
     phos_modifying_enzymes = (
         [p.modifying_enzyme_id for p in kmod.phosphorylations]
@@ -130,4 +141,17 @@ def get_stan_variable_set(kmod: KineticModel, ms: MeasurementSet):
         conc_unbalanced=ConcUnbalanced(ids=[exp_ids, unbalanced_mics]),
         conc_pme=ConcPme(ids=[exp_ids, phos_modifying_enzymes]),
         psi=Psi(ids=[exp_ids]),
+        promiscuous_enzyme_proportion_invsm=PromiscuousEnzymeProportionInvsm(
+            ids=[
+                exp_ids,
+                [er.id for er in promiscuous_enzyme_enzyme_reactions],
+            ],
+            split_ids=[
+                exp_ids,
+                [
+                    [er.enzyme_id, er.reaction_id]
+                    for er in promiscuous_enzyme_enzyme_reactions
+                ],
+            ],
+        ),
     )

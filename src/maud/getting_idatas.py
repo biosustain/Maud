@@ -21,6 +21,7 @@ def get_idata(csvs: List[str], mi: MaudInput, mode: str) -> az.InferenceData:
     )
     coords = {
         "enzymes": [e.id for e in mi.kinetic_model.enzymes],
+        "enzyme_reactions": [er.id for er in mi.kinetic_model.ers],
         "experiments": experiments,
         "reactions": [r.id for r in mi.kinetic_model.reactions],
         "drains": [r.id for r in mi.kinetic_model.drains],
@@ -91,7 +92,7 @@ def get_idata(csvs: List[str], mi: MaudInput, mode: str) -> az.InferenceData:
             "dgf": ["metabolites"],
             "dgrs": ["experiments", "edges"],
             "keq": ["experiments", "edges"],
-            "kcat": ["enzymes"],
+            "kcat": ["enzyme_reactions"],
             "kcat_pme": ["phosphorylation_modifying_enzymes"],
             "km": ["kms"],
             "ki": ["kis"],

@@ -8,6 +8,7 @@ from maud.data_model.hardcoding import ID_SEPARATOR
 from maud.data_model.kinetic_model import (
     Allostery,
     CompetitiveInhibition,
+    Edge,
     Enzyme,
     EnzymeReaction,
     KineticModel,
@@ -20,7 +21,7 @@ from maud.data_model.kinetic_model import (
 from maud.data_model.maud_config import MaudConfig
 from maud.data_model.measurement_set import Experiment, MeasurementSet
 from maud.data_model.prior_set import IndPrior1d, IndPrior2d, PriorSet
-from maud.data_model.stan_input import StanData, StanInputTest, StanInputTrain
+from maud.data_model.stan_input import StanInput
 
 
 CodifiableMaudObject = Union[
@@ -29,6 +30,7 @@ CodifiableMaudObject = Union[
     Metabolite,
     EnzymeReaction,
     Enzyme,
+    Edge,
     Phosphorylation,
     PhosphorylationModifyingEnzyme,
     Reaction,
@@ -42,7 +44,7 @@ def get_stan_inputs(
     priors: PriorSet,
     kinetic_model: KineticModel,
     config: MaudConfig,
-) -> Tuple[StanInputTrain, Optional[StanInputTest]]:
+) -> Tuple[StanInput, Optional[StanInput]]:
     """Get inputs to model.stan and prediction_model.stan.
 
     :param ms: a MeasurementSet object
@@ -96,6 +98,8 @@ def get_stan_inputs(
         phosphorylation_codes = dict()
         pme_codes = dict()
     drain_codes = codify_maud_object(kinetic_model.drains)
+    edge_codes = codify_maud_object(edges)
+    er_codes = codify_maud_object(kinetic_model.ers)
     reaction_codes = codify_maud_object(reactions)
     reaction_to_mechanism = {rxn.id: rxn.mechanism for rxn in reactions}
     edge_mechanism_code = [
@@ -106,6 +110,10 @@ def get_stan_inputs(
     ]
     edge_enzyme_code = [
         enzyme_codes[er.enzyme_id] if isinstance(er, EnzymeReaction) else 0
+        for er in edges
+    ]
+    edge_er_code = [
+        er_codes[er.id] if isinstance(er, EnzymeReaction) else 0
         for er in edges
     ]
     edge_drain_code = [
@@ -286,6 +294,23 @@ def get_stan_inputs(
     phosphorylation_ix_long, phosphorylation_ix_bounds = encode_ragged(
         phosphorylation_by_edge
     )
+    promiscuous_enzymes = [
+        e
+        for e in kinetic_model.enzymes
+        if len([er for er in kinetic_model.ers if er.enzyme_id == e.id]) > 1
+    ]
+    edge_by_promiscuous_enzyme = [
+        [
+            edge_codes[ID_SEPARATOR.join([er.enzyme_id, er.reaction_id])]
+            for er in kinetic_model.ers
+            if er.enzyme_id == pe.id
+        ]
+        for pe in promiscuous_enzymes
+    ]
+    (
+        edge_by_promiscuous_enzyme_long,
+        edge_by_promiscuous_enzyme_bounds,
+    ) = encode_ragged(edge_by_promiscuous_enzyme)
     yconc_train, yenz_train, yflux_train = (
         df.loc[
             lambda df: df["experiment_id"].isin(
@@ -310,281 +335,199 @@ def get_stan_inputs(
         unpack_priors_2d(priors.drain, exp_ids=exp_ids)
         for exp_ids in (experiment_ids_train, experiment_ids_test)
     ]
-    stan_input_train = StanInputTrain(
-        # priors
-        prior_loc_dgf=StanData("prior_loc_dgf", priors.dgf.location.to_list()),
-        prior_cov_dgf=StanData(
-            "prior_cov_dgf",
-            priors.dgf.covariance_matrix.values.tolist(),
-        ),
-        priors_kcat=StanData("priors_kcat", unpack_priors_1d(priors.kcat)),
-        priors_km=StanData("priors_km", unpack_priors_1d(priors.km)),
-        priors_ki=StanData("priors_ki", unpack_priors_1d(priors.ki)),
-        priors_dissociation_constant=StanData(
-            "priors_dissociation_constant",
-            unpack_priors_1d(priors.dissociation_constant),
-        ),
-        priors_transfer_constant=StanData(
-            "priors_transfer_constant",
-            unpack_priors_1d(priors.transfer_constant),
-        ),
-        priors_kcat_pme=StanData(
-            "priors_pme", unpack_priors_1d(priors.kcat_pme)
-        ),
-        priors_psi=StanData(
-            "priors_psi",
-            unpack_priors_1d(priors.psi, ids=experiment_ids_train),
-        ),
-        priors_conc_pme=StanData("priors_conc_pme", priors_conc_pme_train),
-        priors_conc_unbalanced=StanData(
-            "priors_conc_unbalanced", priors_conc_unbalanced_train
-        ),
-        priors_conc_enzyme=StanData(
-            "priors_conc_enzyme", priors_conc_enzyme_train
-        ),
-        priors_drain=StanData("priors_drain", priors_drain_train),
-        # measurements
-        yconc=StanData("yconc", yconc_train["measurement"].tolist()),
-        sigma_conc=StanData("sigma_conc", yconc_train["error_scale"].tolist()),
-        experiment_yconc=StanData(
-            "experiment_yconc",
-            yconc_train["experiment_id"].map(experiment_codes_train).tolist(),
-        ),
-        mic_ix_yconc=StanData(
-            "mic_ix_yconc",
-            yconc_train["target_id"].map(mic_codes).tolist(),
-        ),
-        yflux=StanData("yflux", yflux_train["measurement"].tolist()),
-        sigma_flux=StanData("sigma_flux", yflux_train["error_scale"].tolist()),
-        experiment_yflux=StanData(
-            "experiment_yflux",
-            yflux_train["experiment_id"].map(experiment_codes_train).to_list(),
-        ),
-        reaction_yflux=StanData(
-            "reaction_yflux",
-            yflux_train["target_id"].map(reaction_codes).tolist(),
-        ),
-        yenz=StanData("yenz", yenz_train["measurement"].tolist()),
-        sigma_enz=StanData("sigma_enz", yenz_train["error_scale"].tolist()),
-        experiment_yenz=StanData(
-            "experiment_yenz",
-            yenz_train["experiment_id"].map(experiment_codes_train).tolist(),
-        ),
-        enzyme_yenz=StanData(
-            "enzyme_yenz",
-            yenz_train["target_id"].map(enzyme_codes).tolist(),
-        ),
-        # network properties
-        S=StanData("S", S.values.tolist()),
-        N_reaction=StanData("N_reaction", len(reactions)),
-        balanced_mic_ix=StanData("balanced_mic_ix", balanced_mic_codes),
-        unbalanced_mic_ix=StanData("unbalanced_mic_ix", unbalanced_mic_codes),
-        ci_mic_ix=StanData("ci_mic_ix", ci_mic_codes),
-        edge_type=StanData("edge_type", edge_mechanism_code),
-        edge_to_enzyme=StanData("edge_to_enzyme", edge_enzyme_code),
-        edge_to_tc=StanData("edge_to_tc", edge_tc_code),
-        edge_to_drain=StanData("edge_to_drain", edge_drain_code),
-        edge_to_reaction=StanData("edge_to_reaction", edge_reaction_code),
-        water_stoichiometry=StanData(
-            "water_stoichiometry", edge_water_stoichiometry
-        ),
-        transported_charge=StanData(
-            "transported_charge", edge_transported_charge
-        ),
-        mic_to_met=StanData("mic_to_met", mic_met_code),
-        subunits=StanData(
-            "subunits", [e.subunits for e in kinetic_model.enzymes]
-        ),
-        temperature=StanData(
-            "temperature", [e.temperature for e in experiments_train]
-        ),
-        sub_by_edge_long=StanData("sub_by_edge_long", sub_by_edge_long),
-        sub_by_edge_bounds=StanData("sub_by_edge_bounds", sub_by_edge_bounds),
-        prod_by_edge_long=StanData("prod_by_edge_long", prod_by_edge_long),
-        prod_by_edge_bounds=StanData(
-            "prod_by_edge_bounds", prod_by_edge_bounds
-        ),
-        sub_km_ix_by_edge_long=StanData(
-            "sub_km_ix_by_edge_long", sub_km_ix_by_edge_long
-        ),
-        sub_km_ix_by_edge_bounds=StanData(
-            "sub_km_ix_by_edge_bounds", sub_km_ix_by_edge_bounds
-        ),
-        prod_km_ix_by_edge_long=StanData(
-            "prod_km_ix_by_edge_long", prod_km_ix_by_edge_long
-        ),
-        prod_km_ix_by_edge_bounds=StanData(
-            "prod_by_edge_bounds", prod_km_ix_by_edge_bounds
-        ),
-        ci_ix_long=StanData("ci_ix_long", ci_ix_long),
-        ci_ix_bounds=StanData("ci_ix_bounds", ci_ix_bounds),
-        allostery_ix_long=StanData("allostery_ix_long", allostery_ix_long),
-        allostery_ix_bounds=StanData(
-            "allostery_ix_bounds", allostery_ix_bounds
-        ),
-        allostery_type=StanData("allostery_type", allostery_type),
-        allostery_mic=StanData("allostery_mic", allostery_mic),
-        phosphorylation_ix_long=StanData(
-            "phosphorylation_ix_long", phosphorylation_ix_long
-        ),
-        phosphorylation_ix_bounds=StanData(
-            "phosphorylation_ix_bounds", phosphorylation_ix_bounds
-        ),
-        phosphorylation_type=StanData(
-            "phosphorylation_type", phosphorylation_type
-        ),
-        phosphorylation_pme=StanData(
-            "phosphorylation_pme", phosphorylation_pme
-        ),
-        enzyme_knockout_long=StanData(
-            "enzyme_knockout_long", enz_knockout_long_train
-        ),
-        enzyme_knockout_bounds=StanData(
-            "enzyme_knockout_bounds", enz_knockout_bounds_train
-        ),
-        pme_knockout_long=StanData(
-            "phosphorylation_knockout_long",
-            pme_knockout_long_train,
-        ),
-        pme_knockout_bounds=StanData(
-            "phosphorylation_knockout_bounds",
-            pme_knockout_bounds_train,
-        ),
-        # configuration
-        conc_init=get_conc_init(
-            ms, kinetic_model, priors, config, mode="train"
-        ),
-        likelihood=StanData("likelihood", int(config.likelihood)),
-        drain_small_conc_corrector=StanData(
-            "drain_small_conc_corrector",
-            int(config.drain_small_conc_corrector),
-        ),
-        reject_non_steady=StanData(
-            "reject_non_steady", int(config.reject_non_steady)
-        ),
-        steady_state_threshold_abs=StanData(
-            "steady_state_threshold_abs",
-            config.steady_state_threshold_abs,
-        ),
-        steady_state_threshold_rel=StanData(
-            "steady_state_threshold_rel",
-            config.steady_state_threshold_rel,
-        ),
-        rel_tol=StanData("rel_tol", config.ode_config.rel_tol),
-        abs_tol=StanData("abs_tol", config.ode_config.abs_tol),
-        timepoint=StanData("timepoint", config.ode_config.timepoint),
-        max_num_steps=StanData(
-            "max_num_steps", config.ode_config.max_num_steps
-        ),
+    priors_pepism_train, priors_pepism_test = [
+        unpack_priors_2d(
+            priors.promiscuous_enzyme_proportion_invsm, exp_ids=exp_ids
+        )
+        for exp_ids in (experiment_ids_train, experiment_ids_test)
+    ]
+    stan_input_train = StanInput(
+        dict(
+            # dimensions
+            N_mic=S.shape[0],
+            N_edge=S.shape[1],
+            N_reaction=len(reactions),
+            N_enzyme=len(enzymes),
+            N_enzyme_reaction=len(er_codes),
+            N_edge_sub=len(sub_by_edge_long),
+            N_edge_prod=len(prod_by_edge_long),
+            N_unbalanced=len(unbalanced_mic_codes),
+            N_metabolite=len(metabolite_codes),
+            N_km=len(km_ids),
+            N_sub_km=len(sub_km_ix_by_edge_long),
+            N_prod_km=len(prod_km_ix_by_edge_long),
+            N_drain=len(drain_codes),
+            N_allostery=len(allosteries) if allosteries is not None else 0,
+            N_allosteric_enzyme=len(tc_codes),
+            N_phosphorylation=len(phosphorylation_codes),
+            N_pme=len(pme_codes),
+            N_competitive_inhibition=len(priors.ki.location),
+            N_experiment=len(experiments_train),
+            N_flux_measurement=len(yflux_train),
+            N_enzyme_measurement=len(yenz_train),
+            N_conc_measurement=len(yconc_train),
+            N_enzyme_knockout=len(enz_knockout_long_train),
+            N_pme_knockout=len(pme_knockout_long_train),
+            N_promiscuous_enzyme=len(edge_by_promiscuous_enzyme),
+            N_promiscuous_enzyme_edge=len(edge_by_promiscuous_enzyme_long),
+            # measurements
+            experiment_yconc=yconc_train["experiment_id"]
+            .map(experiment_codes_train)
+            .tolist(),
+            mic_ix_yconc=yconc_train["target_id"].map(mic_codes).tolist(),
+            yconc=yconc_train["measurement"].tolist(),
+            sigma_conc=yconc_train["error_scale"].tolist(),
+            experiment_yflux=yflux_train["experiment_id"]
+            .map(experiment_codes_train)
+            .to_list(),
+            reaction_yflux=yflux_train["target_id"]
+            .map(reaction_codes)
+            .tolist(),
+            yflux=yflux_train["measurement"].tolist(),
+            sigma_flux=yflux_train["error_scale"].tolist(),
+            experiment_yenz=yenz_train["experiment_id"]
+            .map(experiment_codes_train)
+            .tolist(),
+            enzyme_yenz=yenz_train["target_id"].map(enzyme_codes).tolist(),
+            yenz=yenz_train["measurement"].tolist(),
+            sigma_enz=yenz_train["error_scale"].tolist(),
+            # hardcoded priors
+            prior_loc_dgf=priors.dgf.location.to_list(),
+            prior_cov_dgf=priors.dgf.covariance_matrix.values.tolist(),
+            priors_kcat=unpack_priors_1d(priors.kcat),
+            priors_km=unpack_priors_1d(priors.km),
+            priors_ki=unpack_priors_1d(priors.ki),
+            priors_dissociation_constant=unpack_priors_1d(
+                priors.dissociation_constant
+            ),
+            priors_transfer_constant=unpack_priors_1d(
+                priors.transfer_constant
+            ),
+            priors_kcat_pme=unpack_priors_1d(priors.kcat_pme),
+            priors_psi=unpack_priors_1d(priors.psi, ids=experiment_ids_train),
+            priors_conc_pme=priors_conc_pme_train,
+            priors_conc_unbalanced=priors_conc_unbalanced_train,
+            priors_conc_enzyme=priors_conc_enzyme_train,
+            priors_drain=priors_drain_train,
+            priors_promiscuous_enzyme_proportion_invsm=priors_pepism_train,
+            # network properties
+            S=S.values.tolist(),
+            balanced_mic_ix=balanced_mic_codes,
+            unbalanced_mic_ix=unbalanced_mic_codes,
+            ci_mic_ix=ci_mic_codes,
+            edge_type=edge_mechanism_code,
+            edge_to_enzyme=edge_enzyme_code,
+            edge_to_enzyme_reaction=edge_er_code,
+            edge_to_tc=edge_tc_code,
+            edge_to_drain=edge_drain_code,
+            edge_to_reaction=edge_reaction_code,
+            allostery_type=allostery_type,
+            allostery_mic=allostery_mic,
+            phosphorylation_type=phosphorylation_type,
+            phosphorylation_pme=phosphorylation_pme,
+            edge_by_promiscuous_enzyme_long=edge_by_promiscuous_enzyme_long,
+            edge_by_promiscuous_enzyme_bounds=edge_by_promiscuous_enzyme_bounds,
+            water_stoichiometry=edge_water_stoichiometry,
+            transported_charge=edge_transported_charge,
+            mic_to_met=mic_met_code,
+            subunits=[e.subunits for e in kinetic_model.enzymes],
+            temperature=[e.temperature for e in experiments_train],
+            sub_by_edge_long=sub_by_edge_long,
+            sub_by_edge_bounds=sub_by_edge_bounds,
+            prod_by_edge_long=prod_by_edge_long,
+            prod_by_edge_bounds=prod_by_edge_bounds,
+            sub_km_ix_by_edge_long=sub_km_ix_by_edge_long,
+            sub_km_ix_by_edge_bounds=sub_km_ix_by_edge_bounds,
+            prod_km_ix_by_edge_long=prod_km_ix_by_edge_long,
+            prod_km_ix_by_edge_bounds=prod_km_ix_by_edge_bounds,
+            ci_ix_long=ci_ix_long,
+            ci_ix_bounds=ci_ix_bounds,
+            allostery_ix_long=allostery_ix_long,
+            allostery_ix_bounds=allostery_ix_bounds,
+            phosphorylation_ix_long=phosphorylation_ix_long,
+            phosphorylation_ix_bounds=phosphorylation_ix_bounds,
+            enzyme_knockout_long=enz_knockout_long_train,
+            enzyme_knockout_bounds=enz_knockout_bounds_train,
+            pme_knockout_long=pme_knockout_long_train,
+            pme_knockout_bounds=pme_knockout_bounds_train,
+            # configuration
+            conc_init=get_conc_init(
+                ms, kinetic_model, priors, config, mode="train"
+            ),
+            likelihood=int(config.likelihood),
+            drain_small_conc_corrector=int(config.drain_small_conc_corrector),
+            reject_non_steady=int(config.reject_non_steady),
+            steady_state_threshold_abs=config.steady_state_threshold_abs,
+            steady_state_threshold_rel=config.steady_state_threshold_rel,
+            rel_tol=config.ode_config.rel_tol,
+            abs_tol=config.ode_config.abs_tol,
+            timepoint=config.ode_config.timepoint,
+            max_num_steps=config.ode_config.max_num_steps,
+        )
     )
     stan_input_test = (
         None
         if len(experiments_test) == 0
-        else StanInputTest(
-            # priors
-            priors_conc_pme=StanData("priors_conc_pme", priors_conc_pme_test),
-            priors_conc_unbalanced=StanData(
-                "priors_conc_unbalanced", priors_conc_unbalanced_test
-            ),
-            priors_conc_enzyme=StanData(
-                "priors_conc_enzyme", priors_conc_enzyme_test
-            ),
-            priors_drain=StanData("priors_drain", priors_drain_test),
-            # network properties
-            S=StanData("S", S.values.tolist()),
-            N_metabolite=StanData(
-                "N_metabolite", len(kinetic_model.metabolites)
-            ),
-            N_km=StanData("N_km", len(km_ids)),
-            N_reaction=StanData("N_reaction", len(reactions)),
-            N_allosteric_enzyme=StanData("N_allosteric_enzyme", len(tc_codes)),
-            balanced_mic_ix=StanData("balanced_mic_ix", balanced_mic_codes),
-            unbalanced_mic_ix=StanData(
-                "unbalanced_mic_ix", unbalanced_mic_codes
-            ),
-            ci_mic_ix=StanData("ci_mic_ix", ci_mic_codes),
-            edge_type=StanData("edge_type", edge_mechanism_code),
-            edge_to_enzyme=StanData("edge_to_enzyme", edge_enzyme_code),
-            edge_to_tc=StanData("edge_to_tc", edge_tc_code),
-            edge_to_drain=StanData("edge_to_drain", edge_drain_code),
-            edge_to_reaction=StanData("edge_to_reaction", edge_reaction_code),
-            water_stoichiometry=StanData(
-                "water_stoichiometry", edge_water_stoichiometry
-            ),
-            mic_to_met=StanData("mic_to_met", mic_met_code),
-            subunits=StanData(
-                "subunits", [e.subunits for e in kinetic_model.enzymes]
-            ),
-            temperature=StanData(
-                "temperature", [e.temperature for e in experiments_test]
-            ),
-            sub_by_edge_long=StanData("sub_by_edge_long", sub_by_edge_long),
-            sub_by_edge_bounds=StanData(
-                "sub_by_edge_bounds", sub_by_edge_bounds
-            ),
-            prod_by_edge_long=StanData("prod_by_edge_long", prod_by_edge_long),
-            prod_by_edge_bounds=StanData(
-                "prod_by_edge_bounds", prod_by_edge_bounds
-            ),
-            sub_km_ix_by_edge_long=StanData(
-                "sub_km_ix_by_edge_long", sub_km_ix_by_edge_long
-            ),
-            sub_km_ix_by_edge_bounds=StanData(
-                "sub_km_ix_by_edge_bounds", sub_km_ix_by_edge_bounds
-            ),
-            prod_km_ix_by_edge_long=StanData(
-                "prod_km_ix_by_edge_long", prod_km_ix_by_edge_long
-            ),
-            prod_km_ix_by_edge_bounds=StanData(
-                "prod_by_edge_bounds", prod_km_ix_by_edge_bounds
-            ),
-            ci_ix_long=StanData("ci_ix_long", ci_ix_long),
-            ci_ix_bounds=StanData("ci_ix_bounds", ci_ix_bounds),
-            allostery_ix_long=StanData("allostery_ix_long", allostery_ix_long),
-            allostery_ix_bounds=StanData(
-                "allostery_ix_bounds", allostery_ix_bounds
-            ),
-            allostery_type=StanData("allostery_type", allostery_type),
-            allostery_mic=StanData("allostery_mic", allostery_mic),
-            phosphorylation_ix_long=StanData(
-                "phosphorylation_ix_long", phosphorylation_ix_long
-            ),
-            phosphorylation_ix_bounds=StanData(
-                "phosphorylation_ix_bounds", phosphorylation_ix_bounds
-            ),
-            phosphorylation_type=StanData(
-                "phosphorylation_type", phosphorylation_type
-            ),
-            phosphorylation_pme=StanData(
-                "phosphorylation_pme", phosphorylation_pme
-            ),
-            enzyme_knockout_long=StanData(
-                "enzyme_knockout_long", enz_knockout_long_test
-            ),
-            enzyme_knockout_bounds=StanData(
-                "enzyme_knockout_bounds", enz_knockout_bounds_test
-            ),
-            pme_knockout_long=StanData(
-                "pme_knockout_long", pme_knockout_long_test
-            ),
-            pme_knockout_bounds=StanData(
-                "pme_knockout_bounds", pme_knockout_bounds_test
-            ),
-            # configuration
-            conc_init=get_conc_init(
-                ms, kinetic_model, priors, config, mode="test"
-            ),
-            likelihood=StanData("likelihood", int(config.likelihood)),
-            drain_small_conc_corrector=StanData(
-                "drain_small_conc_corrector",
-                int(config.drain_small_conc_corrector),
-            ),
-            rel_tol=StanData("rel_tol", config.ode_config.rel_tol),
-            abs_tol=StanData("abs_tol", config.ode_config.abs_tol),
-            timepoint=StanData("timepoint", config.ode_config.timepoint),
-            max_num_steps=StanData(
-                "max_num_steps", config.ode_config.max_num_steps
-            ),
+        else StanInput(
+            dict(
+                # priors
+                priors_conc_pme=priors_conc_pme_test,
+                priors_conc_unbalanced=priors_conc_unbalanced_test,
+                priors_conc_enzyme=priors_conc_enzyme_test,
+                priors_drain=priors_drain_test,
+                # network properties
+                S=S.values.tolist(),
+                N_metabolite=len(kinetic_model.metabolites),
+                N_km=len(km_ids),
+                N_reaction=len(reactions),
+                N_allosteric_enzyme=len(tc_codes),
+                balanced_mic_ix=balanced_mic_codes,
+                unbalanced_mic_ix=unbalanced_mic_codes,
+                ci_mic_ix=ci_mic_codes,
+                edge_type=edge_mechanism_code,
+                edge_to_enzyme=edge_enzyme_code,
+                edge_to_tc=edge_tc_code,
+                edge_to_drain=edge_drain_code,
+                edge_to_reaction=edge_reaction_code,
+                water_stoichiometry=edge_water_stoichiometry,
+                mic_to_met=mic_met_code,
+                subunits=[e.subunits for e in kinetic_model.enzymes],
+                temperature=[e.temperature for e in experiments_test],
+                sub_by_edge_long=sub_by_edge_long,
+                sub_by_edge_bounds=sub_by_edge_bounds,
+                prod_by_edge_long=prod_by_edge_long,
+                prod_by_edge_bounds=prod_by_edge_bounds,
+                sub_km_ix_by_edge_long=sub_km_ix_by_edge_long,
+                sub_km_ix_by_edge_bounds=sub_km_ix_by_edge_bounds,
+                prod_km_ix_by_edge_long=prod_km_ix_by_edge_long,
+                prod_km_ix_by_edge_bounds=prod_km_ix_by_edge_bounds,
+                ci_ix_long=ci_ix_long,
+                ci_ix_bounds=ci_ix_bounds,
+                allostery_ix_long=allostery_ix_long,
+                allostery_ix_bounds=allostery_ix_bounds,
+                allostery_type=allostery_type,
+                allostery_mic=allostery_mic,
+                phosphorylation_ix_long=phosphorylation_ix_long,
+                phosphorylation_ix_bounds=phosphorylation_ix_bounds,
+                phosphorylation_type=phosphorylation_type,
+                phosphorylation_pme=phosphorylation_pme,
+                enzyme_knockout_long=enz_knockout_long_test,
+                enzyme_knockout_bounds=enz_knockout_bounds_test,
+                pme_knockout_long=pme_knockout_long_test,
+                pme_knockout_bounds=pme_knockout_bounds_test,
+                # configuration
+                conc_init=get_conc_init(
+                    ms, kinetic_model, priors, config, mode="test"
+                ),
+                likelihood=int(config.likelihood),
+                drain_small_conc_corrector=int(
+                    config.drain_small_conc_corrector
+                ),
+                rel_tol=config.ode_config.rel_tol,
+                abs_tol=config.ode_config.abs_tol,
+                timepoint=config.ode_config.timepoint,
+                max_num_steps=config.ode_config.max_num_steps,
+            )
         )
     )
     return stan_input_train, stan_input_test
@@ -613,7 +556,7 @@ def get_conc_init(
     priors: PriorSet,
     config: MaudConfig,
     mode: str,
-) -> StanData:
+) -> List[List[float]]:
     """Get the initial mic concentrations for the ODE solver.
 
     The initial concentration for a measured mic is the measured value.
@@ -649,7 +592,7 @@ def get_conc_init(
                         )
                     )
             out.append(init_exp)
-    return StanData(name="conc_init", value=out)
+    return out
 
 
 def unpack_priors_2d(

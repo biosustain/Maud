@@ -124,6 +124,7 @@ class PriorSet:
     drain: IndPrior2d
     conc_enzyme: IndPrior2d
     conc_pme: IndPrior2d
+    promiscuous_enzyme_proportion_invsm: IndPrior2d
 
     @root_validator
     def missing_priors_are_not_allowed(cls, values):

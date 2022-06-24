@@ -18,6 +18,7 @@ class IdComponent(str, Enum):
     REACTION = "reaction"
     EXPERIMENT = "experiment"
     PHOSPHORYLATION_MODIFYING_ENZYME = "phosphorylation_modifying_enzyme"
+    EDGE = "edge"
 
 
 @dataclass
@@ -296,6 +297,27 @@ class Psi(StanVariable):
         self.default_scale = 2
 
 
+@dataclass(init=False)
+class PromiscuousEnzymeProportionInvsm(StanVariable):
+    """Stan variable representing per-experiment promiscuous enzyme proportions.
+
+    NB these variables are on inverse-softmax scale.
+    """
+
+    def __init__(self, ids, split_ids):
+        self.name = "promiscuous_enzyme_proportion_invsm"
+        self.ids = ids
+        self.shape_names = ["N_experiment", "N_promiscuous_enzyme_edge"]
+        self.split_ids = split_ids
+        self.id_components = [
+            [IdComponent.EXPERIMENT],
+            [IdComponent.ENZYME, IdComponent.REACTION],
+        ]
+        self.non_negative = False
+        self.default_loc = 0
+        self.default_scale = 1
+
+
 @dataclass
 class StanVariableSet:
     """A MaudInput's set of Stan variables."""
@@ -312,3 +334,4 @@ class StanVariableSet:
     conc_unbalanced: ConcUnbalanced
     conc_pme: ConcPme
     psi: Psi
+    promiscuous_enzyme_proportion_invsm: PromiscuousEnzymeProportionInvsm

@@ -1,4 +1,30 @@
 functions {
+  int measure_ragged(int[,] bounds, int i){
+    return bounds[i, 2] - bounds[i, 1] + 1;
+  }
+
+  int[] extract_ragged(int[] ix_long, int[,] bounds, int i){
+  /*
+    Extract the ith element of a ragged array stored in 1d array long.
+
+    Make sure that members bounds[i, 1] to bounds[i, 2] of long form the
+    required element!
+
+   */
+  return ix_long[bounds[i, 1]:bounds[i, 2]];
+  }
+
+  vector get_promiscuous_enzyme_edge_proportion(vector promiscuous_enzyme_edge_proportion_invsm,
+                                                int[] edge_by_promiscuous_enzyme_long,
+                                                int[,] edge_by_promiscuous_enzyme_bounds){
+    vector[size(edge_by_promiscuous_enzyme_long)] out;
+    for (pe in 1:size(edge_by_promiscuous_enzyme_bounds)){
+      int ix_start = edge_by_promiscuous_enzyme_bounds[pe][1];
+      int ix_end = edge_by_promiscuous_enzyme_bounds[pe][2];
+      out[ix_start:ix_end] = softmax(promiscuous_enzyme_edge_proportion_invsm[ix_start:ix_end]);
+    }
+    return out;
+  }
   vector unz_1d(vector[] mnsd, vector z){
     /* 
       Recover a real-valued vector from a 1xn vector z of z scores and a 2xn
@@ -73,21 +99,6 @@ functions {
     if (relative_check_failed) print("Sv ", Sv, " not within ", rel_thresh_per_conc, " of zero.");
     if (absolute_check_failed) print("Sv ", Sv, " not within ", abs_thresh, " of zero.");
     return (relative_check_failed || absolute_check_failed) ? 0 : 1;
-  }
-
-  int measure_ragged(int[,] bounds, int i){
-    return bounds[i, 2] - bounds[i, 1] + 1;
-  }
-
-  int[] extract_ragged(int[] ix_long, int[,] bounds, int i){
-  /*
-    Extract the ith element of a ragged array stored in 1d array long.
-
-    Make sure that members bounds[i, 1] to bounds[i, 2] of long form the
-    required element!
-
-   */
-  return ix_long[bounds[i, 1]:bounds[i, 2]];
   }
 
   vector get_saturation(vector conc,
@@ -256,12 +267,17 @@ functions {
     return out;
   }
 
-  vector get_vmax_by_edge(vector enzyme, vector kcat, int[] edge_to_enzyme, int[] edge_type){
+  vector get_vmax_by_edge(vector enzyme,
+                          vector kcat,
+                          vector edge_enzyme_proportion,
+                          int[] edge_to_enzyme,
+                          int[] edge_to_enzyme_reaction,
+                          int[] edge_type){
     int N_edge = size(edge_to_enzyme);
     vector[N_edge] out = rep_vector(1, N_edge);
     for (f in 1:N_edge){
       if (edge_type[f] != 3){
-        out[f] = enzyme[edge_to_enzyme[f]] * kcat[edge_to_enzyme[f]];
+        out[f] = enzyme[edge_to_enzyme[f]] * kcat[edge_to_enzyme_reaction[f]] * edge_enzyme_proportion[f];
       }
     }
     return out;
@@ -278,12 +294,14 @@ functions {
                        vector kcat_pme,
                        vector conc_pme,
                        vector drain,
+                       vector edge_enzyme_proportion,
                        real temperature,
                        real drain_small_conc_corrector,
                        matrix S,
                        vector subunits,
                        array[] int edge_type,
                        array[] int edge_to_enzyme,
+                       array[] int edge_to_enzyme_reaction,
                        array[] int edge_to_drain,
                        array[] int ci_mic_ix,
                        array[] int sub_km_ix_by_edge_long,
@@ -306,7 +324,7 @@ functions {
                        array[] int phosphorylation_type,
                        array[] int phosphorylation_pme){
     int N_edge = cols(S);
-    vector[N_edge] vmax = get_vmax_by_edge(enzyme, kcat, edge_to_enzyme, edge_type);
+    vector[N_edge] vmax = get_vmax_by_edge(enzyme, kcat, edge_enzyme_proportion, edge_to_enzyme, edge_to_enzyme_reaction, edge_type);
     vector[N_edge] reversibility = get_reversibility(dgr, temperature, S, conc, edge_type);
     vector[N_edge] free_enzyme_ratio = get_free_enzyme_ratio(conc,
                                                              S,
@@ -356,7 +374,19 @@ functions {
                                                      sub_by_edge_bounds,
                                                      edge_type,
                                                      drain_small_conc_corrector);
-    return vmax .* saturation .* reversibility .* allostery .* phosphorylation .* drain_by_edge;
+    print("edge_type: ", edge_type);
+    print("conc: ", conc);
+    print("free_enzyme_ratio: ", free_enzyme_ratio);
+    print("vmax: ", vmax);
+    print("dgr: ", dgr);
+    print("reversibility: ", reversibility);
+    print("saturation: ", saturation);
+    print("allostery: ", allostery);
+    print("phosphorylation: ", phosphorylation);
+    print("drain_by_edge: ", drain_by_edge);
+    vector[N_edge] out = vmax .* saturation .* reversibility .* allostery .* phosphorylation .* drain_by_edge;
+    print("edge_flux", out);
+    return out;
   }
 
   vector dbalanced_dt(real time,
@@ -374,12 +404,14 @@ functions {
                       vector kcat_pme,
                       vector conc_pme,
                       vector drain,
+                      vector edge_enzyme_proportion,
                       real temperature,
                       real drain_small_conc_corrector,
                       matrix S,
                       vector subunits,
                       array[] int edge_type,
                       array[] int edge_to_enzyme,
+                      array[] int edge_to_enzyme_reaction,
                       array[] int edge_to_drain,
                       array[] int ci_mic_ix,
                       array[] int sub_km_ix_by_edge_long,
@@ -415,12 +447,14 @@ functions {
                                               kcat_pme,
                                               conc_pme,
                                               drain,
+                                              edge_enzyme_proportion,
                                               temperature,
                                               drain_small_conc_corrector,
                                               S,
                                               subunits,
                                               edge_type,
                                               edge_to_enzyme,
+                                              edge_to_enzyme_reaction,
                                               edge_to_drain,
                                               ci_mic_ix,
                                               sub_km_ix_by_edge_long,
