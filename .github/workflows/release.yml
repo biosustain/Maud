@@ -16,7 +16,7 @@ jobs:
         python-version: [3.9]
       fail-fast: false
   steps:
-    - name: Check out source code
+    - name: Checkout
       uses: actions/checkout@v2
     - name: Create Release
       uses: actions/create-release@v1
