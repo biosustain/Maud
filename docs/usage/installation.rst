@@ -13,11 +13,11 @@ then activate it, run the following commands:
     source maud_venv/bin/activate
 
 To install the latest Maud and its python dependencies to your new virtual
-environment from the latest master branch, run this command:
+environment, run this command:
 
 .. code-block:: console
 
-    pip install https://github.com/biosustain/Maud/archive/master.zip
+    pip install maud-metabolic-models
 
 Cmdstanpy depends on `cmdstan <https://github.com/stan-dev/cmdstan>`, which
 in turn requires a c++ toolchain. Fortunately, cmdstanpy comes with commands 

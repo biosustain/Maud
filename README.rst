@@ -36,12 +36,12 @@ First create a fresh Python 3.7 virtual environment and then activate it:
     python3.7 -m virtualenv maud_venv  # choose any name you like!
     source maud_venv/bin/activate
 
-To install the latest Maud and its python dependencies to your new virtual
-environment from the latest master branch, run this command:
+To install Maud and its python dependencies to your new virtual environment, run
+this command:
 
 .. code-block:: console
 
-    pip install https://github.com/biosustain/Maud/archive/master.zip
+    pip install maud-metabolic-models
 
 Cmdstanpy depends on `cmdstan <https://github.com/stan-dev/cmdstan>`_, 
 which in turn requires a c++ toolchain. Fortunately, cmdstanpy comes with
