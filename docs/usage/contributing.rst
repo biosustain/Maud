@@ -82,7 +82,8 @@ Releasing versions
 ==================
 
 To release a new version of Maud, edit the field :code:`version` in the file
-:code:`setup.cfg`, then make a pull request with this change.
+:code:`setup.cfg`, then make a pull request with this change. The version name
+should start with a letter v, e.g. :code:`v0.2.1`,
 
 Once the changes are merged into the :code:`origin/master` branch, add a tag
 with the new version number to your local :code:`master` branch, for example
@@ -90,10 +91,10 @@ like this:
 
 .. code:: bash
 
-          git tag 0.2.1
+          git tag v0.2.1
 
 Now push the new tag to github:
  
 .. code:: bash
 
-          git push origin "0.2.1"
+          git push origin "v0.2.1"
