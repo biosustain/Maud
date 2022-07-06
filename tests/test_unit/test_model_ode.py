@@ -1,17 +1,20 @@
 """Unit tests for model ode function."""
 
-import os
+import sys
+
+
+if sys.version_info[1] <= 9:
+    from importlib_resources import files
+else:
+    from importlib.resources import files
 
 import cmdstanpy
 import pytest
 from numpy import isclose
 
 
-here = os.path.dirname(__file__)
-data_path = os.path.join(here, "..", "data")
-model_path = os.path.join(
-    here, "..", "..", "src", "maud", "stan", "model.stan"
-)
+DATA_PATH = files("maud.data")
+MODEL_PATH = files("maud.stan").joinpath("model.stan")
 
 SIM_CONFIG = {
     "chains": 1,
@@ -59,13 +62,13 @@ test_cases = [
 )
 def test_model_ode(folder, csv_ixs, meaningful_ixs, expected_values):
     """Test that the function get_input_data behaves as expected."""
-    input_path = os.path.join(data_path, folder)
-    init_data = os.path.join(input_path, "inits.json")
-    input_data = os.path.join(input_path, "input_data_train.json")
+    input_path = DATA_PATH / folder
+    init_data = input_path / "inits.json"
+    input_data = input_path / "input_data_train.json"
     SIM_CONFIG["inits"] = init_data
-    model = cmdstanpy.CmdStanModel(stan_file=model_path)
+    model = cmdstanpy.CmdStanModel(stan_file=MODEL_PATH)
     sim_values = (
-        model.sample(data=input_data, **SIM_CONFIG)
+        model.sample(data=input_data.__str__(), **SIM_CONFIG)
         .draws_pd()
         .loc[0, csv_ixs]
         .to_list()

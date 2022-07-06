@@ -18,7 +18,14 @@
 
 import os
 import shutil
+import sys
 from datetime import datetime
+
+
+if sys.version_info[1] <= 9:
+    from importlib_resources import files
+else:
+    from importlib.resources import files
 
 import arviz as az
 import click
@@ -28,7 +35,7 @@ from maud.loading_maud_inputs import load_maud_input
 from maud.running_stan import predict, sample, simulate, variational
 
 
-RELATIVE_PATH_EXAMPLE = "../../tests/data/linear"
+RELATIVE_PATH_EXAMPLE = files("maud.data").joinpath("linear")
 
 
 def get_example_path(relative_path_example):

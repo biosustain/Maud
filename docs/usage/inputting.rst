@@ -22,7 +22,7 @@ optionally include extra files specifying non-independent priors and a file
 specifying initial parameter values for the MCMC sampler.
 
 For some working examples of full inputs see `here
-<https://github.com/biosustain/Maud/tree/master/tests/data>`_.
+<https://github.com/biosustain/Maud/tree/master/src/maud/data>`_.
 
 
 The configuration file

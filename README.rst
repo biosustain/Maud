@@ -71,10 +71,10 @@ To run the simple linear model, use the following command:
 
 This will compile the Stan program at `src/maud/inference_model.stan
 <https://github.com/biosustain/Maud/blob/master/src/maud/inference_model.stan>`_, 
-then run the resulting binary file using the data at `tests/data/linar.toml
-<https://github.com/biosustain/Maud/blob/master/tests/data/linear.toml>`_, storing
+then run the resulting binary file using the data at `src/maud/data/linear
+<https://github.com/biosustain/Maud/blob/master/src/maud/data/linear>`_, storing
 the results in csv files starting with
-:code:`model_output_linear`.
+:code:`maud_output-linear`.
 
 The `sample` command can be configured in a few ways - to check out all the
 options try running

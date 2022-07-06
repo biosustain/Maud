@@ -2,6 +2,13 @@
 
 import json
 import os
+import sys
+
+
+if sys.version_info[1] <= 9:
+    from importlib_resources import files
+else:
+    from importlib.resources import files
 
 import numpy as np
 from numpy.testing import assert_equal
@@ -9,8 +16,7 @@ from numpy.testing import assert_equal
 from maud.loading_maud_inputs import load_maud_input
 
 
-HERE = os.path.dirname(__file__)
-LINEAR_PATH = os.path.join(HERE, "..", "data", "linear")
+LINEAR_PATH = files("maud.data").joinpath("linear").__str__()
 EXPECTED_STAN_INPUT_PATH = os.path.join(
     LINEAR_PATH, "expected_stan_input.json"
 )

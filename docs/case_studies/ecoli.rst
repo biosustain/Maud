@@ -26,7 +26,7 @@ represent it, and some information about it, in `Maud's input format
 <usage/inputting.html>`_.
 
 The full input folder can be found in `Maud's GitHub repository
-<https://github.com/biosustain/Maud/blob/master/tests/data/ecoli_small>`_. The
+<https://github.com/biosustain/Maud/blob/master/src/maud/data/ecoli_small>`_. The
 following section explains how it was constructed.
 
 
@@ -204,7 +204,7 @@ command in a suitable python environment (see `here
 
 .. code-block:: bash
 
-    maud sample tests/data/ecoli_small
+    maud sample src/maud/data/ecoli_small
 
 
 Analysing the results
