@@ -247,7 +247,7 @@ def main():
                 met_id = next(
                     filter(
                         lambda mic: mic.id == mic_id,  # noqa: B023
-                        mi.kinetic_model.mics
+                        mi.kinetic_model.mics,
                     )
                 ).metabolite_id
                 met_dgf = list(dgfs[dgfs["metabolite_id"] == met_id]["value"])[
