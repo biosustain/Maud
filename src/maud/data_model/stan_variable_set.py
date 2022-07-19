@@ -3,7 +3,7 @@
 from enum import Enum
 from typing import List, Optional
 
-from pydantic import Field, validator
+from pydantic import Field, root_validator, validator
 from pydantic.dataclasses import dataclass
 
 from maud.data_model.hardcoding import ID_SEPARATOR
@@ -44,6 +44,13 @@ class StanVariable:
         first_length = len(v[0])
         assert all([len(x) == first_length for x in v])
         return v
+
+    @root_validator
+    def split_ids_exist_if_needed(cls, values):
+        """Check split ids exist when there are non-trivial id components."""
+        if any(len(idc) > 1 for idc in values["id_components"]):
+            assert values["split_ids"] is not None
+        return values
 
 
 @dataclass
@@ -249,11 +256,11 @@ class ConcEnzyme(StanVariable):
 class ConcUnbalanced(StanVariable):
     """Stan variable representing a model's unbalanced mic concentrations."""
 
-    def __init__(self, ids):
+    def __init__(self, ids, split_ids):
         self.name = "conc_unbalanced"
         self.ids = ids
         self.shape_names = ["N_experiment", "N_unbalanced"]
-        self.split_ids = None
+        self.split_ids = split_ids
         self.id_components = [
             [IdComponent.EXPERIMENT],
             [IdComponent.METABOLITE, IdComponent.COMPARTMENT],
