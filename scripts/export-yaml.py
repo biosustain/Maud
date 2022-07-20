@@ -245,7 +245,10 @@ def main():
             tmp_dg = 0
             for mic_id, stoic in rxn.stoichiometry.items():
                 met_id = next(
-                    filter(lambda mic: mic.id == mic_id, mi.kinetic_model.mics)
+                    filter(
+                        lambda mic: mic.id == mic_id,  # noqa: B023
+                        mi.kinetic_model.mics,
+                    )
                 ).metabolite_id
                 met_dgf = list(dgfs[dgfs["metabolite_id"] == met_id]["value"])[
                     0

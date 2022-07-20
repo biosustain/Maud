@@ -114,7 +114,16 @@ def get_stan_variable_set(kmod: KineticModel, ms: MeasurementSet):
     drain_ids = [
         d.id for d in kmod.reactions if d.mechanism == ReactionMechanism.DRAIN
     ]
-    unbalanced_mics = [m.id for m in kmod.mics if not m.balanced]
+    unbalanced_mic_ids, unbalanced_mic_mets, unbalanced_mic_cpts = map(
+        list,
+        zip(
+            *[
+                [m.id, m.metabolite_id, m.compartment_id]
+                for m in kmod.mics
+                if not m.balanced
+            ]
+        ),
+    )
     return StanVariableSet(
         dgf=Dgf(ids=[metabolite_ids]),
         km=Km(ids=[km_ids], split_ids=[km_enzs, km_mets, km_cpts]),
@@ -127,7 +136,13 @@ def get_stan_variable_set(kmod: KineticModel, ms: MeasurementSet):
         kcat_pme=KcatPme(ids=[phos_modifying_enzymes]),
         drain=Drain(ids=[exp_ids, drain_ids]),
         conc_enzyme=ConcEnzyme(ids=[exp_ids, enzyme_ids]),
-        conc_unbalanced=ConcUnbalanced(ids=[exp_ids, unbalanced_mics]),
+        conc_unbalanced=ConcUnbalanced(
+            ids=[exp_ids, unbalanced_mic_ids],
+            split_ids=[
+                [exp_ids],
+                [unbalanced_mic_mets, unbalanced_mic_cpts],
+            ],
+        ),
         conc_pme=ConcPme(ids=[exp_ids, phos_modifying_enzymes]),
         psi=Psi(ids=[exp_ids]),
     )

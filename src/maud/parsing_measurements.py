@@ -24,7 +24,7 @@ def parse_measurement_set(
     ]
     y = {
         mt: raw_measurement_table.loc[
-            lambda df: df["measurement_type"] == mt.value
+            lambda df: df["measurement_type"] == mt.value  # noqa: B023
         ]
         for mt in MeasurementType
     }
