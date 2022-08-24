@@ -1,5 +1,5 @@
 """Provides dataclass MaudConfig."""
-from typing import Optional
+from typing import Optional, List
 
 from pydantic import Field, root_validator
 from pydantic.dataclasses import dataclass
@@ -33,6 +33,7 @@ class MaudConfig:
     :param user_inits_file: path to a csv file of initial values.
     :param dgf_mean_file: path to a csv file of formation energy means.
     :param dgf_covariance_file: path to a csv file of formation energy covariances.
+    :param conc_init: Optional per-experiment list of starting metabolite concentrations
     :param steady_state_threshold_abs: absolute threshold for Sv=0 be at steady state
     :param steady_state_threshold_rel: relative threshold for Sv=0 be at steady state
     :param: drain_small_conc_corrector: number for correcting small conc drains
@@ -52,6 +53,7 @@ class MaudConfig:
     user_inits_file: Optional[str] = None
     dgf_mean_file: Optional[str] = None
     dgf_covariance_file: Optional[str] = None
+    conc_init: Optional[List[List[float]]] = None
     ode_config: ODEConfig = ODEConfig()
     reject_non_steady: bool = True
     steady_state_threshold_abs: float = 1e-8

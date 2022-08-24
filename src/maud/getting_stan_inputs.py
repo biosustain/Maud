@@ -453,7 +453,9 @@ def get_stan_inputs(
         # configuration
         conc_init=get_conc_init(
             ms, kinetic_model, priors, config, mode="train"
-        ),
+        )
+        if config.conc_init is None
+        else StanData("conc_init", config.conc_init),
         likelihood=StanData("likelihood", int(config.likelihood)),
         drain_small_conc_corrector=StanData(
             "drain_small_conc_corrector",
@@ -573,7 +575,9 @@ def get_stan_inputs(
             # configuration
             conc_init=get_conc_init(
                 ms, kinetic_model, priors, config, mode="test"
-            ),
+            )
+            if config.conc_init is None
+            else StanData("conc_init", config.conc_init),
             likelihood=StanData("likelihood", int(config.likelihood)),
             drain_small_conc_corrector=StanData(
                 "drain_small_conc_corrector",

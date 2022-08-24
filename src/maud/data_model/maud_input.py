@@ -3,7 +3,7 @@
 from typing import Optional
 
 import pandas as pd
-from pydantic import Field
+from pydantic import Field, root_validator
 from pydantic.dataclasses import dataclass
 
 from maud.data_model.kinetic_model import KineticModel
@@ -50,3 +50,19 @@ class MaudInput:
         self.stan_input_train, self.stan_input_test = get_stan_inputs(
             self.measurements, self.priors, self.kinetic_model, self.config
         )
+
+    @root_validator
+    def conc_init_must_have_correct_shape(cls, values):
+        """Check that conc_init has the right shape."""
+        ci = values["config"].conc_init
+        if ci is not None:
+            ms = values["measurements"]
+            km = values["kinetic_model"]
+            assert len(ci) == len(
+                ms.experiments
+            ), "conc_init has wrong number of elements"
+            for i, conc_vector in enumerate(ci):
+                assert len(conc_vector) == len(
+                    km.mics
+                ), f"conc_init element {i} has wrong number of entries"
+        return values
