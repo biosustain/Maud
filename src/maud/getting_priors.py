@@ -73,8 +73,10 @@ def load_2d_prior(
     row_id_cols = [idc.value for idc in stan_variable.id_components[1]]
     if all(c not in user.columns for c in row_id_cols):
         return IndPrior2d(stan_variable, loc, scale)
-    user["col_id"] = pd.NA if user[row_id_cols].empty else (
-        user[row_id_cols].apply(ID_SEPARATOR.join, axis=1)
+    user["col_id"] = (
+        pd.NA
+        if user[row_id_cols].empty
+        else (user[row_id_cols].apply(ID_SEPARATOR.join, axis=1))
     )
     user["row_id"] = pd.NA if user["experiment"].empty else user["experiment"]
     print(user)
