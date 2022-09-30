@@ -173,6 +173,7 @@ def do_simulate(data_path, output_dir, n):
     os.mkdir(output_path)
     os.mkdir(samples_path)
     print(f"Copying user input from {data_path} to {ui_dir}")
+    shutil.copytree(data_path, ui_dir)
     stanfit = simulate(mi, samples_path, n)
     idata = get_idata(stanfit.runset.csv_files, mi, "train")
     idata.to_netcdf(os.path.join(output_path, "idata.nc"))

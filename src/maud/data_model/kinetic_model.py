@@ -117,13 +117,13 @@ class Reaction:
     @validator("id")
     def id_must_not_contain_seps(cls, v):
         """Check that the id doesn't contain ID_SEPARATOR."""
-        assert ID_SEPARATOR not in v
+        assert ID_SEPARATOR not in v, "ID must not contain separator"
         return v
 
     @validator("stoichiometry")
     def stoichiometry_must_be_non_zero(cls, v):
         """Check that the stoichiometry is not zero."""
-        assert v != 0
+        assert v != 0, "stoichiometry must be non-zero"
         return v
 
 
