@@ -46,7 +46,7 @@ def parse_kinetic_model(raw: dict) -> KineticModel:
         Reaction(
             id=r["id"],
             name=read_with_fallback("name", r, None),
-            mechanism=ReactionMechanism[r["mechanism"].upper()],
+            mechanism=ReactionMechanism[r["mechanism"]],
             stoichiometry=r["stoichiometry"],
             water_stoichiometry=read_with_fallback(
                 "water_stoichiometry", r, 0
@@ -62,9 +62,7 @@ def parse_kinetic_model(raw: dict) -> KineticModel:
             Phosphorylation(
                 modifying_enzyme_id=p["modifying_enzyme_id"],
                 modified_enzyme_id=p["modified_enzyme_id"],
-                modification_type=ModificationType[
-                    p["modification_type"].upper()
-                ],
+                modification_type=ModificationType[p["modification_type"]],
                 name=p["name"] if "name" in p.keys() else None,
             )
             for p in raw["phosphorylation"]
@@ -77,9 +75,7 @@ def parse_kinetic_model(raw: dict) -> KineticModel:
                 enzyme_id=a["enzyme_id"],
                 metabolite_id=a["metabolite_id"],
                 compartment_id=a["compartment_id"],
-                modification_type=ModificationType[
-                    a["modification_type"].upper()
-                ],
+                modification_type=ModificationType[a["modification_type"]],
             )
             for a in raw["allostery"]
         ]
