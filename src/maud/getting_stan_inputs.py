@@ -16,6 +16,7 @@ from maud.data_model.kinetic_model import (
     Phosphorylation,
     PhosphorylationModifyingEnzyme,
     Reaction,
+    ReactionMechanism,
 )
 from maud.data_model.maud_config import MaudConfig
 from maud.data_model.measurement_set import Experiment, MeasurementSet
@@ -168,9 +169,12 @@ def get_stan_inputs(
             sub_km_ids = [
                 ID_SEPARATOR.join([edge.enzyme_id, s]) for s in sub_ids
             ]
-            prod_km_ids = [
-                ID_SEPARATOR.join([edge.enzyme_id, p]) for p in prod_ids
-            ]
+            prod_km_ids = (
+                [ID_SEPARATOR.join([edge.enzyme_id, p]) for p in prod_ids]
+                if rxn.mechanism
+                != ReactionMechanism.IRREVERSIBLE_MICHAELIS_MENTEN
+                else []
+            )
         sub_code_by_edge.append([mic_codes[s] for s in sub_ids])
         sub_km_code_by_edge.append([km_codes[k] for k in sub_km_ids])
         prod_code_by_edge.append([mic_codes[p] for p in prod_ids])

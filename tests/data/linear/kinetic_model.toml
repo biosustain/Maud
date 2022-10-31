@@ -37,7 +37,7 @@ stoichiometry = { M1_e = -1, M1_c = 1}
 [[reaction]]
 id = "r2"
 name = "Reaction number 2"
-mechanism = "reversible_michaelis_menten"
+mechanism = "irreversible_michaelis_menten"
 stoichiometry = { M1_c = -1, M2_c = 1}
 
 [[reaction]]

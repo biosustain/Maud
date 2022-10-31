@@ -92,7 +92,7 @@ def do_sample(data_path, output_dir):
     print(stanfit.diagnose())
     print(stanfit.summary())
     idata = get_idata(stanfit.runset.csv_files, mi, "train")
-    idata.to_netcdf(os.path.join(output_path, "idata.nc"))
+    idata.to_json(os.path.join(output_path, "idata.json"))
     return output_path
 
 
@@ -130,7 +130,7 @@ def do_predict(data_path: str):
     with the user input required to generate the trained samples.
 
     """
-    idata_train = az.from_netcdf(os.path.join(data_path, "idata.nc"))
+    idata_train = az.from_json(os.path.join(data_path, "idata.json"))
     mi = load_maud_input(os.path.join(data_path, "user_input"))
     now = datetime.now().strftime("%Y%m%d%H%M%S")
     output_name = f"maud-predict_output-{mi.config.name}-{now}"
@@ -140,11 +140,7 @@ def do_predict(data_path: str):
     os.mkdir(output_path)
     os.mkdir(test_samples_path)
     idata_predict = predict(mi, output_path, idata_train)
-    # delete attrs hack to make netcdf save work:
-    # https://github.com/arviz-devs/arviz/issues/1554
-    idata_predict.sample_stats.attrs = {}  # type: ignore
-    idata_predict.posterior.attrs = {}  # type: ignore
-    idata_predict.to_netcdf(os.path.join(output_path, "idata_predict.nc"))
+    idata_predict.to_json(os.path.join(output_path, "idata_predict.json"))
 
 
 @cli.command("simulate")
@@ -176,7 +172,7 @@ def do_simulate(data_path, output_dir, n):
     shutil.copytree(data_path, ui_dir)
     stanfit = simulate(mi, samples_path, n)
     idata = get_idata(stanfit.runset.csv_files, mi, "train")
-    idata.to_netcdf(os.path.join(output_path, "idata.nc"))
+    idata.to_json(os.path.join(output_path, "idata.json"))
     print("\n\nSimulated concentrations:")
     print(
         idata.posterior["conc"]
