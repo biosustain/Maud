@@ -37,7 +37,12 @@ def get_km_coords(kinetic_model: KineticModel) -> KmCoords:
     for er in kinetic_model.ers:
         rxn = [r for r in kinetic_model.reactions if r.id == er.reaction_id][0]
         enz = [e for e in kinetic_model.enzymes if e.id == er.enzyme_id][0]
-        for mic_id in rxn.stoichiometry.keys():
+        mic_ids = (
+            list(rxn.stoichiometry.keys())
+            if rxn.mechanism != ReactionMechanism.IRREVERSIBLE_MICHAELIS_MENTEN
+            else [k for k, v in rxn.stoichiometry.items() if v < 0]
+        )
+        for mic_id in mic_ids:
             km_id = ID_SEPARATOR.join([enz.id, mic_id])
             met_id, cpt_id = mic_id.split(ID_SEPARATOR)
             if km_id not in km_ids:
