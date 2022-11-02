@@ -139,12 +139,14 @@ def get_stan_variable_set(kmod: KineticModel, ms: MeasurementSet):
         ),
         transfer_constant=TransferConstant(
             ids=[allosteric_enzyme_ids], split_ids=[allosteric_enzyme_ids]
-            ),
+        ),
         kcat_pme=KcatPme(
             ids=[phos_modifying_enzymes], split_ids=[phos_modifying_enzymes]
-            ),
+        ),
         drain=Drain(ids=[exp_ids, drain_ids], split_ids=[exp_ids, drain_ids]),
-        conc_enzyme=ConcEnzyme(ids=[exp_ids, enzyme_ids], split_ids=[exp_ids, enzyme_ids]),
+        conc_enzyme=ConcEnzyme(
+            ids=[exp_ids, enzyme_ids], split_ids=[exp_ids, enzyme_ids]
+        ),
         conc_unbalanced=ConcUnbalanced(
             ids=[exp_ids, unbalanced_mic_ids],
             split_ids=[
@@ -154,7 +156,7 @@ def get_stan_variable_set(kmod: KineticModel, ms: MeasurementSet):
         ),
         conc_pme=ConcPme(
             ids=[exp_ids, phos_modifying_enzymes],
-            split_ids=[exp_ids, phos_modifying_enzymes]
-            ),
+            split_ids=[exp_ids, phos_modifying_enzymes],
+        ),
         psi=Psi(ids=[exp_ids], split_ids=[exp_ids]),
     )
