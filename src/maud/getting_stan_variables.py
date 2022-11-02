@@ -130,17 +130,23 @@ def get_stan_variable_set(kmod: KineticModel, ms: MeasurementSet):
         ),
     )
     return StanVariableSet(
-        dgf=Dgf(ids=[metabolite_ids]),
+        dgf=Dgf(ids=[metabolite_ids], split_ids=[metabolite_ids]),
         km=Km(ids=[km_ids], split_ids=[km_enzs, km_mets, km_cpts]),
         kcat=Kcat(ids=[kcat_ids], split_ids=[kcat_enzs, kcat_rxns]),
         ki=Ki(ids=[ci_ids], split_ids=[ci_enzs, ci_rxns, ci_mets, ci_cpts]),
         dissociation_constant=DissociationConstant(
             ids=[dc_ids], split_ids=[dc_enzs, dc_mets, dc_cpts]
         ),
-        transfer_constant=TransferConstant(ids=[allosteric_enzyme_ids]),
-        kcat_pme=KcatPme(ids=[phos_modifying_enzymes]),
-        drain=Drain(ids=[exp_ids, drain_ids]),
-        conc_enzyme=ConcEnzyme(ids=[exp_ids, enzyme_ids]),
+        transfer_constant=TransferConstant(
+            ids=[allosteric_enzyme_ids], split_ids=[allosteric_enzyme_ids]
+        ),
+        kcat_pme=KcatPme(
+            ids=[phos_modifying_enzymes], split_ids=[phos_modifying_enzymes]
+        ),
+        drain=Drain(ids=[exp_ids, drain_ids], split_ids=[exp_ids, drain_ids]),
+        conc_enzyme=ConcEnzyme(
+            ids=[exp_ids, enzyme_ids], split_ids=[exp_ids, enzyme_ids]
+        ),
         conc_unbalanced=ConcUnbalanced(
             ids=[exp_ids, unbalanced_mic_ids],
             split_ids=[
@@ -148,6 +154,9 @@ def get_stan_variable_set(kmod: KineticModel, ms: MeasurementSet):
                 [unbalanced_mic_mets, unbalanced_mic_cpts],
             ],
         ),
-        conc_pme=ConcPme(ids=[exp_ids, phos_modifying_enzymes]),
-        psi=Psi(ids=[exp_ids]),
+        conc_pme=ConcPme(
+            ids=[exp_ids, phos_modifying_enzymes],
+            split_ids=[exp_ids, phos_modifying_enzymes],
+        ),
+        psi=Psi(ids=[exp_ids], split_ids=[exp_ids]),
     )
