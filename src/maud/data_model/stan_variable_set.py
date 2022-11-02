@@ -148,10 +148,10 @@ class Ki(StanVariable):
 class Dgf(StanVariable):
     """Stan variable representing a model's standard formation energies."""
 
-    def __init__(self, ids):
+    def __init__(self, ids, split_ids):
         self.name = "dgf"
         self.ids = ids
-        self.split_ids = None
+        self.split_ids = split_ids
         self.shape_names = ["N_metabolite"]
         self.id_components = [[IdComponent.METABOLITE]]
         self.non_negative = False
@@ -194,12 +194,12 @@ class DissociationConstant(StanVariable):
 class TransferConstant(StanVariable):
     """Stan variable representing a model's transfer constants."""
 
-    def __init__(self, ids):
+    def __init__(self, ids, split_ids):
         self.name = "transfer_constant"
         self.ids = ids
         self.shape_names = ["N_ae"]
         self.id_components = [[IdComponent.ENZYME]]
-        self.split_ids = None
+        self.split_ids = split_ids
         self.non_negative = True
         self.default_loc = 0.5
         self.default_scale = 1
@@ -209,11 +209,11 @@ class TransferConstant(StanVariable):
 class KcatPme(StanVariable):
     """Stan variable representing Kcats of phosphorylation modifying enzymes."""
 
-    def __init__(self, ids):
+    def __init__(self, ids, split_ids):
         self.name = "kcat_pme"
         self.ids = ids
         self.shape_names = ["N_pme"]
-        self.split_ids = None
+        self.split_ids = split_ids
         self.id_components = [[IdComponent.PHOSPHORYLATION_MODIFYING_ENZYME]]
         self.non_negative = True
         self.default_loc = 0.5
@@ -224,12 +224,12 @@ class KcatPme(StanVariable):
 class Drain(StanVariable):
     """Stan variable representing a model's drain parameters."""
 
-    def __init__(self, ids):
+    def __init__(self, ids, split_ids):
         self.name = "drain"
         self.ids = ids
         self.shape_names = ["N_experiment", "N_drain"]
         self.id_components = [[IdComponent.EXPERIMENT], [IdComponent.REACTION]]
-        self.split_ids = None
+        self.split_ids = split_ids
         self.non_negative = False
         self.default_loc = 0
         self.default_scale = 1
@@ -239,12 +239,12 @@ class Drain(StanVariable):
 class ConcEnzyme(StanVariable):
     """Stan variable representing a model's enzyme concentrations."""
 
-    def __init__(self, ids):
+    def __init__(self, ids, split_ids):
         self.name = "conc_enzyme"
         self.ids = ids
         self.shape_names = ["N_experimeent", "N_enzyme"]
         self.id_components = [[IdComponent.EXPERIMENT], [IdComponent.ENZYME]]
-        self.split_ids = None
+        self.split_ids = split_ids
         self.non_negative = True
         self.default_loc = 0.1
         self.default_scale = 2.0
@@ -274,11 +274,11 @@ class ConcUnbalanced(StanVariable):
 class ConcPme(StanVariable):
     """Stan variable representing a model's pme concentrations."""
 
-    def __init__(self, ids):
+    def __init__(self, ids, split_ids):
         self.name = "conc_pme"
         self.ids = ids
         self.shape_names = ["N_experiment", "N_pme"]
-        self.split_ids = None
+        self.split_ids = split_ids
         self.id_components = [
             [IdComponent.EXPERIMENT],
             [IdComponent.PHOSPHORYLATION_MODIFYING_ENZYME],
@@ -292,11 +292,11 @@ class ConcPme(StanVariable):
 class Psi(StanVariable):
     """Stan variable representing per-experiment membrane potentials."""
 
-    def __init__(self, ids):
+    def __init__(self, ids, split_ids):
         self.name = "psi"
         self.ids = ids
         self.shape_names = ["N_experiment"]
-        self.split_ids = None
+        self.split_ids = split_ids
         self.id_components = [[IdComponent.EXPERIMENT]]
         self.non_negative = False
         self.default_loc = 0
