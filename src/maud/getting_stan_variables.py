@@ -149,9 +149,7 @@ def get_stan_variable_set(kmod: KineticModel, ms: MeasurementSet):
         ),
         conc_unbalanced=ConcUnbalanced(
             ids=[exp_ids, unbalanced_mic_ids],
-            split_ids=[
-                [exp_ids, unbalanced_mic_mets, unbalanced_mic_cpts],
-            ],
+            split_ids=[exp_ids, unbalanced_mic_mets, unbalanced_mic_cpts],
         ),
         conc_pme=ConcPme(
             ids=[exp_ids, phos_modifying_enzymes],
