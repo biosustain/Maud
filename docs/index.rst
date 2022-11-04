@@ -30,6 +30,7 @@ humans.
    usage/installation
    usage/inputting
    usage/post_installation_usage
+   usage/contributing
 
 .. toctree::
    :maxdepth: 1
