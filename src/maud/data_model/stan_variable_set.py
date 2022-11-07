@@ -18,6 +18,7 @@ class IdComponent(str, Enum):
     REACTION = "reaction"
     EXPERIMENT = "experiment"
     PHOSPHORYLATION_MODIFYING_ENZYME = "phosphorylation_modifying_enzyme"
+    MODIFICATION_TYPE = "modification_type"
 
 
 @dataclass
@@ -173,6 +174,7 @@ class DissociationConstant(StanVariable):
                 IdComponent.ENZYME,
                 IdComponent.METABOLITE,
                 IdComponent.COMPARTMENT,
+                IdComponent.MODIFICATION_TYPE,
             ]
         ]
         self.non_negative = True

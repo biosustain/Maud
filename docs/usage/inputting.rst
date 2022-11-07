@@ -379,6 +379,7 @@ The priors table has the following fields:
 - :code:`enzyme` String identifier
 - :code:`reaction` String identifier
 - :code:`experiment` String identifier
+- :code:`modification_type` String identifier
 - :code:`location` Float specifying a location
 - :code:`scale` Float specifying a scale
 - :code:`pct1`: First percentile of the prior distribution
