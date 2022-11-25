@@ -1,25 +1,32 @@
-"""Provides function get_stan_variable_set."""
+"""Provides function get_maud_parameters."""
 
 from typing import List, Tuple
 
+from maud.data_model.experiment import Experiment
 from maud.data_model.hardcoding import ID_SEPARATOR
 from maud.data_model.kinetic_model import KineticModel, ReactionMechanism
-from maud.data_model.measurement_set import MeasurementSet
-from maud.data_model.stan_variable_set import (
-    ConcEnzyme,
-    ConcPme,
-    ConcUnbalanced,
+from maud.data_model.maud_init import InitInput
+from maud.data_model.maud_parameter import (
+    ConcEnzymeTest,
+    ConcEnzymeTrain,
+    ConcPmeTest,
+    ConcPmeTrain,
+    ConcUnbalancedTest,
+    ConcUnbalancedTrain,
     Dgf,
     DissociationConstant,
-    Drain,
+    DrainTest,
+    DrainTrain,
     Kcat,
     KcatPme,
     Ki,
     Km,
-    Psi,
-    StanVariableSet,
+    ParameterSet,
+    PsiTest,
+    PsiTrain,
     TransferConstant,
 )
+from maud.data_model.prior_input import PriorInput
 
 
 AllostericCoords = Tuple[List[str], List[str], List[str], List[str]]
@@ -97,8 +104,13 @@ def get_kcat_coords(kinetic_model: KineticModel) -> KcatCoords:
     return ids, enzs, rxns
 
 
-def get_stan_variable_set(kmod: KineticModel, ms: MeasurementSet):
-    """Get a StanVariableSet object from a KineticModel and a MeasurementSet."""
+def get_maud_parameters(
+    kmod: KineticModel,
+    experiments: List[Experiment],
+    pi: PriorInput,
+    ii: InitInput,
+):
+    """Get a ParameterSet object from a KineticModel and a MeasurementSet."""
     km_ids, km_enzs, km_mets, km_cpts = get_km_coords(kmod)
     dc_ids, dc_enzs, dc_mets, dc_cpts = get_dc_coords(kmod)
     ci_ids, ci_enzs, ci_rxns, ci_mets, ci_cpts = get_ci_coords(kmod)
@@ -115,7 +127,6 @@ def get_stan_variable_set(kmod: KineticModel, ms: MeasurementSet):
         if kmod.phosphorylations is not None
         else []
     )
-    exp_ids = [e.id for e in ms.experiments]
     drain_ids = [
         d.id for d in kmod.reactions if d.mechanism == ReactionMechanism.DRAIN
     ]
@@ -129,34 +140,85 @@ def get_stan_variable_set(kmod: KineticModel, ms: MeasurementSet):
             ]
         ),
     )
-    return StanVariableSet(
-        dgf=Dgf(ids=[metabolite_ids], split_ids=[metabolite_ids]),
-        km=Km(ids=[km_ids], split_ids=[km_enzs, km_mets, km_cpts]),
-        kcat=Kcat(ids=[kcat_ids], split_ids=[kcat_enzs, kcat_rxns]),
-        ki=Ki(ids=[ci_ids], split_ids=[ci_enzs, ci_rxns, ci_mets, ci_cpts]),
+    exp_ids_train = [e.id for e in experiments if e.is_train]
+    exp_ids_test = [e.id for e in experiments if e.is_test]
+    return ParameterSet(
+        dgf=Dgf([metabolite_ids], [[metabolite_ids]], pi.dgf, ii.dgf),
+        km=Km([km_ids], [[km_enzs, km_mets, km_cpts]], pi.km, ii.km),
+        kcat=Kcat([kcat_ids], [[kcat_enzs, kcat_rxns]], pi.kcat, ii.kcat),
+        ki=Ki([ci_ids], [[ci_enzs, ci_rxns, ci_mets, ci_cpts]], pi.ki, ii.ki),
         dissociation_constant=DissociationConstant(
-            ids=[dc_ids], split_ids=[dc_enzs, dc_mets, dc_cpts]
+            [dc_ids],
+            [[dc_enzs, dc_mets, dc_cpts]],
+            pi.dissociation_constant,
+            ii.dissociation_constant,
         ),
         transfer_constant=TransferConstant(
-            ids=[allosteric_enzyme_ids], split_ids=[allosteric_enzyme_ids]
+            [allosteric_enzyme_ids],
+            [[allosteric_enzyme_ids]],
+            pi.transfer_constant,
+            ii.transfer_constant,
         ),
         kcat_pme=KcatPme(
-            ids=[phos_modifying_enzymes], split_ids=[phos_modifying_enzymes]
+            [phos_modifying_enzymes],
+            [[phos_modifying_enzymes]],
+            pi.kcat_pme,
+            ii.kcat_pme,
         ),
-        drain=Drain(ids=[exp_ids, drain_ids], split_ids=[exp_ids, drain_ids]),
-        conc_enzyme=ConcEnzyme(
-            ids=[exp_ids, enzyme_ids], split_ids=[exp_ids, enzyme_ids]
+        drain_train=DrainTrain(
+            [exp_ids_train, drain_ids],
+            [[exp_ids_train], [drain_ids]],
+            pi.drain,
+            ii.drain,
         ),
-        conc_unbalanced=ConcUnbalanced(
-            ids=[exp_ids, unbalanced_mic_ids],
-            split_ids=[
-                [exp_ids],
+        drain_test=DrainTest(
+            [exp_ids_train, drain_ids],
+            [[exp_ids_train], [drain_ids]],
+            pi.drain,
+            ii.drain,
+        ),
+        conc_enzyme_train=ConcEnzymeTrain(
+            [exp_ids_train, enzyme_ids],
+            [[exp_ids_train], [enzyme_ids]],
+            pi.conc_enzyme,
+            ii.conc_enzyme,
+        ),
+        conc_enzyme_test=ConcEnzymeTest(
+            [exp_ids_train, enzyme_ids],
+            [[exp_ids_train], [enzyme_ids]],
+            pi.conc_enzyme,
+            ii.conc_enzyme,
+        ),
+        conc_unbalanced_train=ConcUnbalancedTrain(
+            [exp_ids_train, unbalanced_mic_ids],
+            [
+                [exp_ids_train],
                 [unbalanced_mic_mets, unbalanced_mic_cpts],
             ],
+            pi.conc_unbalanced,
+            ii.conc_unbalanced,
         ),
-        conc_pme=ConcPme(
-            ids=[exp_ids, phos_modifying_enzymes],
-            split_ids=[exp_ids, phos_modifying_enzymes],
+        conc_unbalanced_test=ConcUnbalancedTest(
+            [exp_ids_train, unbalanced_mic_ids],
+            [
+                [exp_ids_train],
+                [unbalanced_mic_mets, unbalanced_mic_cpts],
+            ],
+            pi.conc_unbalanced,
+            ii.conc_unbalanced,
         ),
-        psi=Psi(ids=[exp_ids], split_ids=[exp_ids]),
+        conc_pme_train=ConcPmeTrain(
+            [exp_ids_train, phos_modifying_enzymes],
+            [[exp_ids_train], [phos_modifying_enzymes]],
+            pi.conc_pme,
+            ii.conc_pme,
+        ),
+        conc_pme_test=ConcPmeTest(
+            [exp_ids_train, phos_modifying_enzymes],
+            [[exp_ids_train], [phos_modifying_enzymes]],
+            pi.conc_pme,
+            ii.conc_pme,
+        ),
+        psi_train=PsiTrain([exp_ids_train], [[exp_ids_test]], pi.psi, ii.psi),
+        psi_test=PsiTest([exp_ids_train], [[exp_ids_train]], pi.psi, ii.psi),
     )

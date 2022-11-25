@@ -1,17 +1,19 @@
 """Definitions of the user's input for priors. Directly read from toml."""
 
+from typing import List, Optional
+
+from pydantic import root_validator, validator
 from pydantic.dataclasses import dataclass
-from pydantic import validator, root_validator
-from typing import Optional, List
 
 
 @dataclass
-class PriorInput0d:
+class IndPriorAtomInput:
     metabolite: Optional[str] = None
     compartment: Optional[str] = None
     enzyme: Optional[str] = None
     reaction: Optional[str] = None
     experiment: Optional[str] = None
+    location: Optional[float] = None
     exploc: Optional[float] = None
     scale: Optional[float] = None
     pct1: Optional[float] = None
@@ -25,21 +27,31 @@ class PriorInput0d:
 
     @root_validator
     def prior_is_specified_correctly(cls, values):
+        lc = values["location"]
         el = values["exploc"]
         sc = values["scale"]
         p1 = values["pct1"]
         p99 = values["pct99"]
+        happy_cases = [
+            {"not_none": [lc, sc], "none": [el, p1, p99]},
+            {"not_none": [el, sc], "none": [lc, p1, p99]},
+            {"not_none": [p1, p99], "none": [lc, el, sc]},
+        ]
         good = [
-            all([el is not None, sc is not None, p1 is None, p99 is None]),
-            all([el is None, sc is None, p1 is not None, p99 is not None]),
+            all(v is not None for v in case["not_none"])
+            and all(v is None for v in case["none"])
+            for case in happy_cases
         ]
         if not any(good):
-            raise ValueError("Either set exploc and scale, or pct1 and pct99.")
+            raise ValueError(
+                "Set one out of the following pairs of attributes: "
+                "location and scale, exploc and scale, or pct1 and pct99."
+            )
         return values
 
 
 @dataclass
-class PriorInputMVN:
+class PriorMVNInput:
     ids: List[str]
     mean_vector: List[float]
     covariance_matrix: List[List[float]]
@@ -47,15 +59,15 @@ class PriorInputMVN:
 
 @dataclass
 class PriorInput:
-    dgf: Optional[PriorInputMVN] = None
-    km: Optional[List[PriorInput0d]] = None
-    kcat: Optional[List[PriorInput0d]] = None
-    kcat_pme: Optional[List[PriorInput0d]] = None
-    ki: Optional[List[PriorInput0d]] = None
-    psi: Optional[List[PriorInput0d]] = None
-    dissociation_constant: Optional[List[PriorInput0d]] = None
-    transfer_constant: Optional[List[PriorInput0d]] = None
-    conc_unbalanced: Optional[List[PriorInput0d]] = None
-    drain: Optional[List[PriorInput0d]] = None
-    conc_enzyme: Optional[List[PriorInput0d]] = None
-    conc_pme: Optional[List[PriorInput0d]] = None
+    dgf: Optional[PriorMVNInput | List[IndPriorAtomInput]] = None
+    km: Optional[List[IndPriorAtomInput]] = None
+    kcat: Optional[List[IndPriorAtomInput]] = None
+    kcat_pme: Optional[List[IndPriorAtomInput]] = None
+    ki: Optional[List[IndPriorAtomInput]] = None
+    psi: Optional[List[IndPriorAtomInput]] = None
+    dissociation_constant: Optional[List[IndPriorAtomInput]] = None
+    transfer_constant: Optional[List[IndPriorAtomInput]] = None
+    conc_unbalanced: Optional[List[IndPriorAtomInput]] = None
+    drain: Optional[List[IndPriorAtomInput]] = None
+    conc_enzyme: Optional[List[IndPriorAtomInput]] = None
+    conc_pme: Optional[List[IndPriorAtomInput]] = None

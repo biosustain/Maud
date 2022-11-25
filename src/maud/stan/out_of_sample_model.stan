@@ -1,6 +1,6 @@
 #include functions.stan
 data {
-  // dimensions
+  // network properties
   int<lower=1> N_mic;
   int<lower=1> N_edge_sub;
   int<lower=1> N_edge_prod;
@@ -18,15 +18,6 @@ data {
   int<lower=0> N_phosphorylation;
   int<lower=0> N_pme;  // phosphorylation modifying enzyme
   int<lower=0> N_competitive_inhibition;
-  int<lower=1> N_experiment;
-  int<lower=0> N_enzyme_knockout;
-  int<lower=0> N_pme_knockout;
-  // hardcoded priors
-  array[2, N_experiment] vector[N_pme] priors_conc_phos;
-  array[2, N_experiment] vector[N_unbalanced] priors_conc_unbalanced;
-  array[2, N_experiment] vector[N_enzyme] priors_conc_enzyme;
-  array[2, N_experiment] vector[N_drain] priors_drain;
-  // network properties
   matrix[N_mic, N_edge] S;
   array[N_mic-N_unbalanced] int<lower=1,upper=N_mic> balanced_mic_ix;
   array[N_unbalanced] int<lower=1,upper=N_mic> unbalanced_mic_ix;
@@ -57,14 +48,23 @@ data {
   array[N_mic] int<lower=1,upper=N_metabolite> mic_to_met;
   vector[N_edge] water_stoichiometry;
   vector[N_edge] transported_charge;
-  array[N_enzyme_knockout] int<lower=0,upper=N_enzyme> enzyme_knockout_long;
-  array[N_experiment, 2] int enzyme_knockout_bounds;
-  array[N_pme_knockout] int<lower=0,upper=N_pme> pme_knockout_long;
-  array[N_experiment, 2] int pme_knockout_bounds;
   vector<lower=1>[N_enzyme] subunits;
-  vector[N_experiment] temperature;
+  // experiment properties
+  int<lower=1> N_experiment_test;
+  int<lower=0> N_enzyme_knockout_test;
+  int<lower=0> N_pme_knockout_test;
+  array[N_enzyme_knockout_test] int<lower=0,upper=N_enzyme> enzyme_knockout_test_long;
+  array[N_experiment_test, 2] int enzyme_knockout_test_bounds;
+  array[N_pme_knockout_test] int<lower=0,upper=N_pme> pme_knockout_test_long;
+  array[N_experiment_test, 2] int pme_knockout_test_bounds;
+  vector[N_experiment_test] temperature_test;
+  // hardcoded priors
+  array[2, N_experiment_test] vector[N_pme] priors_conc_phos_test;
+  array[2, N_experiment_test] vector[N_unbalanced] priors_conc_unbalanced_test;
+  array[2, N_experiment_test] vector[N_enzyme] priors_conc_enzyme_test;
+  array[2, N_experiment_test] vector[N_drain] priors_drain_test;
   // configuration
-  array[N_experiment] vector<lower=0>[N_mic] conc_init;
+  array[N_experiment_test] vector<lower=0>[N_mic-N_unbalanced] conc_init;
   real rel_tol; 
   real abs_tol;
   int max_num_steps;
@@ -82,47 +82,46 @@ parameters {
   vector[N_allostery] dissociation_constant;
   vector[N_allosteric_enzyme] transfer_constant;
   vector[N_pme] kcat_pme;
-  array[N_experiment] vector[N_edge] dgrs;
+  array[N_experiment_test] vector[N_edge] dgr_test;
 }
-
 generated quantities {
-  array[N_experiment] vector<lower=0>[N_mic] conc;
-  array[N_experiment] vector[N_reaction] flux;
-  array[N_experiment] vector[N_pme] conc_pme;
-  array[N_experiment] vector[N_unbalanced] conc_unbalanced;
-  array[N_experiment] vector[N_enzyme] conc_enzyme;
-  array[N_experiment] vector[N_drain] drain;
-  array[N_experiment] vector[N_edge] free_enzyme_ratio;
-  array[N_experiment] vector[N_edge] saturation;
-  array[N_experiment] vector[N_edge] allostery;
-  array[N_experiment] vector[N_edge] phosphorylation;
-  array[N_experiment] vector[N_edge] reversibility;
+  array[N_experiment_test] vector<lower=0>[N_mic] conc_test;
+  array[N_experiment_test] vector[N_reaction] flux_test;
+  array[N_experiment_test] vector[N_pme] conc_pme_test;
+  array[N_experiment_test] vector[N_unbalanced] conc_unbalanced_test;
+  array[N_experiment_test] vector[N_enzyme] conc_enzyme_test;
+  array[N_experiment_test] vector[N_drain] drain_test;
+  array[N_experiment_test] vector[N_edge] free_enzyme_ratio_test;
+  array[N_experiment_test] vector[N_edge] saturation_test;
+  array[N_experiment_test] vector[N_edge] allostery_test;
+  array[N_experiment_test] vector[N_edge] phosphorylation_test;
+  array[N_experiment_test] vector[N_edge] reversibility_test;
   // Sampling experiment boundary conditions from priors
-  for (e in 1:N_experiment){
-    drain[e] = to_vector(normal_rng(priors_drain[1,e], priors_drain[2,e]));
-    conc_pme[e] = to_vector(lognormal_rng(log(priors_conc_pme[1,e]), priors_conc_pme[2,e]));
-    conc_unbalanced[e] = to_vector(lognormal_rng(log(priors_conc_unbalanced[1,e]), priors_conc_unbalanced[2,e]));
-    conc_enzyme[e] = to_vector(lognormal_rng(log(priors_conc_enzyme[1,e]), priors_conc_enzyme[2,e]));
+  for (e in 1:N_experiment_test){
+    drain_test[e] = to_vector(normal_rng(priors_drain_test[1,e], priors_drain_test[2,e]));
+    conc_pme_test[e] = to_vector(lognormal_rng(log(priors_conc_pme_test[1,e]), priors_conc_pme_test[2,e]));
+    conc_unbalanced_test[e] = to_vector(lognormal_rng(log(priors_conc_unbalanced_test[1,e]), priors_conc_unbalanced_test[2,e]));
+    conc_enzyme_test[e] = to_vector(lognormal_rng(log(priors_conc_enzyme_test[1,e]), priors_conc_enzyme_test[2,e]));
   }
   // Simulation of experiments
-  for (e in 1:N_experiment){
-    flux[e] = rep_vector(0, N_reaction);
-    vector[N_enzyme] conc_enzyme_experiment = conc_enzyme[e];
-    vector[N_pme] conc_pme_experiment = conc_pme[e];
-    array[1] vector[N_mic-N_unbalanced] conc_balanced;
-    int N_eko_experiment = measure_ragged(enzyme_knockout_bounds, e);
-    int N_pko_experiment = measure_ragged(pme_knockout_bounds, e);
+  for (e in 1:N_experiment_test){
+    flux_test[e] = rep_vector(0, N_reaction);
+    vector[N_enzyme] conc_enzyme_experiment = conc_enzyme_test[e];
+    vector[N_pme] conc_pme_experiment = conc_pme_test[e];
+    array[1] vector[N_mic-N_unbalanced] conc_balanced_experiment;
+    int N_eko_experiment = measure_ragged(enzyme_knockout_test_bounds, e);
+    int N_pko_experiment = measure_ragged(pme_knockout_test_bounds, e);
     if (N_eko_experiment > 0){
       array[N_eko_experiment] int eko_experiment =
-        extract_ragged(enzyme_knockout_long, enzyme_knockout_bounds, e);
+        extract_ragged(enzyme_knockout_test_long, enzyme_knockout_test_bounds, e);
       conc_enzyme_experiment[eko_experiment] = rep_vector(0, N_eko_experiment);
     }
     if (N_pko_experiment > 0){
       array[N_pko_experiment] int pko_experiment =
-        extract_ragged(pme_knockout_long, pme_knockout_bounds, e);
+        extract_ragged(pme_knockout_test_long, pme_knockout_test_bounds, e);
       conc_pme_experiment[pko_experiment] = rep_vector(0, N_pko_experiment);
     }
-    conc_balanced =
+    conc_balanced_experiment =
       ode_bdf_tol(dbalanced_dt,
                   conc_init[e, balanced_mic_ix],
                   initial_time,
@@ -130,11 +129,11 @@ generated quantities {
                   rel_tol, 
                   abs_tol,
                   max_num_steps,
-                  conc_unbalanced[e],
+                  conc_unbalanced_test[e],
                   balanced_mic_ix,
                   unbalanced_mic_ix,
                   conc_enzyme_experiment,
-                  dgrs[e],
+                  dgr_test[e],
                   kcat,
                   km,
                   ki,
@@ -142,8 +141,8 @@ generated quantities {
                   dissociation_constant,
                   kcat_pme,
                   conc_pme_experiment,
-                  drain[e],
-                  temperature[e],
+                  drain_test[e],
+                  temperature_train[e],
                   drain_small_conc_corrector,
                   S,
                   subunits,
@@ -170,11 +169,11 @@ generated quantities {
                   phosphorylation_ix_bounds,
                   phosphorylation_type,
                   phosphorylation_pme);
-    conc[e, balanced_mic_ix] = conc_balanced[1];
-    conc[e, unbalanced_mic_ix] = conc_unbalanced[e];
-    vector[N_edge] edge_flux = get_edge_flux(conc[e],
+    conc_test[e, balanced_mic_ix] = conc_balanced_experiment[1];
+    conc_test[e, unbalanced_mic_ix] = conc_unbalanced_test[e];
+    vector[N_edge] edge_flux = get_edge_flux(conc_test[e],
                                              conc_enzyme_experiment,
-                                             dgrs[e],
+                                             dgr_test[e],
                                              kcat,
                                              km,
                                              ki,
@@ -182,8 +181,8 @@ generated quantities {
                                              dissociation_constant,
                                              kcat_pme,
                                              conc_pme_experiment,
-                                             drain[e],
-                                             temperature[e],
+                                             drain_test[e],
+                                             temperature_train[e],
                                              drain_small_conc_corrector,
                                              S,
                                              subunits,
@@ -211,11 +210,11 @@ generated quantities {
                                              phosphorylation_type,
                                              phosphorylation_pme);
     for (j in 1:N_edge){
-      flux[e, edge_to_reaction[j]] += edge_flux[j];
+      flux_test[e, edge_to_reaction[j]] += edge_flux[j];
     }
   }
-  for (e in 1:N_experiment){
-    free_enzyme_ratio[e] = get_free_enzyme_ratio(conc[e],
+  for (e in 1:N_experiment_test){
+    free_enzyme_ratio_test[e] = get_free_enzyme_ratio(conc_test[e],
                                                  S,
                                                  km,
                                                  ki,
@@ -231,16 +230,16 @@ generated quantities {
                                                  prod_by_edge_bounds,
                                                  ci_ix_long,
                                                  ci_ix_bounds);
-    saturation[e] = get_saturation(conc[e],
+    saturation_test[e] = get_saturation(conc_test[e],
                                    km,
-                                   free_enzyme_ratio[e],
+                                   free_enzyme_ratio_test[e],
                                    sub_km_ix_by_edge_long,
                                    sub_km_ix_by_edge_bounds,
                                    sub_by_edge_long,
                                    sub_by_edge_bounds,
                                    edge_type);
-    allostery[e] = get_allostery(conc[e],
-                                 free_enzyme_ratio[e],
+    allostery_test[e] = get_allostery(conc_test[e],
+                                 free_enzyme_ratio_test[e],
                                  transfer_constant,
                                  dissociation_constant,
                                  subunits,
@@ -249,13 +248,13 @@ generated quantities {
                                  allostery_type,
                                  allostery_mic,
                                  edge_to_tc);
-    phosphorylation[e] = get_phosphorylation(kcat_pme,
-                                             conc_pme[e],
+    phosphorylation_test[e] = get_phosphorylation(kcat_pme,
+                                             conc_pme_test[e],
                                              phosphorylation_ix_long,
                                              phosphorylation_ix_bounds,
                                              phosphorylation_type,
                                              phosphorylation_pme,
                                              subunits);
-    reversibility[e] = get_reversibility(dgrs[e], temperature[e], S, conc[e], edge_type);
+    reversibility_test[e] = get_reversibility(dgr_test[e], temperature_train[e], S, conc_test[e], edge_type);
   }
 }

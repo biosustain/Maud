@@ -1,120 +1,63 @@
 """Functions for creating InitDict objects."""
 
-from typing import List, Optional, Union
+from typing import List, Optional, Tuple, Union
 
 import numpy as np
 import pandas as pd
 
 from maud.data_model.hardcoding import ID_SEPARATOR
-from maud.data_model.maud_init import InitDict
-from maud.data_model.measurement_set import MeasurementSet
-from maud.data_model.prior_set import (
-    IndPrior1d,
-    IndPrior2d,
-    MultiVariateNormalPrior1d,
-    PriorSet,
-)
-from maud.data_model.stan_variable_set import IdComponent
+from maud.data_model.id_component import IdComponent
+from maud.data_model.maud_init import Init1d, Init2d, InitAtomInput, ParamInitInput, Init
+from maud.data_model.prior import Prior, PriorMVN
 
 
-def get_inits(
-    priors: PriorSet, user_inits: Optional[pd.DataFrame], ms: MeasurementSet
-) -> InitDict:
-    """Get a dictionary of initial values.
-
-    :param priors: Priorset object
-
-    :param user_inits_path: path to a csv of user-specified initial parameter
-    values
-
-    """
-    inits = {}
-    training_experiment_ids = [
-        experiment.id for experiment in ms.experiments if experiment.is_train
-    ]
-    for k, p in priors.__dict__.items():
-        if k.startswith("__"):
-            continue
-        inits[p.stan_variable.name] = get_inits_for_param(
-            user_inits, p, training_experiment_ids
-        )
-    return rescale_inits(inits, priors, training_experiment_ids)
-
-
-def get_inits_for_param(
-    user_init_df: Optional[pd.DataFrame],
-    prior: Union[IndPrior1d, IndPrior2d, MultiVariateNormalPrior1d],
-    training_experiment_ids: List[str],
-) -> Union[pd.Series, pd.DataFrame]:
-    """Process a parameter and a dataframe of user-provided initial values."""
-    inits_pd = (
-        np.exp(prior.location).copy()
-        if prior.stan_variable.non_negative
-        else prior.location
+def get_init_atom_input_ids(
+    iai: InitAtomInput,
+    id_components: List[List[IdComponent]],
+) -> Tuple[str, ...]:
+    """Get an init's id from a userinput."""
+    return tuple(
+        ID_SEPARATOR.join([getattr(iai, c) for c in idci])
+        for idci in id_components
     )
-    if user_init_df is None:
-        assert isinstance(inits_pd, pd.Series) or isinstance(
-            inits_pd, pd.DataFrame
-        )
-        return inits_pd
-    user = user_init_df.loc[
-        lambda df: df["parameter"] == prior.stan_variable.name
-    ]
-    if len(prior.location) == 0:
-        return pd.Series(prior.location).astype(float)
-    elif isinstance(inits_pd, pd.Series):
-        id_components = [c.value for c in prior.stan_variable.id_components[0]]
-        if len(user) > 0:
-            for _, row in user.iterrows():
-                param_id = ID_SEPARATOR.join([row[c] for c in id_components])
-                inits_pd.loc[param_id] = row["value"]
-        if IdComponent.EXPERIMENT in id_components:
-            inits_pd = pd.Series(inits_pd.loc[training_experiment_ids].copy())
-        return inits_pd
-    elif isinstance(inits_pd, pd.DataFrame):
-        id_components = [c.value for c in prior.stan_variable.id_components[1]]
-        if len(user) > 0:
-            for _, row in user.iterrows():
-                non_experiment_id = ID_SEPARATOR.join(
-                    [row[c] for c in id_components]
-                )
-                inits_pd.loc[row["experiment"], non_experiment_id] = row[
-                    "value"
-                ]
-        return inits_pd.loc[training_experiment_ids].copy()
-    else:
-        raise ValueError("Encountered non-pandas inits: " + str(inits_pd))
 
 
-def rescale_inits(
-    inits: dict, priors: PriorSet, training_experiment_ids: List[str]
-) -> InitDict:
-    """Augment a dictionary of inits with equivalent normalised values.
-
-    :param inits: original inits
-
-    :param priors: PriorSet object used to do the normalising
-    """
-    rescaled = {}
-    for (n, i), prior in zip(inits.items(), priors.__dict__.values()):
-        rescaled_name = (
-            f"log_{n}_z" if prior.stan_variable.non_negative else f"{n}_z"
-        )
-        if isinstance(prior, MultiVariateNormalPrior1d):
-            continue
-        elif IdComponent.EXPERIMENT in prior.stan_variable.id_components[0]:
-            prior_loc = prior.location.loc[training_experiment_ids]
-            prior_scale = prior.scale.loc[training_experiment_ids]
+def get_param_inits(
+    ids: List[List[str]],
+    id_components: List[List[IdComponent]],
+    prior: Prior,
+    init_input: ParamInitInput,
+    non_negative: bool,
+) -> Init:
+    """Get initial values for a prarameter, possibly given a user input."""
+    if len(ids) == 1:
+        inits_pd = pd.Series(prior.location, index=ids[0])
+        if non_negative:  # non-negative parameter location is on ln scale
+            inits_pd = np.exp(inits_pd)
+        if init_input is not None:
+            for iai in init_input:
+                init_id = get_init_atom_input_ids(iai, id_components)[0]
+                inits_pd.loc[init_id] = iai.init
+        if isinstance(prior, PriorMVN):  # no need to rescale an MVN parameter
+            return Init1d(inits_pd.tolist())
         else:
-            prior_loc = prior.location
-            prior_scale = prior.scale
-        loc_current = np.log(i) if prior.stan_variable.non_negative else i
-        rescaled[rescaled_name] = (
-            ((loc_current - prior_loc) / prior_scale)
-            .astype(float)
-            .values.tolist()
+            loc_trans = np.log(inits_pd) if non_negative else inits_pd.copy()
+            scale_pd = pd.Series(prior.scale, index=ids[0])
+            inits_pd_scaled = (loc_trans - loc_trans.mean()) / scale_pd
+            return Init1d(inits_pd.tolist(), inits_pd_scaled.tolist())
+    else:
+        inits_pd = pd.DataFrame(prior.location, index=ids[0], columns=ids[1])
+        if non_negative:  # non-negative parameter location is on ln scale
+            inits_pd = np.exp(inits_pd)
+        if init_input is not None:
+            for iai in init_input:
+                init_id_row, init_id_col = get_init_atom_input_ids(
+                    iai, id_components
+                )
+                inits_pd.loc[init_id_row, init_id_col] = iai.init
+        loc_trans = np.log(inits_pd) if non_negative else inits_pd.copy()
+        scale_pd = pd.DataFrame(prior.scale, index=ids[0], columns=ids[1])
+        inits_pd_scaled = (loc_trans - loc_trans.mean()) / scale_pd
+        return Init2d(
+            inits_pd.values.tolist(), inits_pd_scaled.values.tolist()
         )
-    return {
-        **{k: v.astype(float).values.tolist() for k, v in inits.items()},
-        **rescaled,
-    }
