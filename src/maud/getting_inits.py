@@ -9,6 +9,7 @@ from maud.data_model.hardcoding import ID_SEPARATOR
 from maud.data_model.id_component import IdComponent
 from maud.data_model.maud_init import Init1d, Init2d, InitAtomInput, ParamInitInput, Init
 from maud.data_model.prior import Prior, PriorMVN
+from maud.data_model.experiment import Measurement
 
 
 def get_init_atom_input_ids(
@@ -28,6 +29,7 @@ def get_param_inits(
     prior: Prior,
     init_input: ParamInitInput,
     non_negative: bool,
+    measurements: Optional[List[Measurement]] = None
 ) -> Init:
     """Get initial values for a prarameter, possibly given a user input."""
     if len(ids) == 1:
@@ -38,6 +40,10 @@ def get_param_inits(
             for iai in init_input:
                 init_id = get_init_atom_input_ids(iai, id_components)[0]
                 inits_pd.loc[init_id] = iai.init
+        if measurements is not None:
+            for m in measurements:
+                if m.target_id in inits_pd.index:
+                    inits_pd.loc[m.target_id] = m.value
         if isinstance(prior, PriorMVN):  # no need to rescale an MVN parameter
             return Init1d(inits_pd.tolist())
         else:
@@ -55,9 +61,16 @@ def get_param_inits(
                     iai, id_components
                 )
                 inits_pd.loc[init_id_row, init_id_col] = iai.init
+        if measurements is not None:
+            import pdb; pdb.set_trace()
+            for m in measurements:
+                if m.target_id in inits_pd.index and m.experiment in inits_pd.columns:
+                    inits_pd.loc[m.target_id, m.experiment] = m.value
         loc_trans = np.log(inits_pd) if non_negative else inits_pd.copy()
         scale_pd = pd.DataFrame(prior.scale, index=ids[0], columns=ids[1])
         inits_pd_scaled = (loc_trans - loc_trans.mean()) / scale_pd
         return Init2d(
             inits_pd.values.tolist(), inits_pd_scaled.values.tolist()
         )
+
+

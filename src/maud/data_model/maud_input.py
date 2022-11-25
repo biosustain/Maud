@@ -28,7 +28,6 @@ class MaudInput:
     parameters: ParameterSet = Field(init=False, exclude=True)
     stan_input_train: Dict = Field(init=False, exclude=True)
     stan_input_test: Dict = Field(init=False, exclude=True)
-    inits: Dict = Field(init=False, exclude=True)
 
     def __post_init__(self):
         """Add attributes that depend on other ones."""
@@ -44,17 +43,13 @@ class MaudInput:
             self.kinetic_model,
             self.config,
         )
-        self.inits = {
-            p.name: p.inits.inits_unscaled
-            for p in map(
-                lambda f: getattr(self.parameters, f.name),
-                fields(self.parameters),
-            )
-        } | {
-            p.name + "_z": p.inits.inits_scaled
-            for p in map(
-                lambda f: getattr(self.parameters, f.name),
-                fields(self.parameters),
-            )
-            if p.inits.inits_scaled is not None
-        }
+        inits_dict = {}
+        for p in map(
+            lambda f: getattr(self.parameters, f.name),
+            fields(self.parameters),
+        ):
+            inits_dict[p.name] = p.inits.inits_unscaled
+            if p.inits.inits_scaled is not None:
+                scaled_pref = "log_" if p.non_negative else ""
+                inits_dict[scaled_pref + p.name + "_z"] = p.inits.inits_scaled
+        self.inits_dict = inits_dict

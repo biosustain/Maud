@@ -1,6 +1,6 @@
 """Types that go in initial values specificaitons."""
 
-from typing import List, Optional, Sequence, Union
+from typing import List, Optional, Union
 
 from pydantic.dataclasses import dataclass
 

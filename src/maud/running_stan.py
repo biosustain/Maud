@@ -124,7 +124,7 @@ def set_up_output_dir(output_dir: str, mi: MaudInput):
     cmdstanpy.utils.write_stan_json(input_path_train, mi.stan_input_train)
     if mi.stan_input_test is not None:
         cmdstanpy.utils.write_stan_json(input_path_test, mi.stan_input_test)
-    cmdstanpy.utils.write_stan_json(inits_path, mi.inits)
+    cmdstanpy.utils.write_stan_json(inits_path, mi.inits_dict)
 
 
 def predict(
@@ -160,9 +160,9 @@ def predict(
     chains = sample_stats["chain"]
     draws = sample_stats["draw"]
     dims = {
-        "conc": ["experiment", "mic"],
-        "conc_enzyme": ["experiment", "enzyme"],
-        "flux": ["experiment", "reaction"],
+        "conc_test": ["experiment", "mic"],
+        "conc_enzyme_test": ["experiment", "enzyme"],
+        "flux_test": ["experiment", "reaction"],
     }
     for chain in chains:
         for draw in draws:

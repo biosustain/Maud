@@ -1,5 +1,6 @@
 """Definitions of Stan variables and StanVariableSet."""
 
+from dataclasses import fields
 from typing import List, Optional, Union
 
 from pydantic import Field, root_validator, validator
@@ -7,7 +8,7 @@ from pydantic.dataclasses import dataclass
 
 from maud.data_model.hardcoding import ID_SEPARATOR
 from maud.data_model.id_component import IdComponent
-from maud.data_model.maud_init import InitAtomInput, Init
+from maud.data_model.maud_init import Init, InitAtomInput
 from maud.data_model.prior import Prior
 from maud.data_model.prior_input import IndPriorAtomInput, PriorMVNInput
 from maud.getting_inits import get_param_inits
@@ -163,7 +164,8 @@ class Ki(MaudParameter):
             for _, _, met_id, compartment_id in zip(*self.split_ids[0])
         ]
         self.er_ids = [
-            enzyme_id for enzyme_id, reaction_id, _, _ in zip(*self.split_ids[0])
+            enzyme_id
+            for enzyme_id, reaction_id, _, _ in zip(*self.split_ids[0])
         ]
         self.prior = get_ind_prior_1d(
             self.prior_input,

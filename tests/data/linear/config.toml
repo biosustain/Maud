@@ -3,8 +3,7 @@ kinetic_model_file = "kinetic_model.toml"
 priors_file = "priors.toml"
 experiments_file = "experiments.toml"
 likelihood = true
-# steady_state_thereshold_abs = 1e-6
-reject_non_steady = false
+steady_state_threshold_abs = 1e-6
 
 [cmdstanpy_config]
 refresh = 1

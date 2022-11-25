@@ -29,7 +29,7 @@ dgf = [
 
 psi = [
   {location = -0.95, scale = 0.2, experiment = "condition1"},
-  {location = -0.95, scale = 0.2, experiment = "condition1"},
+  {location = -0.95, scale = 0.2, experiment = "condition2"},
 ]
 
 ki = [
