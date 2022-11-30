@@ -7,12 +7,11 @@ steady_state_threshold_abs = 1e-6
 
 [cmdstanpy_config]
 refresh = 1
-iter_warmup = 20
-iter_sampling = 20
+iter_warmup = 40
+iter_sampling = 40
 chains = 4
 save_warmup = true
-init = 0
-max_treedepth=1
+seed = 1234
 
 [ode_config]
 abs_tol = 1e-5
