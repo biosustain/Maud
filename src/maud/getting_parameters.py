@@ -2,7 +2,7 @@
 
 from typing import List, Tuple
 
-from maud.data_model.experiment import Experiment
+from maud.data_model.experiment import Experiment, MeasurementType
 from maud.data_model.hardcoding import ID_SEPARATOR
 from maud.data_model.kinetic_model import KineticModel, ReactionMechanism
 from maud.data_model.maud_init import InitInput
@@ -182,12 +182,24 @@ def get_maud_parameters(
             [[exp_ids_train], [enzyme_ids]],
             pi.conc_enzyme,
             ii.conc_enzyme,
+            [
+                m
+                for e in experiments
+                for m in e.measurements
+                if e.is_train and m.target_type == MeasurementType.ENZYME
+            ],
         ),
         conc_enzyme_test=ConcEnzymeTest(
             [exp_ids_train, enzyme_ids],
             [[exp_ids_train], [enzyme_ids]],
             pi.conc_enzyme,
             ii.conc_enzyme,
+            [
+                m
+                for e in experiments
+                for m in e.measurements
+                if e.is_test and m.target_type == MeasurementType.ENZYME
+            ],
         ),
         conc_unbalanced_train=ConcUnbalancedTrain(
             [exp_ids_train, unbalanced_mic_ids],
@@ -197,6 +209,12 @@ def get_maud_parameters(
             ],
             pi.conc_unbalanced,
             ii.conc_unbalanced,
+            [
+                m
+                for e in experiments
+                for m in e.measurements
+                if e.is_train and m.target_type == MeasurementType.MIC
+            ],
         ),
         conc_unbalanced_test=ConcUnbalancedTest(
             [exp_ids_train, unbalanced_mic_ids],
@@ -206,6 +224,12 @@ def get_maud_parameters(
             ],
             pi.conc_unbalanced,
             ii.conc_unbalanced,
+            [
+                m
+                for e in experiments
+                for m in e.measurements
+                if e.is_test and m.target_type == MeasurementType.MIC
+            ],
         ),
         conc_pme_train=ConcPmeTrain(
             [exp_ids_train, phos_modifying_enzymes],

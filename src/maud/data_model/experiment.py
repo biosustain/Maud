@@ -25,6 +25,7 @@ class MeasurementType(str, Enum):
 
 @dataclass
 class Measurement:
+    experiment: str
     target_type: MeasurementType
     value: float = Field(kw_only=True, allow_inf_nan=False)
     error_scale: float = Field(kw_only=True, allow_inf_nan=False, gt=0)
@@ -37,19 +38,20 @@ class Measurement:
     def __post_init__(self):
         """Add target_id field."""
         if self.target_type == MeasurementType.MIC:
-            self.target_id = ID_SEPARATOR.join([self.metabolite, self.compartment])
+            self.target_id = ID_SEPARATOR.join(
+                [self.metabolite, self.compartment]
+            )
         elif self.target_type == MeasurementType.FLUX:
             self.target_id = self.reaction
         elif self.target_type == MeasurementType.ENZYME:
             self.target_id = self.enzyme
 
 
-
 @dataclass
 class EnzymeKnockout:
     """Maud representation of an enzyme being knocked out in an experiment."""
 
-    experiment_id: str
+    experiment: str
     enzyme_id: str
     id: str = Field(init=False, exclude=True)
 
@@ -64,7 +66,7 @@ class EnzymeKnockout:
 class PhosphorylationModifyingEnzymeKnockout:
     """Maud representation of a pme being knocked out in an experiment."""
 
-    experiment_id: str
+    experiment: str
     pme_id: str
     id: str = Field(init=False, exclude=True)
 
@@ -99,3 +101,16 @@ class Experiment:
         """Make sure the temperature isn't negative."""
         assert v >= 0
         return v
+
+
+def parse_experiment(raw: dict):
+    """Get an Experiment object from a dictionary that comes from toml.load."""
+    special = {"measurements": [], "enzyme_knockouts": [], "pme_knockouts": []}
+    not_special = {k: v for k, v in raw.items() if k not in special.keys()}
+    for k, obj in zip(
+        special.keys(),
+        [Measurement, EnzymeKnockout, PhosphorylationModifyingEnzymeKnockout],
+    ):
+        if k in raw.keys():
+            special[k] = [obj(experiment=raw["id"], **r) for r in raw[k]]
+    return Experiment(**{**special, **not_special})

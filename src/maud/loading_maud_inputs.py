@@ -5,7 +5,7 @@ import os
 import toml
 
 from maud.data_model.maud_config import MaudConfig
-from maud.data_model.experiment import Experiment
+from maud.data_model.experiment import parse_experiment
 from maud.data_model.maud_init import InitInput
 from maud.data_model.maud_input import MaudInput
 from maud.data_model.prior_input import PriorInput
@@ -37,7 +37,7 @@ def load_maud_input(data_path: str) -> MaudInput:
     # parsing
     kinetic_model = parse_kinetic_model(raw_kinetic_model)
     experiments = [
-        Experiment(**e) for e in toml.load(experiments_path)["experiment"]
+        parse_experiment(e) for e in toml.load(experiments_path)["experiment"]
     ]
     prior_input = PriorInput(**toml.load(prior_input_path))
     return MaudInput(

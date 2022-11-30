@@ -389,7 +389,7 @@ class DrainTest(Drain):
 class ConcEnzyme(MaudParameter):
     """Parent class for enzyme concentration parameters."""
 
-    def __init__(self, ids, split_ids, prior_input, init_input):
+    def __init__(self, ids, split_ids, prior_input, init_input, measurements):
         self.ids = ids
         self.id_components = [[IdComponent.EXPERIMENT], [IdComponent.ENZYME]]
         self.split_ids = split_ids
@@ -414,6 +414,7 @@ class ConcEnzyme(MaudParameter):
             self.prior,
             self.init_input,
             self.non_negative,
+            measurements
         )
 
 
@@ -421,31 +422,31 @@ class ConcEnzyme(MaudParameter):
 class ConcEnzymeTrain(ConcEnzyme):
     """Enzyme concentration parameters in training experiments."""
 
-    def __init__(self, ids, split_ids, prior_input, init_input):
+    def __init__(self, ids, split_ids, prior_input, init_input, measurements):
         self.name = "conc_enzyme_train"
         self.shape_names = ["N_experiment_train", "N_enzyme"]
         self.prior_in_test_model = False
         self.prior_in_train_model = True
-        super().__init__(ids, split_ids, prior_input, init_input)
+        super().__init__(ids, split_ids, prior_input, init_input, measurements)
 
 
 @dataclass(init=False)
 class ConcEnzymeTest(ConcEnzyme):
     """Enzyme concentration parameters in test experiments."""
 
-    def __init__(self, ids, split_ids, prior_input, init_input):
+    def __init__(self, ids, split_ids, prior_input, init_input, measurements):
         self.name = "conc_enzyme_test"
         self.shape_names = ["N_experiment_test", "N_enzyme"]
         self.prior_in_test_model = True
         self.prior_in_train_model = False
-        super().__init__(ids, split_ids, prior_input, init_input)
+        super().__init__(ids, split_ids, prior_input, init_input, measurements)
 
 
 @dataclass(init=False)
 class ConcUnbalanced(MaudParameter):
     """Parent class for unbalanced mic concentration parameters."""
 
-    def __init__(self, ids, split_ids, prior_input, init_input):
+    def __init__(self, ids, split_ids, prior_input, init_input, measurements):
         self.ids = ids
         self.split_ids = split_ids
         self.prior_input = prior_input
@@ -471,6 +472,7 @@ class ConcUnbalanced(MaudParameter):
             self.prior,
             self.init_input,
             self.non_negative,
+            measurements
         )
 
 
@@ -478,24 +480,25 @@ class ConcUnbalanced(MaudParameter):
 class ConcUnbalancedTrain(ConcUnbalanced):
     """Unbalanced mic concentration parameters in training experiments."""
 
-    def __init__(self, ids, split_ids, prior_input, init_input):
+    def __init__(self, ids, split_ids, prior_input, init_input, measurements):
         self.name = "conc_unbalanced_train"
         self.shape_names = ["N_experiment_train", "N_unbalanced"]
         self.prior_in_test_model = False
         self.prior_in_train_model = True
-        super().__init__(ids, split_ids, prior_input, init_input)
+        super().__init__(ids, split_ids, prior_input, init_input, measurements)
+
 
 
 @dataclass(init=False)
 class ConcUnbalancedTest(ConcUnbalanced):
     """Unbalanced mic concentration parameters in test experiments."""
 
-    def __init__(self, ids, split_ids, prior_input, init_input):
+    def __init__(self, ids, split_ids, prior_input, init_input, measurements):
         self.name = "conc_unbalanced_test"
         self.shape_names = ["N_experiment_test", "N_enzyme"]
         self.prior_in_test_model = True
         self.prior_in_train_model = False
-        super().__init__(ids, split_ids, prior_input, init_input)
+        super().__init__(ids, split_ids, prior_input, init_input, measurements)
 
 
 @dataclass(init=False)

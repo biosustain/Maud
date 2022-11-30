@@ -36,14 +36,14 @@ def get_param_inits(
         inits_pd = pd.Series(prior.location, index=ids[0])
         if non_negative:  # non-negative parameter location is on ln scale
             inits_pd = np.exp(inits_pd)
-        if init_input is not None:
-            for iai in init_input:
-                init_id = get_init_atom_input_ids(iai, id_components)[0]
-                inits_pd.loc[init_id] = iai.init
         if measurements is not None:
             for m in measurements:
                 if m.target_id in inits_pd.index:
                     inits_pd.loc[m.target_id] = m.value
+        if init_input is not None:
+            for iai in init_input:
+                init_id = get_init_atom_input_ids(iai, id_components)[0]
+                inits_pd.loc[init_id] = iai.init
         if isinstance(prior, PriorMVN):  # no need to rescale an MVN parameter
             return Init1d(inits_pd.tolist())
         else:
@@ -55,17 +55,16 @@ def get_param_inits(
         inits_pd = pd.DataFrame(prior.location, index=ids[0], columns=ids[1])
         if non_negative:  # non-negative parameter location is on ln scale
             inits_pd = np.exp(inits_pd)
+        if measurements is not None:
+            for m in measurements:
+                if m.target_id in inits_pd.columns and m.experiment in inits_pd.index:
+                    inits_pd.loc[m.experiment, m.target_id] = m.value
         if init_input is not None:
             for iai in init_input:
                 init_id_row, init_id_col = get_init_atom_input_ids(
                     iai, id_components
                 )
                 inits_pd.loc[init_id_row, init_id_col] = iai.init
-        if measurements is not None:
-            import pdb; pdb.set_trace()
-            for m in measurements:
-                if m.target_id in inits_pd.index and m.experiment in inits_pd.columns:
-                    inits_pd.loc[m.target_id, m.experiment] = m.value
         loc_trans = np.log(inits_pd) if non_negative else inits_pd.copy()
         scale_pd = pd.DataFrame(prior.scale, index=ids[0], columns=ids[1])
         inits_pd_scaled = (loc_trans - loc_trans.mean()) / scale_pd
