@@ -75,8 +75,9 @@ class Init1d:
                     inits_pd.loc[m.target_id] = m.value
         if param_init_input is not None:
             for iai in param_init_input:
-                init_id = get_init_atom_input_ids(iai, id_components)[0]
-                inits_pd.loc[init_id] = iai.init
+                iai_id = get_init_atom_input_ids(iai, id_components)[0]
+                if iai_id in inits_pd.index:
+                    inits_pd.loc[iai_id] = iai.init
         self.inits_unscaled = inits_pd.tolist()
         if isinstance(prior, PriorMVN):  # no need to rescale an MVN parameter
             self.inits_scaled = None
@@ -116,10 +117,11 @@ class Init2d:
                     inits_pd.loc[m.experiment, m.target_id] = m.value
         if param_init_input is not None:
             for iai in param_init_input:
-                init_id_row, init_id_col = get_init_atom_input_ids(
+                iai_id_row, iai_id_col = get_init_atom_input_ids(
                     iai, id_components
                 )
-                inits_pd.loc[init_id_row, init_id_col] = iai.init
+                if iai_id_row in inits_pd.index and iai_id_col in inits_pd.columns:
+                    inits_pd.loc[iai_id_row, iai_id_col] = iai.init
         inits_for_scaling = (
             np.log(inits_pd) if non_negative else inits_pd.copy()
         )

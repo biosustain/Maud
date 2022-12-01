@@ -6,7 +6,7 @@ from typing import List, Union
 import numpy as np
 from numpy.linalg import LinAlgError
 from pydantic.class_validators import root_validator, validator
-from pydantic.dataclasses import dataclass, Field
+from pydantic.dataclasses import Field, dataclass
 
 
 @dataclass
@@ -41,7 +41,7 @@ class IndPrior1d:
     @validator("scale")
     def scales_are_positive(cls, v):
         """Check that scales are positive."""
-        if len(v) > 0 and any(x <=0 for x in v):
+        if len(v) > 0 and any(x <= 0 for x in v):
             raise ValueError("Scale parameter must be positive.")
         return v
 
@@ -51,7 +51,9 @@ class IndPrior1d:
         n_locs = len(values["location"])
         n_scales = len(values["scale"])
         if n_locs != n_scales:
-            raise ValueError("Location, scale and ids must have the same length.")
+            raise ValueError(
+                "Location, scale and ids must have the same length."
+            )
         return values
 
 
@@ -84,7 +86,7 @@ class IndPrior2d:
     def scales_are_positive(cls, v):
         """Check that scales are all positive."""
         for s in v:
-            if len(s) > 0 and any(x <=0 for x in s):
+            if len(s) > 0 and any(x <= 0 for x in s):
                 raise ValueError("Scale parameter must be positive.")
         return v
 
@@ -141,7 +143,9 @@ class PriorMVN:
         loc = values["location"]
         cov = values["covariance_matrix"]
         if not all(len(x) == len(cov[0]) for x in cov):
-            raise ValueError("All elements of covariance matrix must have same length.")
+            raise ValueError(
+                "All elements of covariance matrix must have same length."
+            )
         if not len(loc) == len(cov[0]):
             raise ValueError("First dimension length incorrect.")
         return values

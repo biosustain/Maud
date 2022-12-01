@@ -388,7 +388,7 @@ def get_experiments_input(
     enz_ko_by_experiment_train, enz_ko_by_experiment_test = (
         [
             [
-                enzyme_codes[eko.enzyme_id]
+                enzyme_codes[eko.enzyme]
                 for eko in experiment.enzyme_knockouts
             ]
             if experiment.enzyme_knockouts is not None
@@ -399,7 +399,7 @@ def get_experiments_input(
     )
     pme_ko_by_experiment_train, pme_ko_by_experiment_test = (
         [
-            [pme_codes[pko.pme_id] for pko in experiment.pme_knockouts]
+            [pme_codes[pko.pme] for pko in experiment.pme_knockouts]
             if experiment.pme_knockouts is not None
             else []
             for experiment in exps

@@ -1,11 +1,8 @@
 name = "methionine_cycle_6"
 kinetic_model_file = "methionine_cycle.toml"
-priors_file = "priors.csv"
-measurements_file = "experiments.csv"
-experimental_setup_file = "biological_context.toml"
-user_inits_file = "inits_20_3.csv"
-dgf_mean_file = "dgf_prior_mean_equilibrator.csv"
-dgf_covariance_file = "dgf_prior_cov_equilibrator.csv"
+priors_file = "priors.toml"
+experiments_file = "experiments.toml"
+user_inits_file = "inits.toml"
 likelihood = true
 reject_non_steady = true
 

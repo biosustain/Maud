@@ -52,14 +52,12 @@ class EnzymeKnockout:
     """Maud representation of an enzyme being knocked out in an experiment."""
 
     experiment: str
-    enzyme_id: str
+    enzyme: str
     id: str = Field(init=False, exclude=True)
 
     def __post_init__(self):
         """Add id field."""
-        self.id = ID_SEPARATOR.join(
-            ["eko", self.experiment_id, self.enzyme_id]
-        )
+        self.id = ID_SEPARATOR.join(["eko", self.experiment, self.enzyme])
 
 
 @dataclass
@@ -67,14 +65,12 @@ class PhosphorylationModifyingEnzymeKnockout:
     """Maud representation of a pme being knocked out in an experiment."""
 
     experiment: str
-    pme_id: str
+    pme: str
     id: str = Field(init=False, exclude=True)
 
     def __post_init__(self):
         """Add id field."""
-        self.id = ID_SEPARATOR.join(
-            ["pko", self.experiment_id, self.enzyme_id]
-        )
+        self.id = ID_SEPARATOR.join(["pko", self.experiment, self.enzyme])
 
 
 @dataclass

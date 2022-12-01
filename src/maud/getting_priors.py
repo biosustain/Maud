@@ -5,15 +5,15 @@ consistently with their ids.
 
 """
 
-from typing import List, Optional, Tuple
+from typing import List, Optional, Tuple, Union
 
 import numpy as np
 import pandas as pd
 
 from maud.data_model.hardcoding import ID_SEPARATOR
 from maud.data_model.maud_parameter import IdComponent
-from maud.data_model.prior_input import IndPriorAtomInput, PriorMVNInput
 from maud.data_model.prior import IndPrior1d, IndPrior2d, PriorMVN
+from maud.data_model.prior_input import IndPriorAtomInput, PriorMVNInput
 from maud.utils import (
     get_lognormal_parameters_from_quantiles,
     get_normal_parameters_from_quantiles,
@@ -76,8 +76,9 @@ def get_ind_prior_1d(
             ids_i, loc_i, scale_i = unpack_ind_prior_atom_input(
                 ipai, id_components, non_negative
             )
-            loc_series.update({ids_i[0]: loc_i})
-            scale_series.update({ids_i[0]: scale_i})
+            if ids_i[0] in loc_series.index:
+                loc_series.update({ids_i[0]: loc_i})
+                scale_series.update({ids_i[0]: scale_i})
     return IndPrior1d(loc_series.tolist(), scale_series.tolist())
 
 
@@ -99,13 +100,14 @@ def get_ind_prior_2d(
             ids_i, loc_i, scale_i = unpack_ind_prior_atom_input(
                 ipai, id_components, non_negative
             )
-            loc_df.loc[ids_i[0], ids_i[1]] = loc_i
-            scale_df.loc[ids_i[0], ids_i[1]] = scale_i
+            if ids_i[0] in loc_df.index and ids_i[1] in loc_df.columns:
+                loc_df.loc[ids_i[0], ids_i[1]] = loc_i
+                scale_df.loc[ids_i[0], ids_i[1]] = scale_i
     return IndPrior2d(loc_df.values.tolist(), scale_df.values.tolist())
 
 
 def get_mvn_prior(
-    pi: Optional[List[IndPriorAtomInput] | PriorMVNInput],
+    pi: Optional[Union[List[IndPriorAtomInput], PriorMVNInput]],
     ids: List[str],
     id_components: List[List[IdComponent]],
     non_negative: bool,

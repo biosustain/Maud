@@ -5,11 +5,17 @@ from typing import List, Optional, Tuple, Union
 import numpy as np
 import pandas as pd
 
+from maud.data_model.experiment import Measurement
 from maud.data_model.hardcoding import ID_SEPARATOR
 from maud.data_model.id_component import IdComponent
-from maud.data_model.maud_init import Init1d, Init2d, InitAtomInput, ParamInitInput, Init
+from maud.data_model.maud_init import (
+    Init,
+    Init1d,
+    Init2d,
+    InitAtomInput,
+    ParamInitInput,
+)
 from maud.data_model.prior import Prior, PriorMVN
-from maud.data_model.experiment import Measurement
 
 
 def get_init_atom_input_ids(
@@ -29,7 +35,7 @@ def get_param_inits(
     prior: Prior,
     init_input: ParamInitInput,
     non_negative: bool,
-    measurements: Optional[List[Measurement]] = None
+    measurements: Optional[List[Measurement]] = None,
 ) -> Init:
     """Get initial values for a prarameter, possibly given a user input."""
     if len(ids) == 1:
@@ -57,7 +63,10 @@ def get_param_inits(
             inits_pd = np.exp(inits_pd)
         if measurements is not None:
             for m in measurements:
-                if m.target_id in inits_pd.columns and m.experiment in inits_pd.index:
+                if (
+                    m.target_id in inits_pd.columns
+                    and m.experiment in inits_pd.index
+                ):
                     inits_pd.loc[m.experiment, m.target_id] = m.value
         if init_input is not None:
             for iai in init_input:
@@ -71,5 +80,3 @@ def get_param_inits(
         return Init2d(
             inits_pd.values.tolist(), inits_pd_scaled.values.tolist()
         )
-
-

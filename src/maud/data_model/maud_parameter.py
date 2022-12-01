@@ -8,10 +8,14 @@ from pydantic.dataclasses import dataclass
 
 from maud.data_model.hardcoding import ID_SEPARATOR
 from maud.data_model.id_component import IdComponent
-from maud.data_model.maud_init import Init, InitAtomInput, Init1d, Init2d
+from maud.data_model.maud_init import Init, Init1d, Init2d, InitAtomInput
 from maud.data_model.prior import Prior
 from maud.data_model.prior_input import IndPriorAtomInput, PriorMVNInput
-from maud.getting_priors import get_ind_prior_1d, get_ind_prior_2d, get_mvn_prior
+from maud.getting_priors import (
+    get_ind_prior_1d,
+    get_ind_prior_2d,
+    get_mvn_prior,
+)
 
 
 @dataclass
@@ -413,7 +417,7 @@ class ConcEnzyme(MaudParameter):
             self.prior,
             self.init_input,
             self.non_negative,
-            measurements
+            measurements,
         )
 
 
@@ -471,7 +475,7 @@ class ConcUnbalanced(MaudParameter):
             self.prior,
             self.init_input,
             self.non_negative,
-            measurements
+            measurements,
         )
 
 
@@ -485,7 +489,6 @@ class ConcUnbalancedTrain(ConcUnbalanced):
         self.prior_in_test_model = False
         self.prior_in_train_model = True
         super().__init__(ids, split_ids, prior_input, init_input, measurements)
-
 
 
 @dataclass(init=False)

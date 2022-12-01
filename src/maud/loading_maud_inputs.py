@@ -4,8 +4,8 @@ import os
 
 import toml
 
-from maud.data_model.maud_config import MaudConfig
 from maud.data_model.experiment import parse_experiment
+from maud.data_model.maud_config import MaudConfig
 from maud.data_model.maud_init import InitInput
 from maud.data_model.maud_input import MaudInput
 from maud.data_model.prior_input import PriorInput

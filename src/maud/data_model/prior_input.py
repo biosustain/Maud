@@ -1,6 +1,6 @@
 """Definitions of the user's input for priors. Directly read from toml."""
 
-from typing import List, Optional
+from typing import List, Optional, Union
 
 from pydantic import root_validator, validator
 from pydantic.dataclasses import dataclass
@@ -59,7 +59,7 @@ class PriorMVNInput:
 
 @dataclass
 class PriorInput:
-    dgf: Optional[PriorMVNInput | List[IndPriorAtomInput]] = None
+    dgf: Optional[Union[PriorMVNInput, List[IndPriorAtomInput]]] = None
     km: Optional[List[IndPriorAtomInput]] = None
     kcat: Optional[List[IndPriorAtomInput]] = None
     kcat_pme: Optional[List[IndPriorAtomInput]] = None
