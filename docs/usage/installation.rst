@@ -4,13 +4,15 @@ Installation
 
 This page explains how to install Maud.
 
+Maud is compatible with Python versions 3.9 and above
+
 We recommend using a fresh virtual environment to install Maud. To make one and
 then activate it, run the following commands:
 
 .. code-block:: console
 
-    python -m venv maud_venv  # choose any name you like!
-    source maud_venv/bin/activate
+    python -m venv .venv --prompt=maud
+    source .venv/bin/activate
 
 To install the latest Maud and its python dependencies to your new virtual
 environment, run this command:

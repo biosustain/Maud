@@ -28,13 +28,12 @@ experiments and the existing literature.
 
 Install
 =======
-First create a fresh Python 3.7 virtual environment and then activate it:
+First create a fresh Python virtual environment and then activate it:
 
 .. code-block:: console
 
-    sudo pip3.7 install virtualenv     # if virtualenv isn't installed already
-    python3.7 -m virtualenv maud_venv  # choose any name you like!
-    source maud_venv/bin/activate
+    python -m venv .venv --prompt=maud
+    source .venv/bin/activate
 
 To install Maud and its python dependencies to your new virtual environment, run
 this command:
