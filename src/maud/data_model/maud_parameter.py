@@ -8,10 +8,9 @@ from pydantic.dataclasses import dataclass
 
 from maud.data_model.hardcoding import ID_SEPARATOR
 from maud.data_model.id_component import IdComponent
-from maud.data_model.maud_init import Init, InitAtomInput
+from maud.data_model.maud_init import Init, InitAtomInput, Init1d, Init2d
 from maud.data_model.prior import Prior
 from maud.data_model.prior_input import IndPriorAtomInput, PriorMVNInput
-from maud.getting_inits import get_param_inits
 from maud.getting_priors import get_ind_prior_1d, get_ind_prior_2d, get_mvn_prior
 
 
@@ -84,7 +83,7 @@ class Km(MaudParameter):
             self.default_loc,
             self.default_scale,
         )
-        self.inits = get_param_inits(
+        self.inits = Init1d(
             self.ids,
             self.id_components,
             self.prior,
@@ -126,7 +125,7 @@ class Kcat(MaudParameter):
             self.default_loc,
             self.default_scale,
         )
-        self.inits = get_param_inits(
+        self.inits = Init1d(
             self.ids,
             self.id_components,
             self.prior,
@@ -175,7 +174,7 @@ class Ki(MaudParameter):
             self.default_loc,
             self.default_scale,
         )
-        self.inits = get_param_inits(
+        self.inits = Init1d(
             self.ids,
             self.id_components,
             self.prior,
@@ -209,7 +208,7 @@ class Dgf(MaudParameter):
             self.default_loc,
             self.default_scale,
         )
-        self.inits = get_param_inits(
+        self.inits = Init1d(
             self.ids,
             self.id_components,
             self.prior,
@@ -254,7 +253,7 @@ class DissociationConstant(MaudParameter):
             self.default_loc,
             self.default_scale,
         )
-        self.inits = get_param_inits(
+        self.inits = Init1d(
             self.ids,
             self.id_components,
             self.prior,
@@ -288,7 +287,7 @@ class TransferConstant(MaudParameter):
             self.default_loc,
             self.default_scale,
         )
-        self.inits = get_param_inits(
+        self.inits = Init1d(
             self.ids,
             self.id_components,
             self.prior,
@@ -322,7 +321,7 @@ class KcatPme(MaudParameter):
             self.default_loc,
             self.default_scale,
         )
-        self.inits = get_param_inits(
+        self.inits = Init1d(
             self.ids,
             self.id_components,
             self.prior,
@@ -352,7 +351,7 @@ class Drain(MaudParameter):
             self.default_loc,
             self.default_scale,
         )
-        self.inits = get_param_inits(
+        self.inits = Init2d(
             self.ids,
             self.id_components,
             self.prior,
@@ -408,7 +407,7 @@ class ConcEnzyme(MaudParameter):
             self.default_loc,
             self.default_scale,
         )
-        self.inits = get_param_inits(
+        self.inits = Init2d(
             self.ids,
             self.id_components,
             self.prior,
@@ -466,7 +465,7 @@ class ConcUnbalanced(MaudParameter):
             self.default_loc,
             self.default_scale,
         )
-        self.inits = get_param_inits(
+        self.inits = Init2d(
             self.ids,
             self.id_components,
             self.prior,
@@ -525,7 +524,7 @@ class ConcPme(MaudParameter):
             self.default_loc,
             self.default_scale,
         )
-        self.inits = get_param_inits(
+        self.inits = Init2d(
             self.ids,
             self.id_components,
             self.prior,
@@ -579,7 +578,7 @@ class Psi(MaudParameter):
             self.default_loc,
             self.default_scale,
         )
-        self.inits = get_param_inits(
+        self.inits = Init1d(
             self.ids,
             self.id_components,
             self.prior,
