@@ -120,7 +120,10 @@ class Init2d:
                 iai_id_row, iai_id_col = get_init_atom_input_ids(
                     iai, id_components
                 )
-                if iai_id_row in inits_pd.index and iai_id_col in inits_pd.columns:
+                if (
+                    iai_id_row in inits_pd.index
+                    and iai_id_col in inits_pd.columns
+                ):
                     inits_pd.loc[iai_id_row, iai_id_col] = iai.init
         inits_for_scaling = (
             np.log(inits_pd) if non_negative else inits_pd.copy()

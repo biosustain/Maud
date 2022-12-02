@@ -20,7 +20,10 @@ def test_load_maud_input():
     """Test that the function load_maud_input behaves as expected."""
     expected_var_ids = {
         "dgf": [["M1", "M2"]],
-        "conc_unbalanced_train": [["condition1", "condition2"], ["M1_e", "M2_e"]],
+        "conc_unbalanced_train": [
+            ["condition1", "condition2"],
+            ["M1_e", "M2_e"],
+        ],
         "conc_pme_train": [["condition1", "condition2"], []],
         "dissociation_constant": [["r1_M2_c", "r2_M1_c"]],
     }
