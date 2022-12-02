@@ -238,9 +238,7 @@ def get_network_properties_input(
         allostery_type = [
             int(a.modification_type.value) for a in kinetic_model.allosteries
         ]
-        allostery_mic = [
-            mic_codes[a.mic_id] for a in kinetic_model.allosteries
-        ]
+        allostery_mic = [mic_codes[a.mic_id] for a in kinetic_model.allosteries]
         for a in kinetic_model.allosteries:
             edge_pos = next(  # is this right???
                 i

@@ -44,8 +44,7 @@ def get_idata(mcmc: CmdStanMCMC, mi: MaudInput, mode: str) -> az.InferenceData:
         if mi.kinetic_model.phosphorylations is not None
         else [],
         "phosphorylation_modifying_enzymes": [
-            pme.id
-            for pme in mi.kinetic_model.phosphorylation_modifying_enzymes
+            pme.id for pme in mi.kinetic_model.phosphorylation_modifying_enzymes
         ]
         if mi.kinetic_model.phosphorylation_modifying_enzymes is not None
         else [],

@@ -25,6 +25,8 @@ class MeasurementType(str, Enum):
 
 @dataclass
 class Measurement:
+    """Maud representation of a measurement."""
+
     experiment: str
     target_type: MeasurementType
     value: float = Field(kw_only=True, allow_inf_nan=False)

@@ -6,11 +6,13 @@ from typing import List, Union
 import numpy as np
 from numpy.linalg import LinAlgError
 from pydantic.class_validators import root_validator, validator
-from pydantic.dataclasses import Field, dataclass
+from pydantic.dataclasses import dataclass
 
 
 @dataclass
 class IndPriorAtom:
+    """Prior for a single quantity."""
+
     location: float
     scale: float
 
@@ -121,6 +123,7 @@ class PriorMVN:
 
     @validator("location")
     def no_null_locations(cls, v):
+        """Check that no locations are nans."""
         for x in v:
             if math.isnan(x):
                 raise ValueError("Location cannot be null.")

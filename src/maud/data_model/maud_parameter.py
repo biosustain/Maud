@@ -1,6 +1,5 @@
 """Definitions of Stan variables and StanVariableSet."""
 
-from dataclasses import fields
 from typing import List, Optional, Union
 
 from pydantic import Field, root_validator, validator

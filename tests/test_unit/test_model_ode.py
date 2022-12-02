@@ -9,9 +9,7 @@ from numpy import isclose
 
 here = os.path.dirname(__file__)
 data_path = os.path.join(here, "..", "data")
-model_path = os.path.join(
-    here, "..", "..", "src", "maud", "stan", "model.stan"
-)
+model_path = os.path.join(here, "..", "..", "src", "maud", "stan", "model.stan")
 
 SIM_CONFIG = {
     "chains": 1,
@@ -71,7 +69,7 @@ def test_model_ode(folder, expected_values):
     )
     for var, expected in expected_values.items():
         sim_values = mcmc.draws_xr(vars=var).sel(chain=1, draw=0)[var]
-        for label, (ix, expected_value) in expected.items():
+        for _, (ix, expected_value) in expected.items():
             sim_value = sim_values.values[ix]
             assert isclose(expected_value, sim_value), msg.format(
                 var=var, ix=ix, expected_value=expected_value

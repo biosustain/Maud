@@ -11,9 +11,7 @@ from maud.loading_maud_inputs import load_maud_input
 
 HERE = os.path.dirname(__file__)
 LINEAR_PATH = os.path.join(HERE, "..", "data", "linear")
-EXPECTED_STAN_INPUT_PATH = os.path.join(
-    LINEAR_PATH, "expected_stan_input.json"
-)
+EXPECTED_STAN_INPUT_PATH = os.path.join(LINEAR_PATH, "expected_stan_input.json")
 
 
 def test_load_maud_input():

@@ -14,6 +14,8 @@ from maud.data_model.prior import IndPrior1d, IndPrior2d, PriorMVN
 
 @dataclass
 class InitAtomInput:
+    """Maud representation of an init input for a single quantity."""
+
     init: float
     metabolite: Optional[str] = None
     compartment: Optional[str] = None
@@ -27,6 +29,8 @@ ParamInitInput = Optional[List[InitAtomInput]]
 
 @dataclass
 class InitInput:
+    """Maud representation of a full init input."""
+
     dgf: ParamInitInput = None
     km: ParamInitInput = None
     kcat: ParamInitInput = None
@@ -46,6 +50,7 @@ def get_init_atom_input_ids(
     id_components: List[List[IdComponent]],
 ) -> Tuple[str, ...]:
     """Get an init's id from a userinput."""
+
     return tuple(
         ID_SEPARATOR.join([getattr(iai, c) for c in idci])
         for idci in id_components
@@ -54,6 +59,8 @@ def get_init_atom_input_ids(
 
 @dataclass(init=False)
 class Init1d:
+    """A 1 dimensional initial values specification."""
+
     inits_unscaled: List[float]
     inits_scaled: Optional[List[float]] = None
 
@@ -93,6 +100,8 @@ class Init1d:
 
 @dataclass(init=False)
 class Init2d:
+    """A 2 dimensional initial values specification."""
+
     inits_unscaled: List[List[float]]
     inits_scaled: Optional[List[List[float]]] = None
 

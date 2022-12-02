@@ -354,9 +354,7 @@ class KineticModel:
             assert (
                 allostery.enzyme_id in enzyme_ids
             ), f"{allostery.id} has bad enzyme_id"
-            assert (
-                allostery.mic_id in mic_ids
-            ), f"{allostery.id} has bad mic_id"
+            assert allostery.mic_id in mic_ids, f"{allostery.id} has bad mic_id"
         return values
 
     @root_validator

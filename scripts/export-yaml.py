@@ -59,9 +59,7 @@ Template_Haldane = Template(
     {%- if not loop.last %} * {% endif %} {%- endfor -%} / {{Keq}}"""
 )
 
-Template_Tr = Template(
-    """{{enz}} * {{kcat}} * ({{Trf}} - {{Trr}} * {{Hal}})"""
-)
+Template_Tr = Template("""{{enz}} * {{kcat}} * ({{Trf}} - {{Trr}} * {{Hal}})""")
 
 Template_Tr_irr = Template("""{{enz}} * {{kcat}} * {{Trf}}""")
 
@@ -205,9 +203,9 @@ def main():
             par_input.append(
                 [
                     f"m{mic.id}",
-                    list(
-                        conc_values[conc_values["mic_id"] == mic.id]["value"]
-                    )[0],
+                    list(conc_values[conc_values["mic_id"] == mic.id]["value"])[
+                        0
+                    ],
                 ]
             )
     for rxn in mi.kinetic_model.reactions:

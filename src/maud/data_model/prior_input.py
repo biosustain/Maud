@@ -8,6 +8,8 @@ from pydantic.dataclasses import dataclass
 
 @dataclass
 class IndPriorAtomInput:
+    """Prior input for a single quantity."""
+
     metabolite: Optional[str] = None
     compartment: Optional[str] = None
     enzyme: Optional[str] = None
@@ -22,12 +24,16 @@ class IndPriorAtomInput:
 
     @validator("scale")
     def scale_is_positive(cls, v):
+        """Check that scale is positive."""
+
         if v <= 0:
             raise ValueError("scale must be a positive number.")
         return v
 
     @root_validator
     def prior_is_specified_correctly(cls, values):
+        """Check that location, scale etc are correct."""
+
         lc = values["location"]
         el = values["exploc"]
         sc = values["scale"]
@@ -53,6 +59,8 @@ class IndPriorAtomInput:
 
 @dataclass
 class PriorMVNInput:
+    """Prior input for a parameter with multivariate normal distribution."""
+
     ids: List[str]
     mean_vector: List[float]
     covariance_matrix: List[List[float]]
@@ -60,6 +68,8 @@ class PriorMVNInput:
 
 @dataclass
 class PriorInput:
+    """A full prior input."""
+
     dgf: Optional[Union[PriorMVNInput, List[IndPriorAtomInput]]] = None
     km: Optional[List[IndPriorAtomInput]] = None
     kcat: Optional[List[IndPriorAtomInput]] = None

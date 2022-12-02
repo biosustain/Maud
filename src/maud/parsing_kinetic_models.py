@@ -29,8 +29,7 @@ def parse_kinetic_model(raw: dict) -> KineticModel:
     now = datetime.now().strftime("%Y%m%d%H%M%S")
     name = read_with_fallback("name", raw, now)
     compartments = [
-        Compartment(c["id"], c["name"], c["volume"])
-        for c in raw["compartment"]
+        Compartment(c["id"], c["name"], c["volume"]) for c in raw["compartment"]
     ]
     mics = [
         MetaboliteInCompartment(
@@ -48,9 +47,7 @@ def parse_kinetic_model(raw: dict) -> KineticModel:
             name=read_with_fallback("name", r, None),
             mechanism=ReactionMechanism[r["mechanism"].upper()],
             stoichiometry=r["stoichiometry"],
-            water_stoichiometry=read_with_fallback(
-                "water_stoichiometry", r, 0
-            ),
+            water_stoichiometry=read_with_fallback("water_stoichiometry", r, 0),
             transported_charge=read_with_fallback("transported_charge", r, 0),
         )
         for r in raw["reaction"]

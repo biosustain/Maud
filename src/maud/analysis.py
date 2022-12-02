@@ -141,9 +141,7 @@ def plot_1d_var(
         hist, bins = np.histogram(x, bins=30)
         xscale = "linear"
         if logscale:
-            bins = np.logspace(
-                np.log10(bins[0]), np.log10(bins[-1]), len(bins)
-            )
+            bins = np.logspace(np.log10(bins[0]), np.log10(bins[-1]), len(bins))
             xscale = "log"
         _, _, hist_patches = ax.hist(x, bins=bins)
         ax.set_xscale(xscale)
