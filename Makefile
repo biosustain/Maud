@@ -6,8 +6,8 @@
 
 ## Apply code quality assurance tools.
 qa:
-	isort --recursive src/maud tests/ scripts/ setup.py
-	black src/maud tests/ scripts/ setup.py
+	isort --recursive src/maud tests/ setup.py
+	black src/maud tests/ setup.py
 
 STAN_BINARY = src/maud/inference_model
 
