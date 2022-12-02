@@ -32,9 +32,8 @@ The file :code:`config.toml` **must** contain these top-level fields:
 
 - :code:`name` String naming the input
 - :code:`kinetic_model_file` Path to a :code:`toml` file defining a kinetic model
-- :code:`priors_file` Path to a :code:`csv` file specifying independent priors
-- :code:`experimental_setup_file` Path to a :code:`toml` file specifying the experimental setup
-- :code:`measurements_file` Path to a code:`csv` file specifying measurements
+- :code:`priors_file` Path to a :code:`toml` file specifying priors
+- :code:`experiments_file` Path to a :code:`toml` file with information about experiments
 - :code:`likelihood` Boolean representing whether to use information from measurements
 
 The following optional fields can also be specified:
@@ -46,9 +45,7 @@ The following optional fields can also be specified:
 - :code:`stanc_options` Table of valid choices for `CmdStanModel <https://cmdstanpy.readthedocs.io/en/v1.0.1/api.html#cmdstanpy.CmdStanModel>`_ argument `stanc_options`
 - :code:`cpp_options` Table of valid choices for  `CmdStanModel <https://cmdstanpy.readthedocs.io/en/v1.0.1/api.html#cmdstanpy.CmdStanModel>`_ argument `cpp_options`
 - :code:`variational_options` Arguments for CmdStanModel.variational
-- :code:`user_inits_file` path to a csv file of initial values
-- :code:`dgf_mean_file` path to a csv file of formation energy means
-- :code:`dgf_covariance_file` path to a csv file of formation energy covariances
+- :code:`user_inits_file` path to a toml file of initial values
 - :code:`steady_state_threshold_abs` absolute threshold for Sv=0 be at steady state
 - :code:`steady_state_threshold_rel` relative threshold for Sv=0 be at steady state
 - :code:`drain_small_conc_corrector` number for correcting small conc drains
@@ -59,9 +56,8 @@ Here is an example configuration file:
 
     name = "linear"
     kinetic_model_file = "kinetic_model.toml"
-    priors_file = "priors.csv"
-    measurements_file = "measurements.csv"
-    experimental_setup_file = "experimental_setup.toml"
+    priors_file = "priors.toml"
+    experiments_file = "experiments.toml"
     likelihood = true
     steady_state_threshold_abs = 1e-6
 
@@ -79,12 +75,12 @@ Here is an example configuration file:
     timepoint = 1e3
 
 This file tells Maud that a file representing a kinetic model can be found at
-the relative path :code:`kinetic_model.toml`, and that priors, experimental
-setup information and measurements can be found at :code:`priors.csv`,
-:code:`experimental_setup.toml` and :code:`measurements.csv` respectively.
+the relative path :code:`kinetic_model.toml`, and that priors and experimental
+information can be found at :code:`priors.toml`, :code:`experiments.toml`
+respectively.
 
 The line :code:`likelihood = true` tells Maud to take into account the
-measurements in :code:`measurements.csv`: in other words, **not** to run in
+measurements in :code:`experiments.toml`: in other words, **not** to run in
 priors-only mode.
 
 When Maud samples with this input, it will create 4 MCMC chains, each with 200
@@ -304,11 +300,13 @@ Here is an example of an entry in a allostery table:
     enzyme_id = "r1"
     modification_type = "activation"
 
-The experimental setup file
+The experiments file
 ===========================
 
-This is a file written in toml, giving qualititative information about the
-input's experimental setup.
+This is a file written in toml, giving information about the input's
+experiments, including qualitative information like whether an enzyme was
+knocked out, as well as quantitative information like temperature or the results
+of measurements.
 
 This section describes this file's fields.
 
@@ -316,7 +314,8 @@ experiment
 ----------
 
 An obligatory table containing information that is specific to each of the
-input's experiments, with the following fields:
+input's experiments. All information in an experiments file should belong to an
+experiment.
 
 - :code:`id` A string identifying the experiment, without any underscores
 - :code:`is_train` A boolean indicating whether to include the experiment in the
@@ -324,80 +323,95 @@ input's experiments, with the following fields:
 - :code:`is_test` A boolean indicating whether to include the experiment in the
   test dataset
 - :code:`temperature` A float specifying the experiment's temperature.
+- :code:`enzyme_knockouts`: An optional table describing enzyme knockouts. Each
+  entry has one field called "enzyme".
+- :code:`pme_knockouts`: An optional table describing knockouts of
+  phosphorylation modifying enzymes. Each entry has one field called "pme".
+- :code:`measurements`: An optional table describing measurements
 
-enzyme_knockout
----------------
+The measurement table has these fields:
 
-An optional table specifying knockouts of enzymes, with the following fields:
-
-- :code:`experiment_id` Id of the knockout's experiment
-- :code:`enzyme_id` Id of the enzyme that was knocked out
-
-phosphorylation_knockout
-------------------------
-
-An optional table specifying knockouts of phosphorylation effects, with the
-following fields:
-
-- :code:`experiment_id` Id of the knockout's experiment
-- :code:`enzyme_id` Id of the enzyme whose phosphorylation was knocked out
-
-
-The measurements file
-=====================
-
-This is a csv file with the following fields:
-
-- :code:`measurement_type` A string specifying what kind of thing was measured 
-- :code:`target_id` A string identifying the thing that was measured 
-- :code:`experiment` A string specifying the measurement's experiment 
-- :code:`measurement` The measured value, as a float
-- :code:`error_scale` The measurement error, as a float
-
-Valid options for the :code:`measurement_type` field are:
-
-- :code:`mic` Concentration of a :code:`metabolite_in_compartment`
-- :code:`enzyme` Concentration of an enzyme
-- :code:`flux` Flux of a reaction
+- :code:`target_type` A string specifying what kind of thing was measured:
+  either "mic", "flux" or "enzyme".
+- :code:`metabolite` A string identifying the metabolite that was measured,
+  required if the target type is "mic".
+- :code:`compartment` A string identifying the compartment that was measured,
+  required if the target type is "mic".
+- :code:`enzyme` A string identifying the enzyme that was measured, required if
+  the target type is "enzyme".
+- :code:`reaction` A string identifying the reaction that was measured, required
+  if the target type is "flux".
+- :code:`value` The measured value, as a float.
+- :code:`error_scale` The measurement error, as a float.
 
 `error_scale` is the standard deviation of a normal distribution for flux
 measurements or the scale parameter of a lognormal distribution for
 concentration measurements.
 
-
 The priors file
 ===============
 
-This is a csv file representing pre-experimental information that can be
-represented by independent probability distributions.
+This is a toml file for representing non-experimental quantitative information.
 
-The priors table has the following fields:
+You can specify the following parameters:
 
-- :code:`parameter` String identifying a parameter
-- :code:`metabolite` String identifier
-- :code:`compartment` String identifier
-- :code:`enzyme` String identifier
-- :code:`reaction` String identifier
-- :code:`experiment` String identifier
-- :code:`location` Float specifying a location
-- :code:`scale` Float specifying a scale
-- :code:`pct1`: First percentile of the prior distribution
-- :code:`pct99`: 99th percentile of the prior distribution
+- :code:`dgf` (can be negative, identified by metabolite)
+- :code:`km` (non-negative, identified by metabolite, compartment, enzyme and reaction)
+- :code:`kcat` (non-negative, identified by enzyme and reaction)
+- :code:`kcat_pme` (non-negative, identified by phosphorylation modifying enzyme)
+- :code:`ki` (non-negative, identified by metabolite, compartment, enzyme and reaction)
+- :code:`dissociation_constant` (non-negative, identified by metabolite, compartment and enzyme)
+- :code:`transfer_constant` (non-negative, identified by enzyme)
+- :code:`psi` (non-negative, identified by metabolite, compartment, enzyme and reaction)
+- :code:`conc_unbalanced` (non-negative, identified by metabolite, compartment and experiment)
+- :code:`drain` (can be negative, identified by reaction and experiment)
+- :code:`conc_enzyme` (non-negative, identified by enzyme and experiment)
+- :code:`conc_pme` (non-negative, identified by phosphorylation modifying enzyme and experiment)
+
+All priors are optional. If you do not specify a prior for a parameter, then
+Maud will use a default prior instead.
+  
+To specify an independent prior distribution for a parameter, create a top level table for it
+in your priors file, with each entry containing enough information to identify
+the target, as well as its prior distribution.
+
+Independent prior distributions are log-normal for non-negative parameters or
+normal for possibly-negative ones. A distribution can be identified either by
+specifying its location and scale parameters (fields :code:`location` and
+:code:`scale`) or its 1% and 99% quantiles (fields :code:`pct1` and
+:code:`pct99`). In addition, for non-negative parameters it is possible to use
+the field :code:`exploc` to specify the expontial of the location parameter
+instead of directly setting the location, which is sometimes easier to
+interpret.
 
 See the :code:`id_components` fields in the `corresponding code file
 <https://github.com/biosustain/Maud/tree/master/src/maud/data_model/stan_variable_set.py>`_
 for which columns need to be specified for each kind of
 prior.
 
-Prior distributions can either be specified by a location and scale or by a 1st
-and 99th percentile, but not both.
+Here is an example specification of independent priors for a kcat parameter:
+
+..code:: toml
+
+    kcat = [
+      {enzyme = "MAT1", reaction = "METAT", exploc = 2.2, scale = 2},
+      {enzyme = "MAT3", reaction = "METAT", exploc = 15.8, scale = 2},
+      {enzyme = "GNMT1", reaction = "GNMT", exploc = 0.7, scale = 60},
+      {enzyme = "AHC1", reaction = "AHC", exploc = 120, scale = 400},
+      {enzyme = "MS1", reaction = "MS", exploc = 1, scale = 3.3},
+      {enzyme = "BHMT1", reaction = "BHMT", exploc = 6, scale = 35},
+      {enzyme = "CBS1", reaction = "CBS", exploc = 10, scale = 188},
+      {enzyme = "MTHFR1", reaction = "MTHFR", exploc = 1.3, scale = 4.2},
+      {enzyme = "PROT1", reaction = "PROT", exploc = 0.188, scale = 0.1},
+      {enzyme = "METH-Gen", reaction = "METH", exploc = 13, scale = 2},
+    ]
+
 
 Multivariate priors for formation energy parameters
-===================================================
+---------------------------------------------------
 
-The use of a single csv file for priors was motivated by the fact that, for
-most model parameters, it is safe to model the pre-experimental information as
-independent. For example, knowing the value of one enzyme's :math:`kcat`
+For most model parameters, it is safe to model the pre-experimental information
+as independent. For example, knowing the value of one enzyme's :math:`kcat`
 parameter does not significantly narrow down another enzyme's :math:`kcat`
 parameter. Thus in this case, and most others, specifying each parameter's
 marginal prior distribution is practically equivalent to specifying the full
@@ -413,63 +427,43 @@ chemical groups are also likely to have similar formation energies, introducing
 further non-independence.
 
 In some cases this dependence is not practically important, and Maud will work
-well enough with independent priors in a csv file as above. For other cases,
-Maud allows non-independent prior information to be specified in the form of
-the mean vector and covariance matrix of a multivariate normal
-distribution. This information is specified as follows.
-
-First, to indicate where to find the required vector and matrix, the fields
-:code:`dgf_mean_file` and :code:`dgf_covariance_file` should be added to the
-top level of the file :code:`config.toml` in the input folder. For example:
+well enough with independent priors as described above. For other cases, Maud
+allows non-independent prior information to be specified in the form of the mean
+vector and covariance matrix of a multivariate normal distribution. This
+information is specified using a different format, with fields :code:`ids`,
+:code:`mean_vector` and :code:`covariance_matrix`, as below:
 
 .. code:: toml
 
-    name = "methionine_cycle"
-    kinetic_model = "methionine_cycle.toml"
-    priors = "priors.csv"
-    experiments = "experiments.csv"
-    dgf_mean_file = "dgf_prior_mean.csv"
-    dgf_covariance_file = "dgf_prior_covariance.csv"
-
-These fields should be paths from the root of the input folder to csv
-files. The :code:`dgf_mean_file` should have columns caled :code:`metabolite`
-and :code:`prior_mean_dgf`, with the former consisting of ids that agree with
-the rest of the input folder (in particular the kinetic model file) and the
-latter of non-null real numbers. For example
-
-.. csv-table::
-
-    metabolite,prior_mean_dgf
-    5mthf,-778.2999561
-    adn,-190.9913035
-    ahcys,-330.3885785
-    amet,-347.1029509
-    atp,-2811.578332
-    cyst-L,-656.8334114
-    ...
-
-The :code:`dgf_covariance_file` should be a valid covariance matrix surrounded
-by metabolite ids. The first column should be called :code:`metabolite` and
-populated with ids that are consistent with the other inputs. Subsequent
-columns should have names that match the first column. Here is (the start of)
-an example:
-
-.. csv-table::
-
-    metabolite,5mthf,adn,ahcys,amet,atp,cyst-L
-    5mthf,457895.226,0.023993053,2.911539829,38.09225442,0.023892737,0.610913519
-    adn,0.023993053,2.081489779,1.034504533,1.00E-10,0.444288943,0
-    ahcys,2.911539829,1.034504533,16.2459485,4.297104388,0.341195482,13.08072127
-    amet,38.09225442,1.00E-10,4.297104388,1000025.576,-1.00E-10,2.066261457
-    atp,0.023892737,0.444288943,0.341195482,-1.00E-10,2.22005692,0
-    cyst-L,0.610913519,0,13.08072127,2.066261457,0,16.61784088
-    ...
-
+    dgf = {
+      ids = ["M1", "M2"],
+      mean_vector = [-1, 2],
+      covariance_matrix = [[1, 0], [0, 1]],
+    }
 
 The initial parameter values file
 =================================
 
-Initial parameter values can be entered in a :code:`json` file. This file should
-be a valid option for the :code:`inits` argument of the cmdstan sample method.
+Initial parameter values can be entered in a :code:`toml` file. This file should
+have a table for each parameter whose inits you would like to set, with
+identifiers specified in the same way as priors, and initial values specified
+using the subfield :code:`init`. For example:
+
+
+.. code:: toml
+
+    kcat = [
+      {enzyme = "AHC1", reaction = "AHC", init = 234.284},
+      {enzyme = "BHMT1", reaction = "BHMT", init = 13.7676},
+      {enzyme = "CBS1", reaction = "CBS", init = 7.02307},
+      {enzyme = "GNMT1", reaction = "GNMT", init = 10.5307},
+      {enzyme = "MAT1", reaction = "METAT", init = 7.89577},
+      {enzyme = "MAT3", reaction = "METAT", init = 19.9215},
+      {enzyme = "METH-Gen", reaction = "METH", init = 1.15777},
+      {enzyme = "MS1", reaction = "MS", init = 1.77471},
+      {enzyme = "MTHFR1", reaction = "MTHFR", init = 3.1654},
+      {enzyme = "PROT1", reaction = "PROT", init = 0.264744},
+    ]
+
 
 

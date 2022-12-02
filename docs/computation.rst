@@ -32,17 +32,17 @@ How Maud draws posterior samples
 ================================
 
 Maud draws posterior samples using Stan and cmdstanpy. When a user inputs a
-:code:`maud sample ...` command, the chosen toml file, and any other
-configuration options are read and translated into :doc:`Maud's data model
-</data_model>`, then initial parameter values and input data in Stan format are
-written as json files. If necessary, the Stan program `<inference_model.stan>`
-is then compiled to c++ and then binary. Next, Maud uses cmdstanpy to trigger
-Stan's sampler using the specified input data and initial conditions. The
-resulting samples are written to csv files in Stan's output format.
+:code:`maud sample ...` command, the files in the target directory are parsed as
+Python objects using Maud's data model, then initial parameter values and input
+data in Stan format are written as json files. If necessary, the Stan program
+`<inference_model.stan>` is then compiled to c++ and then binary. Next, Maud
+uses cmdstanpy to trigger Stan's sampler using the specified input data and
+initial conditions. The resulting samples are written to csv files in Stan's
+output format.
 
 Stan's sampler uses an adaptive Hamiltonian Monte Carlo algorithm to
 efficiently explore the posterior probability distribution defined by the
-:doc:`statistical model <../Theory/Statistics>` And Input Data.
+:doc:`statistical model <../theory/statistics>` And Input Data.
 
 
 Why Use Stan And Adaptive Hmc?

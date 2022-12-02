@@ -2,7 +2,7 @@ km = [
   {metabolite = "adn", compartment = "c", enzyme = "AHC1", reaction = "AHC", init = 5.66E-06},
   {metabolite = "ahcys", compartment = "c", enzyme = "AHC1", reaction = "AHC", init = 2.32E-05},
   {metabolite = "hcys-L", compartment = "c", enzyme = "AHC1", reaction = "AHC", init = 1.06E-05},
-  {metabolite = "glyb", compartment = "c", enzyme = "BHMT1", reaction = "BHMT", init = 0.00845898},
+  {metabolite = "glyb", compartment = "c", ennnnnzyme = "BHMT1", reaction = "BHMT", init = 0.00845898},
   {metabolite = "hcys-L", compartment = "c", enzyme = "BHMT1", reaction = "BHMT", init = 1.98E-05},
   {metabolite = "hcys-L", compartment = "c", enzyme = "CBS1", reaction = "CBS", init = 4.24E-05},
   {metabolite = "ser-L", compartment = "c", enzyme = "CBS1", reaction = "CBS", init = 2.83E-06},
@@ -58,16 +58,16 @@ transfer_constant = [
   {enzyme = "MTHFR1", reaction = "MTHFR", init = 0.392035},
 ]
 kcat = [
-{enzyme = "AHC1", reaction = "AHC", init = 234.284},
-{enzyme = "BHMT1", reaction = "BHMT", init = 13.7676},
-{enzyme = "CBS1", reaction = "CBS", init = 7.02307},
-{enzyme = "GNMT1", reaction = "GNMT", init = 10.5307},
-{enzyme = "MAT1", reaction = "METAT", init = 7.89577},
-{enzyme = "MAT3", reaction = "METAT", init = 19.9215},
-{enzyme = "METH-Gen", reaction = "METH", init = 1.15777},
-{enzyme = "MS1", reaction = "MS", init = 1.77471},
-{enzyme = "MTHFR1", reaction = "MTHFR", init = 3.1654},
-{enzyme = "PROT1", reaction = "PROT", init = 0.264744},
+  {enzyme = "AHC1", reaction = "AHC", init = 234.284},
+  {enzyme = "BHMT1", reaction = "BHMT", init = 13.7676},
+  {enzyme = "CBS1", reaction = "CBS", init = 7.02307},
+  {enzyme = "GNMT1", reaction = "GNMT", init = 10.5307},
+  {enzyme = "MAT1", reaction = "METAT", init = 7.89577},
+  {enzyme = "MAT3", reaction = "METAT", init = 19.9215},
+  {enzyme = "METH-Gen", reaction = "METH", init = 1.15777},
+  {enzyme = "MS1", reaction = "MS", init = 1.77471},
+  {enzyme = "MTHFR1", reaction = "MTHFR", init = 3.1654},
+  {enzyme = "PROT1", reaction = "PROT", init = 0.264744},
 ]
 
 conc_unbalanced = [
