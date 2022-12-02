@@ -16,8 +16,8 @@ ki = [
 ]
 
 dissociation_constant = [
-  {metabolite = "C", compartment = "c", enzyme = "r2B", exploc = 0.9, scale = 0.2},
-  {metabolite = "C", compartment = "c", enzyme = "r2A", exploc = 0.3, scale = 0.2},
+  {metabolite = "C", compartment = "c", enzyme = "r2B", exploc = 0.9, scale = 0.2, modification_type = "inhibition"},
+  {metabolite = "C", compartment = "c", enzyme = "r2A", exploc = 0.3, scale = 0.2, modification_type = "activation"},
 ]
 
 transfer_constant = [

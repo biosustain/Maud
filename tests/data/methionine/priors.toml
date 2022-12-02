@@ -42,13 +42,13 @@ ki = [
 ]
 
 dissociation_constant = [
-  {metabolite = "amet" ,compartment = "c", enzyme = "MAT3", reaction = "METAT", exploc = 0.0001,scale = 0.001},
-  {metabolite = "met-L", compartment = "c", enzyme = "MAT3", reaction = "METAT", exploc = 0.00045,scale = 0.0008},# Based on met_c conc
-  {metabolite = "amet", compartment = "c", enzyme = "GNMT1", reaction = "GNMT", exploc = 0.00003,scale = 0.002},
-  {metabolite = "mlthf", compartment = "c", enzyme = "GNMT1", reaction = "GNMT", exploc = 0.0003,scale = 2},
-  {metabolite = "amet", compartment = "c", enzyme = "CBS1", reaction = "CBS", exploc = 9.22e-05,scale = 2},
-  {metabolite = "ahcys", compartment = "c", enzyme = "MTHFR1", reaction = "MTHFR", exploc = 0.000003,scale = 2},
-  {metabolite = "amet", compartment = "c", enzyme = "MTHFR1", reaction = "MTHFR", exploc = 0.000003,scale = 2},
+  {metabolite = "amet" ,compartment = "c", enzyme = "MAT3", reaction = "METAT", exploc = 0.0001,scale = 0.001, modification_type = "inhibition"},
+  {metabolite = "met-L", compartment = "c", enzyme = "MAT3", reaction = "METAT", exploc = 0.00045,scale = 0.0008, modification_type = "inhibition"},# Based on met_c conc
+  {metabolite = "amet", compartment = "c", enzyme = "GNMT1", reaction = "GNMT", exploc = 0.00003,scale = 0.002, modification_type = "inhibition"},
+  {metabolite = "mlthf", compartment = "c", enzyme = "GNMT1", reaction = "GNMT", exploc = 0.0003,scale = 2, modification_type = "activation"},
+  {metabolite = "amet", compartment = "c", enzyme = "CBS1", reaction = "CBS", exploc = 9.22e-05,scale = 2, modification_type = "inhibition"},
+  {metabolite = "ahcys", compartment = "c", enzyme = "MTHFR1", reaction = "MTHFR", exploc = 0.000003,scale = 2, modification_type = "inhibition"},
+  {metabolite = "amet", compartment = "c", enzyme = "MTHFR1", reaction = "MTHFR", exploc = 0.000003,scale = 2, modification_type = "activation"},
 ]
 
 transfer_constant = [

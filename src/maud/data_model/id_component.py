@@ -12,3 +12,4 @@ class IdComponent(str, Enum):
     REACTION = "reaction"
     EXPERIMENT = "experiment"
     PHOSPHORYLATION_MODIFYING_ENZYME = "phosphorylation_modifying_enzyme"
+    MODIFICATION_TYPE = "modification_type"

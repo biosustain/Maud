@@ -73,7 +73,7 @@ class Init1d:
         non_negative: bool,
         measurements: Optional[List[Measurement]] = None,
     ):
-        inits_pd = pd.Series(prior.location, index=ids[0])
+        inits_pd = pd.Series(prior.location, index=ids[0], dtype="float64")
         if non_negative:  # non-negative parameter location is on ln scale
             inits_pd = np.exp(inits_pd)
         if measurements is not None:
@@ -92,8 +92,8 @@ class Init1d:
             inits_for_scaling = (
                 np.log(inits_pd) if non_negative else inits_pd.copy()
             )
-            loc_pd = pd.Series(prior.location, index=ids[0])
-            scale_pd = pd.Series(prior.scale, index=ids[0])
+            loc_pd = pd.Series(prior.location, index=ids[0], dtype="float64")
+            scale_pd = pd.Series(prior.scale, index=ids[0], dtype="float64")
             inits_pd_scaled = (inits_for_scaling - loc_pd) / scale_pd
             self.inits_scaled = inits_pd_scaled.tolist()
 

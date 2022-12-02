@@ -236,6 +236,7 @@ class DissociationConstant(MaudParameter):
                 IdComponent.ENZYME,
                 IdComponent.METABOLITE,
                 IdComponent.COMPARTMENT,
+                IdComponent.MODIFICATION_TYPE,
             ]
         ]
         self.non_negative = True

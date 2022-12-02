@@ -25,8 +25,8 @@ transfer_constant = [
   {enzyme = "r2", exploc = 1, scale = 0.6},
 ]
 dissociation_constant =
-  {metabolite = "M2", compartment = "c", enzyme = "r1", exploc = 1, scale = 0.6},
-  {metabolite = "M1", compartment = "c", enzyme = "r2", exploc = 1, scale = 0.6},
+  {metabolite = "M2", compartment = "c", enzyme = "r1", exploc = 1, scale = 0.6, modification_type = "activation"},
+  {metabolite = "M1", compartment = "c", enzyme = "r2", exploc = 1, scale = 0.6, modification_type = "inhibition"},
 ]
 
 psi = [

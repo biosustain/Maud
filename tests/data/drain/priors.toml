@@ -16,8 +16,8 @@ dgf = [
   {metabolite = "M2", location = -2, scale = 0.05},
 ]
 dissociation_constant = [
-  {metabolite = "M1", compartment = "c", enzyme = "r1", exploc = 0.5, scale = 0.6},
-  {metabolite = "M2", compartment = "c", enzyme = "r1", exploc = 1, scale = 0.6},
+  {metabolite = "M1", compartment = "c", enzyme = "r1", exploc = 0.5, scale = 0.6, modification_type = "inhibition"},
+  {metabolite = "M2", compartment = "c", enzyme = "r1", exploc = 1, scale = 0.6  , modification_type = "activation"},
 ]
 transfer_constant = [
   {enzyme = "r1", exploc = 1, scale = 0.6},
