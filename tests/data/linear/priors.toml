@@ -18,8 +18,8 @@ transfer_constant = [
 ]
 
 dissociation_constant = [
-  {exploc = 1, scale = 0.6, enzyme = "r1", metabolite = "M2", compartment = "c"},
-  {exploc = 1, scale = 0.6, enzyme = "r2", metabolite = "M1", compartment = "c"},
+  {exploc = 1, scale = 0.6, enzyme = "r1", metabolite = "M2", compartment = "c", modification_type = "activation"},
+  {exploc = 1, scale = 0.6, enzyme = "r2", metabolite = "M1", compartment = "c", modification_type = "inhibition"},
 ]
 
 dgf = [

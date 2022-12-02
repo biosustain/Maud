@@ -13,16 +13,16 @@ from maud.data_model.hardcoding import ID_SEPARATOR
 class ReactionMechanism(int, Enum):
     """Possible reaction mechanisms."""
 
-    REVERSIBLE_MICHAELIS_MENTEN = 1
-    IRREVERSIBLE_MICHAELIS_MENTEN = 2
-    DRAIN = 3
+    reversible_michaelis_menten = 1
+    irreversible_michaelis_menten = 2
+    drain = 3
 
 
 class ModificationType(int, Enum):
     """Possible modification types."""
 
-    ACTIVATION = 1
-    INHIBITION = 2
+    activation = 1
+    inhibition = 2
 
 
 class KMConfig:
@@ -183,6 +183,7 @@ class Allostery:
                 self.enzyme_id,
                 self.metabolite_id,
                 self.compartment_id,
+                self.modification_type.name,
             ]
         )
         self.mic_id = ID_SEPARATOR.join(
@@ -228,8 +229,12 @@ class Phosphorylation:
 
     def __post_init__(self):
         """Add the id field."""
-        self.id = (
-            self.modifying_enzyme_id + ID_SEPARATOR + self.modified_enzyme_id
+        self.id = ID_SEPARATOR.join(
+            [
+                self.modifying_enzyme_id,
+                self.modified_enzyme_id,
+                self.modification_type.name,
+            ]
         )
 
 
@@ -260,7 +265,7 @@ class KineticModel:
     def __post_init__(self):
         """Add drains, edges and stoichiometric matrix."""
         self.drains = [
-            r for r in self.reactions if r.mechanism == ReactionMechanism.DRAIN
+            r for r in self.reactions if r.mechanism == ReactionMechanism.drain
         ]
         self.edges = self.drains + self.ers
         self.stoichiometric_matrix = get_stoichiometric_matrix(

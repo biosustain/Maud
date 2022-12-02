@@ -46,7 +46,7 @@ def get_km_coords(kinetic_model: KineticModel) -> KmCoords:
         enz = [e for e in kinetic_model.enzymes if e.id == er.enzyme_id][0]
         mic_ids = (
             list(rxn.stoichiometry.keys())
-            if rxn.mechanism != ReactionMechanism.IRREVERSIBLE_MICHAELIS_MENTEN
+            if rxn.mechanism != ReactionMechanism.irreversible_michaelis_menten
             else [k for k, v in rxn.stoichiometry.items() if v < 0]
         )
         for mic_id in mic_ids:
@@ -128,7 +128,7 @@ def get_maud_parameters(
         else []
     )
     drain_ids = [
-        d.id for d in kmod.reactions if d.mechanism == ReactionMechanism.DRAIN
+        d.id for d in kmod.reactions if d.mechanism == ReactionMechanism.drain
     ]
     unbalanced_mic_ids, unbalanced_mic_mets, unbalanced_mic_cpts = map(
         list,

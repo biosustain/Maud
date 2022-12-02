@@ -23,7 +23,7 @@ def test_load_maud_input():
             ["M1_e", "M2_e"],
         ],
         "conc_pme_train": [["condition1", "condition2"], []],
-        "dissociation_constant": [["r1_M2_c", "r2_M1_c"]],
+        "dissociation_constant": [["r1_M2_c_activation", "r2_M1_c_inhibition"]],
     }
     mi = load_maud_input(data_path=LINEAR_PATH)
     r1 = next(r for r in mi.kinetic_model.reactions if r.id == "r1")

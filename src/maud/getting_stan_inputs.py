@@ -210,7 +210,7 @@ def get_network_properties_input(
             prod_km_ids = (
                 [ID_SEPARATOR.join([edge.enzyme_id, p]) for p in prod_ids]
                 if rxn.mechanism
-                != ReactionMechanism.IRREVERSIBLE_MICHAELIS_MENTEN
+                != ReactionMechanism.irreversible_michaelis_menten
                 else []
             )
         sub_code_by_edge.append([mic_codes[s] for s in sub_ids])

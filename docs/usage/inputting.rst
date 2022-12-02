@@ -383,29 +383,23 @@ specifying its location and scale parameters (fields :code:`location` and
 the field :code:`exploc` to specify the expontial of the location parameter
 instead of directly setting the location, which is sometimes easier to
 interpret.
+=======
+This is a csv file representing pre-experimental information that can be
+represented by independent probability distributions.
 
-See the :code:`id_components` fields in the `corresponding code file
-<https://github.com/biosustain/Maud/tree/master/src/maud/data_model/stan_variable_set.py>`_
-for which columns need to be specified for each kind of
-prior.
+The priors table has the following fields:
 
-Here is an example specification of independent priors for a kcat parameter:
-
-..code:: toml
-
-    kcat = [
-      {enzyme = "MAT1", reaction = "METAT", exploc = 2.2, scale = 2},
-      {enzyme = "MAT3", reaction = "METAT", exploc = 15.8, scale = 2},
-      {enzyme = "GNMT1", reaction = "GNMT", exploc = 0.7, scale = 60},
-      {enzyme = "AHC1", reaction = "AHC", exploc = 120, scale = 400},
-      {enzyme = "MS1", reaction = "MS", exploc = 1, scale = 3.3},
-      {enzyme = "BHMT1", reaction = "BHMT", exploc = 6, scale = 35},
-      {enzyme = "CBS1", reaction = "CBS", exploc = 10, scale = 188},
-      {enzyme = "MTHFR1", reaction = "MTHFR", exploc = 1.3, scale = 4.2},
-      {enzyme = "PROT1", reaction = "PROT", exploc = 0.188, scale = 0.1},
-      {enzyme = "METH-Gen", reaction = "METH", exploc = 13, scale = 2},
-    ]
-
+- :code:`parameter` String identifying a parameter
+- :code:`metabolite` String identifier
+- :code:`compartment` String identifier
+- :code:`enzyme` String identifier
+- :code:`reaction` String identifier
+- :code:`experiment` String identifier
+- :code:`modification_type` String identifier
+- :code:`location` Float specifying a location
+- :code:`scale` Float specifying a scale
+- :code:`pct1`: First percentile of the prior distribution
+- :code:`pct99`: 99th percentile of the prior distribution
 
 Multivariate priors for formation energy parameters
 ---------------------------------------------------
