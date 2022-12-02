@@ -1,0 +1,15 @@
+name = "drain"
+kinetic_model_file = "kinetic_model.toml"
+priors_file = "priors.toml"
+experiments_file = "experiments.toml"
+likelihood = true
+
+[cmdstanpy_config]
+iter_warmup = 200
+iter_sampling = 200
+chains = 1
+save_warmup = true
+
+[ode_config]
+max_num_steps = 1e9
+timepoint = 1e3

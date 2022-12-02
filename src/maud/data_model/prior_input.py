@@ -13,6 +13,7 @@ class IndPriorAtomInput:
     enzyme: Optional[str] = None
     reaction: Optional[str] = None
     experiment: Optional[str] = None
+    phosphorylation_modifying_enzyme: Optional[str] = None
     location: Optional[float] = None
     exploc: Optional[float] = None
     scale: Optional[float] = None

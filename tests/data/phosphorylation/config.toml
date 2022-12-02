@@ -1,8 +1,7 @@
-name = "linear_phos"
+name = "phosphorylation"
 kinetic_model_file = "kinetic_model.toml"
-priors_file = "priors.csv"
-measurements_file = "measurements.csv"
-experimental_setup_file = "experimental_setup.toml"
+priors_file = "priors.toml"
+experiments_file = "experiments.toml"
 likelihood = true
 steady_state_threshold_abs = 1e-6
 
