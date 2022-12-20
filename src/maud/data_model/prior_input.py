@@ -27,14 +27,13 @@ class IndPriorAtomInput:
     def scale_is_positive(cls, v):
         """Check that scale is positive."""
 
-        if v <= 0:
+        if v is not None and v <= 0:
             raise ValueError("scale must be a positive number.")
         return v
 
     @root_validator
     def prior_is_specified_correctly(cls, values):
         """Check that location, scale etc are correct."""
-
         lc = values["location"]
         el = values["exploc"]
         sc = values["scale"]
@@ -51,6 +50,7 @@ class IndPriorAtomInput:
             for case in happy_cases
         ]
         if not any(good):
+            import pdb; pdb.set_trace()
             raise ValueError(
                 "Set one out of the following pairs of attributes: "
                 "location and scale, exploc and scale, or pct1 and pct99."
