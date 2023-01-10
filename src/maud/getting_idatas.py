@@ -1,14 +1,14 @@
 """Functions for creating InferenceData objects from Maud outputs."""
+from typing import List
 
 import arviz as az
-from cmdstanpy import CmdStanMCMC
 
 from maud.data_model.experiment import MeasurementType
 from maud.data_model.hardcoding import ID_SEPARATOR
 from maud.data_model.maud_input import MaudInput
 
 
-def get_idata(mcmc: CmdStanMCMC, mi: MaudInput, mode: str) -> az.InferenceData:
+def get_idata(csvs: List[str], mi: MaudInput, mode: str) -> az.InferenceData:
     """Get an arviz InferenceData object from Maud csvs."""
 
     experiments = (
@@ -112,8 +112,8 @@ def get_idata(mcmc: CmdStanMCMC, mi: MaudInput, mode: str) -> az.InferenceData:
     #     f"conc_pme_{mode}"
     # ]:
     #     dims[f"log_{zvar}_z"] = dims[zvar]
-    return az.from_cmdstanpy(
-        posterior=mcmc,
+    return az.from_cmdstan(
+        posterior=csvs,
         coords=coords,
         log_likelihood=[f"llik_conc_{mode}", f"llik_flux_{mode}"],
         posterior_predictive=[f"yrep_conc_{mode}", f"yrep_flux_{mode}"],
