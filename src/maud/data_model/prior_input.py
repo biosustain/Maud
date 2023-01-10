@@ -50,7 +50,6 @@ class IndPriorAtomInput:
             for case in happy_cases
         ]
         if not any(good):
-            import pdb; pdb.set_trace()
             raise ValueError(
                 "Set one out of the following pairs of attributes: "
                 "location and scale, exploc and scale, or pct1 and pct99."
