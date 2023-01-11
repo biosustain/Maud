@@ -242,7 +242,7 @@ class DissociationConstant(MaudParameter):
         self.non_negative = True
         self.mic_ids = [
             ID_SEPARATOR.join([met_id, compartment_id])
-            for _, met_id, compartment_id in zip(*self.split_ids[0])
+            for _, met_id, compartment_id, mt in zip(*self.split_ids[0])
         ]
         self.enzyme_ids = self.split_ids[0][0]
         self.default_loc = -0.69  # roughly 0.5

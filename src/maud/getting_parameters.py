@@ -29,7 +29,7 @@ from maud.data_model.maud_parameter import (
 from maud.data_model.prior_input import PriorInput
 
 
-AllostericCoords = Tuple[List[str], List[str], List[str], List[str]]
+AllostericCoords = Tuple[List[str], List[str], List[str], List[str], List[str]]
 KmCoords = Tuple[List[str], List[str], List[str], List[str]]
 KcatCoords = Tuple[List[str], List[str], List[str]]
 KiCoords = Tuple[List[str], List[str], List[str], List[str], List[str]]
@@ -66,13 +66,15 @@ def get_dc_coords(kinetic_model: KineticModel) -> AllostericCoords:
     enzs = []
     mets = []
     cpts = []
+    mts = []
     if kinetic_model.allosteries is not None:
         for a in kinetic_model.allosteries:
             ids.append(a.id)
             enzs.append(a.enzyme_id)
             mets.append(a.metabolite_id)
             cpts.append(a.compartment_id)
-    return ids, enzs, mets, cpts
+            mts.append(a.modification_type.name)
+    return ids, enzs, mets, cpts, mts
 
 
 def get_ci_coords(kinetic_model: KineticModel) -> KiCoords:
@@ -112,7 +114,7 @@ def get_maud_parameters(
 ):
     """Get a ParameterSet object from a KineticModel and a MeasurementSet."""
     km_ids, km_enzs, km_mets, km_cpts = get_km_coords(kmod)
-    dc_ids, dc_enzs, dc_mets, dc_cpts = get_dc_coords(kmod)
+    dc_ids, dc_enzs, dc_mets, dc_cpts, dc_mts = get_dc_coords(kmod)
     ci_ids, ci_enzs, ci_rxns, ci_mets, ci_cpts = get_ci_coords(kmod)
     enzyme_ids = [e.id for e in kmod.enzymes]
     kcat_ids, kcat_enzs, kcat_rxns = get_kcat_coords(kmod)
@@ -149,7 +151,7 @@ def get_maud_parameters(
         ki=Ki([ci_ids], [[ci_enzs, ci_rxns, ci_mets, ci_cpts]], pi.ki, ii.ki),
         dissociation_constant=DissociationConstant(
             [dc_ids],
-            [[dc_enzs, dc_mets, dc_cpts]],
+            [[dc_enzs, dc_mets, dc_cpts, dc_mts]],
             pi.dissociation_constant,
             ii.dissociation_constant,
         ),
