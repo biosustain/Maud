@@ -31,7 +31,7 @@ class IndPriorAtomInput:
             raise ValueError("scale must be a positive number.")
         return v
 
-    @root_validator
+    @root_validator(pre=False, skip_on_failure=True)
     def prior_is_specified_correctly(cls, values):
         """Check that location, scale etc are correct."""
         lc = values["location"]

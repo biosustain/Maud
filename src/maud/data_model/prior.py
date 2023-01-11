@@ -47,7 +47,7 @@ class IndPrior1d:
             raise ValueError("Scale parameter must be positive.")
         return v
 
-    @root_validator
+    @root_validator(pre=False, skip_on_failure=True)
     def lengths_match(cls, values):
         """Check that location and scale have the same index."""
         n_locs = len(values["location"])
@@ -92,7 +92,7 @@ class IndPrior2d:
                 raise ValueError("Scale parameter must be positive.")
         return v
 
-    @root_validator
+    @root_validator(pre=False, skip_on_failure=True)
     def lengths_are_correct(cls, values):
         """Check that ids, location and scale have correct length."""
         loc = values["location"]
@@ -140,7 +140,7 @@ class PriorMVN:
             ) from e
         return v
 
-    @root_validator
+    @root_validator(pre=False, skip_on_failure=True)
     def lengths_are_correct(cls, values):
         """Check that ids, location and cov matrix have correct lengths."""
         loc = values["location"]

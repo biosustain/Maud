@@ -43,7 +43,7 @@ class MaudParameter:
         assert all([len(x) == first_length for x in v])
         return v
 
-    @root_validator
+    @root_validator(pre=False, skip_on_failure=True)
     def split_ids_exist_if_needed(cls, values):
         """Check split ids exist when there are non-trivial id components."""
         if any(len(idc) > 1 for idc in values["id_components"]):

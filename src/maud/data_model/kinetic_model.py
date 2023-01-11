@@ -311,7 +311,7 @@ class KineticModel:
         assert len(rxn_ids) == len(set(rxn_ids))
         return v
 
-    @root_validator
+    @root_validator(pre=False, skip_on_failure=True)
     def stoic_keys_must_be_mic_ids(cls, values):
         """Make sure reaction stoichiometries have existent mic ids."""
         mic_ids = [mic.id for mic in values["mics"]]
@@ -322,7 +322,7 @@ class KineticModel:
                 ), f"{r.id} has stoichiometry for bad mic_id {stoich_mic_id}"
         return values
 
-    @root_validator
+    @root_validator(pre=False, skip_on_failure=True)
     def mic_references_must_exist(cls, values):
         """Make sure mics have existent metabolite and compartment ids."""
         metabolite_ids = [m.id for m in values["metabolites"]]
@@ -336,7 +336,7 @@ class KineticModel:
             ), f"{mic.id} has bad compartment_id."
         return values
 
-    @root_validator
+    @root_validator(pre=False, skip_on_failure=True)
     def er_references_must_exist(cls, values):
         """Make sure ers have existent enzyme and reaction ids."""
         enzyme_ids = [e.id for e in values["enzymes"]]
@@ -348,7 +348,7 @@ class KineticModel:
             ), f"{er.id} has bad reaction_id"
         return values
 
-    @root_validator
+    @root_validator(pre=False, skip_on_failure=True)
     def allostery_references_must_exist(cls, values):
         """Make sure allosteries' external ids exist."""
         if values["allosteries"] is None:
@@ -362,7 +362,7 @@ class KineticModel:
             assert allostery.mic_id in mic_ids, f"{allostery.id} has bad mic_id"
         return values
 
-    @root_validator
+    @root_validator(pre=False, skip_on_failure=True)
     def ci_references_must_exist(cls, values):
         """Make sure competitive inhibitions' external ids exist."""
         if values["competitive_inhibitions"] is None:
@@ -374,7 +374,7 @@ class KineticModel:
             assert ci.mic_id in mic_ids, f"{ci.mic_id} has bad mic_id"
         return values
 
-    @root_validator
+    @root_validator(pre=False, skip_on_failure=True)
     def phosphorylation_references_must_exist(cls, values):
         """Make sure phosphorylations' external ids exist."""
         if values["phosphorylations"] is None:
