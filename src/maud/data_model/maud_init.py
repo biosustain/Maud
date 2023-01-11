@@ -22,6 +22,7 @@ class InitAtomInput:
     enzyme: Optional[str] = None
     reaction: Optional[str] = None
     experiment: Optional[str] = None
+    modification_type: Optional[str] = None
 
 
 ParamInitInput = Optional[List[InitAtomInput]]
