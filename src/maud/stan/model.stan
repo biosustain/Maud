@@ -99,10 +99,21 @@ data {
   real drain_small_conc_corrector;
   real<lower=0> timepoint;
   int<lower=0,upper=1> reject_non_steady;
+  // ode configuration
+  real rel_tol_forward;
+  real abs_tol_forward;
+  real rel_tol_backward;
+  real abs_tol_backward;
+  real rel_tol_quadrature;
+  real abs_tol_quadrature;
+  int num_steps_between_checkpoints;
 }
 transformed data {
   real initial_time = 0;
   matrix[N_metabolite, N_metabolite] prior_cov_dgf_chol = cholesky_decompose(prior_cov_dgf);
+  int interpolation_polynomical = 2;
+  int solver_forward = 2;
+  int solver_backward = 2;
 }
 parameters {
   vector[N_metabolite] dgf;
@@ -141,6 +152,7 @@ transformed parameters {
     vector[N_enzyme] conc_enzyme_experiment = conc_enzyme_train[e];
     vector[N_pme] conc_pme_experiment = conc_pme_train[e];
     array[1] vector[N_mic-N_unbalanced] conc_balanced_experiment;
+    array[1] vector[N_mic-N_unbalanced] conc_balanced_guess;
     int N_eko_experiment = measure_ragged(enzyme_knockout_train_bounds, e);
     int N_pko_experiment = measure_ragged(pme_knockout_train_bounds, e);
     if (N_eko_experiment > 0){
@@ -153,14 +165,22 @@ transformed parameters {
         extract_ragged(pme_knockout_train_long, pme_knockout_train_bounds, e);
       conc_pme_experiment[pko_experiment] = rep_vector(0, N_pko_experiment);
     }
-    conc_balanced_experiment =
-      ode_bdf_tol(dbalanced_dt,
+    conc_balanced_guess =
+      ode_adjoint_tol_ctl(dbalanced_dt,
                   conc_init[e],
                   initial_time,
                   {timepoint},
-                  rel_tol, 
-                  abs_tol,
+                  rel_tol_forward, # adjoint
+                  rep_vector(abs_tol_forward, N_metabolite - N_unbalanced), # adjoint
+                  rel_tol_backward, # adjoint
+                  rep_vector(abs_tol_backward, N_metabolite - N_unbalanced), # adjoint
+                  rel_tol_quadrature,
+                  abs_tol_quadrature,
                   max_num_steps,
+                  num_steps_between_checkpoints, # adjoint
+                  interpolation_polynomical, # adjoint
+                  solver_forward, # adjoint
+                  solver_backward, # adjoint
                   conc_unbalanced_train[e],
                   balanced_mic_ix,
                   unbalanced_mic_ix,
@@ -201,6 +221,53 @@ transformed parameters {
                   phosphorylation_ix_bounds,
                   phosphorylation_type,
                   phosphorylation_pme);
+    conc_balanced_experiment[1] = 
+      solve_newton_tol(ssf,
+                       conc_balanced_guess[1],
+                       abs_tol,
+                       rel_tol,
+                       max_num_steps,
+                       conc_unbalanced_train[e],
+                       balanced_mic_ix,
+                       unbalanced_mic_ix,
+                       conc_enzyme_experiment,
+                       dgr_train[e],
+                       kcat,
+                       km,
+                       ki,
+                       transfer_constant,
+                       dissociation_constant,
+                       kcat_pme,
+                       conc_pme_experiment,
+                       drain_train[e],
+                       temperature_train[e],
+                       drain_small_conc_corrector,
+                       S,
+                       subunits,
+                       edge_type,
+                       edge_to_enzyme,
+                       edge_to_drain,
+                       ci_mic_ix,
+                       sub_km_ix_by_edge_long,
+                       sub_km_ix_by_edge_bounds,
+                       prod_km_ix_by_edge_long,
+                       prod_km_ix_by_edge_bounds,
+                       sub_by_edge_long,
+                       sub_by_edge_bounds,
+                       prod_by_edge_long,
+                       prod_by_edge_bounds,
+                       ci_ix_long,
+                       ci_ix_bounds,
+                       allostery_ix_long,
+                       allostery_ix_bounds,
+                       allostery_type,
+                       allostery_mic,
+                       edge_to_tc,
+                       phosphorylation_ix_long,
+                       phosphorylation_ix_bounds,
+                       phosphorylation_type,
+                       phosphorylation_pme);
+
     conc_train[e, balanced_mic_ix] = conc_balanced_experiment[1];
     conc_train[e, unbalanced_mic_ix] = conc_unbalanced_train[e];
     {
@@ -244,26 +311,6 @@ transformed parameters {
                                              phosphorylation_pme);
     for (j in 1:N_edge)
       flux_train[e, edge_to_reaction[j]] += edge_flux[j];
-    if (reject_non_steady == 1 &&
-        check_steady_state((S * edge_flux)[balanced_mic_ix], conc_balanced_experiment[1], steady_state_threshold_abs, steady_state_threshold_rel) == 0){
-        print("Non-steady state in experiment ", e);
-        print("Balanced metabolite concentration", conc_balanced_experiment[1]);
-        print("flux_train: ", flux_train[e]);
-        print("conc_init: ", conc_init);
-        print("conc_unbalanced_train: ", conc_unbalanced_train[e]);
-        print("conc_enzyme_experiment: ", conc_enzyme_experiment);
-        print("km: ", km);
-        print("drain_train: ", drain_train[e]);
-        print("kcat: ", kcat);
-        print("dgr_train: ", dgr_train[e]);
-        print("ki: ", ki);
-        print("dissociation_constant: ", dissociation_constant);
-        print("transfer_constant: ", transfer_constant);
-        print("kcat_pme: ", kcat_pme);
-        print("conc_pme_experiment: ", conc_pme_experiment);
-        print("psi_train: ", psi_train);
-        reject("Rejecting");
-      }
     }
   }
 }

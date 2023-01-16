@@ -26,6 +26,10 @@ import click
 from maud.getting_idatas import get_idata
 from maud.loading_maud_inputs import load_maud_input
 from maud.running_stan import predict, sample, simulate, variational
+import cmdstanpy
+
+cmdstanpy.set_cmdstan_path("/Users/nicow/.cmdstan/cmdstan-2.31.0")
+
 
 
 RELATIVE_PATH_EXAMPLE = "../../tests/data/linear"
@@ -291,7 +295,7 @@ def do_variational(data_path, output_dir):
     of cmdstanpy's diagnose and summary methods.
 
     """
-    mi = load_maud_input(data_path, mode="sample")
+    mi = load_maud_input(data_path)
     now = datetime.now().strftime("%Y%m%d%H%M%S")
     output_name = f"maud_output_vi-{mi.config.name}-{now}"
     output_path = os.path.join(output_dir, output_name)

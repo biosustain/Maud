@@ -31,9 +31,7 @@ DEFAULT_SAMPLE_CONFIG = {
     "threads_per_chain": 1,
 }
 DEFAULT_VARIATIONAL_CONFIG = {
-    "algorithm": "meanfield",
-    "output_samples": 10,
-    "require_converged": True,
+
 }
 SIM_CONFIG = {
     "chains": 1,
@@ -114,6 +112,18 @@ def simulate(mi: MaudInput, output_dir: str, n: int) -> CmdStanMCMC:
         inits=os.path.join(output_dir, "inits.json"),
         **SIM_CONFIG,
     )
+    # return model.optimize(
+    #     output_dir=output_dir,
+    #     # iter_sampling=n,
+    #     iter=1000,
+    #     data=os.path.join(output_dir, "input_data_train.json"),
+    #     inits=os.path.join(output_dir, "inits.json"),
+    #     algorithm="LBFGS",
+    #     # **SIM_CONFIG,
+    #     show_console=True,
+    #     refresh=1,
+    #     save_profile=True,
+    # )
 
 
 def set_up_output_dir(output_dir: str, mi: MaudInput):
@@ -121,7 +131,15 @@ def set_up_output_dir(output_dir: str, mi: MaudInput):
     input_path_train = os.path.join(output_dir, "input_data_train.json")
     input_path_test = os.path.join(output_dir, "input_data_test.json")
     inits_path = os.path.join(output_dir, "inits.json")
-    cmdstanpy.utils.write_stan_json(input_path_train, mi.stan_input_train)
+    cmdstanpy.utils.write_stan_json(input_path_train, 
+                                    dict(mi.stan_input_train,
+                                        **{"rel_tol_forward": 1e-6,
+                                           "abs_tol_forward": 1e-9,
+                                           "rel_tol_backward": 1,
+                                           "abs_tol_backward": 1,
+                                           "rel_tol_quadrature": 1,
+                                           "abs_tol_quadrature": 1,
+                                           "num_steps_between_checkpoints": int(100000)}))
     if mi.stan_input_test is not None:
         cmdstanpy.utils.write_stan_json(input_path_test, mi.stan_input_test)
     cmdstanpy.utils.write_stan_json(inits_path, mi.inits_dict)

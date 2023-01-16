@@ -50,5 +50,5 @@ class MaudConfig:
     reject_non_steady: bool = True
     steady_state_threshold_abs: float = 1e-8
     steady_state_threshold_rel: float = 1e-3
-    default_initial_concentration: float = 0.01
-    drain_small_conc_corrector: float = 1e-6
+    default_initial_concentration: float = 1e-6
+    drain_small_conc_corrector: float = 1e-9
