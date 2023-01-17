@@ -171,9 +171,9 @@ transformed parameters {
                   initial_time,
                   {timepoint},
                   rel_tol_forward, # adjoint
-                  rep_vector(abs_tol_forward, N_metabolite - N_unbalanced), # adjoint
+                  rep_vector(abs_tol_forward, N_mic - N_unbalanced), # adjoint
                   rel_tol_backward, # adjoint
-                  rep_vector(abs_tol_backward, N_metabolite - N_unbalanced), # adjoint
+                  rep_vector(abs_tol_backward, N_mic - N_unbalanced), # adjoint
                   rel_tol_quadrature,
                   abs_tol_quadrature,
                   max_num_steps,
