@@ -222,11 +222,11 @@ transformed parameters {
                   phosphorylation_type,
                   phosphorylation_pme);
     conc_balanced_experiment[1] = 
-      solve_newton_tol(ssf,
+      solve_powell_tol(ssf,
                        conc_balanced_guess[1],
                        abs_tol,
                        rel_tol,
-                       max_num_steps,
+                       max_num_steps/50,
                        conc_unbalanced_train[e],
                        balanced_mic_ix,
                        unbalanced_mic_ix,

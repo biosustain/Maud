@@ -135,10 +135,10 @@ def set_up_output_dir(output_dir: str, mi: MaudInput):
                                     dict(mi.stan_input_train,
                                         **{"rel_tol_forward": 1e-6,
                                            "abs_tol_forward": 1e-9,
-                                           "rel_tol_backward": 1,
-                                           "abs_tol_backward": 1,
-                                           "rel_tol_quadrature": 1,
-                                           "abs_tol_quadrature": 1,
+                                           "rel_tol_backward": 1e-6,
+                                           "abs_tol_backward": 1e-9,
+                                           "rel_tol_quadrature": 1e-6,
+                                           "abs_tol_quadrature": 1e-9,
                                            "num_steps_between_checkpoints": int(100000)}))
     if mi.stan_input_test is not None:
         cmdstanpy.utils.write_stan_json(input_path_test, mi.stan_input_test)
