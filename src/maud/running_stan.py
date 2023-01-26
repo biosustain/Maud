@@ -118,17 +118,13 @@ def simulate(mi: MaudInput, output_dir: str, n: int) -> CmdStanMCMC:
 
 def set_up_output_dir(output_dir: str, mi: MaudInput):
     """Write input data and inits to the output directory."""
-    input_filepath_train = os.path.join(output_dir, "input_data_train.json")
-    input_filepath_test = os.path.join(output_dir, "input_data_test.json")
-    inits_filepath = os.path.join(output_dir, "inits.json")
-    cmdstanpy.utils.write_stan_json(
-        input_filepath_train, mi.stan_input_train.stan_input_dict
-    )
+    input_path_train = os.path.join(output_dir, "input_data_train.json")
+    input_path_test = os.path.join(output_dir, "input_data_test.json")
+    inits_path = os.path.join(output_dir, "inits.json")
+    cmdstanpy.utils.write_stan_json(input_path_train, mi.stan_input_train)
     if mi.stan_input_test is not None:
-        cmdstanpy.utils.write_stan_json(
-            input_filepath_test, mi.stan_input_test.stan_input_dict
-        )
-    cmdstanpy.utils.write_stan_json(inits_filepath, mi.inits)
+        cmdstanpy.utils.write_stan_json(input_path_test, mi.stan_input_test)
+    cmdstanpy.utils.write_stan_json(inits_path, mi.inits_dict)
 
 
 def predict(
@@ -164,9 +160,9 @@ def predict(
     chains = sample_stats["chain"]
     draws = sample_stats["draw"]
     dims = {
-        "conc": ["experiment", "mic"],
-        "conc_enzyme": ["experiment", "enzyme"],
-        "flux": ["experiment", "reaction"],
+        "conc_test": ["experiment", "mic"],
+        "conc_enzyme_test": ["experiment", "enzyme"],
+        "flux_test": ["experiment", "reaction"],
     }
     for chain in chains:
         for draw in draws:
@@ -198,9 +194,7 @@ def predict(
             idata_draw = az.from_cmdstan(
                 mcmc_draw.runset.csv_files,
                 coords={
-                    "experiment": [
-                        e.id for e in mi.measurements.experiments if e.is_test
-                    ],
+                    "experiment": [e.id for e in mi.experiments if e.is_test],
                     "mic": [m.id for m in mi.kinetic_model.mics],
                     "enzyme": [e.id for e in mi.kinetic_model.enzymes],
                     "reaction": [r.id for r in mi.kinetic_model.reactions],

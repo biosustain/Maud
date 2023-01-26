@@ -1,0 +1,21 @@
+[[experiment]]
+id = "condition1"
+is_train = true
+is_test = true
+measurements = [
+  {target_type = "mic", metabolite = "M1", compartment = "c", value = 1.44218, error_scale = 0.1},
+  {target_type = "mic", metabolite = "M2", compartment = "c", value = 1.43082, error_scale = 0.1},
+  {target_type = "mic", metabolite = "M2", compartment = "e", value = 1, error_scale = 0.05},
+  {target_type = "flux", reaction = r3, value = 0.125573, error_scale = 0.01},
+]
+
+[[experiment]]
+id = "condition2"
+is_train = true
+is_test = true
+measurements = [
+  {target_type = "mic", metabolite = "M1", compartment = "c", value = 1.66444, error_scale = 0.1},
+  {target_type = "mic", metabolite = "M2", compartment = "c", value = 1.23255, error_scale = 0.1},
+  {target_type = "mic", metabolite = "M2", compartment = "e", value = 1, error_scale = 0.05},
+  {target_type = "flux", metabolite = "r3", value = 0.107911, error_scale = 0.01},
+]

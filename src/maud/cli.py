@@ -175,7 +175,7 @@ def do_simulate(data_path, output_dir, n):
     idata.to_json(os.path.join(output_path, "idata.json"))
     print("\n\nSimulated concentrations:")
     print(
-        idata.posterior["conc"]
+        idata.posterior["conc_train"]
         .mean(dim=["chain", "draw"])
         .to_series()
         .unstack()
@@ -183,7 +183,7 @@ def do_simulate(data_path, output_dir, n):
     )
     print("\n\nSimulated fluxes:")
     print(
-        idata.posterior["flux"]
+        idata.posterior["flux_train"]
         .mean(dim=["chain", "draw"])
         .to_series()
         .unstack()
@@ -191,27 +191,39 @@ def do_simulate(data_path, output_dir, n):
     )
     print("\n\nSimulated enzyme concentrations:")
     print(
-        idata.posterior["conc_enzyme"]
+        idata.posterior["conc_enzyme_train"]
         .mean(dim=["chain", "draw"])
         .to_series()
         .unstack()
         .T
     )
     print("\n\nSimulated reaction delta Gs:")
-    print(idata.posterior["dgrs"].mean(dim=["chain", "draw"]).to_series())
+    print(idata.posterior["dgr_train"].mean(dim=["chain", "draw"]).to_series())
     print("\n\nSimulated measurements:")
-    print(idata.posterior["yconc_sim"].mean(dim=["chain", "draw"]).to_series())
-    print(idata.posterior["yflux_sim"].mean(dim=["chain", "draw"]).to_series())
-    print("\n\nSimulated log likelihoods:")
     print(
-        idata.posterior["log_lik_conc"].mean(dim=["chain", "draw"]).to_series()
+        idata.posterior_predictive["yrep_conc_train"]
+        .mean(dim=["chain", "draw"])
+        .to_series()
     )
     print(
-        idata.posterior["log_lik_flux"].mean(dim=["chain", "draw"]).to_series()
+        idata.posterior_predictive["yrep_flux_train"]
+        .mean(dim=["chain", "draw"])
+        .to_series()
+    )
+    print("\n\nSimulated log likelihoods:")
+    print(
+        idata.log_likelihood["llik_conc_train"]
+        .mean(dim=["chain", "draw"])
+        .to_series()
+    )
+    print(
+        idata.log_likelihood["llik_flux_train"]
+        .mean(dim=["chain", "draw"])
+        .to_series()
     )
     print("\n\nSimulated allostery terms:")
     print(
-        idata.posterior["allostery"]
+        idata.posterior["allostery_train"]
         .mean(dim=["chain", "draw"])
         .to_series()
         .unstack()
@@ -219,7 +231,7 @@ def do_simulate(data_path, output_dir, n):
     )
     print("\n\nSimulated reversibility terms:")
     print(
-        idata.posterior["reversibility"]
+        idata.posterior["reversibility_train"]
         .mean(dim=["chain", "draw"])
         .to_series()
         .unstack()
@@ -227,7 +239,7 @@ def do_simulate(data_path, output_dir, n):
     )
     print("\n\nSimulated saturation terms:")
     print(
-        idata.posterior["saturation"]
+        idata.posterior["saturation_train"]
         .mean(dim=["chain", "draw"])
         .to_series()
         .unstack()
@@ -236,14 +248,16 @@ def do_simulate(data_path, output_dir, n):
     if mi.kinetic_model.phosphorylations is not None:
         print("\n\nSimulated phosphorylation terms:")
         print(
-            idata.posterior["phosphorylation"]
+            idata.posterior["phosphorylation_train"]
             .mean(dim=["chain", "draw"])
             .to_series()
             .unstack()
             .T
         )
     print("\n\nSimulated membrane potential:")
-    print(idata.posterior["psi"].mean(dim=["chain", "draw"]).to_series().T)
+    print(
+        idata.posterior["psi_train"].mean(dim=["chain", "draw"]).to_series().T
+    )
     return output_path
 
 

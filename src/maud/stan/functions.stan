@@ -43,7 +43,7 @@ functions {
     return out;
   }
 
-  vector get_dgrs(matrix S, vector dgf, real temperature, int[] mic_to_met, vector water_stoichiometry, vector trans_charge, real psi){
+  vector get_dgr(matrix S, vector dgf, real temperature, int[] mic_to_met, vector water_stoichiometry, vector trans_charge, real psi){
     /*
         Calculate dgr standard from metabolite formation energies, assuming water's
         formation energy is known exactly.
@@ -61,7 +61,7 @@ functions {
         formation energy is known exactly.
     */
     real minus_RT = -0.008314 * temperature;
-    vector[cols(S)] dgrs = get_dgrs(S, dgf, temperature, mic_to_met, water_stoichiometry, trans_charge, psi);
+    vector[cols(S)] dgrs = get_dgr(S, dgf, temperature, mic_to_met, water_stoichiometry, trans_charge, psi);
     return exp(dgrs / minus_RT);
   }
 

@@ -1,17 +1,17 @@
 name = "linear"
 kinetic_model_file = "kinetic_model.toml"
-priors_file = "priors.csv"
-measurements_file = "measurements.csv"
-experimental_setup_file = "experimental_setup.toml"
+priors_file = "priors.toml"
+experiments_file = "experiments.toml"
 likelihood = true
 steady_state_threshold_abs = 1e-6
 
 [cmdstanpy_config]
 refresh = 1
-iter_warmup = 20
-iter_sampling = 20
+iter_warmup = 40
+iter_sampling = 40
 chains = 4
 save_warmup = true
+seed = 1234
 
 [ode_config]
 abs_tol = 1e-5

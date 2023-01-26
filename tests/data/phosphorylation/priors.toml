@@ -1,0 +1,47 @@
+kcat = [
+  {enzyme = "r1", reaction = "r1", exploc = 1, scale = 0.6},
+  {enzyme = "r2", reaction = "r2", exploc = 1, scale = 0.6},
+  {enzyme = "r3", reaction = "r3", exploc = 1, scale = 0.6},
+]
+km = [
+  {metabolite = "M1", compartment = "e", enzyme = "r1", exploc = 1, scale = 0.6},
+  {metabolite = "M1", compartment = "c", enzyme = "r1", exploc = 1, scale = 0.6},
+  {metabolite = "M1", compartment = "c", enzyme = "r2", exploc = 1, scale = 0.6},
+  {metabolite = "M2", compartment = "c", enzyme = "r2", exploc = 1, scale = 0.6},
+  {metabolite = "M2", compartment = "c", enzyme = "r3", exploc = 1, scale = 0.6},
+  {metabolite = "M2", compartment = "e", enzyme = "r3", exploc = 1, scale = 0.6},
+]
+dgf = [
+  {metabolite = "M1", location = -1, scale = 0.05},
+  {metabolite = "M2", location = -2, scale = 0.05},
+]
+
+ki = [
+  {metabolite = "M2", compartment = "c", enzyme = "r2", reaction = "r2", exploc = 1, scale = 0.6},
+]
+
+transfer_constant = [
+  {enzyme = "r1", exploc = 1, scale = 0.6},
+  {enzyme = "r2", exploc = 1, scale = 0.6},
+]
+dissociation_constant =
+  {metabolite = "M2", compartment = "c", enzyme = "r1", exploc = 1, scale = 0.6, modification_type = "activation"},
+  {metabolite = "M1", compartment = "c", enzyme = "r2", exploc = 1, scale = 0.6, modification_type = "inhibition"},
+]
+
+psi = [
+  {experiment = "condition1", location = -0.95, scale = 0.2},
+  {experiment = "condition2", location = -0.95, scale = 0.2},
+]
+
+conc_pme = [
+  {experiment = "condition1", phosphorylation_modifying_enzyme = "pi2", exploc = 0.9, scale = 0.2},
+  {experiment = "condition1", phosphorylation_modifying_enzyme = "pa2", exploc = 1, scale = 0.2},
+  {experiment = "condition2", phosphorylation_modifying_enzyme = "pi2", exploc = 0.9, scale = 0.2},
+  {experiment = "condition2", phosphorylation_modifying_enzyme = "pa2", exploc = 1, scale = 0.2},
+]
+
+kcat_pme = [
+  {phosphorylation_modifying_enzyme = "pi2", exploc = 0.5, scale = 0.6},
+  {phosphorylation_modifying_enzyme = "pa2", exploc = 1.2, scale = 0.6},
+]

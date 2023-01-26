@@ -1,0 +1,10 @@
+[[experiment]]
+id = "condition1"
+is_train = true
+is_test = true
+measurements = [
+  {target_type = "mic", metabolite = "B", compartment = "c", value = 0.323117, error_scale = 0.1},
+  {target_type = "mic", metabolite = "C", compartment = "c", value = 3.021870, error_scale = 0.1},
+  {target_type = "flux", reaction = "r3", value = 0.421816, error_scale = 0.01},
+  {target_type = "flux", reaction = "r4", value = 2.116740, error_scale = 0.01},
+] 

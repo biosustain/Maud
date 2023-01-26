@@ -44,20 +44,11 @@ humans.
    theory/transported_charges
    theory/papers
 
-..
-   .. toctree::
-      :maxdepth: 1
-      :caption: Case studies:
-
-      case_studies/ecoli
-
-
 .. toctree::
    :maxdepth: 1
    :caption: How Maud works:
 
-   how_maud_works/data_model
-   how_maud_works/computation
+   computation
 
 
 

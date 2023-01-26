@@ -1,0 +1,39 @@
+kcat = [
+  {enzyme = "r1", exploc = 1, scale = 0.6},
+  {enzyme = "r2", exploc = 1, scale = 0.6},
+  {enzyme = "r3", exploc = 1, scale = 0.6},
+]
+km = [
+  {metabolite = "M1", compartment = "e", enzyme = "r1", exploc = 1, scale = 0.6},
+  {metabolite = "M1", compartment = "c", enzyme = "r1", exploc = 1, scale = 0.6},
+  {metabolite = "M1", compartment = "c", enzyme = "r2", exploc = 1, scale = 0.6},
+  {metabolite = "M2", compartment = "c", enzyme = "r2", exploc = 1, scale = 0.6},
+  {metabolite = "M2", compartment = "c", enzyme = "r3", exploc = 1, scale = 0.6},
+  {metabolite = "M2", compartment = "e", enzyme = "r3", exploc = 1, scale = 0.6},
+]
+dgf = [
+  {metabolite = "M1", location = -1, scale = 0.05},
+  {metabolite = "M2", location = -2, scale = 0.05},
+]
+dissociation_constant = [
+  {metabolite = "M1", compartment = "c", enzyme = "r1", exploc = 0.5, scale = 0.6, modification_type = "inhibition"},
+  {metabolite = "M2", compartment = "c", enzyme = "r1", exploc = 1, scale = 0.6  , modification_type = "activation"},
+]
+transfer_constant = [
+  {enzyme = "r1", exploc = 1, scale = 0.6},
+]
+drain = [
+  {metabolite = "M2", compartment = "e", experiment = "condition1", location = 0.125573, scale = 0.01},
+  {metabolite = "M2", compartment = "e", experiment = "condition2", location = 0.107911, scale = 0.01},
+]
+conc_enzyme = [
+  {enzyme = "r1", experiment = "condition1", exploc = 1, scale = 0.05},
+  {enzyme = "r2", experiment = "condition1", exploc = 1, scale = 0.05},
+  {enzyme = "r3", experiment = "condition1", exploc = 1, scale = 0.05},
+  {enzyme = "r1", experiment = "condition2", exploc = 1.5, scale = 0.05},
+  {enzyme = "r2", experiment = "condition2", exploc = 1.5, scale = 0.05},
+]
+conc_unbalanced = [
+  {metabolite = "M1", compartment = "e", experiment = "condition1", exploc = 1, scale = 0.05},
+  {metabolite = "M1", compartment = "e", experiment = "condition2", exploc = 2, scale = 0.05},
+]

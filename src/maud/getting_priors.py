@@ -1,135 +1,136 @@
-"""Functions for creating *Prior* and PriorSet objects."""
+"""Functions for creating prior objects from PriorInput objects.
 
-from functools import partial
+This module handles setting priors to default values and assigning priors
+consistently with their ids.
+
+"""
+
+from typing import List, Optional, Tuple, Union
 
 import numpy as np
 import pandas as pd
 
 from maud.data_model.hardcoding import ID_SEPARATOR
-from maud.data_model.prior_set import (
-    IndPrior1d,
-    IndPrior2d,
-    MultiVariateNormalPrior1d,
-    PriorSet,
-    UserPriorInput,
-)
-from maud.data_model.stan_variable_set import StanVariable, StanVariableSet
+from maud.data_model.maud_parameter import IdComponent
+from maud.data_model.prior import IndPrior1d, IndPrior2d, PriorMVN
+from maud.data_model.prior_input import IndPriorAtomInput, PriorMVNInput
 from maud.utils import (
     get_lognormal_parameters_from_quantiles,
     get_normal_parameters_from_quantiles,
-    series_to_diag_df,
 )
 
 
-def load_1d_prior(
-    user_df: pd.DataFrame, stan_variable: StanVariable
-) -> IndPrior1d:
-    """Get an IndPrior1d object from a dataframe and StanVariable.
+def get_loc_and_scale(
+    ipai: IndPriorAtomInput, non_negative: bool
+) -> Tuple[float, float]:
+    """Get location and scale from a user input prior.
 
-    The StanVariable provides defaults and is included in the return value.
+    This is non-trivial because of the "exploc" input and the option to input
+    priors as percentiles.
+
     """
-    location = pd.Series(stan_variable.default_loc, index=stan_variable.ids[0])
-    scale = pd.Series(stan_variable.default_scale, index=stan_variable.ids[0])
-    user_df_sv = user_df.loc[lambda df: df["parameter"] == stan_variable.name]
-    id_cols = [idc.value for idc in stan_variable.id_components[0]]
-    if all(c not in user_df_sv.columns for c in id_cols):
-        return IndPrior1d(stan_variable, location, scale)
-    ids = user_df_sv[id_cols].apply(ID_SEPARATOR.join, axis=1).tolist()
-    qf = (
-        partial(get_lognormal_parameters_from_quantiles, p1=0.01, p2=0.99)
-        if stan_variable.non_negative
-        else partial(get_normal_parameters_from_quantiles, p1=0.01, p2=0.99)
-    )
-    pct_loc, pct_scale = qf(x1=user_df_sv["pct1"], x2=user_df_sv["pct99"])
-    ls_loc, ls_scale = user_df_sv["location"], user_df_sv["scale"]
-    # this is because prior locations for non-negative variables are enterred
-    # unlogged:
-    if stan_variable.non_negative:
-        ls_loc = np.log(ls_loc)
-    is_ls = user_df_sv[["location", "scale"]].notnull().all(axis=1)
-    location.loc[ids] = np.where(is_ls, ls_loc, pct_loc)
-    scale.loc[ids] = np.where(is_ls, ls_scale, pct_scale)
-    return IndPrior1d(stan_variable, location, scale)
-
-
-def load_2d_prior(
-    user_df: pd.DataFrame, stan_variable: StanVariable
-) -> IndPrior2d:
-    """Get an IndPrior2d object from a dataframe and StanVariable.
-
-    The StanVariable provides defaults and is included in the return value.
-    """
-    loc = pd.DataFrame(
-        stan_variable.default_loc,
-        index=stan_variable.ids[0],
-        columns=stan_variable.ids[1],
-    )
-    scale = pd.DataFrame(
-        stan_variable.default_scale,
-        index=stan_variable.ids[0],
-        columns=stan_variable.ids[1],
-    )
-    user = user_df.loc[lambda df: df["parameter"] == stan_variable.name].copy()
-    row_id_cols = [idc.value for idc in stan_variable.id_components[1]]
-    if all(c not in user.columns for c in row_id_cols):
-        return IndPrior2d(stan_variable, loc, scale)
-    user["col_id"] = (
-        pd.NA
-        if user[row_id_cols].empty
-        else (user[row_id_cols].apply(ID_SEPARATOR.join, axis=1))
-    )
-    user["row_id"] = pd.NA if user["experiment"].empty else user["experiment"]
-    print(user)
-    # this is because prior locations for non-negative variables are enterred
-    # unlogged:
-    if stan_variable.non_negative:
-        user["location"] = np.log(user["location"])
-    qf = (
-        partial(get_lognormal_parameters_from_quantiles, p1=0.01, p2=0.99)
-        if stan_variable.non_negative
-        else partial(get_normal_parameters_from_quantiles, p1=0.01, p2=0.99)
-    )
-    user["pct_loc"], user["pct_scale"] = qf(x1=user["pct1"], x2=user["pct99"])
-    is_ls = user[["location", "scale"]].notnull().all(axis=1)
-    user["used_loc"] = np.where(is_ls, user["location"], user["pct_loc"])
-    user["used_scale"] = np.where(is_ls, user["scale"], user["pct_scale"])
-    if not user.empty:
-        user_loc = user.set_index(["row_id", "col_id"])["used_loc"].unstack()
-        user_scale = user.set_index(["row_id", "col_id"])[
-            "used_scale"
-        ].unstack()
-        loc = loc.mask(user_loc.notnull(), user_loc)
-        scale = scale.mask(user_scale.notnull(), user_scale)
-    return IndPrior2d(stan_variable, loc, scale)
-
-
-def get_prior_set(upi: UserPriorInput, sv: StanVariableSet) -> PriorSet:
-    """Get a PriorSet from a UserPriorInput and StanVariableSet."""
-    if upi.dgf_loc is not None and upi.dgf_cov is not None:
-        met_order = sv.dgf.ids[0]
-        prior_dgf = MultiVariateNormalPrior1d(
-            sv.dgf,
-            upi.dgf_loc.loc[met_order],
-            upi.dgf_cov.loc[met_order, met_order],
+    if ipai.location is not None and ipai.scale is not None:
+        return ipai.location, ipai.scale
+    elif ipai.exploc is not None and ipai.scale is not None:
+        return np.log(ipai.exploc), ipai.scale
+    elif ipai.pct1 is not None and ipai.pct99 is not None:
+        quantfunc = (
+            get_lognormal_parameters_from_quantiles
+            if non_negative
+            else get_normal_parameters_from_quantiles
         )
+        return quantfunc(ipai.pct1, 0.01, ipai.pct99, 0.99)
     else:
-        ip = load_1d_prior(upi.main_table, sv.dgf)
-        prior_dgf = MultiVariateNormalPrior1d(
-            sv.dgf, ip.location, series_to_diag_df(ip.scale).fillna(0)
-        )
-    return PriorSet(
-        dgf=prior_dgf,
-        km=load_1d_prior(upi.main_table, sv.km),
-        ki=load_1d_prior(upi.main_table, sv.ki),
-        kcat=load_1d_prior(upi.main_table, sv.kcat),
-        psi=load_1d_prior(upi.main_table, sv.psi),
-        dissociation_constant=load_1d_prior(
-            upi.main_table, sv.dissociation_constant
-        ),
-        transfer_constant=load_1d_prior(upi.main_table, sv.transfer_constant),
-        kcat_pme=load_1d_prior(upi.main_table, sv.kcat_pme),
-        drain=load_2d_prior(upi.main_table, sv.drain),
-        conc_enzyme=load_2d_prior(upi.main_table, sv.conc_enzyme),
-        conc_unbalanced=load_2d_prior(upi.main_table, sv.conc_unbalanced),
-        conc_pme=load_2d_prior(upi.main_table, sv.conc_pme),
+        raise ValueError("Incorrect prior input.")
+
+
+def unpack_ind_prior_atom_input(
+    ipai: IndPriorAtomInput,
+    id_components: List[List[IdComponent]],
+    non_negative: bool,
+) -> Tuple[List[str], float, float]:
+    """Get a 0d prior from a user input."""
+    ids = [
+        ID_SEPARATOR.join([getattr(ipai, c) for c in idci])
+        for idci in id_components
+    ]
+    loc, scale = get_loc_and_scale(ipai, non_negative)
+    return ids, loc, scale
+
+
+def get_ind_prior_1d(
+    pi: Optional[List[IndPriorAtomInput]],
+    ids: List[str],
+    id_components: List[List[IdComponent]],
+    non_negative: bool,
+    default_loc: float,
+    default_scale: float,
+) -> IndPrior1d:
+    """Get an independent 1d prior from a prior input and StanVariable."""
+    if len(ids) == 0:
+        return IndPrior1d(location=[], scale=[])
+    loc_series = pd.Series(default_loc, index=ids)
+    scale_series = pd.Series(default_scale, index=ids)
+    if pi is not None:
+        for ipai in pi:
+            ids_i, loc_i, scale_i = unpack_ind_prior_atom_input(
+                ipai, id_components, non_negative
+            )
+            if ids_i[0] in loc_series.index:
+                loc_series.update({ids_i[0]: loc_i})
+                scale_series.update({ids_i[0]: scale_i})
+    return IndPrior1d(loc_series.tolist(), scale_series.tolist())
+
+
+def get_ind_prior_2d(
+    pi: Optional[List[IndPriorAtomInput]],
+    ids: List[List[str]],
+    id_components: List[List[IdComponent]],
+    non_negative: bool,
+    default_loc: float,
+    default_scale: float,
+) -> IndPrior2d:
+    """Get an independent 2d prior from a prior input and StanVariable."""
+    if any(len(ids_i) == 0 for ids_i in ids):
+        return IndPrior2d(location=[[]], scale=[[]])
+    loc_df = pd.DataFrame(float(default_loc), index=ids[0], columns=ids[1])
+    scale_df = pd.DataFrame(float(default_scale), index=ids[0], columns=ids[1])
+    if pi is not None:
+        for ipai in pi:
+            ids_i, loc_i, scale_i = unpack_ind_prior_atom_input(
+                ipai, id_components, non_negative
+            )
+            if ids_i[0] in loc_df.index and ids_i[1] in loc_df.columns:
+                loc_df.loc[ids_i[0], ids_i[1]] = loc_i
+                scale_df.loc[ids_i[0], ids_i[1]] = scale_i
+    return IndPrior2d(loc_df.values.tolist(), scale_df.values.tolist())
+
+
+def get_mvn_prior(
+    pi: Optional[Union[List[IndPriorAtomInput], PriorMVNInput]],
+    ids: List[str],
+    id_components: List[List[IdComponent]],
+    non_negative: bool,
+    default_loc: float,
+    default_scale: float,
+) -> PriorMVN:
+    """Get a multivariate normal prior from a prior input and StanVariable."""
+    loc_series = pd.Series(default_loc, index=ids)
+    cov_df = pd.DataFrame(
+        np.diagflat(np.tile(default_scale, len(ids))), index=ids, columns=ids
     )
+    if isinstance(pi, PriorMVNInput):
+        loc_series = pd.Series(pi.mean_vector, index=pi.ids).reindex(ids)
+        cov_df = (
+            pd.DataFrame(pi.covariance_matrix, index=pi.ids, columns=pi.ids)
+            .reindex(ids)
+            .reindex(columns=ids)
+        )
+    elif isinstance(pi, list):
+        for ipai in pi:
+            ids_i, loc_i, cov_ii = unpack_ind_prior_atom_input(
+                ipai, id_components, non_negative
+            )
+            loc_series.loc[ids_i[0]] = loc_i
+            cov_df.loc[ids_i[0], ids_i[0]] = cov_ii
+    return PriorMVN(loc_series.tolist(), cov_df.values.tolist())

@@ -1,27 +1,37 @@
 """Functions for creating InferenceData objects from Maud outputs."""
-
 from typing import List
 
 import arviz as az
-from arviz.utils import Numba
 
+from maud.data_model.experiment import MeasurementType
 from maud.data_model.hardcoding import ID_SEPARATOR
 from maud.data_model.maud_input import MaudInput
-from maud.utils import join_str_cols
 
 
 def get_idata(csvs: List[str], mi: MaudInput, mode: str) -> az.InferenceData:
     """Get an arviz InferenceData object from Maud csvs."""
 
-    Numba.disable_numba()
     experiments = (
-        [e.id for e in mi.measurements.experiments if e.is_train]
+        [e for e in mi.experiments if e.is_train]
         if mode == "train"
-        else [e.id for e in mi.measurements.experiments if e.is_test]
+        else [e for e in mi.experiments if e.is_test]
+    )
+    yconc_coords, yflux_coords, yenz_coords = (
+        [
+            f"{e.id}{ID_SEPARATOR}{m.target_id}"
+            for e in experiments
+            for m in e.measurements
+            if m.target_type == t
+        ]
+        for t in [
+            MeasurementType.MIC,
+            MeasurementType.FLUX,
+            MeasurementType.ENZYME,
+        ]
     )
     coords = {
         "enzymes": [e.id for e in mi.kinetic_model.enzymes],
-        "experiments": experiments,
+        "experiments": [e.id for e in experiments],
         "reactions": [r.id for r in mi.kinetic_model.reactions],
         "drains": [r.id for r in mi.kinetic_model.drains],
         "metabolites": [m.id for m in mi.kinetic_model.metabolites],
@@ -34,8 +44,7 @@ def get_idata(csvs: List[str], mi: MaudInput, mode: str) -> az.InferenceData:
         if mi.kinetic_model.phosphorylations is not None
         else [],
         "phosphorylation_modifying_enzymes": [
-            pme.id
-            for pme in mi.kinetic_model.phosphorylation_modifying_enzymes
+            pme.id for pme in mi.kinetic_model.phosphorylation_modifying_enzymes
         ]
         if mi.kinetic_model.phosphorylation_modifying_enzymes is not None
         else [],
@@ -52,60 +61,62 @@ def get_idata(csvs: List[str], mi: MaudInput, mode: str) -> az.InferenceData:
         ]
         if mi.kinetic_model.competitive_inhibitions is not None
         else [],
-        "kms": mi.stan_variable_set.km.ids[0],
-        "kis": mi.stan_variable_set.ki.ids[0],
-        "dissociation_constants": (
-            mi.stan_variable_set.dissociation_constant.ids[0]
-        ),
-        "yconcs": join_str_cols(
-            mi.measurements.yconc[["experiment_id", "target_id"]].loc[
-                lambda df: df["experiment_id"].isin(experiments)
-            ],
-            sep=ID_SEPARATOR,
-        ).to_list(),
-        "yfluxs": join_str_cols(
-            mi.measurements.yflux[["experiment_id", "target_id"]].loc[
-                lambda df: df["experiment_id"].isin(experiments)
-            ],
-            sep=ID_SEPARATOR,
-        ).to_list(),
-        "yenz": join_str_cols(
-            mi.measurements.yenz[["experiment_id", "target_id"]].loc[
-                lambda df: df["experiment_id"].isin(experiments)
-            ],
-            sep=ID_SEPARATOR,
-        ).to_list(),
+        "kms": mi.parameters.km.ids[0],
+        "kis": mi.parameters.ki.ids[0],
+        "dissociation_constants": (mi.parameters.dissociation_constant.ids[0]),
+        "yconcs": yconc_coords,
+        "yfluxs": yflux_coords,
+        "yenz": yenz_coords,
     }
+    dims = {
+        f"flux_{mode}": ["experiments", "reactions"],
+        f"conc_{mode}": ["experiments", "mics"],
+        f"log_conc_enzyme_{mode}_z": ["experiments", "enzymes"],
+        f"conc_enzyme_{mode}": ["experiments", "enzymes"],
+        f"conc_unbalanced_{mode}": ["experiments", "unbalanced_mics"],
+        f"conc_pme_{mode}": [
+            "experiments",
+            "phosphorylation_modifying_enzymes",
+        ],
+        f"drain_{mode}": ["experiments", "drains"],
+        f"psi_{mode}": ["experiments"],
+        f"saturation_{mode}": ["experiments", "edges"],
+        f"allostery_{mode}": ["experiments", "edges"],
+        f"phosphorylation_{mode}": ["experiments", "edges"],
+        f"reversibility_{mode}": ["experiments", "edges"],
+        "dissociation_constant": ["allosteries"],
+        "log_transfer_constant_z": ["allosteric_enzymes"],
+        "transfer_constant": ["allosteric_enzymes"],
+        "dgf": ["metabolites"],
+        "dgr_train": ["experiments", "edges"],
+        "keq": ["experiments", "edges"],
+        "kcat": ["enzymes"],
+        "kcat_pme": ["phosphorylation_modifying_enzymes"],
+        "km": ["kms"],
+        "ki": ["kis"],
+        f"yrep_conc_{mode}": ["yconcs"],
+        f"yrep_flux_{mode}": ["yfluxs"],
+        f"llik_conc_{mode}": ["yconcs"],
+        f"llik_flux_{mode}": ["yfluxs"],
+    }
+    # for zvar in [
+    #     "kcat",
+    #     "km",
+    #     "kcat_pme",
+    #     "ki",
+    #     "dissociation_constant",
+    #     "transfer_constant",
+    #     "psi_train",
+    #     f"drain_{mode}",
+    #     f"conc_unbalanced_{mode}",
+    #     f"conc_pme_{mode}"
+    # ]:
+    #     dims[f"log_{zvar}_z"] = dims[zvar]
     return az.from_cmdstan(
-        csvs,
+        posterior=csvs,
         coords=coords,
-        dims={
-            "flux": ["experiments", "reactions"],
-            "conc": ["experiments", "mics"],
-            "conc_enzyme": ["experiments", "enzymes"],
-            "conc_unbalanced": ["experiments", "unbalanced_mics"],
-            "conc_pme": ["experiments", "phosphorylation_modifying_enzymes"],
-            "drain": ["experiments", "drains"],
-            "dissociation_constant": ["allosteries"],
-            "transfer_constant": ["allosteric_enzymes"],
-            "dgf": ["metabolites"],
-            "dgrs": ["experiments", "edges"],
-            "keq": ["experiments", "edges"],
-            "kcat": ["enzymes"],
-            "kcat_pme": ["phosphorylation_modifying_enzymes"],
-            "km": ["kms"],
-            "ki": ["kis"],
-            "psi": ["experiments"],
-            "yconc_sim": ["yconcs"],
-            "yflux_sim": ["yfluxs"],
-            "yenz_sim": ["yenzs"],
-            "log_lik_conc": ["yconcs"],
-            "log_lik_flux": ["yfluxs"],
-            "log_lik_enz": ["yenzs"],
-            "saturation": ["experiments", "edges"],
-            "allostery": ["experiments", "edges"],
-            "phosphorylation": ["experiments", "edges"],
-            "reversibility": ["experiments", "edges"],
-        },
+        log_likelihood=[f"llik_conc_{mode}", f"llik_flux_{mode}"],
+        posterior_predictive=[f"yrep_conc_{mode}", f"yrep_flux_{mode}"],
+        dims=dims,
         save_warmup=True,
     )
