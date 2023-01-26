@@ -70,15 +70,13 @@ def get_prior_inputs(parameters: ParameterSet) -> Tuple[Dict, Dict]:
         f"priors_{p.name}": [p.prior.location, p.prior.scale]
         for p in map(lambda f: getattr(parameters, f.name), fields(parameters))
         if p.prior_in_train_model
-        and isinstance(p.prior, IndPrior1d)
-        or isinstance(p.prior, IndPrior2d)
+        and (isinstance(p.prior, IndPrior1d) or isinstance(p.prior, IndPrior2d))
     }
     ind_priors_test = {
         f"priors_{p.name}": [p.prior.location, p.prior.scale]
         for p in map(lambda f: getattr(parameters, f.name), fields(parameters))
         if p.prior_in_test_model
-        and isinstance(p.prior, IndPrior1d)
-        or isinstance(p.prior, IndPrior2d)
+        and (isinstance(p.prior, IndPrior1d) or isinstance(p.prior, IndPrior2d))
     }
     assert hasattr(parameters.dgf.prior, "covariance_matrix")
     dgf_priors = {
