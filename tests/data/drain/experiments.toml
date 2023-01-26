@@ -7,7 +7,7 @@ measurements = [
   {target_type = "mic", metabolite = "M2", compartment = "c", value = 1.43082, error_scale = 0.1},
   {target_type = "mic", metabolite = "M2", compartment = "e", value = 1, error_scale = 0.05},
   {target_type = "flux", reaction = r3, value = 0.125573, error_scale = 0.01},
-]p
+]
 
 [[experiment]]
 id = "condition2"

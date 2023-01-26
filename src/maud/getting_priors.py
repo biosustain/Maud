@@ -90,7 +90,7 @@ def get_ind_prior_2d(
     default_loc: float,
     default_scale: float,
 ) -> IndPrior2d:
-    """Get an independent 1d prior from a prior input and StanVariable."""
+    """Get an independent 2d prior from a prior input and StanVariable."""
     if any(len(ids_i) == 0 for ids_i in ids):
         return IndPrior2d(location=[[]], scale=[[]])
     loc_df = pd.DataFrame(float(default_loc), index=ids[0], columns=ids[1])
