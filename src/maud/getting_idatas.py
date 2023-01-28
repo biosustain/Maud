@@ -88,6 +88,7 @@ def get_idata(csvs: List[str], mi: MaudInput, mode: str) -> az.InferenceData:
         "log_transfer_constant_z": ["allosteric_enzymes"],
         "transfer_constant": ["allosteric_enzymes"],
         "dgf": ["metabolites"],
+        "dgf_alpha": ["metabolites"],
         "dgr_train": ["experiments", "edges"],
         "keq": ["experiments", "edges"],
         "kcat": ["enzymes"],

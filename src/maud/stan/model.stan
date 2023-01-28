@@ -142,12 +142,13 @@ transformed parameters {
   array[N_experiment_train] vector[N_enzyme] conc_enzyme_train = unz_log_2d(priors_conc_enzyme_train, log_conc_enzyme_train_z);
   array[N_experiment_train] vector[N_unbalanced] conc_unbalanced_train = unz_log_2d(priors_conc_unbalanced_train, log_conc_unbalanced_train_z);
   array[N_experiment_train] vector[N_pme] conc_pme_train = unz_log_2d(priors_conc_pme_train, log_conc_pme_train_z);
+  vector[N_metabolite] dgf_real = prior_loc_dgf + prior_cov_dgf_chol * dgf;
   // transform
   array[N_experiment_train] vector<lower=0>[N_mic] conc_train;
   array[N_experiment_train] vector[N_reaction] flux_train;
   array[N_experiment_train] vector[N_edge] dgr_train;
   for (e in 1:N_experiment_train){
-    dgr_train[e] = get_dgr(S, dgf, temperature_train[e], mic_to_met, water_stoichiometry, transported_charge, psi_train[e]);
+    dgr_train[e] = get_dgr(S, dgf_real, temperature_train[e], mic_to_met, water_stoichiometry, transported_charge, psi_train[e]);
     flux_train[e] = rep_vector(0, N_reaction);
     vector[N_enzyme] conc_enzyme_experiment = conc_enzyme_train[e];
     vector[N_pme] conc_pme_experiment = conc_pme_train[e];
@@ -222,7 +223,7 @@ transformed parameters {
                   phosphorylation_type,
                   phosphorylation_pme);
     conc_balanced_experiment[1] = 
-      solve_powell_tol(ssf,
+      solve_newton_tol(ssf,
                        conc_balanced_guess[1],
                        abs_tol,
                        rel_tol,
@@ -320,7 +321,7 @@ model {
   log_ki_z ~ std_normal();
   log_dissociation_constant_z ~ std_normal();
   log_transfer_constant_z ~ std_normal();
-  dgf ~ multi_normal_cholesky(prior_loc_dgf, prior_cov_dgf_chol);
+  dgf ~ std_normal();
   log_kcat_pme_z ~ std_normal();
   for (ex in 1:N_experiment_train){
     log_conc_unbalanced_train_z[ex] ~ std_normal();
@@ -358,7 +359,7 @@ generated quantities {
     llik_flux_train[f] = normal_lpdf(yflux_train[f] | flux_train[experiment_yflux_train[f], reaction_yflux_train[f]], sigma_yflux_train[f]);
   }
   for (e in 1:N_experiment_train){
-    keq_train[e] = get_keq(S, dgf, temperature_train[e], mic_to_met, water_stoichiometry, transported_charge, psi_train[e]);
+    keq_train[e] = get_keq(S, dgf_real, temperature_train[e], mic_to_met, water_stoichiometry, transported_charge, psi_train[e]);
     free_enzyme_ratio_train[e] = get_free_enzyme_ratio(conc_train[e],
                                                        S,
                                                        km,

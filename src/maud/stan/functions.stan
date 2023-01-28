@@ -202,7 +202,7 @@ functions {
           Q_num += conc_over_dc;
         }
       }
-      out[f] = inv(1 + tc_edge * (free_enzyme_ratio[f] * Q_num / Q_denom) ^ subunits[f]);
+      out[f] = inv(1 + tc_edge * (Q_num / Q_denom) ^ subunits[f]);
     }
     return out;
   }

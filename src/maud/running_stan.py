@@ -105,25 +105,26 @@ def simulate(mi: MaudInput, output_dir: str, n: int) -> CmdStanMCMC:
         stanc_options=mi.config.stanc_options,
     )
     set_up_output_dir(output_dir, mi)
-    return model.sample(
-        output_dir=output_dir,
-        iter_sampling=n,
-        data=os.path.join(output_dir, "input_data_train.json"),
-        inits=os.path.join(output_dir, "inits.json"),
-        **SIM_CONFIG,
-    )
-    # return model.optimize(
+    # return model.sample(
     #     output_dir=output_dir,
-    #     # iter_sampling=n,
-    #     iter=1000,
+    #     iter_sampling=n,
     #     data=os.path.join(output_dir, "input_data_train.json"),
     #     inits=os.path.join(output_dir, "inits.json"),
-    #     algorithm="LBFGS",
-    #     # **SIM_CONFIG,
-    #     show_console=True,
-    #     refresh=1,
-    #     save_profile=True,
+    #     **SIM_CONFIG,
     # )
+    return model.optimize(
+        output_dir=output_dir,
+        # iter_sampling=n,
+        iter=1000,
+        data=os.path.join(output_dir, "input_data_train.json"),
+        inits=os.path.join(output_dir, "inits.json"),
+        algorithm="LBFGS",
+        # **SIM_CONFIG,
+        show_console=True,
+        refresh=1,
+        save_profile=True,
+        save_iterations=True,
+    )
 
 
 def set_up_output_dir(output_dir: str, mi: MaudInput):
@@ -133,11 +134,11 @@ def set_up_output_dir(output_dir: str, mi: MaudInput):
     inits_path = os.path.join(output_dir, "inits.json")
     cmdstanpy.utils.write_stan_json(input_path_train, 
                                     dict(mi.stan_input_train,
-                                        **{"rel_tol_forward": 1e-6,
+                                        **{"rel_tol_forward": 1e-9,
                                            "abs_tol_forward": 1e-9,
-                                           "rel_tol_backward": 1e-6,
-                                           "abs_tol_backward": 1e-9,
-                                           "rel_tol_quadrature": 1e-6,
+                                           "rel_tol_backward": 1e-9,
+                                           "abs_tol_backward": 3e-9,
+                                           "rel_tol_quadrature": 1e-9,
                                            "abs_tol_quadrature": 1e-9,
                                            "num_steps_between_checkpoints": int(100000)}))
     if mi.stan_input_test is not None:
