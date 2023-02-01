@@ -1,0 +1,54 @@
+km = [
+  {metabolite = "A", compartment = "c", enzyme = "r1", exploc = 0.5, scale = 0.2},
+  {metabolite = "B", compartment = "c", enzyme = "r1", exploc = 1, scale = 0.2},
+  {metabolite = "A", compartment = "c", enzyme = "r2A", exploc = 2, scale = 0.2},
+  {metabolite = "C", compartment = "c", enzyme = "r2A", exploc = 0.5, scale = 0.2},
+  {metabolite = "A", compartment = "c", enzyme = "r2B", exploc = 1, scale = 0.2},
+  {metabolite = "C", compartment = "c", enzyme = "r2B", exploc = 2, scale = 0.2},
+  {metabolite = "B", compartment = "c", enzyme = "r3", exploc = 0.5, scale = 0.2},
+  {metabolite = "D", compartment = "c", enzyme = "r3", exploc = 2, scale = 0.2},
+  {metabolite = "C", compartment = "c", enzyme = "r4", exploc = 1, scale = 0.2},
+  {metabolite = "D", compartment = "c", enzyme = "r4", exploc = 3, scale = 0.2},
+]
+
+ki = [
+  {metabolite = "D", compartment = "c", enzyme = "r1", reaction = "r1", exploc = 1, scale = 0.2},
+]
+
+dissociation_constant = [
+  {metabolite = "C", compartment = "c", enzyme = "r2B", exploc = 0.9, scale = 0.2, modification_type = "inhibition"},
+  {metabolite = "C", compartment = "c", enzyme = "r2A", exploc = 0.3, scale = 0.2, modification_type = "activation"},
+]
+
+transfer_constant = [
+  {enzyme = "r2A", exploc = 1, scale = 0.2},
+  {enzyme = "r2B", exploc = 1, scale = 0.2},
+]
+
+kcat = [
+  {enzyme = "r1", reaction = "r1", exploc = 0.5, scale = 0.2},
+  {enzyme = "r2A", reaction = "r2", exploc = 2, scale = 0.2},
+  {enzyme = "r2B", reaction = "r2", exploc = 1, scale = 0.2},
+  {enzyme = "r3", reaction = "r3", exploc = 2, scale = 0.2},
+  {enzyme = "r4", reaction = "r4", exploc = 1, scale = 0.2},
+]
+
+conc_unbalanced = [
+  {metabolite = "A", compartment = "c", experiment = "condition1", exploc = 5, scale = 0.2},
+  {metabolite = "D", compartment = "c", experiment = "condition1", exploc = 0.5, scale = 0.2},
+]
+
+conc_enzyme = [
+  {enzyme = "r1", experiment = "condition1", exploc = 1, scale = 0.2},
+  {enzyme = "r2A", experiment = "condition1", exploc = 2, scale = 0.2},
+  {enzyme = "r2B", experiment = "condition1", exploc = 3, scale = 0.2},
+  {enzyme = "r3", experiment = "condition1", exploc = 2, scale = 0.2},
+  {enzyme = "r4", experiment = "condition1", exploc = 3, scale = 0.2},
+]
+
+dgf = [
+  {metabolite = "A", location = 10, scale = 0.2},
+  {metabolite = "B", location = 2, scale = 0.2},
+  {metabolite = "C", location = 5, scale = 0.2},
+  {metabolite = "D", location = 0, scale = 0.2},
+]

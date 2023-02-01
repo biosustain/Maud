@@ -1,0 +1,37 @@
+kcat = [
+  {exploc = 1, scale = 0.6, reaction = "r1", enzyme = "r1"},
+  {exploc = 1, scale = 0.6, reaction = "r2", enzyme = "r2"},
+  {exploc = 1, scale = 0.6, reaction = "r3", enzyme = "r3"},
+]
+
+km = [
+  {exploc = 1, scale = 0.6, metabolite = "M1", compartment = "e", enzyme = "r1"},
+  {exploc = 1, scale = 0.6, metabolite = "M1", compartment = "c", enzyme = "r1"},
+  {exploc = 1, scale = 0.6, metabolite = "M1", compartment = "c", enzyme = "r2"},
+  {exploc = 1, scale = 0.6, metabolite = "M2", compartment = "c", enzyme = "r3"},
+  {exploc = 1, scale = 0.6, metabolite = "M2", compartment = "e", enzyme = "r3"},
+]
+
+transfer_constant = [
+  {exploc = 1, scale = 0.6, enzyme = "r1"},
+  {exploc = 1, scale = 0.6, enzyme = "r2"},
+]
+
+dissociation_constant = [
+  {exploc = 1, scale = 0.6, enzyme = "r1", metabolite = "M2", compartment = "c", modification_type = "activation"},
+  {exploc = 1, scale = 0.6, enzyme = "r2", metabolite = "M1", compartment = "c", modification_type = "inhibition"},
+]
+
+dgf = [
+  {location = -1, metabolite = "M1", scale = 0.05},
+  {location = -2, metabolite = "M2", scale = 0.05},
+]
+
+psi = [
+  {location = -0.95, scale = 0.2, experiment = "condition1"},
+  {location = -0.95, scale = 0.2, experiment = "condition2"},
+]
+
+ki = [
+  {exploc = 1, scale = 0.6, enzyme = "r2", reaction = "r2", metabolite = "M1", compartment = "c"},
+]

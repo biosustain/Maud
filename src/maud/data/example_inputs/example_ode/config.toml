@@ -1,0 +1,14 @@
+name = "test-ode"
+kinetic_model_file = "kinetic_model.toml"
+priors_file = "priors.toml"
+experiments_file = "experiments.toml"
+likelihood = true
+
+[cmdstanpy_config]
+iter_warmup = 0
+iter_sampling = 1
+chains = 1
+
+[ode_config]
+max_num_steps = 1e9
+timepoint = 1e3

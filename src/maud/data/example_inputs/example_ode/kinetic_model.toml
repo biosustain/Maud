@@ -1,0 +1,96 @@
+compartment = [
+  {id = "c", name = "cytosol", volume = 1}
+]
+
+metabolite_in_compartment = [
+  {metabolite_id = "A", compartment_id = "c", balanced = false},
+  {metabolite_id = "B", compartment_id = "c", balanced = true},
+  {metabolite_id = "C", compartment_id = "c", balanced = true},
+  {metabolite_id = "D", compartment_id = "c", balanced = false},
+]
+
+enzyme_reaction = [
+  {enzyme_id = "r1", reaction_id = "r1"},
+  {enzyme_id = "r2A", reaction_id = "r2"},
+  {enzyme_id = "r2B", reaction_id = "r2"},
+  {enzyme_id = "r3", reaction_id = "r3"},
+  {enzyme_id = "r4", reaction_id = "r4"},
+]
+
+[[metabolite]]
+id = "A"
+name = "Metabolite A"
+
+[[metabolite]]
+id = "B"
+name = "Metabolite B"
+
+[[metabolite]]
+id = "C"
+name = "Metabolite C"
+
+[[metabolite]]
+id = "D"
+name = "Metabolite D"
+
+[[enzyme]]
+id = "r1"
+name = 'the enzyme that catalyses reaction r1'
+
+[[enzyme]]
+id = 'r2A'
+name = 'Isoenzyme A that catalyses reaction r2'
+
+[[enzyme]]
+id = 'r2B'
+name = 'Isoenzyme B that catalyses reaction r2'
+
+[[enzyme]]
+id = 'r3'
+name = 'the enzyme that catalyses reaction r3'
+
+[[enzyme]]
+id = 'r4'
+name = 'the enzyme that catalyses reaction r4'
+
+[[reaction]]
+id = "r1"
+name = "reaction number 1"
+stoichiometry = {A_c = -1, B_c = 1}
+mechanism = "reversible_michaelis_menten"
+
+[[reaction]]
+id = "r2"
+name = "reaction number 2"
+stoichiometry = {A_c = -1, C_c = 1}
+mechanism = "reversible_michaelis_menten"
+
+[[reaction]]
+id = "r3"
+name = "reaction number 3"
+stoichiometry = {B_c = -1, D_c = 1}
+mechanism = "reversible_michaelis_menten"
+
+[[reaction]]
+id = "r4"
+name = "reaction number 4"
+stoichiometry = {C_c = -1, D_c = 1}
+mechanism = "reversible_michaelis_menten"
+
+[[competitive_inhibition]]
+enzyme_id = "r1"
+reaction_id = "r1"
+metabolite_id = "D"
+compartment_id = "c"
+
+[[allostery]]
+modification_type = "activation"
+enzyme_id = "r2A"
+metabolite_id = "C"
+compartment_id = "c"
+
+[[allostery]]
+modification_type = "inhibition"
+enzyme_id = "r2B"
+metabolite_id = "C"
+compartment_id = "c"
