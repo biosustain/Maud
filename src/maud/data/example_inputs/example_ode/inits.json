@@ -1,0 +1,118 @@
+{
+  "dgf": [
+    10.0,
+    2.0,
+    5.0,
+    0.0
+  ],
+  "km": [
+    0.5,
+    1.0,
+    2.0,
+    0.5,
+    1.0,
+    2.0,
+    0.5,
+    2.0,
+    1.0,
+    3.0000000000000004
+  ],
+  "kcat": [
+    0.5,
+    2.0,
+    1.0,
+    2.0,
+    1.0
+  ],
+  "kcat_phos": [],
+  "ki": [
+    1.0
+  ],
+  "psi": [
+    0.0
+  ],
+  "dissociation_constant": [
+    0.3,
+    0.9
+  ],
+  "transfer_constant": [
+    1.0,
+    1.0
+  ],
+  "conc_unbalanced_train": [
+    [
+      4.999999999999999,
+      0.5
+    ]
+  ],
+  "drain_train": [
+    []
+  ],
+  "conc_enzyme_train": [
+    [
+      1.0,
+      2.0,
+      3.0000000000000004,
+      2.0,
+      3.0000000000000004
+    ]
+  ],
+  "conc_phos_train": [
+    []
+  ],
+  "log_km_z": [
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0
+  ],
+  "log_kcat_z": [
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0
+  ],
+  "log_kcat_phos_z": [],
+  "log_ki_z": [
+    0.0
+  ],
+  "psi_z": [
+    0.0
+  ],
+  "log_dissociation_constant_z": [
+    0.0,
+    0.0
+  ],
+  "log_transfer_constant_z": [
+    0.0,
+    0.0
+  ],
+  "log_conc_unbalanced_train_z": [
+    [
+      0.0,
+      0.0
+    ]
+  ],
+  "drain_train_z": [
+    []
+  ],
+  "log_conc_enzyme_train_z": [
+    [
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0
+    ]
+  ],
+  "log_conc_phos_train_z": [
+    []
+  ]
+}
