@@ -22,20 +22,15 @@ from datetime import datetime
 
 import arviz as az
 import click
+import importlib_resources
 
+from maud.data.example_inputs import linear
 from maud.getting_idatas import get_idata
 from maud.loading_maud_inputs import load_maud_input
 from maud.running_stan import predict, sample, simulate, variational
 
 
-RELATIVE_PATH_EXAMPLE = "../../tests/data/linear"
-
-
-def get_example_path(relative_path_example):
-    """Get absolute path to file containing example input."""
-
-    here = os.path.dirname(os.path.abspath(__file__))
-    return os.path.join(here, relative_path_example)
+EXAMPLE_INPUT_PATH = importlib_resources.files(linear)._paths[0]
 
 
 @click.group()
@@ -50,7 +45,7 @@ def cli():
 @click.argument(
     "data_path",
     type=click.Path(exists=True, dir_okay=True, file_okay=False),
-    default=get_example_path(RELATIVE_PATH_EXAMPLE),
+    default=EXAMPLE_INPUT_PATH,
 )
 def sample_command(data_path, output_dir):
     """Generate MCMC samples given a user input directory.
@@ -149,7 +144,7 @@ def do_predict(data_path: str):
 @click.argument(
     "data_path",
     type=click.Path(exists=True, dir_okay=True, file_okay=False),
-    default=get_example_path(RELATIVE_PATH_EXAMPLE),
+    default=EXAMPLE_INPUT_PATH,
 )
 def simulate_command(data_path, output_dir, n):
     """Generate draws from the initial values."""
@@ -266,7 +261,7 @@ def do_simulate(data_path, output_dir, n):
 @click.argument(
     "data_path",
     type=click.Path(exists=True, dir_okay=True, file_okay=False),
-    default=get_example_path(RELATIVE_PATH_EXAMPLE),
+    default=EXAMPLE_INPUT_PATH,
 )
 def variational_command(data_path, output_dir):
     """Generate MCMC samples given a user input directory.
