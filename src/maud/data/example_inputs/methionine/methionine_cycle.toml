@@ -6,7 +6,7 @@ volume = 1.0
 [[reaction]]
 id = "METAT"
 name = "Methionine adenosyltransferase"
-mechanism = "IRREVERSIBLE_MICHAELIS_MENTEN"
+mechanism = "irreversible_michaelis_menten"
 water_stoichiometry = -1.0
 transported_charge = 0.0
 
@@ -20,7 +20,7 @@ amet_c = 1.0
 [[reaction]]
 id = "met-L-source"
 name = "met-L-source"
-mechanism = "DRAIN"
+mechanism = "drain"
 water_stoichiometry = 0.0
 transported_charge = 0.0
 
@@ -30,7 +30,7 @@ met-L_c = 1.0
 [[reaction]]
 id = "METH"
 name = "Methylase"
-mechanism = "IRREVERSIBLE_MICHAELIS_MENTEN"
+mechanism = "irreversible_michaelis_menten"
 water_stoichiometry = 0.0
 transported_charge = 0.0
 
@@ -40,7 +40,7 @@ ahcys_c = 1.0
 [[reaction]]
 id = "GNMT"
 name = "Glycine N-methyltransferase"
-mechanism = "IRREVERSIBLE_MICHAELIS_MENTEN"
+mechanism = "irreversible_michaelis_menten"
 water_stoichiometry = 0.0
 transported_charge = 0.0
 
@@ -52,7 +52,7 @@ sarcs_c = 1.0
 [[reaction]]
 id = "AHC"
 name = "S-adenosylhomocysteine hydrolase"
-mechanism = "REVERSIBLE_MICHAELIS_MENTEN"
+mechanism = "reversible_michaelis_menten"
 water_stoichiometry = -1.0
 transported_charge = 0.0
 
@@ -63,7 +63,7 @@ hcys-L_c = 1.0
 [[reaction]]
 id = "MS"
 name = "Methionine Synthase"
-mechanism = "IRREVERSIBLE_MICHAELIS_MENTEN"
+mechanism = "irreversible_michaelis_menten"
 water_stoichiometry = 0.0
 transported_charge = 0.0
 
@@ -75,7 +75,7 @@ thf_c = 1.0
 [[reaction]]
 id = "BHMT"
 name = "Betaine-homocysteine methyltransferase"
-mechanism = "IRREVERSIBLE_MICHAELIS_MENTEN"
+mechanism = "irreversible_michaelis_menten"
 water_stoichiometry = 0.0
 transported_charge = 0.0
 
@@ -87,7 +87,7 @@ dmgly_c = 1.0
 [[reaction]]
 id = "CBS"
 name = "Cystathionine beta synthase"
-mechanism = "IRREVERSIBLE_MICHAELIS_MENTEN"
+mechanism = "irreversible_michaelis_menten"
 water_stoichiometry = 1.0
 transported_charge = 0.0
 
@@ -98,7 +98,7 @@ cyst-L_c = 1.0
 [[reaction]]
 id = "MTHFR"
 name = "Methylenetetrahydrofolate reductase"
-mechanism = "IRREVERSIBLE_MICHAELIS_MENTEN"
+mechanism = "irreversible_michaelis_menten"
 water_stoichiometry = 0.0
 transported_charge = 0.0
 
@@ -110,7 +110,7 @@ nadp_c = 1.0
 [[reaction]]
 id = "PROT"
 name = "Protein Synthesis"
-mechanism = "IRREVERSIBLE_MICHAELIS_MENTEN"
+mechanism = "irreversible_michaelis_menten"
 water_stoichiometry = 0.0
 transported_charge = 0.0
 
@@ -209,78 +209,97 @@ reaction_id = "PROT"
 [[metabolite]]
 id = "met-L"
 name = "methionine"
+inchi_key = "FFEARJCKVFRZRR-BYPYZUCNSA-N"  # source http://bigg.ucsd.edu/universal/metabolites/met__L
 
 [[metabolite]]
 id = "atp"
 name = "adenosine triphosphate"
+inchi_key = "ZKHQWZAMYRWXGA-KQYNXXCUSA-J"  # source http://bigg.ucsd.edu/universal/metabolites/atp
 
 [[metabolite]]
 id = "pi"
 name = "orthophosphate"
+inchi_key = "NBIIXXVUZAFLBC-UHFFFAOYSA-L"  # source http://bigg.ucsd.edu/universal/metabolites/ip
 
 [[metabolite]]
 id = "ppi"
 name = "pyrophosphate"
+inchi_key = "XPPKVPWEQAFLFU-UHFFFAOYSA-K"  # source http://bigg.ucsd.edu/universal/metabolites/ppi
 
 [[metabolite]]
 id = "amet"
 name = "adenosyl methionine"
+inchi_key = "MEFKEPWMEQBLKI-AIRLBKTGSA-O"  # source http://bigg.ucsd.edu/universal/metabolites/amet
 
 [[metabolite]]
 id = "ahcys"
 name = "adenosyl homocysteine"
+inchi_key = "ZJUKTBDSGOFHSH-WFMPWKQPSA-N"  # source http://bigg.ucsd.edu/universal/metabolites/ahcys
 
 [[metabolite]]
 id = "gly"
 name = "glycine"
+inchi_key = "DHMQDGOQFOQNFH-UHFFFAOYSA-N"  # source http://bigg.ucsd.edu/universal/metabolites/gly
 
 [[metabolite]]
 id = "sarcs"
 name = "sarcosine"
+inchi_key = "FSYKKLYZXJSNPZ-UHFFFAOYSA-N"  # source http://bigg.ucsd.edu/universal/metabolites/sarcs
 
 [[metabolite]]
 id = "hcys-L"
 name = "homocysteine"
+inchi_key = "FFFHZYDWPBMWHY-UHFFFAOYSA-N"  # source http://bigg.ucsd.edu/universal/metabolites/hcys__L
 
 [[metabolite]]
 id = "adn"
 name = "adenosine"
+inchi_key = "OIRDTQYFTABQOQ-KQYNXXCUSA-N"  # source http://bigg.ucsd.edu/universal/metabolites/adn
 
 [[metabolite]]
 id = "thf"
 name = "tetrahydrofolate"
+inchi_key = "MSTNYGQPCMXVAQ-RYUDHWBXSA-L"  # source http://bigg.ucsd.edu/universal/metabolites/thf
 
 [[metabolite]]
 id = "5mthf"
 name = "5-methyltetrahydrofolate"
+inchi_key = "ZNOVTXRBGFNYRX-STQMWFEESA-L"  # source http://bigg.ucsd.edu/universal/metabolites/5mthf
 
 [[metabolite]]
 id = "mlthf"
 name = "5,10-methylenetetrahydrofolate"
+inchi_key = "QYNUQALWYRSVHF-OLZOCXBDSA-L"  # source http://bigg.ucsd.edu/universal/metabolites/mlthf
 
 [[metabolite]]
 id = "glyb"
 name = "betaine"
+inchi_key = "KWIUHFFTVRNATP-UHFFFAOYSA-N"  # source http://bigg.ucsd.edu/universal/metabolites/glyb
 
 [[metabolite]]
 id = "dmgly"
 name = "dimethyl-glycine"
-
+inchi_key = "FFDGPVCHZBVARC-UHFFFAOYSA-N"  # source http://bigg.ucsd.edu/universal/metabolites/dmgly
+ 
 [[metabolite]]
 id = "ser-L"
 name = "serine"
+inchi_key = "MTCFGRXMJLQNBG-REOHCLBHSA-N"  # source http://bigg.ucsd.edu/universal/metabolites/ser__L
 
 [[metabolite]]
 id = "nadp"
 name = "nadp"
+inchi_key = "XJLXINKUBYWONI-NNYOXOHSSA-K"  # source http://bigg.ucsd.edu/universal/metabolites/nadp
 
 [[metabolite]]
 id = "nadph"
 name = "nadph"
+inchi_key = "ACFIXJIJDZMPPO-NNYOXOHSSA-J"  # source http://bigg.ucsd.edu/universal/metabolites/nadph
 
 [[metabolite]]
 id = "cyst-L"
 name = "cystathionine"
+inchi_key = "ILRYLPWNYFXEMH-WHFBIAKZSA-N"  # source http://bigg.ucsd.edu/universal/metabolites/cyst__L
 
 [[metabolite_in_compartment]]
 metabolite_id = "met-L"
@@ -381,43 +400,43 @@ balanced = false
 enzyme_id = "MAT3"
 metabolite_id = "amet"
 compartment_id = "c"
-modification_type = "ACTIVATION"
+modification_type = "activation"
 
 [[allostery]]
 enzyme_id = "MAT3"
 metabolite_id = "met-L"
 compartment_id = "c"
-modification_type = "ACTIVATION"
+modification_type = "activation"
 
 [[allostery]]
 enzyme_id = "GNMT1"
 metabolite_id = "amet"
 compartment_id = "c"
-modification_type = "ACTIVATION"
+modification_type = "activation"
 
 [[allostery]]
 enzyme_id = "GNMT1"
 metabolite_id = "mlthf"
 compartment_id = "c"
-modification_type = "INHIBITION"
+modification_type = "inhibition"
 
 [[allostery]]
 enzyme_id = "CBS1"
 metabolite_id = "amet"
 compartment_id = "c"
-modification_type = "ACTIVATION"
+modification_type = "activation"
 
 [[allostery]]
 enzyme_id = "MTHFR1"
 metabolite_id = "amet"
 compartment_id = "c"
-modification_type = "INHIBITION"
+modification_type = "inhibition"
 
 [[allostery]]
 enzyme_id = "MTHFR1"
 metabolite_id = "ahcys"
 compartment_id = "c"
-modification_type = "ACTIVATION"
+modification_type = "activation"
 
 [[competitive_inhibition]]
 enzyme_id = "MAT1"
