@@ -409,3 +409,19 @@ dgf = [
  {metabolite = "ser-L", init = -216.712},
  {metabolite = "thf", init = 108.366},
 ]
+psi = [
+  {experiment = "dataset1", init = 0},
+  {experiment = "dataset10", init = 0},
+  {experiment = "dataset11", init = 0},
+  {experiment = "dataset12", init = 0},
+  {experiment = "dataset2", init = 0},
+  {experiment = "dataset3", init = 0},
+  {experiment = "dataset4", init = 0},
+  {experiment = "dataset5", init = 0},
+  {experiment = "dataset6", init = 0},
+  {experiment = "dataset7", init = 0},
+  {experiment = "dataset8", init = 0},
+  {experiment = "dataset9", init = 0},
+  {experiment = "validation", init = 0},
+
+]
