@@ -1,7 +1,7 @@
 """Provides dataclass MaudConfig."""
 from typing import Optional
 
-from pydantic.dataclasses import dataclass
+from pydantic.dataclasses import dataclass, Field
 
 
 @dataclass
@@ -46,7 +46,7 @@ class MaudConfig:
     cpp_options: Optional[dict] = None
     variational_options: Optional[dict] = None
     user_inits_file: Optional[str] = None
-    ode_config: ODEConfig = ODEConfig()
+    ode_config: ODEConfig = Field(default_factory=ODEConfig)
     reject_non_steady: bool = True
     steady_state_threshold_abs: float = 1e-8
     steady_state_threshold_rel: float = 1e-3
