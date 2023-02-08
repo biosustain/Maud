@@ -1,7 +1,7 @@
 """Provides dataclass MaudConfig."""
 from typing import Optional
 
-from pydantic.dataclasses import dataclass, Field
+from pydantic.dataclasses import Field, dataclass
 
 
 @dataclass
