@@ -23,8 +23,8 @@ class MaudInput:
     config: MaudConfig
     kinetic_model: KineticModel
     experiments: List[Experiment]
-    prior_input: PriorInput = PriorInput()
-    init_input: InitInput = InitInput()
+    prior_input: PriorInput = Field(default_factory=PriorInput)
+    init_input: InitInput = Field(default_factory=InitInput)
     parameters: ParameterSet = Field(init=False, exclude=True)
     stan_input_train: Dict = Field(init=False, exclude=True)
     stan_input_test: Dict = Field(init=False, exclude=True)
