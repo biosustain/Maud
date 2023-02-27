@@ -4,7 +4,7 @@ from typing import Optional
 from pydantic.dataclasses import Field, dataclass
 
 
-@dataclass
+@dataclass(frozen=True)
 class ODEConfig:
     """Config that is specific to the ODE solver."""
 
