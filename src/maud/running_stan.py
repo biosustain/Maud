@@ -115,10 +115,13 @@ def simulate(mi: MaudInput, output_dir: str, n: int) -> CmdStanMCMC:
     return model.optimize(
         output_dir=output_dir,
         # iter_sampling=n,
-        iter=1000,
+        iter=2000,
         data=os.path.join(output_dir, "input_data_train.json"),
         inits=os.path.join(output_dir, "inits.json"),
         algorithm="LBFGS",
+        init_alpha=1e-4,
+        tol_param=1e-12,
+        history_size=10,
         # **SIM_CONFIG,
         show_console=True,
         refresh=1,
@@ -200,7 +203,7 @@ def predict(
                 "inits": inits,
                 "output_dir": output_dir,
                 "iter_warmup": 0,
-                "iter_sampling": 1,
+                "iter_sampling": 1000,
                 "fixed_param": True,
                 "show_progress": False,
             }
@@ -220,7 +223,7 @@ def predict(
                 },
                 dims=dims,
             ).assign_coords(
-                coords={"chain": [chain], "draw": [draw]},
+                coords={"chain": [chain], "draw": [draw for draw in range(0,1000)]},
                 groups="posterior_groups",
             )
             if draw == 0:

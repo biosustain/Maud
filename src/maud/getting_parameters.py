@@ -174,8 +174,8 @@ def get_maud_parameters(
             ii.drain,
         ),
         drain_test=DrainTest(
-            [exp_ids_train, drain_ids],
-            [[exp_ids_train], [drain_ids]],
+            [exp_ids_test, drain_ids],
+            [[exp_ids_test], [drain_ids]],
             pi.drain,
             ii.drain,
         ),
@@ -192,8 +192,8 @@ def get_maud_parameters(
             ],
         ),
         conc_enzyme_test=ConcEnzymeTest(
-            [exp_ids_train, enzyme_ids],
-            [[exp_ids_train], [enzyme_ids]],
+            [exp_ids_test, enzyme_ids],
+            [[exp_ids_test], [enzyme_ids]],
             pi.conc_enzyme,
             ii.conc_enzyme,
             [
@@ -219,9 +219,9 @@ def get_maud_parameters(
             ],
         ),
         conc_unbalanced_test=ConcUnbalancedTest(
-            [exp_ids_train, unbalanced_mic_ids],
+            [exp_ids_test, unbalanced_mic_ids],
             [
-                [exp_ids_train],
+                [exp_ids_test],
                 [unbalanced_mic_mets, unbalanced_mic_cpts],
             ],
             pi.conc_unbalanced,
@@ -240,11 +240,11 @@ def get_maud_parameters(
             ii.conc_pme,
         ),
         conc_pme_test=ConcPmeTest(
-            [exp_ids_train, phos_modifying_enzymes],
-            [[exp_ids_train], [phos_modifying_enzymes]],
+            [exp_ids_test, phos_modifying_enzymes],
+            [[exp_ids_test], [phos_modifying_enzymes]],
             pi.conc_pme,
             ii.conc_pme,
         ),
-        psi_train=PsiTrain([exp_ids_train], [[exp_ids_test]], pi.psi, ii.psi),
-        psi_test=PsiTest([exp_ids_train], [[exp_ids_train]], pi.psi, ii.psi),
+        psi_train=PsiTrain([exp_ids_train], [[exp_ids_train]], pi.psi, ii.psi),
+        psi_test=PsiTest([exp_ids_test], [[exp_ids_test]], pi.psi, ii.psi),
     )

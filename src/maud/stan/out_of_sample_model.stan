@@ -59,7 +59,7 @@ data {
   array[N_experiment_test, 2] int pme_knockout_test_bounds;
   vector[N_experiment_test] temperature_test;
   // hardcoded priors
-  array[2, N_experiment_test] vector[N_pme] priors_conc_phos_test;
+  array[2, N_experiment_test] vector[N_pme] priors_conc_pme_test;
   array[2, N_experiment_test] vector[N_unbalanced] priors_conc_unbalanced_test;
   array[2, N_experiment_test] vector[N_enzyme] priors_conc_enzyme_test;
   array[2, N_experiment_test] vector[N_drain] priors_drain_test;
@@ -99,9 +99,9 @@ generated quantities {
   // Sampling experiment boundary conditions from priors
   for (e in 1:N_experiment_test){
     drain_test[e] = to_vector(normal_rng(priors_drain_test[1,e], priors_drain_test[2,e]));
-    conc_pme_test[e] = to_vector(lognormal_rng(log(priors_conc_pme_test[1,e]), priors_conc_pme_test[2,e]));
-    conc_unbalanced_test[e] = to_vector(lognormal_rng(log(priors_conc_unbalanced_test[1,e]), priors_conc_unbalanced_test[2,e]));
-    conc_enzyme_test[e] = to_vector(lognormal_rng(log(priors_conc_enzyme_test[1,e]), priors_conc_enzyme_test[2,e]));
+    conc_pme_test[e] = to_vector(lognormal_rng(priors_conc_pme_test[1,e], priors_conc_pme_test[2,e]));
+    conc_unbalanced_test[e] = to_vector(lognormal_rng(priors_conc_unbalanced_test[1,e], priors_conc_unbalanced_test[2,e]));
+    conc_enzyme_test[e] = to_vector(lognormal_rng(priors_conc_enzyme_test[1,e], priors_conc_enzyme_test[2,e]));
   }
   // Simulation of experiments
   for (e in 1:N_experiment_test){
@@ -123,7 +123,7 @@ generated quantities {
     }
     conc_balanced_experiment =
       ode_bdf_tol(dbalanced_dt,
-                  conc_init[e, balanced_mic_ix],
+                  conc_init[e],
                   initial_time,
                   {timepoint},
                   rel_tol, 
@@ -142,7 +142,7 @@ generated quantities {
                   kcat_pme,
                   conc_pme_experiment,
                   drain_test[e],
-                  temperature_train[e],
+                  temperature_test[e],
                   drain_small_conc_corrector,
                   S,
                   subunits,
@@ -182,7 +182,7 @@ generated quantities {
                                              kcat_pme,
                                              conc_pme_experiment,
                                              drain_test[e],
-                                             temperature_train[e],
+                                             temperature_test[e],
                                              drain_small_conc_corrector,
                                              S,
                                              subunits,
@@ -255,6 +255,6 @@ generated quantities {
                                              phosphorylation_type,
                                              phosphorylation_pme,
                                              subunits);
-    reversibility_test[e] = get_reversibility(dgr_test[e], temperature_train[e], S, conc_test[e], edge_type);
+    reversibility_test[e] = get_reversibility(dgr_test[e], temperature_test[e], S, conc_test[e], edge_type);
   }
 }
