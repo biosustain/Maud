@@ -2,7 +2,7 @@ km = [
   {metabolite = "adn", compartment = "c", enzyme = "AHC1", reaction = "AHC", init = 5.66E-06},
   {metabolite = "ahcys", compartment = "c", enzyme = "AHC1", reaction = "AHC", init = 2.32E-05},
   {metabolite = "hcys-L", compartment = "c", enzyme = "AHC1", reaction = "AHC", init = 1.06E-05},
-  {metabolite = "glyb", compartment = "c", ennnnnzyme = "BHMT1", reaction = "BHMT", init = 0.00845898},
+  {metabolite = "glyb", compartment = "c", enzyme = "BHMT1", reaction = "BHMT", init = 0.00845898},
   {metabolite = "hcys-L", compartment = "c", enzyme = "BHMT1", reaction = "BHMT", init = 1.98E-05},
   {metabolite = "hcys-L", compartment = "c", enzyme = "CBS1", reaction = "CBS", init = 4.24E-05},
   {metabolite = "ser-L", compartment = "c", enzyme = "CBS1", reaction = "CBS", init = 2.83E-06},
@@ -42,13 +42,13 @@ ki = [
 ]
 
 dissociation_constant = [
-  {metabolite = "mlthf", compartment = "c", enzyme = "GNMT1", reaction = "GNMT", init = 0.000228576},
-  {metabolite = "amet", compartment = "c", enzyme = "MTHFR1", reaction = "MTHFR", init = 1.46E-05},
-  {metabolite = "amet", compartment = "c", enzyme = "CBS1", reaction = "CBS", init = 9.30E-05},
-  {metabolite = "amet", compartment = "c", enzyme = "GNMT1", reaction = "GNMT", init = 1.98E-05},
-  {metabolite = "amet", compartment = "c", enzyme = "MAT3", reaction = "METAT", init = 0.000316641},
-  {metabolite = "met-L", compartment = "c", enzyme = "MAT3", reaction = "METAT", init = 0.00059999},
-  {metabolite = "ahcys", compartment = "c", enzyme = "MTHFR1", reaction = "MTHFR", init = 2.45E-06},
+  {metabolite = "mlthf", compartment = "c", enzyme = "GNMT1", init = 0.000228576, modification_type = "inhibition"},
+  {metabolite = "amet", compartment = "c", enzyme = "MTHFR1", init = 1.46E-05, modification_type = "inhibition"},
+  {metabolite = "amet", compartment = "c", enzyme = "CBS1", init = 9.30E-05, modification_type = "activation"},
+  {metabolite = "amet", compartment = "c", enzyme = "GNMT1", init = 1.98E-05, modification_type = "activation"},
+  {metabolite = "amet", compartment = "c", enzyme = "MAT3", init = 0.000316641, modification_type = "activation"},
+  {metabolite = "met-L", compartment = "c", enzyme = "MAT3", init = 0.00059999, modification_type = "activation"},
+  {metabolite = "ahcys", compartment = "c", enzyme = "MTHFR1", init = 2.45E-06, modification_type = "activation"},
 ]
 
 transfer_constant = [

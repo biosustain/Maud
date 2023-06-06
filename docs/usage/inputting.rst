@@ -40,15 +40,20 @@ The following optional fields can also be specified:
 
 - :code:`reject_non_steady` Boolean saying whether to reject draws that enter non-steady states
 - :code:`ode_config` Table of configuration options for Stan's ode solver
-- :code:`cmdstanpy_config` Table of keyword arguments to the cmdstanpy method `sample <https://cmdstanpy.readthedocs.io/en/v1.0.1/api.html#cmdstanpy.CmdStanModel.sample>`_
+- :code:`cmdstanpy_config` Table of keyword arguments to the cmdstanpy method `CmdStanModel.sample <https://cmdstanpy.readthedocs.io/en/v1.1.0/api.html#cmdstanpy.CmdStanModel.sample>`_
 - :code:`cmdstanpy_config_predict` Table of overriding sample keyword argments for predictions
-- :code:`stanc_options` Table of valid choices for `CmdStanModel <https://cmdstanpy.readthedocs.io/en/v1.0.1/api.html#cmdstanpy.CmdStanModel>`_ argument `stanc_options`
-- :code:`cpp_options` Table of valid choices for  `CmdStanModel <https://cmdstanpy.readthedocs.io/en/v1.0.1/api.html#cmdstanpy.CmdStanModel>`_ argument `cpp_options`
-- :code:`variational_options` Arguments for CmdStanModel.variational
+- :code:`stanc_options` Table of valid choices for `CmdStanModel <https://cmdstanpy.readthedocs.io/en/v1.1.0/api.html#cmdstanpy.CmdStanModel>`_ argument `stanc_options`
+- :code:`cpp_options` Table of valid choices for  `CmdStanModel <https://cmdstanpy.readthedocs.io/en/v1.1.0/api.html#cmdstanpy.CmdStanModel>`_ argument `cpp_options`
+- :code:`variational_options` Arguments for the cmdstanpy method :code:`CmdStanModel.variational <https://cmdstanpy.readthedocs.io/en/v1.1.0/api.html#cmdstanpy.CmdStanModel.variational>`_
 - :code:`user_inits_file` path to a toml file of initial values
 - :code:`steady_state_threshold_abs` absolute threshold for Sv=0 be at steady state
 - :code:`steady_state_threshold_rel` relative threshold for Sv=0 be at steady state
+- :code:`default_initial_concentration` default initial concentration for unmeasured species
 - :code:`drain_small_conc_corrector` number for correcting small conc drains
+- :code:`molecule_unit` A unit for counting molecules, like 'mol' or 'mmol'
+- :code:`volume_unit` A unit for measuring volume, like 'L'
+- :code:`energy_unit` A unit for measuring energy, like 'J' or 'kJ'
+
 
 Here is an example configuration file:
 

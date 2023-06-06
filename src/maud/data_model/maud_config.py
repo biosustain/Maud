@@ -4,7 +4,7 @@ from typing import Optional
 from pydantic.dataclasses import Field, dataclass
 
 
-@dataclass
+@dataclass(frozen=True)
 class ODEConfig:
     """Config that is specific to the ODE solver."""
 
@@ -32,7 +32,11 @@ class MaudConfig:
     :param user_inits_file: path to a csv file of initial values.
     :param steady_state_threshold_abs: absolute threshold for Sv=0 be at steady state
     :param steady_state_threshold_rel: relative threshold for Sv=0 be at steady state
-    :param: drain_small_conc_corrector: number for correcting small conc drains
+    :param default_initial_concentration: in molecule_unit per volume_unit
+    :param drain_small_conc_corrector: number for correcting small conc drains
+    :param molecule_unit: A unit for counting molecules, like 'mol' or 'mmol'
+    :param volume_unit: A unit for measuring volume, like 'L'
+    :param energy_unit: A unit for measuring energy, like 'J' or 'kJ'
     """
 
     name: str
@@ -52,3 +56,6 @@ class MaudConfig:
     steady_state_threshold_rel: float = 1e-3
     default_initial_concentration: float = 0.01
     drain_small_conc_corrector: float = 1e-6
+    molecule_unit: str = "mmol"
+    volume_unit: str = "L"
+    energy_unit: str = "kJ"
