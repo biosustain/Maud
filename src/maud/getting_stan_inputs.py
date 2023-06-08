@@ -368,7 +368,7 @@ def get_experiments_input(
             m
             for e in experiments
             for m in e.measurements
-            if e.is_train and m.target_type == t
+            if e.is_train and m.target_type == t and m.likelihood
         ]
         for t in measurement_types
     )
@@ -377,7 +377,7 @@ def get_experiments_input(
             e.id
             for e in experiments
             for m in e.measurements
-            if e.is_train and m.target_type == t
+            if e.is_train and m.target_type == t and m.likelihood
         ]
         for t in measurement_types
     )

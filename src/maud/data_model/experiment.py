@@ -3,7 +3,7 @@
 from enum import Enum
 from typing import List, Optional
 
-from pydantic import Field, validator
+from pydantic import Field, root_validator, validator
 from pydantic.dataclasses import dataclass
 
 from maud.data_model.hardcoding import ID_SEPARATOR
@@ -30,12 +30,16 @@ class Measurement:
     experiment: str
     target_type: MeasurementType
     value: float = Field(kw_only=True, allow_inf_nan=False)
-    error_scale: float = Field(kw_only=True, allow_inf_nan=False, gt=0)
+    error_scale: Optional[float] = Field(
+        kw_only=True, allow_inf_nan=False, gt=0, default=None
+    )
     metabolite: Optional[str] = None
     compartment: Optional[str] = None
     reaction: Optional[str] = None
     enzyme: Optional[str] = None
     target_id: str = Field(default=None, init=False, exclude=True)
+    # if False, this is used only for specifying an initial value
+    likelihood: bool = Field(default=True)
 
     def __post_init__(self):
         """Add target_id field."""
@@ -47,6 +51,25 @@ class Measurement:
             self.target_id = self.reaction
         elif self.target_type == MeasurementType.ENZYME:
             self.target_id = self.enzyme
+
+    @root_validator(pre=False, skip_on_failure=True)
+    def error_scale_must_exist_if_likelihood(cls, values):
+        """Verify the right combinations of error_scale and likelihood."""
+        assert (
+            values["reaction"] is None or values["likelihood"]
+        ), f"likelihood=False is not implemented for reaction types ({values['reaction']}, {values['experiment']})"
+        ident = (
+            values["reaction"]
+            if values["reaction"] is not None
+            else values["metabolite"]
+        )
+        assert (
+            values["error_scale"] is not None or not values["likelihood"]
+        ), f"{ident} measurement (exp={values['experiment']}) must provide error_scale if used for likelihood"
+        assert not (
+            values["error_scale"] is not None and not values["likelihood"]
+        ), f"{ident} measurement (exp={values['experiment']}) has an error_scale but likelihood is false"
+        return values
 
 
 @dataclass
