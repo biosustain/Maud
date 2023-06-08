@@ -4,6 +4,7 @@ import os
 
 import arviz as az
 import cmdstanpy
+from cmdstanpy import CmdStanMLE
 from cmdstanpy.stanfit.mcmc import CmdStanMCMC
 from cmdstanpy.stanfit.vb import CmdStanVB
 
@@ -113,6 +114,35 @@ def simulate(mi: MaudInput, output_dir: str, n: int) -> CmdStanMCMC:
         data=os.path.join(output_dir, "input_data_train.json"),
         inits=os.path.join(output_dir, "inits.json"),
         **SIM_CONFIG,
+    )
+
+
+def optimize(mi: MaudInput, output_dir: str) -> CmdStanMLE:
+    """Generate MLE from the input maud model.
+
+    :param mi: a MaudInput object
+    :param output_dir: a string specifying where to save the output.
+    """
+    model = cmdstanpy.CmdStanModel(
+        stan_file=os.path.join(HERE, STAN_PROGRAM_RELATIVE_PATH),
+        cpp_options=mi.config.cpp_options,
+        stanc_options=mi.config.stanc_options,
+    )
+    set_up_output_dir(output_dir, mi)
+    return model.optimize(
+        output_dir=output_dir,
+        # upper bound, will stop once the gradients become small enough
+        iter=3000,
+        data=os.path.join(output_dir, "input_data_train.json"),
+        inits=os.path.join(output_dir, "inits.json"),
+        algorithm="LBFGS",
+        init_alpha=1e-4,
+        tol_param=1e-12,
+        history_size=10,
+        show_console=True,
+        refresh=1,
+        save_profile=True,
+        save_iterations=True,
     )
 
 
