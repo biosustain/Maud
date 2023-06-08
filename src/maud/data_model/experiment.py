@@ -55,20 +55,25 @@ class Measurement:
     @root_validator(pre=False, skip_on_failure=True)
     def error_scale_must_exist_if_likelihood(cls, values):
         """Verify the right combinations of error_scale and likelihood."""
-        assert (
-            values["reaction"] is None or values["likelihood"]
-        ), f"likelihood=False is not implemented for reaction types ({values['reaction']}, {values['experiment']})"
+        assert values["reaction"] is None or values["likelihood"], (
+            "likelihood=False is not implemented for reaction types"
+            f"({values['reaction']}, {values['experiment']})"
+        )
         ident = (
             values["reaction"]
             if values["reaction"] is not None
             else values["metabolite"]
         )
-        assert (
-            values["error_scale"] is not None or not values["likelihood"]
-        ), f"{ident} measurement (exp={values['experiment']}) must provide error_scale if used for likelihood"
+        assert values["error_scale"] is not None or not values["likelihood"], (
+            f"{ident} measurement (exp={values['experiment']}) must provide"
+            " error_scale if used for likelihood"
+        )
         assert not (
             values["error_scale"] is not None and not values["likelihood"]
-        ), f"{ident} measurement (exp={values['experiment']}) has an error_scale but likelihood is false"
+        ), (
+            f"{ident} measurement (exp={values['experiment']}) has an"
+            " error_scale but likelihood is false"
+        )
         return values
 
 
