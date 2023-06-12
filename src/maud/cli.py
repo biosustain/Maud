@@ -159,7 +159,7 @@ def simulate_command(data_path, output_dir, n):
     default=EXAMPLE_INPUT_PATH,
 )
 def optimize_command(data_path, output_dir):
-    """Optimize a Maximum A Posteriori from the model parameters."""
+    """Optimize the model parameters."""
     click.echo(do_optimize(data_path, output_dir))
 
 
@@ -269,7 +269,7 @@ def do_simulate(data_path, output_dir, n):
 
 
 def do_optimize(data_path, output_dir):
-    """Generate a Maximum A Posteriori from the model parameters."""
+    """Optimize the model parameters."""
 
     mi = load_maud_input(data_path=data_path)
     now = datetime.now().strftime("%Y%m%d%H%M%S")
