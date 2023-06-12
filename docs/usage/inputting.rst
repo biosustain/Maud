@@ -354,14 +354,14 @@ The measurement table has these fields:
 measurements or the scale parameter of a lognormal distribution for
 concentration measurements.
 
-The initial_state table has these fields:
+The :code:`initial_state` table has these fields:
 
 - :code:`metabolite` A string identifying the metabolite.
 - :code:`compartment` A string identifying the compartment.
-- :code:`value` The measured value, as a float.
+- :code:`value` The initial state, as a float.
 
-A default initial concentration for all metabolites and experiments can
-be specified in the general configuration. In addition, this initial_state
+A default initial concentration for all metabolites and experiments can be
+specified in the general configuration. In addition, this :code:`initial_state`
 table can be specified for a more granular control of the initial vector of
 concentrations to solve the steady state ODE. This may be useful when the
 concentrations in the model span over several orders of magnitudes and thus a
