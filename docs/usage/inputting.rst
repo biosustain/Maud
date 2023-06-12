@@ -333,6 +333,7 @@ experiment.
 - :code:`pme_knockouts`: An optional table describing knockouts of
   phosphorylation modifying enzymes. Each entry has one field called "pme".
 - :code:`measurements`: An optional table describing measurements
+- :code:`initial_state`: An optional table describing the initial concentrations of balanced metabolites
 
 The measurement table has these fields:
 
@@ -352,6 +353,19 @@ The measurement table has these fields:
 `error_scale` is the standard deviation of a normal distribution for flux
 measurements or the scale parameter of a lognormal distribution for
 concentration measurements.
+
+The :code:`initial_state` table has these fields:
+
+- :code:`metabolite` A string identifying the metabolite.
+- :code:`compartment` A string identifying the compartment.
+- :code:`value` The initial state, as a float.
+
+A default initial concentration for all metabolites and experiments can be
+specified in the general configuration. In addition, this :code:`initial_state`
+table can be specified for a more granular control of the initial vector of
+concentrations to solve the steady state ODE. This may be useful when the
+concentrations in the model span over several orders of magnitudes and thus a
+unique initial value is suboptimal.
 
 The priors file
 ===============

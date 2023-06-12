@@ -76,6 +76,20 @@ class PhosphorylationModifyingEnzymeKnockout:
 
 
 @dataclass
+class InitConcentration:
+    """Indication of the initial value of a concentration in the ODE."""
+
+    metabolite: str
+    compartment: str
+    value: float
+    target_id: str = Field(default=None, init=False, exclude=True)
+
+    def __post_init__(self):
+        """Add target_id field."""
+        self.target_id = ID_SEPARATOR.join([self.metabolite, self.compartment])
+
+
+@dataclass
 class Experiment:
     """Maud representation of an experiment.
 
@@ -89,6 +103,7 @@ class Experiment:
     is_test: bool
     temperature: float = 298.15
     measurements: List[Measurement] = Field(default_factory=lambda: [])
+    initial_state: List[InitConcentration] = Field(default_factory=lambda: [])
     enzyme_knockouts: List[EnzymeKnockout] = Field(default_factory=lambda: [])
     pme_knockouts: List[PhosphorylationModifyingEnzymeKnockout] = Field(
         default_factory=lambda: []
