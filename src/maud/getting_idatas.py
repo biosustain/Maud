@@ -21,7 +21,7 @@ def get_idata(csvs: List[str], mi: MaudInput, mode: str) -> az.InferenceData:
             f"{e.id}{ID_SEPARATOR}{m.target_id}"
             for e in experiments
             for m in e.measurements
-            if m.target_type == t and m.likelihood
+            if m.target_type == t
         ]
         for t in [
             MeasurementType.MIC,
