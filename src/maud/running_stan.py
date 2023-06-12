@@ -43,6 +43,17 @@ SIM_CONFIG = {
     "show_progress": False,
     "threads_per_chain": 1,
 }
+DEFAULT_OPTIMIZE_CONFIG = {
+    "algorithm": "LBFGS",
+    "iter": 3000,
+    "init_alpha": 1e-4,
+    "tol_param": 1e-12,
+    "history_size": 10,
+    "show_console": True,
+    "refresh": 1,
+    "save_profile": True,
+    "save_iterations": True,
+}
 
 
 def sample(mi: MaudInput, output_dir: str) -> CmdStanMCMC:
@@ -123,6 +134,9 @@ def optimize(mi: MaudInput, output_dir: str) -> CmdStanMLE:
     :param mi: a MaudInput object
     :param output_dir: a string specifying where to save the output.
     """
+    mi_options = (
+        {} if mi.config.optimize_options is None else mi.config.optimize_options
+    )
     model = cmdstanpy.CmdStanModel(
         stan_file=os.path.join(HERE, STAN_PROGRAM_RELATIVE_PATH),
         cpp_options=mi.config.cpp_options,
@@ -130,19 +144,13 @@ def optimize(mi: MaudInput, output_dir: str) -> CmdStanMLE:
     )
     set_up_output_dir(output_dir, mi)
     return model.optimize(
-        output_dir=output_dir,
-        # upper bound, will stop once the gradients become small enough
-        iter=3000,
         data=os.path.join(output_dir, "input_data_train.json"),
         inits=os.path.join(output_dir, "inits.json"),
-        algorithm="LBFGS",
-        init_alpha=1e-4,
-        tol_param=1e-12,
-        history_size=10,
-        show_console=True,
-        refresh=1,
-        save_profile=True,
-        save_iterations=True,
+        output_dir=output_dir,
+        **{
+            **DEFAULT_OPTIMIZE_CONFIG,
+            **mi_options,
+        },
     )
 
 

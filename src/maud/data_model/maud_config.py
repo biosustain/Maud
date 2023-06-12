@@ -29,6 +29,7 @@ class MaudConfig:
     :param stanc_options: Valid choices for CmdStanModel argument `stanc_options`.
     :param cpp_options: Valid choices for CmdStanModel `cpp_options`.
     :param variational_options: Arguments for CmdStanModel.variational.
+    :param optimize_options: Arguments for CmdStanModel.optimize.
     :param user_inits_file: path to a csv file of initial values.
     :param steady_state_threshold_abs: absolute threshold for Sv=0 be at steady state
     :param steady_state_threshold_rel: relative threshold for Sv=0 be at steady state
@@ -49,6 +50,7 @@ class MaudConfig:
     stanc_options: Optional[dict] = None
     cpp_options: Optional[dict] = None
     variational_options: Optional[dict] = None
+    optimize_options: Optional[dict] = None
     user_inits_file: Optional[str] = None
     ode_config: ODEConfig = Field(default_factory=ODEConfig)
     reject_non_steady: bool = True
