@@ -509,7 +509,7 @@ def get_conc_init(
             m
             for m in experiment.measurements
             if m.target_type == MeasurementType.MIC
-        ]
+        ] + experiment.initial_state
         for j, mic in enumerate(balanced_mics):
             if any(mic.id == m.target_id for m in msmts):
                 inits[i][j] = gmean(

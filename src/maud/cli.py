@@ -27,7 +27,7 @@ import importlib_resources
 from maud.data.example_inputs import linear
 from maud.getting_idatas import get_idata
 from maud.loading_maud_inputs import load_maud_input
-from maud.running_stan import predict, sample, simulate, variational
+from maud.running_stan import optimize, predict, sample, simulate, variational
 
 
 EXAMPLE_INPUT_PATH = importlib_resources.files(linear)._paths[0]
@@ -151,6 +151,18 @@ def simulate_command(data_path, output_dir, n):
     click.echo(do_simulate(data_path, output_dir, n))
 
 
+@cli.command("optimize")
+@click.option("--output_dir", default=".", help="Where to save the output")
+@click.argument(
+    "data_path",
+    type=click.Path(exists=True, dir_okay=True, file_okay=False),
+    default=EXAMPLE_INPUT_PATH,
+)
+def optimize_command(data_path, output_dir):
+    """Optimize the model parameters."""
+    click.echo(do_optimize(data_path, output_dir))
+
+
 def do_simulate(data_path, output_dir, n):
     """Generate draws from the initial values."""
 
@@ -210,6 +222,113 @@ def do_simulate(data_path, output_dir, n):
                 .mean(dim=["chain", "draw"])
                 .to_series()
             )
+    print("\n\nSimulated allostery terms:")
+    print(
+        idata.posterior["allostery_train"]
+        .mean(dim=["chain", "draw"])
+        .to_series()
+        .unstack()
+        .T
+    )
+    print("\n\nSimulated reversibility terms:")
+    print(
+        idata.posterior["reversibility_train"]
+        .mean(dim=["chain", "draw"])
+        .to_series()
+        .unstack()
+        .T
+    )
+    print("\n\nSimulated saturation terms:")
+    print(
+        idata.posterior["saturation_train"]
+        .mean(dim=["chain", "draw"])
+        .to_series()
+        .unstack()
+        .T
+    )
+    if mi.kinetic_model.phosphorylations is not None:
+        print("\n\nSimulated phosphorylation terms:")
+        print(
+            idata.posterior["phosphorylation_train"]
+            .mean(dim=["chain", "draw"])
+            .to_series()
+            .unstack()
+            .T
+        )
+    print("\n\nSimulated membrane potential:")
+    print(
+        idata.posterior["psi_train"].mean(dim=["chain", "draw"]).to_series().T
+    )
+    return output_path
+
+
+def do_optimize(data_path, output_dir):
+    """Optimize the model parameters."""
+
+    mi = load_maud_input(data_path=data_path)
+    now = datetime.now().strftime("%Y%m%d%H%M%S")
+    output_name = f"maud_output_opt-{mi.config.name}-{now}"
+    output_path = os.path.join(output_dir, output_name)
+    samples_path = os.path.join(output_path, "samples")
+    ui_dir = os.path.join(output_path, "user_input")
+    print("Creating output directory: " + output_path)
+    os.mkdir(output_path)
+    os.mkdir(samples_path)
+    print(f"Copying user input from {data_path} to {ui_dir}")
+    shutil.copytree(data_path, ui_dir)
+    stanfit = optimize(mi, samples_path)
+    idata = get_idata(stanfit.runset.csv_files, mi, "train")
+    idata.to_json(os.path.join(output_path, "idata.json"))
+    print("\n\nSimulated concentrations:")
+    print(
+        idata.posterior["conc_train"]
+        .mean(dim=["chain", "draw"])
+        .to_series()
+        .unstack()
+        .T
+    )
+    print("\n\nSimulated fluxes:")
+    print(
+        idata.posterior["flux_train"]
+        .mean(dim=["chain", "draw"])
+        .to_series()
+        .unstack()
+        .T
+    )
+    print("\n\nSimulated kms:")
+    print(idata.posterior["km"].mean(dim=["chain", "draw"]).to_series())
+    print("\n\nSimulated enzyme concentrations:")
+    print(
+        idata.posterior["conc_enzyme_train"]
+        .mean(dim=["chain", "draw"])
+        .to_series()
+        .unstack()
+        .T
+    )
+    print("\n\nSimulated reaction delta Gs:")
+    print(idata.posterior["dgr_train"].mean(dim=["chain", "draw"]).to_series())
+    print("\n\nSimulated measurements:")
+    print(
+        idata.posterior_predictive["yrep_conc_train"]
+        .mean(dim=["chain", "draw"])
+        .to_series()
+    )
+    print(
+        idata.posterior_predictive["yrep_flux_train"]
+        .mean(dim=["chain", "draw"])
+        .to_series()
+    )
+    print("\n\nSimulated log likelihoods:")
+    print(
+        idata.log_likelihood["llik_conc_train"]
+        .mean(dim=["chain", "draw"])
+        .to_series()
+    )
+    print(
+        idata.log_likelihood["llik_flux_train"]
+        .mean(dim=["chain", "draw"])
+        .to_series()
+    )
     print("\n\nSimulated allostery terms:")
     print(
         idata.posterior["allostery_train"]
