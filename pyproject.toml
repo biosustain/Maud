@@ -47,6 +47,7 @@ development = [
     "pre-commit",
     "isort",
     "pytest",
+    "pytest-cov",
     "tox",
     "sphinx",
     "ruff",
@@ -72,16 +73,6 @@ exclude = '''
     | _version.py
 )
 '''
-
-[tool.coverage.paths]
-source = ["src/maud", "*/site-packages/maud"]
-[tool.coverage.run]
-branch = true
-parallel = true
-omit = ["src/maud/_version.py"]
-[tool.coverage.report]
-exclude_lines = []
-precision = 2
 
 [tool.isort]
 known_first_party = ["src/maud", "src/maud/data_model", "src/maud/data"]
@@ -123,7 +114,7 @@ target-version = "py310"
 [tool.tox]
 legacy_tox_ini = """
     [tox]
-    envlist = isort, black, coverage, ruff, safety, py3{9,10}
+    envlist = isort, black, ruff, safety, py3{9,10}
 
     [testenv]
     deps =
@@ -155,13 +146,6 @@ legacy_tox_ini = """
         black
     commands=
         black --check --diff {toxinidir}/src/maud {toxinidir}/tests
-
-    [testenv:coverage]
-    skip_install = True
-    deps=
-        coverage[toml]
-    commands=
-         coverage report --fail-under=30
 
     [testenv:ruff]
     skip_install = True
