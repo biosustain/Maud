@@ -1,4 +1,4 @@
-# Configuration file for the Sphinx documentation builder.
+"""Configuration file for the Sphinx documentation builder."""
 #
 # This file only contains a selection of the most common options. For a full
 # list see the documentation:
@@ -18,9 +18,14 @@
 # -- Project information -----------------------------------------------------
 
 project = 'Maud'
-copyright = '2019, Novo Nordisk Foundation Center for Biosustainability, Technical University of Denmark'
-author = 'Novo Nordisk Foundation Center for Biosustainability, Technical University of Denmark'
-
+copyright = (
+    "2019, Novo Nordisk Foundation Center for Biosustainability, "
+    "Technical University of Denmark"
+)
+author = (
+    "Novo Nordisk Foundation Center for Biosustainability, "
+    "Technical University of Denmark"
+)
 
 # -- General configuration ---------------------------------------------------
 

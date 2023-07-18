@@ -17,8 +17,7 @@ def join_list_of_strings(l1, l2, sep="-"):
 
 
 def load_infd_fit(fit, mi: MaudInput) -> az.InferenceData:
-    """Get an arviz InferenceData object from out-of-sample tmp generated csvs."""
-
+    """Get an InferenceData object from out-of-sample tmp generated csvs."""
     coords = {
         **mi.stan_coords.__dict__,
         **{
@@ -57,7 +56,6 @@ def load_infd_fit(fit, mi: MaudInput) -> az.InferenceData:
 
 def load_infd(csvs: List[str], mi: MaudInput) -> az.InferenceData:
     """Get an arviz InferenceData object from Maud csvs."""
-
     Numba.disable_numba()
     coords = {
         **mi.stan_coords.__dict__,

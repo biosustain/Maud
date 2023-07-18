@@ -51,7 +51,6 @@ def get_init_atom_input_ids(
     id_components: List[List[IdComponent]],
 ) -> Tuple[str, ...]:
     """Get an init's id from a userinput."""
-
     return tuple(
         ID_SEPARATOR.join([getattr(iai, c) for c in idci])
         for idci in id_components

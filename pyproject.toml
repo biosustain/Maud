@@ -87,10 +87,26 @@ plugins = ["pydantic.mypy", "numpy.typing.mypy_plugin"]
 module = ["scipy.*", "cmdstanpy.*", "depinfo", "maud.*", "matplotlib.*"]
 ignore_missing_imports = true
 
+[tool.ruff]
+# Enable the following rules:
+# pycodestyle (`E`), Pyflakes (`F`), pycodestyle (`W`), flake8-bugbear (`B`)
+select = ["E", "F", "B", "W", "D"]
+ignore = [
+    "B905",  # Use zip() without a `strict` parameter.
+    "D107",  # Init methods can be undocumented.
+    "D203",  # Class docstrints don't need blank lines before them.
+    "D213",  # https://beta.ruff.rs/docs/rules/multi-line-summary-second-line/
+    "D104",  # __init__.py can be empty.
+]  
+fixable = ["ALL"]
+unfixable = []
+line-length = 80
+target-version = "py310"
+
 [tool.tox]
 legacy_tox_ini = """
     [tox]
-    envlist = isort, black, flake8, safety, py3{9,10}
+    envlist = isort, black, ruff, safety, py3{9,10}
     
     [testenv]
     deps =
@@ -123,14 +139,12 @@ legacy_tox_ini = """
     commands=
         black --check --diff {toxinidir}/src/maud {toxinidir}/tests
     
-    [testenv:flake8]
+    [testenv:ruff]
     skip_install = True
     deps=
-        flake8
-        flake8-docstrings
-        flake8-bugbear
+        ruff
     commands=
-        flake8 {toxinidir}/src/maud {toxinidir}/tests
+        ruff .
     
     [testenv:safety]
     deps=
@@ -168,44 +182,5 @@ legacy_tox_ini = """
     omit =
         src/maud/_version.py
     
-    [flake8]
-    max-line-length = 88
-    exclude =
-        __init__.py
-        _version.py
-    # The following conflict with `black` which is the more pedantic.
-    ignore =
-        E203
-        W503
-        D202
-        D107
-    
-    [isort]
-    skip =
-        __init__.py
-        _version.py
-    line_length = 80
-    indent = 4
-    multi_line_output = 3
-    include_trailing_comma = true
-    force_grid_wrap = 0
-    use_parentheses = true
-    lines_after_imports = 2
-    known_first_party = maud
-    known_third_party =
-        arviz
-        numpy
-        pandas
-        matplotlib
-        jinja2
-        toml
-        cmdstanpy
-        click
-        depinfo
-        black
-        depinfo
-        pytest
-        scipy
-        tox
 """
 

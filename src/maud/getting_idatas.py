@@ -10,7 +10,6 @@ from maud.data_model.maud_input import MaudInput
 
 def get_idata(csvs: List[str], mi: MaudInput, mode: str) -> az.InferenceData:
     """Get an arviz InferenceData object from Maud csvs."""
-
     experiments = (
         [e for e in mi.experiments if e.is_train]
         if mode == "train"

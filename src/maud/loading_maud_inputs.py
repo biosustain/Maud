@@ -13,8 +13,7 @@ from maud.parsing_kinetic_models import parse_kinetic_model
 
 
 def load_maud_input(data_path: str) -> MaudInput:
-    """
-    Load an MaudInput object from a data path.
+    """Load an MaudInput object from a data path.
 
     :param filepath: path to directory containing input toml file
     :param mode: determines which experiments will be included,

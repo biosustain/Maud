@@ -7,8 +7,8 @@ from pydantic.dataclasses import dataclass
 
 
 @dataclass
-class IndPriorAtomInput:
-    """Prior input for a single quantity."""
+class ParameterInputAtom:
+    """Parameter input for a single quantity."""
 
     metabolite: Optional[str] = None
     compartment: Optional[str] = None
@@ -22,6 +22,7 @@ class IndPriorAtomInput:
     scale: Optional[float] = None
     pct1: Optional[float] = None
     pct99: Optional[float] = None
+    init: Optional[float] = None
 
     @validator("scale")
     def scale_is_positive(cls, v):
@@ -57,8 +58,8 @@ class IndPriorAtomInput:
 
 
 @dataclass
-class PriorMVNInput:
-    """Prior input for a parameter with multivariate normal distribution."""
+class ParameterInputMVN:
+    """User input for a parameter with multivariate normal prior."""
 
     ids: List[str]
     mean_vector: List[float]
@@ -66,18 +67,18 @@ class PriorMVNInput:
 
 
 @dataclass
-class PriorInput:
-    """A full prior input."""
+class ParametersInput:
+    """User input for all parameters."""
 
-    dgf: Optional[Union[PriorMVNInput, List[IndPriorAtomInput]]] = None
-    km: Optional[List[IndPriorAtomInput]] = None
-    kcat: Optional[List[IndPriorAtomInput]] = None
-    kcat_pme: Optional[List[IndPriorAtomInput]] = None
-    ki: Optional[List[IndPriorAtomInput]] = None
-    psi: Optional[List[IndPriorAtomInput]] = None
-    dissociation_constant: Optional[List[IndPriorAtomInput]] = None
-    transfer_constant: Optional[List[IndPriorAtomInput]] = None
-    conc_unbalanced: Optional[List[IndPriorAtomInput]] = None
-    drain: Optional[List[IndPriorAtomInput]] = None
-    conc_enzyme: Optional[List[IndPriorAtomInput]] = None
-    conc_pme: Optional[List[IndPriorAtomInput]] = None
+    dgf: Optional[Union[ParameterInputMVN, List[ParameterInputAtom]]] = None
+    km: Optional[List[ParameterInputAtom]] = None
+    kcat: Optional[List[ParameterInputAtom]] = None
+    kcat_pme: Optional[List[ParameterInputAtom]] = None
+    ki: Optional[List[ParameterInputAtom]] = None
+    psi: Optional[List[ParameterInputAtom]] = None
+    dissociation_constant: Optional[List[ParameterInputAtom]] = None
+    transfer_constant: Optional[List[ParameterInputAtom]] = None
+    conc_unbalanced: Optional[List[ParameterInputAtom]] = None
+    drain: Optional[List[ParameterInputAtom]] = None
+    conc_enzyme: Optional[List[ParameterInputAtom]] = None
+    conc_pme: Optional[List[ParameterInputAtom]] = None
