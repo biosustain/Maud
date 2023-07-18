@@ -7,6 +7,8 @@ data/cached_stan_models/*.pkl
 *.txt
 *.json
 
+.coverage
+
 data/stan_records/*
 data/in/*
 !data/in/readme.md

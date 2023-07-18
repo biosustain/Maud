@@ -71,6 +71,16 @@ exclude = '''
 )
 '''
 
+[tool.coverage.paths]
+source = ["src/maud", "*/site-packages/maud"]
+[tool.coverage.run]
+branch = true
+parallel = true
+omit = ["src/maud/_version.py"]
+[tool.coverage.report]
+exclude_lines = []
+precision = 2
+
 [tool.isort]
 known_first_party = ["src/maud", "src/maud/data_model", "src/maud/data"]
 multi_line_output = 3
@@ -86,6 +96,11 @@ plugins = ["pydantic.mypy", "numpy.typing.mypy_plugin"]
 [[tool.mypy.overrides]]
 module = ["scipy.*", "cmdstanpy.*", "depinfo", "maud.*", "matplotlib.*"]
 ignore_missing_imports = true
+
+[tool.pytest.inioptions]
+minversion = "6.0"
+testpaths = ["tests"]
+markers = ["raises"]
 
 [tool.ruff]
 # Enable the following rules:
@@ -106,7 +121,7 @@ target-version = "py310"
 [tool.tox]
 legacy_tox_ini = """
     [tox]
-    envlist = isort, black, ruff, safety, py3{9,10}
+    envlist = isort, black, coverage, ruff, safety, py3{9,10}
     
     [testenv]
     deps =
@@ -139,6 +154,13 @@ legacy_tox_ini = """
     commands=
         black --check --diff {toxinidir}/src/maud {toxinidir}/tests
     
+    [testenv:coverage]
+    skip_install = True
+    deps=
+        coverage[toml]
+    commands=
+         coverage report
+
     [testenv:ruff]
     skip_install = True
     deps=
@@ -152,35 +174,5 @@ legacy_tox_ini = """
     commands=
         pip install --upgrade pip
         safety check -i 44715 -i 51549
-    
-    ################################################################################
-    # Testing tools configuration                                                  #
-    ################################################################################
-    
-    [pytest]
-    testpaths =
-        tests
-    markers =
-        raises
-    
-    [coverage:paths]
-    source =
-        src/maud
-        */site-packages/maud
-    
-    [coverage:run]
-    branch = true
-    parallel = true
-    omit =
-        src/maud/_version.py
-    
-    [coverage:report]
-    exclude_lines =
-        # Have to re-enable the standard pragma
-        pragma: no cover
-    precision = 2
-    omit =
-        src/maud/_version.py
-    
 """
 
