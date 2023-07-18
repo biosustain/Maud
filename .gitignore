@@ -1,3 +1,5 @@
+build/
+dist/
 *__pycache__*
 data/cached_stan_models/*.pkl
 */.ipynb_checkpoints/*
@@ -18,10 +20,11 @@ data/in/*
 !tests/data/*/*.csv
 !tests/data/*/*/*.csv
 
-src/maud/stan_code/autogen/*
-!src/maud/stan_code/autogen/readme.md
+src/maud/stan/*
+!src/maud/stan/*.*
+src/maud/stan/*.hpp
 
-docs/_build/*
+docs/_build/
 !docs/_build/html*
 docs/_static/*
 docs/_templates/*
@@ -33,5 +36,5 @@ docs/_templates/*
 venv/*
 .venv*
 maud_venv/*
-src/maud.egg-info
+*egg-info*
 pip-wheel-metadata
