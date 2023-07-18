@@ -161,7 +161,7 @@ legacy_tox_ini = """
     deps=
         coverage[toml]
     commands=
-         coverage report
+         coverage report --fail-under=30
 
     [testenv:ruff]
     skip_install = True
