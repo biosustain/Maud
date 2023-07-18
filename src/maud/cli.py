@@ -29,7 +29,6 @@ from maud.getting_idatas import get_idata
 from maud.loading_maud_inputs import load_maud_input
 from maud.running_stan import optimize, predict, sample, simulate, variational
 
-
 EXAMPLE_INPUT_PATH = importlib_resources.files(linear)._paths[0]
 
 
