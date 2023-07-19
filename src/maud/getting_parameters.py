@@ -28,7 +28,6 @@ from maud.data_model.maud_parameter import (
 )
 from maud.data_model.prior_input import PriorInput
 
-
 AllostericCoords = Tuple[List[str], List[str], List[str], List[str], List[str]]
 KmCoords = Tuple[List[str], List[str], List[str], List[str]]
 KcatCoords = Tuple[List[str], List[str], List[str]]

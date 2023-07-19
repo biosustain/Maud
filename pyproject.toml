@@ -1,8 +1,68 @@
 [build-system]
-requires = [
-  'setuptools>=40.6.0',
-  'wheel'
+requires = ["setuptools"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "maud-metabolic-models"
+version = "0.5.1.1"
+authors = [
+    {name = "Novo Nordisk Foundation Center for Biosustainability, Technical University of Denmark"}
+  ]
+classifiers = [
+    "Development Status :: 2 - Pre-Alpha",
+    "Intended Audience :: Science/Research",
+    "License :: OSI Approved :: GNU General Public License v3 (GPLv3)",
+    "Natural Language :: English",
+    "Operating System :: MacOS :: MacOS X",
+    "Operating System :: Microsoft :: Windows :: Windows 10",
+    "Operating System :: POSIX",
+    "Topic :: Scientific/Engineering :: Bio-Informatics",
 ]
+license = {text = "GNU General Public License version 3"}
+description = "Bayesian statistical models of metabolic networks"
+readme = "README.rst"
+requires-python = ">=3.9"
+dependencies = [
+    "pip >= 20",
+    "arviz >= 0.12.1",
+    "importlib_resources >= 3.2",
+    "numpy",
+    "scipy",
+    "sympy",
+    "pandas",
+    "matplotlib",
+    "toml",
+    "cmdstanpy >= 1.0.3",
+    "click",
+    "depinfo == 1.7.0",
+    "pydantic == 1.9.0",
+]
+
+[project.entry-points.console_scripts]
+maud = "maud.cli:cli"
+
+[project.optional-dependencies]
+development = [
+    "black",
+    "pre-commit",
+    "isort",
+    "pytest",
+    "pytest-cov",
+    "tox",
+    "sphinx",
+    "ruff",
+    "sphinx-click",
+]
+
+[project.urls]
+homepage = "https://github.com/biosustain/Maud"
+download = "https://pypi.org/project/maud-metabolic-models/"
+documentation = "https://maud-metabolic-models.readthedocs.io"
+
+[tool.setuptools]
+include-package-data = true
+[tool.setuptools.packages.find]
+where = ["src"]
 
 [tool.black]
 line-length = 80
@@ -14,9 +74,90 @@ exclude = '''
 )
 '''
 
+[tool.isort]
+known_first_party = ["src/maud", "src/maud/data_model", "src/maud/data"]
+multi_line_output = 3
+include_trailing_comma = true
+force_grid_wrap = 0
+use_parentheses = true
+ensure_newline_before_comments = true
+line_length = 80
+
 [tool.mypy]
 plugins = ["pydantic.mypy", "numpy.typing.mypy_plugin"]
 
 [[tool.mypy.overrides]]
 module = ["scipy.*", "cmdstanpy.*", "depinfo", "maud.*", "matplotlib.*"]
 ignore_missing_imports = true
+
+[tool.pytest.inioptions]
+minversion = "6.0"
+testpaths = ["tests"]
+markers = ["raises"]
+
+[tool.ruff]
+# Enable the following rules:
+# pycodestyle (`E`), Pyflakes (`F`), pycodestyle (`W`), flake8-bugbear (`B`)
+select = ["E", "F", "B", "W", "D"]
+ignore = [
+    "B905",  # Use zip() without a `strict` parameter.
+    "D107",  # Init methods can be undocumented.
+    "D203",  # Class docstrints don't need blank lines before them.
+    "D213",  # https://beta.ruff.rs/docs/rules/multi-line-summary-second-line/
+    "D104",  # __init__.py can be empty.
+]
+fixable = ["ALL"]
+unfixable = []
+line-length = 80
+target-version = "py310"
+
+[tool.tox]
+legacy_tox_ini = """
+    [tox]
+    envlist = isort, black, ruff, safety, py3{9,10}
+
+    [testenv]
+    deps =
+        pytest
+        pytest-cov
+        pytest-raises
+    commands =
+        pytest --cov=maud --cov-report=term --ignore=tests/test_integration {posargs}
+
+    [testenv:py38]
+    passenv =
+        CMDSTAN
+
+    [testenv:py39]
+    passenv =
+        CMDSTAN
+
+    [testenv:isort]
+    skip_install = True
+    deps=
+        isort
+    commands=
+        isort --check-only --diff {toxinidir}/src/maud \
+        {toxinidir}/tests
+
+    [testenv:black]
+    skip_install = True
+    deps=
+        black
+    commands=
+        black --check --diff {toxinidir}/src/maud {toxinidir}/tests
+
+    [testenv:ruff]
+    skip_install = True
+    deps=
+        ruff
+    commands=
+        ruff .
+
+    [testenv:safety]
+    deps=
+        safety
+    commands=
+        pip install --upgrade pip
+        safety check -i 44715 -i 51549
+"""

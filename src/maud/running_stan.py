@@ -10,7 +10,6 @@ from cmdstanpy.stanfit.vb import CmdStanVB
 
 from maud.data_model.maud_input import MaudInput
 
-
 HERE = os.path.dirname(os.path.abspath(__file__))
 DEFAULT_PRIOR_LOC_DRAIN = None
 DEFAULT_PRIOR_SCALE_DRAIN = None

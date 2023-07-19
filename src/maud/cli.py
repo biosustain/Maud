@@ -29,7 +29,6 @@ from maud.getting_idatas import get_idata
 from maud.loading_maud_inputs import load_maud_input
 from maud.running_stan import optimize, predict, sample, simulate, variational
 
-
 EXAMPLE_INPUT_PATH = importlib_resources.files(linear)._paths[0]
 
 
@@ -165,7 +164,6 @@ def optimize_command(data_path, output_dir):
 
 def do_simulate(data_path, output_dir, n):
     """Generate draws from the initial values."""
-
     mi = load_maud_input(data_path=data_path)
     now = datetime.now().strftime("%Y%m%d%H%M%S")
     output_name = f"maud_output_sim-{mi.config.name}-{now}"
@@ -270,7 +268,6 @@ def do_simulate(data_path, output_dir, n):
 
 def do_optimize(data_path, output_dir):
     """Optimize the model parameters."""
-
     mi = load_maud_input(data_path=data_path)
     now = datetime.now().strftime("%Y%m%d%H%M%S")
     output_name = f"maud_output_opt-{mi.config.name}-{now}"

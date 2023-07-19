@@ -26,13 +26,13 @@ class MaudConfig:
     :param cmdstanpy_config: Arguments to cmdstanpy.CmdStanModel.sample.
     :param reject_non_steady: Reject draws if a non-steady state is encountered.
     :param ode_config: Configuration for Stan's ode solver.
-    :param stanc_options: Valid choices for CmdStanModel argument `stanc_options`.
-    :param cpp_options: Valid choices for CmdStanModel `cpp_options`.
+    :param stanc_options: Options for CmdStanModel argument `stanc_options`.
+    :param cpp_options: Options for CmdStanModel `cpp_options`.
     :param variational_options: Arguments for CmdStanModel.variational.
     :param optimize_options: Arguments for CmdStanModel.optimize.
     :param user_inits_file: path to a csv file of initial values.
-    :param steady_state_threshold_abs: absolute threshold for Sv=0 be at steady state
-    :param steady_state_threshold_rel: relative threshold for Sv=0 be at steady state
+    :param steady_state_threshold_abs: abs threshold for Sv=0 be at steady state
+    :param steady_state_threshold_rel: rel threshold for Sv=0 be at steady state
     :param default_initial_concentration: in molecule_unit per volume_unit
     :param drain_small_conc_corrector: number for correcting small conc drains
     :param molecule_unit: A unit for counting molecules, like 'mol' or 'mmol'
