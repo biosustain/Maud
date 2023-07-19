@@ -69,7 +69,7 @@ jobs:
         find . -name '*.tar.gz' -exec mv '{}' dist/ \;
         find . -name '*.whl' -exec mv '{}' dist/ \;
     - name: Upload
-      uses: pypa/gh-action-pypi-publish@v1
+      uses: pypa/gh-action-pypi-publish@release/v1
       with:
         user: __token__
         repository-url: https://test.pypi.org/legacy/
