@@ -2,7 +2,17 @@
 
 name: Install Maud and run tox
 
-on: push
+on:
+  push:
+    branches:
+      - 'main'
+    tags:
+      - '**'
+  pull_request:
+  workflow_dispatch: {}
+
+env:
+  CMDSTAN_VERSION: "2.32.2"
 
 jobs:
   build:
