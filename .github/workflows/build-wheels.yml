@@ -51,6 +51,7 @@ jobs:
       with:
         name: artifact-source-dist
         path: "./**/dist/*.tar.gz"
+
   upload:
     name: Upload to PyPI
     needs: [make-wheels, make-sdist]
@@ -70,4 +71,5 @@ jobs:
       uses: pypa/gh-action-pypi-publish@v1.4.2
       with:
         user: __token__
-        password: ${{ secrets.PYPI_TOKEN }}
+        repository-url: https://test.pypi.org/legacy/
+        password: ${{ secrets.TEST_PYPI_API_TOKEN }}
