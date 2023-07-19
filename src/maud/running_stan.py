@@ -68,11 +68,6 @@ def load_stan_model(
 
     If that fails, compile them.
     """
-    # on Windows specifically, we should point cmdstanpy to the repackaged
-    # CmdStan if it exists. This lets cmdstanpy handle the TBB path for us.
-    local_cmdstan = STAN_FILES_FOLDER / f"cmdstan-{CMDSTAN_VERSION}"
-    if os.path.exists(local_cmdstan):
-        cmdstanpy.set_cmdstan_path(str((local_cmdstan.resolve())))
     try:
         model = cmdstanpy.CmdStanModel(
             exe_file=STAN_FILES_FOLDER / f"{name}.exe",
