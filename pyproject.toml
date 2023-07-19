@@ -62,7 +62,9 @@ documentation = "https://maud-metabolic-models.readthedocs.io"
 [tool.setuptools]
 include-package-data = true
 [tool.setuptools.packages.find]
-where = ["src"]
+where = ["maud"]
+[tool.setuptools.package-data]
+"*" = ["*.stan"]
 
 [tool.black]
 line-length = 80
@@ -75,7 +77,7 @@ exclude = '''
 '''
 
 [tool.isort]
-known_first_party = ["src/maud", "src/maud/data_model", "src/maud/data"]
+known_first_party = ["maud", "maud/data_model", "maud/data"]
 multi_line_output = 3
 include_trailing_comma = true
 force_grid_wrap = 0
@@ -137,7 +139,7 @@ legacy_tox_ini = """
     deps=
         isort
     commands=
-        isort --check-only --diff {toxinidir}/src/maud \
+        isort --check-only --diff {toxinidir}/maud \
         {toxinidir}/tests
 
     [testenv:black]
@@ -145,7 +147,7 @@ legacy_tox_ini = """
     deps=
         black
     commands=
-        black --check --diff {toxinidir}/src/maud {toxinidir}/tests
+        black --check --diff {toxinidir}/maud {toxinidir}/tests
 
     [testenv:ruff]
     skip_install = True
