@@ -15,7 +15,7 @@ from setuptools import Extension, setup
 from setuptools.command.build_ext import build_ext
 from wheel.bdist_wheel import bdist_wheel
 
-MODEL_DIR = os.path.join("src", "maud", "stan")
+MODEL_DIR = os.path.join("maud", "stan")
 MODELS = ["model", "out_of_sample_model"]
 
 CMDSTAN_VERSION = "2.32.2"
