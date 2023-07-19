@@ -74,6 +74,7 @@ packages = [
     "maud.data.example_inputs.example_ode",
     "maud.data.example_outputs",
     "maud.data.example_outputs.linear",
+    "maud.data.example_outputs.linear.user_input",
 ]
 [tool.setuptools.package-data]
 "*" = ["*.stan", "*.json", "*.toml"]
