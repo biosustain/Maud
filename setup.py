@@ -1,4 +1,4 @@
-"""This setup.py is used only for the building of the Stan models.
+"""Code for building the Stan models.
 
 The rest of the metadata is in setup.cfg.
 """
@@ -16,7 +16,7 @@ from setuptools.command.build_ext import build_ext
 from wheel.bdist_wheel import bdist_wheel
 
 MODEL_DIR = os.path.join("src", "maud", "stan")
-MODELS = ["model"]
+MODELS = ["model", "out_of_sample_model"]
 
 CMDSTAN_VERSION = "2.32.2"
 BINARIES_DIR = "bin"
@@ -26,8 +26,9 @@ TBB_DIRS = ["tbb", "tbb_2020.3"]
 
 
 def prune_cmdstan(cmdstan_dir: os.PathLike) -> None:
-    """Keep only the cmdstan executables and tbb files
-    (minimum required to run a cmdstanpy commands on a pre-compiled model).
+    """Keep only the cmdstan executables and tbb files.
+
+    (minimum required to run a cmdstanpy commands on a pre-compiled model)
     """
     original_dir = Path(cmdstan_dir).resolve()
     parent_dir = original_dir.parent
@@ -54,11 +55,15 @@ def prune_cmdstan(cmdstan_dir: os.PathLike) -> None:
 
 
 def repackage_cmdstan() -> bool:
+    """Repackage cmdstan."""
     return os.environ.get("MAUD_REPACKAGE_CMDSTAN", "").lower() in ["true", "1"]
 
 
 def maybe_install_cmdstan_toolchain() -> None:
-    """Install C++ compilers required to build stan models on Windows machines."""
+    """Install C++ compilers.
+
+    These are required to build stan models on Windows machines.
+    """
     try:
         cmdstanpy.utils.cxx_toolchain_path()
     except Exception:
@@ -69,6 +74,7 @@ def maybe_install_cmdstan_toolchain() -> None:
 
 
 def install_cmdstan_deps(cmdstan_dir: Path) -> None:
+    """Install cmdstan's dependencies."""
     from multiprocessing import cpu_count
 
     if repackage_cmdstan():
@@ -99,7 +105,7 @@ def install_cmdstan_deps(cmdstan_dir: Path) -> None:
 
 
 def build_models(target_dir: str) -> None:
-
+    """Build the models."""
     cmdstan_dir = (Path(target_dir) / f"cmdstan-{CMDSTAN_VERSION}").resolve()
     install_cmdstan_deps(cmdstan_dir)
     for model in MODELS:
@@ -117,6 +123,7 @@ class BuildModels(build_ext):
     """Custom build command to pre-compile Stan models."""
 
     def run(self) -> None:
+        """Run."""
         if not self.dry_run:
             target_dir = os.path.join(self.build_lib, MODEL_DIR)
             self.mkpath(target_dir)
@@ -125,7 +132,7 @@ class BuildModels(build_ext):
 
 
 def clean_models(target_dir: str) -> None:
-    # Remove compiled stan files
+    """Remove compiled stan files."""
     for model in MODELS:
         for filename in [model, f"{model}.hpp", f"{model}.exe"]:
             stan_file = Path(target_dir) / filename
@@ -137,6 +144,7 @@ class CleanModels(clean):
     """Custom clean command to remove pre-compile Stan models."""
 
     def run(self) -> None:
+        """Run the command."""
         if not self.dry_run:
             target_dir = os.path.join(self.build_lib, MODEL_DIR)
             clean_models(target_dir)
@@ -144,16 +152,28 @@ class CleanModels(clean):
             super().run()
 
 
-# this is taken from the cibuildwheel example https://github.com/joerick/python-ctypes-package-sample
-# it marks the wheel as not specific to the Python API version.
-# This means the wheel will only be built once per platform, rather than per-Python-per-platform.
-# If you are combining with any actual C extensions, you will most likely want to remove this.
 class WheelABINone(bdist_wheel):
+    """Taken from the cibuildwheel example.
+
+    Here is the original:
+    https://github.com/joerick/python-ctypes-package-sample
+
+    It marks the wheel as not specific to the Python API version.
+
+    This means the wheel will only be built once per platform, rather than
+    per-Python-per-platform.
+
+    If you are combining with any actual C extensions, you will most likely
+    want to remove this.
+    """
+
     def finalize_options(self) -> None:
+        """Finalize the options."""
         bdist_wheel.finalize_options(self)
         self.root_is_pure = False
 
     def get_tag(self) -> Tuple[str, str, str]:
+        """Get the tag."""
         _, _, plat = bdist_wheel.get_tag(self)
         return "py3", "none", plat
 

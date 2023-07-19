@@ -1,6 +1,9 @@
 """Code for sampling from a posterior distribution."""
 
 import os
+import shutil
+import warnings
+from pathlib import Path
 
 import arviz as az
 import cmdstanpy
@@ -10,9 +13,12 @@ from cmdstanpy.stanfit.vb import CmdStanVB
 
 from maud.data_model.maud_input import MaudInput
 
+CMDSTAN_VERSION = "2.32.2"
+
 HERE = os.path.dirname(os.path.abspath(__file__))
 DEFAULT_PRIOR_LOC_DRAIN = None
 DEFAULT_PRIOR_SCALE_DRAIN = None
+STAN_FILES_FOLDER = Path(__file__).parent / "stan"
 STAN_PROGRAM_RELATIVE_PATH = os.path.join("stan", "model.stan")
 STAN_PROGRAM_RELATIVE_PATH_PREDICT = os.path.join(
     "stan", "out_of_sample_model.stan"
@@ -55,16 +61,52 @@ DEFAULT_OPTIMIZE_CONFIG = {
 }
 
 
+def load_stan_model(
+    name: str, cpp_options: dict, stanc_options: dict
+) -> cmdstanpy.CmdStanModel:
+    """Try to load precompiled Stan models.
+
+    If that fails, compile them.
+    """
+    # on Windows specifically, we should point cmdstanpy to the repackaged
+    # CmdStan if it exists. This lets cmdstanpy handle the TBB path for us.
+    local_cmdstan = STAN_FILES_FOLDER / f"cmdstan-{CMDSTAN_VERSION}"
+    if os.path.exists(local_cmdstan):
+        cmdstanpy.set_cmdstan_path(str((local_cmdstan.resolve())))
+    try:
+        model = cmdstanpy.CmdStanModel(
+            exe_file=STAN_FILES_FOLDER / f"{name}.exe",
+            stan_file=STAN_FILES_FOLDER / f"{name}.stan",
+            cpp_options=cpp_options,
+            stanc_options=stanc_options,
+            compile=False,
+        )
+    except ValueError:
+        warnings.warn(
+            f"Failed to load pre-built model '{name}.exe', compiling",
+            stacklevel=2,
+        )
+        model = cmdstanpy.CmdStanModel(
+            stan_file=STAN_FILES_FOLDER / f"{name}.stan",
+            cpp_options=cpp_options,
+            stanc_options=stanc_options,
+        )
+        shutil.copy(
+            model.exe_file,  # type: ignore
+            STAN_FILES_FOLDER / f"{name}.exe",
+        )
+
+    return model
+
+
 def sample(mi: MaudInput, output_dir: str) -> CmdStanMCMC:
     """Sample from the posterior defined by mi.
 
     :param mi: a MaudInput object
     :param output_dir: a string specifying where to save the output.
     """
-    model = cmdstanpy.CmdStanModel(
-        stan_file=os.path.join(HERE, STAN_PROGRAM_RELATIVE_PATH),
-        cpp_options=mi.config.cpp_options,
-        stanc_options=mi.config.stanc_options,
+    model = load_stan_model(
+        "model", mi.config.cpp_options, mi.config.stanc_options
     )
     set_up_output_dir(output_dir, mi)
     sample_args: dict = {
@@ -89,10 +131,8 @@ def variational(mi: MaudInput, output_dir: str) -> CmdStanVB:
         if mi.config.variational_options is None
         else mi.config.variational_options
     )
-    model = cmdstanpy.CmdStanModel(
-        stan_file=os.path.join(HERE, STAN_PROGRAM_RELATIVE_PATH),
-        cpp_options=mi.config.cpp_options,
-        stanc_options=mi.config.stanc_options,
+    model = load_stan_model(
+        "model", mi.config.cpp_options, mi.config.stanc_options
     )
     set_up_output_dir(output_dir, mi)
     return model.variational(
@@ -112,10 +152,8 @@ def simulate(mi: MaudInput, output_dir: str, n: int) -> CmdStanMCMC:
     :param mi: a MaudInput object
     :param output_dir: a string specifying where to save the output.
     """
-    model = cmdstanpy.CmdStanModel(
-        stan_file=os.path.join(HERE, STAN_PROGRAM_RELATIVE_PATH),
-        cpp_options=mi.config.cpp_options,
-        stanc_options=mi.config.stanc_options,
+    model = load_stan_model(
+        "model", mi.config.cpp_options, mi.config.stanc_options
     )
     set_up_output_dir(output_dir, mi)
     return model.sample(
@@ -136,10 +174,8 @@ def optimize(mi: MaudInput, output_dir: str) -> CmdStanMLE:
     mi_options = (
         {} if mi.config.optimize_options is None else mi.config.optimize_options
     )
-    model = cmdstanpy.CmdStanModel(
-        stan_file=os.path.join(HERE, STAN_PROGRAM_RELATIVE_PATH),
-        cpp_options=mi.config.cpp_options,
-        stanc_options=mi.config.stanc_options,
+    model = load_stan_model(
+        "model", mi.config.cpp_options, mi.config.stanc_options
     )
     set_up_output_dir(output_dir, mi)
     return model.optimize(
@@ -175,10 +211,8 @@ def predict(
     :param output_dir: directory where output will be saved
     :param idata_train: InferenceData object with posterior draws
     """
-    model = cmdstanpy.CmdStanModel(
-        stan_file=os.path.join(HERE, STAN_PROGRAM_RELATIVE_PATH_PREDICT),
-        cpp_options=mi.config.cpp_options,
-        stanc_options=mi.config.stanc_options,
+    model = load_stan_model(
+        "out_of_sample_model", mi.config.cpp_options, mi.config.stanc_options
     )
     set_up_output_dir(output_dir, mi)
     kinetic_parameters = [
