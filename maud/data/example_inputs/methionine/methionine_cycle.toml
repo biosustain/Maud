@@ -280,7 +280,7 @@ inchi_key = "KWIUHFFTVRNATP-UHFFFAOYSA-N"  # source http://bigg.ucsd.edu/univers
 id = "dmgly"
 name = "dimethyl-glycine"
 inchi_key = "FFDGPVCHZBVARC-UHFFFAOYSA-N"  # source http://bigg.ucsd.edu/universal/metabolites/dmgly
- 
+
 [[metabolite]]
 id = "ser-L"
 name = "serine"
@@ -455,4 +455,3 @@ enzyme_id = "GNMT1"
 reaction_id = "GNMT"
 metabolite_id = "ahcys"
 compartment_id = "c"
-

@@ -1,18 +1,18 @@
 functions {
   vector unz_1d(vector[] mnsd, vector z){
-    /* 
+    /*
       Recover a real-valued vector from a 1xn vector z of z scores and a 2xn
       array mnsd of vectors consisting of the mean and standard deviation of
-      each element. 
+      each element.
     */
     return mnsd[1] + mnsd[2] .* z;
   }
 
   vector unz_log_1d(vector[] mnsd, vector z){
-    /* 
+    /*
       Recover a positive-constrained vector from a 1xn vector z of z scores and
       a 2xn array mnsd of vectors consisting of the lognormal mean and standard
-      deviation of each element. 
+      deviation of each element.
     */
     return exp(mnsd[1] + mnsd[2] .* z);
   }

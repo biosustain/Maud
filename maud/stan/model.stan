@@ -90,7 +90,7 @@ data {
   array[2, N_experiment_train] vector[N_drain] priors_drain_train;
   // configuration
   array[N_experiment_train] vector<lower=0>[N_mic-N_unbalanced] conc_init;
-  real rel_tol; 
+  real rel_tol;
   real abs_tol;
   real steady_state_threshold_abs;
   real steady_state_threshold_rel;
@@ -158,7 +158,7 @@ transformed parameters {
                   conc_init[e],
                   initial_time,
                   {timepoint},
-                  rel_tol, 
+                  rel_tol,
                   abs_tol,
                   max_num_steps,
                   conc_unbalanced_train[e],

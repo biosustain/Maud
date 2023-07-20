@@ -22,7 +22,7 @@ import pytest
 
 
 @pytest.mark.parametrize(
-    "public_module, symbol", [("maud.helpers", "show_versions")]
+    "public_module, symbol", [("maud.utility_functions", "show_versions")]
 )
 def test_public_api(public_module, symbol):
     """Expect the given public package interface."""

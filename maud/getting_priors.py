@@ -14,7 +14,7 @@ from maud.data_model.hardcoding import ID_SEPARATOR
 from maud.data_model.maud_parameter import IdComponent
 from maud.data_model.prior import IndPrior1d, IndPrior2d, PriorMVN
 from maud.data_model.prior_input import IndPriorAtomInput, PriorMVNInput
-from maud.utils import (
+from maud.utility_functions import (
     get_lognormal_parameters_from_quantiles,
     get_normal_parameters_from_quantiles,
 )

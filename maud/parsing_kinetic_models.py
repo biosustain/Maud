@@ -17,7 +17,7 @@ from maud.data_model.kinetic_model import (
     Reaction,
     ReactionMechanism,
 )
-from maud.utils import read_with_fallback
+from maud.utility_functions import read_with_fallback
 
 
 def parse_kinetic_model(raw: dict) -> KineticModel:
