@@ -24,12 +24,12 @@ import arviz as az
 import click
 import importlib_resources
 
-from maud.data.example_inputs import linear
+from maud.data.example_inputs import linear, methionine
 from maud.getting_idatas import get_idata
 from maud.loading_maud_inputs import load_maud_input
 from maud.running_stan import optimize, predict, sample, simulate, variational
 
-EXAMPLE_INPUT_PATH = importlib_resources.files(linear)._paths[0]
+AVAILABLE_EXAMPLE_INPUTS = {"linear": linear, "methionine": methionine}
 
 
 @click.group()
@@ -39,12 +39,29 @@ def cli():
     pass
 
 
+@cli.command("load-input")
+@click.option("--output_dir", default=".", help="Where to save the folder.")
+@click.argument("input_name", type=click.STRING)
+def load_input_command(input_name, output_dir):
+    """Extract one of Maud's example inputs.
+
+    Available inputs: "linear", "methionine"
+    """
+    if input_name not in AVAILABLE_EXAMPLE_INPUTS.keys():
+        raise ValueError(
+            f"{input_name} not available."
+            " Available inputs:\n\t{'\n\t'.split(available)}"
+        )
+    data = AVAILABLE_EXAMPLE_INPUTS[input_name]
+    path = importlib_resources.files(data)._paths[0]
+    shutil.copytree(path, os.path.join(output_dir, input_name))
+
+
 @cli.command("sample")
 @click.option("--output_dir", default=".", help="Where to save Maud's output")
 @click.argument(
     "data_path",
     type=click.Path(exists=True, dir_okay=True, file_okay=False),
-    default=EXAMPLE_INPUT_PATH,
 )
 def sample_command(data_path, output_dir):
     """Generate MCMC samples given a user input directory.
@@ -143,7 +160,6 @@ def do_predict(data_path: str):
 @click.argument(
     "data_path",
     type=click.Path(exists=True, dir_okay=True, file_okay=False),
-    default=EXAMPLE_INPUT_PATH,
 )
 def simulate_command(data_path, output_dir, n):
     """Generate draws from the initial values."""
@@ -155,7 +171,6 @@ def simulate_command(data_path, output_dir, n):
 @click.argument(
     "data_path",
     type=click.Path(exists=True, dir_okay=True, file_okay=False),
-    default=EXAMPLE_INPUT_PATH,
 )
 def optimize_command(data_path, output_dir):
     """Optimize the model parameters."""
@@ -377,7 +392,6 @@ def do_optimize(data_path, output_dir):
 @click.argument(
     "data_path",
     type=click.Path(exists=True, dir_okay=True, file_okay=False),
-    default=EXAMPLE_INPUT_PATH,
 )
 def variational_command(data_path, output_dir):
     """Generate MCMC samples given a user input directory.

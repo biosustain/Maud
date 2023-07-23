@@ -22,7 +22,7 @@ class ExpectedValue:
 
 
 @dataclass
-class TestCase:
+class ODETestCase:
     """A test case."""
 
     name: str
@@ -33,7 +33,7 @@ class TestCase:
 
 
 TEST_CASES = [
-    TestCase(
+    ODETestCase(
         name="example_ode",
         inits_path=importlib_resources.files(example_ode).joinpath(
             "inits.json"
@@ -66,6 +66,7 @@ def test_model_ode(test_case):
         iter_warmup=0,
         iter_sampling=1,
         show_progress=False,
+        show_console=True,
         threads_per_chain=1,
         output_dir=None,
     )

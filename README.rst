@@ -1,90 +1,54 @@
-====
-Maud
-====
+====================
+Maud's Documentation
+====================
 
-.. image:: https://img.shields.io/badge/License-GPLv3-blue.svg
-   :target: https://www.gnu.org/licenses/gpl-3.0
-   :alt: GNU General Public License 3.0
+This note explains how to build Maud's documentation locally and how to
+contribute to it.
 
-.. image:: https://img.shields.io/badge/code%20style-black-000000.svg
-   :target: https://github.com/ambv/black
-   :alt: Black
+Building the docs locally
+=========================
 
-.. image:: https://img.shields.io/badge/Contributor%20Covenant-v1.4%20adopted-ff69b4.svg
-   :target: https://www.contributor-covenant.org/
-   :alt: Contributor Covenant Version 1.4
+In order to build the documentation locally you will need to have `sphinx
+<http://www.sphinx-doc.org/en/master/>`_ installed in your python
+environment. If you don't, you should be able to install it with the following
+command line incantation:
 
-.. image:: https://readthedocs.org/projects/maud-metabolic-models/badge/?version=latest
-   :target: https://maud-metabolic-models.readthedocs.io/en/latest/?badge=latest
-   :alt: Documentation Status
+.. code:: bash
 
-Maud is a work-in-progress application that fits Bayesian statistical models of
-metabolic networks using `Python <https://www.python.org/>`_ and `Stan
-<https://mc-stan.org>`_.
+    pip install -U Sphinx
 
-Maud aims to take into account allosteric effects, ensure that the laws of
-thermodynamics are obeyed and to synthesise information from both steady state
-experiments and the existing literature.
+Sphinx turns the source files in the `docs
+<https://github.com/biosustain/Maud/tree/master/docs>`_ directory into nicely
+formatted and structured output files in the directory :code:`docs/_build`. You
+can check all the available options by running :code:`make` from the docs
+directory.
 
-Install
-=======
-First create a fresh Python virtual environment and then activate it:
+In order to create a set of html pages, run
 
-.. code-block:: console
+.. code:: bash
 
-    python -m venv .venv --prompt=maud
-    source .venv/bin/activate
+    make html
 
-To install Maud and its python dependencies to your new virtual environment, run
-this command:
+This will create an html version of the documentation, which you can read by
+opening the file :code:`docs/_build/html/index.html` in your browser.
 
-.. code-block:: console
+Alternatively, to create a pdf version of the documentation, run
 
-    pip install maud-metabolic-models
+.. code:: bash
 
-Cmdstanpy depends on `cmdstan <https://github.com/stan-dev/cmdstan>`_, 
-which in turn requires a c++ toolchain. Fortunately, cmdstanpy comes with
-commands that can install these for you. On windows the necessary dependencies 
-can be installed with the following powershell commands:
+    make latexpdf
 
-.. code-block:: console
-
-    python -m cmdstanpy.install_cxx_toolchain
-    python -m cmdstanpy.install_cmdstan --compiler
-
-On macos or Linux, you must install the c++ requirements manually 
-(see [here](https://cmdstanpy.readthedocs.io/en/v0.9.67/installation.html#install-cmdstan)) for instuctions. 
-Cmdstan can then be installed using this shell command:
-
-.. code-block:: console
-
-    install_cmdstan
-
-Usage
-=====
-To run the simple linear model, use the following command:
-
-.. code-block:: console
-
-    maud sample
-
-This will compile the Stan program at `src/maud/inference_model.stan
-<https://github.com/biosustain/Maud/blob/master/src/maud/inference_model.stan>`_, 
-then run the resulting binary file using the data at `src/maud/data/example_inputs/linear
-<https://github.com/biosustain/Maud/blob/master/src/maud/data/example_inputs/linear>`_, storing
-the results in a folder whose name starts with
-:code:`model_output_linear`.
-
-The `sample` command can be configured in a few ways - to check out all the
-options try running
-
-.. code-block:: console
-
-    maud sample --help
+The output should appear at :code:`docs/_build/latex/maud.pdf`.
 
 
-Copyright
-=========
+Contributing to the documentation
+=================================
 
-* Copyright (c) 2019, Novo Nordisk Foundation Center for Biosustainability, Technical University of Denmark.
-* Free software distributed under the `GNU General Public License 3.0 <https://www.gnu.org/licenses/>`_
+To add new documentation, either edit an existing :code:`.rst` file in the
+docs directory, or add a new one and edit the file `docs/index.rst
+<https://github.com/biosustain/Maud/blob/master/docs/index.rst>`_ so that the
+new file is included in the :code:`toctree` list.
+
+To check that the new contribution looks like you expect, you can build the
+docs locally using the commands :code:`make html` or :code:`make latexpdf` as
+described above.
