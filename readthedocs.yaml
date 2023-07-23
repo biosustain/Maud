@@ -5,7 +5,7 @@ build:
   tools:
     python: "3.11"
   jobs:
-    pre-install:
+    pre_install:
       - pip install cmdstanpy wheel
 
 python:
