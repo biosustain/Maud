@@ -22,7 +22,7 @@ class ExpectedValue:
 
 
 @dataclass
-class TestCase:
+class ODETestCase:
     """A test case."""
 
     name: str
@@ -33,7 +33,7 @@ class TestCase:
 
 
 TEST_CASES = [
-    TestCase(
+    ODETestCase(
         name="example_ode",
         inits_path=importlib_resources.files(example_ode).joinpath(
             "inits.json"
