@@ -45,7 +45,9 @@ maud = "maud.cli:cli"
 development = [
     "black",
     "pre-commit",
+    "furo",
     "isort",
+    "myst_parser",
     "pytest",
     "pytest-cov",
     "tox",
