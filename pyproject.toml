@@ -54,6 +54,7 @@ development = [
     "sphinx",
     "ruff",
     "sphinx-click",
+    "sphinxcontrib-bibtex",
 ]
 
 [project.urls]
