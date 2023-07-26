@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "maud-metabolic-models"
-version = "0.5.1.1"
+version = "0.6.0.0"
 authors = [
     {name = "Novo Nordisk Foundation Center for Biosustainability, Technical University of Denmark"}
   ]
@@ -54,7 +54,7 @@ development = [
     "sphinx",
     "ruff",
     "sphinx-click",
-    "sphinxcontrib-bibtex"
+    "sphinxcontrib-bibtex",
 ]
 
 [project.urls]

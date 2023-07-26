@@ -5,14 +5,15 @@ build:
   tools:
     python: "3.11"
   jobs:
-    pre-install:
+    pre_install:
       - pip install cmdstanpy wheel
+      - install_cmdstan
 
 python:
   install:
     - method: pip
       path: .
-      extra-requirements:
+      extra_requirements:
         - development
 
 
