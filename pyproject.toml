@@ -73,8 +73,9 @@ packages = [
     # data packages
     "maud.data",
     "maud.data.example_inputs",
-    "maud.data.example_inputs.linear",
     "maud.data.example_inputs.example_ode",
+    "maud.data.example_inputs.linear",
+    "maud.data.example_inputs.methionine",
     "maud.data.example_outputs",
     "maud.data.example_outputs.linear",
     "maud.data.example_outputs.linear.user_input",
