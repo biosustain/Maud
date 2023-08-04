@@ -3,7 +3,7 @@
 
 import numpy as np
 
-from maud.utils import (
+from maud.utility_functions import (
     get_lognormal_parameters_from_quantiles,
     get_normal_parameters_from_quantiles,
 )

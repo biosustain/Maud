@@ -4,13 +4,12 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import List, Tuple
 
-import cmdstanpy
 import importlib_resources
 import pytest
 from numpy import isclose
 
-from maud import stan
 from maud.data.example_inputs import example_ode
+from maud.running_stan import load_stan_model
 
 
 @dataclass
@@ -23,7 +22,7 @@ class ExpectedValue:
 
 
 @dataclass
-class TestCase:
+class ODETestCase:
     """A test case."""
 
     name: str
@@ -34,7 +33,7 @@ class TestCase:
 
 
 TEST_CASES = [
-    TestCase(
+    ODETestCase(
         name="example_ode",
         inits_path=importlib_resources.files(example_ode).joinpath(
             "inits.json"
@@ -58,9 +57,7 @@ TEST_CASES = [
 @pytest.mark.parametrize("test_case", TEST_CASES)
 def test_model_ode(test_case):
     """Test that the function get_input_data behaves as expected."""
-    model = cmdstanpy.CmdStanModel(
-        stan_file=importlib_resources.files(stan).joinpath("model.stan")
-    )
+    model = load_stan_model("model", stanc_options={}, cpp_options={})
     mcmc = model.sample(
         data=str(test_case.input_data_path),
         inits=str(test_case.inits_path),
@@ -69,6 +66,7 @@ def test_model_ode(test_case):
         iter_warmup=0,
         iter_sampling=1,
         show_progress=False,
+        show_console=True,
         threads_per_chain=1,
         output_dir=None,
     )

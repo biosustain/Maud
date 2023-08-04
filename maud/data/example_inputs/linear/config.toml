@@ -1,0 +1,20 @@
+name = "linear"
+kinetic_model_file = "kinetic_model.toml"
+priors_file = "priors.toml"
+experiments_file = "experiments.toml"
+likelihood = true
+steady_state_threshold_abs = 1e-6
+
+[cmdstanpy_config]
+refresh = 1
+iter_warmup = 300
+iter_sampling = 300
+chains = 4
+save_warmup = true
+seed = 1234
+
+[ode_config]
+abs_tol = 1e-5
+rel_tol = 1e-5
+max_num_steps = 1e6
+timepoint = 1e3
