@@ -469,6 +469,20 @@ def get_config_input(config: MaudConfig):
         "abs_tol": config.ode_config.abs_tol,
         "timepoint": config.ode_config.timepoint,
         "max_num_steps": config.ode_config.max_num_steps,
+        "adjoint_solve": config.adjoint_solve,
+        "algebra_solve": config.algebra_solve,
+        "rel_tol_forward": config.ode_config.rel_tol_forward,
+        "abs_tol_forward": config.ode_config.abs_tol_forward,
+        "rel_tol_backward": config.ode_config.rel_tol_backward,
+        "abs_tol_backward": config.ode_config.abs_tol_backward,
+        "rel_tol_quadrature": config.ode_config.rel_tol_quadrature,
+        "abs_tol_quadrature": config.ode_config.abs_tol_quadrature,
+        "num_steps_between_checkpoints": config.ode_config.num_steps_between_checkpoints,
+        "interpolation_polynomial": config.ode_config.interpolation_polynomial,
+        "solver_forward": config.ode_config.solver_forward,
+        "solver_backward": config.ode_config.solver_backward,
+        "algebra_func_tol": config.ode_config.algebra_func_tol,
+        "algebra_rel_tol": config.ode_config.algebra_rel_tol,
     }
 
 

@@ -12,6 +12,18 @@ class ODEConfig:
     abs_tol: float = 1e-9
     max_num_steps: int = int(1e9)
     timepoint: float = 500
+    rel_tol_forward: float = 1e-9
+    abs_tol_forward: float = 1e-9
+    rel_tol_backward: float = 1e-9
+    abs_tol_backward: float = 1e-9
+    rel_tol_quadrature: float = 1e-9
+    abs_tol_quadrature: float = 1e-9
+    num_steps_between_checkpoints: int = int(100000)
+    interpolation_polynomial: int = 2
+    solver_forward: int = 2
+    solver_backward: int = 2
+    algebra_func_tol: float = 1e-6
+    algebra_rel_tol: float = 1e-10
 
 
 @dataclass
@@ -54,6 +66,8 @@ class MaudConfig:
     user_inits_file: Optional[str] = None
     ode_config: ODEConfig = Field(default_factory=ODEConfig)
     reject_non_steady: bool = True
+    adjoint_solve: bool = True
+    algebra_solve: bool = True
     steady_state_threshold_abs: float = 1e-8
     steady_state_threshold_rel: float = 1e-3
     default_initial_concentration: float = 0.01

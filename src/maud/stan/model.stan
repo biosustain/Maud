@@ -90,8 +90,8 @@ data {
   array[2, N_experiment_train] vector[N_drain] priors_drain_train;
   // configuration
   array[N_experiment_train] vector<lower=0>[N_mic-N_unbalanced] conc_init;
-  real rel_tol; 
-  real abs_tol;
+  real algebra_func_tol; 
+  real algebra_rel_tol;
   real steady_state_threshold_abs;
   real steady_state_threshold_rel;
   int max_num_steps;
@@ -99,6 +99,19 @@ data {
   real drain_small_conc_corrector;
   real<lower=0> timepoint;
   int<lower=0,upper=1> reject_non_steady;
+  int<lower=0,upper=1> algebra_solve;
+  int<lower=0,upper=1> adjoint_solve;
+  // ode configuration
+  real rel_tol_forward;
+  real abs_tol_forward;
+  real rel_tol_backward;
+  real abs_tol_backward;
+  real rel_tol_quadrature;
+  real abs_tol_quadrature;
+  int num_steps_between_checkpoints;
+  int interpolation_polynomial;
+  int solver_forward;
+  int solver_backward;
 }
 transformed data {
   real initial_time = 0;
@@ -153,54 +166,162 @@ transformed parameters {
         extract_ragged(pme_knockout_train_long, pme_knockout_train_bounds, e);
       conc_pme_experiment[pko_experiment] = rep_vector(0, N_pko_experiment);
     }
-    conc_balanced_experiment =
-      ode_bdf_tol(dbalanced_dt,
-                  conc_init[e],
-                  initial_time,
-                  {timepoint},
-                  rel_tol, 
-                  abs_tol,
-                  max_num_steps,
-                  conc_unbalanced_train[e],
-                  balanced_mic_ix,
-                  unbalanced_mic_ix,
-                  conc_enzyme_experiment,
-                  dgr_train[e],
-                  kcat,
-                  km,
-                  ki,
-                  transfer_constant,
-                  dissociation_constant,
-                  kcat_pme,
-                  conc_pme_experiment,
-                  drain_train[e],
-                  temperature_train[e],
-                  drain_small_conc_corrector,
-                  S,
-                  subunits,
-                  edge_type,
-                  edge_to_enzyme,
-                  edge_to_drain,
-                  ci_mic_ix,
-                  sub_km_ix_by_edge_long,
-                  sub_km_ix_by_edge_bounds,
-                  prod_km_ix_by_edge_long,
-                  prod_km_ix_by_edge_bounds,
-                  sub_by_edge_long,
-                  sub_by_edge_bounds,
-                  prod_by_edge_long,
-                  prod_by_edge_bounds,
-                  ci_ix_long,
-                  ci_ix_bounds,
-                  allostery_ix_long,
-                  allostery_ix_bounds,
-                  allostery_type,
-                  allostery_mic,
-                  edge_to_tc,
-                  phosphorylation_ix_long,
-                  phosphorylation_ix_bounds,
-                  phosphorylation_type,
-                  phosphorylation_pme);
+    if (adjoint_solve == 1){
+	    conc_balanced_experiment =
+	      ode_adjoint_tol_ctl(dbalanced_dt,
+			  conc_init[e],
+			  initial_time,
+			  {timepoint},
+			  rel_tol_forward, # adjoint
+			  rep_vector(abs_tol_forward, N_mic - N_unbalanced), # adjoint
+			  rel_tol_backward, # adjoint
+			  rep_vector(abs_tol_backward, N_mic - N_unbalanced), # adjoint
+			  rel_tol_quadrature, # adjoint
+			  abs_tol_quadrature, # adjoint
+			  max_num_steps,
+			  num_steps_between_checkpoints, # adjoint
+			  interpolation_polynomial, # adjoint
+			  solver_forward, # adjoint
+			  solver_backward, # adjoint
+			  conc_unbalanced_train[e],
+			  balanced_mic_ix,
+			  unbalanced_mic_ix,
+			  conc_enzyme_experiment,
+			  dgr_train[e],
+			  kcat,
+			  km,
+			  ki,
+			  transfer_constant,
+			  dissociation_constant,
+			  kcat_pme,
+			  conc_pme_experiment,
+			  drain_train[e],
+			  temperature_train[e],
+			  drain_small_conc_corrector,
+			  S,
+			  subunits,
+			  edge_type,
+			  edge_to_enzyme,
+			  edge_to_drain,
+			  ci_mic_ix,
+			  sub_km_ix_by_edge_long,
+			  sub_km_ix_by_edge_bounds,
+			  prod_km_ix_by_edge_long,
+			  prod_km_ix_by_edge_bounds,
+			  sub_by_edge_long,
+			  sub_by_edge_bounds,
+			  prod_by_edge_long,
+			  prod_by_edge_bounds,
+			  ci_ix_long,
+			  ci_ix_bounds,
+			  allostery_ix_long,
+			  allostery_ix_bounds,
+			  allostery_type,
+			  allostery_mic,
+			  edge_to_tc,
+			  phosphorylation_ix_long,
+			  phosphorylation_ix_bounds,
+			  phosphorylation_type,
+			  phosphorylation_pme);
+    } else {
+	conc_balanced_experiment =
+	      ode_bdf_tol(dbalanced_dt,
+			  conc_init[e],
+			  initial_time,
+			  {timepoint},
+			  rel_tol_forward,
+			  abs_tol_forward,
+			  max_num_steps,
+			  conc_unbalanced_train[e],
+			  balanced_mic_ix,
+			  unbalanced_mic_ix,
+			  conc_enzyme_experiment,
+			  dgr_train[e],
+			  kcat,
+			  km,
+			  ki,
+			  transfer_constant,
+			  dissociation_constant,
+			  kcat_pme,
+			  conc_pme_experiment,
+			  drain_train[e],
+			  temperature_train[e],
+			  drain_small_conc_corrector,
+			  S,
+			  subunits,
+			  edge_type,
+			  edge_to_enzyme,
+			  edge_to_drain,
+			  ci_mic_ix,
+			  sub_km_ix_by_edge_long,
+			  sub_km_ix_by_edge_bounds,
+			  prod_km_ix_by_edge_long,
+			  prod_km_ix_by_edge_bounds,
+			  sub_by_edge_long,
+			  sub_by_edge_bounds,
+			  prod_by_edge_long,
+			  prod_by_edge_bounds,
+			  ci_ix_long,
+			  ci_ix_bounds,
+			  allostery_ix_long,
+			  allostery_ix_bounds,
+			  allostery_type,
+			  allostery_mic,
+			  edge_to_tc,
+			  phosphorylation_ix_long,
+			  phosphorylation_ix_bounds,
+			  phosphorylation_type,
+			  phosphorylation_pme);
+
+    }
+
+    if (algebra_solve == 1){
+	conc_balanced_experiment[1] = solve_powell_tol(ssf,
+		       conc_balanced_experiment[1],
+		       algebra_rel_tol,
+		       algebra_func_tol,
+		       max_num_steps,
+		       conc_unbalanced_train[e],
+		       balanced_mic_ix,
+		       unbalanced_mic_ix,
+		       conc_enzyme_experiment,
+		       dgr_train[e],
+		       kcat,
+		       km,
+		       ki,
+		       transfer_constant,
+		       dissociation_constant,
+		       kcat_pme,
+		       conc_pme_experiment,
+		       drain_train[e],
+		       temperature_train[e],
+		       drain_small_conc_corrector,
+		       S,
+		       subunits,
+		       edge_type,
+		       edge_to_enzyme,
+		       edge_to_drain,
+		       ci_mic_ix,
+		       sub_km_ix_by_edge_long,
+		       sub_km_ix_by_edge_bounds,
+		       prod_km_ix_by_edge_long,
+		       prod_km_ix_by_edge_bounds,
+		       sub_by_edge_long,
+		       sub_by_edge_bounds,
+		       prod_by_edge_long,
+		       prod_by_edge_bounds,
+		       ci_ix_long,
+		       ci_ix_bounds,
+		       allostery_ix_long,
+		       allostery_ix_bounds,
+		       allostery_type,
+		       allostery_mic,
+		       edge_to_tc,
+		       phosphorylation_ix_long,
+		       phosphorylation_ix_bounds,
+		       phosphorylation_type,
+		       phosphorylation_pme);
+    }
     conc_train[e, balanced_mic_ix] = conc_balanced_experiment[1];
     conc_train[e, unbalanced_mic_ix] = conc_unbalanced_train[e];
     {
