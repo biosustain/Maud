@@ -66,8 +66,8 @@ class MaudConfig:
     user_inits_file: Optional[str] = None
     ode_config: ODEConfig = Field(default_factory=ODEConfig)
     reject_non_steady: bool = True
-    adjoint_solve: bool = True
-    algebra_solve: bool = True
+    adjoint_solve: bool = False
+    algebra_solve: bool = False
     steady_state_threshold_abs: float = 1e-8
     steady_state_threshold_rel: float = 1e-3
     default_initial_concentration: float = 0.01
