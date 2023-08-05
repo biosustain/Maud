@@ -1,8 +1,10 @@
-name = "test-ode"
+name = "test-ode-adjoint"
 kinetic_model_file = "kinetic_model.toml"
 priors_file = "priors.toml"
 experiments_file = "experiments.toml"
 likelihood = true
+adjoint_solve = true
+algebra_solve = false
 
 [cmdstanpy_config]
 iter_warmup = 0
@@ -10,5 +12,19 @@ iter_sampling = 1
 chains = 1
 
 [ode_config]
+rel_tol = 1e-9
+abs_tol = 1e-9
 max_num_steps = 1e9
-timepoint = 1e3
+timepoint = 500
+rel_tol_forward = 1e-12
+abs_tol_forward = 1e-12
+rel_tol_backward = 1e-12
+abs_tol_backward = 1e-12
+rel_tol_quadrature = 1e-12
+abs_tol_quadrature = 1e-12
+num_steps_between_checkpoints = 100000
+interpolation_polynomial = 2
+solver_forward = 2
+solver_backward = 2
+algebra_func_tol = 1e-6
+algebra_rel_tol = 1e-10

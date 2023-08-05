@@ -32,6 +32,13 @@ class ODETestCase:
     expected_flux_train: List[ExpectedValue]
 
 
+ODE_CONFIG_OPTIONS = [
+    "input_data_train_adjoint_algebra.json",
+    "input_data_train_adjoint.json",
+    "input_data_train_bdf_algebra.json",
+    "input_data_train_bdf.json",
+]
+
 TEST_CASES = [
     ODETestCase(
         name="example_ode",
@@ -39,7 +46,7 @@ TEST_CASES = [
             "inits.json"
         ),
         input_data_path=importlib_resources.files(example_ode).joinpath(
-            "input_data_train.json"
+            varied_ode_config
         ),
         expected_conc_train=[
             ExpectedValue("B", (0, 0), 5.0),
@@ -51,6 +58,7 @@ TEST_CASES = [
             ExpectedValue("r4", (0, 3), 2.11674),
         ],
     )
+    for varied_ode_config in ODE_CONFIG_OPTIONS
 ]
 
 
