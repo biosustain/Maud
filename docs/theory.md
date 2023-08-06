@@ -44,7 +44,7 @@ want. Questions about the network can be formulated in terms of integrals over
 the posterior distribution. For example, suppose that our thermokinetic model
 says that the flux through a reaction is given by the function $flux:
 \Theta\rightarrow\mathbb{R}$; our model's probability, given measurements $y$,
-that the flux is greater than $x$ is then $\int_x^\inftyp(\theta\mid
+that the flux is greater than $x$ is then $\int_x^\infty(\theta\mid
 y)d\theta$.
 
 The rest of this page sets out how Maud fleshes out the three sub-models and
@@ -128,7 +128,7 @@ metabolite's 'formation energy'.
 * $n$ is a vector representing the number of charges transported by each
 reaction.
 * $F$ is the Faraday constant (a number)
-* $\psi$ is a vector representin each reaction's membrane potential (these
+* $\psi$ is a vector representing each reaction's membrane potential (these
 numbers only matter for reactions that transport non-zero charge)
 
 Note that, for reactions with zero transported charge, the thermodynamic effect
@@ -277,7 +277,7 @@ model for these measurements is imperfect in at least these ways:
   absolute concentrations.
 
 These problems also apply to flux measurements, but there is another issue:
-flux meausrements are derived from k
+flux measurements are derived from k
 
 (sec-prior-model)=
 ### Prior model

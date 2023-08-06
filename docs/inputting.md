@@ -46,7 +46,27 @@ The following optional fields can also be specified:
 * `molecule_unit` A unit for counting molecules, like 'mol' or 'mmol'
 * `volume_unit` A unit for measuring volume, like 'L'
 * `energy_unit` A unit for measuring energy, like 'J' or 'kJ'
+* `algebra_solve` A boolean argument that specifies if the powell algebra solver will be used to determine the steady state
+* `adjoint_solve` A boolean argument that specifies if the adjoint ode solver will be used in place of the bdf solver.
 
+The following fields can be specified by the ODE solver. The variables and definitions can be found both in the [`Stan documentation`](`https://mc-stan.org/docs/functions-reference/functions-ode-solver.html`) with more detail in the [`Sundials documentation`](`https://sundials.readthedocs.io/en/latest/cvodes/Usage/SIM.html#c.CVodeSStolerances`):
+
+* `rel_tol` Relative tolerance of the BDF solver
+* `abs_tol` Absolute tolerance of the BDF solver -- applied to every state variable.
+* `max_num_steps` Maximum number of steps taken by both the algebra and ODE solvers.
+* `timepoint` The integration time solved for either ODE solver.
+* `rel_tol_forward` The relative tolerance used during the forward solve
+* `abs_tol_forward` The absolute tolerance used during the backwards solve -- can be converted into a vector
+* `rel_tol_backward` The relative tolerance used during the backwards solve
+* `abs_tol_backward` The absolute tolerance used during the backwards solve -- can be converted into a vector
+* `rel_tol_quadrature` The relative tolerance used in the backwards quadrature problem
+* `abs_tol_quadrature` The absolute tolerance used in the backwards quadrature problem
+* `num_steps_between_checkpoints` number of steps between checkpoints in forward solution
+* `interpolation_polynomial` 1 for hermite and 2 for polynomial
+* `solver_forward` Solver used for forward ODE problem: 1=Adams (non-stiff), 2=BDF (stiff)
+* `solver_backward` Solver used for backward ODE problem: 1=Adams (non-stiff), 2=BDF (stiff)
+* `algebra_func_tol` After convergence of the solver, the proposed solution is plugged into the algebraic system and its norm is compared to the function tolerance. If the norm is below the function tolerance, the solution is deemed acceptable
+* `algebra_rel_tol` The relative tolerance is the estimated relative error of the solver and serves to test if a satisfactory solution has been found
 
 Here is an example configuration file:
 
@@ -71,6 +91,18 @@ Here is an example configuration file:
     rel_tol = 1e-4
     max_num_steps = 1e6
     timepoint = 1e3
+    rel_tol_forward = 1e-9
+    abs_tol_forward = 1e-9
+    rel_tol_backward = 1e-9
+    abs_tol_backward = 1e-9
+    rel_tol_quadrature = 1e-9
+    abs_tol_quadrature = 1e-9
+    num_steps_between_checkpoints = int(100000)
+    interpolation_polynomial = 2
+    solver_forward = 2
+    solver_backward = 2
+    algebra_func_tol = 1e-6
+    algebra_rel_tol = 1e-10
 
 This file tells Maud that a file representing a kinetic model can be found at
 the relative path `kinetic_model.toml`, and that priors and experimental
