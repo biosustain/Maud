@@ -90,7 +90,7 @@ data {
   array[2, N_experiment_train] vector[N_drain] priors_drain_train;
   // configuration
   array[N_experiment_train] vector<lower=0>[N_mic-N_unbalanced] conc_init;
-  real algebra_func_tol; 
+  real algebra_func_tol;
   real algebra_rel_tol;
   real steady_state_threshold_abs;
   real steady_state_threshold_rel;
@@ -102,6 +102,8 @@ data {
   int<lower=0,upper=1> algebra_solve;
   int<lower=0,upper=1> adjoint_solve;
   // ode configuration
+  real rel_tol;
+  real abs_tol;
   real rel_tol_forward;
   real abs_tol_forward;
   real rel_tol_backward;
@@ -229,8 +231,8 @@ transformed parameters {
 			  conc_init[e],
 			  initial_time,
 			  {timepoint},
-			  rel_tol_forward,
-			  abs_tol_forward,
+			  rel_tol,
+			  abs_tol,
 			  max_num_steps,
 			  conc_unbalanced_train[e],
 			  balanced_mic_ix,
