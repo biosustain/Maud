@@ -5,6 +5,8 @@ experiments_file = "experiments.toml"
 user_inits_file = "inits.toml"
 likelihood = true
 reject_non_steady = true
+algebra_solve = false
+adjoint_solve = false
 
 [cmdstanpy_config]
 iter_warmup = 1000
@@ -19,5 +21,17 @@ adapt_delta = 0.99
 [ode_config]
 rel_tol = 1e-9
 abs_tol = 1e-9
-max_num_steps = 1000000.0
+max_num_steps = 1000000
 timepoint = 1e+20
+rel_tol_forward = 1e-9
+abs_tol_forward = 1e-9
+rel_tol_backward = 1e-9
+abs_tol_backward = 1e-9
+rel_tol_quadrature = 1e-9
+abs_tol_quadrature = 1e-9
+num_steps_between_checkpoints = 1e5
+interpolation_polynomial = 2
+solver_forward = 2
+solver_backward = 2
+algebra_func_tol = 1e-6
+algebra_rel_tol = 1e-10
