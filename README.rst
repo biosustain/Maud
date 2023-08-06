@@ -42,17 +42,17 @@ this command:
 
     pip install maud-metabolic-models
 
-Cmdstanpy depends on `cmdstan <https://github.com/stan-dev/cmdstan>`_, 
-which in turn requires a c++ toolchain. On some computers you will have to 
-install these in order to use Maud. You will hit an error at the next step if 
+Cmdstanpy depends on `cmdstan <https://github.com/stan-dev/cmdstan>`_,
+which in turn requires a c++ toolchain. On some computers you will have to
+install these in order to use Maud. You will hit an error at the next step if
 this applies to your computer. Luckily cmdstanpy comes with commands that
-can do the necessary installing for you. On windows the c++ toolchain can be installed with 
+can do the necessary installing for you. On windows the c++ toolchain can be installed with
 the following powershell commands:
 
 
 Usage
 =====
-Maud is used from the command line. To see all the available commands try running 
+Maud is used from the command line. To see all the available commands try running
 
 .. code-block:: console
 
