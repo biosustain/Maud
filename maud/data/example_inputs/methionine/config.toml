@@ -1,10 +1,11 @@
 name = "methionine_cycle_6"
 kinetic_model_file = "methionine_cycle.toml"
-priors_file = "priors.toml"
+priors_file = "parameters.toml"
 experiments_file = "experiments.toml"
-user_inits_file = "inits.toml"
 likelihood = true
 reject_non_steady = true
+steady_state_threshold_abs = 1e-5
+steady_state_threshold_rel = 1e-3
 
 [cmdstanpy_config]
 iter_warmup = 1000
@@ -20,4 +21,4 @@ adapt_delta = 0.99
 rel_tol = 1e-9
 abs_tol = 1e-9
 max_num_steps = 1000000.0
-timepoint = 1e+20
+timepoint = 1e+6
