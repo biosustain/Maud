@@ -459,30 +459,33 @@ def get_experiments_input(
 
 def get_config_input(config: MaudConfig):
     """Get Stan input related to algorithm configuration."""
+    mc = config
+    oc = mc.ode_config
+
     return {
-        "likelihood": int(config.likelihood),
-        "drain_small_conc_corrector": config.drain_small_conc_corrector,
-        "reject_non_steady": int(config.reject_non_steady),
-        "steady_state_threshold_abs": config.steady_state_threshold_abs,
-        "steady_state_threshold_rel": config.steady_state_threshold_rel,
-        "rel_tol": config.ode_config.rel_tol,
-        "abs_tol": config.ode_config.abs_tol,
-        "timepoint": config.ode_config.timepoint,
-        "max_num_steps": config.ode_config.max_num_steps,
-        "adjoint_solve": config.adjoint_solve,
-        "algebra_solve": config.algebra_solve,
-        "rel_tol_forward": config.ode_config.rel_tol_forward,
-        "abs_tol_forward": config.ode_config.abs_tol_forward,
-        "rel_tol_backward": config.ode_config.rel_tol_backward,
-        "abs_tol_backward": config.ode_config.abs_tol_backward,
-        "rel_tol_quadrature": config.ode_config.rel_tol_quadrature,
-        "abs_tol_quadrature": config.ode_config.abs_tol_quadrature,
-        "num_steps_between_checkpoints": config.ode_config.num_steps_between_checkpoints,
-        "interpolation_polynomial": config.ode_config.interpolation_polynomial,
-        "solver_forward": config.ode_config.solver_forward,
-        "solver_backward": config.ode_config.solver_backward,
-        "algebra_func_tol": config.ode_config.algebra_func_tol,
-        "algebra_rel_tol": config.ode_config.algebra_rel_tol,
+        "likelihood": int(mc.likelihood),
+        "drain_small_conc_corrector": mc.drain_small_conc_corrector,
+        "reject_non_steady": int(mc.reject_non_steady),
+        "steady_state_threshold_abs": mc.steady_state_threshold_abs,
+        "steady_state_threshold_rel": mc.steady_state_threshold_rel,
+        "rel_tol": oc.rel_tol,
+        "abs_tol": oc.abs_tol,
+        "timepoint": oc.timepoint,
+        "max_num_steps": oc.max_num_steps,
+        "adjoint_solve": mc.adjoint_solve,
+        "algebra_solve": mc.algebra_solve,
+        "rel_tol_forward": oc.rel_tol_forward,
+        "abs_tol_forward": oc.abs_tol_forward,
+        "rel_tol_backward": oc.rel_tol_backward,
+        "abs_tol_backward": oc.abs_tol_backward,
+        "rel_tol_quadrature": oc.rel_tol_quadrature,
+        "abs_tol_quadrature": oc.abs_tol_quadrature,
+        "num_steps_between_checkpoints": oc.num_steps_between_checkpoints,
+        "interpolation_polynomial": oc.interpolation_polynomial,
+        "solver_forward": oc.solver_forward,
+        "solver_backward": oc.solver_backward,
+        "algebra_func_tol": oc.algebra_func_tol,
+        "algebra_rel_tol": oc.algebra_rel_tol,
     }
 
 
