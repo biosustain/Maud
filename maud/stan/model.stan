@@ -135,6 +135,7 @@ transformed parameters {
   array[N_experiment_train] vector<lower=0>[N_mic] conc_train;
   array[N_experiment_train] vector[N_reaction] flux_train;
   array[N_experiment_train] vector[N_edge] dgr_train;
+  matrix[N_experiment_train, N_mic-N_unbalanced] steady_dev;
   for (e in 1:N_experiment_train){
     dgr_train[e] = get_dgr(S, dgf, temperature_train[e], mic_to_met, water_stoichiometry, transported_charge, psi_train[e]);
     flux_train[e] = rep_vector(0, N_reaction);
@@ -242,6 +243,7 @@ transformed parameters {
                                              phosphorylation_ix_bounds,
                                              phosphorylation_type,
                                              phosphorylation_pme);
+    steady_dev[e] = (S * edge_flux)'[balanced_mic_ix];
     for (j in 1:N_edge)
       flux_train[e, edge_to_reaction[j]] += edge_flux[j];
     if (reject_non_steady == 1 &&
@@ -300,6 +302,10 @@ model {
       yenz_train[e] ~ lognormal(log(conc_enzyme_train[experiment_yenz_train[e], enzyme_yenz_train[e]]), sigma_yenz_train[e]);
     for (f in 1:N_flux_measurement_train)
       yflux_train[f] ~ normal(flux_train[experiment_yflux_train[f], reaction_yflux_train[f]], sigma_yflux_train[f]);
+    if (reject_non_steady == 0) {
+      for (xpt in 1:N_experiment_train)
+        steady_dev[xpt] ~ normal(0.0, steady_state_threshold_abs);
+    }
   }
 }
 generated quantities {

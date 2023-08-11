@@ -278,6 +278,17 @@ def do_simulate(data_path, output_dir, n):
     print(
         idata.posterior["psi_train"].mean(dim=["chain", "draw"]).to_series().T
     )
+    print("\n\nSimulated steady state deviation:")
+    # TODO: put the dimensions directly in the idata object
+    steady_dev = (
+        idata.posterior["steady_dev"].mean(dim=["chain", "draw"]).to_series().T
+    )
+    steady_dev.index = steady_dev.index.set_names("metabolite", level=0)
+    steady_dev.index = steady_dev.index.set_names("experiment", level=1)
+    steady_dev.index = steady_dev.index.set_levels(
+        [idata.posterior.mics, idata.posterior.experiments]
+    )
+    print(steady_dev)
     return output_path
 
 
@@ -384,6 +395,17 @@ def do_optimize(data_path, output_dir):
     print(
         idata.posterior["psi_train"].mean(dim=["chain", "draw"]).to_series().T
     )
+    print("\n\nSimulated steady state deviation:")
+    # TODO: put the dimensions directly in the idata object
+    steady_dev = (
+        idata.posterior["steady_dev"].mean(dim=["chain", "draw"]).to_series().T
+    )
+    steady_dev.index = steady_dev.index.set_names("metabolite", level=0)
+    steady_dev.index = steady_dev.index.set_names("experiment", level=1)
+    steady_dev.index = steady_dev.index.set_levels(
+        [idata.posterior.mics, idata.posterior.experiments]
+    )
+    print(steady_dev)
     return output_path
 
 
