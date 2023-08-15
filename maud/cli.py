@@ -286,7 +286,7 @@ def do_simulate(data_path, output_dir, n):
     steady_dev.index = steady_dev.index.set_names("metabolite", level=0)
     steady_dev.index = steady_dev.index.set_names("experiment", level=1)
     steady_dev.index = steady_dev.index.set_levels(
-        [idata.posterior.mics, idata.posterior.experiments]
+        [idata.posterior.experiments, idata.posterior.mics]
     )
     print(steady_dev)
     return output_path
@@ -403,7 +403,7 @@ def do_optimize(data_path, output_dir):
     steady_dev.index = steady_dev.index.set_names("metabolite", level=0)
     steady_dev.index = steady_dev.index.set_names("experiment", level=1)
     steady_dev.index = steady_dev.index.set_levels(
-        [idata.posterior.mics, idata.posterior.experiments]
+        [idata.posterior.experiments, idata.posterior.mics]
     )
     print(steady_dev)
     return output_path
