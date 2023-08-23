@@ -475,7 +475,7 @@ def get_config_input(config: MaudConfig, mics: List[MetaboliteInCompartment]):
             for k in mic_balanced
         ]
         if config.steady_state_threshold_opt is not None
-        else [config.steady_state_threshold_abs] * len(mics),
+        else [config.steady_state_threshold_abs] * len(mic_balanced),
         "rel_tol": config.ode_config.rel_tol,
         "abs_tol": config.ode_config.abs_tol,
         "timepoint": config.ode_config.timepoint,

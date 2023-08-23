@@ -283,10 +283,18 @@ def do_simulate(data_path, output_dir, n):
     steady_dev = (
         idata.posterior["steady_dev"].mean(dim=["chain", "draw"]).to_series().T
     )
-    steady_dev.index = steady_dev.index.set_names("metabolite", level=0)
-    steady_dev.index = steady_dev.index.set_names("experiment", level=1)
+    steady_dev.index = steady_dev.index.set_names("experiment", level=0)
+    steady_dev.index = steady_dev.index.set_names("metabolite", level=1)
+    balanced_metabolites = [m.id for m in mi.kinetic_model.mics if m.balanced]
     steady_dev.index = steady_dev.index.set_levels(
-        [idata.posterior.experiments, idata.posterior.mics]
+        [
+            idata.posterior.experiments,
+            [
+                m
+                for m in idata.posterior.mics.to_series()
+                if str(m) in balanced_metabolites
+            ],
+        ]
     )
     print(steady_dev)
     return output_path
@@ -400,10 +408,18 @@ def do_optimize(data_path, output_dir):
     steady_dev = (
         idata.posterior["steady_dev"].mean(dim=["chain", "draw"]).to_series().T
     )
-    steady_dev.index = steady_dev.index.set_names("metabolite", level=0)
-    steady_dev.index = steady_dev.index.set_names("experiment", level=1)
+    steady_dev.index = steady_dev.index.set_names("experiment", level=0)
+    steady_dev.index = steady_dev.index.set_names("metabolite", level=1)
+    balanced_metabolites = [m.id for m in mi.kinetic_model.mics if m.balanced]
     steady_dev.index = steady_dev.index.set_levels(
-        [idata.posterior.experiments, idata.posterior.mics]
+        [
+            idata.posterior.experiments,
+            [
+                m
+                for m in idata.posterior.mics.to_series()
+                if str(m) in balanced_metabolites
+            ],
+        ]
     )
     print(steady_dev)
     return output_path
