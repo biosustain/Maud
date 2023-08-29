@@ -219,6 +219,21 @@ def do_simulate(data_path, output_dir, n):
     )
     print("\n\nSimulated reaction delta Gs:")
     print(idata.posterior["dgr_train"].mean(dim=["chain", "draw"]).to_series())
+    print("\n\nSimulated concentration control coefficients")
+    print(
+        idata.posterior["concentration_control_matrix"]
+        .mean(dim=["chain", "draw"])
+        .to_series()
+        .unstack()
+    )
+    print("\n\nSimulated flux control coefficients")
+    print(
+        idata.posterior["flux_control_matrix"]
+        .mean(dim=["chain", "draw"])
+        .to_series()
+        .unstack()
+    )
+
     print("\n\nSimulated measurements:")
     print(
         idata.posterior_predictive["yrep_conc_train"]

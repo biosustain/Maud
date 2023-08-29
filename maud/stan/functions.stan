@@ -444,4 +444,127 @@ functions {
                                               phosphorylation_pme);
     return (S * edge_flux)[balanced_ix];
   }
+  complex_vector get_complex_edge_flux(vector conc,
+                             complex_vector enzyme,
+                             vector dgr,
+                             vector kcat,
+                             vector km,
+                             vector ki,
+                             vector tc,
+                             vector dc,
+                             vector kcat_pme,
+                             vector conc_pme,
+                             vector drain,
+                             real temperature,
+                             real drain_small_conc_corrector,
+                             matrix S,
+                             vector subunits,
+                             array[] int edge_type,
+                             array[] int edge_to_enzyme,
+                             array[] int edge_to_drain,
+                             array[] int ci_mic_ix,
+                             array[] int sub_km_ix_by_edge_long,
+                             array[,] int sub_km_ix_by_edge_bounds,
+                             array[] int prod_km_ix_by_edge_long,
+                             array[,] int prod_km_ix_by_edge_bounds,
+                             array[] int sub_by_edge_long,
+                             array[,] int sub_by_edge_bounds,
+                             array[] int prod_by_edge_long,
+                             array[,] int prod_by_edge_bounds,
+                             array[] int ci_ix_long,
+                             array[,] int ci_ix_bounds,
+                             array[] int allostery_ix_long,
+                             array[,] int allostery_ix_bounds,
+                             array[] int allostery_type,
+                             array[] int allostery_mic,
+                             array[] int edge_to_tc,
+                             array[] int phos_ix_long,
+                             array[,] int phos_ix_bounds,
+                             array[] int phosphorylation_type,
+                             array[] int phosphorylation_pme){
+    int N_edge = cols(S);
+    complex_vector[N_edge] vmax = get_complex_vmax_by_edge(enzyme, kcat, edge_to_enzyme, edge_type);
+    vector[N_edge] reversibility = get_reversibility(dgr, temperature, S, conc, edge_type);
+    vector[N_edge] free_enzyme_ratio = get_free_enzyme_ratio(conc,
+                                                             S,
+                                                             km,
+                                                             ki,
+                                                             edge_type,
+                                                             ci_mic_ix,
+                                                             sub_km_ix_by_edge_long,
+                                                             sub_km_ix_by_edge_bounds,
+                                                             prod_km_ix_by_edge_long,
+                                                             prod_km_ix_by_edge_bounds,
+                                                             sub_by_edge_long,
+                                                             sub_by_edge_bounds,
+                                                             prod_by_edge_long,
+                                                             prod_by_edge_bounds,
+                                                             ci_ix_long,
+                                                             ci_ix_bounds);
+    vector[N_edge] saturation = get_saturation(conc,
+                                               km,
+                                               free_enzyme_ratio,
+                                               sub_km_ix_by_edge_long,
+                                               sub_km_ix_by_edge_bounds,
+                                               sub_by_edge_long,
+                                               sub_by_edge_bounds,
+                                               edge_type);
+    vector[N_edge] allostery = get_allostery(conc,
+                                             free_enzyme_ratio,
+                                             tc,
+                                             dc,
+                                             subunits,
+                                             allostery_ix_long,
+                                             allostery_ix_bounds,
+                                             allostery_type,
+                                             allostery_mic,
+                                             edge_to_tc);
+    vector[N_edge] phosphorylation = get_phosphorylation(kcat_pme,
+                                                         conc_pme,
+                                                         phos_ix_long,
+                                                         phos_ix_bounds,
+                                                         phosphorylation_type,
+                                                         phosphorylation_pme,
+                                                         subunits);
+    vector[N_edge] drain_by_edge = get_drain_by_edge(drain,
+                                                     conc,
+                                                     edge_to_drain,
+                                                     sub_by_edge_long,
+                                                     sub_by_edge_bounds,
+                                                     edge_type,
+                                                     drain_small_conc_corrector);
+    return vmax .* saturation .* reversibility .* allostery .* phosphorylation .* drain_by_edge;
+  }
+
+  complex_vector get_complex_vmax_by_edge(complex_vector enzyme, vector kcat, int[] edge_to_enzyme, int[] edge_type){
+    int N_edge = size(edge_to_enzyme);
+    complex_vector[N_edge] out = rep_vector(1, N_edge);
+    for (f in 1:N_edge){
+      if (edge_type[f] != 3){
+        out[f] = enzyme[edge_to_enzyme[f]] * kcat[edge_to_enzyme[f]];
+      }
+    }
+    return out;
+  }
+  vector get_flux_enz_jacobian(complex_vector edge_flux,
+                               complex complex_enzyme_step){
+    return -1.*get_imag(edge_flux) ./ get_imag(complex_enzyme_step);
+  }
+  matrix get_concentration_control_matrix(matrix S,
+                                          matrix flux_enz_jacobian,
+                                          array[] int balanced_mic_ix,
+                                          int N_edge,
+                                          int N_balanced){
+    matrix[N_balanced, N_edge] balanced_S = S[balanced_mic_ix,:];
+    return -1.*generalized_inverse(balanced_S*flux_enz_jacobian)*balanced_S;
+  }
+  matrix get_flux_control_matrix(matrix S,
+                                 matrix flux_enz_jacobian,
+                                 array[] int balanced_mic_ix,
+                                 int N_edge,
+                                 int N_balanced){
+    matrix[N_balanced, N_edge] balanced_S = S[balanced_mic_ix,:];
+    matrix[N_edge, N_edge] I = identity_matrix(N_edge);
+    return I - flux_enz_jacobian*generalized_inverse(balanced_S*flux_enz_jacobian)*balanced_S;
+  }
 }

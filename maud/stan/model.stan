@@ -102,6 +102,7 @@ data {
 }
 transformed data {
   real initial_time = 0;
+  complex complex_enzyme_step = 1e-14i;
   matrix[N_metabolite, N_metabolite] prior_cov_dgf_chol = cholesky_decompose(prior_cov_dgf);
 }
 parameters {
@@ -307,12 +308,16 @@ generated quantities {
   vector[N_flux_measurement_train] yrep_flux_train;
   vector[N_conc_measurement_train] llik_conc_train;
   vector[N_flux_measurement_train] llik_flux_train;
+  array[N_experiment_train] matrix[N_mic-N_unbalanced, N_enzyme] concentration_control_matrix;
+  array[N_experiment_train] matrix[N_edge, N_enzyme] flux_control_matrix;
+  array[N_experiment_train] matrix[N_edge, N_enzyme] flux_enz_jacobian;
   array[N_experiment_train] vector[N_edge] free_enzyme_ratio_train;
   array[N_experiment_train] vector[N_edge] saturation_train;
   array[N_experiment_train] vector[N_edge] allostery_train;
   array[N_experiment_train] vector[N_edge] phosphorylation_train;
   array[N_experiment_train] vector[N_edge] reversibility_train;
   array[N_experiment_train] vector[N_edge] keq_train;
+  // Simulating measurements from the posterior predictive distribution
   for (c in 1:N_conc_measurement_train){
     yrep_conc_train[c] = lognormal_rng(log(conc_train[experiment_yconc_train[c], mic_ix_yconc_train[c]]), sigma_yconc_train[c]);
     llik_conc_train[c] = lognormal_lpdf(yconc_train[c] | log(conc_train[experiment_yconc_train[c], mic_ix_yconc_train[c]]), sigma_yconc_train[c]);
@@ -321,6 +326,7 @@ generated quantities {
     yrep_flux_train[f] = normal_rng(flux_train[experiment_yflux_train[f], reaction_yflux_train[f]], sigma_yflux_train[f]);
     llik_flux_train[f] = normal_lpdf(yflux_train[f] | flux_train[experiment_yflux_train[f], reaction_yflux_train[f]], sigma_yflux_train[f]);
   }
+  // Calculating regulatory decomposition
   for (e in 1:N_experiment_train){
     keq_train[e] = get_keq(S, dgf, temperature_train[e], mic_to_met, water_stoichiometry, transported_charge, psi_train[e]);
     free_enzyme_ratio_train[e] = get_free_enzyme_ratio(conc_train[e],
@@ -365,5 +371,63 @@ generated quantities {
                                                    phosphorylation_pme,
                                                    subunits);
     reversibility_train[e] = get_reversibility(dgr_train[e], temperature_train[e], S, conc_train[e], edge_type);
+  }
+  // Calculating control coefficients
+  for (e in 1:N_experiment_train){
+    vector[N_pme] conc_pme_experiment = conc_pme_train[e];
+    for (enz in 1:N_enzyme){
+      complex_vector[N_enzyme] numerical_step_enzyme = conc_enzyme_train[e];
+      numerical_step_enzyme[enz] = conc_enzyme_train[e][enz] + complex_enzyme_step;
+      complex_vector[N_edge] edge_flux = get_complex_edge_flux(conc_train[e],
+                                               numerical_step_enzyme,
+                                               dgr_train[e],
+                                               kcat,
+                                               km,
+                                               ki,
+                                               transfer_constant,
+                                               dissociation_constant,
+                                               kcat_pme,
+                                               conc_pme_experiment,
+                                               drain_train[e],
+                                               temperature_train[e],
+                                               drain_small_conc_corrector,
+                                               S,
+                                               subunits,
+                                               edge_type,
+                                               edge_to_enzyme,
+                                               edge_to_drain,
+                                               ci_mic_ix,
+                                               sub_km_ix_by_edge_long,
+                                               sub_km_ix_by_edge_bounds,
+                                               prod_km_ix_by_edge_long,
+                                               prod_km_ix_by_edge_bounds,
+                                               sub_by_edge_long,
+                                               sub_by_edge_bounds,
+                                               prod_by_edge_long,
+                                               prod_by_edge_bounds,
+                                               ci_ix_long,
+                                               ci_ix_bounds,
+                                               allostery_ix_long,
+                                               allostery_ix_bounds,
+                                               allostery_type,
+                                               allostery_mic,
+                                               edge_to_tc,
+                                               phosphorylation_ix_long,
+                                               phosphorylation_ix_bounds,
+                                               phosphorylation_type,
+                                               phosphorylation_pme);
+      flux_enz_jacobian[e][:,enz] = get_flux_enz_jacobian(edge_flux,
+                                                          complex_enzyme_step);
+    }
+    concentration_control_matrix[e] = get_concentration_control_matrix(S,
+                                                                       flux_enz_jacobian[e],
+                                                                       balanced_mic_ix,
+                                                                       N_edge,
+                                                                       N_mic-N_unbalanced);
+    flux_control_matrix[e] = get_flux_control_matrix(S,
+                                                     flux_enz_jacobian[e],
+                                                     balanced_mic_ix,
+                                                     N_edge,
+                                                     N_mic-N_unbalanced);
   }
 }
