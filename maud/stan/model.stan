@@ -100,6 +100,7 @@ data {
   real drain_small_conc_corrector;
   real<lower=0> timepoint;
   int<lower=0,upper=1> reject_non_steady;
+  int<lower=0,upper=1> penalize_non_steady;
 }
 transformed data {
   real initial_time = 0;
@@ -303,7 +304,7 @@ model {
       yenz_train[e] ~ lognormal(log(conc_enzyme_train[experiment_yenz_train[e], enzyme_yenz_train[e]]), sigma_yenz_train[e]);
     for (f in 1:N_flux_measurement_train)
       yflux_train[f] ~ normal(flux_train[experiment_yflux_train[f], reaction_yflux_train[f]], sigma_yflux_train[f]);
-    if (reject_non_steady == 0) {
+    if (penalize_non_steady == 1) {
       for (xpt in 1:N_experiment_train)
         steady_dev[xpt] ~ normal(0.0, steady_state_threshold_opt);
     }

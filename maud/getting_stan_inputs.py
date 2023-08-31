@@ -466,6 +466,7 @@ def get_config_input(config: MaudConfig, mics: List[MetaboliteInCompartment]):
         "likelihood": int(config.likelihood),
         "drain_small_conc_corrector": config.drain_small_conc_corrector,
         "reject_non_steady": int(config.reject_non_steady),
+        "penalize_non_steady": int(config.penalize_non_steady),
         "steady_state_threshold_abs": config.steady_state_threshold_abs,
         "steady_state_threshold_rel": config.steady_state_threshold_rel,
         "steady_state_threshold_opt": [
