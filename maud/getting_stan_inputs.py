@@ -467,7 +467,7 @@ def get_config_input(config: MaudConfig):
         "penalize_non_steady": int(config.penalize_non_steady),
         "steady_state_threshold_abs": config.steady_state_threshold_abs,
         "steady_state_threshold_rel": config.steady_state_threshold_rel,
-        "steady_state_threshold_sigma": config.steady_state_threshold_sigma,
+        "steady_state_penalty_sigma": config.steady_state_penalty_sigma,
         "rel_tol": config.ode_config.rel_tol,
         "abs_tol": config.ode_config.abs_tol,
         "timepoint": config.ode_config.timepoint,
