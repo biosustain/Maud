@@ -49,8 +49,8 @@ def load_input_command(input_name, output_dir):
     """
     if input_name not in AVAILABLE_EXAMPLE_INPUTS.keys():
         raise ValueError(
-            f"{input_name} not available."
-            " Available inputs:\n\t{'\n\t'.split(available)}"
+            f"{input_name} not available. Avaliable inputs:\n\t"
+            + "\n\t".join(AVAILABLE_EXAMPLE_INPUTS.keys())
         )
     data = AVAILABLE_EXAMPLE_INPUTS[input_name]
     path = importlib_resources.files(data)._paths[0]
@@ -220,27 +220,21 @@ def do_simulate(data_path, output_dir, n):
     print("\n\nSimulated reaction delta Gs:")
     print(idata.posterior["dgr_train"].mean(dim=["chain", "draw"]).to_series())
     print("\n\nSimulated measurements:")
-    print(
-        idata.posterior_predictive["yrep_conc_train"]
-        .mean(dim=["chain", "draw"])
-        .to_series()
-    )
-    print(
-        idata.posterior_predictive["yrep_flux_train"]
-        .mean(dim=["chain", "draw"])
-        .to_series()
-    )
+    for var in ["yrep_conc_train", "yrep_flux_train"]:
+        if var in idata.posterior_predictive.data_vars:
+            print(
+                idata.posterior_predictive[var]
+                .mean(dim=["chain", "draw"])
+                .to_series()
+            )
     print("\n\nSimulated log likelihoods:")
-    print(
-        idata.log_likelihood["llik_conc_train"]
-        .mean(dim=["chain", "draw"])
-        .to_series()
-    )
-    print(
-        idata.log_likelihood["llik_flux_train"]
-        .mean(dim=["chain", "draw"])
-        .to_series()
-    )
+    for var in ["llik_conc_train", "llik_flux_train"]:
+        if var in idata.log_likelihood.data_vars:
+            print(
+                idata.log_likelihood[var]
+                .mean(dim=["chain", "draw"])
+                .to_series()
+            )
     print("\n\nSimulated allostery terms:")
     print(
         idata.posterior["allostery_train"]
@@ -331,22 +325,22 @@ def do_optimize(data_path, output_dir):
         .mean(dim=["chain", "draw"])
         .to_series()
     )
-    print(
-        idata.posterior_predictive["yrep_flux_train"]
-        .mean(dim=["chain", "draw"])
-        .to_series()
-    )
+    print("\n\nSimulated measurements:")
+    for var in ["yrep_conc_train", "yrep_flux_train"]:
+        if var in idata.posterior_predictive.data_vars:
+            print(
+                idata.posterior_predictive[var]
+                .mean(dim=["chain", "draw"])
+                .to_series()
+            )
     print("\n\nSimulated log likelihoods:")
-    print(
-        idata.log_likelihood["llik_conc_train"]
-        .mean(dim=["chain", "draw"])
-        .to_series()
-    )
-    print(
-        idata.log_likelihood["llik_flux_train"]
-        .mean(dim=["chain", "draw"])
-        .to_series()
-    )
+    for var in ["llik_conc_train", "llik_flux_train"]:
+        if var in idata.log_likelihood.data_vars:
+            print(
+                idata.log_likelihood[var]
+                .mean(dim=["chain", "draw"])
+                .to_series()
+            )
     print("\n\nSimulated allostery terms:")
     print(
         idata.posterior["allostery_train"]
