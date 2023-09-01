@@ -26,7 +26,7 @@ class MaudConfig:
     :param likelihood: Whether or not to take measurements into account.
     :param cmdstanpy_config: Arguments to cmdstanpy.CmdStanModel.sample.
     :param reject_non_steady: Reject draws if a non-steady state is encountered.
-    :param penalize_non_steady: Penalize the deviation from steady state in the log likelihood.  # noqa: E501
+    :param penalize_non_steady: Penalize the deviation from steady state in the log likelihood.
     :param ode_config: Configuration for Stan's ode solver.
     :param stanc_options: Options for CmdStanModel argument `stanc_options`.
     :param cpp_options: Options for CmdStanModel `cpp_options`.
@@ -35,13 +35,13 @@ class MaudConfig:
     :param user_inits_file: path to a csv file of initial values.
     :param steady_state_threshold_abs: abs threshold for Sv=0 be at steady state
     :param steady_state_threshold_rel: rel threshold for Sv=0 be at steady state
-    :param steady_state_penalty_sigma: dictionary of standard deviations for SV checks when reject_non_steady is false  # noqa: E501
+    :param steady_state_penalty_sigma: dictionary of standard deviations for SV checks when reject_non_steady is false.
     :param default_initial_concentration: in molecule_unit per volume_unit
     :param drain_small_conc_corrector: number for correcting small conc drains
     :param molecule_unit: A unit for counting molecules, like 'mol' or 'mmol'
     :param volume_unit: A unit for measuring volume, like 'L'
     :param energy_unit: A unit for measuring energy, like 'J' or 'kJ'
-    """
+    """  # noqa: E501
 
     name: str
     kinetic_model_file: str

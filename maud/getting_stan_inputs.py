@@ -459,7 +459,6 @@ def get_experiments_input(
 
 def get_config_input(config: MaudConfig):
     """Get Stan input related to algorithm configuration."""
-
     return {
         "likelihood": int(config.likelihood),
         "drain_small_conc_corrector": config.drain_small_conc_corrector,
