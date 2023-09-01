@@ -347,6 +347,23 @@ gradient calculations.
 For the systems we have investigated, this method works better than solving the
 steady state problem using an algebra solver.
 
+It is relevant to note a caveat for the Maximum A Posteriori estimation
+(optimization) in opposition to sampling the full distribution. In an
+optimization context, a hard rejection of non-steady states may be
+disadvantageous. The reason is that, when a rejection occurs, the gradients are
+lost, removing the trajectory of the optimization. For this application, `maud`
+provides the possibility of including the departure from steady state in the
+likelihood, such that the gradients are not lost but the optimization still
+favors steady states. This is implemented in the form of
+[](#eq-steady-penalty)
+
+$$
+(|S\cdot f_v(x_t, \theta)| - \epsilon C) \sim N(0, \sigma)
+$$(eq-steady-penalty)
+
+where $C$ is the vector of balanced concentrations and $\epsilon$ and
+$\sigma$ are configurable parameters.
+
 (sec-analysis-of-results)=
 ### Analysis of results
 
