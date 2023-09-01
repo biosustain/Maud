@@ -1,0 +1,235 @@
+[[experiment]]
+id = "dataset1"
+is_train = true
+is_test = false
+
+measurements = [
+ {target_type = "mic", metabolite = "5mthf", compartment = "c", value = 5.79e-06, error_scale = 0.1},
+ {target_type = "mic", metabolite = "ahcys", compartment = "c", value = 2.16e-07, error_scale = 0.1},
+ {target_type = "mic", metabolite = "amet", compartment = "c", value = 5.94e-05, error_scale = 0.1},
+ {target_type = "mic", metabolite = "hcys-L", compartment = "c", value = 3.52e-06, error_scale = 0.1},
+ {target_type = "mic", metabolite = "met-L", compartment = "c", value = 4.33e-05, error_scale = 0.1},
+ {target_type = "flux", reaction = "AHC", value = 0.00105, error_scale = 9.96e-05},
+ {target_type = "flux", reaction = "CBS", value = 0.000719, error_scale = 7.26e-05},
+ {target_type = "flux", reaction = "GNMT", value = 1.9e-05, error_scale = 1.9e-06},
+ {target_type = "flux", reaction = "MS", value = 9.7e-05, error_scale = 1.03e-05},
+ {target_type = "flux", reaction = "PROT", value = 0.000131, error_scale = 1.33e-05},
+]
+
+[[experiment]]
+id = "dataset2"
+is_train = false
+is_test = true
+measurements = [
+ {target_type = "mic", metabolite = "5mthf", compartment = "c", value = 3.33e-06, error_scale = 0.1},
+ {target_type = "mic", metabolite = "ahcys", compartment = "c", value = 3.69e-07, error_scale = 0.1},
+ {target_type = "mic", metabolite = "amet", compartment = "c", value = 0.000263, error_scale = 0.1},
+ {target_type = "mic", metabolite = "hcys-L", compartment = "c", value = 6.37e-06, error_scale = 0.1},
+ {target_type = "mic", metabolite = "met-L", compartment = "c", value = 6.3e-05, error_scale = 0.1},
+ {target_type = "flux", reaction = "AHC", value = 0.001438, error_scale = 0.0001505},
+ {target_type = "flux", reaction = "CBS", value = 0.000963, error_scale = 0.0001},
+ {target_type = "flux", reaction = "GNMT", value = 0.000301, error_scale = 3.27e-05},
+ {target_type = "flux", reaction = "MS", value = 6.5e-05, error_scale = 6.6e-06},
+ {target_type = "flux", reaction = "PROT", value = 0.000153, error_scale = 1.49e-05},
+]
+
+[[experiment]]
+id = "dataset3"
+is_train = false
+is_test = true
+measurements = [
+ {target_type = "mic", metabolite = "5mthf", compartment = "c", value = 1.02e-05, error_scale = 0.1},
+ {target_type = "mic", metabolite = "ahcys", compartment = "c", value = 1.81e-07, error_scale = 0.1},
+ {target_type = "mic", metabolite = "amet", compartment = "c", value = 1.63e-05, error_scale = 0.1},
+ {target_type = "mic", metabolite = "hcys-L", compartment = "c", value = 4.24e-06, error_scale = 0.1},
+ {target_type = "mic", metabolite = "met-L", compartment = "c", value = 2.71e-05, error_scale = 0.1},
+ {target_type = "flux", reaction = "AHC", value = 0.000791, error_scale = 8.19e-05},
+ {target_type = "flux", reaction = "CBS", value = 0.000638, error_scale = 6.68e-05},
+ {target_type = "flux", reaction = "GNMT", value = 2e-06, error_scale = 2e-07},
+ {target_type = "flux", reaction = "MS", value = 0.000153, error_scale = 1.5e-05},
+ {target_type = "flux", reaction = "PROT", value = 0.000105, error_scale = 1.1e-05},
+]
+[[experiment.enzyme_knockouts]]
+enzyme = "BHMT1"
+
+[[experiment]]
+id = "dataset4"
+is_train = false
+is_test = true
+measurements = [
+ {target_type = "mic", metabolite = "5mthf", compartment = "c", value = 1.19e-06, error_scale = 0.1},
+ {target_type = "mic", metabolite = "ahcys", compartment = "c", value = 2.3e-07, error_scale = 0.1},
+ {target_type = "mic", metabolite = "amet", compartment = "c", value = 0.000103, error_scale = 0.1},
+ {target_type = "mic", metabolite = "hcys-L", compartment = "c", value = 4.12e-06, error_scale = 0.1},
+ {target_type = "mic", metabolite = "met-L", compartment = "c", value = 4.34e-05, error_scale = 0.1},
+ {target_type = "flux", reaction = "AHC", value = 0.001052, error_scale = 9.75e-05},
+ {target_type = "flux", reaction = "CBS", value = 0.000628, error_scale = 6.32e-05},
+ {target_type = "flux", reaction = "GNMT", value = 5.2e-05, error_scale = 5.2e-06},
+ {target_type = "flux", reaction = "MS", value = 2.1e-05, error_scale = 2.1e-06},
+ {target_type = "flux", reaction = "PROT", value = 0.000134, error_scale = 1.36e-05},
+
+
+]
+
+[[experiment]]
+id = "dataset5"
+is_train = true
+is_test = false
+measurements = [
+ {target_type = "mic", metabolite = "5mthf", compartment = "c", value = 2.47e-06, error_scale = 0.1},
+ {target_type = "mic", metabolite = "ahcys", compartment = "c", value = 2.07e-07, error_scale = 0.1},
+ {target_type = "mic", metabolite = "amet", compartment = "c", value = 5.68e-05, error_scale = 0.1},
+ {target_type = "mic", metabolite = "hcys-L", compartment = "c", value = 3.82e-06, error_scale = 0.1},
+ {target_type = "mic", metabolite = "met-L", compartment = "c", value = 3.96e-05, error_scale = 0.1},
+ {target_type = "flux", reaction = "AHC", value = 0.000992, error_scale = 9.55e-05},
+ {target_type = "flux", reaction = "CBS", value = 0.000607, error_scale = 6.22e-05},
+ {target_type = "flux", reaction = "GNMT", value = 1.8e-05, error_scale = 1.8e-06},
+ {target_type = "flux", reaction = "MS", value = 8.6e-05, error_scale = 8.7e-06},
+ {target_type = "flux", reaction = "PROT", value = 0.000132, error_scale = 1.39e-05},
+
+
+]
+
+[[experiment]]
+id = "dataset6"
+is_train = true
+is_test = false
+measurements = [
+ {target_type = "mic", metabolite = "5mthf", compartment = "c", value = 4.26e-06, error_scale = 0.1},
+ {target_type = "mic", metabolite = "ahcys", compartment = "c", value = 1.39e-07, error_scale = 0.1},
+ {target_type = "mic", metabolite = "amet", compartment = "c", value = 9.2e-05, error_scale = 0.1},
+ {target_type = "mic", metabolite = "hcys-L", compartment = "c", value = 4.17e-06, error_scale = 0.1},
+ {target_type = "mic", metabolite = "met-L", compartment = "c", value = 4.27e-05, error_scale = 0.1},
+ {target_type = "flux", reaction = "AHC", value = 0.001088, error_scale = 0.0001153},
+ {target_type = "flux", reaction = "CBS", value = 0.00063, error_scale = 6.31e-05},
+ {target_type = "flux", reaction = "GNMT", value = 4e-05, error_scale = 3.8e-06},
+ {target_type = "flux", reaction = "MS", value = 7.5e-05, error_scale = 7.7e-06},
+ {target_type = "flux", reaction = "PROT", value = 0.000135, error_scale = 1.39e-05},
+
+
+]
+
+[[experiment]]
+id = "dataset7"
+is_train = false
+is_test = true
+measurements = [
+ {target_type = "mic", metabolite = "5mthf", compartment = "c", value = 5.03e-06, error_scale = 0.1},
+ {target_type = "mic", metabolite = "ahcys", compartment = "c", value = 2.37e-07, error_scale = 0.1},
+ {target_type = "mic", metabolite = "amet", compartment = "c", value = 5.12e-05, error_scale = 0.1},
+ {target_type = "mic", metabolite = "hcys-L", compartment = "c", value = 4.3e-06, error_scale = 0.1},
+ {target_type = "mic", metabolite = "met-L", compartment = "c", value = 3.59e-05, error_scale = 0.1},
+ {target_type = "flux", reaction = "AHC", value = 0.001011, error_scale = 9.9e-05},
+ {target_type = "flux", reaction = "CBS", value = 0.000632, error_scale = 6.66e-05},
+ {target_type = "flux", reaction = "GNMT", value = 1.6e-05, error_scale = 1.6e-06},
+ {target_type = "flux", reaction = "MS", value = 8.5e-05, error_scale = 8.5e-06},
+ {target_type = "flux", reaction = "PROT", value = 0.000188, error_scale = 2.04e-05},
+
+
+]
+
+[[experiment]]
+id = "dataset8"
+is_train = false
+is_test = true
+measurements = [
+ {target_type = "mic", metabolite = "5mthf", compartment = "c", value = 4.29e-06, error_scale = 0.1},
+ {target_type = "mic", metabolite = "ahcys", compartment = "c", value = 1.98e-07, error_scale = 0.1},
+ {target_type = "mic", metabolite = "amet", compartment = "c", value = 4.25e-05, error_scale = 0.1},
+ {target_type = "mic", metabolite = "hcys-L", compartment = "c", value = 4.53e-06, error_scale = 0.1},
+ {target_type = "mic", metabolite = "met-L", compartment = "c", value = 5.3e-05, error_scale = 0.1},
+ {target_type = "flux", reaction = "AHC", value = 0.000886, error_scale = 8.56e-05},
+ {target_type = "flux", reaction = "CBS", value = 0.000641, error_scale = 6.61e-05},
+ {target_type = "flux", reaction = "GNMT", value = 1.1e-05, error_scale = 1.1e-06},
+ {target_type = "flux", reaction = "MS", value = 7.5e-05, error_scale = 7.4e-06},
+ {target_type = "flux", reaction = "PROT", value = 0.000149, error_scale = 1.54e-05},
+]
+
+[[experiment]]
+id = "dataset9"
+is_train = true
+is_test = false
+measurements = [
+ {target_type = "mic", metabolite = "5mthf", compartment = "c", value = 5.68e-06, error_scale = 0.1},
+ {target_type = "mic", metabolite = "ahcys", compartment = "c", value = 2.46e-07, error_scale = 0.1},
+ {target_type = "mic", metabolite = "amet", compartment = "c", value = 7.66e-05, error_scale = 0.1},
+ {target_type = "mic", metabolite = "hcys-L", compartment = "c", value = 4.2e-06, error_scale = 0.1},
+ {target_type = "mic", metabolite = "met-L", compartment = "c", value = 4.14e-05, error_scale = 0.1},
+ {target_type = "flux", reaction = "AHC", value = 0.001125, error_scale = 0.0001195},
+ {target_type = "flux", reaction = "CBS", value = 0.000641, error_scale = 6.57e-05},
+ {target_type = "flux", reaction = "GNMT", value = 6.2e-05, error_scale = 6.2e-06},
+ {target_type = "flux", reaction = "MS", value = 9.5e-05, error_scale = 9.6e-06},
+ {target_type = "flux", reaction = "PROT", value = 0.000134, error_scale = 1.4e-05},
+
+
+]
+
+[[experiment]]
+id = "dataset10"
+is_train = true
+is_test = false
+measurements = [
+ {target_type = "mic", metabolite = "5mthf", compartment = "c", value = 5.22e-06, error_scale = 0.1},
+ {target_type = "mic", metabolite = "ahcys", compartment = "c", value = 2.68e-07, error_scale = 0.1},
+ {target_type = "mic", metabolite = "amet", compartment = "c", value = 0.000108, error_scale = 0.1},
+ {target_type = "mic", metabolite = "hcys-L", compartment = "c", value = 4.86e-06, error_scale = 0.1},
+ {target_type = "mic", metabolite = "met-L", compartment = "c", value = 4.07e-05, error_scale = 0.1},
+ {target_type = "flux", reaction = "AHC", value = 0.001175, error_scale = 0.0001166},
+ {target_type = "flux", reaction = "CBS", value = 0.000699, error_scale = 7.37e-05},
+ {target_type = "flux", reaction = "GNMT", value = 5.8e-05, error_scale = 5.9e-06},
+ {target_type = "flux", reaction = "MS", value = 9.2e-05, error_scale = 9.3e-06},
+ {target_type = "flux", reaction = "PROT", value = 0.000129, error_scale = 1.33e-05},
+
+
+]
+
+[[experiment]]
+id = "dataset11"
+is_train = false
+is_test = true
+measurements = [
+ {target_type = "mic", metabolite = "5mthf", compartment = "c",value = 3.55e-06, error_scale = 0.1},
+ {target_type = "mic", metabolite = "ahcys", compartment = "c",value = 2.13e-07, error_scale = 0.1},
+ {target_type = "mic", metabolite = "amet", compartment = "c", value = 0.000222, error_scale = 0.1},
+ {target_type = "mic", metabolite = "hcys-L", compartment = "c",value = 4.21e-06, error_scale = 0.1},
+ {target_type = "mic", metabolite = "met-L", compartment = "c", value = 4.07e-05, error_scale = 0.1},
+ {target_type = "flux", reaction = "AHC", value = 0.000951, error_scale = 8.95e-05},
+ {target_type = "flux", reaction = "CBS", value = 0.000633, error_scale = 6.45e-05},
+ {target_type = "flux", reaction = "GNMT", value = 0.000202, error_scale = 2.06e-05},
+ {target_type = "flux", reaction = "MS", value = 6.1e-05, error_scale = 6.1e-06},
+ {target_type = "flux", reaction = "PROT", value = 0.000134, error_scale = 1.41e-05},
+]
+
+[[experiment]]
+id = "dataset12"
+is_train = true
+is_test = false
+measurements = [
+ {target_type = "mic", metabolite = "5mthf", compartment = "c", value = 5.72e-06, error_scale = 0.1},
+ {target_type = "mic", metabolite = "ahcys", compartment = "c", value = 2.69e-07, error_scale = 0.1},
+ {target_type = "mic", metabolite = "amet", compartment = "c", value = 0.000109, error_scale = 0.1},
+ {target_type = "mic", metabolite = "hcys-L", compartment = "c", value = 5.65e-06, error_scale = 0.1},
+ {target_type = "mic", metabolite = "met-L", compartment = "c", value = 4.39e-05, error_scale = 0.1},
+ {target_type = "flux", reaction = "AHC", value = 0.001106, error_scale = 0.0001122},
+ {target_type = "flux", reaction = "CBS", value = 0.000588, error_scale = 5.79e-05},
+ {target_type = "flux", reaction = "GNMT", value = 6e-05, error_scale = 6.2e-06},
+ {target_type = "flux", reaction = "MS", value = 0.0001, error_scale = 9.7e-06},
+ {target_type = "flux", reaction = "PROT", value = 0.000138, error_scale = 1.43e-05},
+]
+
+[[experiment]]
+id = "validation"
+is_train = false
+is_test = true
+measurements = [
+ {target_type = "mic", metabolite = "5mthf", compartment = "c", value = 5.68e-06, error_scale = 0.1},
+ {target_type = "mic", metabolite = "ahcys", compartment = "c", value = 2.32e-07, error_scale = 0.1},
+ {target_type = "mic", metabolite = "amet", compartment = "c", value = 2.79e-05, error_scale = 0.1},
+ {target_type = "mic", metabolite = "hcys-L", compartment = "c", value = 4.19e-06, error_scale = 0.1},
+ {target_type = "mic", metabolite = "met-L", compartment = "c", value = 3.59e-05, error_scale = 0.1},
+ {target_type = "flux", reaction = "AHC", value = 0.001064, error_scale = 0.000105},
+ {target_type = "flux", reaction = "CBS", value = 0.000637, error_scale = 6.4e-05},
+ {target_type = "flux", reaction = "GNMT", value = 6e-06, error_scale = 6e-07},
+ {target_type = "flux", reaction = "MS", value = 9.5e-05, error_scale = 9.5e-06},
+ {target_type = "flux", reaction = "PROT", value = 0.00012, error_scale = 1.2e-05},
+]

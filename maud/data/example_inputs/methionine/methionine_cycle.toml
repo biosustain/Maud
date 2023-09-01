@@ -1,0 +1,457 @@
+[[compartment]]
+id = "c"
+name = "compartment"
+volume = 1.0
+
+[[reaction]]
+id = "METAT"
+name = "Methionine adenosyltransferase"
+mechanism = "irreversible_michaelis_menten"
+water_stoichiometry = -1.0
+transported_charge = 0.0
+
+[reaction.stoichiometry]
+met-L_c = -1.0
+atp_c = -1.0
+pi_c = 1.0
+ppi_c = 1.0
+amet_c = 1.0
+
+[[reaction]]
+id = "met-L-source"
+name = "met-L-source"
+mechanism = "drain"
+water_stoichiometry = 0.0
+transported_charge = 0.0
+
+[reaction.stoichiometry]
+met-L_c = 1.0
+
+[[reaction]]
+id = "METH"
+name = "Methylase"
+mechanism = "irreversible_michaelis_menten"
+water_stoichiometry = 0.0
+transported_charge = 0.0
+
+[reaction.stoichiometry]
+amet_c = -1.0
+ahcys_c = 1.0
+[[reaction]]
+id = "GNMT"
+name = "Glycine N-methyltransferase"
+mechanism = "irreversible_michaelis_menten"
+water_stoichiometry = 0.0
+transported_charge = 0.0
+
+[reaction.stoichiometry]
+amet_c = -1.0
+gly_c = -1.0
+ahcys_c = 1.0
+sarcs_c = 1.0
+[[reaction]]
+id = "AHC"
+name = "S-adenosylhomocysteine hydrolase"
+mechanism = "reversible_michaelis_menten"
+water_stoichiometry = -1.0
+transported_charge = 0.0
+
+[reaction.stoichiometry]
+ahcys_c = -1.0
+adn_c = 1.0
+hcys-L_c = 1.0
+[[reaction]]
+id = "MS"
+name = "Methionine Synthase"
+mechanism = "irreversible_michaelis_menten"
+water_stoichiometry = 0.0
+transported_charge = 0.0
+
+[reaction.stoichiometry]
+hcys-L_c = -1.0
+5mthf_c = -1.0
+met-L_c = 1.0
+thf_c = 1.0
+[[reaction]]
+id = "BHMT"
+name = "Betaine-homocysteine methyltransferase"
+mechanism = "irreversible_michaelis_menten"
+water_stoichiometry = 0.0
+transported_charge = 0.0
+
+[reaction.stoichiometry]
+hcys-L_c = -1.0
+glyb_c = -1.0
+met-L_c = 1.0
+dmgly_c = 1.0
+[[reaction]]
+id = "CBS"
+name = "Cystathionine beta synthase"
+mechanism = "irreversible_michaelis_menten"
+water_stoichiometry = 1.0
+transported_charge = 0.0
+
+[reaction.stoichiometry]
+hcys-L_c = -1.0
+ser-L_c = -1.0
+cyst-L_c = 1.0
+[[reaction]]
+id = "MTHFR"
+name = "Methylenetetrahydrofolate reductase"
+mechanism = "irreversible_michaelis_menten"
+water_stoichiometry = 0.0
+transported_charge = 0.0
+
+[reaction.stoichiometry]
+mlthf_c = -1.0
+nadph_c = -1.0
+nadp_c = 1.0
+5mthf_c = 1.0
+[[reaction]]
+id = "PROT"
+name = "Protein Synthesis"
+mechanism = "irreversible_michaelis_menten"
+water_stoichiometry = 0.0
+transported_charge = 0.0
+
+[reaction.stoichiometry]
+met-L_c = -1.0
+[[enzyme]]
+id = "MAT1"
+name = "Methionine adenosyltransferase 1"
+subunits = 1
+
+[[enzyme]]
+id = "MAT3"
+name = "Methionine adenosyltransferase 3"
+subunits = 2
+
+[[enzyme]]
+id = "METH-Gen"
+name = "Generic methylase"
+subunits = 1
+
+[[enzyme]]
+id = "GNMT1"
+name = "Glycine N-methyltransferase"
+subunits = 4
+
+[[enzyme]]
+id = "AHC1"
+name = "S-adenosylhomocysteine hydrolase 1"
+subunits = 1
+
+[[enzyme]]
+id = "MS1"
+name = "Methionine Synthase 1"
+subunits = 1
+
+[[enzyme]]
+id = "BHMT1"
+name = "Betaine-homocysteine methyltransferase"
+subunits = 1
+
+[[enzyme]]
+id = "CBS1"
+name = "Cystathionine beta synthase"
+subunits = 2
+
+[[enzyme]]
+id = "MTHFR1"
+name = "Methylenetetrahydrofolate reductase"
+subunits = 2
+
+[[enzyme]]
+id = "PROT1"
+name = "Methylenetetrahydrofolate reductase"
+subunits = 1
+
+[[enzyme_reaction]]
+enzyme_id = "MAT1"
+reaction_id = "METAT"
+
+[[enzyme_reaction]]
+enzyme_id = "MAT3"
+reaction_id = "METAT"
+
+[[enzyme_reaction]]
+enzyme_id = "METH-Gen"
+reaction_id = "METH"
+
+[[enzyme_reaction]]
+enzyme_id = "GNMT1"
+reaction_id = "GNMT"
+
+[[enzyme_reaction]]
+enzyme_id = "AHC1"
+reaction_id = "AHC"
+
+[[enzyme_reaction]]
+enzyme_id = "MS1"
+reaction_id = "MS"
+
+[[enzyme_reaction]]
+enzyme_id = "BHMT1"
+reaction_id = "BHMT"
+
+[[enzyme_reaction]]
+enzyme_id = "CBS1"
+reaction_id = "CBS"
+
+[[enzyme_reaction]]
+enzyme_id = "MTHFR1"
+reaction_id = "MTHFR"
+
+[[enzyme_reaction]]
+enzyme_id = "PROT1"
+reaction_id = "PROT"
+
+[[metabolite]]
+id = "met-L"
+name = "methionine"
+inchi_key = "FFEARJCKVFRZRR-BYPYZUCNSA-N"  # source http://bigg.ucsd.edu/universal/metabolites/met__L
+
+[[metabolite]]
+id = "atp"
+name = "adenosine triphosphate"
+inchi_key = "ZKHQWZAMYRWXGA-KQYNXXCUSA-J"  # source http://bigg.ucsd.edu/universal/metabolites/atp
+
+[[metabolite]]
+id = "pi"
+name = "orthophosphate"
+inchi_key = "NBIIXXVUZAFLBC-UHFFFAOYSA-L"  # source http://bigg.ucsd.edu/universal/metabolites/ip
+
+[[metabolite]]
+id = "ppi"
+name = "pyrophosphate"
+inchi_key = "XPPKVPWEQAFLFU-UHFFFAOYSA-K"  # source http://bigg.ucsd.edu/universal/metabolites/ppi
+
+[[metabolite]]
+id = "amet"
+name = "adenosyl methionine"
+inchi_key = "MEFKEPWMEQBLKI-AIRLBKTGSA-O"  # source http://bigg.ucsd.edu/universal/metabolites/amet
+
+[[metabolite]]
+id = "ahcys"
+name = "adenosyl homocysteine"
+inchi_key = "ZJUKTBDSGOFHSH-WFMPWKQPSA-N"  # source http://bigg.ucsd.edu/universal/metabolites/ahcys
+
+[[metabolite]]
+id = "gly"
+name = "glycine"
+inchi_key = "DHMQDGOQFOQNFH-UHFFFAOYSA-N"  # source http://bigg.ucsd.edu/universal/metabolites/gly
+
+[[metabolite]]
+id = "sarcs"
+name = "sarcosine"
+inchi_key = "FSYKKLYZXJSNPZ-UHFFFAOYSA-N"  # source http://bigg.ucsd.edu/universal/metabolites/sarcs
+
+[[metabolite]]
+id = "hcys-L"
+name = "homocysteine"
+inchi_key = "FFFHZYDWPBMWHY-UHFFFAOYSA-N"  # source http://bigg.ucsd.edu/universal/metabolites/hcys__L
+
+[[metabolite]]
+id = "adn"
+name = "adenosine"
+inchi_key = "OIRDTQYFTABQOQ-KQYNXXCUSA-N"  # source http://bigg.ucsd.edu/universal/metabolites/adn
+
+[[metabolite]]
+id = "thf"
+name = "tetrahydrofolate"
+inchi_key = "MSTNYGQPCMXVAQ-RYUDHWBXSA-L"  # source http://bigg.ucsd.edu/universal/metabolites/thf
+
+[[metabolite]]
+id = "5mthf"
+name = "5-methyltetrahydrofolate"
+inchi_key = "ZNOVTXRBGFNYRX-STQMWFEESA-L"  # source http://bigg.ucsd.edu/universal/metabolites/5mthf
+
+[[metabolite]]
+id = "mlthf"
+name = "5,10-methylenetetrahydrofolate"
+inchi_key = "QYNUQALWYRSVHF-OLZOCXBDSA-L"  # source http://bigg.ucsd.edu/universal/metabolites/mlthf
+
+[[metabolite]]
+id = "glyb"
+name = "betaine"
+inchi_key = "KWIUHFFTVRNATP-UHFFFAOYSA-N"  # source http://bigg.ucsd.edu/universal/metabolites/glyb
+
+[[metabolite]]
+id = "dmgly"
+name = "dimethyl-glycine"
+inchi_key = "FFDGPVCHZBVARC-UHFFFAOYSA-N"  # source http://bigg.ucsd.edu/universal/metabolites/dmgly
+
+[[metabolite]]
+id = "ser-L"
+name = "serine"
+inchi_key = "MTCFGRXMJLQNBG-REOHCLBHSA-N"  # source http://bigg.ucsd.edu/universal/metabolites/ser__L
+
+[[metabolite]]
+id = "nadp"
+name = "nadp"
+inchi_key = "XJLXINKUBYWONI-NNYOXOHSSA-K"  # source http://bigg.ucsd.edu/universal/metabolites/nadp
+
+[[metabolite]]
+id = "nadph"
+name = "nadph"
+inchi_key = "ACFIXJIJDZMPPO-NNYOXOHSSA-J"  # source http://bigg.ucsd.edu/universal/metabolites/nadph
+
+[[metabolite]]
+id = "cyst-L"
+name = "cystathionine"
+inchi_key = "ILRYLPWNYFXEMH-WHFBIAKZSA-N"  # source http://bigg.ucsd.edu/universal/metabolites/cyst__L
+
+[[metabolite_in_compartment]]
+metabolite_id = "met-L"
+compartment_id = "c"
+balanced = true
+
+[[metabolite_in_compartment]]
+metabolite_id = "atp"
+compartment_id = "c"
+balanced = false
+
+[[metabolite_in_compartment]]
+metabolite_id = "pi"
+compartment_id = "c"
+balanced = false
+
+[[metabolite_in_compartment]]
+metabolite_id = "ppi"
+compartment_id = "c"
+balanced = false
+
+[[metabolite_in_compartment]]
+metabolite_id = "amet"
+compartment_id = "c"
+balanced = true
+
+[[metabolite_in_compartment]]
+metabolite_id = "ahcys"
+compartment_id = "c"
+balanced = true
+
+[[metabolite_in_compartment]]
+metabolite_id = "gly"
+compartment_id = "c"
+balanced = false
+
+[[metabolite_in_compartment]]
+metabolite_id = "sarcs"
+compartment_id = "c"
+balanced = false
+
+[[metabolite_in_compartment]]
+metabolite_id = "hcys-L"
+compartment_id = "c"
+balanced = true
+
+[[metabolite_in_compartment]]
+metabolite_id = "adn"
+compartment_id = "c"
+balanced = false
+
+[[metabolite_in_compartment]]
+metabolite_id = "thf"
+compartment_id = "c"
+balanced = false
+
+[[metabolite_in_compartment]]
+metabolite_id = "5mthf"
+compartment_id = "c"
+balanced = true
+
+[[metabolite_in_compartment]]
+metabolite_id = "mlthf"
+compartment_id = "c"
+balanced = false
+
+[[metabolite_in_compartment]]
+metabolite_id = "glyb"
+compartment_id = "c"
+balanced = false
+
+[[metabolite_in_compartment]]
+metabolite_id = "dmgly"
+compartment_id = "c"
+balanced = false
+
+[[metabolite_in_compartment]]
+metabolite_id = "ser-L"
+compartment_id = "c"
+balanced = false
+
+[[metabolite_in_compartment]]
+metabolite_id = "nadp"
+compartment_id = "c"
+balanced = false
+
+[[metabolite_in_compartment]]
+metabolite_id = "nadph"
+compartment_id = "c"
+balanced = false
+
+[[metabolite_in_compartment]]
+metabolite_id = "cyst-L"
+compartment_id = "c"
+balanced = false
+
+[[allostery]]
+enzyme_id = "MAT3"
+metabolite_id = "amet"
+compartment_id = "c"
+modification_type = "activation"
+
+[[allostery]]
+enzyme_id = "MAT3"
+metabolite_id = "met-L"
+compartment_id = "c"
+modification_type = "activation"
+
+[[allostery]]
+enzyme_id = "GNMT1"
+metabolite_id = "amet"
+compartment_id = "c"
+modification_type = "activation"
+
+[[allostery]]
+enzyme_id = "GNMT1"
+metabolite_id = "mlthf"
+compartment_id = "c"
+modification_type = "inhibition"
+
+[[allostery]]
+enzyme_id = "CBS1"
+metabolite_id = "amet"
+compartment_id = "c"
+modification_type = "activation"
+
+[[allostery]]
+enzyme_id = "MTHFR1"
+metabolite_id = "amet"
+compartment_id = "c"
+modification_type = "inhibition"
+
+[[allostery]]
+enzyme_id = "MTHFR1"
+metabolite_id = "ahcys"
+compartment_id = "c"
+modification_type = "activation"
+
+[[competitive_inhibition]]
+enzyme_id = "MAT1"
+reaction_id = "METAT"
+metabolite_id = "amet"
+compartment_id = "c"
+
+[[competitive_inhibition]]
+enzyme_id = "METH-Gen"
+reaction_id = "METH"
+metabolite_id = "ahcys"
+compartment_id = "c"
+
+[[competitive_inhibition]]
+enzyme_id = "GNMT1"
+reaction_id = "GNMT"
+metabolite_id = "ahcys"
+compartment_id = "c"
