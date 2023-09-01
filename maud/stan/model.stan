@@ -94,7 +94,7 @@ data {
   real abs_tol;
   real steady_state_threshold_abs;
   real steady_state_threshold_rel;
-  vector[N_mic-N_unbalanced] steady_state_threshold_sigma;
+  real steady_state_threshold_sigma;
   int max_num_steps;
   int<lower=0,upper=1> likelihood;  // set to 0 for priors-only mode
   real drain_small_conc_corrector;
@@ -245,7 +245,7 @@ transformed parameters {
                                              phosphorylation_ix_bounds,
                                              phosphorylation_type,
                                              phosphorylation_pme);
-    steady_dev[e] = (S * edge_flux)'[balanced_mic_ix];
+    steady_dev[e] = (fabs((S * edge_flux)[balanced_mic_ix]) - conc_train[e, balanced_mic_ix] * steady_state_threshold_rel)';
     for (j in 1:N_edge)
       flux_train[e, edge_to_reaction[j]] += edge_flux[j];
     if (reject_non_steady == 1 &&

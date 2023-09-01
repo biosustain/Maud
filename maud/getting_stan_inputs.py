@@ -46,7 +46,7 @@ def get_stan_inputs(
     experiments_input_train, experiments_input_test = get_experiments_input(
         experiments, kinetic_model
     )
-    config_input = get_config_input(config, kinetic_model.mics)
+    config_input = get_config_input(config)
     conc_init_train, conc_init_test = get_conc_init(
         experiments, kinetic_model, config
     )
@@ -457,10 +457,8 @@ def get_experiments_input(
     return input_train, input_test
 
 
-def get_config_input(config: MaudConfig, mics: List[MetaboliteInCompartment]):
+def get_config_input(config: MaudConfig):
     """Get Stan input related to algorithm configuration."""
-    # to write them in the right order
-    mic_balanced: List[str] = [mic.id for mic in mics if mic.balanced]
 
     return {
         "likelihood": int(config.likelihood),
@@ -469,14 +467,7 @@ def get_config_input(config: MaudConfig, mics: List[MetaboliteInCompartment]):
         "penalize_non_steady": int(config.penalize_non_steady),
         "steady_state_threshold_abs": config.steady_state_threshold_abs,
         "steady_state_threshold_rel": config.steady_state_threshold_rel,
-        "steady_state_threshold_sigma": [
-            config.steady_state_threshold_sigma[k]
-            if k in config.steady_state_threshold_sigma
-            else config.steady_state_threshold_abs
-            for k in mic_balanced
-        ]
-        if config.steady_state_threshold_sigma is not None
-        else [config.steady_state_threshold_abs] * len(mic_balanced),
+        "steady_state_threshold_sigma": config.steady_state_threshold_sigma,
         "rel_tol": config.ode_config.rel_tol,
         "abs_tol": config.ode_config.abs_tol,
         "timepoint": config.ode_config.timepoint,
