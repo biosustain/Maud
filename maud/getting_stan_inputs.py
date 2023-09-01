@@ -469,13 +469,13 @@ def get_config_input(config: MaudConfig, mics: List[MetaboliteInCompartment]):
         "penalize_non_steady": int(config.penalize_non_steady),
         "steady_state_threshold_abs": config.steady_state_threshold_abs,
         "steady_state_threshold_rel": config.steady_state_threshold_rel,
-        "steady_state_threshold_opt": [
-            config.steady_state_threshold_opt[k]
-            if k in config.steady_state_threshold_opt
+        "steady_state_threshold_sigma": [
+            config.steady_state_threshold_sigma[k]
+            if k in config.steady_state_threshold_sigma
             else config.steady_state_threshold_abs
             for k in mic_balanced
         ]
-        if config.steady_state_threshold_opt is not None
+        if config.steady_state_threshold_sigma is not None
         else [config.steady_state_threshold_abs] * len(mic_balanced),
         "rel_tol": config.ode_config.rel_tol,
         "abs_tol": config.ode_config.abs_tol,

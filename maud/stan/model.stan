@@ -94,7 +94,7 @@ data {
   real abs_tol;
   real steady_state_threshold_abs;
   real steady_state_threshold_rel;
-  vector[N_mic-N_unbalanced] steady_state_threshold_opt;
+  vector[N_mic-N_unbalanced] steady_state_threshold_sigma;
   int max_num_steps;
   int<lower=0,upper=1> likelihood;  // set to 0 for priors-only mode
   real drain_small_conc_corrector;
@@ -306,7 +306,7 @@ model {
       yflux_train[f] ~ normal(flux_train[experiment_yflux_train[f], reaction_yflux_train[f]], sigma_yflux_train[f]);
     if (penalize_non_steady == 1) {
       for (xpt in 1:N_experiment_train)
-        steady_dev[xpt] ~ normal(0.0, steady_state_threshold_opt);
+        steady_dev[xpt] ~ normal(0.0, steady_state_threshold_sigma);
     }
   }
 }

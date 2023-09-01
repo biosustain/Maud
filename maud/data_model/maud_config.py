@@ -26,7 +26,7 @@ class MaudConfig:
     :param likelihood: Whether or not to take measurements into account.
     :param cmdstanpy_config: Arguments to cmdstanpy.CmdStanModel.sample.
     :param reject_non_steady: Reject draws if a non-steady state is encountered.
-    :param penalize_non_steady: Penalize the deviation from steady state in the log likelihood.
+    :param penalize_non_steady: Penalize the deviation from steady state in the log likelihood.  # noqa: F401
     :param ode_config: Configuration for Stan's ode solver.
     :param stanc_options: Options for CmdStanModel argument `stanc_options`.
     :param cpp_options: Options for CmdStanModel `cpp_options`.
@@ -35,7 +35,7 @@ class MaudConfig:
     :param user_inits_file: path to a csv file of initial values.
     :param steady_state_threshold_abs: abs threshold for Sv=0 be at steady state
     :param steady_state_threshold_rel: rel threshold for Sv=0 be at steady state
-    :param steady_state_threshold_opt: dictionary of standard deviations for SV checks when reject_non_steady is false
+    :param steady_state_threshold_sigma: dictionary of standard deviations for SV checks when reject_non_steady is false  # noqa: F401
     :param default_initial_concentration: in molecule_unit per volume_unit
     :param drain_small_conc_corrector: number for correcting small conc drains
     :param molecule_unit: A unit for counting molecules, like 'mol' or 'mmol'
@@ -60,7 +60,7 @@ class MaudConfig:
     penalize_non_steady: bool = False
     steady_state_threshold_abs: float = 1e-8
     steady_state_threshold_rel: float = 1e-3
-    steady_state_threshold_opt: Optional[dict[str, float]] = None
+    steady_state_threshold_sigma: Optional[dict[str, float]] = None
     default_initial_concentration: float = 0.01
     drain_small_conc_corrector: float = 1e-6
     molecule_unit: str = "mmol"
