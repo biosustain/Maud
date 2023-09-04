@@ -35,7 +35,7 @@ class MaudConfig:
     :param user_inits_file: path to a csv file of initial values.
     :param steady_state_threshold_abs: abs threshold for Sv=0 be at steady state
     :param steady_state_threshold_rel: rel threshold for Sv=0 be at steady state
-    :param steady_state_penalty_sigma: dictionary of standard deviations for SV checks when reject_non_steady is false.
+    :param steady_state_penalty_rel: relative standard deviation for SV checks when penalize_non_steady is true.
     :param default_initial_concentration: in molecule_unit per volume_unit
     :param drain_small_conc_corrector: number for correcting small conc drains
     :param molecule_unit: A unit for counting molecules, like 'mol' or 'mmol'
@@ -60,7 +60,7 @@ class MaudConfig:
     penalize_non_steady: bool = False
     steady_state_threshold_abs: float = 1e-8
     steady_state_threshold_rel: float = 1e-3
-    steady_state_penalty_sigma: float = 1e-8
+    steady_state_penalty_rel: float = 1e-8
     default_initial_concentration: float = 0.01
     drain_small_conc_corrector: float = 1e-6
     molecule_unit: str = "mmol"

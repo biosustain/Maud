@@ -94,7 +94,7 @@ data {
   real abs_tol;
   real steady_state_threshold_abs;
   real steady_state_threshold_rel;
-  real steady_state_penalty_sigma;
+  real steady_state_penalty_rel;
   int max_num_steps;
   int<lower=0,upper=1> likelihood;  // set to 0 for priors-only mode
   real drain_small_conc_corrector;
@@ -245,7 +245,7 @@ transformed parameters {
                                              phosphorylation_ix_bounds,
                                              phosphorylation_type,
                                              phosphorylation_pme);
-    steady_dev[e] = (fabs((S * edge_flux)[balanced_mic_ix]) - conc_train[e, balanced_mic_ix] * steady_state_threshold_rel)';
+    steady_dev[e] = ((S * edge_flux)[balanced_mic_ix])';
     for (j in 1:N_edge)
       flux_train[e, edge_to_reaction[j]] += edge_flux[j];
     if (reject_non_steady == 1 &&
@@ -306,7 +306,7 @@ model {
       yflux_train[f] ~ normal(flux_train[experiment_yflux_train[f], reaction_yflux_train[f]], sigma_yflux_train[f]);
     if (penalize_non_steady == 1) {
       for (xpt in 1:N_experiment_train)
-        steady_dev[xpt] ~ normal(0.0, steady_state_penalty_sigma);
+        steady_dev[xpt] ~ normal(0.0, conc_train[xpt, balanced_mic_ix] * steady_state_penalty_rel);
     }
   }
 }

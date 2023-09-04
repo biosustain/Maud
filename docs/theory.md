@@ -358,11 +358,11 @@ favors steady states. This is implemented in the form of
 [](#eq-steady-penalty)
 
 $$
-(|S\cdot f_v(x_t, \theta)| - \epsilon C) \sim N(0, \sigma)
+S\cdot f_v(x_t, \theta) \sim N(0, $\epsilon$ $C$)
 $$(eq-steady-penalty)
 
-where $C$ is the vector of balanced concentrations and $\epsilon$ and
-$\sigma$ are configurable parameters.
+where $C$ is the vector of balanced concentrations and $\epsilon$ is a
+configurable parameter.
 
 (sec-analysis-of-results)=
 ### Analysis of results
