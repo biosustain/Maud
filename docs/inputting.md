@@ -32,6 +32,7 @@ The file `config.toml` **must** contain these top-level fields:
 The following optional fields can also be specified:
 
 * `reject_non_steady` Boolean saying whether to reject draws that enter non-steady states
+* `penalize_non_steady` Boolean saying whether to penalize steady state deviations in the likelihood. It cannot be `True` when `reject_non_steady` is `True`.
 * `ode_config` Table of configuration options for Stan's ode solver
 * `cmdstanpy_config` Table of keyword arguments to the cmdstanpy method [`CmdStanModel.sample](https://cmdstanpy.readthedocs.io/en/v1.1.0/api.html#cmdstanpy.CmdStanModel.sample)
 * `cmdstanpy_config_predict` Table of overriding sample keyword argments for predictions
@@ -41,6 +42,7 @@ The following optional fields can also be specified:
 * `user_inits_file` path to a toml file of initial values
 * `steady_state_threshold_abs` absolute threshold for Sv=0 be at steady state
 * `steady_state_threshold_rel` relative threshold for Sv=0 be at steady state
+* `steady_state_penalty_sigma` standard deviation to penalize deviations from steady state in the likelihood
 * `default_initial_concentration` default initial concentration for unmeasured species
 * `drain_small_conc_corrector` number for correcting small conc drains
 * `molecule_unit` A unit for counting molecules, like 'mol' or 'mmol'
