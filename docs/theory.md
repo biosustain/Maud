@@ -358,6 +358,76 @@ object and save it as a json file, along with a range of files containing debug
 information. These files can be used to validate the computation and to draw
 conclusions about the measured system.
 
+### Metabolic Control Analysis
+
+Determining systems level changes in flux and metabolite concentration is not
+intuitive given the interation on the scale of individual enzymes. This problem
+has been addressed using metabolic control analysis (MCA) {cite}`kascer1973`.
+MCA can be applied to any model parameter, however, in Maud we will address the
+most common application: changes in enzyme concentration. The question that MCA
+addresses is: *How does the change in a given parameter change the system wide
+properties of flux and concentration?* MCA provides a tool to address these
+changes close to the reference state, which can be any parameterised model that
+achieves a steady-state.
+
+Given the solution to the steady-state is given by the following equation,
+we can take the derivative of this steady state with respect to the parameter of
+interest as shown in equation [](#eq-steady_parameter).
+
+$$
+    \frac{dx}{dt} = S \cdot f_v(x_t, \theta)
+$$(eq-steady_parameter)
+
+By taking the derivative of the steady state with respect to the parameters we
+can determine the systems wide change for a given parameter. To do so, we need
+to apply the chain rule, this separates into the following terms:
+$S\frac{\partial f_v}{\partial \theta}$, that determines the change in
+concentration due to the direct impact of the flux vector; and,
+$S\frac{\partial f_v}{\pratial S}\frac{\partial x}{\partial \theta}$, that
+accounts for the change in flux due to the local change in metabolite
+concentration that resulted from the parameter change. This is presented in
+equation [](#eq-Sv_partial).
+
+$$
+    \partial \frac{S \cdot f_v(x_t, \theta)}{\partial \theta} = S\frac{\partial f_v}{\partial \theta} + S\frac{\partal f_v}{\partial x}\frac{\partial x}{\partial \theta}
+$$(eq-Sv_partial)
+
+Because we are at steady state it follows that the derivative is equal to zero:
+
+$$
+    S\frac{\partial f_v}{\partial \theta} + S\frac{\partal f_v}{\partial x}\frac{\partial x}{\partial \theta} = 0
+$$(eq-Sv_partial_zero)
+
+By rearranging the above equation we can isolate the derivative of the substrate concentration
+with respect to the parameter (equation [](#eq-x_theta_partial)).
+
+$$
+    \frac{d x}{d \theta} = -\left( S\frac{partial f_v}{\partial \x} \right)^{-1} S \frac{\partial f_v}{\partial \theta}
+$$(eq-x_theta_partial)
+
+Given the flux vector $f_v(x, \theta)$, we can differentiate this with respect
+to the parameter of interest $\theta$. We can also distinguish between the
+change in parameters with respect to the local flux $f_v(f, \theta)$, and that
+of the global flux that results from the changes in metabolites $J$. Differentiating the flux vector
+with respect to the parameter distributions arrive at equation [](#eq-gq_flux_partial).
+
+$$
+    \frac{d J}{d P} = \frac{\partial f_v}{\partial \theta} + \frac{\partal f_v}{\partial x}\frac{\partial x}{\partial \theta}
+$$(eq-gq_flux_partial)
+
+By substituting [](#eq-x_theta_partial) into [](#eq-gq_flux_partial), we arrive at equation that is only
+dependent on the stoichiometric matrix, and the local sensitivities.
+
+$$
+    \frac{d f_v}{d P} = \frac{\partial f_v}{\partial \theta} + \frac{\partal f_v}{\partial x}\frac{\partial x}{\partial \theta}
+$$
+
+Where the local sensitivity is defined in equation [](#eq-elasticity) and is
+commonly known as the elasticity matrix.
+
+$$
+   \epsilon = \frac{f_v}{\partial x}
+$$
 
 ```{bibliography}
 ```
