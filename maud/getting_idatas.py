@@ -101,9 +101,15 @@ def get_idata(csvs: List[str], mi: MaudInput, mode: str) -> az.InferenceData:
         "concentration_control_matrix": [
             "experiments",
             "balanced_mics",
+            "edges",
+        ],
+        "flux_control_matrix": ["experiments", "edges", "edges"],
+        "flux_response_coefficient": ["experiments", "edges", "enzymes"],
+        "concentration_response_coefficient": [
+            "experiments",
+            "balanced_mics",
             "enzymes",
         ],
-        "flux_control_matrix": ["experiments", "edges", "enzymes"],
     }
     # for zvar in [
     #     "kcat",

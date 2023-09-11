@@ -233,7 +233,20 @@ def do_simulate(data_path, output_dir, n):
         .to_series()
         .unstack()
     )
-
+    print("\n\nSimulated response coefficients")
+    print(
+        idata.posterior["flux_response_coefficient"]
+        .mean(dim=["chain", "draw"])
+        .to_series()
+        .unstack()
+    )
+    print("\n\nSimulated response coefficients")
+    print(
+        idata.posterior["concentration_response_coefficient"]
+        .mean(dim=["chain", "draw"])
+        .to_series()
+        .unstack()
+    )
     print("\n\nSimulated measurements:")
     print(
         idata.posterior_predictive["yrep_conc_train"]
