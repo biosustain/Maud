@@ -109,6 +109,7 @@ amount of flux carried per unit of saturated enzyme.
 The term $Reversibility$ is a vector of real numbers capturing the impact of
 thermodynamics on the reaction's flux, as shown in
 [](#eq-reversibility).
+
 $$
 \begin{aligned}
   Reversibility &= 1 - \exp(\frac{\Delta_{r}G' + RT \cdot S^T \ln(x)}{RT}) \\
@@ -362,7 +363,7 @@ conclusions about the measured system.
 
 Determining systems level changes in flux and metabolite concentration is not
 intuitive given the interation on the scale of individual enzymes. This problem
-has been addressed using metabolic control analysis (MCA) {cite}`kascer1973`.
+has been addressed using metabolic control analysis (MCA) {cite}`kacser1973`.
 MCA can be applied to any model parameter, however, in Maud we will address the
 most common application: changes in enzyme concentration. The question that MCA
 addresses is: *How does the change in a given parameter change the system wide
@@ -383,51 +384,81 @@ can determine the systems wide change for a given parameter. To do so, we need
 to apply the chain rule, this separates into the following terms:
 $S\frac{\partial f_v}{\partial \theta}$, that determines the change in
 concentration due to the direct impact of the flux vector; and,
-$S\frac{\partial f_v}{\pratial S}\frac{\partial x}{\partial \theta}$, that
+$S\frac{\partial f_v}{\partial S}\frac{\partial x}{\partial \theta}$, that
 accounts for the change in flux due to the local change in metabolite
 concentration that resulted from the parameter change. This is presented in
 equation [](#eq-Sv_partial).
 
 $$
-    \partial \frac{S \cdot f_v(x_t, \theta)}{\partial \theta} = S\frac{\partial f_v}{\partial \theta} + S\frac{\partal f_v}{\partial x}\frac{\partial x}{\partial \theta}
+    \partial \frac{S \cdot f_v(x_t, \theta)}{\partial \theta} = S\frac{\partial f_v}{\partial \theta} + S\frac{\partial f_v}{\partial x}\frac{\partial x}{\partial \theta}
 $$(eq-Sv_partial)
 
 Because we are at steady state it follows that the derivative is equal to zero:
 
 $$
-    S\frac{\partial f_v}{\partial \theta} + S\frac{\partal f_v}{\partial x}\frac{\partial x}{\partial \theta} = 0
+    S\frac{\partial f_v}{\partial \theta} + S\frac{\partial f_v}{\partial x}\frac{\partial x}{\partial \theta} = 0
 $$(eq-Sv_partial_zero)
 
 By rearranging the above equation we can isolate the derivative of the substrate concentration
 with respect to the parameter (equation [](#eq-x_theta_partial)).
 
 $$
-    \frac{d x}{d \theta} = -\left( S\frac{partial f_v}{\partial \x} \right)^{-1} S \frac{\partial f_v}{\partial \theta}
+    \frac{d x}{d \theta} = -\left( S\frac{\partial f_v}{\partial x} \right)^{-1} S \frac{\partial f_v}{\partial \theta}
 $$(eq-x_theta_partial)
+
+$$
+    \frac{\partial f_v}{\partial P} = \frac{\partial f_v}{\partial \theta} + \frac{\partial f_v}{\partial x}\frac{\partial x}{\partial \theta}
+$$(eq-gq_flux_partial)
+
 
 Given the flux vector $f_v(x, \theta)$, we can differentiate this with respect
 to the parameter of interest $\theta$. We can also distinguish between the
 change in parameters with respect to the local flux $f_v(f, \theta)$, and that
-of the global flux that results from the changes in metabolites $J$. Differentiating the flux vector
-with respect to the parameter distributions arrive at equation [](#eq-gq_flux_partial).
+of the global flux that results from the changes in metabolites $J$.
+Differentiating the flux vector with respect to the parameter distributions
+arrive at equation [](#eq-gq_flux_partial_substituted).
 
 $$
-    \frac{d J}{d P} = \frac{\partial f_v}{\partial \theta} + \frac{\partal f_v}{\partial x}\frac{\partial x}{\partial \theta}
-$$(eq-gq_flux_partial)
+    \frac{\partial J}{\partial P} = \left( I - \frac{\partial f_v}{\partial x} \left( S \frac{\partial f_v}{\partial x} \right)^{-1} S \right) \frac{\partial f_v}{\partial \theta}
+$$(eq-gq_flux_partial_substituted)
 
-By substituting [](#eq-x_theta_partial) into [](#eq-gq_flux_partial), we arrive at equation that is only
-dependent on the stoichiometric matrix, and the local sensitivities.
+By substituting [](#eq-x_theta_partial) into [](#eq-gq_flux_partial), we arrive
+at equation #[](eq-gq_flux_partial_substituted) that is only dependent on the
+stoichiometric matrix, and the local sensitivities and elasticities.
+
+
+Where the local elasticities is defined in equation [](#eq-elasticity) and is
+commonly known as the elasticity matrix. The difference between the local and
+global quantities is the requirement to be at steady state. For example
+equation [](#eq-gq_flux_partial) is at steady state, whereas the corresponding
+sensitivity matrix defined in equation [](#eq-sensitivites) is not.
 
 $$
-    \frac{d f_v}{d P} = \frac{\partial f_v}{\partial \theta} + \frac{\partal f_v}{\partial x}\frac{\partial x}{\partial \theta}
-$$
+   \epsilon = \frac{\partial f_v}{\partial x}
+$$(eq-elasticity)
 
-Where the local sensitivity is defined in equation [](#eq-elasticity) and is
-commonly known as the elasticity matrix.
 
 $$
-   \epsilon = \frac{f_v}{\partial x}
+    \sigma = \frac{\partial f_v}{\partial \theta}
+$$(eq-sensitivites)
+
+We refer to the global changes $\frac{\partial x}{\partial \theta}$ and
+$\frac{\partial J}{\partial \theta}$ represented in equations
+[](#eq-x_theta_partial) and [](#eq-gq_flux_partial_substituted). Each of these
+equations includes the local sensitivity $\sigma$ multiplied by the global control
+coefficients -- this ensures that the quantities are represented at the steady-state.
+Therefore, we can investigate the global quantities as separate values, which
+are referred to as control coefficients. These are the changes in the respective
+parameter and the local change in flux. The flux control coefficient and concentration
+control coefficients are defined below in equations [](#eq-FCC) [](#eq-CCC).
+
 $$
+ C_{i,j}^J = I - \frac{\partial f_v}{\partial x} \left( S \frac{\partial f_v}{\partial x} \right)^{-1} S
+$$(eq-FCC)
+
+$$
+    C_{i,k}^x = -\left( S\frac{\partial f_v}{\partial x} \right)^{-1} S
+$$(eq-CCC)
 
 ```{bibliography}
 ```
