@@ -460,5 +460,11 @@ $$
     C_{i,k}^x = -\left( S\frac{\partial f_v}{\partial x} \right)^{-1} S
 $$(eq-CCC)
 
+#### Notes on MCA
+- Unscaled parameters were used because knockouts can cause the normalised
+  constants to be divided by 0.
+- The units are whatever the units are that the users passed to Maud.
+
+
 ```{bibliography}
 ```
