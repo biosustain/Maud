@@ -39,6 +39,7 @@ def get_idata(csvs: List[str], mi: MaudInput, mode: str) -> az.InferenceData:
         "unbalanced_mics": [
             m.id for m in mi.kinetic_model.mics if not m.balanced
         ],
+        "balanced_mics": [m.id for m in mi.kinetic_model.mics if m.balanced],
         "phosphorylations": [p.id for p in mi.kinetic_model.phosphorylations]
         if mi.kinetic_model.phosphorylations is not None
         else [],
@@ -97,6 +98,18 @@ def get_idata(csvs: List[str], mi: MaudInput, mode: str) -> az.InferenceData:
         f"yrep_flux_{mode}": ["yfluxs"],
         f"llik_conc_{mode}": ["yconcs"],
         f"llik_flux_{mode}": ["yfluxs"],
+        "concentration_control_matrix": [
+            "experiments",
+            "balanced_mics",
+            "edges",
+        ],
+        "flux_control_matrix": ["experiments", "edges", "edges"],
+        "flux_response_coefficient": ["experiments", "edges", "enzymes"],
+        "concentration_response_coefficient": [
+            "experiments",
+            "balanced_mics",
+            "enzymes",
+        ],
     }
     # for zvar in [
     #     "kcat",
