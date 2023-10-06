@@ -74,7 +74,6 @@ def load_stan_model(
             stan_file=STAN_FILES_FOLDER / f"{name}.stan",
             cpp_options=cpp_options,
             stanc_options=stanc_options,
-            compile=False,
         )
     except ValueError:
         warnings.warn(
