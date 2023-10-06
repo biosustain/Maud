@@ -32,7 +32,7 @@ dependencies = [
     "pandas",
     "matplotlib",
     "toml",
-    "cmdstanpy >= 1.0.3",
+    "cmdstanpy >= 1.2.0",
     "click",
     "depinfo == 1.7.0",
     "pydantic == 1.9.0",
