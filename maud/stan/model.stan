@@ -154,7 +154,7 @@ transformed parameters {
     flux_train[e] = rep_vector(0, N_reaction);
     vector[N_enzyme] conc_enzyme_experiment = conc_enzyme_train[e];
     vector[N_pme] conc_pme_experiment = conc_pme_train[e];
-    array[1] vector[N_mic - N_unbalanced] conc_balanced_experiment;
+    vector[N_mic - N_unbalanced] conc_balanced_experiment;
     int N_eko_experiment = measure_ragged(enzyme_knockout_train_bounds, e);
     int N_pko_experiment = measure_ragged(pme_knockout_train_bounds, e);
     if (N_eko_experiment > 0) {
@@ -170,8 +170,8 @@ transformed parameters {
                                                                   e);
       conc_pme_experiment[pko_experiment] = rep_vector(0, N_pko_experiment);
     }
-    conc_balanced_experiment = ode_bdf_tol(dbalanced_dt, conc_init[e],
-                                           initial_time, {timepoint},
+    conc_balanced_experiment = solve_newton_tol(maud_ae_system,
+                                           conc_init[e],
                                            rel_tol, abs_tol, max_num_steps,
                                            conc_unbalanced_train[e],
                                            balanced_mic_ix,
@@ -202,7 +202,7 @@ transformed parameters {
                                            phosphorylation_ix_bounds,
                                            phosphorylation_type,
                                            phosphorylation_pme);
-    conc_train[e, balanced_mic_ix] = conc_balanced_experiment[1];
+    conc_train[e, balanced_mic_ix] = conc_balanced_experiment;
     conc_train[e, unbalanced_mic_ix] = conc_unbalanced_train[e];
     {
       vector[N_edge] edge_flux = get_edge_flux(conc_train[e],
@@ -238,42 +238,42 @@ transformed parameters {
       for (j in 1 : N_edge) {
         flux_train[e, edge_to_reaction[j]] += edge_flux[j];
       }
-      if (reject_non_steady == 1
-          && check_steady_state((S * edge_flux)[balanced_mic_ix],
-                                conc_balanced_experiment[1],
-                                steady_state_threshold_abs,
-                                steady_state_threshold_rel)
-             == 0) {
-        print("Non-steady state in experiment ", e);
-        print("Balanced metabolite concentration",
-              conc_balanced_experiment[1]);
-        print("flux_train: ", flux_train[e]);
-        print("conc_init: ", conc_init);
-        print("conc_unbalanced_train: ", conc_unbalanced_train[e]);
-        print("log_conc_unbalanced_train_z: ", log_conc_unbalanced_train_z[e]);
-        print("conc_enzyme_experiment: ", conc_enzyme_experiment);
-        print("log_conc_enzyme_train_z: ", log_conc_enzyme_train_z[e]);
-        print("km: ", km);
-        print("log_km_z: ", log_km_z);
-        print("drain_train: ", drain_train[e]);
-        print("drain_train_z: ", drain_train_z[e]);
-        print("kcat: ", kcat);
-        print("log_kcat_z: ", log_kcat_z);
-        print("dgr_train: ", dgr_train[e]);
-        print("ki: ", ki);
-        print("log_ki_z: ", log_ki_z);
-        print("dissociation_constant: ", dissociation_constant);
-        print("log_dissociation_constant_z: ", log_dissociation_constant_z);
-        print("transfer_constant: ", transfer_constant);
-        print("log_transfer_constant_z: ", log_transfer_constant_z);
-        print("kcat_pme: ", kcat_pme);
-        print("log_kcat_pme_z: ", log_kcat_pme_z);
-        print("conc_pme_experiment: ", conc_pme_experiment);
-        print("log_conc_pme_train_z: ", log_conc_pme_train_z[e]);
-        print("psi_train: ", psi_train);
-        print("psi_train_z: ", psi_train_z);
-        reject("Rejecting");
-      }
+//      if (reject_non_steady == 1
+//          && check_steady_state((S * edge_flux)[balanced_mic_ix],
+//                                conc_balanced_experiment,
+//                                steady_state_threshold_abs,
+//                                steady_state_threshold_rel)
+//             == 0) {
+//        print("Non-steady state in experiment ", e);
+//        print("Balanced metabolite concentration",
+//              conc_balanced_experiment);
+//        print("flux_train: ", flux_train[e]);
+//        print("conc_init: ", conc_init);
+//        print("conc_unbalanced_train: ", conc_unbalanced_train[e]);
+//        print("log_conc_unbalanced_train_z: ", log_conc_unbalanced_train_z[e]);
+//        print("conc_enzyme_experiment: ", conc_enzyme_experiment);
+//        print("log_conc_enzyme_train_z: ", log_conc_enzyme_train_z[e]);
+//        print("km: ", km);
+//        print("log_km_z: ", log_km_z);
+//        print("drain_train: ", drain_train[e]);
+//        print("drain_train_z: ", drain_train_z[e]);
+//        print("kcat: ", kcat);
+//        print("log_kcat_z: ", log_kcat_z);
+//        print("dgr_train: ", dgr_train[e]);
+//        print("ki: ", ki);
+//        print("log_ki_z: ", log_ki_z);
+//        print("dissociation_constant: ", dissociation_constant);
+//        print("log_dissociation_constant_z: ", log_dissociation_constant_z);
+//        print("transfer_constant: ", transfer_constant);
+//        print("log_transfer_constant_z: ", log_transfer_constant_z);
+//        print("kcat_pme: ", kcat_pme);
+//        print("log_kcat_pme_z: ", log_kcat_pme_z);
+//        print("conc_pme_experiment: ", conc_pme_experiment);
+//        print("log_conc_pme_train_z: ", log_conc_pme_train_z[e]);
+//        print("psi_train: ", psi_train);
+//        print("psi_train_z: ", psi_train_z);
+//        reject("Rejecting");
+//      }
     }
   }
 }
