@@ -33,7 +33,8 @@ The following optional fields can also be specified:
 
 * `reject_non_steady` Boolean saying whether to reject draws that enter non-steady states
 * `penalize_non_steady` Boolean saying whether to penalize steady state deviations in the likelihood. It cannot be `True` when `reject_non_steady` is `True`.
-* `ode_config` Table of configuration options for Stan's ode solver
+* `ode_solver_config` Table of configuration options for Stan's ode solver
+* `algebra_solver_config` Table of configuration options for Stan's algebra solver
 * `cmdstanpy_config` Table of keyword arguments to the cmdstanpy method [`CmdStanModel.sample](https://cmdstanpy.readthedocs.io/en/v1.1.0/api.html#cmdstanpy.CmdStanModel.sample)
 * `cmdstanpy_config_predict` Table of overriding sample keyword argments for predictions
 * `stanc_options` Table of valid choices for [CmdStanModel](https://cmdstanpy.readthedocs.io/en/v1.1.0/api.html#cmdstanpy.CmdStanModel) argument `stanc_options`
@@ -68,11 +69,15 @@ Here is an example configuration file:
     chains = 4
     save_warmup = true
 
-    [ode_config]
+    [ode_solver_config]
     abs_tol = 1e-4
     rel_tol = 1e-4
     max_num_steps = 1e6
-    timepoint = 1e3
+
+    [algebra_solver_config]
+    abs_tol = 1e-4
+    rel_tol = 1e-4
+    max_num_steps = 1e6
 
 This file tells Maud that a file representing a kinetic model can be found at
 the relative path `kinetic_model.toml`, and that priors and experimental

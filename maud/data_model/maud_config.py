@@ -1,18 +1,27 @@
 """Provides dataclass MaudConfig."""
 from typing import Optional
 
+from pydantic import Field
 from pydantic.class_validators import root_validator
-from pydantic.dataclasses import Field, dataclass
+from pydantic.dataclasses import dataclass
 
 
 @dataclass(frozen=True)
-class ODEConfig:
-    """Config that is specific to the ODE solver."""
+class ODESolverConfig:
+    """Config that is specific to an ODE solver."""
 
     rel_tol: float = 1e-9
     abs_tol: float = 1e-9
-    max_num_steps: int = int(1e9)
-    timepoint: float = 500
+    max_num_steps: int = int(1e7)
+
+
+@dataclass(frozen=True)
+class AlgebraSolverConfig:
+    """Config that is specific to an ODE solver."""
+
+    rel_tol: float = 1e-7
+    abs_tol: float = 1e-7
+    max_num_steps: int = int(1e6)
 
 
 @dataclass
@@ -27,7 +36,8 @@ class MaudConfig:
     :param cmdstanpy_config: Arguments to cmdstanpy.CmdStanModel.sample.
     :param reject_non_steady: Reject draws if a non-steady state is encountered.
     :param penalize_non_steady: Penalize the deviation from steady state in the log likelihood.
-    :param ode_config: Configuration for Stan's ode solver.
+    :param ode_solver_config: Configuration for Stan's ode solver.
+    :param algebra_solver_config: Configuration for Stan's algebra solver.
     :param stanc_options: Options for CmdStanModel argument `stanc_options`.
     :param cpp_options: Options for CmdStanModel `cpp_options`.
     :param variational_options: Arguments for CmdStanModel.variational.
@@ -55,7 +65,10 @@ class MaudConfig:
     variational_options: Optional[dict] = None
     optimize_options: Optional[dict] = None
     user_inits_file: Optional[str] = None
-    ode_config: ODEConfig = Field(default_factory=ODEConfig)
+    ode_solver_config: ODESolverConfig = Field(default_factory=ODESolverConfig)
+    algebra_solver_config: AlgebraSolverConfig = Field(
+        default_factory=AlgebraSolverConfig
+    )
     reject_non_steady: bool = True
     penalize_non_steady: bool = False
     steady_state_threshold_abs: float = 1e-8

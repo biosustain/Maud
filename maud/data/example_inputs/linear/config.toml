@@ -13,8 +13,12 @@ chains = 4
 save_warmup = true
 seed = 1234
 
-[ode_config]
+[ode_solver_config]
+abs_tol = 1e-7
+rel_tol = 1e-7
+max_num_steps = 1e6
+
+[algebra_solver_config]
 abs_tol = 1e-5
 rel_tol = 1e-5
 max_num_steps = 1e6
-timepoint = 1e3

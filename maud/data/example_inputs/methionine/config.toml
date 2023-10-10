@@ -16,8 +16,7 @@ refresh = 1
 metric = "dense_e"
 adapt_delta = 0.99
 
-[ode_config]
+[ode_solver_config]
 rel_tol = 1e-8
 abs_tol = 1e-8
 max_num_steps = 1000000.0
-timepoint = 1e+20

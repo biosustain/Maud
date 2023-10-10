@@ -467,10 +467,12 @@ def get_config_input(config: MaudConfig):
         "steady_state_threshold_abs": config.steady_state_threshold_abs,
         "steady_state_threshold_rel": config.steady_state_threshold_rel,
         "steady_state_penalty_rel": config.steady_state_penalty_rel,
-        "rel_tol": config.ode_config.rel_tol,
-        "abs_tol": config.ode_config.abs_tol,
-        "timepoint": config.ode_config.timepoint,
-        "max_num_steps": config.ode_config.max_num_steps,
+        "rel_tol_ode": config.ode_solver_config.rel_tol,
+        "abs_tol_ode": config.ode_solver_config.abs_tol,
+        "max_num_steps_ode": config.ode_solver_config.max_num_steps,
+        "rel_tol_alg": config.algebra_solver_config.rel_tol,
+        "abs_tol_alg": config.algebra_solver_config.abs_tol,
+        "max_num_steps_alg": config.algebra_solver_config.max_num_steps,
     }
 
 
