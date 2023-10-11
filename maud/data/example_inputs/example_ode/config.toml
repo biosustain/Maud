@@ -9,6 +9,5 @@ iter_warmup = 0
 iter_sampling = 1
 chains = 1
 
-[ode_config]
+[ode_solver_config]
 max_num_steps = 1e9
-timepoint = 1e3

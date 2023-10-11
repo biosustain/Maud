@@ -90,15 +90,17 @@ data {
   array[2, N_experiment_train] vector[N_drain] priors_drain_train;
   // configuration
   array[N_experiment_train] vector<lower=0>[N_mic - N_unbalanced] conc_init;
-  real rel_tol;
-  real abs_tol;
+  real rel_tol_ode;
+  real abs_tol_ode;
+  int max_num_steps_ode;
+  real rel_tol_alg;
+  real abs_tol_alg;
+  int max_num_steps_alg;
   real steady_state_threshold_abs;
   real steady_state_threshold_rel;
   real steady_state_penalty_rel;
-  int max_num_steps;
   int<lower=0, upper=1> likelihood; // set to 0 for priors-only mode
   real drain_small_conc_corrector;
-  real<lower=0> timepoint;
   int<lower=0, upper=1> reject_non_steady;
   int<lower=0, upper=1> penalize_non_steady;
 }
@@ -154,7 +156,7 @@ transformed parameters {
     flux_train[e] = rep_vector(0, N_reaction);
     vector[N_enzyme] conc_enzyme_experiment = conc_enzyme_train[e];
     vector[N_pme] conc_pme_experiment = conc_pme_train[e];
-    array[1] vector[N_mic - N_unbalanced] conc_balanced_experiment;
+    vector[N_mic - N_unbalanced] conc_balanced_experiment;
     int N_eko_experiment = measure_ragged(enzyme_knockout_train_bounds, e);
     int N_pko_experiment = measure_ragged(pme_knockout_train_bounds, e);
     if (N_eko_experiment > 0) {
@@ -170,39 +172,42 @@ transformed parameters {
                                                                   e);
       conc_pme_experiment[pko_experiment] = rep_vector(0, N_pko_experiment);
     }
-    conc_balanced_experiment = ode_bdf_tol(dbalanced_dt, conc_init[e],
-                                           initial_time, {timepoint},
-                                           rel_tol, abs_tol, max_num_steps,
-                                           conc_unbalanced_train[e],
-                                           balanced_mic_ix,
-                                           unbalanced_mic_ix,
-                                           conc_enzyme_experiment,
-                                           dgr_train[e], kcat, km, ki,
-                                           transfer_constant,
-                                           dissociation_constant, kcat_pme,
-                                           conc_pme_experiment,
-                                           drain_train[e],
-                                           temperature_train[e],
-                                           drain_small_conc_corrector, S,
-                                           subunits, edge_type,
-                                           edge_to_enzyme, edge_to_drain,
-                                           ci_mic_ix, sub_km_ix_by_edge_long,
-                                           sub_km_ix_by_edge_bounds,
-                                           prod_km_ix_by_edge_long,
-                                           prod_km_ix_by_edge_bounds,
-                                           sub_by_edge_long,
-                                           sub_by_edge_bounds,
-                                           prod_by_edge_long,
-                                           prod_by_edge_bounds, ci_ix_long,
-                                           ci_ix_bounds, allostery_ix_long,
-                                           allostery_ix_bounds,
-                                           allostery_type, allostery_mic,
-                                           edge_to_tc,
-                                           phosphorylation_ix_long,
-                                           phosphorylation_ix_bounds,
-                                           phosphorylation_type,
-                                           phosphorylation_pme);
-    conc_train[e, balanced_mic_ix] = conc_balanced_experiment[1];
+    conc_balanced_experiment = solve_newton_tol(maud_ae_system,
+                                               conc_init[e],
+                                               rel_tol_alg, abs_tol_alg,
+                                               max_num_steps_alg,
+                                               rel_tol_ode, abs_tol_ode,
+                                               max_num_steps_ode,
+                                               conc_unbalanced_train[e],
+                                               balanced_mic_ix,
+                                               unbalanced_mic_ix,
+                                               conc_enzyme_experiment,
+                                               dgr_train[e], kcat, km, ki,
+                                               transfer_constant,
+                                               dissociation_constant, kcat_pme,
+                                               conc_pme_experiment,
+                                               drain_train[e],
+                                               temperature_train[e],
+                                               drain_small_conc_corrector, S,
+                                               subunits, edge_type,
+                                               edge_to_enzyme, edge_to_drain,
+                                               ci_mic_ix, sub_km_ix_by_edge_long,
+                                               sub_km_ix_by_edge_bounds,
+                                               prod_km_ix_by_edge_long,
+                                               prod_km_ix_by_edge_bounds,
+                                               sub_by_edge_long,
+                                               sub_by_edge_bounds,
+                                               prod_by_edge_long,
+                                               prod_by_edge_bounds, ci_ix_long,
+                                               ci_ix_bounds, allostery_ix_long,
+                                               allostery_ix_bounds,
+                                               allostery_type, allostery_mic,
+                                               edge_to_tc,
+                                               phosphorylation_ix_long,
+                                               phosphorylation_ix_bounds,
+                                               phosphorylation_type,
+                                               phosphorylation_pme);
+    conc_train[e, balanced_mic_ix] = conc_balanced_experiment;
     conc_train[e, unbalanced_mic_ix] = conc_unbalanced_train[e];
     {
       vector[N_edge] edge_flux = get_edge_flux(conc_train[e],
@@ -237,42 +242,6 @@ transformed parameters {
       steady_dev[e] = (S * edge_flux)[balanced_mic_ix]';
       for (j in 1 : N_edge) {
         flux_train[e, edge_to_reaction[j]] += edge_flux[j];
-      }
-      if (reject_non_steady == 1
-          && check_steady_state((S * edge_flux)[balanced_mic_ix],
-                                conc_balanced_experiment[1],
-                                steady_state_threshold_abs,
-                                steady_state_threshold_rel)
-             == 0) {
-        print("Non-steady state in experiment ", e);
-        print("Balanced metabolite concentration",
-              conc_balanced_experiment[1]);
-        print("flux_train: ", flux_train[e]);
-        print("conc_init: ", conc_init);
-        print("conc_unbalanced_train: ", conc_unbalanced_train[e]);
-        print("log_conc_unbalanced_train_z: ", log_conc_unbalanced_train_z[e]);
-        print("conc_enzyme_experiment: ", conc_enzyme_experiment);
-        print("log_conc_enzyme_train_z: ", log_conc_enzyme_train_z[e]);
-        print("km: ", km);
-        print("log_km_z: ", log_km_z);
-        print("drain_train: ", drain_train[e]);
-        print("drain_train_z: ", drain_train_z[e]);
-        print("kcat: ", kcat);
-        print("log_kcat_z: ", log_kcat_z);
-        print("dgr_train: ", dgr_train[e]);
-        print("ki: ", ki);
-        print("log_ki_z: ", log_ki_z);
-        print("dissociation_constant: ", dissociation_constant);
-        print("log_dissociation_constant_z: ", log_dissociation_constant_z);
-        print("transfer_constant: ", transfer_constant);
-        print("log_transfer_constant_z: ", log_transfer_constant_z);
-        print("kcat_pme: ", kcat_pme);
-        print("log_kcat_pme_z: ", log_kcat_pme_z);
-        print("conc_pme_experiment: ", conc_pme_experiment);
-        print("log_conc_pme_train_z: ", log_conc_pme_train_z[e]);
-        print("psi_train: ", psi_train);
-        print("psi_train_z: ", psi_train_z);
-        reject("Rejecting");
       }
     }
   }

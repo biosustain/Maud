@@ -226,9 +226,8 @@ solving [](#eq-steady).
 
 :::{note}
 
-Note that in practice we do not solve [](#eq-steady) directly but instead use
-ODE simulation - see section {ref}`sec-solving-the-steady-state-problem` for
-details
+See section {ref}`sec-solving-the-steady-state-problem` for how we solve
+[](#eq-steady) in practice.
 
 :::
 
@@ -337,16 +336,19 @@ adaptive Hamiltonian Monte Carlo requires gradients of the posterior
 distribution, it is also necessary to calculate sensitivities of the steady
 state solution with respect to all parameters.
 
-Our approach to this problem is to choose a starting concentration vector
-$x_{0}$ and a simulation time $t$, then find $x_t$ using numerical ODE
-integration. To verify whether $x_t$ is a steady state we then evaluate $S\cdot
-f_v(x_t, \theta)$ and check if the result is sufficiently close to zero.
+Our approach to this problem is, before MCMC sampling, to choose a
+concentration vector $x_{guess}$. Every time Maud's sampler evaluates the
+statistical model's log probability and gradients, it numerically solves
+[](#eq-steady), and finds its gradients, using this starting guess and Stan's
+interface to the Sundials Newton solver IDAS.
 
-Stan provides an interface to the Sundials ODE solver CVODES, including
-gradient calculations.
-
-For the systems we have investigated, this method works better than solving the
-steady state problem using an algebra solver.
+The system function that is passed to IDAS includes a representation of
+[](#eq-steady) in Stan code. In order to model the instantaneous change of
+metabolite concentrations for a given concentration vector due to
+[](#eq-steady), Maud uses the Stan interface to the Sundials ODE solver CVODES
+to evolve the system. This hybrid approach, using both numerical ODE solving
+and algebra solving, follows the one taken in
+{cite}`margossianComputingSteadyStates2018`.
 
 It is relevant to note a caveat for the Maximum A Posteriori estimation
 (optimization) in opposition to sampling the full distribution. In an
