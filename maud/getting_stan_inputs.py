@@ -68,7 +68,7 @@ def get_prior_inputs(parameters: ParameterSet) -> Tuple[Dict, Dict]:
     """Get the priors component of an input to Maud's Stan model."""
     params = [
         getattr(parameters, p)
-        for p in parameters.dict().keys()
+        for p in parameters.model_computed_fields.keys()
         if isinstance(getattr(parameters, p), MaudParameter)
     ]
     ind_priors_train = {

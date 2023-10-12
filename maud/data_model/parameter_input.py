@@ -2,7 +2,13 @@
 
 from typing import Dict, List, Optional, Union
 
-from pydantic import BaseModel, Field, field_validator, model_validator
+from pydantic import (
+    BaseModel,
+    Field,
+    PositiveFloat,
+    field_validator,
+    model_validator,
+)
 
 
 class ParameterInputAtom(BaseModel):
@@ -17,7 +23,7 @@ class ParameterInputAtom(BaseModel):
     modification_type: Optional[str] = None
     location: Optional[float] = None
     exploc: Optional[float] = None
-    scale: Optional[float] = None
+    scale: Optional[PositiveFloat] = None
     pct1: Optional[float] = None
     pct99: Optional[float] = None
     init: Optional[float] = None

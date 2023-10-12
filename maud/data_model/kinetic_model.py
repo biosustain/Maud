@@ -4,7 +4,13 @@ from enum import Enum
 from typing import Dict, List, Optional, Union
 
 import pandas as pd
-from pydantic import BaseModel, computed_field, field_validator, model_validator
+from pydantic import (
+    BaseModel,
+    ConfigDict,
+    computed_field,
+    field_validator,
+    model_validator,
+)
 
 from maud.data_model.hardcoding import ID_SEPARATOR
 
@@ -22,12 +28,6 @@ class ModificationType(int, Enum):
 
     activation = 1
     inhibition = 2
-
-
-class KMConfig:
-    """Config allowing the KineticModel class to contain pandas objects."""
-
-    arbitrary_types_allowed = True
 
 
 class Metabolite(BaseModel):
@@ -249,11 +249,7 @@ class KineticModel(BaseModel):
     allosteric_enzymes: Optional[List[Enzyme]]
     competitive_inhibitions: Optional[List[CompetitiveInhibition]]
     phosphorylations: Optional[List[Phosphorylation]]
-
-    class Config:
-        """Config for the KineticModel class."""
-
-        arbitrary_types_allowed = True
+    model_config: ConfigDict = {"arbitrary_types_allowed": True}
 
     @computed_field
     def drains(self) -> List[Reaction]:

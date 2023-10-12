@@ -12,11 +12,6 @@ from maud.data_model.parameter_input import (
     ParameterInputMVN,
 )
 from maud.data_model.prior import IndPrior1d, IndPrior2d, PriorMVN
-from maud.getting_priors import (
-    get_ind_prior_1d,
-    get_ind_prior_2d,
-    get_mvn_prior,
-)
 
 
 class MaudParameter(BaseModel):
@@ -39,22 +34,19 @@ class MaudParameter(BaseModel):
     @computed_field
     def prior(self) -> Union[IndPrior1d, IndPrior2d, PriorMVN]:
         """Return a prior, calculated from the user input."""
-        if len(self.shape_names) == 1:
-            if isinstance(self.user_input, ParameterInputMVN):
-                pfunc = get_mvn_prior
-            elif self.name == "dgf":
-                pfunc = get_mvn_prior
-            else:
-                pfunc = get_ind_prior_1d
+        if self.name == "dgf":
+            initialiser = PriorMVN
+        elif len(self.shape_names) == 1:
+            initialiser = IndPrior1d
         else:
-            pfunc = get_ind_prior_2d
-        return pfunc(
-            self.user_input,
-            self.ids,
-            self.id_components,
-            self.non_negative,
-            self.default_loc,
-            self.default_scale,
+            initialiser = IndPrior2d
+        return initialiser(
+            user_input=self.user_input,
+            ids=self.ids,
+            id_components=self.id_components,
+            non_negative=self.non_negative,
+            default_loc=self.default_loc,
+            default_scale=self.default_scale,
         )
 
     @computed_field
