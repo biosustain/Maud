@@ -1,4 +1,11 @@
 functions {
+  vector unfix(vector free, vector fixed, array[] int ix_free, array[] int ix_fixed){
+    int N_out = rows(free) + rows(fixed);
+    vector[N_out] out;
+    out[ix_free] = free;
+    out[ix_fixed] = fixed;
+    return out;
+  }
   vector unz_1d(array[] vector mnsd, vector z) {
     /*
       Recover a real-valued vector from a 1xn vector z of z scores and a 2xn

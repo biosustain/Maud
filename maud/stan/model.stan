@@ -18,6 +18,7 @@ data {
   int<lower=0> N_phosphorylation;
   int<lower=0> N_pme; // phosphorylation modifying enzyme
   int<lower=0> N_competitive_inhibition;
+  int<lower=0> N_dgf_fixed;
   matrix[N_mic, N_edge] S;
   array[N_mic - N_unbalanced] int<lower=1, upper=N_mic> balanced_mic_ix;
   array[N_unbalanced] int<lower=1, upper=N_mic> unbalanced_mic_ix;
@@ -49,6 +50,9 @@ data {
   vector[N_edge] water_stoichiometry;
   vector[N_edge] transported_charge;
   vector<lower=1>[N_enzyme] subunits;
+  vector[N_dgf_fixed] dgf_fixed;
+  array[N_dgf_fixed] int ix_dgf_fixed;
+  array[N_metabolite-N_dgf_fixed] int ix_dgf_free;
   // experiment properties
   int<lower=1> N_experiment_train;
   int<lower=0> N_flux_measurement_train;
@@ -111,7 +115,7 @@ transformed data {
   int N_balanced = N_mic - N_unbalanced;
 }
 parameters {
-  vector[N_metabolite] dgf;
+  vector[N_metabolite-N_dgf_fixed] dgf_free;
   vector[N_enzyme] log_kcat_z;
   vector[N_km] log_km_z;
   vector[N_pme] log_kcat_pme_z;
@@ -125,6 +129,8 @@ parameters {
   array[N_experiment_train] vector[N_unbalanced] log_conc_unbalanced_train_z;
 }
 transformed parameters {
+  // unfix
+  vector[N_metabolite] dgf = unfix(dgf_free, dgf_fixed, ix_dgf_free, ix_dgf_fixed);
   // rescale
   vector[N_km] km = unz_log_1d(priors_km, log_km_z);
   vector[N_competitive_inhibition] ki = unz_log_1d(priors_ki, log_ki_z);
