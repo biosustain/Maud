@@ -2,7 +2,7 @@
 
 from typing import Optional
 
-from pydantic import BaseModel, Field, model_validator
+from pydantic import BaseModel, ConfigDict, Field, model_validator
 
 
 class ODESolverConfig(BaseModel):
@@ -11,11 +11,7 @@ class ODESolverConfig(BaseModel):
     rel_tol: float = 1e-9
     abs_tol: float = 1e-9
     max_num_steps: int = int(1e7)
-
-    class Config:
-        """Config for the ODESolverConfig class."""
-
-        frozen = True
+    model_config: ConfigDict = {"frozen": True}
 
 
 class AlgebraSolverConfig(BaseModel):
@@ -24,11 +20,7 @@ class AlgebraSolverConfig(BaseModel):
     rel_tol: float = 1e-7
     abs_tol: float = 1e-7
     max_num_steps: int = int(1e6)
-
-    class Config:
-        """Config for the ODESolverConfig class."""
-
-        frozen = True
+    model_config: ConfigDict = {"frozen": True}
 
 
 class MaudConfig(BaseModel):
