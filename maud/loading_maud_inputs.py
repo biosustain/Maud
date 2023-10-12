@@ -8,7 +8,7 @@ from maud.data_model.experiment import parse_experiment
 from maud.data_model.maud_config import MaudConfig
 from maud.data_model.maud_init import InitInput
 from maud.data_model.maud_input import MaudInput
-from maud.data_model.parameter_input import ParametersInput
+from maud.data_model.parameter_input import ParameterSetInput
 from maud.parsing_kinetic_models import parse_kinetic_model
 
 
@@ -38,11 +38,11 @@ def load_maud_input(data_path: str) -> MaudInput:
     experiments = [
         parse_experiment(e) for e in toml.load(experiments_path)["experiment"]
     ]
-    parameters_input = ParametersInput(**toml.load(parameter_input_path))
+    parameter_set_input = ParameterSetInput(**toml.load(parameter_input_path))
     return MaudInput(
         config=config,
         kinetic_model=kinetic_model,
-        parameters_input=parameters_input,
+        parameter_set_input=parameter_set_input,
         experiments=experiments,
         init_input=init_input,
     )

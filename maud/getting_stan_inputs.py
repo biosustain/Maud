@@ -20,8 +20,9 @@ from maud.data_model.kinetic_model import (
     ReactionMechanism,
 )
 from maud.data_model.maud_config import MaudConfig
-from maud.data_model.maud_parameter import ParameterSet
-from maud.data_model.prior import IndPrior1d, IndPrior2d
+from maud.data_model.maud_parameter import MaudParameter
+from maud.data_model.parameter_set import ParameterSet
+from maud.data_model.prior import PriorMVN
 
 
 def get_stan_inputs(
@@ -65,21 +66,20 @@ def get_stan_inputs(
 
 def get_prior_inputs(parameters: ParameterSet) -> Tuple[Dict, Dict]:
     """Get the priors component of an input to Maud's Stan model."""
+    params = [
+        getattr(parameters, p)
+        for p in parameters.dict().keys()
+        if isinstance(getattr(parameters, p), MaudParameter)
+    ]
     ind_priors_train = {
         f"priors_{p.name}": [p.prior.location, p.prior.scale]
-        for p in map(
-            lambda k: getattr(parameters, k), parameters.__fields__.keys()
-        )
-        if p.prior_in_train_model
-        and (isinstance(p.prior, IndPrior1d) or isinstance(p.prior, IndPrior2d))
+        for p in params
+        if p.prior_in_train_model and not isinstance(p.prior, PriorMVN)
     }
     ind_priors_test = {
         f"priors_{p.name}": [p.prior.location, p.prior.scale]
-        for p in map(
-            lambda k: getattr(parameters, k), parameters.__fields__.keys()
-        )
-        if p.prior_in_test_model
-        and (isinstance(p.prior, IndPrior1d) or isinstance(p.prior, IndPrior2d))
+        for p in params
+        if p.prior_in_test_model and not isinstance(p.prior, PriorMVN)
     }
     assert hasattr(parameters.dgf.prior, "covariance_matrix")
     dgf_priors = {

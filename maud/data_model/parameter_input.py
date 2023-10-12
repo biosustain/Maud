@@ -65,7 +65,7 @@ class ParameterInputMVN(BaseModel):
     covariance_matrix: List[List[float]]
 
 
-class ParametersInput(BaseModel):
+class ParameterSetInput(BaseModel):
     """User input for all parameters."""
 
     dgf: Optional[Union[ParameterInputMVN, List[ParameterInputAtom]]] = Field(
