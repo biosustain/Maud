@@ -6,7 +6,7 @@ This is where logic for constructing MaudParameter objects should live.
 
 from pydantic import BaseModel, computed_field
 
-import maud.data_model.parameters as ps
+import maud.data_model.maud_parameter as mp
 from maud.data_model.experiment import Experiment, MeasurementType
 from maud.data_model.hardcoding import ID_SEPARATOR
 from maud.data_model.kinetic_model import KineticModel, ReactionMechanism
@@ -23,10 +23,10 @@ class ParameterSet(BaseModel):
     init_input: InitInput
 
     @computed_field
-    def dgf(self) -> ps.Dgf:
+    def dgf(self) -> mp.Dgf:
         """Add the dgf field."""
         metabolite_ids = [m.id for m in self.kinetic_model.metabolites]
-        return ps.Dgf(
+        return mp.Dgf(
             ids=[metabolite_ids],
             split_ids=[[metabolite_ids]],
             user_input=self.parameter_set_input.dgf,
@@ -34,7 +34,7 @@ class ParameterSet(BaseModel):
         )
 
     @computed_field
-    def km(self) -> ps.Km:
+    def km(self) -> mp.Km:
         """Add the km field."""
         ids = []
         enzs = []
@@ -63,7 +63,7 @@ class ParameterSet(BaseModel):
                     enzs.append(enz.id)
                     mets.append(met_id)
                     cpts.append(cpt_id)
-        return ps.Km(
+        return mp.Km(
             ids=[ids],
             split_ids=[[enzs, mets, cpts]],
             user_input=self.parameter_set_input.km,
@@ -71,7 +71,7 @@ class ParameterSet(BaseModel):
         )
 
     @computed_field
-    def ki(self) -> ps.Ki:
+    def ki(self) -> mp.Ki:
         """Add the ki field."""
         ids = []
         enzs = []
@@ -85,7 +85,7 @@ class ParameterSet(BaseModel):
                 rxns.append(ci.reaction_id)
                 mets.append(ci.metabolite_id)
                 cpts.append(ci.compartment_id)
-        return ps.Ki(
+        return mp.Ki(
             ids=[ids],
             split_ids=[[enzs, rxns, mets, cpts]],
             user_input=self.parameter_set_input.ki,
@@ -93,7 +93,7 @@ class ParameterSet(BaseModel):
         )
 
     @computed_field
-    def kcat(self) -> ps.Kcat:
+    def kcat(self) -> mp.Kcat:
         """Add the kcat field."""
         ids = []
         enzs = []
@@ -102,7 +102,7 @@ class ParameterSet(BaseModel):
             ids.append(er.id)
             enzs.append(er.enzyme_id)
             rxns.append(er.reaction_id)
-        return ps.Kcat(
+        return mp.Kcat(
             ids=[ids],
             split_ids=[[enzs, rxns]],
             user_input=self.parameter_set_input.kcat,
@@ -110,7 +110,7 @@ class ParameterSet(BaseModel):
         )
 
     @computed_field
-    def dissociation_constant(self) -> ps.DissociationConstant:
+    def dissociation_constant(self) -> mp.DissociationConstant:
         """Add the dissociation_constant field."""
         ids = []
         enzs = []
@@ -124,7 +124,7 @@ class ParameterSet(BaseModel):
                 mets.append(a.metabolite_id)
                 cpts.append(a.compartment_id)
                 mts.append(a.modification_type.name)
-        return ps.DissociationConstant(
+        return mp.DissociationConstant(
             ids=[ids],
             split_ids=[[enzs, mets, cpts, mts]],
             user_input=self.parameter_set_input.dissociation_constant,
@@ -132,14 +132,14 @@ class ParameterSet(BaseModel):
         )
 
     @computed_field
-    def transfer_constant(self) -> ps.TransferConstant:
+    def transfer_constant(self) -> mp.TransferConstant:
         """Add the transfer_constant field."""
         allosteric_enzyme_ids = (
             [e.id for e in self.kinetic_model.allosteric_enzymes]
             if self.kinetic_model.allosteric_enzymes is not None
             else []
         )
-        return ps.TransferConstant(
+        return mp.TransferConstant(
             ids=[allosteric_enzyme_ids],
             split_ids=[[allosteric_enzyme_ids]],
             user_input=self.parameter_set_input.transfer_constant,
@@ -147,14 +147,14 @@ class ParameterSet(BaseModel):
         )
 
     @computed_field
-    def kcat_pme(self) -> ps.KcatPme:
+    def kcat_pme(self) -> mp.KcatPme:
         """Add the kcat_pme field."""
         phos_modifying_enzymes = (
             [p.modifying_enzyme_id for p in self.kinetic_model.phosphorylations]
             if self.kinetic_model.phosphorylations is not None
             else []
         )
-        return ps.KcatPme(
+        return mp.KcatPme(
             ids=[phos_modifying_enzymes],
             split_ids=[[phos_modifying_enzymes]],
             user_input=self.parameter_set_input.kcat_pme,
@@ -162,7 +162,7 @@ class ParameterSet(BaseModel):
         )
 
     @computed_field
-    def drain_train(self) -> ps.DrainTrain:
+    def drain_train(self) -> mp.DrainTrain:
         """Add the drain_train field."""
         drain_ids = [
             d.id
@@ -170,7 +170,7 @@ class ParameterSet(BaseModel):
             if d.mechanism == ReactionMechanism.drain
         ]
         exp_ids = [e.id for e in self.experiments if e.is_train]
-        return ps.DrainTrain(
+        return mp.DrainTrain(
             ids=[exp_ids, drain_ids],
             split_ids=[[exp_ids], [drain_ids]],
             user_input=self.parameter_set_input.drain,
@@ -178,7 +178,7 @@ class ParameterSet(BaseModel):
         )
 
     @computed_field
-    def drain_test(self) -> ps.DrainTest:
+    def drain_test(self) -> mp.DrainTest:
         """Add the drain_test field."""
         drain_ids = [
             d.id
@@ -186,7 +186,7 @@ class ParameterSet(BaseModel):
             if d.mechanism == ReactionMechanism.drain
         ]
         exp_ids = [e.id for e in self.experiments if e.is_test]
-        return ps.DrainTest(
+        return mp.DrainTest(
             ids=[exp_ids, drain_ids],
             split_ids=[[exp_ids], [drain_ids]],
             user_input=self.parameter_set_input.drain,
@@ -194,7 +194,7 @@ class ParameterSet(BaseModel):
         )
 
     @computed_field
-    def conc_enzyme_train(self) -> ps.ConcEnzymeTrain:
+    def conc_enzyme_train(self) -> mp.ConcEnzymeTrain:
         """Add the conc_enzyme_train field."""
         enzyme_ids = [e.id for e in self.kinetic_model.enzymes]
         exp_ids = [e.id for e in self.experiments if e.is_train]
@@ -204,7 +204,7 @@ class ParameterSet(BaseModel):
             for m in e.measurements
             if e.is_train and m.target_type == MeasurementType.ENZYME
         ]
-        return ps.ConcEnzymeTrain(
+        return mp.ConcEnzymeTrain(
             ids=[exp_ids, enzyme_ids],
             split_ids=[[exp_ids], [enzyme_ids]],
             user_input=self.parameter_set_input.conc_enzyme,
@@ -213,7 +213,7 @@ class ParameterSet(BaseModel):
         )
 
     @computed_field
-    def conc_enzyme_test(self) -> ps.ConcEnzymeTest:
+    def conc_enzyme_test(self) -> mp.ConcEnzymeTest:
         """Add the conc_enzyme_test field."""
         enzyme_ids = [e.id for e in self.kinetic_model.enzymes]
         exp_ids = [e.id for e in self.experiments if e.is_test]
@@ -223,7 +223,7 @@ class ParameterSet(BaseModel):
             for m in e.measurements
             if e.is_test and m.target_type == MeasurementType.ENZYME
         ]
-        return ps.ConcEnzymeTest(
+        return mp.ConcEnzymeTest(
             ids=[exp_ids, enzyme_ids],
             split_ids=[[exp_ids], [enzyme_ids]],
             user_input=self.parameter_set_input.conc_enzyme,
@@ -232,7 +232,7 @@ class ParameterSet(BaseModel):
         )
 
     @computed_field
-    def conc_unbalanced_train(self) -> ps.ConcUnbalancedTrain:
+    def conc_unbalanced_train(self) -> mp.ConcUnbalancedTrain:
         """Add the conc_unbalanced_train field."""
         exp_ids = [e.id for e in self.experiments if e.is_train]
         measurements = [
@@ -251,7 +251,7 @@ class ParameterSet(BaseModel):
                 ]
             ),
         )
-        return ps.ConcUnbalancedTrain(
+        return mp.ConcUnbalancedTrain(
             ids=[exp_ids, unbalanced_mic_ids],
             split_ids=[
                 [exp_ids],
@@ -263,7 +263,7 @@ class ParameterSet(BaseModel):
         )
 
     @computed_field
-    def conc_unbalanced_test(self) -> ps.ConcUnbalancedTest:
+    def conc_unbalanced_test(self) -> mp.ConcUnbalancedTest:
         """Add the conc_unbalanced_test field."""
         exp_ids = [e.id for e in self.experiments if e.is_test]
         measurements = [
@@ -282,7 +282,7 @@ class ParameterSet(BaseModel):
                 ]
             ),
         )
-        return ps.ConcUnbalancedTest(
+        return mp.ConcUnbalancedTest(
             ids=[exp_ids, unbalanced_mic_ids],
             split_ids=[
                 [exp_ids],
@@ -294,7 +294,7 @@ class ParameterSet(BaseModel):
         )
 
     @computed_field
-    def conc_pme_train(self) -> ps.ConcPmeTrain:
+    def conc_pme_train(self) -> mp.ConcPmeTrain:
         """Add the conc_pme_train field."""
         exp_ids = [e.id for e in self.experiments if e.is_train]
         pme_ids = (
@@ -302,7 +302,7 @@ class ParameterSet(BaseModel):
             if self.kinetic_model.phosphorylations is not None
             else []
         )
-        return ps.ConcPmeTrain(
+        return mp.ConcPmeTrain(
             ids=[exp_ids, pme_ids],
             split_ids=[[exp_ids], [pme_ids]],
             user_input=self.parameter_set_input.conc_pme,
@@ -310,7 +310,7 @@ class ParameterSet(BaseModel):
         )
 
     @computed_field
-    def conc_pme_test(self) -> ps.ConcPmeTest:
+    def conc_pme_test(self) -> mp.ConcPmeTest:
         """Add the conc_pme_test field."""
         exp_ids = [e.id for e in self.experiments if e.is_test]
         pme_ids = (
@@ -318,7 +318,7 @@ class ParameterSet(BaseModel):
             if self.kinetic_model.phosphorylations is not None
             else []
         )
-        return ps.ConcPmeTest(
+        return mp.ConcPmeTest(
             ids=[exp_ids, pme_ids],
             split_ids=[[exp_ids], [pme_ids]],
             user_input=self.parameter_set_input.conc_pme,
@@ -326,10 +326,10 @@ class ParameterSet(BaseModel):
         )
 
     @computed_field
-    def psi_train(self) -> ps.PsiTrain:
+    def psi_train(self) -> mp.PsiTrain:
         """Add the psi_train field."""
         exp_ids = [e.id for e in self.experiments if e.is_train]
-        return ps.PsiTrain(
+        return mp.PsiTrain(
             ids=[exp_ids],
             split_ids=[[exp_ids]],
             user_input=self.parameter_set_input.psi,
@@ -337,10 +337,10 @@ class ParameterSet(BaseModel):
         )
 
     @computed_field
-    def psi_test(self) -> ps.PsiTest:
+    def psi_test(self) -> mp.PsiTest:
         """Add the psi_test field."""
         exp_ids = [e.id for e in self.experiments if e.is_test]
-        return ps.PsiTest(
+        return mp.PsiTest(
             ids=[exp_ids],
             split_ids=[[exp_ids]],
             user_input=self.parameter_set_input.psi,
