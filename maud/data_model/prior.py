@@ -5,26 +5,23 @@ from typing import List, Union
 
 import numpy as np
 from numpy.linalg import LinAlgError
-from pydantic.class_validators import root_validator, validator
-from pydantic.dataclasses import dataclass
+from pydantic import BaseModel, field_validator, model_validator
 
 
-@dataclass
-class IndPriorAtom:
+class IndPriorAtom(BaseModel):
     """Prior for a single quantity."""
 
     location: float
     scale: float
 
 
-@dataclass
-class IndPrior1d:
+class IndPrior1d(BaseModel):
     """Independent location/scale prior for a 1D parameter."""
 
     location: List[float]
     scale: List[float]
 
-    @validator("location")
+    @field_validator("location")
     def no_null_locations(cls, v):
         """Check that locations are non-null."""
         for x in v:
@@ -32,7 +29,7 @@ class IndPrior1d:
                 raise ValueError("Location cannot be null.")
         return v
 
-    @validator("scale")
+    @field_validator("scale")
     def no_null_scales(cls, v):
         """Check that scales are non-null."""
         for x in v:
@@ -40,14 +37,14 @@ class IndPrior1d:
                 raise ValueError("Scale cannot be null.")
         return v
 
-    @validator("scale")
+    @field_validator("scale")
     def scales_are_positive(cls, v):
         """Check that scales are positive."""
         if len(v) > 0 and any(x <= 0 for x in v):
             raise ValueError("Scale parameter must be positive.")
         return v
 
-    @root_validator(pre=False, skip_on_failure=True)
+    @model_validator(mode="before")
     def lengths_match(cls, values):
         """Check that location and scale have the same index."""
         n_locs = len(values["location"])
@@ -59,14 +56,13 @@ class IndPrior1d:
         return values
 
 
-@dataclass
-class IndPrior2d:
+class IndPrior2d(BaseModel):
     """Independent location/scale prior for a 2D parameter."""
 
     location: List[List[float]]
     scale: List[List[float]]
 
-    @validator("location")
+    @field_validator("location")
     def no_null_locations(cls, v):
         """Check that locations are non-null."""
         for vi in v:
@@ -75,7 +71,7 @@ class IndPrior2d:
                     raise ValueError("Location cannot be null.")
         return v
 
-    @validator("scale")
+    @field_validator("scale")
     def no_null_scales(cls, v):
         """Check that scales are non-null."""
         for vi in v:
@@ -84,7 +80,7 @@ class IndPrior2d:
                     raise ValueError("Scale cannot be null.")
         return v
 
-    @validator("scale")
+    @field_validator("scale")
     def scales_are_positive(cls, v):
         """Check that scales are all positive."""
         for s in v:
@@ -92,7 +88,7 @@ class IndPrior2d:
                 raise ValueError("Scale parameter must be positive.")
         return v
 
-    @root_validator(pre=False, skip_on_failure=True)
+    @model_validator(mode="before")
     def lengths_are_correct(cls, values):
         """Check that ids, location and scale have correct length."""
         loc = values["location"]
@@ -105,14 +101,13 @@ class IndPrior2d:
         return values
 
 
-@dataclass
-class PriorMVN:
+class PriorMVN(BaseModel):
     """Prior Location vector and covariance matrix for a 1D parameter."""
 
     location: List[float]
     covariance_matrix: List[List[float]]
 
-    @validator("covariance_matrix")
+    @field_validator("covariance_matrix")
     def no_null_covariances(cls, v):
         """Check that scales are non-null."""
         for vi in v:
@@ -121,7 +116,7 @@ class PriorMVN:
                     raise ValueError("Covariance cannot be null.")
         return v
 
-    @validator("location")
+    @field_validator("location")
     def no_null_locations(cls, v):
         """Check that no locations are nans."""
         for x in v:
@@ -129,7 +124,7 @@ class PriorMVN:
                 raise ValueError("Location cannot be null.")
         return v
 
-    @validator("covariance_matrix")
+    @field_validator("covariance_matrix")
     def cov_matrix_is_pos_def(cls, v):
         """Check that covariance matrix is positive definite."""
         try:
@@ -140,7 +135,7 @@ class PriorMVN:
             ) from e
         return v
 
-    @root_validator(pre=False, skip_on_failure=True)
+    @model_validator(mode="before")
     def lengths_are_correct(cls, values):
         """Check that ids, location and cov matrix have correct lengths."""
         loc = values["location"]

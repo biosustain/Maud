@@ -35,7 +35,7 @@ dependencies = [
     "cmdstanpy >= 1.2.0",
     "click",
     "depinfo == 1.7.0",
-    "pydantic == 1.9.0",
+    "pydantic >= 2.0",
 ]
 
 [project.entry-points.console_scripts]

@@ -26,7 +26,7 @@ from maud.data_model.maud_parameter import (
     PsiTrain,
     TransferConstant,
 )
-from maud.data_model.prior_input import PriorInput
+from maud.data_model.parameter_input import ParametersInput
 
 AllostericCoords = Tuple[List[str], List[str], List[str], List[str], List[str]]
 KmCoords = Tuple[List[str], List[str], List[str], List[str]]
@@ -108,7 +108,7 @@ def get_kcat_coords(kinetic_model: KineticModel) -> KcatCoords:
 def get_maud_parameters(
     kmod: KineticModel,
     experiments: List[Experiment],
-    pi: PriorInput,
+    pi: ParametersInput,
     ii: InitInput,
 ):
     """Get a ParameterSet object from a KineticModel and a MeasurementSet."""
@@ -144,46 +144,66 @@ def get_maud_parameters(
     exp_ids_train = [e.id for e in experiments if e.is_train]
     exp_ids_test = [e.id for e in experiments if e.is_test]
     return ParameterSet(
-        dgf=Dgf([metabolite_ids], [[metabolite_ids]], pi.dgf, ii.dgf),
-        km=Km([km_ids], [[km_enzs, km_mets, km_cpts]], pi.km, ii.km),
-        kcat=Kcat([kcat_ids], [[kcat_enzs, kcat_rxns]], pi.kcat, ii.kcat),
-        ki=Ki([ci_ids], [[ci_enzs, ci_rxns, ci_mets, ci_cpts]], pi.ki, ii.ki),
+        dgf=Dgf(
+            ids=[metabolite_ids],
+            split_ids=[[metabolite_ids]],
+            user_input=pi.dgf,
+            init_input=ii.dgf,
+        ),
+        km=Km(
+            ids=[km_ids],
+            split_ids=[[km_enzs, km_mets, km_cpts]],
+            user_input=pi.km,
+            init_input=ii.km,
+        ),
+        kcat=Kcat(
+            ids=[kcat_ids],
+            split_ids=[[kcat_enzs, kcat_rxns]],
+            user_input=pi.kcat,
+            init_input=ii.kcat,
+        ),
+        ki=Ki(
+            ids=[ci_ids],
+            split_ids=[[ci_enzs, ci_rxns, ci_mets, ci_cpts]],
+            user_input=pi.ki,
+            init_input=ii.ki,
+        ),
         dissociation_constant=DissociationConstant(
-            [dc_ids],
-            [[dc_enzs, dc_mets, dc_cpts, dc_mts]],
-            pi.dissociation_constant,
-            ii.dissociation_constant,
+            ids=[dc_ids],
+            split_ids=[[dc_enzs, dc_mets, dc_cpts, dc_mts]],
+            user_input=pi.dissociation_constant,
+            init_input=ii.dissociation_constant,
         ),
         transfer_constant=TransferConstant(
-            [allosteric_enzyme_ids],
-            [[allosteric_enzyme_ids]],
-            pi.transfer_constant,
-            ii.transfer_constant,
+            ids=[allosteric_enzyme_ids],
+            split_ids=[[allosteric_enzyme_ids]],
+            user_input=pi.transfer_constant,
+            init_input=ii.transfer_constant,
         ),
         kcat_pme=KcatPme(
-            [phos_modifying_enzymes],
-            [[phos_modifying_enzymes]],
-            pi.kcat_pme,
-            ii.kcat_pme,
+            ids=[phos_modifying_enzymes],
+            split_ids=[[phos_modifying_enzymes]],
+            user_input=pi.kcat_pme,
+            init_input=ii.kcat_pme,
         ),
         drain_train=DrainTrain(
-            [exp_ids_train, drain_ids],
-            [[exp_ids_train], [drain_ids]],
-            pi.drain,
-            ii.drain,
+            ids=[exp_ids_train, drain_ids],
+            split_ids=[[exp_ids_train], [drain_ids]],
+            user_input=pi.drain,
+            init_input=ii.drain,
         ),
         drain_test=DrainTest(
-            [exp_ids_train, drain_ids],
-            [[exp_ids_train], [drain_ids]],
-            pi.drain,
-            ii.drain,
+            ids=[exp_ids_train, drain_ids],
+            split_ids=[[exp_ids_train], [drain_ids]],
+            user_input=pi.drain,
+            init_input=ii.drain,
         ),
         conc_enzyme_train=ConcEnzymeTrain(
-            [exp_ids_train, enzyme_ids],
-            [[exp_ids_train], [enzyme_ids]],
-            pi.conc_enzyme,
-            ii.conc_enzyme,
-            [
+            ids=[exp_ids_train, enzyme_ids],
+            split_ids=[[exp_ids_train], [enzyme_ids]],
+            user_input=pi.conc_enzyme,
+            init_input=ii.conc_enzyme,
+            measurements=[
                 m
                 for e in experiments
                 for m in e.measurements
@@ -191,11 +211,11 @@ def get_maud_parameters(
             ],
         ),
         conc_enzyme_test=ConcEnzymeTest(
-            [exp_ids_train, enzyme_ids],
-            [[exp_ids_train], [enzyme_ids]],
-            pi.conc_enzyme,
-            ii.conc_enzyme,
-            [
+            ids=[exp_ids_train, enzyme_ids],
+            split_ids=[[exp_ids_train], [enzyme_ids]],
+            user_input=pi.conc_enzyme,
+            init_input=ii.conc_enzyme,
+            measurements=[
                 m
                 for e in experiments
                 for m in e.measurements
@@ -203,14 +223,14 @@ def get_maud_parameters(
             ],
         ),
         conc_unbalanced_train=ConcUnbalancedTrain(
-            [exp_ids_train, unbalanced_mic_ids],
-            [
+            ids=[exp_ids_train, unbalanced_mic_ids],
+            split_ids=[
                 [exp_ids_train],
                 [unbalanced_mic_mets, unbalanced_mic_cpts],
             ],
-            pi.conc_unbalanced,
-            ii.conc_unbalanced,
-            [
+            user_input=pi.conc_unbalanced,
+            init_input=ii.conc_unbalanced,
+            measurements=[
                 m
                 for e in experiments
                 for m in e.measurements
@@ -218,14 +238,14 @@ def get_maud_parameters(
             ],
         ),
         conc_unbalanced_test=ConcUnbalancedTest(
-            [exp_ids_train, unbalanced_mic_ids],
-            [
+            ids=[exp_ids_train, unbalanced_mic_ids],
+            split_ids=[
                 [exp_ids_train],
                 [unbalanced_mic_mets, unbalanced_mic_cpts],
             ],
-            pi.conc_unbalanced,
-            ii.conc_unbalanced,
-            [
+            user_input=pi.conc_unbalanced,
+            init_input=ii.conc_unbalanced,
+            measurements=[
                 m
                 for e in experiments
                 for m in e.measurements
@@ -233,17 +253,27 @@ def get_maud_parameters(
             ],
         ),
         conc_pme_train=ConcPmeTrain(
-            [exp_ids_train, phos_modifying_enzymes],
-            [[exp_ids_train], [phos_modifying_enzymes]],
-            pi.conc_pme,
-            ii.conc_pme,
+            ids=[exp_ids_train, phos_modifying_enzymes],
+            split_ids=[[exp_ids_train], [phos_modifying_enzymes]],
+            user_input=pi.conc_pme,
+            init_input=ii.conc_pme,
         ),
         conc_pme_test=ConcPmeTest(
-            [exp_ids_train, phos_modifying_enzymes],
-            [[exp_ids_train], [phos_modifying_enzymes]],
-            pi.conc_pme,
-            ii.conc_pme,
+            ids=[exp_ids_train, phos_modifying_enzymes],
+            split_ids=[[exp_ids_train], [phos_modifying_enzymes]],
+            user_input=pi.conc_pme,
+            init_input=ii.conc_pme,
         ),
-        psi_train=PsiTrain([exp_ids_train], [[exp_ids_test]], pi.psi, ii.psi),
-        psi_test=PsiTest([exp_ids_train], [[exp_ids_train]], pi.psi, ii.psi),
+        psi_train=PsiTrain(
+            ids=[exp_ids_train],
+            split_ids=[[exp_ids_test]],
+            user_input=pi.psi,
+            init_input=ii.psi,
+        ),
+        psi_test=PsiTest(
+            ids=[exp_ids_train],
+            split_ids=[[exp_ids_train]],
+            user_input=pi.psi,
+            init_input=ii.psi,
+        ),
     )

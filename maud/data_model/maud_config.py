@@ -1,31 +1,37 @@
-"""Provides dataclass MaudConfig."""
+"""Provides model MaudConfig."""
+
 from typing import Optional
 
-from pydantic import Field
-from pydantic.class_validators import root_validator
-from pydantic.dataclasses import dataclass
+from pydantic import BaseModel, Field, model_validator
 
 
-@dataclass(frozen=True)
-class ODESolverConfig:
+class ODESolverConfig(BaseModel):
     """Config that is specific to an ODE solver."""
 
     rel_tol: float = 1e-9
     abs_tol: float = 1e-9
     max_num_steps: int = int(1e7)
 
+    class Config:
+        """Config for the ODESolverConfig class."""
 
-@dataclass(frozen=True)
-class AlgebraSolverConfig:
+        frozen = True
+
+
+class AlgebraSolverConfig(BaseModel):
     """Config that is specific to an ODE solver."""
 
     rel_tol: float = 1e-7
     abs_tol: float = 1e-7
     max_num_steps: int = int(1e6)
 
+    class Config:
+        """Config for the ODESolverConfig class."""
 
-@dataclass
-class MaudConfig:
+        frozen = True
+
+
+class MaudConfig(BaseModel):
     """User's configuration for a Maud input.
 
     :param name: name for the input. Used to name the output directory
@@ -79,13 +85,11 @@ class MaudConfig:
     molecule_unit: str = "mmol"
     volume_unit: str = "L"
 
-    @root_validator
-    def do_not_penalize_if_rejecting(cls, values):
+    @model_validator(mode="after")
+    def do_not_penalize_if_rejecting(self):
         """Check that locations are non-null."""
-        assert not (
-            values["penalize_non_steady"] and values["reject_non_steady"]
-        ), (
+        assert not self.penalize_non_steady and self.reject_non_steady, (
             "Penalizing the non-steady state has no effect if the non-steady"
             " state is rejected; set one of the two to false."
         )
-        return values
+        return self

@@ -1,13 +1,11 @@
 """Definitions of the user's input for priors. Directly read from toml."""
 
-from typing import List, Optional, Union
+from typing import Dict, List, Optional, Union
 
-from pydantic import root_validator, validator
-from pydantic.dataclasses import dataclass
+from pydantic import BaseModel, Field, field_validator, model_validator
 
 
-@dataclass
-class ParameterInputAtom:
+class ParameterInputAtom(BaseModel):
     """Parameter input for a single quantity."""
 
     metabolite: Optional[str] = None
@@ -23,22 +21,23 @@ class ParameterInputAtom:
     pct1: Optional[float] = None
     pct99: Optional[float] = None
     init: Optional[float] = None
+    fixed_value: Optional[float] = None
 
-    @validator("scale")
+    @field_validator("scale")
     def scale_is_positive(cls, v):
         """Check that scale is positive."""
         if v is not None and v <= 0:
             raise ValueError("scale must be a positive number.")
         return v
 
-    @root_validator(pre=False, skip_on_failure=True)
-    def prior_is_specified_correctly(cls, values):
+    @model_validator(mode="before")
+    def prior_is_specified_correctly(cls, data):
         """Check that location, scale etc are correct."""
-        lc = values["location"]
-        el = values["exploc"]
-        sc = values["scale"]
-        p1 = values["pct1"]
-        p99 = values["pct99"]
+        lc = data["location"] if "location" in data.keys() else None
+        el = data["exploc"] if "exploc" in data.keys() else None
+        sc = data["scale"] if "scale" in data.keys() else None
+        p1 = data["pct1"] if "pct1" in data.keys() else None
+        p99 = data["pct99"] if "pct99" in data.keys() else None
         happy_cases = [
             {"not_none": [lc, sc], "none": [el, p1, p99]},
             {"not_none": [el, sc], "none": [lc, p1, p99]},
@@ -54,31 +53,40 @@ class ParameterInputAtom:
                 "Set one out of the following pairs of attributes: "
                 "location and scale, exploc and scale, or pct1 and pct99."
             )
-        return values
+        return data
 
 
-@dataclass
-class ParameterInputMVN:
+class ParameterInputMVN(BaseModel):
     """User input for a parameter with multivariate normal prior."""
 
     ids: List[str]
+    fixed_values: Optional[Dict[str, float]] = None
     mean_vector: List[float]
     covariance_matrix: List[List[float]]
 
 
-@dataclass
-class ParametersInput:
+class ParametersInput(BaseModel):
     """User input for all parameters."""
 
-    dgf: Optional[Union[ParameterInputMVN, List[ParameterInputAtom]]] = None
-    km: Optional[List[ParameterInputAtom]] = None
-    kcat: Optional[List[ParameterInputAtom]] = None
-    kcat_pme: Optional[List[ParameterInputAtom]] = None
-    ki: Optional[List[ParameterInputAtom]] = None
-    psi: Optional[List[ParameterInputAtom]] = None
-    dissociation_constant: Optional[List[ParameterInputAtom]] = None
-    transfer_constant: Optional[List[ParameterInputAtom]] = None
-    conc_unbalanced: Optional[List[ParameterInputAtom]] = None
-    drain: Optional[List[ParameterInputAtom]] = None
-    conc_enzyme: Optional[List[ParameterInputAtom]] = None
-    conc_pme: Optional[List[ParameterInputAtom]] = None
+    dgf: Optional[Union[ParameterInputMVN, List[ParameterInputAtom]]] = Field(
+        default_factory=list
+    )
+    km: Optional[List[ParameterInputAtom]] = Field(default_factory=list)
+    kcat: Optional[List[ParameterInputAtom]] = Field(default_factory=list)
+    kcat_pme: Optional[List[ParameterInputAtom]] = Field(default_factory=list)
+    ki: Optional[List[ParameterInputAtom]] = Field(default_factory=list)
+    psi: Optional[List[ParameterInputAtom]] = Field(default_factory=list)
+    dissociation_constant: Optional[List[ParameterInputAtom]] = Field(
+        default_factory=list
+    )
+    transfer_constant: Optional[List[ParameterInputAtom]] = Field(
+        default_factory=list
+    )
+    conc_unbalanced: Optional[List[ParameterInputAtom]] = Field(
+        default_factory=list
+    )
+    drain: Optional[List[ParameterInputAtom]] = Field(default_factory=list)
+    conc_enzyme: Optional[List[ParameterInputAtom]] = Field(
+        default_factory=list
+    )
+    conc_pme: Optional[List[ParameterInputAtom]] = Field(default_factory=list)

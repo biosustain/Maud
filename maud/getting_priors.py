@@ -12,8 +12,11 @@ import pandas as pd
 
 from maud.data_model.hardcoding import ID_SEPARATOR
 from maud.data_model.maud_parameter import IdComponent
+from maud.data_model.parameter_input import (
+    ParameterInputAtom,
+    ParameterInputMVN,
+)
 from maud.data_model.prior import IndPrior1d, IndPrior2d, PriorMVN
-from maud.data_model.prior_input import IndPriorAtomInput, PriorMVNInput
 from maud.utility_functions import (
     get_lognormal_parameters_from_quantiles,
     get_normal_parameters_from_quantiles,
@@ -21,7 +24,7 @@ from maud.utility_functions import (
 
 
 def get_loc_and_scale(
-    ipai: IndPriorAtomInput, non_negative: bool
+    ipai: ParameterInputAtom, non_negative: bool
 ) -> Tuple[float, float]:
     """Get location and scale from a user input prior.
 
@@ -45,7 +48,7 @@ def get_loc_and_scale(
 
 
 def unpack_ind_prior_atom_input(
-    ipai: IndPriorAtomInput,
+    ipai: ParameterInputAtom,
     id_components: List[List[IdComponent]],
     non_negative: bool,
 ) -> Tuple[List[str], float, float]:
@@ -59,14 +62,15 @@ def unpack_ind_prior_atom_input(
 
 
 def get_ind_prior_1d(
-    pi: Optional[List[IndPriorAtomInput]],
-    ids: List[str],
+    pi: Optional[List[ParameterInputAtom]],
+    ids: List[List[str]],
     id_components: List[List[IdComponent]],
     non_negative: bool,
     default_loc: float,
     default_scale: float,
 ) -> IndPrior1d:
     """Get an independent 1d prior from a prior input and StanVariable."""
+    ids = ids[0]
     if len(ids) == 0:
         return IndPrior1d(location=[], scale=[])
     loc_series = pd.Series(default_loc, index=ids)
@@ -79,11 +83,11 @@ def get_ind_prior_1d(
             if ids_i[0] in loc_series.index:
                 loc_series.update({ids_i[0]: loc_i})
                 scale_series.update({ids_i[0]: scale_i})
-    return IndPrior1d(loc_series.tolist(), scale_series.tolist())
+    return IndPrior1d(location=loc_series.tolist(), scale=scale_series.tolist())
 
 
 def get_ind_prior_2d(
-    pi: Optional[List[IndPriorAtomInput]],
+    pi: Optional[List[ParameterInputAtom]],
     ids: List[List[str]],
     id_components: List[List[IdComponent]],
     non_negative: bool,
@@ -103,23 +107,26 @@ def get_ind_prior_2d(
             if ids_i[0] in loc_df.index and ids_i[1] in loc_df.columns:
                 loc_df.loc[ids_i[0], ids_i[1]] = loc_i
                 scale_df.loc[ids_i[0], ids_i[1]] = scale_i
-    return IndPrior2d(loc_df.values.tolist(), scale_df.values.tolist())
+    return IndPrior2d(
+        location=loc_df.values.tolist(), scale=scale_df.values.tolist()
+    )
 
 
 def get_mvn_prior(
-    pi: Optional[Union[List[IndPriorAtomInput], PriorMVNInput]],
-    ids: List[str],
+    pi: Optional[Union[List[ParameterInputAtom], ParameterInputMVN]],
+    ids: List[List[str]],
     id_components: List[List[IdComponent]],
     non_negative: bool,
     default_loc: float,
     default_scale: float,
 ) -> PriorMVN:
     """Get a multivariate normal prior from a prior input and StanVariable."""
+    ids = ids[0]
     loc_series = pd.Series(default_loc, index=ids)
     cov_df = pd.DataFrame(
         np.diagflat(np.tile(default_scale, len(ids))), index=ids, columns=ids
     )
-    if isinstance(pi, PriorMVNInput):
+    if isinstance(pi, ParameterInputMVN):
         loc_series = pd.Series(pi.mean_vector, index=pi.ids).reindex(ids)
         cov_df = (
             pd.DataFrame(pi.covariance_matrix, index=pi.ids, columns=pi.ids)
@@ -133,4 +140,6 @@ def get_mvn_prior(
             )
             loc_series.loc[ids_i[0]] = loc_i
             cov_df.loc[ids_i[0], ids_i[0]] = cov_ii
-    return PriorMVN(loc_series.tolist(), cov_df.values.tolist())
+    return PriorMVN(
+        location=loc_series.tolist(), covariance_matrix=cov_df.values.tolist()
+    )

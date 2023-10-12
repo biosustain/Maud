@@ -1,6 +1,5 @@
 """Provides function get_stan_inputs for generating Stan input dictionaries."""
 
-from dataclasses import fields
 from typing import Dict, Iterable, List, Tuple, Union
 
 from scipy.stats import gmean
@@ -68,13 +67,17 @@ def get_prior_inputs(parameters: ParameterSet) -> Tuple[Dict, Dict]:
     """Get the priors component of an input to Maud's Stan model."""
     ind_priors_train = {
         f"priors_{p.name}": [p.prior.location, p.prior.scale]
-        for p in map(lambda f: getattr(parameters, f.name), fields(parameters))
+        for p in map(
+            lambda k: getattr(parameters, k), parameters.__fields__.keys()
+        )
         if p.prior_in_train_model
         and (isinstance(p.prior, IndPrior1d) or isinstance(p.prior, IndPrior2d))
     }
     ind_priors_test = {
         f"priors_{p.name}": [p.prior.location, p.prior.scale]
-        for p in map(lambda f: getattr(parameters, f.name), fields(parameters))
+        for p in map(
+            lambda k: getattr(parameters, k), parameters.__fields__.keys()
+        )
         if p.prior_in_test_model
         and (isinstance(p.prior, IndPrior1d) or isinstance(p.prior, IndPrior2d))
     }
