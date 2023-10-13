@@ -7,7 +7,7 @@ This is where logic for constructing MaudParameter objects should live.
 from pydantic import BaseModel, computed_field
 
 import maud.data_model.maud_parameter as mp
-from maud.data_model.experiment import Experiment, MeasurementType
+from maud.data_model.experiment import Experiment, Measurement, MeasurementType
 from maud.data_model.hardcoding import ID_SEPARATOR
 from maud.data_model.kinetic_model import KineticModel, ReactionMechanism
 from maud.data_model.maud_init import InitInput
@@ -161,188 +161,153 @@ class ParameterSet(BaseModel):
             init_input=self.init_input.kcat_pme,
         )
 
+    def _get_experiments(self, train: bool) -> list[str]:
+        return [
+            e.id
+            for e in self.experiments
+            if (e.is_train if train else e.is_test)
+        ]
+
+    def _get_drain(self, train: bool) -> mp.Drain:
+        drain_ids = [
+            d.id
+            for d in self.kinetic_model.reactions
+            if d.mechanism == ReactionMechanism.drain
+        ]
+        exp_ids = self._get_experiments(train)
+        result = mp.Drain(
+            ids=[exp_ids, drain_ids],
+            split_ids=[[exp_ids], [drain_ids]],
+            user_input=self.parameter_set_input.drain,
+            init_input=self.init_input.drain,
+        )
+        return result if train else result.test()
+
     @computed_field
-    def drain_train(self) -> mp.DrainTrain:
+    def drain_train(self) -> mp.Drain:
         """Add the drain_train field."""
-        drain_ids = [
-            d.id
-            for d in self.kinetic_model.reactions
-            if d.mechanism == ReactionMechanism.drain
-        ]
-        exp_ids = [e.id for e in self.experiments if e.is_train]
-        return mp.DrainTrain(
-            ids=[exp_ids, drain_ids],
-            split_ids=[[exp_ids], [drain_ids]],
-            user_input=self.parameter_set_input.drain,
-            init_input=self.init_input.drain,
-        )
+        return self._get_drain(train=True)
 
     @computed_field
-    def drain_test(self) -> mp.DrainTest:
+    def drain_test(self) -> mp.Drain:
         """Add the drain_test field."""
-        drain_ids = [
-            d.id
-            for d in self.kinetic_model.reactions
-            if d.mechanism == ReactionMechanism.drain
+        return self._get_drain(train=False)
+
+    def _get_measurements(
+        self, train: bool, mtype: MeasurementType
+    ) -> list[Measurement]:
+        return [
+            m
+            for e in self.experiments
+            for m in e.measurements
+            if (e.is_train if train else e.is_test) and m.target_type == mtype
         ]
-        exp_ids = [e.id for e in self.experiments if e.is_test]
-        return mp.DrainTest(
-            ids=[exp_ids, drain_ids],
-            split_ids=[[exp_ids], [drain_ids]],
-            user_input=self.parameter_set_input.drain,
-            init_input=self.init_input.drain,
+
+    def _get_conc_enzyme(self, train: bool) -> mp.ConcEnzyme:
+        enzyme_ids = [e.id for e in self.kinetic_model.enzymes]
+        exp_ids = self._get_experiments(train)
+        measurements = self._get_measurements(train, MeasurementType.ENZYME)
+        result = mp.ConcEnzyme(
+            ids=[exp_ids, enzyme_ids],
+            split_ids=[[exp_ids], [enzyme_ids]],
+            user_input=self.parameter_set_input.conc_enzyme,
+            init_input=self.init_input.conc_enzyme,
+            measurements=measurements,
         )
+        return result if train else result.test()
 
     @computed_field
-    def conc_enzyme_train(self) -> mp.ConcEnzymeTrain:
+    def conc_enzyme_train(self) -> mp.ConcEnzyme:
         """Add the conc_enzyme_train field."""
-        enzyme_ids = [e.id for e in self.kinetic_model.enzymes]
-        exp_ids = [e.id for e in self.experiments if e.is_train]
-        measurements = [
-            m
-            for e in self.experiments
-            for m in e.measurements
-            if e.is_train and m.target_type == MeasurementType.ENZYME
-        ]
-        return mp.ConcEnzymeTrain(
-            ids=[exp_ids, enzyme_ids],
-            split_ids=[[exp_ids], [enzyme_ids]],
-            user_input=self.parameter_set_input.conc_enzyme,
-            init_input=self.init_input.conc_enzyme,
-            measurements=measurements,
-        )
+        return self._get_conc_enzyme(train=True)
 
     @computed_field
-    def conc_enzyme_test(self) -> mp.ConcEnzymeTest:
+    def conc_enzyme_test(self) -> mp.ConcEnzyme:
         """Add the conc_enzyme_test field."""
-        enzyme_ids = [e.id for e in self.kinetic_model.enzymes]
-        exp_ids = [e.id for e in self.experiments if e.is_test]
-        measurements = [
-            m
-            for e in self.experiments
-            for m in e.measurements
-            if e.is_test and m.target_type == MeasurementType.ENZYME
-        ]
-        return mp.ConcEnzymeTest(
-            ids=[exp_ids, enzyme_ids],
-            split_ids=[[exp_ids], [enzyme_ids]],
-            user_input=self.parameter_set_input.conc_enzyme,
-            init_input=self.init_input.conc_enzyme,
+        return self._get_conc_enzyme(train=False)
+
+    def _get_conc_unbalanced(self, train: bool) -> mp.ConcUnbalanced:
+        exp_ids = self._get_experiments(train)
+        measurements = self._get_measurements(train, MeasurementType.MIC)
+        unbalanced_mic_ids, unbalanced_mic_mets, unbalanced_mic_cpts = map(
+            list,
+            zip(
+                *[
+                    [m.id, m.metabolite_id, m.compartment_id]
+                    for m in self.kinetic_model.mics
+                    if not m.balanced
+                ]
+            ),
+        )
+        result = mp.ConcUnbalanced(
+            ids=[exp_ids, unbalanced_mic_ids],
+            split_ids=[
+                [exp_ids],
+                [unbalanced_mic_mets, unbalanced_mic_cpts],
+            ],
+            user_input=self.parameter_set_input.conc_unbalanced,
+            init_input=self.init_input.conc_unbalanced,
             measurements=measurements,
         )
+        return result if train else result.test()
 
     @computed_field
-    def conc_unbalanced_train(self) -> mp.ConcUnbalancedTrain:
+    def conc_unbalanced_train(self) -> mp.ConcUnbalanced:
         """Add the conc_unbalanced_train field."""
-        exp_ids = [e.id for e in self.experiments if e.is_train]
-        measurements = [
-            m
-            for e in self.experiments
-            for m in e.measurements
-            if e.is_train and m.target_type == MeasurementType.MIC
-        ]
-        unbalanced_mic_ids, unbalanced_mic_mets, unbalanced_mic_cpts = map(
-            list,
-            zip(
-                *[
-                    [m.id, m.metabolite_id, m.compartment_id]
-                    for m in self.kinetic_model.mics
-                    if not m.balanced
-                ]
-            ),
-        )
-        return mp.ConcUnbalancedTrain(
-            ids=[exp_ids, unbalanced_mic_ids],
-            split_ids=[
-                [exp_ids],
-                [unbalanced_mic_mets, unbalanced_mic_cpts],
-            ],
-            user_input=self.parameter_set_input.conc_unbalanced,
-            init_input=self.init_input.conc_unbalanced,
-            measurements=measurements,
-        )
+        return self._get_conc_unbalanced(train=True)
 
     @computed_field
-    def conc_unbalanced_test(self) -> mp.ConcUnbalancedTest:
+    def conc_unbalanced_test(self) -> mp.ConcUnbalanced:
         """Add the conc_unbalanced_test field."""
-        exp_ids = [e.id for e in self.experiments if e.is_test]
-        measurements = [
-            m
-            for e in self.experiments
-            for m in e.measurements
-            if e.is_test and m.target_type == MeasurementType.MIC
-        ]
-        unbalanced_mic_ids, unbalanced_mic_mets, unbalanced_mic_cpts = map(
-            list,
-            zip(
-                *[
-                    [m.id, m.metabolite_id, m.compartment_id]
-                    for m in self.kinetic_model.mics
-                    if not m.balanced
-                ]
-            ),
-        )
-        return mp.ConcUnbalancedTest(
-            ids=[exp_ids, unbalanced_mic_ids],
-            split_ids=[
-                [exp_ids],
-                [unbalanced_mic_mets, unbalanced_mic_cpts],
-            ],
-            user_input=self.parameter_set_input.conc_unbalanced,
-            init_input=self.init_input.conc_unbalanced,
-            measurements=measurements,
-        )
+        return self._get_conc_unbalanced(train=False)
 
-    @computed_field
-    def conc_pme_train(self) -> mp.ConcPmeTrain:
+    def _get_conc_pme(self, train: bool) -> mp.ConcPme:
         """Add the conc_pme_train field."""
-        exp_ids = [e.id for e in self.experiments if e.is_train]
+        exp_ids = self._get_experiments(train)
         pme_ids = (
             [p.modifying_enzyme_id for p in self.kinetic_model.phosphorylations]
             if self.kinetic_model.phosphorylations is not None
             else []
         )
-        return mp.ConcPmeTrain(
+        result = mp.ConcPme(
             ids=[exp_ids, pme_ids],
             split_ids=[[exp_ids], [pme_ids]],
             user_input=self.parameter_set_input.conc_pme,
             init_input=self.init_input.conc_pme,
         )
+        return result if train else result.test()
 
     @computed_field
-    def conc_pme_test(self) -> mp.ConcPmeTest:
+    def conc_pme_train(self) -> mp.ConcPme:
+        """Add the conc_pme_train field."""
+        return self._get_conc_pme(train=True)
+
+    @computed_field
+    def conc_pme_test(self) -> mp.ConcPme:
         """Add the conc_pme_test field."""
-        exp_ids = [e.id for e in self.experiments if e.is_test]
-        pme_ids = (
-            [p.modifying_enzyme_id for p in self.kinetic_model.phosphorylations]
-            if self.kinetic_model.phosphorylations is not None
-            else []
-        )
-        return mp.ConcPmeTest(
-            ids=[exp_ids, pme_ids],
-            split_ids=[[exp_ids], [pme_ids]],
-            user_input=self.parameter_set_input.conc_pme,
-            init_input=self.init_input.conc_pme,
-        )
+        return self._get_conc_pme(train=False)
 
-    @computed_field
-    def psi_train(self) -> mp.PsiTrain:
+    def _get_psi(self, train: bool) -> mp.Psi:
         """Add the psi_train field."""
-        exp_ids = [e.id for e in self.experiments if e.is_train]
-        return mp.PsiTrain(
+        exp_ids = [
+            e.id
+            for e in self.experiments
+            if (e.is_train if train else e.is_test)
+        ]
+        result = mp.Psi(
             ids=[exp_ids],
             split_ids=[[exp_ids]],
             user_input=self.parameter_set_input.psi,
             init_input=self.init_input.psi,
         )
+        return result if train else result.test()
 
     @computed_field
-    def psi_test(self) -> mp.PsiTest:
+    def psi_train(self) -> mp.Psi:
+        """Add the psi_train field."""
+        return self._get_psi(train=True)
+
+    @computed_field
+    def psi_test(self) -> mp.Psi:
         """Add the psi_test field."""
-        exp_ids = [e.id for e in self.experiments if e.is_test]
-        return mp.PsiTest(
-            ids=[exp_ids],
-            split_ids=[[exp_ids]],
-            user_input=self.parameter_set_input.psi,
-            init_input=self.init_input.psi,
-        )
+        return self._get_psi(train=False)
