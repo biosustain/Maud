@@ -169,7 +169,6 @@ class ParameterSet(BaseModel):
         ]
 
     def _get_drain(self, train: bool) -> mp.Drain:
-        """Add the drain_train field."""
         drain_ids = [
             d.id
             for d in self.kinetic_model.reactions
@@ -281,12 +280,12 @@ class ParameterSet(BaseModel):
     @computed_field
     def conc_pme_train(self) -> mp.ConcPme:
         """Add the conc_pme_train field."""
-        return self._get_conc_pme(True)
+        return self._get_conc_pme(train=True)
 
     @computed_field
     def conc_pme_test(self) -> mp.ConcPme:
         """Add the conc_pme_test field."""
-        return self._get_conc_pme(False)
+        return self._get_conc_pme(train=False)
 
     def _get_psi(self, train: bool) -> mp.Psi:
         """Add the psi_train field."""
@@ -311,4 +310,4 @@ class ParameterSet(BaseModel):
     @computed_field
     def psi_test(self) -> mp.Psi:
         """Add the psi_test field."""
-        return self._get_psi(train=True).test()
+        return self._get_psi(train=False)
