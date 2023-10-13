@@ -165,7 +165,8 @@ class IndPrior2d(BaseModel):
                     ID_SEPARATOR.join([getattr(pia, c) for c in idci])
                     for idci in self.id_components
                 ]
-                loc_df.loc[ids_i[0], ids_i[1]] = loc_i
+                if ids_i[0] in loc_df.index and ids_i[1] in loc_df.columns:
+                    loc_df.loc[ids_i[0], ids_i[1]] = loc_i
         return loc_df.values.tolist()
 
     @computed_field
@@ -183,7 +184,8 @@ class IndPrior2d(BaseModel):
                     ID_SEPARATOR.join([getattr(pia, c) for c in idci])
                     for idci in self.id_components
                 ]
-                scale_df.loc[ids_i[0], ids_i[1]] = scale_i
+                if ids_i[0] in scale_df.index and ids_i[1] in scale_df.columns:
+                    scale_df.loc[ids_i[0], ids_i[1]] = scale_i
         return scale_df.values.tolist()
 
     @field_validator("location")
