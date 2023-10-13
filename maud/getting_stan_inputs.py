@@ -82,7 +82,7 @@ def get_fixed_param_input(
     else:
         codes = codify_maud_object(kinetic_model.metabolites)
         return {
-            "N_dgf_fixed": len(dgf.fixed_ids),
+            "N_dgf_fixed": len(dgf.fixed_ids[0]),
             "dgf_fixed": dgf.fixed_values[0],
             "ix_dgf_free": [
                 v for k, v in codes.items() if k not in dgf.fixed_ids[0]
