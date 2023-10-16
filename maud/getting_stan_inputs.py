@@ -76,7 +76,7 @@ def get_fixed_param_input(
         return {
             "N_dgf_fixed": 0,
             "dgf_fixed": [],
-            "ix_dgf_free": list(range(1, len(dgf.location) + 1)),
+            "ix_dgf_free": list(range(1, len(dgf.prior.location) + 1)),
             "ix_dgf_fixed": [],
         }
     else:
