@@ -483,5 +483,6 @@ a separate table, like this:
 ids = ["M1", "M2", "M3"]
 mean_vector = [1, 2, 3]
 covariance_matrix = [[1, 2, 3], [1, 2, 1], [3, 2, 1]]
-fixed_values = {"M1" = -1}
+[dgf.fixed_values]
+M1 = -1
 ```
