@@ -87,9 +87,7 @@ def get_fixed_param_input(
             "ix_dgf_free": [
                 v for k, v in codes.items() if k not in dgf.fixed_ids[0]
             ],
-            "ix_dgf_fixed": [
-                v for k, v in codes.items() if k in dgf.fixed_ids[0]
-            ],
+            "ix_dgf_fixed": [codes[k] for k in dgf.fixed_ids[0]],
         }
 
 
