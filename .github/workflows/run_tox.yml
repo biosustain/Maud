@@ -12,7 +12,7 @@ on:
   workflow_dispatch: {}
 
 env:
-  CMDSTAN_VERSION: "2.32.2"
+  CMDSTAN_VERSION: "2.33.1"
 
 jobs:
   build:
