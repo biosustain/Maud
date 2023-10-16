@@ -1,18 +1,11 @@
-"""Provides dataclass Experiment."""
+"""Provides model Experiment."""
 
 from enum import Enum
 from typing import List, Optional
 
-from pydantic import Field, validator
-from pydantic.dataclasses import dataclass
+from pydantic import BaseModel, Field, computed_field, field_validator
 
 from maud.data_model.hardcoding import ID_SEPARATOR
-
-
-class MSConfig:
-    """Config for MeasurementSet, allowing it to contain pandas objects."""
-
-    arbitrary_types_allowed = True
 
 
 class MeasurementType(str, Enum):
@@ -23,8 +16,7 @@ class MeasurementType(str, Enum):
     ENZYME = "enzyme"
 
 
-@dataclass
-class Measurement:
+class Measurement(BaseModel):
     """Maud representation of a measurement."""
 
     experiment: str
@@ -35,62 +27,61 @@ class Measurement:
     compartment: Optional[str] = None
     reaction: Optional[str] = None
     enzyme: Optional[str] = None
-    target_id: str = Field(default=None, init=False, exclude=True)
 
-    def __post_init__(self):
+    @computed_field
+    def target_id(self) -> str:
         """Add target_id field."""
         if self.target_type == MeasurementType.MIC:
-            self.target_id = ID_SEPARATOR.join(
-                [self.metabolite, self.compartment]
-            )
+            assert self.metabolite is not None
+            assert self.compartment is not None
+            return ID_SEPARATOR.join([self.metabolite, self.compartment])
         elif self.target_type == MeasurementType.FLUX:
-            self.target_id = self.reaction
-        elif self.target_type == MeasurementType.ENZYME:
-            self.target_id = self.enzyme
+            assert self.reaction is not None
+            return self.reaction
+        else:
+            assert self.enzyme is not None
+            return self.enzyme
 
 
-@dataclass
-class EnzymeKnockout:
+class EnzymeKnockout(BaseModel):
     """Maud representation of an enzyme being knocked out in an experiment."""
 
     experiment: str
     enzyme: str
-    id: str = Field(init=False, exclude=True)
 
-    def __post_init__(self):
+    @computed_field
+    def id(self) -> str:
         """Add id field."""
-        self.id = ID_SEPARATOR.join(["eko", self.experiment, self.enzyme])
+        return ID_SEPARATOR.join(["eko", self.experiment, self.enzyme])
 
 
-@dataclass
-class PhosphorylationModifyingEnzymeKnockout:
+class PhosphorylationModifyingEnzymeKnockout(BaseModel):
     """Maud representation of a pme being knocked out in an experiment."""
 
     experiment: str
+    enzyme: str
     pme: str
-    id: str = Field(init=False, exclude=True)
 
-    def __post_init__(self):
+    @computed_field
+    def id(self) -> str:
         """Add id field."""
-        self.id = ID_SEPARATOR.join(["pko", self.experiment, self.enzyme])
+        return ID_SEPARATOR.join(["pko", self.experiment, self.enzyme])
 
 
-@dataclass
-class InitConcentration:
+class InitConcentration(BaseModel):
     """Indication of the initial value of a concentration in the ODE."""
 
     metabolite: str
     compartment: str
     value: float
-    target_id: str = Field(default=None, init=False, exclude=True)
 
-    def __post_init__(self):
+    @computed_field
+    def target_id(self) -> str:
         """Add target_id field."""
-        self.target_id = ID_SEPARATOR.join([self.metabolite, self.compartment])
+        return ID_SEPARATOR.join([self.metabolite, self.compartment])
 
 
-@dataclass
-class Experiment:
+class Experiment(BaseModel):
     """Maud representation of an experiment.
 
     This means a case where the boundary conditions and all measured quantities
@@ -109,7 +100,7 @@ class Experiment:
         default_factory=lambda: []
     )
 
-    @validator("temperature")
+    @field_validator("temperature")
     def temp_must_be_non_negative(cls, v):
         """Make sure the temperature isn't negative."""
         assert v >= 0

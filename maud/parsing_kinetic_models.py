@@ -28,19 +28,12 @@ def parse_kinetic_model(raw: dict) -> KineticModel:
     """
     now = datetime.now().strftime("%Y%m%d%H%M%S")
     name = read_with_fallback("name", raw, now)
-    compartments = [
-        Compartment(c["id"], c["name"], c["volume"]) for c in raw["compartment"]
-    ]
+    compartments = [Compartment(**c) for c in raw["compartment"]]
     mics = [
-        MetaboliteInCompartment(
-            mic["metabolite_id"], mic["compartment_id"], mic["balanced"]
-        )
+        MetaboliteInCompartment(**mic)
         for mic in raw["metabolite_in_compartment"]
     ]
-    ers = [
-        EnzymeReaction(er["enzyme_id"], er["reaction_id"])
-        for er in raw["enzyme_reaction"]
-    ]
+    ers = [EnzymeReaction(**er) for er in raw["enzyme_reaction"]]
     reactions = [
         Reaction(
             id=r["id"],

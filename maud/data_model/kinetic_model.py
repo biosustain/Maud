@@ -4,8 +4,13 @@ from enum import Enum
 from typing import Dict, List, Optional, Union
 
 import pandas as pd
-from pydantic import Field, root_validator, validator
-from pydantic.dataclasses import dataclass
+from pydantic import (
+    BaseModel,
+    ConfigDict,
+    computed_field,
+    field_validator,
+    model_validator,
+)
 
 from maud.data_model.hardcoding import ID_SEPARATOR
 
@@ -25,50 +30,41 @@ class ModificationType(int, Enum):
     inhibition = 2
 
 
-class KMConfig:
-    """Config allowing the KineticModel class to contain pandas objects."""
-
-    arbitrary_types_allowed = True
-
-
-@dataclass
-class Metabolite:
+class Metabolite(BaseModel):
     """Maud representation of a metabolite."""
 
     id: str
     name: Optional[str]
     inchi_key: Optional[str]
 
-    @validator("id")
+    @field_validator("id")
     def id_must_not_contain_seps(cls, v):
         """Check that the id doesn't contain ID_SEPARATOR."""
         assert ID_SEPARATOR not in v
         return v
 
 
-@dataclass
-class Enzyme:
+class Enzyme(BaseModel):
     """Maud representation of an enzyme."""
 
     id: str
     name: Optional[str]
     subunits: int
 
-    @validator("id")
+    @field_validator("id")
     def id_must_not_contain_seps(cls, v):
         """Check that the id doesn't contain ID_SEPARATOR."""
         assert ID_SEPARATOR not in v
         return v
 
-    @validator("subunits")
+    @field_validator("subunits")
     def subunits_must_be_positive(cls, v):
         """Check that the subunits attribute is biologically possible."""
         assert v > 0
         return v
 
 
-@dataclass
-class PhosphorylationModifyingEnzyme:
+class PhosphorylationModifyingEnzyme(BaseModel):
     """Maud representation of a phosphorylation modifying enzyme.
 
     For example, a phosphatase?
@@ -77,15 +73,14 @@ class PhosphorylationModifyingEnzyme:
 
     id: str
 
-    @validator("id")
+    @field_validator("id")
     def id_must_not_contain_seps(cls, v):
         """Check that the id doesn't contain ID_SEPARATOR."""
         assert ID_SEPARATOR not in v
         return v
 
 
-@dataclass
-class Compartment:
+class Compartment(BaseModel):
     """Maud representation of an intra-cellular compartment.
 
     For example, cytosol or mitochondria.
@@ -96,15 +91,14 @@ class Compartment:
     name: Optional[str]
     volume: float
 
-    @validator("id")
+    @field_validator("id")
     def id_must_not_contain_seps(cls, v):
         """Check that the id doesn't contain ID_SEPARATOR."""
         assert ID_SEPARATOR not in v
         return v
 
 
-@dataclass
-class Reaction:
+class Reaction(BaseModel):
     """Maud representation of a chemical reaction."""
 
     id: str
@@ -114,21 +108,20 @@ class Reaction:
     water_stoichiometry: float
     transported_charge: float
 
-    @validator("id")
+    @field_validator("id")
     def id_must_not_contain_seps(cls, v):
         """Check that the id doesn't contain ID_SEPARATOR."""
         assert ID_SEPARATOR not in v, "ID must not contain separator"
         return v
 
-    @validator("stoichiometry")
+    @field_validator("stoichiometry")
     def stoichiometry_must_be_non_zero(cls, v):
         """Check that the stoichiometry is not zero."""
         assert v != 0, "stoichiometry must be non-zero"
         return v
 
 
-@dataclass
-class MetaboliteInCompartment:
+class MetaboliteInCompartment(BaseModel):
     """Maud representation of a metabolite/compartment pair.
 
     This is needed because metabolites often exist in multiple compartments, and
@@ -142,15 +135,14 @@ class MetaboliteInCompartment:
     metabolite_id: str
     compartment_id: str
     balanced: bool
-    id: str = Field(init=False, exclude=True)
 
-    def __post_init__(self):
+    @computed_field
+    def id(self) -> str:
         """Add the id field."""
-        self.id = ID_SEPARATOR.join([self.metabolite_id, self.compartment_id])
+        return ID_SEPARATOR.join([self.metabolite_id, self.compartment_id])
 
 
-@dataclass
-class EnzymeReaction:
+class EnzymeReaction(BaseModel):
     """Maud representation of an enzyme/reaction pair.
 
     This is needed because some enzymes catalyse multiple reactions.
@@ -159,26 +151,25 @@ class EnzymeReaction:
 
     enzyme_id: str
     reaction_id: str
-    id: str = Field(init=False, exclude=True)
 
-    def __post_init__(self):
+    @computed_field
+    def id(self) -> str:
         """Add the id field."""
-        self.id = self.enzyme_id + ID_SEPARATOR + self.reaction_id
+        return self.enzyme_id + ID_SEPARATOR + self.reaction_id
 
 
-@dataclass
-class Allostery:
+class Allostery(BaseModel):
     """Maud representation of an allosteric modification."""
 
     enzyme_id: str
     metabolite_id: str
     compartment_id: str
     modification_type: ModificationType
-    id: str = Field(init=False, exclude=True)
 
-    def __post_init__(self):
-        """Add the id and mic_id fields."""
-        self.id = ID_SEPARATOR.join(
+    @computed_field
+    def id(self) -> str:
+        """Add the id field."""
+        return ID_SEPARATOR.join(
             [
                 self.enzyme_id,
                 self.metabolite_id,
@@ -186,24 +177,25 @@ class Allostery:
                 self.modification_type.name,
             ]
         )
-        self.mic_id = ID_SEPARATOR.join(
-            [self.metabolite_id, self.compartment_id]
-        )
+
+    @computed_field
+    def mic_id(self) -> str:
+        """Add the mic_id field."""
+        return ID_SEPARATOR.join([self.metabolite_id, self.compartment_id])
 
 
-@dataclass
-class CompetitiveInhibition:
+class CompetitiveInhibition(BaseModel):
     """Maud representation of a competitive inhibition."""
 
     enzyme_id: str
     reaction_id: str
     metabolite_id: str
     compartment_id: str
-    id: str = Field(init=False, exclude=True)
 
-    def __post_init__(self):
-        """Add the id, er_id and mic_id fields."""
-        self.id = ID_SEPARATOR.join(
+    @computed_field
+    def id(self) -> str:
+        """Add the id field."""
+        return ID_SEPARATOR.join(
             [
                 self.enzyme_id,
                 self.reaction_id,
@@ -211,25 +203,30 @@ class CompetitiveInhibition:
                 self.compartment_id,
             ]
         )
-        self.er_id = ID_SEPARATOR.join([self.enzyme_id, self.reaction_id])
-        self.mic_id = ID_SEPARATOR.join(
-            [self.metabolite_id, self.compartment_id]
-        )
+
+    @computed_field
+    def er_id(self) -> str:
+        """Add the er_id field."""
+        return ID_SEPARATOR.join([self.enzyme_id, self.reaction_id])
+
+    @computed_field
+    def mic_id(self) -> str:
+        """Add the mic_id field."""
+        return ID_SEPARATOR.join([self.metabolite_id, self.compartment_id])
 
 
-@dataclass
-class Phosphorylation:
+class Phosphorylation(BaseModel):
     """Maud representation of a phosphorylation modification."""
 
     name: Optional[str]
     modifying_enzyme_id: str
     modified_enzyme_id: str
     modification_type: ModificationType
-    id: str = Field(init=False, exclude=True)
 
-    def __post_init__(self):
+    @computed_field
+    def id(self) -> str:
         """Add the id field."""
-        self.id = ID_SEPARATOR.join(
+        return ID_SEPARATOR.join(
             [
                 self.modifying_enzyme_id,
                 self.modified_enzyme_id,
@@ -238,8 +235,7 @@ class Phosphorylation:
         )
 
 
-@dataclass(config=KMConfig)
-class KineticModel:
+class KineticModel(BaseModel):
     """Representation of a system of metabolic network."""
 
     name: str
@@ -253,26 +249,31 @@ class KineticModel:
     allosteric_enzymes: Optional[List[Enzyme]]
     competitive_inhibitions: Optional[List[CompetitiveInhibition]]
     phosphorylations: Optional[List[Phosphorylation]]
-    drains: List[Reaction] = Field(init=False, exclude=True)
-    edges: List[Union[Reaction, EnzymeReaction]] = Field(
-        init=False, exclude=True
-    )
-    stoichiometric_matrix: pd.DataFrame = Field(init=False, exclude=True)
-    phosphorylation_modifying_enzymes: Optional[
-        List[PhosphorylationModifyingEnzyme]
-    ] = Field(init=False, exclude=True)
+    model_config: ConfigDict = {"arbitrary_types_allowed": True}
 
-    def __post_init__(self):
-        """Add drains, edges and stoichiometric matrix."""
-        self.drains = [
+    @computed_field
+    def drains(self) -> List[Reaction]:
+        """Add the drains field."""
+        return [
             r for r in self.reactions if r.mechanism == ReactionMechanism.drain
         ]
-        self.edges = self.drains + self.ers
-        self.stoichiometric_matrix = get_stoichiometric_matrix(
-            self.edges, self.mics, self.reactions
-        )
 
-        self.phosphorylation_modifying_enzymes = (
+    @computed_field
+    def edges(self) -> List[Union[Reaction, EnzymeReaction]]:
+        """Add the edges field."""
+        return self.drains + self.ers
+
+    @computed_field
+    def stoichiometric_matrix(self) -> pd.DataFrame:
+        """Add the stoichiometric_matrix field."""
+        return get_stoichiometric_matrix(self.edges, self.mics, self.reactions)
+
+    @computed_field
+    def phosphorylation_modifying_enzymes(
+        self,
+    ) -> Optional[List[PhosphorylationModifyingEnzyme]]:
+        """Add the phosphorylation_modifying_enzymes field."""
+        return (
             [
                 PhosphorylationModifyingEnzyme(pme_id)
                 for pme_id in list(
@@ -283,108 +284,108 @@ class KineticModel:
             else None
         )
 
-    @validator("metabolites")
+    @field_validator("metabolites")
     def metabolite_ids_must_be_unique(cls, v):
         """Make sure there aren't any duplicated metabolite ids."""
         met_ids = [m.id for m in v]
         assert len(met_ids) == len(set(met_ids))
         return v
 
-    @validator("enzymes")
+    @field_validator("enzymes")
     def enzyme_ids_must_be_unique(cls, v):
         """Make sure there aren't any duplicated enzyme ids."""
         met_ids = [m.id for m in v]
         assert len(met_ids) == len(set(met_ids))
         return v
 
-    @validator("compartments")
+    @field_validator("compartments")
     def compartment_ids_must_be_unique(cls, v):
         """Make sure there aren't any duplicated compartment ids."""
         met_ids = [m.id for m in v]
         assert len(met_ids) == len(set(met_ids))
         return v
 
-    @validator("reactions")
+    @field_validator("reactions")
     def reaction_ids_must_be_unique(cls, v):
         """Make sure there aren't any duplicated reaction ids."""
         rxn_ids = [r.id for r in v]
         assert len(rxn_ids) == len(set(rxn_ids))
         return v
 
-    @root_validator(pre=False, skip_on_failure=True)
-    def stoic_keys_must_be_mic_ids(cls, values):
+    @model_validator(mode="after")
+    def stoic_keys_must_be_mic_ids(self) -> "KineticModel":
         """Make sure reaction stoichiometries have existent mic ids."""
-        mic_ids = [mic.id for mic in values["mics"]]
-        for r in values["reactions"]:
+        mic_ids = [mic.id for mic in self.mics]
+        for r in self.reactions:
             for stoich_mic_id in r.stoichiometry.keys():
                 assert (
                     stoich_mic_id in mic_ids
                 ), f"{r.id} has stoichiometry for bad mic_id {stoich_mic_id}"
-        return values
+        return self
 
-    @root_validator(pre=False, skip_on_failure=True)
-    def mic_references_must_exist(cls, values):
+    @model_validator(mode="after")
+    def mic_references_must_exist(self) -> "KineticModel":
         """Make sure mics have existent metabolite and compartment ids."""
-        metabolite_ids = [m.id for m in values["metabolites"]]
-        compartment_ids = [c.id for c in values["compartments"]]
-        for mic in values["mics"]:
+        metabolite_ids = [m.id for m in self.metabolites]
+        compartment_ids = [c.id for c in self.compartments]
+        for mic in self.mics:
             assert (
                 mic.metabolite_id in metabolite_ids
             ), f"{mic.id} has bad metabolite_id."
             assert (
                 mic.compartment_id in compartment_ids
             ), f"{mic.id} has bad compartment_id."
-        return values
+        return self
 
-    @root_validator(pre=False, skip_on_failure=True)
-    def er_references_must_exist(cls, values):
+    @model_validator(mode="after")
+    def er_references_must_exist(self) -> "KineticModel":
         """Make sure ers have existent enzyme and reaction ids."""
-        enzyme_ids = [e.id for e in values["enzymes"]]
-        reaction_ids = [r.id for r in values["reactions"]]
-        for er in values["ers"]:
+        enzyme_ids = [e.id for e in self.enzymes]
+        reaction_ids = [r.id for r in self.reactions]
+        for er in self.ers:
             assert er.enzyme_id in enzyme_ids, f"{er.id} has bad enzyme_id"
             assert (
                 er.reaction_id in reaction_ids
             ), f"{er.id} has bad reaction_id"
-        return values
+        return self
 
-    @root_validator(pre=False, skip_on_failure=True)
-    def allostery_references_must_exist(cls, values):
+    @model_validator(mode="after")
+    def allostery_references_must_exist(self) -> "KineticModel":
         """Make sure allosteries' external ids exist."""
-        if values["allosteries"] is None:
-            return values
-        enzyme_ids = [e.id for e in values["enzymes"]]
-        mic_ids = [mic.id for mic in values["mics"]]
-        for allostery in values["allosteries"]:
+        if self.allosteries is None:
+            return self
+        enzyme_ids = [e.id for e in self.enzymes]
+        mic_ids = [mic.id for mic in self.mics]
+        for allostery in self.allosteries:
             assert (
                 allostery.enzyme_id in enzyme_ids
             ), f"{allostery.id} has bad enzyme_id"
             assert allostery.mic_id in mic_ids, f"{allostery.id} has bad mic_id"
-        return values
+        return self
 
-    @root_validator(pre=False, skip_on_failure=True)
-    def ci_references_must_exist(cls, values):
+    @model_validator(mode="after")
+    def ci_references_must_exist(self) -> "KineticModel":
         """Make sure competitive inhibitions' external ids exist."""
-        if values["competitive_inhibitions"] is None:
-            return values
-        er_ids = [er.id for er in values["ers"]]
-        mic_ids = [mic.id for mic in values["mics"]]
-        for ci in values["competitive_inhibitions"]:
+        if self.competitive_inhibitions is None:
+            return self
+        er_ids = [er.id for er in self.ers]
+        mic_ids = [mic.id for mic in self.mics]
+        for ci in self.competitive_inhibitions:
             assert ci.er_id in er_ids, f"{ci.id} has bad er_id"
             assert ci.mic_id in mic_ids, f"{ci.mic_id} has bad mic_id"
-        return values
+        return self
 
-    @root_validator(pre=False, skip_on_failure=True)
-    def phosphorylation_references_must_exist(cls, values):
+    @model_validator(mode="after")
+    def phosphorylation_references_must_exist(self):
         """Make sure phosphorylations' external ids exist."""
-        if values["phosphorylations"] is None:
-            return values
-        enzyme_ids = [e.id for e in values["enzymes"]]
-        for p in values["phosphorylations"]:
+        if self.phosphorylations is None:
+            return self
+        enzyme_ids = [e.id for e in self.enzymes]
+        for p in self.phosphorylations:
             assert (
                 p.modified_enzyme_id in enzyme_ids
             ), f"{p.id} has bad enzyme_id"
-        return values
+        return self
 
 
 def get_stoichiometric_matrix(
