@@ -74,7 +74,7 @@ class MaudParameter(BaseModel):
             if self.user_input.fixed_values is None:
                 return None
             else:
-                return list(self.user_input.fixed_values.values())
+                return [list(self.user_input.fixed_values.values())]
         else:
             raise ValueError(f"Something wrong with input {self.user_input}")
 
