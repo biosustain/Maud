@@ -74,11 +74,12 @@ class MaudInput(BaseModel):
                     scaled_pref + param.name + "_z"
                 ] = param.inits.inits_scaled
             if param.fixed_ids is not None:
+                met_to_init = dict(
+                    zip(param.inits.ids[0], param.inits.inits_unscaled)
+                )
                 inits_dict[param.name + "_free"] = [
-                    v
-                    for k, v in zip(
-                        param.inits.ids[0], param.inits.inits_unscaled
-                    )
-                    if k not in param.fixed_ids[0]
+                    init
+                    for met, init in met_to_init.items()
+                    if met not in param.fixed_ids[0]
                 ]
         return inits_dict
