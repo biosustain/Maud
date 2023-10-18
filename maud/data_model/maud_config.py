@@ -2,7 +2,7 @@
 
 from typing import Optional
 
-from pydantic import BaseModel, ConfigDict, Field, model_validator
+from pydantic import BaseModel, ConfigDict, Field
 
 
 class ODESolverConfig(BaseModel):
@@ -32,7 +32,6 @@ class MaudConfig(BaseModel):
     :param experiments_file: path to a valid experiments file.
     :param likelihood: Whether or not to take measurements into account.
     :param cmdstanpy_config: Arguments to cmdstanpy.CmdStanModel.sample.
-    :param reject_non_steady: Reject draws if a non-steady state is encountered.
     :param penalize_non_steady: Penalize the deviation from steady state in the log likelihood.
     :param ode_solver_config: Configuration for Stan's ode solver.
     :param algebra_solver_config: Configuration for Stan's algebra solver.
@@ -67,7 +66,6 @@ class MaudConfig(BaseModel):
     algebra_solver_config: AlgebraSolverConfig = Field(
         default_factory=AlgebraSolverConfig
     )
-    reject_non_steady: bool = True
     penalize_non_steady: bool = False
     steady_state_threshold_abs: float = 1e-8
     steady_state_threshold_rel: float = 1e-3
@@ -76,12 +74,3 @@ class MaudConfig(BaseModel):
     drain_small_conc_corrector: float = 1e-6
     molecule_unit: str = "mmol"
     volume_unit: str = "L"
-
-    @model_validator(mode="after")
-    def do_not_penalize_if_rejecting(self):
-        """Check that locations are non-null."""
-        assert not self.penalize_non_steady and self.reject_non_steady, (
-            "Penalizing the non-steady state has no effect if the non-steady"
-            " state is rejected; set one of the two to false."
-        )
-        return self
