@@ -4,7 +4,6 @@ priors_file = "priors.toml"
 experiments_file = "experiments.toml"
 user_inits_file = "inits.toml"
 likelihood = true
-reject_non_steady = true
 
 [cmdstanpy_config]
 iter_warmup = 1000
