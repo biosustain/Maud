@@ -66,9 +66,20 @@ class MaudInput(BaseModel):
             for p in self.parameters.dict().keys()
             if isinstance(getattr(self.parameters, p), MaudParameter)
         ]
-        for p in params:
-            inits_dict[p.name] = p.inits.inits_unscaled
-            if p.inits.inits_scaled is not None:
-                scaled_pref = "log_" if p.non_negative else ""
-                inits_dict[scaled_pref + p.name + "_z"] = p.inits.inits_scaled
+        for param in params:
+            inits_dict[param.name] = param.inits.inits_unscaled
+            if param.inits.inits_scaled is not None:
+                scaled_pref = "log_" if param.non_negative else ""
+                inits_dict[
+                    scaled_pref + param.name + "_z"
+                ] = param.inits.inits_scaled
+            if param.fixed_ids is not None:
+                met_to_init = dict(
+                    zip(param.inits.ids[0], param.inits.inits_unscaled)
+                )
+                inits_dict[param.name + "_free"] = [
+                    init
+                    for met, init in met_to_init.items()
+                    if met not in param.fixed_ids[0]
+                ]
         return inits_dict

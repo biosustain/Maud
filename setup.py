@@ -18,7 +18,7 @@ from wheel.bdist_wheel import bdist_wheel
 MODEL_DIR = os.path.join("maud", "stan")
 MODELS = ["model", "out_of_sample_model"]
 
-CMDSTAN_VERSION = "2.32.2"
+CMDSTAN_VERSION = "2.33.1"
 BINARIES_DIR = "bin"
 BINARIES = ["diagnose", "print", "stanc", "stansummary"]
 MATH_LIB = "stan/lib/stan_math/lib"

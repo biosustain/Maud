@@ -454,3 +454,34 @@ kcat = [
   {enzyme = "PROT1", reaction = "PROT", init = 0.264744},
 ]
 ```
+
+## Fixing parameter values
+
+Sometimes it is useful to model a parameter as if its value were known exactly.
+For example, the formation energies of metabolites that are only involved in
+irreversible reactions are typically not identified by Maud's statistical
+model. Fixing these unidentified parameters can improve computational
+performance without loss of any information. Another use might be to test
+whether a particular parameter value is feasible at all.
+
+Maud currently supports fixing the values of `dgf` parameters. This can be done
+for independent parameter inputs by adding a `fixed_value` field to the
+relevant items as shown here:
+
+```toml
+dgf = [
+  {location = -1, metabolite = "M1", scale = 0.05, fixed_value = -1},
+]
+```
+
+If a multivariate input is used for `dgf`, fixed values can be specified using
+a separate table, like this:
+
+```toml
+[dgf]
+ids = ["M1", "M2", "M3"]
+mean_vector = [1, 2, 3]
+covariance_matrix = [[1, 2, 3], [1, 2, 1], [3, 2, 1]]
+[dgf.fixed_values]
+M1 = -1
+```

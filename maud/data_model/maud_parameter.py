@@ -34,6 +34,51 @@ class MaudParameter(BaseModel):
     measurements: Optional[List[Measurement]] = None
 
     @computed_field
+    def fixed_ids(self) -> Optional[List[List[str]]]:
+        """Set the fixed_ids field."""
+        if self.name != "dgf":
+            return None
+        elif self.user_input is None:
+            return None
+        elif isinstance(self.user_input, List):
+            out = [[]]
+            for pia in self.user_input:
+                if pia.fixed_value is not None:
+                    out[0] += [
+                        ID_SEPARATOR.join([getattr(pia, c) for c in idci])
+                        for idci in self.id_components
+                    ]
+            return out
+        elif isinstance(self.user_input, ParameterInputMVN):
+            if self.user_input.fixed_values is None:
+                return None
+            else:
+                return [list(self.user_input.fixed_values.keys())]
+        else:
+            raise ValueError(f"Something wrong with input {self.user_input}")
+
+    @computed_field
+    def fixed_values(self) -> Optional[List[List[float]]]:
+        """Set the fixed_values field."""
+        if self.name != "dgf":
+            return None
+        elif self.user_input is None:
+            return None
+        elif isinstance(self.user_input, List):
+            out = [[]]
+            for pia in self.user_input:
+                if pia.fixed_value is not None:
+                    out[0].append(pia.fixed_value)
+            return out
+        elif isinstance(self.user_input, ParameterInputMVN):
+            if self.user_input.fixed_values is None:
+                return None
+            else:
+                return [list(self.user_input.fixed_values.values())]
+        else:
+            raise ValueError(f"Something wrong with input {self.user_input}")
+
+    @computed_field
     def prior(self) -> Union[IndPrior1d, IndPrior2d, PriorMVN]:
         """Return a prior, calculated from the user input."""
         if self.name == "dgf":

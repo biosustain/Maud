@@ -42,6 +42,7 @@ def get_stan_inputs(
     network_properties_input = get_network_properties_input(
         kinetic_model, parameters
     )
+    fixed_param_input = get_fixed_param_input(parameters, kinetic_model)
     priors_input_train, priors_input_test = get_prior_inputs(parameters)
     experiments_input_train, experiments_input_test = get_experiments_input(
         experiments, kinetic_model
@@ -52,16 +53,42 @@ def get_stan_inputs(
     )
     return (
         network_properties_input
+        | fixed_param_input
         | priors_input_train
         | experiments_input_train
         | config_input
         | {"conc_init": conc_init_train},
         network_properties_input
+        | fixed_param_input
         | priors_input_test
         | experiments_input_test
         | config_input
         | {"conc_init": conc_init_test},
     )
+
+
+def get_fixed_param_input(
+    parameters: ParameterSet, kinetic_model: KineticModel
+) -> Dict:
+    """Get the fixed param part of the Stan input."""
+    dgf = parameters.dgf
+    if dgf.fixed_ids is None:
+        return {
+            "N_dgf_fixed": 0,
+            "dgf_fixed": [],
+            "ix_dgf_free": list(range(1, len(dgf.prior.location) + 1)),
+            "ix_dgf_fixed": [],
+        }
+    else:
+        codes = codify_maud_object(kinetic_model.metabolites)
+        return {
+            "N_dgf_fixed": len(dgf.fixed_ids[0]),
+            "dgf_fixed": dgf.fixed_values[0],
+            "ix_dgf_free": [
+                v for k, v in codes.items() if k not in dgf.fixed_ids[0]
+            ],
+            "ix_dgf_fixed": [codes[k] for k in dgf.fixed_ids[0]],
+        }
 
 
 def get_prior_inputs(parameters: ParameterSet) -> Tuple[Dict, Dict]:

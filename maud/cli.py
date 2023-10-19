@@ -16,6 +16,7 @@
 
 """Functions that are exposed to the command line interface live here."""
 
+import json
 import os
 import shutil
 from datetime import datetime
@@ -102,6 +103,13 @@ def do_sample(data_path, output_dir):
     stanfit = sample(mi, samples_path)
     print(stanfit.diagnose())
     print(stanfit.summary())
+    if stanfit.metric is not None:
+        for i, chain_metric in enumerate(stanfit.metric):
+            chain_metric_dict = {"inv_metric": chain_metric.tolist()}
+            with open(
+                os.path.join(samples_path, f"metric-{str(i)}.json"), "w"
+            ) as f:
+                json.dump(chain_metric_dict, f)
     idata = get_idata(stanfit.runset.csv_files, mi, "train")
     idata.to_json(os.path.join(output_path, "idata.json"))
     return output_path

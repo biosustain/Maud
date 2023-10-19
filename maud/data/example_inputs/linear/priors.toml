@@ -23,7 +23,7 @@ dissociation_constant = [
 ]
 
 dgf = [
-  {location = -1, metabolite = "M1", scale = 0.05},
+  {location = -1, metabolite = "M1", scale = 0.05, fixed_value = -1},
   {location = -2, metabolite = "M2", scale = 0.05},
 ]
 

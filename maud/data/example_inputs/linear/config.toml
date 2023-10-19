@@ -14,11 +14,11 @@ save_warmup = true
 seed = 1234
 
 [ode_solver_config]
-abs_tol = 1e-7
-rel_tol = 1e-7
+abs_tol = 1e-4
+rel_tol = 1e-6
 max_num_steps = 1e6
 
 [algebra_solver_config]
-abs_tol = 1e-5
-rel_tol = 1e-5
+abs_tol = 1e-4
+rel_tol = 1e-6
 max_num_steps = 1e6

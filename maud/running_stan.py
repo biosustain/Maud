@@ -13,7 +13,7 @@ from cmdstanpy.stanfit.vb import CmdStanVB
 
 from maud.data_model.maud_input import MaudInput
 
-CMDSTAN_VERSION = "2.32.2"
+CMDSTAN_VERSION = "2.33.1"
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 DEFAULT_PRIOR_LOC_DRAIN = None
