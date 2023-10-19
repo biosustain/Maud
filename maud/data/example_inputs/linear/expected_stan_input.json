@@ -510,11 +510,11 @@
   "steady_state_threshold_abs": 1e-06,
   "steady_state_threshold_rel": 0.001,
   "steady_state_penalty_rel": 1e-08,
-  "rel_tol_ode": 1e-07,
-  "abs_tol_ode": 1e-07,
+  "rel_tol_ode": 1e-06,
+  "abs_tol_ode": 1e-04,
   "max_num_steps_ode": 1000000,
-  "rel_tol_alg": 1e-05,
-  "abs_tol_alg": 1e-05,
+  "rel_tol_alg": 1e-06,
+  "abs_tol_alg": 1e-04,
   "max_num_steps_alg": 1000000,
   "conc_init": [
     [
