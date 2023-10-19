@@ -531,7 +531,10 @@ def do_pathfinder(data_path, output_dir):
     os.mkdir(samples_path)
     print(f"Copying user input from {data_path} to {ui_dir}")
     shutil.copytree(data_path, ui_dir)
-    pathfinder(mi, samples_path)
+    pf = pathfinder(mi, samples_path)
+    inits_pf = pf.create_inits()
+    with open(os.path.join(samples_path, "inits_pathfinder.json", "w")) as f:
+        json.dump(inits_pf, f)
     return output_path
 
 
