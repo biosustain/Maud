@@ -184,7 +184,15 @@ def laplace(mi: MaudInput, output_dir: str) -> CmdStanLaplace:
     fixed_args = {"output_dir": output_dir}
     fixed_args_opt = {"inits": os.path.join(output_dir, "inits.json")}
     laplace_args = DEFAULT_LAPLACE_CONFIG | mi_options_laplace | fixed_args
-    opt_args = DEFAULT_OPTIMIZE_CONFIG | mi_options_optimize | fixed_args_opt
+    if "mode" in laplace_args.keys():
+        if laplace_args["mode"] is not None:
+            opt_args = None
+        else:
+            raise ValueError("'mode' must not be None!")
+    else:
+        opt_args = (
+            DEFAULT_OPTIMIZE_CONFIG | mi_options_optimize | fixed_args_opt
+        )
     model = load_stan_model(
         "model", mi.config.cpp_options, mi.config.stanc_options
     )
