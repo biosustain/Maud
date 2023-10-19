@@ -24,6 +24,7 @@ from datetime import datetime
 import arviz as az
 import click
 import importlib_resources
+from stanio import write_stan_json
 
 from maud.data.example_inputs import linear, methionine
 from maud.getting_idatas import get_idata
@@ -533,8 +534,11 @@ def do_pathfinder(data_path, output_dir):
     shutil.copytree(data_path, ui_dir)
     pf = pathfinder(mi, samples_path)
     inits_pf = pf.create_inits()
-    with open(os.path.join(samples_path, "inits_pathfinder.json", "w")) as f:
-        json.dump(inits_pf, f)
+    for i, inits_dict in enumerate(inits_pf):
+        write_stan_json(
+            os.path.join(samples_path, f"inits_pathfinder-{str(i)}.json"),
+            inits_dict,
+        )
     return output_path
 
 
@@ -553,7 +557,7 @@ def do_laplace(data_path, output_dir):
     """Generate approximate posterior draws using the Laplace method."""
     mi = load_maud_input(data_path=data_path)
     now = datetime.now().strftime("%Y%m%d%H%M%S")
-    output_name = f"maud_output_opt-{mi.config.name}-{now}"
+    output_name = f"maud_output_laplace-{mi.config.name}-{now}"
     output_path = os.path.join(output_dir, output_name)
     samples_path = os.path.join(output_path, "samples")
     ui_dir = os.path.join(output_path, "user_input")
