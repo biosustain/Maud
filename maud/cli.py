@@ -514,12 +514,12 @@ def do_variational(data_path, output_dir):
     type=click.Path(exists=True, dir_okay=True, file_okay=False),
 )
 def pathfinder_command(data_path, output_dir):
-    """Generate pathfinder samples given a user input directory."""
+    """Generate draws using the pathfinder algorithm."""
     click.echo(do_pathfinder(data_path, output_dir))
 
 
 def do_pathfinder(data_path, output_dir):
-    """Generate pathfinder samples given a user input directory."""
+    """Generate draws using the pathfinder algorithm."""
     mi = load_maud_input(data_path)
     now = datetime.now().strftime("%Y%m%d%H%M%S")
     output_name = f"maud_output_pf-{mi.config.name}-{now}"
@@ -542,12 +542,12 @@ def do_pathfinder(data_path, output_dir):
     type=click.Path(exists=True, dir_okay=True, file_okay=False),
 )
 def laplace_command(data_path, output_dir):
-    """Do Laplace approximation."""
+    """Generate approximate posterior draws using the Laplace method."""
     click.echo(do_laplace(data_path, output_dir))
 
 
 def do_laplace(data_path, output_dir):
-    """Do Laplace approximation."""
+    """Generate approximate posterior draws using the Laplace method."""
     mi = load_maud_input(data_path=data_path)
     now = datetime.now().strftime("%Y%m%d%H%M%S")
     output_name = f"maud_output_opt-{mi.config.name}-{now}"
