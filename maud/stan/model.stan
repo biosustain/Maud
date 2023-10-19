@@ -110,7 +110,13 @@ data {
 transformed data {
   real initial_time = 0;
   complex complex_step = 1e-14i;
-  matrix[N_metabolite, N_metabolite] prior_cov_dgf_chol = cholesky_decompose(prior_cov_dgf);
+  matrix[N_metabolite-N_dgf_fixed, N_metabolite-N_dgf_fixed] prior_cov_dgf_free;
+  for (mi in 1:N_metabolite-N_dgf_fixed){
+    for (mj in 1:N_metabolite-N_dgf_fixed)
+      prior_cov_dgf_free[mi,mj] = prior_cov_dgf[ix_dgf_free[mi],ix_dgf_free[mj]];
+  }
+  matrix[N_metabolite-N_dgf_fixed, N_metabolite-N_dgf_fixed]
+    prior_cov_dgf_free_chol = cholesky_decompose(prior_cov_dgf_free);
   int N_balanced = N_mic - N_unbalanced;
 }
 parameters {
@@ -257,7 +263,8 @@ model {
   log_ki_z ~ std_normal();
   log_dissociation_constant_z ~ std_normal();
   log_transfer_constant_z ~ std_normal();
-  dgf ~ multi_normal_cholesky(prior_loc_dgf, prior_cov_dgf_chol);
+  dgf_free ~ multi_normal_cholesky(prior_loc_dgf[ix_dgf_free],
+                                   prior_cov_dgf_free_chol);
   log_kcat_pme_z ~ std_normal();
   for (ex in 1 : N_experiment_train) {
     log_conc_unbalanced_train_z[ex] ~ std_normal();
