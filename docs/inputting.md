@@ -39,6 +39,9 @@ The following optional fields can also be specified:
 * `stanc_options` Table of valid choices for [CmdStanModel](https://cmdstanpy.readthedocs.io/en/v1.1.0/api.html#cmdstanpy.CmdStanModel) argument `stanc_options`
 * `cpp_options` Table of valid choices for  [`CmdStanModel](https://cmdstanpy.readthedocs.io/en/v1.1.0/api.html#cmdstanpy.CmdStanModel) argument `cpp_options`
 * `variational_options` Arguments for the cmdstanpy method [`CmdStanModel.variational](https://cmdstanpy.readthedocs.io/en/v1.1.0/api.html#cmdstanpy.CmdStanModel.variational)
+* `optimize_options` Arguments for the cmdstanpy method [`CmdStanModel.optimize](https://cmdstanpy.readthedocs.io/en/v1.1.0/api.html#cmdstanpy.CmdStanModel.optimize)
+* `pathfinder_options` Arguments for the cmdstanpy method [`CmdStanModel.pathfinder](https://cmdstanpy.readthedocs.io/en/v1.1.0/api.html#cmdstanpy.CmdStanModel.pathfinder)
+* `laplace_options` Arguments for the cmdstanpy method [`CmdStanModel.laplace_sample](https://cmdstanpy.readthedocs.io/en/v1.1.0/api.html#cmdstanpy.CmdStanModel.laplace_sample)
 * `user_inits_file` path to a toml file of initial values
 * `steady_state_threshold_abs` absolute threshold for Sv=0 be at steady state
 * `steady_state_threshold_rel` relative threshold for Sv=0 be at steady state
