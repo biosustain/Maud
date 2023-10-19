@@ -31,8 +31,7 @@ The file `config.toml` **must** contain these top-level fields:
 
 The following optional fields can also be specified:
 
-* `reject_non_steady` Boolean saying whether to reject draws that enter non-steady states
-* `penalize_non_steady` Boolean saying whether to penalize steady state deviations in the likelihood. It cannot be `True` when `reject_non_steady` is `True`.
+* `penalize_non_steady` Boolean saying whether to penalize steady state deviations in the likelihood.
 * `ode_solver_config` Table of configuration options for Stan's ode solver
 * `algebra_solver_config` Table of configuration options for Stan's algebra solver
 * `cmdstanpy_config` Table of keyword arguments to the cmdstanpy method [`CmdStanModel.sample](https://cmdstanpy.readthedocs.io/en/v1.1.0/api.html#cmdstanpy.CmdStanModel.sample)

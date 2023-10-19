@@ -105,7 +105,6 @@ data {
   real steady_state_penalty_rel;
   int<lower=0, upper=1> likelihood; // set to 0 for priors-only mode
   real drain_small_conc_corrector;
-  int<lower=0, upper=1> reject_non_steady;
   int<lower=0, upper=1> penalize_non_steady;
 }
 transformed data {
