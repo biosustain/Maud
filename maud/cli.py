@@ -493,7 +493,7 @@ def do_variational(data_path, output_dir):
     of cmdstanpy's diagnose and summary methods.
 
     """
-    mi = load_maud_input(data_path, mode="sample")
+    mi = load_maud_input(data_path)
     now = datetime.now().strftime("%Y%m%d%H%M%S")
     output_name = f"maud_output_vi-{mi.config.name}-{now}"
     output_path = os.path.join(output_dir, output_name)
