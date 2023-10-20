@@ -7,8 +7,9 @@ from pathlib import Path
 
 import arviz as az
 import cmdstanpy
-from cmdstanpy import CmdStanMLE
+from cmdstanpy import CmdStanLaplace, CmdStanMLE
 from cmdstanpy.stanfit.mcmc import CmdStanMCMC
+from cmdstanpy.stanfit.pathfinder import CmdStanPathfinder
 from cmdstanpy.stanfit.vb import CmdStanVB
 
 from maud.data_model.maud_input import MaudInput
@@ -41,6 +42,8 @@ DEFAULT_VARIATIONAL_CONFIG = {
     "output_samples": 10,
     "require_converged": True,
 }
+DEFAULT_PATHFINDER_CONFIG = {"num_paths": 4, "draws": 10, "show_console": True}
+DEFAULT_LAPLACE_CONFIG = {"draws": 10, "show_console": True}
 SIM_CONFIG = {
     "chains": 1,
     "fixed_param": True,
@@ -137,6 +140,67 @@ def variational(mi: MaudInput, output_dir: str) -> CmdStanVB:
             **mi_options,
             **{"output_dir": output_dir},
         },
+    )
+
+
+def pathfinder(mi: MaudInput, output_dir: str) -> CmdStanPathfinder:
+    """Run the pathfinder algorithm via cmdstanpy.
+
+    :param mi: a MaudInput object
+    :param output_dir: a string specifying where to save the output.
+    """
+    mi_options = (
+        {}
+        if mi.config.pathfinder_options is None
+        else mi.config.pathfinder_options
+    )
+    model = load_stan_model(
+        "model", mi.config.cpp_options, mi.config.stanc_options
+    )
+    set_up_output_dir(output_dir, mi)
+    return model.pathfinder(
+        data=os.path.join(output_dir, "input_data_train.json"),
+        inits=os.path.join(output_dir, "inits.json"),
+        **{
+            **DEFAULT_PATHFINDER_CONFIG,
+            **mi_options,
+            **{"output_dir": output_dir},
+        },
+    )
+
+
+def laplace(mi: MaudInput, output_dir: str) -> CmdStanLaplace:
+    """Run Laplace approximation.
+
+    :param mi: a MaudInput object
+    :param output_dir: a string specifying where to save the output.
+    """
+    mi_options_laplace = (
+        {} if mi.config.laplace_options is None else mi.config.laplace_options
+    )
+    mi_options_optimize = (
+        {} if mi.config.optimize_options is None else mi.config.optimize_options
+    )
+    fixed_args = {"output_dir": output_dir}
+    fixed_args_opt = {"inits": os.path.join(output_dir, "inits.json")}
+    laplace_args = DEFAULT_LAPLACE_CONFIG | mi_options_laplace | fixed_args
+    if "mode" in laplace_args.keys():
+        if laplace_args["mode"] is not None:
+            opt_args = None
+        else:
+            raise ValueError("'mode' must not be None!")
+    else:
+        opt_args = (
+            DEFAULT_OPTIMIZE_CONFIG | mi_options_optimize | fixed_args_opt
+        )
+    model = load_stan_model(
+        "model", mi.config.cpp_options, mi.config.stanc_options
+    )
+    set_up_output_dir(output_dir, mi)
+    return model.laplace_sample(
+        data=os.path.join(output_dir, "input_data_train.json"),
+        opt_args=opt_args,
+        **laplace_args,
     )
 
 
