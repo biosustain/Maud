@@ -38,6 +38,8 @@ class MaudConfig(BaseModel):
     :param stanc_options: Options for CmdStanModel argument `stanc_options`.
     :param cpp_options: Options for CmdStanModel `cpp_options`.
     :param variational_options: Arguments for CmdStanModel.variational.
+    :param pathfinder_options: Arguments for CmdStanModel.pathfinder.
+    :param laplace_options: Arguments for CmdStanModel.laplace.
     :param optimize_options: Arguments for CmdStanModel.optimize.
     :param user_inits_file: path to a csv file of initial values.
     :param steady_state_threshold_abs: abs threshold for Sv=0 be at steady state
@@ -60,6 +62,8 @@ class MaudConfig(BaseModel):
     stanc_options: Optional[dict] = None
     cpp_options: Optional[dict] = None
     variational_options: Optional[dict] = None
+    pathfinder_options: Optional[dict] = None
+    laplace_options: Optional[dict] = None
     optimize_options: Optional[dict] = None
     user_inits_file: Optional[str] = None
     ode_solver_config: ODESolverConfig = Field(default_factory=ODESolverConfig)
