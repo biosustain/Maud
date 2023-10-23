@@ -120,7 +120,7 @@ def do_sample(data_path, output_dir):
             ) as f:
                 json.dump(chain_metric_dict, f)
     idata = get_idata(stanfit.runset.csv_files, mi, "train")
-    idata.to_json(os.path.join(output_path, "idata.json"))
+    idata.to_netcdf(os.path.join(output_path, "idata.nc"))
     return output_path
 
 
@@ -158,7 +158,7 @@ def do_predict(data_path: str):
     with the user input required to generate the trained samples.
 
     """
-    idata_train = az.from_json(os.path.join(data_path, "idata.json"))
+    idata_train = az.from_netcdf(os.path.join(data_path, "idata.nc"))
     mi = load_maud_input(os.path.join(data_path, "user_input"))
     now = datetime.now().strftime("%Y%m%d%H%M%S")
     output_name = f"maud-predict_output-{mi.config.name}-{now}"
@@ -168,7 +168,7 @@ def do_predict(data_path: str):
     os.mkdir(output_path)
     os.mkdir(test_samples_path)
     idata_predict = predict(mi, output_path, idata_train)
-    idata_predict.to_json(os.path.join(output_path, "idata_predict.json"))
+    idata_predict.to_netcdf(os.path.join(output_path, "idata_predict.json"))
 
 
 @cli.command("simulate")
@@ -209,7 +209,7 @@ def do_simulate(data_path, output_dir, n):
     shutil.copytree(data_path, ui_dir)
     stanfit = simulate(mi, samples_path, n)
     idata = get_idata(stanfit.runset.csv_files, mi, "train")
-    idata.to_json(os.path.join(output_path, "idata.json"))
+    idata.to_netcdf(os.path.join(output_path, "idata.nc"))
     print("\n\nSimulated concentrations:")
     print(
         idata.posterior["conc_train"]
@@ -354,7 +354,7 @@ def do_optimize(data_path, output_dir):
     shutil.copytree(data_path, ui_dir)
     stanfit = optimize(mi, samples_path)
     idata = get_idata(stanfit.runset.csv_files, mi, "train")
-    idata.to_json(os.path.join(output_path, "idata.json"))
+    idata.to_netcdf(os.path.join(output_path, "idata.nc"))
     print("\n\nSimulated concentrations:")
     print(
         idata.posterior["conc_train"]
@@ -568,7 +568,7 @@ def do_laplace(data_path, output_dir):
     shutil.copytree(data_path, ui_dir)
     laplace_fit = laplace(mi, samples_path)
     idata = get_idata(laplace_fit._runset.csv_files, mi, "train")
-    idata.to_json(os.path.join(output_path, "idata.json"))
+    idata.to_netcdf(os.path.join(output_path, "idata.nc"))
     print("\n\nSimulated concentrations:")
     print(
         idata.posterior["conc_train"]
