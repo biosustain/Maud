@@ -319,6 +319,7 @@ def predict(
                     **sample_args,
                     **mi.config.cmdstanpy_config_predict,
                 }
+            sample_args["chains"] = 1
             mcmc_draw = model.sample(**sample_args)
             idata_draw = az.from_cmdstan(
                 mcmc_draw.runset.csv_files,
