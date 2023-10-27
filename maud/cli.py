@@ -168,6 +168,7 @@ def do_predict(data_path: str):
     os.mkdir(output_path)
     os.mkdir(test_samples_path)
     idata_predict = predict(mi, output_path, idata_train)
+    idata_predict.posterior.attrs = {}  # error with netcdf
     idata_predict.to_netcdf(os.path.join(output_path, "idata_predict.json"))
 
 
