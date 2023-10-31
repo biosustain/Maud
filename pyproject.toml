@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "maud-metabolic-models"
-version = "0.7.0.1"
+version = "0.7.1.0"
 authors = [
     {name = "Novo Nordisk Foundation Center for Biosustainability, Technical University of Denmark"}
   ]
