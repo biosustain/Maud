@@ -3,6 +3,7 @@
 from enum import Enum
 from typing import Dict, List, Optional, Union
 
+import numpy as np
 import pandas as pd
 from pydantic import (
     BaseModel,
@@ -14,6 +15,20 @@ from pydantic import (
 
 from maud.data_model.hardcoding import ID_SEPARATOR
 from maud.utility_functions import get_left_nullspace
+
+
+class ConservedMoiety(BaseModel):
+    """Maud representation of conserved moiety groups."""
+
+    id: str
+    name: Optional[str]
+    moiety_group: List[str]
+
+    @field_validator("id")
+    def id_must_not_contain_seps(cls, v):
+        """Check that the id doesn't contain ID_SEPARATOR."""
+        assert ID_SEPARATOR not in v
+        return v
 
 
 class ReactionMechanism(int, Enum):
@@ -249,6 +264,7 @@ class KineticModel(BaseModel):
     allosteries: Optional[List[Allostery]]
     allosteric_enzymes: Optional[List[Enzyme]]
     competitive_inhibitions: Optional[List[CompetitiveInhibition]]
+    conserved_moiety: Optional[List[ConservedMoiety]]
     phosphorylations: Optional[List[Phosphorylation]]
     model_config: ConfigDict = {"arbitrary_types_allowed": True}
 
@@ -272,7 +288,13 @@ class KineticModel(BaseModel):
     @computed_field
     def left_nullspace(self) -> pd.DataFrame:
         """Calculate the left nullspace."""
-        return get_left_nullspace(self.stoichiometric_matrix)
+        balanced_mics = [mic.id for mic in self.mics if mic.balanced]
+        left_nullspace = get_left_nullspace(
+            self.stoichiometric_matrix.loc[balanced_mics]
+        )
+        left_nullspace[np.abs(left_nullspace) < 1e-10] = 0
+        left_nullspace[np.abs(left_nullspace) > 1e-10] = 1
+        return left_nullspace
 
     @computed_field
     def phosphorylation_modifying_enzymes(
@@ -391,6 +413,28 @@ class KineticModel(BaseModel):
             assert (
                 p.modified_enzyme_id in enzyme_ids
             ), f"{p.id} has bad enzyme_id"
+        return self
+
+    @model_validator(mode="after")
+    def correct_conserved_moieties_defined(self):
+        """Compare the defined conserved_moieties to the left nullspace."""
+        balanced_metabolites = [m.id for m in self.mics if m.balanced]
+        left_nullspace = self.left_nullspace.T
+        left_nullspace = left_nullspace.astype(int)
+        mgs = [con_moi.moiety_group for con_moi in self.conserved_moiety]
+        cms = [
+            [m for m, n in zip(balanced_metabolites, lns) if n]
+            for lns in left_nullspace
+        ]
+        for cm in cms:
+            assert (
+                cm in mgs
+            ), f"{cm} not defined in kinetic model `moiety_group`"
+        for mg in mgs:
+            assert (
+                mg in cms
+            ), f"{mg} defined in kinetic model `moiety_group` \
+            but may not be a conserved moiety"
         return self
 
 
