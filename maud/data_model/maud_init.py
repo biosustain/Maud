@@ -42,6 +42,7 @@ class InitInput(BaseModel):
     drain: ParamInitInput = None
     conc_enzyme: ParamInitInput = None
     conc_pme: ParamInitInput = None
+    conc_moiety_pool: ParamInitInput = None
 
 
 def get_init_atom_input_ids(

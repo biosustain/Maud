@@ -216,6 +216,19 @@ class ParameterSet(BaseModel):
         )
         return result if train else result.test()
 
+    def _get_conc_moiety_pool(self, train: bool) -> mp.ConservedMoiety:
+        exp_ids = self._get_experiments(train)
+        conserved_moiety_ids = [
+            cm.id for cm in self.kinetic_model.conserved_moiety
+        ]
+        result = mp.ConservedMoiety(
+            ids=[exp_ids, conserved_moiety_ids],
+            split_ids=[[exp_ids], [conserved_moiety_ids]],
+            user_input=self.parameter_set_input.conc_moiety_pool,
+            init_input=self.init_input.conc_moiety_pool,
+        )
+        return result if train else result.test()
+
     @computed_field
     def conc_enzyme_train(self) -> mp.ConcEnzyme:
         """Add the conc_enzyme_train field."""
@@ -225,6 +238,16 @@ class ParameterSet(BaseModel):
     def conc_enzyme_test(self) -> mp.ConcEnzyme:
         """Add the conc_enzyme_test field."""
         return self._get_conc_enzyme(train=False)
+
+    @computed_field
+    def conc_moiety_pool_train(self) -> mp.ConservedMoiety:
+        """Add the conc_enzyme_train field."""
+        return self._get_conc_moiety_pool(train=True)
+
+    @computed_field
+    def conc_moiety_pool_test(self) -> mp.ConservedMoiety:
+        """Add the conc_enzyme_test field."""
+        return self._get_conc_moiety_pool(train=False)
 
     def _get_conc_unbalanced(self, train: bool) -> mp.ConcUnbalanced:
         exp_ids = self._get_experiments(train)

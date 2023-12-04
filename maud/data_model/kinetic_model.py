@@ -17,20 +17,6 @@ from maud.data_model.hardcoding import ID_SEPARATOR
 from maud.utility_functions import get_left_nullspace
 
 
-class ConservedMoiety(BaseModel):
-    """Maud representation of conserved moiety groups."""
-
-    id: str
-    name: Optional[str]
-    moiety_group: List[str]
-
-    @field_validator("id")
-    def id_must_not_contain_seps(cls, v):
-        """Check that the id doesn't contain ID_SEPARATOR."""
-        assert ID_SEPARATOR not in v
-        return v
-
-
 class ReactionMechanism(int, Enum):
     """Possible reaction mechanisms."""
 
@@ -94,6 +80,25 @@ class PhosphorylationModifyingEnzyme(BaseModel):
         """Check that the id doesn't contain ID_SEPARATOR."""
         assert ID_SEPARATOR not in v
         return v
+
+
+class ConservedMoiety(BaseModel):
+    """Maud representation of conserved moiety groups."""
+
+    id: str
+    name: Optional[str]
+    moiety_group: List[str]
+
+    @field_validator("id")
+    def id_must_not_contain_seps(cls, v):
+        """Check that the id doesn't contain ID_SEPARATOR."""
+        assert ID_SEPARATOR not in v
+        return v
+
+    @computed_field
+    def solve(self) -> str:
+        """Return dependent moiety."""
+        return self.moiety_group[-1]
 
 
 class Compartment(BaseModel):

@@ -9,6 +9,7 @@ from maud.data_model.hardcoding import ID_SEPARATOR
 from maud.data_model.kinetic_model import (
     Allostery,
     CompetitiveInhibition,
+    ConservedMoiety,
     Enzyme,
     EnzymeReaction,
     KineticModel,
@@ -566,6 +567,7 @@ CodifiableMaudObject = Union[
     Reaction,
     Experiment,
     CompetitiveInhibition,
+    ConservedMoiety,
 ]
 
 

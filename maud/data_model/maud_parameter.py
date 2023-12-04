@@ -351,6 +351,20 @@ class ConcUnbalanced(TrainTestParameter):
     default_scale: float = 2.0
 
 
+class ConservedMoiety(TrainTestParameter):
+    """Parent class for unbalanced mic concentration parameters."""
+
+    name: str = "conc_moiety_pool"
+    shape_names: List[str] = ["N_experiment_train", "N_moiety_pool"]
+    id_components: List[List[IdComponent]] = [
+        [IdComponent.EXPERIMENT],
+        [IdComponent.CONSERVED_MOIETY],
+    ]
+    non_negative: bool = True
+    default_loc: float = -2.3
+    default_scale: float = 2.0
+
+
 class ConcPme(TrainTestParameter):
     """Parent class for pme concentration parameters."""
 
