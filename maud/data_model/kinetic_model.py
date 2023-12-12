@@ -299,7 +299,8 @@ class KineticModel(BaseModel):
         )
         left_nullspace[np.abs(left_nullspace) < 1e-10] = 0
         left_nullspace[np.abs(left_nullspace) > 1e-10] = 1
-        return left_nullspace
+
+        return pd.DataFrame(left_nullspace.T, columns=balanced_mics)
 
     @computed_field
     def phosphorylation_modifying_enzymes(
@@ -424,7 +425,7 @@ class KineticModel(BaseModel):
     def correct_conserved_moieties_defined(self):
         """Compare the defined conserved_moieties to the left nullspace."""
         balanced_metabolites = [m.id for m in self.mics if m.balanced]
-        left_nullspace = self.left_nullspace.T
+        left_nullspace = self.left_nullspace.values
         left_nullspace = left_nullspace.astype(int)
         mgs = [con_moi.moiety_group for con_moi in self.conserved_moiety]
         cms = [
