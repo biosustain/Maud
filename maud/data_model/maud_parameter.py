@@ -354,7 +354,7 @@ class ConcUnbalanced(TrainTestParameter):
 class ConservedMoiety(TrainTestParameter):
     """Parent class for unbalanced mic concentration parameters."""
 
-    name: str = "conc_moiety_pool"
+    name: str = "conc_moiety_pool_train"
     shape_names: List[str] = ["N_experiment_train", "N_moiety_pool"]
     id_components: List[List[IdComponent]] = [
         [IdComponent.EXPERIMENT],

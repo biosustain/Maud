@@ -2,6 +2,7 @@
 
 from typing import Dict, Iterable, List, Tuple, Union
 
+import pandas as pd
 from scipy.stats import gmean
 
 from maud.data_model.experiment import Experiment, MeasurementType
@@ -136,6 +137,14 @@ def get_network_properties_input(
     enzyme_codes = codify_maud_object(enzymes)
     km_ids = parameters.km.ids[0]
     km_codes = dict(zip(km_ids, range(1, len(km_ids) + 1)))
+    if len(kinetic_model.left_nullspace) > 0:
+        lns_ind = kinetic_model.left_nullspace_independent.values.tolist()
+        dependent_mic_codes = [
+            mic_codes[lns.solve] for lns in kinetic_model.conserved_moiety
+        ]
+    else:
+        lns_ind = [[]]
+        dependent_mic_codes = []
     if allosteries is not None:
         tc_codes = codify_maud_object(
             [
@@ -198,7 +207,11 @@ def get_network_properties_input(
         for e in edges
     ]
     mic_met_code = [metabolite_codes[m.metabolite_id] for m in mics]
-    balanced_mic_codes = [mic_codes[mic.id] for mic in mics if mic.balanced]
+    independent_mic_codes = [
+        mic_codes[mic.id]
+        for mic in mics
+        if ((mic.balanced) & (mic_codes[mic.id] not in dependent_mic_codes))
+    ]
     unbalanced_mic_codes = [
         mic_codes[mic.id] for mic in mics if not mic.balanced
     ]
@@ -324,10 +337,13 @@ def get_network_properties_input(
     )
     return {
         "N_mic": len(kinetic_model.mics),
+        "N_pool": len(dependent_mic_codes),
         "N_edge_sub": len(sub_by_edge_long),
         "N_edge_prod": len(prod_by_edge_long),
         "N_edge": len(S.columns),
         "N_unbalanced": len(unbalanced_mic_codes),
+        "N_independent": len(independent_mic_codes),
+        "N_dependent": len(dependent_mic_codes),
         "N_enzyme": len(enzymes),
         "N_phosphorylation": len(phosphorylation_codes),
         "N_pme": len(pme_codes),
@@ -339,9 +355,11 @@ def get_network_properties_input(
         "N_sub_km": len(sub_km_ix_by_edge_long),
         "N_prod_km": len(prod_km_ix_by_edge_long),
         "S": S.values.tolist(),
+        "left_nullspace_independent": lns_ind,
         "N_reaction": len(reactions),
         "N_metabolite": len(metabolite_codes),
-        "balanced_mic_ix": balanced_mic_codes,
+        "independent_bal_ix": independent_mic_codes,
+        "dependent_bal_ix": dependent_mic_codes,
         "unbalanced_mic_ix": unbalanced_mic_codes,
         "ci_mic_ix": ci_mic_codes,
         "edge_type": edge_mechanism_code,
@@ -496,9 +514,10 @@ def get_config_input(config: MaudConfig):
         "penalize_non_steady": int(config.penalize_non_steady),
         "steady_state_threshold_abs": config.steady_state_threshold_abs,
         "steady_state_threshold_rel": config.steady_state_threshold_rel,
-        "steady_state_penalty_rel": config.steady_state_penalty_rel,
+        "steady_state_penalty_abs": config.steady_state_penalty_abs,
         "rel_tol_ode": config.ode_solver_config.rel_tol,
         "abs_tol_ode": config.ode_solver_config.abs_tol,
+        "timepoint": config.ode_solver_config.timepoint,
         "max_num_steps_ode": config.ode_solver_config.max_num_steps,
         "rel_tol_alg": config.algebra_solver_config.rel_tol,
         "abs_tol_alg": config.algebra_solver_config.abs_tol,
@@ -537,22 +556,41 @@ def get_conc_init(
     """
     default = config.default_initial_concentration
     balanced_mics = [m for m in kinetic_model.mics if m.balanced]
-    inits = [[default for _ in balanced_mics] for e in experiments]
-    for i, experiment in enumerate(experiments):
+    balanced_mic_ids = [m.id for m in balanced_mics]
+    experiment_ids = [exp.id for exp in experiments]
+    experiments_train = [exp.id for exp in experiments if exp.is_train]
+    experiments_test = [exp.id for exp in experiments if exp.is_test]
+    if len(kinetic_model.left_nullspace) > 0:
+        dependent_mics = [m.solve for m in kinetic_model.conserved_moiety]
+        moiety_groups = [
+            mg.moiety_group for mg in kinetic_model.conserved_moiety
+        ]
+    else:
+        dependent_mics = []
+        moiety_groups = []
+    independent_mics = [
+        m.id
+        for m in kinetic_model.mics
+        if (m.balanced) & (m.id not in dependent_mics)
+    ]
+    inits = pd.DataFrame(
+        default, index=experiment_ids, columns=balanced_mic_ids
+    )
+    for experiment in experiments:
         msmts = [
             m
             for m in experiment.measurements
             if m.target_type == MeasurementType.MIC
         ] + experiment.initial_state
-        for j, mic in enumerate(balanced_mics):
+        for mic in balanced_mics:
             if any(mic.id == m.target_id for m in msmts):
-                inits[i][j] = gmean(
+                inits.loc[experiment.id, mic.id] = gmean(
                     [m.value for m in msmts if mic.id == m.target_id]
                 )
-    inits_train = [
-        inits[i] for i, exp in enumerate(experiments) if exp.is_train
-    ]
-    inits_test = [inits[i] for i, exp in enumerate(experiments) if exp.is_test]
+    for mg in moiety_groups:
+        inits[mg] = inits[mg].apply(lambda x: x / x.sum(), axis=1)
+    inits_train = inits.loc[experiments_train, independent_mics].values
+    inits_test = inits.loc[experiments_test, independent_mics].values
     return inits_train, inits_test
 
 

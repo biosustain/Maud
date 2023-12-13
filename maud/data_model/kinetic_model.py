@@ -303,6 +303,15 @@ class KineticModel(BaseModel):
         return pd.DataFrame(left_nullspace.T, columns=balanced_mics)
 
     @computed_field
+    def left_nullspace_independent(self) -> pd.DataFrame:
+        """Add the independent left_nullspace entries."""
+        if len(self.left_nullspace) > 0:
+            dependent_mets = [mic.solve for mic in self.conserved_moiety]
+            return self.left_nullspace.drop(dependent_mets, axis=1)
+        else:
+            return None
+
+    @computed_field
     def phosphorylation_modifying_enzymes(
         self,
     ) -> Optional[List[PhosphorylationModifyingEnzyme]]:
@@ -427,20 +436,21 @@ class KineticModel(BaseModel):
         balanced_metabolites = [m.id for m in self.mics if m.balanced]
         left_nullspace = self.left_nullspace.values
         left_nullspace = left_nullspace.astype(int)
-        mgs = [con_moi.moiety_group for con_moi in self.conserved_moiety]
-        cms = [
-            [m for m, n in zip(balanced_metabolites, lns) if n]
-            for lns in left_nullspace
-        ]
-        for cm in cms:
-            assert (
-                cm in mgs
-            ), f"{cm} not defined in kinetic model `moiety_group`"
-        for mg in mgs:
-            assert (
-                mg in cms
-            ), f"{mg} defined in kinetic model `moiety_group` \
-            but may not be a conserved moiety"
+        if len(left_nullspace) > 0:
+            mgs = [con_moi.moiety_group for con_moi in self.conserved_moiety]
+            cms = [
+                [m for m, n in zip(balanced_metabolites, lns) if n]
+                for lns in left_nullspace
+            ]
+            for cm in cms:
+                assert (
+                    cm in mgs
+                ), f"{cm} not defined in kinetic model `moiety_group`"
+            for mg in mgs:
+                assert (
+                    mg in cms
+                ), f"{mg} defined in kinetic model `moiety_group` \
+                but may not be a conserved moiety"
         return self
 
 

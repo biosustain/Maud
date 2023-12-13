@@ -11,6 +11,7 @@ class ODESolverConfig(BaseModel):
     rel_tol: float = 1e-9
     abs_tol: float = 1e-9
     max_num_steps: int = int(1e7)
+    timepoint: float = 1e4
     model_config: ConfigDict = {"frozen": True}
 
 
