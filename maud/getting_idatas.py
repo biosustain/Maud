@@ -28,6 +28,7 @@ def get_idata(csvs: List[str], mi: MaudInput, mode: str) -> az.InferenceData:
             MeasurementType.ENZYME,
         ]
     )
+    dependent_mics = [m.solve for m in mi.kinetic_model.conserved_moiety]
     coords = {
         "enzymes": [e.id for e in mi.kinetic_model.enzymes],
         "experiments": [e.id for e in experiments],
@@ -39,7 +40,11 @@ def get_idata(csvs: List[str], mi: MaudInput, mode: str) -> az.InferenceData:
         "unbalanced_mics": [
             m.id for m in mi.kinetic_model.mics if not m.balanced
         ],
-        "balanced_mics": [m.id for m in mi.kinetic_model.mics if m.balanced],
+        "independent_mics": [
+            m.id
+            for m in mi.kinetic_model.mics
+            if (m.balanced) & (m.id not in dependent_mics)
+        ],
         "phosphorylations": [p.id for p in mi.kinetic_model.phosphorylations]
         if mi.kinetic_model.phosphorylations is not None
         else [],
@@ -100,14 +105,14 @@ def get_idata(csvs: List[str], mi: MaudInput, mode: str) -> az.InferenceData:
         f"llik_flux_{mode}": ["yfluxs"],
         "concentration_control_matrix": [
             "experiments",
-            "balanced_mics",
+            "independent_mics",
             "edges",
         ],
         "flux_control_matrix": ["experiments", "edges", "edges"],
         "flux_response_coefficient": ["experiments", "edges", "enzymes"],
         "concentration_response_coefficient": [
             "experiments",
-            "balanced_mics",
+            "independent_mics",
             "enzymes",
         ],
     }

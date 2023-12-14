@@ -442,11 +442,11 @@ class KineticModel(BaseModel):
                 [m for m, n in zip(balanced_metabolites, lns) if n]
                 for lns in left_nullspace
             ]
-            for cm in cms:
+            for cm in sorted(cms):
                 assert (
                     cm in mgs
                 ), f"{cm} not defined in kinetic model `moiety_group`"
-            for mg in mgs:
+            for mg in sorted(mgs):
                 assert (
                     mg in cms
                 ), f"{mg} defined in kinetic model `moiety_group` \
