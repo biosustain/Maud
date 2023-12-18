@@ -375,12 +375,13 @@ functions {
            .* phosphorylation .* drain_by_edge;
   }
 
-  vector dbalanced_dt(real time, vector current_balanced, vector unbalanced,
-                      array[] int balanced_ix, array[] int unbalanced_ix,
+  vector dbalanced_dt(real time, vector current_independent, vector unbalanced,
+                      vector conc_pool, array[] int independent_bal_ix, array[] int dependent_bal_ix,
+                      array[] int unbalanced_ix,
                       vector enzyme, vector dgr, vector kcat, vector km,
                       vector ki, vector tc, vector dc, vector kcat_pme,
                       vector conc_pme, vector drain, real temperature,
-                      real drain_small_conc_corrector, matrix S,
+                      real drain_small_conc_corrector, matrix S, matrix left_nullspace_independent,
                       vector subunits, array[] int edge_type,
                       array[] int edge_to_enzyme, array[] int edge_to_drain,
                       array[] int ci_mic_ix,
@@ -401,8 +402,9 @@ functions {
                       array[,] int phosphorylation_ix_bounds,
                       array[] int phosphorylation_type,
                       array[] int phosphorylation_pme) {
-    vector[rows(current_balanced) + rows(unbalanced)] current_concentration;
-    current_concentration[balanced_ix] = current_balanced;
+    vector[size(independent_bal_ix) + size(dependent_bal_ix)+ rows(unbalanced)] current_concentration;
+    current_concentration[independent_bal_ix] = current_independent;
+    current_concentration[dependent_bal_ix] = conc_pool - left_nullspace_independent * current_independent;
     current_concentration[unbalanced_ix] = unbalanced;
     vector[cols(S)] edge_flux = get_edge_flux(current_concentration, enzyme,
                                               dgr, kcat, km, ki, tc, dc,
@@ -429,7 +431,7 @@ functions {
                                               phosphorylation_ix_bounds,
                                               phosphorylation_type,
                                               phosphorylation_pme);
-    return (S * edge_flux)[balanced_ix];
+    return S[independent_bal_ix] * edge_flux;
   }
   complex_vector get_complex_edge_flux_enzyme(vector conc,
                                               complex_vector enzyme,
@@ -526,19 +528,19 @@ functions {
     return get_imag(edge_flux) ./ get_imag(complex_enzyme_step);
   }
   matrix get_concentration_control_matrix(matrix S, matrix elasticity,
-                                          array[] int balanced_mic_ix,
-                                          int N_edge, int N_balanced) {
-    matrix[N_balanced, N_edge] balanced_S = S[balanced_mic_ix,  : ];
-    return -generalized_inverse(balanced_S * elasticity) * balanced_S;
+                                          array[] int independent_bal_ix,
+                                          int N_edge, int N_independent) {
+    matrix[N_independent, N_edge] independent_bal_S= S[independent_bal_ix,  : ];
+    return -generalized_inverse(independent_bal_S * elasticity) * independent_bal_S;
   }
   matrix get_flux_control_matrix(matrix S, matrix elasticity,
-                                 array[] int balanced_mic_ix, int N_edge,
-                                 int N_balanced) {
-    matrix[N_balanced, N_edge] balanced_S = S[balanced_mic_ix,  : ];
+                                 array[] int independent_bal_ix, int N_edge,
+                                 int N_independent) {
+    matrix[N_independent, N_edge] independent_bal_S= S[independent_bal_ix,  : ];
     matrix[N_edge, N_edge] I = identity_matrix(N_edge);
     return I
-           - elasticity * generalized_inverse(balanced_S * elasticity)
-             * balanced_S;
+           - elasticity * generalized_inverse(independent_bal_S * elasticity)
+             * independent_bal_S;
   }
   complex_vector get_complex_edge_flux_metabolite(complex_vector conc,
                                                   vector enzyme, vector dgr,
@@ -800,10 +802,12 @@ functions {
     }
     return out;
   }
-
-vector maud_ae_system(vector conc,
+/*
+vector maud_ae_system(vector conc_ind,
                       data real rel_tol_ode, data real abs_tol_ode, data int max_num_steps_ode,
-                      vector conc_unbalanced,
+                      vector init_dc_ind_dt,
+                      vector conc_unbalanced, vector pool, array[] int independent_bal_ix,
+                      array[] int dependent_bal_ix,
                       array[] int balanced_mic_ix, array[] int unbalanced_mic_ix,
                       vector conc_enzyme, vector dgr, vector kcat, vector km,
                       vector ki, vector tc, vector dc, vector kcat_pme,
@@ -829,9 +833,20 @@ vector maud_ae_system(vector conc,
                       array[,] int phosphorylation_ix_bounds,
                       array[] int phosphorylation_type,
                       array[] int phosphorylation_pme){
-  return conc - to_vector(ode_bdf_tol(dbalanced_dt, conc, 0, {1},
+                      \*
+  Delaying implementation of AlgebraSolver + DAESolver until we can confirm
+  DAE solver works independently. Concern with AlgebraSolver is that the independent
+  concentrations may be chosen higher than the selected pool size. Potential solutions
+  to overcome there are to sample the concentraitons as part of a simplex. Additionally
+  we could always select the smallest concentration as independent so the solver is more
+  unlikely to sample over the bound.
+                      *\
+  return conc - to_vector(dae_tol(dae_residual, conc, init_dc_ind_dt, 0, {1},
                           rel_tol_ode, abs_tol_ode, max_num_steps_ode,
                           conc_unbalanced,
+                          pool,
+                          independent_bal_ix,
+                          dependent_bal_ix
                           balanced_mic_ix,
                           unbalanced_mic_ix,
                           conc_enzyme,
@@ -861,5 +876,6 @@ vector maud_ae_system(vector conc,
                           phosphorylation_type,
                           phosphorylation_pme)[1]);
 }
+*/
 
 }

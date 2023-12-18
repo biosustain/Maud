@@ -1,37 +1,82 @@
 compartment = [
   {id = "c", name = "cytosol", volume = 1}
+  {id = "e", name = "external", volume = 1}
 ]
 
 metabolite_in_compartment = [
-  {metabolite_id = "A", compartment_id = "c", balanced = false},
+  {metabolite_id = "A", compartment_id = "c", balanced = true},
+  {metabolite_id = "A", compartment_id = "e", balanced = false},
   {metabolite_id = "B", compartment_id = "c", balanced = true},
   {metabolite_id = "C", compartment_id = "c", balanced = true},
-  {metabolite_id = "D", compartment_id = "c", balanced = false},
+  {metabolite_id = "D", compartment_id = "c", balanced = true},
+  {metabolite_id = "D", compartment_id = "e", balanced = false},
+  {metabolite_id = "X1", compartment_id = "c", balanced = true},
+  {metabolite_id = "X2", compartment_id = "c", balanced = true},
+  {metabolite_id = "Z", compartment_id = "c", balanced = false},
 ]
 
 enzyme_reaction = [
+  {enzyme_id = "transA", reaction_id = "transA"},
+  {enzyme_id = "transD", reaction_id = "transD"},
   {enzyme_id = "r1", reaction_id = "r1"},
   {enzyme_id = "r2A", reaction_id = "r2"},
   {enzyme_id = "r2B", reaction_id = "r2"},
   {enzyme_id = "r3", reaction_id = "r3"},
   {enzyme_id = "r4", reaction_id = "r4"},
+  {enzyme_id = "regX", reaction_id = "regX"},
 ]
+
+[[conserved_moiety]]
+id = "X"
+name = "Conserved X"
+moiety_group = ["X1_c", "X2_c"]
 
 [[metabolite]]
 id = "A"
 name = "Metabolite A"
+inchi_key = ""
 
 [[metabolite]]
 id = "B"
 name = "Metabolite B"
+inchi_key = ""
 
 [[metabolite]]
 id = "C"
 name = "Metabolite C"
+inchi_key = ""
 
 [[metabolite]]
 id = "D"
 name = "Metabolite D"
+inchi_key = ""
+
+[[metabolite]]
+id = "X1"
+name = "Cofactor X1"
+inchi_key = ""
+
+[[metabolite]]
+id = "X2"
+name = "Cofactor X2"
+inchi_key = ""
+
+[[metabolite]]
+id = "Z"
+name = "Cofactor Z"
+inchi_key = ""
+
+[[enzyme]]
+id = "transA"
+name = 'Exchanges A metabolite between internal and external'
+
+[[enzyme]]
+id = "transD"
+name = 'Exchanges D metabolite between internal and external'
+
+[[enzyme]]
+id = "regX"
+name = 'Regenerates the X cofactor'
 
 [[enzyme]]
 id = "r1"
@@ -54,6 +99,24 @@ id = 'r4'
 name = 'the enzyme that catalyses reaction r4'
 
 [[reaction]]
+id = "transA"
+name = "transport of A"
+stoichiometry = {A_e = -1, A_c = 1}
+mechanism = "reversible_michaelis_menten"
+
+[[reaction]]
+id = "transD"
+name = "transport of D"
+stoichiometry = {D_c = -1, D_e = 1}
+mechanism = "reversible_michaelis_menten"
+
+[[reaction]]
+id = "regX"
+name = "regenerates X"
+stoichiometry = {Z_c = -1, X2_c = -1, X1_c = 1}
+mechanism = "reversible_michaelis_menten"
+
+[[reaction]]
 id = "r1"
 name = "reaction number 1"
 stoichiometry = {A_c = -1, B_c = 1}
@@ -68,7 +131,7 @@ mechanism = "reversible_michaelis_menten"
 [[reaction]]
 id = "r3"
 name = "reaction number 3"
-stoichiometry = {B_c = -1, D_c = 1}
+stoichiometry = {X1_c = -1, B_c = -1, D_c = 1, X2_c = 1}
 mechanism = "reversible_michaelis_menten"
 
 [[reaction]]

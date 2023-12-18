@@ -28,6 +28,7 @@ def get_idata(csvs: List[str], mi: MaudInput, mode: str) -> az.InferenceData:
             MeasurementType.ENZYME,
         ]
     )
+    dependent_mics = [m.solve for m in mi.kinetic_model.conserved_moiety]
     coords = {
         "enzymes": [e.id for e in mi.kinetic_model.enzymes],
         "experiments": [e.id for e in experiments],
@@ -35,11 +36,18 @@ def get_idata(csvs: List[str], mi: MaudInput, mode: str) -> az.InferenceData:
         "drains": [r.id for r in mi.kinetic_model.drains],
         "metabolites": [m.id for m in mi.kinetic_model.metabolites],
         "mics": [m.id for m in mi.kinetic_model.mics],
+        "conserved_moieties": [
+            cm.id for cm in mi.kinetic_model.conserved_moiety
+        ],
         "edges": [e.id for e in mi.kinetic_model.edges],
         "unbalanced_mics": [
             m.id for m in mi.kinetic_model.mics if not m.balanced
         ],
-        "balanced_mics": [m.id for m in mi.kinetic_model.mics if m.balanced],
+        "independent_mics": [
+            m.id
+            for m in mi.kinetic_model.mics
+            if (m.balanced) & (m.id not in dependent_mics)
+        ],
         "phosphorylations": [p.id for p in mi.kinetic_model.phosphorylations]
         if mi.kinetic_model.phosphorylations is not None
         else [],
@@ -71,6 +79,7 @@ def get_idata(csvs: List[str], mi: MaudInput, mode: str) -> az.InferenceData:
     dims = {
         f"flux_{mode}": ["experiments", "reactions"],
         f"conc_{mode}": ["experiments", "mics"],
+        f"conc_moiety_pool_{mode}": ["experiments", "conserved_moieties"],
         f"log_conc_enzyme_{mode}_z": ["experiments", "enzymes"],
         f"conc_enzyme_{mode}": ["experiments", "enzymes"],
         f"conc_unbalanced_{mode}": ["experiments", "unbalanced_mics"],
@@ -100,14 +109,14 @@ def get_idata(csvs: List[str], mi: MaudInput, mode: str) -> az.InferenceData:
         f"llik_flux_{mode}": ["yfluxs"],
         "concentration_control_matrix": [
             "experiments",
-            "balanced_mics",
+            "independent_mics",
             "edges",
         ],
         "flux_control_matrix": ["experiments", "edges", "edges"],
         "flux_response_coefficient": ["experiments", "edges", "enzymes"],
         "concentration_response_coefficient": [
             "experiments",
-            "balanced_mics",
+            "independent_mics",
             "enzymes",
         ],
     }

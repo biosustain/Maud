@@ -21,6 +21,7 @@ class ParameterInputAtom(BaseModel):
     experiment: Optional[str] = None
     phosphorylation_modifying_enzyme: Optional[str] = None
     modification_type: Optional[str] = None
+    conserved_moiety: Optional[str] = None
     location: Optional[float] = None
     exploc: Optional[float] = None
     scale: Optional[PositiveFloat] = None
@@ -96,3 +97,6 @@ class ParameterSetInput(BaseModel):
         default_factory=list
     )
     conc_pme: Optional[List[ParameterInputAtom]] = Field(default_factory=list)
+    conc_moiety_pool: Optional[List[ParameterInputAtom]] = Field(
+        default_factory=list
+    )

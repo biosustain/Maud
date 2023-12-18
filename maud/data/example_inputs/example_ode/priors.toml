@@ -1,54 +1,205 @@
+
 km = [
-  {metabolite = "A", compartment = "c", enzyme = "r1", exploc = 0.5, scale = 0.2},
-  {metabolite = "B", compartment = "c", enzyme = "r1", exploc = 1, scale = 0.2},
-  {metabolite = "A", compartment = "c", enzyme = "r2A", exploc = 2, scale = 0.2},
-  {metabolite = "C", compartment = "c", enzyme = "r2A", exploc = 0.5, scale = 0.2},
-  {metabolite = "A", compartment = "c", enzyme = "r2B", exploc = 1, scale = 0.2},
-  {metabolite = "C", compartment = "c", enzyme = "r2B", exploc = 2, scale = 0.2},
-  {metabolite = "B", compartment = "c", enzyme = "r3", exploc = 0.5, scale = 0.2},
-  {metabolite = "D", compartment = "c", enzyme = "r3", exploc = 2, scale = 0.2},
-  {metabolite = "C", compartment = "c", enzyme = "r4", exploc = 1, scale = 0.2},
-  {metabolite = "D", compartment = "c", enzyme = "r4", exploc = 3, scale = 0.2},
+  {metabolite = "A", compartment = "e", enzyme = "transA", exploc = 1, scale = 1},
+  {metabolite = "A", compartment = "c", enzyme = "transA", exploc = 1, scale = 1},
+  {metabolite = "D", compartment = "e", enzyme = "transD", exploc = 1, scale = 1},
+  {metabolite = "D", compartment = "c", enzyme = "transD", exploc = 1, scale = 1},
+  {metabolite = "Z", compartment = "c", enzyme = "regX", exploc = 0.1, scale = 1},
+  {metabolite = "X1", compartment = "c", enzyme = "regX", exploc = 1, scale = 1},
+  {metabolite = "X2", compartment = "c", enzyme = "regX", exploc = 0.01, scale = 1},
+  {metabolite = "A", compartment = "c", enzyme = "r1", exploc = 0.5, scale = 1},
+  {metabolite = "B", compartment = "c", enzyme = "r1", exploc = 1, scale = 1},
+  {metabolite = "A", compartment = "c", enzyme = "r2A", exploc = 2, scale = 1},
+  {metabolite = "C", compartment = "c", enzyme = "r2A", exploc = 0.5, scale = 1},
+  {metabolite = "A", compartment = "c", enzyme = "r2B", exploc = 1, scale = 1},
+  {metabolite = "C", compartment = "c", enzyme = "r2B", exploc = 2, scale = 1},
+  {metabolite = "B", compartment = "c", enzyme = "r3", exploc = 0.5, scale = 1},
+  {metabolite = "X2", compartment = "c", enzyme = "r3", exploc = 0.5, scale = 1},
+  {metabolite = "X1", compartment = "c", enzyme = "r3", exploc = 0.01, scale = 1},
+  {metabolite = "D", compartment = "c", enzyme = "r3", exploc = 2, scale = 1},
+  {metabolite = "C", compartment = "c", enzyme = "r4", exploc = 1, scale = 1},
+  {metabolite = "D", compartment = "c", enzyme = "r4", exploc = 3, scale = 1},
 ]
 
 ki = [
-  {metabolite = "D", compartment = "c", enzyme = "r1", reaction = "r1", exploc = 1, scale = 0.2},
+  {metabolite = "D", compartment = "c", enzyme = "r1", reaction = "r1", exploc = 1, scale = 1},
 ]
 
 dissociation_constant = [
-  {metabolite = "C", compartment = "c", enzyme = "r2B", exploc = 0.9, scale = 0.2, modification_type = "inhibition"},
-  {metabolite = "C", compartment = "c", enzyme = "r2A", exploc = 0.3, scale = 0.2, modification_type = "activation"},
+  {metabolite = "C", compartment = "c", enzyme = "r2B", exploc = 0.9, scale = 1, modification_type = "inhibition"},
+  {metabolite = "C", compartment = "c", enzyme = "r2A", exploc = 0.3, scale = 1, modification_type = "activation"},
 ]
 
 transfer_constant = [
-  {enzyme = "r2A", exploc = 1, scale = 0.2},
-  {enzyme = "r2B", exploc = 1, scale = 0.2},
+  {enzyme = "r2A", exploc = 1, scale = 1},
+  {enzyme = "r2B", exploc = 1, scale = 1},
 ]
 
 kcat = [
-  {enzyme = "r1", reaction = "r1", exploc = 0.5, scale = 0.2},
-  {enzyme = "r2A", reaction = "r2", exploc = 2, scale = 0.2},
-  {enzyme = "r2B", reaction = "r2", exploc = 1, scale = 0.2},
-  {enzyme = "r3", reaction = "r3", exploc = 2, scale = 0.2},
-  {enzyme = "r4", reaction = "r4", exploc = 1, scale = 0.2},
+  {enzyme = "transA", reaction = "transA", exploc = 0.5, scale = 1},
+  {enzyme = "transD", reaction = "transD", exploc = 2, scale = 1},
+  {enzyme = "regX", reaction = "regX", exploc = 4, scale = 1},
+  {enzyme = "r1", reaction = "r1", exploc = 0.5, scale = 1},
+  {enzyme = "r2A", reaction = "r2", exploc = 2, scale = 1},
+  {enzyme = "r2B", reaction = "r2", exploc = 1, scale = 1},
+  {enzyme = "r3", reaction = "r3", exploc = 2, scale = 1},
+  {enzyme = "r4", reaction = "r4", exploc = 1, scale = 1},
 ]
 
 conc_unbalanced = [
-  {metabolite = "A", compartment = "c", experiment = "condition1", exploc = 5, scale = 0.2},
-  {metabolite = "D", compartment = "c", experiment = "condition1", exploc = 0.5, scale = 0.2},
+  {metabolite = "A", compartment = "e", experiment = "condition1", exploc = 5, scale = 0.1},
+  {metabolite = "D", compartment = "e", experiment = "condition1", exploc = 0.5, scale = 0.1},
+  {metabolite = "Z", compartment = "e", experiment = "condition1", exploc = 5, scale = 0.1},
+
+  {metabolite = "A", compartment = "e", experiment = "condition2", exploc = 5, scale = 0.1},
+  {metabolite = "D", compartment = "e", experiment = "condition2", exploc = 0.5, scale = 0.1},
+  {metabolite = "Z", compartment = "e", experiment = "condition2", exploc = 5, scale = 0.1},
+
+  {metabolite = "A", compartment = "e", experiment = "condition3", exploc = 5, scale = 0.1},
+  {metabolite = "D", compartment = "e", experiment = "condition3", exploc = 0.5, scale = 0.1},
+  {metabolite = "Z", compartment = "e", experiment = "condition3", exploc = 5, scale = 0.1},
+
+  {metabolite = "A", compartment = "e", experiment = "condition4", exploc = 5, scale = 0.1},
+  {metabolite = "D", compartment = "e", experiment = "condition4", exploc = 0.5, scale = 0.1},
+  {metabolite = "Z", compartment = "e", experiment = "condition4", exploc = 5, scale = 0.1},
+
+  {metabolite = "A", compartment = "e", experiment = "condition5", exploc = 5, scale = 0.1},
+  {metabolite = "D", compartment = "e", experiment = "condition5", exploc = 0.5, scale = 0.1},
+  {metabolite = "Z", compartment = "e", experiment = "condition5", exploc = 5, scale = 0.1},
+
+  {metabolite = "A", compartment = "e", experiment = "condition6", exploc = 5, scale = 0.1},
+  {metabolite = "D", compartment = "e", experiment = "condition6", exploc = 0.5, scale = 0.1},
+  {metabolite = "Z", compartment = "e", experiment = "condition6", exploc = 5, scale = 0.1},
+
+  {metabolite = "A", compartment = "e", experiment = "condition7", exploc = 5, scale = 0.1},
+  {metabolite = "D", compartment = "e", experiment = "condition7", exploc = 0.5, scale = 0.1},
+  {metabolite = "Z", compartment = "e", experiment = "condition7", exploc = 5, scale = 0.1},
+
+  {metabolite = "A", compartment = "e", experiment = "condition8", exploc = 5, scale = 0.1},
+  {metabolite = "D", compartment = "e", experiment = "condition8", exploc = 0.5, scale = 0.1},
+  {metabolite = "Z", compartment = "e", experiment = "condition8", exploc = 5, scale = 0.1},
+
+  {metabolite = "A", compartment = "e", experiment = "condition9", exploc = 5, scale = 0.1},
+  {metabolite = "D", compartment = "e", experiment = "condition9", exploc = 0.5, scale = 0.1},
+  {metabolite = "Z", compartment = "e", experiment = "condition9", exploc = 5, scale = 0.1},
+
+  {metabolite = "A", compartment = "e", experiment = "condition10", exploc = 5, scale = 0.1},
+  {metabolite = "D", compartment = "e", experiment = "condition10", exploc = 0.5, scale = 0.1},
+  {metabolite = "Z", compartment = "e", experiment = "condition10", exploc = 5, scale = 0.1},
 ]
 
 conc_enzyme = [
-  {enzyme = "r1", experiment = "condition1", exploc = 1, scale = 0.2},
-  {enzyme = "r2A", experiment = "condition1", exploc = 2, scale = 0.2},
-  {enzyme = "r2B", experiment = "condition1", exploc = 3, scale = 0.2},
-  {enzyme = "r3", experiment = "condition1", exploc = 2, scale = 0.2},
-  {enzyme = "r4", experiment = "condition1", exploc = 3, scale = 0.2},
+
+  {enzyme = "transA", experiment = "eondition1", exploc = 1, scale = 0.1},
+  {enzyme = "transD", experiment = "eondition1", exploc = 1, scale = 0.1},
+  {enzyme = "regX", experiment = "condition1", exploc = 1, scale = 0.1},
+  {enzyme = "r1", experiment = "condition1", exploc = 1, scale = 0.1},
+  {enzyme = "r2A", experiment = "condition1", exploc = 1, scale = 0.1},
+  {enzyme = "r2B", experiment = "condition1", exploc = 1, scale = 0.1},
+  {enzyme = "r3", experiment = "condition1", exploc = 1, scale = 0.1},
+  {enzyme = "r4", experiment = "condition1", exploc = 1, scale = 0.1},
+
+  {enzyme = "transA", experiment = "condition2", exploc = 1, scale = 0.1},
+  {enzyme = "transD", experiment = "condition2", exploc = 1, scale = 0.1},
+  {enzyme = "regX", experiment = "condition2", exploc = 1, scale = 0.1},
+  {enzyme = "r1", experiment = "condition2", exploc = 1, scale = 0.1},
+  {enzyme = "r2A", experiment = "condition2", exploc = 2, scale = 0.1},
+  {enzyme = "r2B", experiment = "condition2", exploc = 0.5, scale = 0.1},
+  {enzyme = "r3", experiment = "condition2", exploc = 4, scale = 0.1},
+  {enzyme = "r4", experiment = "condition2", exploc = 2, scale = 0.1},
+
+  {enzyme = "transA", experiment = "condition3", exploc = 1, scale = 0.1},
+  {enzyme = "transD", experiment = "condition3", exploc = 1, scale = 0.1},
+  {enzyme = "regX", experiment = "condition3", exploc = 1, scale = 0.1},
+  {enzyme = "r1", experiment = "condition3", exploc = 0.4, scale = 0.1},
+  {enzyme = "r2A", experiment = "condition3", exploc = 0.3, scale = 0.1},
+  {enzyme = "r2B", experiment = "condition3", exploc = 1.5, scale = 0.1},
+  {enzyme = "r3", experiment = "condition3", exploc = 0.2, scale = 0.1},
+  {enzyme = "r4", experiment = "condition3", exploc = 0.7, scale = 0.1},
+
+  {enzyme = "transA", experiment = "condition4", exploc = 1, scale = 0.1},
+  {enzyme = "transD", experiment = "condition4", exploc = 1, scale = 0.1},
+  {enzyme = "regX", experiment = "condition4", exploc = 1, scale = 0.1},
+  {enzyme = "r1", experiment = "condition4", exploc = 2.1, scale = 0.1},
+  {enzyme = "r2A", experiment = "condition4", exploc = 1.3, scale = 0.1},
+  {enzyme = "r2B", experiment = "condition4", exploc = 0.5, scale = 0.1},
+  {enzyme = "r3", experiment = "condition4", exploc = 2, scale = 0.1},
+  {enzyme = "r4", experiment = "condition4", exploc = 1, scale = 0.1},
+
+  {enzyme = "transA", experiment = "condition5", exploc = 1, scale = 0.1},
+  {enzyme = "transD", experiment = "condition5", exploc = 1, scale = 0.1},
+  {enzyme = "regX", experiment = "condition5", exploc = 1, scale = 0.1},
+  {enzyme = "r1", experiment = "condition5", exploc = 1.1, scale = 0.1},
+  {enzyme = "r2A", experiment = "condition5", exploc = 2.4, scale = 0.1},
+  {enzyme = "r2B", experiment = "condition5", exploc = 1.2, scale = 0.1},
+  {enzyme = "r3", experiment = "condition5", exploc = 7, scale = 0.1},
+  {enzyme = "r4", experiment = "condition5", exploc = 0.5, scale = 0.1},
+
+  {enzyme = "transA", experiment = "condition6", exploc = 1, scale = 0.1},
+  {enzyme = "transD", experiment = "condition6", exploc = 1, scale = 0.1},
+  {enzyme = "regX", experiment = "condition6", exploc = 1, scale = 0.1},
+  {enzyme = "r1", experiment = "condition6", exploc = 0.6, scale = 0.1},
+  {enzyme = "r2A", experiment = "condition6", exploc = 1.2, scale = 0.1},
+  {enzyme = "r2B", experiment = "condition6", exploc = 4.1, scale = 0.1},
+  {enzyme = "r3", experiment = "condition6", exploc = 0.9, scale = 0.1},
+  {enzyme = "r4", experiment = "condition6", exploc = 0.8, scale = 0.1},
+
+  {enzyme = "transA", experiment = "condition7", exploc = 1, scale = 0.1},
+  {enzyme = "transD", experiment = "condition7", exploc = 1, scale = 0.1},
+  {enzyme = "regX", experiment = "condition7", exploc = 1, scale = 0.1},
+  {enzyme = "r1", experiment = "condition7", exploc = 1, scale = 0.1},
+  {enzyme = "r2A", experiment = "condition7", exploc = 2, scale = 0.1},
+  {enzyme = "r2B", experiment = "condition7", exploc = 3, scale = 0.1},
+  {enzyme = "r3", experiment = "condition7", exploc = 2, scale = 0.1},
+  {enzyme = "r4", experiment = "condition7", exploc = 3, scale = 0.1},
+
+  {enzyme = "transA", experiment = "condition8", exploc = 1, scale = 0.1},
+  {enzyme = "transD", experiment = "condition8", exploc = 1, scale = 0.1},
+  {enzyme = "regX", experiment = "condition8", exploc = 1, scale = 0.1},
+  {enzyme = "r1", experiment = "condition8", exploc = 3, scale = 0.1},
+  {enzyme = "r2A", experiment = "condition8", exploc = 2, scale = 0.1},
+  {enzyme = "r2B", experiment = "condition8", exploc = 1, scale = 0.1},
+  {enzyme = "r3", experiment = "condition8", exploc = 0.4, scale = 0.1},
+  {enzyme = "r4", experiment = "condition8", exploc = 4, scale = 0.1},
+
+  {enzyme = "transA", experiment = "condition9", exploc = 1, scale = 0.1},
+  {enzyme = "transD", experiment = "condition9", exploc = 1, scale = 0.1},
+  {enzyme = "regX", experiment = "condition9", exploc = 1, scale = 0.1},
+  {enzyme = "r1", experiment = "condition9", exploc = 1.1, scale = 0.1},
+  {enzyme = "r2A", experiment = "condition9", exploc = 0.4, scale = 0.1},
+  {enzyme = "r2B", experiment = "condition9", exploc = 3, scale = 0.1},
+  {enzyme = "r3", experiment = "condition9", exploc = 1.5, scale = 0.1},
+  {enzyme = "r4", experiment = "condition9", exploc = 0.8, scale = 0.1},
+
+  {enzyme = "transA", experiment = "condition10", exploc = 1, scale = 0.1},
+  {enzyme = "transD", experiment = "condition10", exploc = 1, scale = 0.1},
+  {enzyme = "regX", experiment = "condition10", exploc = 1, scale = 0.1},
+  {enzyme = "r1", experiment = "condition10", exploc = 0.5, scale = 0.1},
+  {enzyme = "r2A", experiment = "condition10", exploc = 0.5, scale = 0.1},
+  {enzyme = "r2B", experiment = "condition10", exploc = 0.5, scale = 0.1},
+  {enzyme = "r3", experiment = "condition10", exploc = 0.5, scale = 0.1},
+  {enzyme = "r4", experiment = "condition10", exploc = 0.5, scale = 0.1},
 ]
 
 dgf = [
-  {metabolite = "A", location = 10, scale = 0.2},
-  {metabolite = "B", location = 2, scale = 0.2},
-  {metabolite = "C", location = 5, scale = 0.2},
-  {metabolite = "D", location = 0, scale = 0.2},
+  {metabolite = "A", location = 10.0, scale = 0.2},
+  {metabolite = "B", location = 2.0, scale = 0.2},
+  {metabolite = "C", location = 5.0, scale = 0.2},
+  {metabolite = "D", location = 0.0, scale = 0.2},
+  {metabolite = "X1", location = 1.0, scale = 0.2},
+  {metabolite = "X2", location = 0.0, scale = 0.2},
+  {metabolite = "Z", location = 5.0, scale = 0.2},
+]
+
+conc_moiety_pool = [
+  {conserved_moiety= "X", experiment = "condition1", exploc = 2, scale = 0.1},
+  {conserved_moiety= "X", experiment = "condition2", exploc = 2, scale = 0.1},
+  {conserved_moiety= "X", experiment = "condition3", exploc = 2, scale = 0.1},
+  {conserved_moiety= "X", experiment = "condition4", exploc = 2, scale = 0.1},
+  {conserved_moiety= "X", experiment = "condition5", exploc = 2, scale = 0.1},
+  {conserved_moiety= "X", experiment = "condition6", exploc = 2, scale = 0.1},
+  {conserved_moiety= "X", experiment = "condition7", exploc = 2, scale = 0.1},
+  {conserved_moiety= "X", experiment = "condition8", exploc = 2, scale = 0.1},
+  {conserved_moiety= "X", experiment = "condition9", exploc = 2, scale = 0.1},
+  {conserved_moiety= "X", experiment = "condition10", exploc = 2, scale = 0.1},
 ]
