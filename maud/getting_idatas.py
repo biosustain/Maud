@@ -36,6 +36,9 @@ def get_idata(csvs: List[str], mi: MaudInput, mode: str) -> az.InferenceData:
         "drains": [r.id for r in mi.kinetic_model.drains],
         "metabolites": [m.id for m in mi.kinetic_model.metabolites],
         "mics": [m.id for m in mi.kinetic_model.mics],
+        "conserved_moieties": [
+            cm.id for cm in mi.kinetic_model.conserved_moiety
+        ],
         "edges": [e.id for e in mi.kinetic_model.edges],
         "unbalanced_mics": [
             m.id for m in mi.kinetic_model.mics if not m.balanced
@@ -76,6 +79,7 @@ def get_idata(csvs: List[str], mi: MaudInput, mode: str) -> az.InferenceData:
     dims = {
         f"flux_{mode}": ["experiments", "reactions"],
         f"conc_{mode}": ["experiments", "mics"],
+        f"conc_moiety_pool_{mode}": ["experiments", "conserved_moieties"],
         f"log_conc_enzyme_{mode}_z": ["experiments", "enzymes"],
         f"conc_enzyme_{mode}": ["experiments", "enzymes"],
         f"conc_unbalanced_{mode}": ["experiments", "unbalanced_mics"],
