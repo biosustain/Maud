@@ -1,5 +1,5 @@
 [build-system]
-requires = ["setuptools", "cmdstanpy >= 1.0.7", "wheel"]
+requires = ["setuptools", "cmdstanpy >= 1.2.1", "wheel"]
 build-backend = "setuptools.build_meta"
 
 [project]
@@ -32,7 +32,7 @@ dependencies = [
     "pandas",
     "matplotlib",
     "toml",
-    "cmdstanpy >= 1.2.0",
+    "cmdstanpy >= 1.2.1",
     "click",
     "depinfo == 1.7.0",
     "pydantic >= 2.0",
