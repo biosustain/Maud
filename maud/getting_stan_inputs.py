@@ -166,9 +166,11 @@ def get_network_properties_input(
     reaction_codes = codify_maud_object(reactions)
     reaction_to_mechanism = {rxn.id: rxn.mechanism for rxn in reactions}
     edge_mechanism_code = [
-        int(reaction_to_mechanism[e.id].value)
-        if isinstance(e, Reaction)
-        else int(reaction_to_mechanism[e.reaction_id].value)
+        (
+            int(reaction_to_mechanism[e.id].value)
+            if isinstance(e, Reaction)
+            else int(reaction_to_mechanism[e.reaction_id].value)
+        )
         for e in edges
     ]
     edge_enzyme_code = [
@@ -179,21 +181,27 @@ def get_network_properties_input(
         drain_codes[d.id] if isinstance(d, Reaction) else 0 for d in edges
     ]
     edge_reaction_code = [
-        reaction_codes[e.id]
-        if isinstance(e, Reaction)
-        else reaction_codes[e.reaction_id]
+        (
+            reaction_codes[e.id]
+            if isinstance(e, Reaction)
+            else reaction_codes[e.reaction_id]
+        )
         for e in edges
     ]
     edge_water_stoichiometry = [
-        reaction_by_id[e.reaction_id].water_stoichiometry
-        if isinstance(e, EnzymeReaction)
-        else 0
+        (
+            reaction_by_id[e.reaction_id].water_stoichiometry
+            if isinstance(e, EnzymeReaction)
+            else 0
+        )
         for e in edges
     ]
     edge_transported_charge = [
-        reaction_by_id[e.reaction_id].transported_charge
-        if isinstance(e, EnzymeReaction)
-        else 0
+        (
+            reaction_by_id[e.reaction_id].transported_charge
+            if isinstance(e, EnzymeReaction)
+            else 0
+        )
         for e in edges
     ]
     mic_met_code = [metabolite_codes[m.metabolite_id] for m in mics]
@@ -207,9 +215,11 @@ def get_network_properties_input(
         else []
     )
     edge_tc_code = [
-        tc_codes[e.enzyme_id]
-        if isinstance(e, EnzymeReaction) and e.enzyme_id in tc_codes.keys()
-        else 0
+        (
+            tc_codes[e.enzyme_id]
+            if isinstance(e, EnzymeReaction) and e.enzyme_id in tc_codes.keys()
+            else 0
+        )
         for e in edges
     ]
     # ragged arrays
@@ -413,18 +423,25 @@ def get_experiments_input(
     )
     enz_ko_by_experiment_train, enz_ko_by_experiment_test = (
         [
-            [enzyme_codes[eko.enzyme] for eko in experiment.enzyme_knockouts]
-            if experiment.enzyme_knockouts is not None
-            else []
+            (
+                [
+                    enzyme_codes[eko.enzyme]
+                    for eko in experiment.enzyme_knockouts
+                ]
+                if experiment.enzyme_knockouts is not None
+                else []
+            )
             for experiment in exps
         ]
         for exps in (experiments_train, experiments_test)
     )
     pme_ko_by_experiment_train, pme_ko_by_experiment_test = (
         [
-            [pme_codes[pko.pme] for pko in experiment.pme_knockouts]
-            if experiment.pme_knockouts is not None
-            else []
+            (
+                [pme_codes[pko.pme] for pko in experiment.pme_knockouts]
+                if experiment.pme_knockouts is not None
+                else []
+            )
             for experiment in exps
         ]
         for exps in (experiments_train, experiments_test)

@@ -1,6 +1,5 @@
 """Test functions from the utils module."""
 
-
 import numpy as np
 
 from maud.utility_functions import (
