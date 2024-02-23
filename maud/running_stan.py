@@ -47,9 +47,9 @@ DEFAULT_LAPLACE_CONFIG = {"draws": 10, "show_console": True}
 SIM_CONFIG = {
     "chains": 1,
     "fixed_param": True,
-    "iter_warmup": 0,
     "show_progress": False,
     "threads_per_chain": 1,
+    "adapt_engaged": False,
 }
 DEFAULT_OPTIMIZE_CONFIG = {
     "algorithm": "LBFGS",

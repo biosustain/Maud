@@ -1,4 +1,5 @@
 """Functions for creating InferenceData objects from Maud outputs."""
+
 from typing import List
 
 import arviz as az
@@ -36,31 +37,39 @@ def get_idata(csvs: List[str], mi: MaudInput, mode: str) -> az.InferenceData:
         "metabolites": [m.id for m in mi.kinetic_model.metabolites],
         "mics": [m.id for m in mi.kinetic_model.mics],
         "edges": [e.id for e in mi.kinetic_model.edges],
+        "edges1": [e.id for e in mi.kinetic_model.edges],
         "unbalanced_mics": [
             m.id for m in mi.kinetic_model.mics if not m.balanced
         ],
         "balanced_mics": [m.id for m in mi.kinetic_model.mics if m.balanced],
-        "phosphorylations": [p.id for p in mi.kinetic_model.phosphorylations]
-        if mi.kinetic_model.phosphorylations is not None
-        else [],
-        "phosphorylation_modifying_enzymes": [
-            pme.id for pme in mi.kinetic_model.phosphorylation_modifying_enzymes
-        ]
-        if mi.kinetic_model.phosphorylation_modifying_enzymes is not None
-        else [],
-        "allosteries": [p.id for p in mi.kinetic_model.allosteries]
-        if mi.kinetic_model.allosteries is not None
-        else [],
-        "allosteric_enzymes": [
-            e.id for e in mi.kinetic_model.allosteric_enzymes
-        ]
-        if mi.kinetic_model.allosteric_enzymes is not None
-        else [],
-        "competitive_inhibitions": [
-            p.id for p in mi.kinetic_model.competitive_inhibitions
-        ]
-        if mi.kinetic_model.competitive_inhibitions is not None
-        else [],
+        "phosphorylations": (
+            [p.id for p in mi.kinetic_model.phosphorylations]
+            if mi.kinetic_model.phosphorylations is not None
+            else []
+        ),
+        "phosphorylation_modifying_enzymes": (
+            [
+                pme.id
+                for pme in mi.kinetic_model.phosphorylation_modifying_enzymes
+            ]
+            if mi.kinetic_model.phosphorylation_modifying_enzymes is not None
+            else []
+        ),
+        "allosteries": (
+            [p.id for p in mi.kinetic_model.allosteries]
+            if mi.kinetic_model.allosteries is not None
+            else []
+        ),
+        "allosteric_enzymes": (
+            [e.id for e in mi.kinetic_model.allosteric_enzymes]
+            if mi.kinetic_model.allosteric_enzymes is not None
+            else []
+        ),
+        "competitive_inhibitions": (
+            [p.id for p in mi.kinetic_model.competitive_inhibitions]
+            if mi.kinetic_model.competitive_inhibitions is not None
+            else []
+        ),
         "kms": mi.parameters.km.ids[0],
         "kis": mi.parameters.ki.ids[0],
         "dissociation_constants": (mi.parameters.dissociation_constant.ids[0]),
@@ -103,7 +112,7 @@ def get_idata(csvs: List[str], mi: MaudInput, mode: str) -> az.InferenceData:
             "balanced_mics",
             "edges",
         ],
-        "flux_control_matrix": ["experiments", "edges", "edges"],
+        "flux_control_matrix": ["experiments", "edges", "edges1"],
         "flux_response_coefficient": ["experiments", "edges", "enzymes"],
         "concentration_response_coefficient": [
             "experiments",
