@@ -85,7 +85,6 @@ packages = [
 
 [tool.black]
 line-length = 80
-python-version = ['py38', 'py39']
 exclude = '''
 (
     __init__.py
