@@ -31,12 +31,13 @@ class MaudParameter(BaseModel):
     init_input: Optional[List[InitAtomInput]]
     ids: List[List[str]]
     split_ids: List[List[List[str]]]
+    fixable: bool = False
     measurements: Optional[List[Measurement]] = None
 
     @computed_field
     def fixed_ids(self) -> Optional[List[List[str]]]:
         """Set the fixed_ids field."""
-        if self.name != "dgf":
+        if not self.fixable:
             return None
         elif self.user_input is None:
             return None
@@ -60,7 +61,7 @@ class MaudParameter(BaseModel):
     @computed_field
     def fixed_values(self) -> Optional[List[List[float]]]:
         """Set the fixed_values field."""
-        if self.name != "dgf":
+        if not self.fixable:
             return None
         elif self.user_input is None:
             return None
@@ -244,6 +245,7 @@ class Dgf(MaudParameter):
     default_scale: float = 10
     prior_in_test_model: bool = False
     prior_in_train_model: bool = True
+    fixable: bool = True
 
 
 class DissociationConstant(MaudParameter):
