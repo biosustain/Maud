@@ -6,7 +6,7 @@ import importlib_resources
 import numpy as np
 from numpy.testing import assert_equal
 
-from maud.data.example_inputs import linear
+from maud.data.example_inputs import linear, linear_multidgf
 from maud.loading_maud_inputs import load_maud_input
 
 
@@ -36,3 +36,10 @@ def test_load_maud_input():
         actual = v.tolist() if isinstance(v, np.ndarray) else v
         expected = expected_stan_input[k]
         assert_equal(actual, expected, err_msg=f"{k} different from expected.")
+
+
+def test_load_multidgf():
+    """Test that the multidgf input loads correctly."""
+    files = importlib_resources.files(linear_multidgf)
+    mi = load_maud_input(data_path=files._paths[0])  # path 0 is package
+    assert mi.inits_dict["dgf_free"] == [-10.0, -32.0]
