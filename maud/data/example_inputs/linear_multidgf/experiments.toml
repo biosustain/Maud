@@ -1,0 +1,32 @@
+[[experiment]]
+id = "condition1"
+is_train = true
+is_test = true
+temperature = 299.0
+measurements = [
+  {target_type = "mic", metabolite = "M1", compartment = "c", value = 0.59, error_scale = 0.1},
+  {target_type = "mic", metabolite = "M1", compartment = "e", value = 1.09, error_scale = 0.05},
+  {target_type = "mic", metabolite = "M2", compartment = "e", value = 1.05, error_scale = 0.05},
+  {target_type = "flux", reaction = "r3", value = 0.19, error_scale = 0.1},
+  {target_type = "enzyme", enzyme = "r1", value = 1.5, error_scale = 0.1},
+  {target_type = "enzyme", enzyme = "r2", value = 1.5, error_scale = 0.1},
+  {target_type = "enzyme", enzyme = "r3", value = 1.5, error_scale = 0.1},
+]
+initial_state = [
+  {metabolite = "M2", compartment = "c", value = 0.38},
+]
+
+[[experiment]]
+id = "condition2"
+is_train = true
+is_test = true
+measurements = [
+  {target_type = "mic", metabolite = "M1", compartment = "c", value = 0.54, error_scale = 0.1},
+  {target_type = "mic", metabolite = "M2", compartment = "c", value = 0.38, error_scale = 0.1},
+  {target_type = "mic", metabolite = "M1", compartment = "e", value = 1.12, error_scale = 0.05},
+  {target_type = "mic", metabolite = "M2", compartment = "e", value = 1.14, error_scale = 0.05},
+  {target_type = "flux", reaction = "r3", value = 0.39, error_scale = 0.1},
+  {target_type = "enzyme", enzyme = "r1", value = 1.5, error_scale = 0.1},
+  {target_type = "enzyme", enzyme = "r2", value = 1.5, error_scale = 0.1},
+  {target_type = "enzyme", enzyme = "r3", value = 1.5, error_scale = 0.1},
+]

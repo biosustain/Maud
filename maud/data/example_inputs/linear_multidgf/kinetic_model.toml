@@ -1,0 +1,66 @@
+name = "Example kinetic model"
+
+compartment = [
+  {id = 'c', name = 'cytosol', volume = 1},
+  {id = 'e', name = 'external', volume = 1},
+]
+
+metabolite = [
+  {id = "M1", name = "Metabolite number 1"},
+  {id = "M2", name = "Metabolite number 2"},
+]
+
+enzyme = [
+  {id = "r1", name = "r1ase", subunits = 1},
+  {id = "r2", name = "r2ase", subunits = 1},
+  {id = "r3", name = "r3ase", subunits = 1},
+]
+
+metabolite_in_compartment = [
+  {metabolite_id = "M1", compartment_id = "e", balanced = false},
+  {metabolite_id = "M1", compartment_id = "c", balanced = true},
+  {metabolite_id = "M2", compartment_id = "c", balanced = true},
+  {metabolite_id = "M2", compartment_id = "e", balanced = false},
+]
+enzyme_reaction = [
+  {enzyme_id = "r1", reaction_id = "r1"},
+  {enzyme_id = "r2", reaction_id = "r2"},
+  {enzyme_id = "r3", reaction_id = "r3"},
+]
+
+[[reaction]]
+id = "r1"
+name = "Reaction number 1"
+mechanism = "reversible_michaelis_menten"
+stoichiometry = { M1_e = -1, M1_c = 1}
+
+[[reaction]]
+id = "r2"
+name = "Reaction number 2"
+mechanism = "irreversible_michaelis_menten"
+stoichiometry = { M1_c = -1, M2_c = 1}
+
+[[reaction]]
+id = "r3"
+name = "Reaction number 3"
+mechanism = "reversible_michaelis_menten"
+stoichiometry = { M2_c = -1, M2_e = 1}
+transported_charge = 1
+
+[[allostery]]
+enzyme_id = "r1"
+metabolite_id = "M2"
+compartment_id = "c"
+modification_type = "activation"
+
+[[allostery]]
+enzyme_id = "r2"
+metabolite_id = "M1"
+compartment_id = "c"
+modification_type = "inhibition"
+
+[[competitive_inhibition]]
+enzyme_id = "r2"
+reaction_id = "r2"
+metabolite_id = "M1"
+compartment_id = "c"
