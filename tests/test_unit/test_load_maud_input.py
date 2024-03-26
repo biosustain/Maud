@@ -22,7 +22,7 @@ def test_load_maud_input():
         "dissociation_constant": [["r1_M2_c_activation", "r2_M1_c_inhibition"]],
     }
     linear_files = importlib_resources.files(linear)
-    mi = load_maud_input(data_path=linear_files._paths[0])  # path 0 is package
+    mi = load_maud_input(data_path=str(linear_files))  # path 0 is package
     r1 = next(r for r in mi.kinetic_model.reactions if r.id == "r1")
     assert r1.stoichiometry == {"M1_e": -1, "M1_c": 1}
     assert "r1_r1" in mi.parameters.kcat.ids[0]
@@ -41,5 +41,5 @@ def test_load_maud_input():
 def test_load_multidgf():
     """Test that the multidgf input loads correctly."""
     files = importlib_resources.files(linear_multidgf)
-    mi = load_maud_input(data_path=files._paths[0])  # path 0 is package
+    mi = load_maud_input(data_path=str(files))  # path 0 is package
     assert mi.inits_dict["dgf_free"] == [-10.0, -32.0]
