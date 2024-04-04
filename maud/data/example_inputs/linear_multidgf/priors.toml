@@ -22,11 +22,6 @@ dissociation_constant = [
   {exploc = 1, scale = 0.6, enzyme = "r2", metabolite = "M1", compartment = "c", modification_type = "inhibition"},
 ]
 
-# dgf = [
-#   {location = -1, metabolite = "M1", scale = 0.05, fixed_value = -1},
-#   {location = -2, metabolite = "M2", scale = 0.05},
-# ]
-
 psi = [
   {location = -0.95, scale = 0.2, experiment = "condition1"},
   {location = -0.95, scale = 0.2, experiment = "condition2"},
