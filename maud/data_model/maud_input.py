@@ -82,4 +82,6 @@ class MaudInput(BaseModel):
                     for met, init in met_to_init.items()
                     if met not in param.fixed_ids[0]
                 ]
+            elif param.fixable:
+                inits_dict[param.name + "_free"] = param.inits.inits_unscaled
         return inits_dict
