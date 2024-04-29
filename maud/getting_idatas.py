@@ -1,4 +1,5 @@
 """Functions for creating InferenceData objects from Maud outputs."""
+
 from typing import List
 
 import arviz as az
@@ -40,6 +41,7 @@ def get_idata(csvs: List[str], mi: MaudInput, mode: str) -> az.InferenceData:
             cm.id for cm in mi.kinetic_model.conserved_moiety
         ],
         "edges": [e.id for e in mi.kinetic_model.edges],
+        "edges1": [e.id for e in mi.kinetic_model.edges],
         "unbalanced_mics": [
             m.id for m in mi.kinetic_model.mics if not m.balanced
         ],
@@ -112,7 +114,7 @@ def get_idata(csvs: List[str], mi: MaudInput, mode: str) -> az.InferenceData:
             "independent_mics",
             "edges",
         ],
-        "flux_control_matrix": ["experiments", "edges", "edges"],
+        "flux_control_matrix": ["experiments", "edges", "edges1"],
         "flux_response_coefficient": ["experiments", "edges", "enzymes"],
         "concentration_response_coefficient": [
             "experiments",

@@ -70,9 +70,9 @@ class MaudInput(BaseModel):
             inits_dict[param.name] = param.inits.inits_unscaled
             if param.inits.inits_scaled is not None:
                 scaled_pref = "log_" if param.non_negative else ""
-                inits_dict[
-                    scaled_pref + param.name + "_z"
-                ] = param.inits.inits_scaled
+                inits_dict[scaled_pref + param.name + "_z"] = (
+                    param.inits.inits_scaled
+                )
             if param.fixed_ids is not None:
                 met_to_init = dict(
                     zip(param.inits.ids[0], param.inits.inits_unscaled)
@@ -82,4 +82,6 @@ class MaudInput(BaseModel):
                     for met, init in met_to_init.items()
                     if met not in param.fixed_ids[0]
                 ]
+            elif param.fixable:
+                inits_dict[param.name + "_free"] = param.inits.inits_unscaled
         return inits_dict

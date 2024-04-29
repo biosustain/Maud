@@ -1,10 +1,10 @@
 [build-system]
-requires = ["setuptools", "cmdstanpy >= 1.0.7", "wheel"]
+requires = ["setuptools", "cmdstanpy >= 1.2.1", "wheel"]
 build-backend = "setuptools.build_meta"
 
 [project]
 name = "maud-metabolic-models"
-version = "0.7.0.1"
+version = "0.7.1.0"
 authors = [
     {name = "Novo Nordisk Foundation Center for Biosustainability, Technical University of Denmark"}
   ]
@@ -21,10 +21,10 @@ classifiers = [
 license = {text = "GNU General Public License version 3"}
 description = "Bayesian statistical models of metabolic networks"
 readme = "README.rst"
-requires-python = ">=3.9"
+requires-python = ">=3.10"
 dependencies = [
     "pip >= 20",
-    "arviz >= 0.12.1",
+    "arviz >= 0.18.0",
     "importlib_resources >= 3.2",
     "numpy",
     "scipy",
@@ -32,7 +32,7 @@ dependencies = [
     "pandas",
     "matplotlib",
     "toml",
-    "cmdstanpy >= 1.2.0",
+    "cmdstanpy >= 1.2.1",
     "click",
     "depinfo == 1.7.0",
     "pydantic >= 2.0",
@@ -76,6 +76,7 @@ packages = [
     "maud.data.example_inputs.example_ode",
     "maud.data.example_inputs.linear",
     "maud.data.example_inputs.methionine",
+    "maud.data.example_inputs.linear_multidgf",
     "maud.data.example_outputs",
     "maud.data.example_outputs.linear",
     "maud.data.example_outputs.linear.user_input",
@@ -85,7 +86,6 @@ packages = [
 
 [tool.black]
 line-length = 80
-python-version = ['py38', 'py39']
 exclude = '''
 (
     __init__.py
@@ -117,23 +117,23 @@ markers = ["raises"]
 [tool.ruff]
 # Enable the following rules:
 # pycodestyle (`E`), Pyflakes (`F`), pycodestyle (`W`), flake8-bugbear (`B`)
-select = ["E", "F", "B", "W", "D"]
-ignore = [
+lint.select = ["E", "F", "B", "W", "D"]
+lint.ignore = [
     "B905",  # Use zip() without a `strict` parameter.
     "D107",  # Init methods can be undocumented.
     "D203",  # Class docstrints don't need blank lines before them.
     "D213",  # https://beta.ruff.rs/docs/rules/multi-line-summary-second-line/
     "D104",  # __init__.py can be empty.
 ]
-fixable = ["ALL"]
-unfixable = []
+lint.fixable = ["ALL"]
+lint.unfixable = []
 line-length = 80
 target-version = "py310"
 
 [tool.tox]
 legacy_tox_ini = """
     [tox]
-    envlist = isort, black, ruff, safety, py3{9,10}
+    envlist = isort, black, ruff, safety, py3{10,11}
 
     [testenv]
     deps =
@@ -143,11 +143,11 @@ legacy_tox_ini = """
     commands =
         pytest --cov=maud --cov-report=term --ignore=tests/test_integration {posargs}
 
-    [testenv:py38]
+    [testenv:py310]
     passenv =
         CMDSTAN
 
-    [testenv:py39]
+    [testenv:py311]
     passenv =
         CMDSTAN
 
@@ -171,7 +171,7 @@ legacy_tox_ini = """
     deps=
         ruff
     commands=
-        ruff .
+        ruff check .
 
     [testenv:safety]
     deps=

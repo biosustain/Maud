@@ -63,7 +63,7 @@ def test_model_ode(test_case):
         inits=str(test_case.inits_path),
         chains=1,
         fixed_param=True,
-        iter_warmup=0,
+        adapt_engaged=False,
         iter_sampling=1,
         show_progress=False,
         show_console=True,
