@@ -24,7 +24,7 @@ readme = "README.rst"
 requires-python = ">=3.10"
 dependencies = [
     "pip >= 20",
-    "arviz >= 0.18.0",
+    "arviz>=0.18.0",
     "importlib_resources >= 3.2",
     "numpy",
     "scipy",
@@ -32,7 +32,7 @@ dependencies = [
     "pandas",
     "matplotlib",
     "toml",
-    "cmdstanpy >= 1.2.1",
+    "cmdstanpy>=1.2.3",
     "click",
     "depinfo == 1.7.0",
     "pydantic >= 2.0",
@@ -118,6 +118,8 @@ markers = ["raises"]
 # Enable the following rules:
 # pycodestyle (`E`), Pyflakes (`F`), pycodestyle (`W`), flake8-bugbear (`B`)
 lint.select = ["E", "F", "B", "W", "D"]
+# Enable the following rules:
+# pycodestyle (`E`), Pyflakes (`F`), pycodestyle (`W`), flake8-bugbear (`B`)
 lint.ignore = [
     "B905",  # Use zip() without a `strict` parameter.
     "D107",  # Init methods can be undocumented.
@@ -125,7 +127,11 @@ lint.ignore = [
     "D213",  # https://beta.ruff.rs/docs/rules/multi-line-summary-second-line/
     "D104",  # __init__.py can be empty.
 ]
+# Enable the following rules:
+# pycodestyle (`E`), Pyflakes (`F`), pycodestyle (`W`), flake8-bugbear (`B`)
 lint.fixable = ["ALL"]
+# Enable the following rules:
+# pycodestyle (`E`), Pyflakes (`F`), pycodestyle (`W`), flake8-bugbear (`B`)
 lint.unfixable = []
 line-length = 80
 target-version = "py310"

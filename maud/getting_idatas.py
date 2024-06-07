@@ -29,7 +29,10 @@ def get_idata(csvs: List[str], mi: MaudInput, mode: str) -> az.InferenceData:
             MeasurementType.ENZYME,
         ]
     )
-    dependent_mics = [m.solve for m in mi.kinetic_model.conserved_moiety]
+    dependent_mics = (
+        [m.solve for m in mi.kinetic_model.conserved_moiety] 
+        if mi.kinetic_model.conserved_moiety is not None else []
+    )
     coords = {
         "enzymes": [e.id for e in mi.kinetic_model.enzymes],
         "experiments": [e.id for e in experiments],
@@ -39,7 +42,8 @@ def get_idata(csvs: List[str], mi: MaudInput, mode: str) -> az.InferenceData:
         "mics": [m.id for m in mi.kinetic_model.mics],
         "conserved_moieties": [
             cm.id for cm in mi.kinetic_model.conserved_moiety
-        ],
+        ] if mi.kinetic_model.conserved_moiety is not None
+        else [],
         "edges": [e.id for e in mi.kinetic_model.edges],
         "edges1": [e.id for e in mi.kinetic_model.edges],
         "unbalanced_mics": [

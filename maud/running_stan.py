@@ -311,13 +311,13 @@ def predict(
                 "output_dir": output_dir,
                 "iter_warmup": 0,
                 "iter_sampling": 1,
+                "adapt_engaged": False,
                 "fixed_param": True,
-                "show_progress": False,
             }
             if mi.config.cmdstanpy_config_predict is not None:
                 sample_args = {
-                    **sample_args,
                     **mi.config.cmdstanpy_config_predict,
+                    **sample_args,
                 }
             sample_args["chains"] = 1
             mcmc_draw = model.sample(**sample_args)

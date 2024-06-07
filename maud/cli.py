@@ -220,13 +220,14 @@ def do_simulate(data_path, output_dir, n):
         .T
     )
     print("\n\nSimulated conserved moiety pools:")
-    print(
-        idata.posterior["conc_moiety_pool_train"]
-        .mean(dim=["chain", "draw"])
-        .to_series()
-        .unstack()
-        .T
-    )
+    if "conc_moiety_pool_train" in idata.posterior.keys():
+        print(
+            idata.posterior["conc_moiety_pool_train"]
+            .mean(dim=["chain", "draw"])
+            .to_series()
+            .unstack()
+            .T
+        )
     print("\n\nSimulated fluxes:")
     print(
         idata.posterior["flux_train"]
