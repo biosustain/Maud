@@ -4,7 +4,7 @@ This page explains how to install Maud and use its command line interface.
 
 ## Installing Maud
 
-Maud is compatible with Python versions 3.9 and above
+Maud is compatible with Python versions 3.10 and above.
 
 We recommend using a fresh virtual environment to install Maud. To make one and
 then activate it, run the following commands:
