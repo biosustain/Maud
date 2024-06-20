@@ -101,53 +101,6 @@ def get_null_space(a, rtol=1e-5):
     return v[rank:].T.copy()
 
 
-def get_left_nullspace(matrix: pd.DataFrame, atol=1e-13, rtol=0.0):
-    """Compute an approximate basis for the null space (kernel) of a matrix.
-
-    The algorithm used by this function is based on the singular value
-    decomposition of the given matrix.
-
-    Parameters
-    ----------
-    matrix : ndarray
-        The matrix should be at most 2-D.  A 1-D array with length k
-        will be treated as a 2-D with shape (1, k)
-    atol : float
-        The absolute tolerance for a zero singular value.  Singular values
-        smaller than ``atol`` are considered to be zero.
-    rtol : float
-        The relative tolerance for a zero singular value.  Singular values less
-        than the relative tolerance times the largest singular value are
-        considered to be zero.
-
-    Notes
-    -----
-    If both `atol` and `rtol` are positive, the combined tolerance is the
-    maximum of the two; that is::
-        tol = max(atol, rtol * smax)
-    Singular values smaller than ``tol`` are considered to be zero.
-
-    Returns
-    -------
-    ndarray
-        If ``matrix`` is an array with shape (m, k), then the returned
-        nullspace will be an array with shape ``(k, n)``, where n is the
-        estimated dimension of the nullspace.
-
-    References
-    ----------
-    Adapted from:
-    https://scipy.github.io/old-wiki/pages/Cookbook/RankNullspace.html
-    and then taken from from
-    https://github.com/opencobra/memote/blob/develop/src/memote/support/consistency_helpers.py#L163
-    """  # noqa: D402
-    matrix = np.atleast_2d(matrix)
-    _, sigma, vh = np.linalg.svd(matrix.T)
-    tol = max(atol, rtol * sigma[0])
-    num_nonzero = (sigma >= tol).sum()
-    return vh[num_nonzero:].conj().T
-
-
 def get_rref(mat):
     """Return reduced row echelon form of a matrix."""
     return sp.Matrix(mat).rref(iszerofunc=lambda x: abs(x) < 1e-10)[0]

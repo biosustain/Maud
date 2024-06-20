@@ -13,7 +13,6 @@ from pydantic import (
 )
 
 from maud.data_model.hardcoding import ID_SEPARATOR
-from maud.utility_functions import get_left_nullspace
 
 
 class ReactionMechanism(int, Enum):
@@ -268,11 +267,6 @@ class KineticModel(BaseModel):
     def stoichiometric_matrix(self) -> pd.DataFrame:
         """Add the stoichiometric_matrix field."""
         return get_stoichiometric_matrix(self.edges, self.mics, self.reactions)
-
-    @computed_field
-    def left_nullspace(self) -> pd.DataFrame:
-        """Calculate the left nullspace."""
-        return get_left_nullspace(self.stoichiometric_matrix)
 
     @computed_field
     def phosphorylation_modifying_enzymes(
