@@ -133,6 +133,7 @@ def get_network_properties_input(
     metabolite_codes = codify_maud_object(kinetic_model.metabolites)
     mic_codes = codify_maud_object(mics)
     enzyme_codes = codify_maud_object(enzymes)
+    ers_codes = codify_maud_object(kinetic_model.ers)
     km_ids = parameters.km.ids[0]
     km_codes = dict(zip(km_ids, range(1, len(km_ids) + 1)))
     if allosteries is not None:
@@ -175,6 +176,10 @@ def get_network_properties_input(
     ]
     edge_enzyme_code = [
         enzyme_codes[er.enzyme_id] if isinstance(er, EnzymeReaction) else 0
+        for er in edges
+    ]
+    edge_ers_code = [
+        ers_codes[er.id] if isinstance(er, EnzymeReaction) else 0
         for er in edges
     ]
     edge_drain_code = [
@@ -338,6 +343,7 @@ def get_network_properties_input(
         "N_edge": len(S.columns),
         "N_unbalanced": len(unbalanced_mic_codes),
         "N_enzyme": len(enzymes),
+        "N_er": len(kinetic_model.ers),
         "N_phosphorylation": len(phosphorylation_codes),
         "N_pme": len(pme_codes),
         "N_competitive_inhibition": len(ci_ix_long),
@@ -355,6 +361,7 @@ def get_network_properties_input(
         "ci_mic_ix": ci_mic_codes,
         "edge_type": edge_mechanism_code,
         "edge_to_enzyme": edge_enzyme_code,
+        "edge_to_er": edge_ers_code,
         "edge_to_tc": edge_tc_code,
         "edge_to_drain": edge_drain_code,
         "edge_to_reaction": edge_reaction_code,
