@@ -371,18 +371,6 @@ functions {
                                                      sub_by_edge_bounds,
                                                      edge_type,
                                                      drain_small_conc_corrector);
-    // Paste these lines into the function get_edge_flux to debug.
-    print("free_enzyme_ratio: ", free_enzyme_ratio);
-    print("vmax: ", vmax);
-    print("kcat: ", kcat);
-    print("reversibility: ", reversibility);
-    print("saturation: ", saturation);
-    print("allostery: ", allostery);
-    print("phosphorylation: ", phosphorylation);
-    print("drain_by_edge: ", drain_by_edge);
-    print("drain_by_edge: ", drain_by_edge);
-    print("conc: ", conc);
-    print("flux: ", vmax .* saturation .* reversibility .* allostery.* phosphorylation .* drain_by_edge);
     return vmax .* saturation .* reversibility .* allostery
            .* phosphorylation .* drain_by_edge;
   }

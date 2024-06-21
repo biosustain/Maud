@@ -140,9 +140,13 @@ def get_network_properties_input(
     km_codes = dict(zip(km_ids, range(1, len(km_ids) + 1)))
     if len(kinetic_model.left_nullspace) > 0:
         lns_ind = kinetic_model.left_nullspace_independent.values.tolist()
-        dependent_mic_codes = [
-            mic_codes[lns.solve] for lns in kinetic_model.conserved_moiety
+        dependent_mets = [mic.solve for mic in kinetic_model.conserved_moiety]
+        dep_idx = kinetic_model.left_nullspace[dependent_mets]
+        dep_idx = [
+            dep_idx.index[dep_idx[met] == 1].item() for met in dependent_mets
         ]
+        dependent_mets = [dependent_mets[i] for i in dep_idx]
+        dependent_mic_codes = [mic_codes[lns] for lns in dependent_mets]
     else:
         lns_ind = [[]]
         dependent_mic_codes = []
