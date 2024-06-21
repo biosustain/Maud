@@ -332,8 +332,8 @@ functions {
                        array[] int phosphorylation_type,
                        array[] int phosphorylation_pme) {
     int N_edge = cols(S);
-    vector[N_edge] vmax = get_vmax_by_edge(enzyme, kcat, edge_to_enzyme, edge_to_er,
-                                           edge_type);
+    vector[N_edge] vmax = get_vmax_by_edge(enzyme, kcat, edge_to_enzyme,
+                                           edge_to_er, edge_type);
     vector[N_edge] reversibility = get_reversibility(dgr, temperature, S,
                                                      conc, edge_type);
     vector[N_edge] free_enzyme_ratio = get_free_enzyme_ratio(conc, S, km, ki,
@@ -514,7 +514,8 @@ functions {
   }
 
   complex_vector get_complex_vmax_by_edge(complex_vector enzyme, vector kcat,
-                                          array[] int edge_to_enzyme, array[] int edge_to_er,
+                                          array[] int edge_to_enzyme,
+                                          array[] int edge_to_er,
                                           array[] int edge_type) {
     int N_edge = size(edge_to_enzyme);
     complex_vector[N_edge] out = rep_vector(1, N_edge);
@@ -817,7 +818,7 @@ vector maud_ae_system(vector conc_ind,
                       vector conc_pme, vector drain, real temperature,
                       real drain_small_conc_corrector, matrix S,
                       vector subunits, array[] int edge_type,
-                      array[] int edge_to_enzyme, array[] into edge_to_er, array[] int edge_to_drain,
+                      array[] int edge_to_enzyme, array[] int edge_to_er, array[] int edge_to_drain,
                       array[] int ci_mic_ix,
                       array[] int sub_km_ix_by_edge_long,
                       array[,] int sub_km_ix_by_edge_bounds,

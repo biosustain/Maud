@@ -5,6 +5,7 @@
   "N_edge": 3,
   "N_unbalanced": 2,
   "N_enzyme": 3,
+  "N_er": 3,
   "N_phosphorylation": 0,
   "N_pme": 0,
   "N_competitive_inhibition": 1,
@@ -55,6 +56,11 @@
     1
   ],
   "edge_to_enzyme": [
+    1,
+    2,
+    3
+  ],
+  "edge_to_er": [
     1,
     2,
     3

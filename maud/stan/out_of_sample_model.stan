@@ -13,8 +13,8 @@ data {
   int<lower=1> N_sub_km;
   int<lower=1> N_prod_km;
   int<lower=1> N_reaction;
+  int<lower=1> N_er;  // enzyme reactions
   int<lower=1> N_enzyme;
-  int<lower=1> N_er;
   int<lower=0> N_drain;
   int<lower=1> N_edge;
   int<lower=0> N_allostery;

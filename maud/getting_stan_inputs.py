@@ -192,7 +192,7 @@ def get_network_properties_input(
         enzyme_codes[er.enzyme_id] if isinstance(er, EnzymeReaction) else 0
         for er in edges
     ]
-    edge_er_code = [
+    edge_er_codes = [
         er_codes[er.id] if isinstance(er, EnzymeReaction) else 0 for er in edges
     ]
     edge_drain_code = [
@@ -383,7 +383,7 @@ def get_network_properties_input(
         "ci_mic_ix": ci_mic_codes,
         "edge_type": edge_mechanism_code,
         "edge_to_enzyme": edge_enzyme_code,
-        "edge_to_er": edge_er_code,
+        "edge_to_er": edge_er_codes,
         "edge_to_tc": edge_tc_code,
         "edge_to_drain": edge_drain_code,
         "edge_to_reaction": edge_reaction_code,

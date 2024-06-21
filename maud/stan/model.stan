@@ -31,7 +31,7 @@ data {
   array[N_competitive_inhibition] int<lower=1, upper=N_mic> ci_mic_ix;
   array[N_edge] int<lower=1, upper=3> edge_type; // 1 = reversible modular rate law, 2 = drain
   array[N_edge] int<lower=0, upper=N_enzyme> edge_to_enzyme; // 0 if drain
-  array[N_edge] int<lower=0, upper=N_enzyme> edge_to_er; // 0 if drain
+  array[N_edge] int<lower=0, upper=N_er> edge_to_er; // 0 if drain
   array[N_edge] int<lower=0, upper=N_allostery> edge_to_tc; // 0 if non-allosteric
   array[N_edge] int<lower=0, upper=N_drain> edge_to_drain; // 0 if enzyme
   array[N_edge] int<lower=0, upper=N_reaction> edge_to_reaction;
@@ -242,6 +242,7 @@ transformed parameters {
     conc_train[e, independent_bal_ix] = conc_independent_balanced_experiment;
     conc_train[e, dependent_bal_ix] = conc_moiety_pool_experiment - left_nullspace_independent * conc_independent_balanced_experiment;
     conc_train[e, unbalanced_mic_ix] = conc_unbalanced_experiment;
+
     {
       vector[N_edge] edge_flux = get_edge_flux(conc_train[e],
                                                conc_enzyme_experiment,
