@@ -437,15 +437,11 @@ class KineticModel(BaseModel):
         left_nullspace = self.left_nullspace.values
         left_nullspace = left_nullspace.astype(int)
         if len(left_nullspace) > 0:
-            mgs = sorted(
-                [con_moi.moiety_group for con_moi in self.conserved_moiety]
-            )
-            cms = sorted(
-                [
-                    [m for m, n in zip(balanced_metabolites, lns) if n]
-                    for lns in left_nullspace
-                ]
-            )
+            mgs = [sorted(con_moi.moiety_group) for con_moi in self.conserved_moiety]
+            cms = [
+                sorted([m for m, n in zip(balanced_metabolites, lns) if n])
+                for lns in left_nullspace
+            ]
             for cm in cms:
                 assert (
                     cm in mgs
