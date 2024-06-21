@@ -11,6 +11,7 @@ data {
   int<lower=1> N_prod_km;
   int<lower=1> N_reaction;
   int<lower=1> N_enzyme;
+  int<lower=1> N_er;
   int<lower=0> N_drain;
   int<lower=1> N_edge;
   int<lower=0> N_allostery;
@@ -25,6 +26,7 @@ data {
   array[N_competitive_inhibition] int<lower=1, upper=N_mic> ci_mic_ix;
   array[N_edge] int<lower=1, upper=3> edge_type; // 1 = reversible modular rate law, 2 = drain
   array[N_edge] int<lower=0, upper=N_enzyme> edge_to_enzyme; // 0 if drain
+  array[N_edge] int<lower=0, upper=N_er> edge_to_er; // 0 if drain
   array[N_edge] int<lower=0, upper=N_allostery> edge_to_tc; // 0 if non-allosteric
   array[N_edge] int<lower=0, upper=N_drain> edge_to_drain; // 0 if enzyme
   array[N_edge] int<lower=0, upper=N_reaction> edge_to_reaction;
@@ -201,7 +203,7 @@ transformed parameters {
                                                temperature_train[e],
                                                drain_small_conc_corrector, S,
                                                subunits, edge_type,
-                                               edge_to_enzyme, edge_to_drain,
+                                               edge_to_enzyme, edge_to_er, edge_to_drain,
                                                ci_mic_ix, sub_km_ix_by_edge_long,
                                                sub_km_ix_by_edge_bounds,
                                                prod_km_ix_by_edge_long,
@@ -231,7 +233,7 @@ transformed parameters {
                                                temperature_train[e],
                                                drain_small_conc_corrector, S,
                                                subunits, edge_type,
-                                               edge_to_enzyme, edge_to_drain,
+                                               edge_to_enzyme, edge_to_er, edge_to_drain,
                                                ci_mic_ix,
                                                sub_km_ix_by_edge_long,
                                                sub_km_ix_by_edge_bounds,
@@ -388,6 +390,7 @@ generated quantities {
                                                                     subunits,
                                                                     edge_type,
                                                                     edge_to_enzyme,
+                                                                    edge_to_er,
                                                                     edge_to_drain,
                                                                     ci_mic_ix,
                                                                     sub_km_ix_by_edge_long,
@@ -431,6 +434,7 @@ generated quantities {
                                                                     subunits,
                                                                     edge_type,
                                                                     edge_to_enzyme,
+                                                                    edge_to_er,
                                                                     edge_to_drain,
                                                                     ci_mic_ix,
                                                                     sub_km_ix_by_edge_long,
