@@ -179,8 +179,7 @@ def get_network_properties_input(
         for er in edges
     ]
     edge_er_codes = [
-        er_codes[er.id] if isinstance(er, EnzymeReaction) else 0
-        for er in edges
+        er_codes[er.id] if isinstance(er, EnzymeReaction) else 0 for er in edges
     ]
     edge_drain_code = [
         drain_codes[d.id] if isinstance(d, Reaction) else 0 for d in edges
