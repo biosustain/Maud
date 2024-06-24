@@ -140,6 +140,7 @@ def get_left_nullspace(matrix: pd.DataFrame, atol=1e-13, rtol=0.0):
     https://scipy.github.io/old-wiki/pages/Cookbook/RankNullspace.html
     and then taken from from
     https://github.com/opencobra/memote/blob/develop/src/memote/support/consistency_helpers.py#L163
+
     """  # noqa: D402
     matrix = np.atleast_2d(matrix)
     _, sigma, vh = np.linalg.svd(matrix.T)

@@ -30,8 +30,9 @@ def get_idata(csvs: List[str], mi: MaudInput, mode: str) -> az.InferenceData:
         ]
     )
     dependent_mics = (
-        [m.solve for m in mi.kinetic_model.conserved_moiety] 
-        if mi.kinetic_model.conserved_moiety is not None else []
+        [m.solve for m in mi.kinetic_model.conserved_moiety]
+        if mi.kinetic_model.conserved_moiety is not None
+        else []
     )
     coords = {
         "enzymes": [e.id for e in mi.kinetic_model.enzymes],
@@ -40,10 +41,11 @@ def get_idata(csvs: List[str], mi: MaudInput, mode: str) -> az.InferenceData:
         "drains": [r.id for r in mi.kinetic_model.drains],
         "metabolites": [m.id for m in mi.kinetic_model.metabolites],
         "mics": [m.id for m in mi.kinetic_model.mics],
-        "conserved_moieties": [
-            cm.id for cm in mi.kinetic_model.conserved_moiety
-        ] if mi.kinetic_model.conserved_moiety is not None
-        else [],
+        "conserved_moieties": (
+            [cm.id for cm in mi.kinetic_model.conserved_moiety]
+            if mi.kinetic_model.conserved_moiety is not None
+            else []
+        ),
         "edges": [e.id for e in mi.kinetic_model.edges],
         "edges1": [e.id for e in mi.kinetic_model.edges],
         "unbalanced_mics": [
@@ -54,27 +56,34 @@ def get_idata(csvs: List[str], mi: MaudInput, mode: str) -> az.InferenceData:
             for m in mi.kinetic_model.mics
             if (m.balanced) & (m.id not in dependent_mics)
         ],
-        "phosphorylations": [p.id for p in mi.kinetic_model.phosphorylations]
-        if mi.kinetic_model.phosphorylations is not None
-        else [],
-        "phosphorylation_modifying_enzymes": [
-            pme.id for pme in mi.kinetic_model.phosphorylation_modifying_enzymes
-        ]
-        if mi.kinetic_model.phosphorylation_modifying_enzymes is not None
-        else [],
-        "allosteries": [p.id for p in mi.kinetic_model.allosteries]
-        if mi.kinetic_model.allosteries is not None
-        else [],
-        "allosteric_enzymes": [
-            e.id for e in mi.kinetic_model.allosteric_enzymes
-        ]
-        if mi.kinetic_model.allosteric_enzymes is not None
-        else [],
-        "competitive_inhibitions": [
-            p.id for p in mi.kinetic_model.competitive_inhibitions
-        ]
-        if mi.kinetic_model.competitive_inhibitions is not None
-        else [],
+        "phosphorylations": (
+            [p.id for p in mi.kinetic_model.phosphorylations]
+            if mi.kinetic_model.phosphorylations is not None
+            else []
+        ),
+        "phosphorylation_modifying_enzymes": (
+            [
+                pme.id
+                for pme in mi.kinetic_model.phosphorylation_modifying_enzymes
+            ]
+            if mi.kinetic_model.phosphorylation_modifying_enzymes is not None
+            else []
+        ),
+        "allosteries": (
+            [p.id for p in mi.kinetic_model.allosteries]
+            if mi.kinetic_model.allosteries is not None
+            else []
+        ),
+        "allosteric_enzymes": (
+            [e.id for e in mi.kinetic_model.allosteric_enzymes]
+            if mi.kinetic_model.allosteric_enzymes is not None
+            else []
+        ),
+        "competitive_inhibitions": (
+            [p.id for p in mi.kinetic_model.competitive_inhibitions]
+            if mi.kinetic_model.competitive_inhibitions is not None
+            else []
+        ),
         "kms": mi.parameters.km.ids[0],
         "kis": mi.parameters.ki.ids[0],
         "dissociation_constants": (mi.parameters.dissociation_constant.ids[0]),
