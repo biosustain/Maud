@@ -2,9 +2,12 @@
 data {
   // network properties
   int<lower=1> N_mic;
+  int<lower=0> N_pool;
   int<lower=1> N_edge_sub;
   int<lower=1> N_edge_prod;
   int<lower=1> N_unbalanced;
+  int<lower=0> N_independent;
+  int<lower=0> N_dependent;
   int<lower=1> N_metabolite;
   int<lower=1> N_km;
   int<lower=1> N_sub_km;
@@ -21,7 +24,9 @@ data {
   int<lower=0> N_competitive_inhibition;
   int<lower=0> N_dgf_fixed;
   matrix[N_mic, N_edge] S;
-  array[N_mic - N_unbalanced] int<lower=1, upper=N_mic> balanced_mic_ix;
+  matrix[N_pool, N_independent] left_nullspace_independent;
+  array[N_independent] int<lower=1, upper=N_mic> independent_bal_ix;
+  array[N_dependent] int<lower=1, upper=N_mic> dependent_bal_ix;
   array[N_unbalanced] int<lower=1, upper=N_mic> unbalanced_mic_ix;
   array[N_competitive_inhibition] int<lower=1, upper=N_mic> ci_mic_ix;
   array[N_edge] int<lower=1, upper=3> edge_type; // 1 = reversible modular rate law, 2 = drain
@@ -94,8 +99,10 @@ data {
   array[2, N_experiment_train] vector[N_unbalanced] priors_conc_unbalanced_train;
   array[2, N_experiment_train] vector[N_enzyme] priors_conc_enzyme_train;
   array[2, N_experiment_train] vector[N_drain] priors_drain_train;
+  array[2, N_experiment_train] vector[N_pool] priors_conc_moiety_pool_train;
   // configuration
-  array[N_experiment_train] vector<lower=0>[N_mic - N_unbalanced] conc_init;
+  real timepoint;
+  array[N_experiment_train] vector<lower=0>[N_independent] conc_init;
   real rel_tol_ode;
   real abs_tol_ode;
   int max_num_steps_ode;
@@ -104,7 +111,7 @@ data {
   int max_num_steps_alg;
   real steady_state_threshold_abs;
   real steady_state_threshold_rel;
-  real steady_state_penalty_rel;
+  real steady_state_penalty_abs;
   int<lower=0, upper=1> likelihood; // set to 0 for priors-only mode
   real drain_small_conc_corrector;
   int<lower=0, upper=1> penalize_non_steady;
@@ -119,7 +126,6 @@ transformed data {
   }
   matrix[N_metabolite-N_dgf_fixed, N_metabolite-N_dgf_fixed]
     prior_cov_dgf_free_chol = cholesky_decompose(prior_cov_dgf_free);
-  int N_balanced = N_mic - N_unbalanced;
 }
 parameters {
   vector[N_metabolite-N_dgf_fixed] dgf_free;
@@ -134,6 +140,7 @@ parameters {
   array[N_experiment_train] vector[N_enzyme] log_conc_enzyme_train_z;
   array[N_experiment_train] vector[N_pme] log_conc_pme_train_z;
   array[N_experiment_train] vector[N_unbalanced] log_conc_unbalanced_train_z;
+  array[N_experiment_train] vector[N_pool] log_conc_moiety_pool_train_z;
 }
 transformed parameters {
   // unfix
@@ -157,19 +164,25 @@ transformed parameters {
                                                                     log_conc_unbalanced_train_z);
   array[N_experiment_train] vector[N_pme] conc_pme_train = unz_log_2d(priors_conc_pme_train,
                                                                     log_conc_pme_train_z);
+  array[N_experiment_train] vector[N_pool] conc_moiety_pool_train = unz_log_2d(priors_conc_moiety_pool_train,
+                                                                    log_conc_moiety_pool_train_z);
   // transform
   array[N_experiment_train] vector<lower=0>[N_mic] conc_train;
   array[N_experiment_train] vector[N_reaction] flux_train;
   array[N_experiment_train] vector[N_edge] dgr_train;
-  matrix[N_experiment_train, N_mic - N_unbalanced] steady_dev;
+  matrix[N_experiment_train, N_independent] steady_dev;
   for (e in 1 : N_experiment_train) {
+    vector[N_independent] conc_init_exp = conc_init[e];
     dgr_train[e] = get_dgr(S, dgf, temperature_train[e], mic_to_met,
                            water_stoichiometry, transported_charge,
                            psi_train[e]);
     flux_train[e] = rep_vector(0, N_reaction);
     vector[N_enzyme] conc_enzyme_experiment = conc_enzyme_train[e];
+    vector[N_unbalanced] conc_unbalanced_experiment = conc_unbalanced_train[e];
+    vector[N_drain] drain_experiment = drain_train[e];
+    vector[N_pool] conc_moiety_pool_experiment = conc_moiety_pool_train[e];
     vector[N_pme] conc_pme_experiment = conc_pme_train[e];
-    vector[N_mic - N_unbalanced] conc_balanced_experiment;
+    vector[N_independent] conc_independent_balanced_experiment;
     int N_eko_experiment = measure_ragged(enzyme_knockout_train_bounds, e);
     int N_pko_experiment = measure_ragged(pme_knockout_train_bounds, e);
     if (N_eko_experiment > 0) {
@@ -185,43 +198,51 @@ transformed parameters {
                                                                   e);
       conc_pme_experiment[pko_experiment] = rep_vector(0, N_pko_experiment);
     }
-    conc_balanced_experiment = solve_newton_tol(maud_ae_system,
-                                               conc_init[e],
-                                               rel_tol_alg, abs_tol_alg,
-                                               max_num_steps_alg,
-                                               rel_tol_ode, abs_tol_ode,
-                                               max_num_steps_ode,
-                                               conc_unbalanced_train[e],
-                                               balanced_mic_ix,
-                                               unbalanced_mic_ix,
-                                               conc_enzyme_experiment,
-                                               dgr_train[e], kcat, km, ki,
-                                               transfer_constant,
-                                               dissociation_constant, kcat_pme,
-                                               conc_pme_experiment,
-                                               drain_train[e],
-                                               temperature_train[e],
-                                               drain_small_conc_corrector, S,
-                                               subunits, edge_type,
-                                               edge_to_enzyme, edge_to_er, edge_to_drain,
-                                               ci_mic_ix, sub_km_ix_by_edge_long,
-                                               sub_km_ix_by_edge_bounds,
-                                               prod_km_ix_by_edge_long,
-                                               prod_km_ix_by_edge_bounds,
-                                               sub_by_edge_long,
-                                               sub_by_edge_bounds,
-                                               prod_by_edge_long,
-                                               prod_by_edge_bounds, ci_ix_long,
-                                               ci_ix_bounds, allostery_ix_long,
-                                               allostery_ix_bounds,
-                                               allostery_type, allostery_mic,
-                                               edge_to_tc,
-                                               phosphorylation_ix_long,
-                                               phosphorylation_ix_bounds,
-                                               phosphorylation_type,
-                                               phosphorylation_pme);
-    conc_train[e, balanced_mic_ix] = conc_balanced_experiment;
-    conc_train[e, unbalanced_mic_ix] = conc_unbalanced_train[e];
+    for (p in 1 : N_pool){
+      for (m in 1 : N_independent){
+        if (left_nullspace_independent[p,m] == 1){
+          conc_init_exp[m] = conc_init_exp[m] * conc_moiety_pool_experiment[p];
+        }
+      }
+    }
+    conc_independent_balanced_experiment = ode_bdf_tol(dbalanced_dt, conc_init_exp, 0, {timepoint},
+                                         rel_tol_ode, abs_tol_ode, max_num_steps_ode,
+                                         conc_unbalanced_experiment,
+                                         conc_moiety_pool_experiment,
+                                         independent_bal_ix,
+                                         dependent_bal_ix,
+                                         unbalanced_mic_ix,
+                                         conc_enzyme_experiment,
+                                         dgr_train[e], kcat, km, ki,
+                                         transfer_constant,
+                                         dissociation_constant, kcat_pme,
+                                         conc_pme_experiment,
+                                         drain_experiment,
+                                         temperature_train[e],
+                                         drain_small_conc_corrector, S,
+                                         left_nullspace_independent,
+                                         subunits, edge_type,
+                                         edge_to_enzyme, edge_to_er, edge_to_drain,
+                                         ci_mic_ix, sub_km_ix_by_edge_long,
+                                         sub_km_ix_by_edge_bounds,
+                                         prod_km_ix_by_edge_long,
+                                         prod_km_ix_by_edge_bounds,
+                                         sub_by_edge_long,
+                                         sub_by_edge_bounds,
+                                         prod_by_edge_long,
+                                         prod_by_edge_bounds, ci_ix_long,
+                                         ci_ix_bounds, allostery_ix_long,
+                                         allostery_ix_bounds,
+                                         allostery_type, allostery_mic,
+                                         edge_to_tc,
+                                         phosphorylation_ix_long,
+                                         phosphorylation_ix_bounds,
+                                         phosphorylation_type,
+                                         phosphorylation_pme)[1];
+    conc_train[e, independent_bal_ix] = conc_independent_balanced_experiment;
+    conc_train[e, dependent_bal_ix] = conc_moiety_pool_experiment - left_nullspace_independent * conc_independent_balanced_experiment;
+    conc_train[e, unbalanced_mic_ix] = conc_unbalanced_experiment;
+
     {
       vector[N_edge] edge_flux = get_edge_flux(conc_train[e],
                                                conc_enzyme_experiment,
@@ -252,7 +273,7 @@ transformed parameters {
                                                phosphorylation_ix_bounds,
                                                phosphorylation_type,
                                                phosphorylation_pme);
-      steady_dev[e] = (S * edge_flux)[balanced_mic_ix]';
+      steady_dev[e] = (S * edge_flux)[independent_bal_ix]';
       for (j in 1 : N_edge) {
         flux_train[e, edge_to_reaction[j]] += edge_flux[j];
       }
@@ -272,6 +293,7 @@ model {
     log_conc_unbalanced_train_z[ex] ~ std_normal();
     log_conc_enzyme_train_z[ex] ~ std_normal();
     log_conc_pme_train_z[ex] ~ std_normal();
+    log_conc_moiety_pool_train_z[ex] ~ std_normal();
     drain_train_z[ex] ~ std_normal();
     psi_train_z[ex] ~ std_normal();
   }
@@ -290,9 +312,7 @@ model {
     }
     if (penalize_non_steady == 1) {
       for (xpt in 1 : N_experiment_train) {
-        steady_dev[xpt] ~ normal(0.0,
-                                 conc_train[xpt, balanced_mic_ix]
-                                 * steady_state_penalty_rel);
+        0 ~ normal(steady_dev[xpt], steady_state_penalty_abs);
       }
     }
   }
@@ -302,12 +322,12 @@ generated quantities {
   vector[N_flux_measurement_train] yrep_flux_train;
   vector[N_conc_measurement_train] llik_conc_train;
   vector[N_flux_measurement_train] llik_flux_train;
-  array[N_experiment_train] matrix[N_mic - N_unbalanced, N_edge] concentration_control_matrix;
+  array[N_experiment_train] matrix[N_independent, N_edge] concentration_control_matrix;
   array[N_experiment_train] matrix[N_edge, N_edge] flux_control_matrix;
-  array[N_experiment_train] matrix[N_edge, N_balanced] elasticity;
+  array[N_experiment_train] matrix[N_edge, N_independent] elasticity;
   array[N_experiment_train] matrix[N_edge, N_enzyme] sensitivity;
   array[N_experiment_train] matrix[N_edge, N_enzyme] flux_response_coefficient;
-  array[N_experiment_train] matrix[N_balanced, N_enzyme] concentration_response_coefficient;
+  array[N_experiment_train] matrix[N_independent, N_enzyme] concentration_response_coefficient;
   array[N_experiment_train] vector[N_edge] free_enzyme_ratio_train;
   array[N_experiment_train] vector[N_edge] saturation_train;
   array[N_experiment_train] vector[N_edge] allostery_train;
@@ -370,8 +390,8 @@ generated quantities {
   // Calculating control coefficients
   for (e in 1 : N_experiment_train) {
     vector[N_pme] conc_pme_experiment = conc_pme_train[e];
-    for (bal_met in 1 : N_balanced) {
-      int met_idx = balanced_mic_ix[bal_met];
+    for (ind_met in 1 : N_independent) {
+      int met_idx = independent_bal_ix[ind_met];
       complex_vector[N_mic] complex_step_conc = conc_train[e];
       complex_step_conc[met_idx] = complex_step_conc[met_idx] + complex_step;
       complex_vector[N_edge] edge_flux_met = get_complex_edge_flux_metabolite(complex_step_conc,
@@ -412,7 +432,7 @@ generated quantities {
                                                                     phosphorylation_ix_bounds,
                                                                     phosphorylation_type,
                                                                     phosphorylation_pme);
-      elasticity[e][ : , bal_met] = get_flux_jacobian(edge_flux_met,
+      elasticity[e][ : , ind_met] = get_flux_jacobian(edge_flux_met,
                                                       complex_step);
     }
     for (enz in 1 : N_enzyme) {
@@ -461,12 +481,12 @@ generated quantities {
     }
     concentration_control_matrix[e] = get_concentration_control_matrix(S,
                                                                     elasticity[e],
-                                                                    balanced_mic_ix,
+                                                                    independent_bal_ix,
                                                                     N_edge,
-                                                                    N_balanced);
+                                                                    N_independent);
     flux_control_matrix[e] = get_flux_control_matrix(S, elasticity[e],
-                                                     balanced_mic_ix, N_edge,
-                                                     N_balanced);
+                                                     independent_bal_ix, N_edge,
+                                                     N_independent);
     flux_response_coefficient[e] = flux_control_matrix[e] * sensitivity[e];
     concentration_response_coefficient[e] = concentration_control_matrix[e]
                                             * sensitivity[e];

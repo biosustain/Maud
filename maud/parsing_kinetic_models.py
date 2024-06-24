@@ -7,6 +7,7 @@ from maud.data_model.kinetic_model import (
     Allostery,
     Compartment,
     CompetitiveInhibition,
+    ConservedMoiety,
     Enzyme,
     EnzymeReaction,
     KineticModel,
@@ -87,6 +88,17 @@ def parse_kinetic_model(raw: dict) -> KineticModel:
         ]
     else:
         competitive_inhibitions = None
+    if "conserved_moiety" in raw.keys():
+        conserved_moiety = [
+            ConservedMoiety(
+                id=cm["id"],
+                name=read_with_fallback("name", cm, None),
+                moiety_group=cm["moiety_group"],
+            )
+            for cm in raw["conserved_moiety"]
+        ]
+    else:
+        conserved_moiety = None
     return KineticModel(
         name=name,
         metabolites=metabolites,
@@ -98,6 +110,7 @@ def parse_kinetic_model(raw: dict) -> KineticModel:
         allosteries=allosteries,
         allosteric_enzymes=allosteric_enzymes,
         competitive_inhibitions=competitive_inhibitions,
+        conserved_moiety=conserved_moiety,
         phosphorylations=phosphorylations,
     )
 

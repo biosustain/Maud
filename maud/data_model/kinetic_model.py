@@ -3,6 +3,7 @@
 from enum import Enum
 from typing import Dict, List, Optional, Union
 
+import numpy as np
 import pandas as pd
 from pydantic import (
     BaseModel,
@@ -13,6 +14,7 @@ from pydantic import (
 )
 
 from maud.data_model.hardcoding import ID_SEPARATOR
+from maud.utility_functions import get_left_nullspace
 
 
 class ReactionMechanism(int, Enum):
@@ -78,6 +80,25 @@ class PhosphorylationModifyingEnzyme(BaseModel):
         """Check that the id doesn't contain ID_SEPARATOR."""
         assert ID_SEPARATOR not in v
         return v
+
+
+class ConservedMoiety(BaseModel):
+    """Maud representation of conserved moiety groups."""
+
+    id: str
+    name: Optional[str]
+    moiety_group: List[str]
+
+    @field_validator("id")
+    def id_must_not_contain_seps(cls, v):
+        """Check that the id doesn't contain ID_SEPARATOR."""
+        assert ID_SEPARATOR not in v
+        return v
+
+    @computed_field
+    def solve(self) -> str:
+        """Return dependent moiety."""
+        return self.moiety_group[-1]
 
 
 class Compartment(BaseModel):
@@ -248,6 +269,7 @@ class KineticModel(BaseModel):
     allosteries: Optional[List[Allostery]]
     allosteric_enzymes: Optional[List[Enzyme]]
     competitive_inhibitions: Optional[List[CompetitiveInhibition]]
+    conserved_moiety: Optional[List[ConservedMoiety]]
     phosphorylations: Optional[List[Phosphorylation]]
     model_config: ConfigDict = {"arbitrary_types_allowed": True}
 
@@ -267,6 +289,34 @@ class KineticModel(BaseModel):
     def stoichiometric_matrix(self) -> pd.DataFrame:
         """Add the stoichiometric_matrix field."""
         return get_stoichiometric_matrix(self.edges, self.mics, self.reactions)
+
+    @computed_field
+    def left_nullspace(self) -> pd.DataFrame:
+        """Calculate the left nullspace."""
+        balanced_mics = [mic.id for mic in self.mics if mic.balanced]
+        left_nullspace = get_left_nullspace(
+            self.stoichiometric_matrix.loc[balanced_mics]
+        )
+        left_nullspace[np.abs(left_nullspace) < 1e-10] = 0
+        left_nullspace[np.abs(left_nullspace) > 1e-10] = 1
+
+        return pd.DataFrame(left_nullspace.T, columns=balanced_mics)
+
+    @computed_field
+    def left_nullspace_independent(self) -> pd.DataFrame:
+        """Add the independent left_nullspace entries."""
+        lns = self.left_nullspace
+        if len(lns) > 0:
+            dependent_mets = [mic.solve for mic in self.conserved_moiety]
+            dep_idx = lns[dependent_mets]
+            dep_idx = [
+                dep_idx.index[dep_idx[met] == 1].item()
+                for met in dependent_mets
+            ]
+            dependent_mets = [dependent_mets[i] for i in dep_idx]
+            return self.left_nullspace.drop(dependent_mets, axis=1)
+        else:
+            return None
 
     @computed_field
     def phosphorylation_modifying_enzymes(
@@ -385,6 +435,32 @@ class KineticModel(BaseModel):
             assert (
                 p.modified_enzyme_id in enzyme_ids
             ), f"{p.id} has bad enzyme_id"
+        return self
+
+    @model_validator(mode="after")
+    def correct_conserved_moieties_defined(self):
+        """Compare the defined conserved_moieties to the left nullspace."""
+        balanced_metabolites = [m.id for m in self.mics if m.balanced]
+        left_nullspace = self.left_nullspace.values
+        left_nullspace = left_nullspace.astype(int)
+        if len(left_nullspace) > 0:
+            mgs = [
+                sorted(con_moi.moiety_group)
+                for con_moi in self.conserved_moiety
+            ]
+            cms = [
+                sorted([m for m, n in zip(balanced_metabolites, lns) if n])
+                for lns in left_nullspace
+            ]
+            for cm in cms:
+                assert (
+                    cm in mgs
+                ), f"{cm} not defined in kinetic model `moiety_group`"
+            for mg in mgs:
+                assert (
+                    mg in cms
+                ), f"{mg} defined in kinetic model `moiety_group` \
+                but may not be a conserved moiety"
         return self
 
 

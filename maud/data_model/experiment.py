@@ -12,6 +12,7 @@ class MeasurementType(str, Enum):
     """Possible types of measurement."""
 
     MIC = "mic"
+    CONSERVED_MOIETY = "conserved_moiety"
     FLUX = "flux"
     ENZYME = "enzyme"
 
@@ -27,6 +28,8 @@ class Measurement(BaseModel):
     compartment: Optional[str] = None
     reaction: Optional[str] = None
     enzyme: Optional[str] = None
+    moiety_id: Optional[str] = None
+    moiety_group: Optional[List[str]] = None
 
     @computed_field
     def target_id(self) -> str:
@@ -38,9 +41,13 @@ class Measurement(BaseModel):
         elif self.target_type == MeasurementType.FLUX:
             assert self.reaction is not None
             return self.reaction
-        else:
+        elif self.target_type == MeasurementType.ENZYME:
             assert self.enzyme is not None
             return self.enzyme
+        else:
+            assert self.moiety_group is not None
+            assert self.moiety_id is not None
+            return self.moiety_id
 
 
 class EnzymeKnockout(BaseModel):
