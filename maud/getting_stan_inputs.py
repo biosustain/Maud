@@ -135,13 +135,18 @@ def get_network_properties_input(
     metabolite_codes = codify_maud_object(kinetic_model.metabolites)
     mic_codes = codify_maud_object(mics)
     enzyme_codes = codify_maud_object(enzymes)
+    er_codes = codify_maud_object(kinetic_model.ers)
     km_ids = parameters.km.ids[0]
     km_codes = dict(zip(km_ids, range(1, len(km_ids) + 1)))
     if len(kinetic_model.left_nullspace) > 0:
         lns_ind = kinetic_model.left_nullspace_independent.values.tolist()
-        dependent_mic_codes = [
-            mic_codes[lns.solve] for lns in kinetic_model.conserved_moiety
+        dependent_mets = [mic.solve for mic in kinetic_model.conserved_moiety]
+        dep_idx = kinetic_model.left_nullspace[dependent_mets]
+        dep_idx = [
+            dep_idx.index[dep_idx[met] == 1].item() for met in dependent_mets
         ]
+        dependent_mets = [dependent_mets[i] for i in dep_idx]
+        dependent_mic_codes = [mic_codes[lns] for lns in dependent_mets]
     else:
         lns_ind = [[]]
         dependent_mic_codes = []
@@ -186,6 +191,9 @@ def get_network_properties_input(
     edge_enzyme_code = [
         enzyme_codes[er.enzyme_id] if isinstance(er, EnzymeReaction) else 0
         for er in edges
+    ]
+    edge_er_codes = [
+        er_codes[er.id] if isinstance(er, EnzymeReaction) else 0 for er in edges
     ]
     edge_drain_code = [
         drain_codes[d.id] if isinstance(d, Reaction) else 0 for d in edges
@@ -355,6 +363,7 @@ def get_network_properties_input(
         "N_independent": len(independent_mic_codes),
         "N_dependent": len(dependent_mic_codes),
         "N_enzyme": len(enzymes),
+        "N_er": len(kinetic_model.ers),
         "N_phosphorylation": len(phosphorylation_codes),
         "N_pme": len(pme_codes),
         "N_competitive_inhibition": len(ci_ix_long),
@@ -374,6 +383,7 @@ def get_network_properties_input(
         "ci_mic_ix": ci_mic_codes,
         "edge_type": edge_mechanism_code,
         "edge_to_enzyme": edge_enzyme_code,
+        "edge_to_er": edge_er_codes,
         "edge_to_tc": edge_tc_code,
         "edge_to_drain": edge_drain_code,
         "edge_to_reaction": edge_reaction_code,

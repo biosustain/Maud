@@ -305,8 +305,15 @@ class KineticModel(BaseModel):
     @computed_field
     def left_nullspace_independent(self) -> pd.DataFrame:
         """Add the independent left_nullspace entries."""
-        if len(self.left_nullspace) > 0:
+        lns = self.left_nullspace
+        if len(lns) > 0:
             dependent_mets = [mic.solve for mic in self.conserved_moiety]
+            dep_idx = lns[dependent_mets]
+            dep_idx = [
+                dep_idx.index[dep_idx[met] == 1].item()
+                for met in dependent_mets
+            ]
+            dependent_mets = [dependent_mets[i] for i in dep_idx]
             return self.left_nullspace.drop(dependent_mets, axis=1)
         else:
             return None
@@ -437,15 +444,14 @@ class KineticModel(BaseModel):
         left_nullspace = self.left_nullspace.values
         left_nullspace = left_nullspace.astype(int)
         if len(left_nullspace) > 0:
-            mgs = sorted(
-                [con_moi.moiety_group for con_moi in self.conserved_moiety]
-            )
-            cms = sorted(
-                [
-                    [m for m, n in zip(balanced_metabolites, lns) if n]
-                    for lns in left_nullspace
-                ]
-            )
+            mgs = [
+                sorted(con_moi.moiety_group)
+                for con_moi in self.conserved_moiety
+            ]
+            cms = [
+                sorted([m for m, n in zip(balanced_metabolites, lns) if n])
+                for lns in left_nullspace
+            ]
             for cm in cms:
                 assert (
                     cm in mgs
