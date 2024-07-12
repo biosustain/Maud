@@ -375,7 +375,7 @@ generated quantities {
                                        dissociation_constant, subunits,
                                        allostery_ix_long,
                                        allostery_ix_bounds, allostery_type,
-                                       allostery_mic, edge_to_tc);
+                                       allostery_mic, edge_to_tc, edge_to_enzyme);
     phosphorylation_train[e] = get_phosphorylation(kcat_pme,
                                                    conc_pme_train[e],
                                                    phosphorylation_ix_long,
