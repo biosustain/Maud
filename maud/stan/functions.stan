@@ -216,7 +216,8 @@ functions {
                        // one per allostery
                        array[] int allostery_mic,
                        // one per allostery
-                       array[] int edge_to_tc // one per edge
+                       array[] int edge_to_tc, // one per edge
+                       array[] int edge_to_enzyme
                        ) {
     int N_edge = size(allostery_ix_bounds);
     vector[N_edge] out = rep_vector(1, N_edge);
@@ -241,7 +242,7 @@ functions {
       }
       out[f] = inv(1
                    + tc_edge
-                     * (free_enzyme_ratio[f] * Q_num / Q_denom) ^ subunits[f]);
+                     * (free_enzyme_ratio[edge_to_enzyme[f]] * Q_num / Q_denom) ^ subunits[edge_to_enzyme[f]]);
     }
     return out;
   }
@@ -358,7 +359,7 @@ functions {
                                              subunits, allostery_ix_long,
                                              allostery_ix_bounds,
                                              allostery_type, allostery_mic,
-                                             edge_to_tc);
+                                             edge_to_tc, edge_to_enzyme);
     vector[N_edge] phosphorylation = get_phosphorylation(kcat_pme, conc_pme,
                                                          phos_ix_long,
                                                          phos_ix_bounds,
@@ -496,7 +497,7 @@ functions {
                                              subunits, allostery_ix_long,
                                              allostery_ix_bounds,
                                              allostery_type, allostery_mic,
-                                             edge_to_tc);
+                                             edge_to_tc, edge_to_enzyme);
     vector[N_edge] phosphorylation = get_phosphorylation(kcat_pme, conc_pme,
                                                          phos_ix_long,
                                                          phos_ix_bounds,
@@ -616,7 +617,7 @@ functions {
                                                              allostery_ix_bounds,
                                                              allostery_type,
                                                              allostery_mic,
-                                                             edge_to_tc);
+                                                             edge_to_tc, edge_to_enzyme);
     complex_vector[N_edge] phosphorylation = get_phosphorylation(kcat_pme,
                                                                  conc_pme,
                                                                  phos_ix_long,
@@ -652,7 +653,8 @@ functions {
                                        // one per allostery
                                        array[] int allostery_mic,
                                        // one per allostery
-                                       array[] int edge_to_tc // one per edge
+                                       array[] int edge_to_tc, // one per edge
+                                       array[] int edge_to_enzyme
                                        ) {
     int N_edge = size(allostery_ix_bounds);
     complex_vector[N_edge] out = rep_vector(1, N_edge);
@@ -678,7 +680,7 @@ functions {
       out[f] = 1
                / (1
                   + tc_edge
-                    * (free_enzyme_ratio[f] * Q_num / Q_denom) ^ subunits[f]);
+                    * (free_enzyme_ratio[edge_to_enzyme[f]] * Q_num / Q_denom) ^ subunits[edge_to_enzyme[f]]);
     }
     return out;
   }
