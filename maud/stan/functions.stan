@@ -242,7 +242,7 @@ functions {
       }
       out[f] = inv(1
                    + tc_edge
-                     * (free_enzyme_ratio[edge_to_enzyme[f]] * Q_num / Q_denom) ^ subunits[edge_to_enzyme[f]]);
+                     * (free_enzyme_ratio[f] * Q_num / Q_denom) ^ subunits[edge_to_enzyme[f]]);
     }
     return out;
   }
@@ -680,7 +680,7 @@ functions {
       out[f] = 1
                / (1
                   + tc_edge
-                    * (free_enzyme_ratio[edge_to_enzyme[f]] * Q_num / Q_denom) ^ subunits[edge_to_enzyme[f]]);
+                    * (free_enzyme_ratio[f] * Q_num / Q_denom) ^ subunits[edge_to_enzyme[f]]);
     }
     return out;
   }

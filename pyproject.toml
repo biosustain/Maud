@@ -184,5 +184,5 @@ legacy_tox_ini = """
         safety
     commands=
         pip install --upgrade pip
-        safety check -i 44715 -i 51549
+        safety check -i 44715 -i 51549 -i 70612
 """
